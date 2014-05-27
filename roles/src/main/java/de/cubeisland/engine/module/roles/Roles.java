@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.roles;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
 import de.cubeisland.engine.core.command.CommandManager;
 import de.cubeisland.engine.core.module.Module;
+import de.cubeisland.engine.core.module.service.Metadata;
 import de.cubeisland.engine.core.storage.database.Database;
 import de.cubeisland.engine.module.roles.commands.ManagementCommands;
 import de.cubeisland.engine.module.roles.commands.RoleCommands;
@@ -39,6 +39,7 @@ import de.cubeisland.engine.module.roles.role.RolesManager;
 import de.cubeisland.engine.module.roles.storage.TableData;
 import de.cubeisland.engine.module.roles.storage.TablePerm;
 import de.cubeisland.engine.module.roles.storage.TableRole;
+import de.cubeisland.engine.reflect.codec.ConverterManager;
 
 public class Roles extends Module
 {
@@ -82,6 +83,8 @@ public class Roles extends Module
                 rolesManager.recalculateAllRoles();
             }
         });
+
+        this.getCore().getModuleManager().getServiceManager().registerService(this, Metadata.class, new MetadataProvider(this.rolesManager));
     }
 
     @Override
