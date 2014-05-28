@@ -56,7 +56,7 @@ public class MovementCommands
     }
 
     @Command(desc = "Teleports you X amount of blocks into the air and puts a glass block beneath you.")
-    @IParams(@Grouped(@Indexed(label = "height")))
+    @IParams(@Grouped(@Indexed(label = "height", type = Integer.class)))
     public void up(CommandContext context)
     {
         if (context.getSender() instanceof User)
