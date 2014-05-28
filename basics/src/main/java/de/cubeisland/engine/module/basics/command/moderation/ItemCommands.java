@@ -404,7 +404,7 @@ public class ItemCommands
                 return;
             }
             int amount = item.getMaxStackSize();
-            if (context.hasArg(0))
+            if (context.hasArg(1))
             {
                 amount = context.getArg(1, 0);
                 if (amount <= 0)
