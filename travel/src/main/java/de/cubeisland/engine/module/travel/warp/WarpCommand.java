@@ -22,18 +22,17 @@ import java.util.Set;
 
 import org.bukkit.Location;
 
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
 import de.cubeisland.engine.core.command.reflected.OnlyIngame;
+import de.cubeisland.engine.core.command.reflected.context.Flag;
+import de.cubeisland.engine.core.command.reflected.context.Flags;
+import de.cubeisland.engine.core.command.reflected.context.Grouped;
+import de.cubeisland.engine.core.command.reflected.context.IParams;
+import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.core.command.reflected.context.NParams;
+import de.cubeisland.engine.core.command.reflected.context.Named;
 import de.cubeisland.engine.core.command.result.confirm.ConfirmResult;
 import de.cubeisland.engine.core.command.sender.ConsoleCommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -59,9 +58,9 @@ public class WarpCommand extends TpPointCommand
         this.delegateChild(new DelegatingContextFilter()
         {
             @Override
-            public String delegateTo(CommandContext context)
+            public String delegateTo(CubeContext context)
             {
-                return context.isSender(User.class) && context.getArgCount() > 0 ? "tp" : null;
+                return context.isSender(User.class) && context.getIndexedCount() > 0 ? "tp" : null;
             }
         });
         this.module = module;
@@ -72,14 +71,14 @@ public class WarpCommand extends TpPointCommand
     @Command(desc = "Teleport to a warp")
     @IParams({@Grouped(@Indexed(label = "warp")),
               @Grouped(req = false, value = @Indexed(label = "owner", type = User.class))})
-    public void tp(CommandContext context)
+    public void tp(CubeContext context)
     {
         User user = getUser(context, 1);
         User sender = (User)context.getSender();
-        Warp warp = manager.findOne(user, context.<String>getArg(0));
+        Warp warp = manager.findOne(user, context.getString(0));
         if (warp == null)
         {
-            warpNotFoundMessage(context, user, context.<String>getArg(0));
+            warpNotFoundMessage(context, user, context.getString(0));
             return;
         }
         if (!warp.canAccess(sender))
@@ -119,7 +118,7 @@ public class WarpCommand extends TpPointCommand
     @Command(alias = "make", desc = "Create a warp")
     @IParams(@Grouped(@Indexed(label = "name")))
     @Flags(@Flag(name = "priv", longName = "private", permission = "private"))
-    public void create(ParameterizedContext context)
+    public void create(CubeContext context)
     {
         if (this.manager.getCount() >= this.module.getConfig().warps.max)
         {
@@ -153,7 +152,7 @@ public class WarpCommand extends TpPointCommand
               @Grouped(req = false, value = @Indexed(label = "welcome message"), greedy = true)})
     @NParams(@Named(names = "owner", type = User.class, permission = "other"))
     @Flags(@Flag(longName = "append", name = "a"))
-    public void greeting(ParameterizedContext context)
+    public void greeting(CubeContext context)
     {
         User user = this.getUser(context, "owner");
         String name = context.getArg(0);
@@ -187,7 +186,7 @@ public class WarpCommand extends TpPointCommand
     @Command(desc = "Move a warp")
     @IParams({@Grouped(value = @Indexed(label = "warp")),
               @Grouped(req = false, value = @Indexed(label = "owner", type = User.class))})
-    public void move(CommandContext context)
+    public void move(CubeContext context)
     {
         User user = this.getUser(context, 1);
         String name = context.getArg(0);
@@ -216,7 +215,7 @@ public class WarpCommand extends TpPointCommand
     @Command(alias = "delete", desc = "Remove a warp")
     @IParams({@Grouped(@Indexed(label = "warp")),
               @Grouped(req = false, value = @Indexed(label = "owner", type = User.class))})
-    public void remove(CommandContext context)
+    public void remove(CubeContext context)
     {
         User user = getUser(context, 1);
         String name = context.getArg(0);
@@ -243,7 +242,7 @@ public class WarpCommand extends TpPointCommand
     @IParams({@Grouped(@Indexed(label = "warp")),
               @Grouped(@Indexed(label = "new name"))})
     @NParams(@Named(names = "owner", type = User.class))
-    public void rename(ParameterizedContext context)
+    public void rename(CubeContext context)
     {
         User user = getUser(context, "owner");
         String name = context.getArg(0);
@@ -281,9 +280,9 @@ public class WarpCommand extends TpPointCommand
     @Flags({@Flag(name = "pub", longName = "public"),
             @Flag(name = "o", longName = "owned"),
             @Flag(name = "i", longName = "invited")})
-    public void list(ParameterizedContext context)
+    public void list(CubeContext context)
     {
-        if ((context.hasArg(0) && "*".equals(context.getArg(0))) || !(context.hasArg(0) || context.isSender(User.class)))
+        if ((context.hasIndexed(0) && "*".equals(context.getArg(0))) || !(context.hasIndexed(0) || context.isSender(User.class)))
         {
             context.ensurePermission(module.getPermissions().WARP_LIST_OTHER);
             this.listAll(context);
@@ -328,7 +327,7 @@ public class WarpCommand extends TpPointCommand
         }
     }
 
-    private void listAll(ParameterizedContext context)
+    private void listAll(CubeContext context)
     {
         int count = this.manager.getCount();
         if (count == 0)
@@ -343,7 +342,7 @@ public class WarpCommand extends TpPointCommand
     @Command(alias = {"ilist", "invited"}, desc = "List all players invited to your warps")
     @IParams(@Grouped(req = false, value = @Indexed(label = "warp")))
     @NParams(@Named(names = "owner", type = User.class, permission = "other"))
-    public void invitedList(ParameterizedContext context)
+    public void invitedList(CubeContext context)
     {
         User user = this.getUser(context, "owner");
         Set<Warp> warps = new HashSet<>();
@@ -390,10 +389,10 @@ public class WarpCommand extends TpPointCommand
     @Command(desc = "Invite a user to one of your warps")
     @IParams({@Grouped(@Indexed(label = "warp")),
               @Grouped(@Indexed(label = "player", type = User.class))})
-    public void invite(CommandContext context)
+    public void invite(CubeContext context)
     {
         User sender = (User)context.getSender();
-        Warp warp = this.manager.findOne(sender, context.<String>getArg(0));
+        Warp warp = this.manager.findOne(sender, context.getString(0));
         if (warp == null || !warp.isOwner(sender))
         {
             context.sendTranslated(NEGATIVE, "You do not own a warp named {name#warp}!", context.getArg(0));
@@ -427,10 +426,10 @@ public class WarpCommand extends TpPointCommand
     @Command(desc = "Uninvite a player from one of your warps")
     @IParams({@Grouped(value = @Indexed(label = "warp")),
               @Grouped(@Indexed(label = "player", type = User.class))})
-    public void unInvite(CommandContext context)
+    public void unInvite(CubeContext context)
     {
         User sender = (User)context.getSender();
-        Warp warp = this.manager.getExact(sender, context.<String>getArg(0));
+        Warp warp = this.manager.getExact(sender, context.getString(0));
         if (warp == null || !warp.isOwner(sender))
         {
             context.sendTranslated(NEGATIVE, "You do not own a warp named {name#warp}!", context.getArg(0));
@@ -463,7 +462,7 @@ public class WarpCommand extends TpPointCommand
     @Command(name = "private", alias = "makeprivate", desc = "Make a players warp private")
     @IParams({@Grouped(req = false, value = @Indexed(label = "warp")),
               @Grouped(req = false, value = @Indexed(label = "owner", type = User.class))})
-    public void makePrivate(CommandContext context)
+    public void makePrivate(CubeContext context)
     {
         User user = this.getUser(context, 1);
         if (!user.equals(context.getSender()))
@@ -494,7 +493,7 @@ public class WarpCommand extends TpPointCommand
     @Command(name = "public", desc = "Make a users warp public")
     @IParams({@Grouped(req = false, value = @Indexed(label = "warp")),
               @Grouped(req = false, value = @Indexed(label = "owner", type = User.class))})
-    public void makePublic(CommandContext context)
+    public void makePublic(CubeContext context)
     {
         User user = this.getUser(context, 1);
         if (!user.equals(context.getSender()))
@@ -527,7 +526,7 @@ public class WarpCommand extends TpPointCommand
     @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
     @Flags({@Flag(name = "pub", longName = "public"),
             @Flag(name = "priv", longName = "private")})
-    public ConfirmResult clear(final ParameterizedContext context)
+    public ConfirmResult clear(final CubeContext context)
     {
         if (this.module.getConfig().clearOnlyFromConsole && !(context.getSender() instanceof ConsoleCommandSender))
         {
@@ -535,7 +534,7 @@ public class WarpCommand extends TpPointCommand
             return null;
         }
         final User user = context.getArg(0, null);
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             if (context.hasFlag("pub"))
             {
@@ -574,7 +573,7 @@ public class WarpCommand extends TpPointCommand
             @Override
             public void run()
             {
-                if (context.hasArg(0))
+                if (context.hasIndexed(0))
                 {
                     manager.massDelete(user, context.hasFlag("priv"), context.hasFlag("pub"));
                     context.sendTranslated(POSITIVE, "Deleted warps.");
@@ -589,7 +588,7 @@ public class WarpCommand extends TpPointCommand
     }
 
 
-    private void warpInDeletedWorldMessage(CommandContext context, User user, Warp warp)
+    private void warpInDeletedWorldMessage(CubeContext context, User user, Warp warp)
     {
         if (warp.isOwner(user))
         {
@@ -599,7 +598,7 @@ public class WarpCommand extends TpPointCommand
         context.sendTranslated(NEGATIVE, "The warp {name} of {user} is in a world that no longer exists!",warp.getName(), warp.getOwnerName());
     }
 
-    private void warpNotFoundMessage(CommandContext context, User user, String name)
+    private void warpNotFoundMessage(CubeContext context, User user, String name)
     {
         if (context.getSender().equals(user))
         {

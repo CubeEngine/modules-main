@@ -19,10 +19,9 @@ package de.cubeisland.engine.module.roles.commands;
 
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.world.WorldManager;
@@ -49,10 +48,10 @@ public class UserCommandHelper extends ContainerCommand
         this.module = module;
     }
 
-    protected User getUser(CommandContext context, int pos)
+    protected User getUser(CubeContext context, int pos)
     {
         User user = null;
-        if (context.hasArg(pos))
+        if (context.hasIndexed(pos))
         {
             user = context.getArg(pos);
         }
@@ -82,12 +81,12 @@ public class UserCommandHelper extends ContainerCommand
      * @param context
      * @return
      */
-    protected World getWorld(ParameterizedContext context)
+    protected World getWorld(CubeContext context)
     {
         World world;
-        if (context.hasParam("in"))
+        if (context.hasNamed("in"))
         {
-            world = context.getParam("in");
+            world = context.getArg("in");
             if (world == null)
             {
                 context.sendTranslated(NEGATIVE, "World {world} not found!", context.getString("in"));

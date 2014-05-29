@@ -29,10 +29,8 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsConfiguration;
-import de.cubeisland.engine.core.command.exception.IncorrectUsageException;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
+import de.cubeisland.engine.core.command.CubeContext;
+import de.cubeisland.engine.core.command.exception.MissingParameterException;
 import de.cubeisland.engine.core.command.parameterized.completer.WorldCompleter;
 import de.cubeisland.engine.core.command.readers.IntegerOrAllReader;
 import de.cubeisland.engine.core.command.reflected.Command;
@@ -46,6 +44,8 @@ import de.cubeisland.engine.core.command.reflected.context.Named;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsConfiguration;
 
 import static de.cubeisland.engine.core.util.ChatFormat.GOLD;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
@@ -72,7 +72,7 @@ public class WorldControlCommands
     @IParams({@Grouped(@Indexed(label = {"!sun","!rain","!storm"})),
               @Grouped(req = false, value = @Indexed(label = "duration"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void weather(ParameterizedContext context)
+    public void weather(CubeContext context)
     {
         User sender = null;
         if (context.getSender() instanceof User)
@@ -82,7 +82,7 @@ public class WorldControlCommands
         boolean sunny = true;
         boolean noThunder = true;
         int duration = 10000000;
-        String weather = Match.string().matchString(context.<String>getArg(0), "sun", "rain", "storm");
+        String weather = Match.string().matchString(context.getString(0), "sun", "rain", "storm");
         if (weather == null)
         {
             context.sendTranslated(NEGATIVE, "Invalid weather! {input}", context.getArg(0));
@@ -104,7 +104,7 @@ public class WorldControlCommands
             sunny = false;
             noThunder = false;
         }
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
             duration = context.getArg(1, 0);
             if (duration == 0)
@@ -115,9 +115,9 @@ public class WorldControlCommands
             duration *= 20;
         }
         World world;
-        if (context.hasParam("in"))
+        if (context.hasNamed("in"))
         {
-            world = context.getParam("in", null);
+            world = context.getArg("in", null);
             if (world == null)
             {
                 context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.getArg(1));
@@ -128,7 +128,7 @@ public class WorldControlCommands
         {
             if (sender == null)
             {
-                throw new IncorrectUsageException(context.getSender().getTranslation(NEGATIVE, "If not used ingame you have to specify a world!"));
+                throw new MissingParameterException("in", context.getSender().getTranslation(NEGATIVE, "If not used ingame you have to specify a world!"));
             }
             world = sender.getWorld();
         }
@@ -149,7 +149,7 @@ public class WorldControlCommands
     @IParams({@Grouped(@Indexed(label = "entityType[:itemMaterial]")),
               @Grouped(req = false, value = @Indexed(label = {"radius","!*"}, type = IntegerOrAllReader.class))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void remove(ParameterizedContext context)
+    public void remove(CubeContext context)
     {
         User sender = null;
         if (context.getSender() instanceof User)
@@ -157,9 +157,9 @@ public class WorldControlCommands
             sender = (User)context.getSender();
         }
         World world;
-        if (context.hasParam("in"))
+        if (context.hasNamed("in"))
         {
-            world = context.getParam("in");
+            world = context.getArg("in");
         }
         else
         {
@@ -171,7 +171,7 @@ public class WorldControlCommands
             world = sender.getWorld();
         }
         int radius = this.config.commands.removeDefaultRadius;
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
             if ("*".equals(context.getArg(1)))
             {
@@ -213,7 +213,7 @@ public class WorldControlCommands
         else
         {
             List<Entity> list = world.getEntities(); // All entites remaining in that list will not get deleted!
-            String[] s_entityTypes = StringUtils.explode(",", context.<String>getArg(0));
+            String[] s_entityTypes = StringUtils.explode(",", context.getString(0));
             List<org.bukkit.entity.EntityType> types = new ArrayList<>();
             for (String s_entityType : s_entityTypes)
             {
@@ -304,7 +304,7 @@ public class WorldControlCommands
     @NParams(@Named(names = "in", type = World.class, completer = WorldCompleter.class))
     @Flags({@Flag(longName = "lightning", name = "l"), // die with style
             @Flag(longName = "all", name = "a")})// infinite radius
-    public void butcher(ParameterizedContext context)
+    public void butcher(CubeContext context)
     {
         User sender = null;
         if (context.getSender() instanceof User)
@@ -323,7 +323,7 @@ public class WorldControlCommands
         {
             loc = sender.getLocation();
         }
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
             radius = context.getArg(1, 0);
             if (radius < 0 && !(radius == -1 && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context
@@ -353,7 +353,7 @@ public class WorldControlCommands
         }
         String[] s_types = { "monster" };
         boolean allTypes = false;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             if (context.getArg(0).equals("*"))
             {
@@ -366,7 +366,7 @@ public class WorldControlCommands
             }
             else
             {
-                s_types = StringUtils.explode(",", context.<String>getArg(0));
+                s_types = StringUtils.explode(",", context.getString(0));
             }
         }
         List<Entity> remList = new ArrayList<>();

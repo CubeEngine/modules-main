@@ -26,12 +26,11 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.core.ban.BanManager;
 import de.cubeisland.engine.core.ban.IpBan;
 import de.cubeisland.engine.core.ban.UserBan;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.readers.UserOrAllReader;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -77,7 +76,7 @@ public class KickBanCommands
     @Command(desc = "Kicks a player from the server")
     @IParams({@Grouped(@Indexed(label = {"player","!*"}, type = UserOrAllReader.class)),
               @Grouped(value = @Indexed(label = "reason"), req = false, greedy = true)})
-    public void kick(ParameterizedContext context)
+    public void kick(CubeContext context)
     {
         String reason;
         reason = this.getReasonFrom(context, 1, module.perms().COMMAND_KICK_NOREASON);
@@ -114,7 +113,7 @@ public class KickBanCommands
               @Grouped(value = @Indexed(label = "reason"), req = false, greedy = true)})
     @Flags({@Flag(longName = "ipban", name = "ip"),
             @Flag(longName = "force", name = "f")})
-    public void ban(ParameterizedContext context)
+    public void ban(CubeContext context)
     {
         if (this.cannotBanUser(context)) return;
         OfflinePlayer player = context.getArg(0);
@@ -185,10 +184,10 @@ public class KickBanCommands
         um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
     }
 
-    private String getReasonFrom(CommandContext context, int at, Permission permNeeded)
+    private String getReasonFrom(CubeContext context, int at, Permission permNeeded)
     {
         String reason = "";
-        if (context.hasArg(at))
+        if (context.hasIndexed(at))
         {
             reason = ChatFormat.parseFormats(context.getStrings(at));
         }
@@ -202,7 +201,7 @@ public class KickBanCommands
 
     @Command(alias = "pardon", desc = "Unbans a previously banned player.")
     @IParams(@Grouped(@Indexed(label = "player")))
-    public void unban(CommandContext context)
+    public void unban(CubeContext context)
     {
         String userName = context.getArg(0);
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(userName);
@@ -221,7 +220,7 @@ public class KickBanCommands
     @Command(alias = "banip", desc = "Bans the IP from this server.")
     @IParams({@Grouped(@Indexed(label = "IP address")),
               @Grouped(value = @Indexed(label = "reason"), req = false, greedy = true)})
-    public void ipban(CommandContext context)
+    public void ipban(CubeContext context)
     {
         String ipaddress = context.getArg(0);
         try
@@ -261,7 +260,7 @@ public class KickBanCommands
 
     @Command(alias = {"unbanip", "pardonip"}, desc = "Bans the IP from this server.")
     @IParams(@Grouped(@Indexed(label = "IP address")))
-    public void ipunban(CommandContext context)
+    public void ipunban(CubeContext context)
     {
         String ipadress = context.getArg(0);
         try
@@ -287,7 +286,7 @@ public class KickBanCommands
               @Grouped(@Indexed(label = "time")),
               @Grouped(value = @Indexed(label = "reason"), req = false, greedy = true)})
     @Flags(@Flag(longName = "force", name = "f"))
-    public void tempban(ParameterizedContext context)
+    public void tempban(CubeContext context)
     {
         if (this.cannotBanUser(context)) return;
         OfflinePlayer player = context.getArg(0);
@@ -310,7 +309,7 @@ public class KickBanCommands
         }
         try
         {
-            long millis = StringUtils.convertTimeToMillis(context.<String>getArg(1));
+            long millis = StringUtils.convertTimeToMillis(context.getString(1));
             Date toDate = new Date(System.currentTimeMillis() + millis);
             this.banManager.addBan(new UserBan(player.getName(),context.getSender().getName(), reason, toDate));
             if (player.isOnline())
@@ -329,7 +328,7 @@ public class KickBanCommands
         }
     }
 
-    private boolean cannotBanUser(CommandContext context)
+    private boolean cannotBanUser(CubeContext context)
     {
         if (!Bukkit.getOnlineMode())
         {
@@ -347,7 +346,7 @@ public class KickBanCommands
     }
 
     @Command(desc = "Reloads the ban lists")
-    public void reloadbans(CommandContext context)
+    public void reloadbans(CubeContext context)
     {
         this.banManager.reloadBans();
         context.sendTranslated(POSITIVE, "Reloadhe ban lists successfully!");
@@ -355,17 +354,17 @@ public class KickBanCommands
 
     @Command(desc = "View all players banned from this server")
     @IParams(@Grouped(req = false, value = @Indexed(label = {"!ips","!players"})))
-    public void banlist(CommandContext context)
+    public void banlist(CubeContext context)
     {
         // TODO paging
         boolean players = true;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
-            if ("players".equalsIgnoreCase(context.<String>getArg(0)))
+            if ("players".equalsIgnoreCase(context.getString(0)))
             {
                 players = true;
             }
-            else if ("ips".equalsIgnoreCase(context.<String>getArg(0)))
+            else if ("ips".equalsIgnoreCase(context.getString(0)))
             {
                 players = false;
             }

@@ -25,18 +25,17 @@ import org.bukkit.entity.Entity;
 
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.ContainerCommand;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.parameterized.Completer;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedTabContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
+import de.cubeisland.engine.core.command.reflected.context.Flag;
+import de.cubeisland.engine.core.command.reflected.context.Flags;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
+import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.core.command.reflected.context.NParams;
+import de.cubeisland.engine.core.command.reflected.context.Named;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.math.BlockVector3;
@@ -69,7 +68,7 @@ public class LockerCommands extends ContainerCommand
     @Alias(names = "cinfo")
     @Command(desc = "Shows information about a protection")
     @Flags(@Flag(longName = "persist", name = "p"))
-    public void info(ParameterizedContext context)
+    public void info(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
         if (context.hasFlag("p"))
@@ -116,7 +115,7 @@ public class LockerCommands extends ContainerCommand
 
     @Alias(names = "cpersist")
     @Command(desc = "persists your last locker command")
-    public void persist(ParameterizedContext context)
+    public void persist(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
         if (this.manager.commandListener.persist((User)context.getSender()))
@@ -132,7 +131,7 @@ public class LockerCommands extends ContainerCommand
     @Alias(names = "cremove")
     @Command(desc = "Shows information about a protection")
     @Flags(@Flag(longName = "persist", name = "p"))
-    public void remove(ParameterizedContext context)
+    public void remove(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
         if (context.hasFlag("p"))
@@ -147,14 +146,14 @@ public class LockerCommands extends ContainerCommand
     @Command(desc = "Unlocks a password protected chest")
     @IParams(@Grouped(@Indexed(label = "password")))
     @Flags(@Flag(longName = "persist", name = "p"))
-    public void unlock(ParameterizedContext context)
+    public void unlock(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
         if (context.hasFlag("p"))
         {
             this.persist(context);
         }
-        this.manager.commandListener.setCommandType(context.getSender(), CommandType.UNLOCK, context.<String>getArg(0));
+        this.manager.commandListener.setCommandType(context.getSender(), CommandType.UNLOCK, context.getString(0));
         context.sendTranslated(POSITIVE, "Right click to unlock a password protected chest!");
     }
 
@@ -163,14 +162,14 @@ public class LockerCommands extends ContainerCommand
     @IParams(@Grouped(@Indexed(label = "players")))
     @Flags({@Flag(name = "g", longName = "global"),
             @Flag(longName = "persist", name = "p")})
-    public void modify(ParameterizedContext context)
+    public void modify(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
         if (context.hasFlag("p"))
         {
             this.persist(context);
         }
-        String[] explode = StringUtils.explode(",", context.<String>getArg(0));
+        String[] explode = StringUtils.explode(",", context.getString(0));
         for (String name : explode)
         {
             if (name.startsWith("@"))
@@ -190,11 +189,11 @@ public class LockerCommands extends ContainerCommand
         } // All users do exist!
         if (context.hasFlag("g"))
         {
-            this.manager.setGlobalAccess((User)context.getSender(), context.<String>getArg(0));
+            this.manager.setGlobalAccess((User)context.getSender(), context.getString(0));
         }
         else
         {
-            this.manager.commandListener.setCommandType(context.getSender(), MODIFY, context.<String>getArg(0));
+            this.manager.commandListener.setCommandType(context.getSender(), MODIFY, context.getString(0));
             context.sendTranslated(POSITIVE, "Right click a protection to modify it!");
         }
     }
@@ -203,7 +202,7 @@ public class LockerCommands extends ContainerCommand
     @Command(desc = "gives a protection to someone else")
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
     @Flags(@Flag(longName = "persist", name = "p"))
-    public void give(ParameterizedContext context)
+    public void give(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
         if (context.hasFlag("p"))
@@ -217,7 +216,7 @@ public class LockerCommands extends ContainerCommand
     @Command(desc = "creates a KeyBook or invalidates previous KeyBooks")
     @Flags({@Flag(longName = "invalidate", name = "i"),
             @Flag(longName = "persist", name = "p")})
-    public void key(ParameterizedContext context)
+    public void key(CubeContext context)
     {
         if (!this.module.getConfig().allowKeyBooks)
         {
@@ -231,13 +230,12 @@ public class LockerCommands extends ContainerCommand
         }
         if (context.hasFlag("i"))
         {
-            this.manager.commandListener.setCommandType(context.getSender(), INVALIDATE_KEYS, context.<String>getArg(
-                0));
+            this.manager.commandListener.setCommandType(context.getSender(), INVALIDATE_KEYS, context.getString(0));
             context.sendTranslated(POSITIVE, "Right click a protection to invalidate old KeyBooks for it!");
         }
         else
         {
-            this.manager.commandListener.setCommandType(context.getSender(), KEYS, context.<String>getArg(0), true);
+            this.manager.commandListener.setCommandType(context.getSender(), KEYS, context.getString(0), true);
             context.sendTranslated(POSITIVE, "Right click a protection to with a book to create a new KeyBook!");
         }
     }
@@ -247,7 +245,7 @@ public class LockerCommands extends ContainerCommand
     @NParams({@Named(names = "set", label = "flags...", completer = FlagCompleter.class),
               @Named(names = "unset", label = "flags...", completer = FlagCompleter.class)})
     @Flags(@Flag(longName = "persist", name = "p"))
-    public void flag(ParameterizedContext context)
+    public void flag(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
         if (context.getParams().isEmpty())
@@ -266,12 +264,12 @@ public class LockerCommands extends ContainerCommand
         {
             this.persist(context);
         }
-        if (context.hasParam("set") && context.hasParam("unSet"))
+        if (context.hasNamed("set") && context.hasNamed("unSet"))
         {
             context.sendTranslated(NEGATIVE, "You have cannot set and unset flags at the same time!");
             return;
         }
-        if (context.hasParam("set"))
+        if (context.hasNamed("set"))
         {
             this.manager.commandListener.setCommandType(context.getSender(), CommandType.FLAGS_SET, context.getString("set"));
         }
@@ -285,7 +283,7 @@ public class LockerCommands extends ContainerCommand
     public static class FlagCompleter implements Completer
     {
         @Override
-        public List<String> complete(ParameterizedTabContext context, String token)
+        public List<String> complete(CubeContext context, String token)
         {
             String subToken = token;
             if (subToken.contains(","))

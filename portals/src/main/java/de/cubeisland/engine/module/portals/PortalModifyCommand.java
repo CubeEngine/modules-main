@@ -22,7 +22,7 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
@@ -52,13 +52,13 @@ public class PortalModifyCommand extends ContainerCommand
     @Command(desc = "Changes the owner of a portal")
     @IParams({@Grouped(@Indexed(label = "owner", type = User.class)),
               @Grouped(req = false, value = @Indexed(label = "portal"))})
-    public void owner(CommandContext context)
+    public void owner(CubeContext context)
     {
         User user = context.getArg(0);
         Portal portal = null;
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
-            portal = manager.getPortal(context.<String>getArg(1));
+            portal = manager.getPortal(context.getString(1));
             if (portal == null)
             {
                 context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(1));
@@ -84,12 +84,12 @@ public class PortalModifyCommand extends ContainerCommand
     @Command(alias = "dest", desc = "changes the destination of the selected portal")
     @IParams({@Grouped(@Indexed(label = {"!here","world","p:<portal>"})),
               @Grouped(req = false, value = @Indexed(label = "portal"))})
-    public void destination(CommandContext context)
+    public void destination(CubeContext context)
     {
         Portal portal = null;
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
-            portal = manager.getPortal(context.<String>getArg(1));
+            portal = manager.getPortal(context.getString(1));
             if (portal == null)
             {
                 context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(1));
@@ -142,7 +142,7 @@ public class PortalModifyCommand extends ContainerCommand
 
     @Command(desc = "Changes a portals location")
     @IParams(@Grouped(req = false, value = @Indexed(label = "portal")))
-    public void location(CommandContext context)
+    public void location(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -151,9 +151,9 @@ public class PortalModifyCommand extends ContainerCommand
             if (selector.getSelection(sender) instanceof Cuboid)
             {
                 Portal portal = sender.attachOrGet(PortalsAttachment.class, getModule()).getPortal();
-                if (context.hasArg(0))
+                if (context.hasIndexed(0))
                 {
-                    portal = manager.getPortal(context.<String>getArg(0));
+                    portal = manager.getPortal(context.getString(0));
                     if (portal == null)
                     {
                         context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));
@@ -182,15 +182,15 @@ public class PortalModifyCommand extends ContainerCommand
 
     @Command(desc = "Modifies the location where a player exits when teleporting a portal")
     @IParams(@Grouped(req = false, value = @Indexed(label = "portal")))
-    public void exit(CommandContext context)
+    public void exit(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
             User sender = (User)context.getSender();
             Portal portal = sender.attachOrGet(PortalsAttachment.class, getModule()).getPortal();
-            if (context.hasArg(0))
+            if (context.hasIndexed(0))
             {
-                portal = manager.getPortal(context.<String>getArg(0));
+                portal = manager.getPortal(context.getString(0));
                 if (portal == null)
                 {
                     context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));
@@ -219,12 +219,12 @@ public class PortalModifyCommand extends ContainerCommand
 
     @Command(desc = "Toggles safe teleportation for this portal")
     @IParams(@Grouped(req = false, value = @Indexed(label = "portal")))
-    public void togglesafe(CommandContext context)
+    public void togglesafe(CubeContext context)
     {
         Portal portal = null;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
-            portal = manager.getPortal(context.<String>getArg(0));
+            portal = manager.getPortal(context.getString(0));
             if (portal == null)
             {
                 context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));
@@ -255,12 +255,12 @@ public class PortalModifyCommand extends ContainerCommand
 
     @Command(desc = "Toggles whether entities can teleport with this portal")
     @IParams(@Grouped(req = false, value = @Indexed(label = "portal")))
-    public void entity(CommandContext context)
+    public void entity(CubeContext context)
     {
         Portal portal = null;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
-            portal = manager.getPortal(context.<String>getArg(0));
+            portal = manager.getPortal(context.getString(0));
             if (portal == null)
             {
                 context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));

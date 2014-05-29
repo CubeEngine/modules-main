@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.roles.commands;
 
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.reflected.Alias;
@@ -43,7 +43,7 @@ public class ManagementCommands extends ContainerCommand
 
     @Alias(names = "manload")
     @Command(desc = "Reloads all roles from config")
-    public void reload(CommandContext context)
+    public void reload(CubeContext context)
     {
         Roles module = (Roles)this.getModule();
         module.getConfiguration().reload();
@@ -54,7 +54,7 @@ public class ManagementCommands extends ContainerCommand
 
     @Alias(names = "mansave")
     @Command(desc = "Overrides all configs with current settings")
-    public void save(CommandContext context)
+    public void save(CubeContext context)
     {
         // database is up to date so only saving configs
         Roles module = (Roles)this.getModule();
@@ -67,10 +67,10 @@ public class ManagementCommands extends ContainerCommand
 
     @Command(desc = "Sets or resets the current default world")
     @IParams(@Grouped(req = false, value = @Indexed(label = "world", type = World.class)))
-    public void defaultworld(CommandContext context)
+    public void defaultworld(CubeContext context)
     {
         World world = null;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             world = context.getArg(0);
             context.sendTranslated(POSITIVE, "All your roles commands will now have {input#world} as default world!", context.getArg(
@@ -91,7 +91,7 @@ public class ManagementCommands extends ContainerCommand
             ((User)sender).get(RolesAttachment.class).setWorkingWorld(world);
             return;
         }
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             curWorldOfConsole = world;
             return;

@@ -19,14 +19,13 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.Set;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.UserAccount;
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -55,9 +54,9 @@ public class BankCommands extends ContainerCommand
     @Command(desc = "Shows the balance of the specified bank")
     @IParams(@Grouped(req = false, value = @Indexed(label = "bank", type = BankAccount.class)))
     @Flags(@Flag(longName = "showHidden", name = "f"))
-    public void balance(ParameterizedContext context)
+    public void balance(CubeContext context)
     {
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             BankAccount bankAccount = context.getArg(0);
             boolean showHidden = context.hasFlag("f") && module.perms().COMMAND_BANK_BALANCE_SHOWHIDDEN.isAuthorized(context.getSender());
@@ -88,10 +87,10 @@ public class BankCommands extends ContainerCommand
 
     @Command(desc = "Lists all banks")
     @IParams(@Grouped(req = false, value = @Indexed(label = "owner", type = User.class)))
-    public void list(CommandContext context) //Lists all banks [of given player]
+    public void list(CubeContext context) //Lists all banks [of given player]
     {
         String format = " - " + ChatFormat.YELLOW;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             User user = context.getArg(1);
             Set<BankAccount> bankAccounts = this.manager.getBankAccounts(user);
@@ -125,12 +124,12 @@ public class BankCommands extends ContainerCommand
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(req = false, value = @Indexed(label = "bank", type = BankAccount.class))})
     @Flags(@Flag(longName = "force", name = "f"))
-    public void invite(ParameterizedContext context)
+    public void invite(CubeContext context)
     {
         User user = context.getArg(0);
         boolean force = context.hasFlag("f")
             && module.perms().COMMAND_BANK_INVITE_FORCE.isAuthorized(context.getSender());
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
             BankAccount account = context.getArg(1);
             if (!account.needsInvite())
@@ -175,11 +174,11 @@ public class BankCommands extends ContainerCommand
     @IParams({@Grouped(@Indexed(label = "bank", type = BankAccount.class)),
               @Grouped(req = false, value = @Indexed(label = "player", type = User.class))})
     @Flags(@Flag(longName = "force", name = "f"))
-    public void join(ParameterizedContext context)
+    public void join(CubeContext context)
     {
         User user;
         boolean other = false;
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
             if (!module.perms().COMMAND_BANK_JOIN_OTHER.isAuthorized(context.getSender()))
             {
@@ -237,13 +236,13 @@ public class BankCommands extends ContainerCommand
     @Command(desc = "Leaves a bank")
     @IParams({@Grouped(req = false, value = @Indexed(label = "bank", type = BankAccount.class)),
               @Grouped(req = false, value = @Indexed(label = "player", type = User.class))})
-    public void leave(CommandContext context)
+    public void leave(CubeContext context)
     {
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             User user;
             boolean other = false;
-            if (context.hasArg(1))
+            if (context.hasIndexed(1))
             {
                 if (!module.perms().COMMAND_BANK_LEAVE_OTHER.isAuthorized(context.getSender()))
                 {
@@ -263,7 +262,7 @@ public class BankCommands extends ContainerCommand
                 return;
             }
             BankAccount account;
-            if (context.hasArg(0))
+            if (context.hasIndexed(0))
             {
                 account = context.getArg(0);
             }
@@ -304,7 +303,7 @@ public class BankCommands extends ContainerCommand
     @Command(desc = "Removes a player from the invite-list")
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(@Indexed(label = "bank", type = BankAccount.class))})
-    public void uninvite(CommandContext context)
+    public void uninvite(CubeContext context)
     {
         User user = context.getArg(0);
         BankAccount bankAccount = context.getArg(1);
@@ -324,7 +323,7 @@ public class BankCommands extends ContainerCommand
 
     @Command(desc = "Rejects an invite from a bank")
     @IParams(@Grouped(@Indexed(label = "bank", type = BankAccount.class)))
-    public void rejectinvite(CommandContext context)
+    public void rejectinvite(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -344,15 +343,15 @@ public class BankCommands extends ContainerCommand
     @Command(desc = "Creates a new bank")
     @IParams(@Grouped(@Indexed(label = "name")))
     @Flags(@Flag(longName = "nojoin", name = "nj"))
-    public void create(ParameterizedContext context)
+    public void create(CubeContext context)
     {
-        if (this.manager.bankAccountExists(context.<String>getArg(0)))
+        if (this.manager.bankAccountExists(context.getString(0)))
         {
             context.sendTranslated(NEGATIVE, "There is already a bank names {input#bank}!", context.getArg(0));
         }
         else
         {
-            BankAccount bankAccount = this.manager.getBankAccount(context.<String>getArg(0), true);
+            BankAccount bankAccount = this.manager.getBankAccount(context.getString(0), true);
             if (context.getSender() instanceof User && !context.hasFlag("nj"))
             {
                 bankAccount.promoteToOwner((User)context.getSender());
@@ -363,7 +362,7 @@ public class BankCommands extends ContainerCommand
 
     @Command(desc = "Deletes a bank")
     @IParams(@Grouped(@Indexed(label = "bank", type = BankAccount.class)))
-    public void delete(CommandContext context)
+    public void delete(CubeContext context)
     {
         BankAccount account = context.getArg(0);
         if (context.getSender() instanceof User)
@@ -393,7 +392,7 @@ public class BankCommands extends ContainerCommand
     @IParams({@Grouped(@Indexed(label = "name",type = BankAccount.class)),
               @Grouped(@Indexed(label = "new name"))})
     @Flags(@Flag(longName = "force", name = "f"))
-    public void rename(ParameterizedContext context)
+    public void rename(CubeContext context)
     {
         BankAccount account = context.getArg(0);
         boolean force = context.hasFlag("f") && module.perms().COMMAND_BANK_RENAME_FORCE.isAuthorized(context.getSender());
@@ -405,7 +404,7 @@ public class BankCommands extends ContainerCommand
                 return;
             }
         }
-        if (account.rename(context.<String>getArg(1)))
+        if (account.rename(context.getString(1)))
         {
             context.sendTranslated(POSITIVE, "Bank renamed!");
             return;
@@ -417,7 +416,7 @@ public class BankCommands extends ContainerCommand
     @IParams({@Grouped(@Indexed(label = "bank", type = BankAccount.class)),
               @Grouped(@Indexed(label = "player", type = User.class))})
     @Flags(@Flag(longName = "force", name = "f"))
-    public void setOwner(ParameterizedContext context)
+    public void setOwner(CubeContext context)
     {
         User user = context.getArg(1);
         BankAccount account = context.getArg(0);
@@ -436,7 +435,7 @@ public class BankCommands extends ContainerCommand
 
     @Command(desc = "Lists the current invites of a bank")
     @IParams(@Grouped(@Indexed(label = "bank", type = BankAccount.class)))
-    public void listinvites(ParameterizedContext context)
+    public void listinvites(CubeContext context)
     {
         BankAccount account = context.getArg(0);
         if (account.needsInvite())
@@ -468,7 +467,7 @@ public class BankCommands extends ContainerCommand
 
     @Command(desc = "Lists the members of a bank")
     @IParams(@Grouped(@Indexed(label = "bank", type = BankAccount.class)))
-    public void listmembers(CommandContext context)
+    public void listmembers(CubeContext context)
     {
         BankAccount account = context.getArg(0);
         Set<String> owners = account.getOwners();
@@ -502,14 +501,14 @@ public class BankCommands extends ContainerCommand
 
     // TODO bank Info cmd http://git.cubeisland.de/cubeengine/cubeengine/issues/246
     // Owners Members Invites Balance Hidden
-    public void info(CommandContext context)//list all members with their rank
+    public void info(CubeContext context)//list all members with their rank
     {}
 
     @Command(desc = "Deposits given amount of money into the bank")
     @IParams({@Grouped(@Indexed(label = "bank", type = BankAccount.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     @Flags(@Flag(longName = "force", name = "f"))
-    public void deposit(ParameterizedContext context)
+    public void deposit(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -537,7 +536,7 @@ public class BankCommands extends ContainerCommand
     @IParams({@Grouped(@Indexed(label = "bank", type = BankAccount.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     @Flags(@Flag(longName = "force", name = "f"))
-    public void withdraw(ParameterizedContext context)//takes money from the bank
+    public void withdraw(CubeContext context)//takes money from the bank
     {
         if (context.getSender() instanceof User)
         {
@@ -572,7 +571,7 @@ public class BankCommands extends ContainerCommand
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "bank", name = "b")})
-    public void pay(ParameterizedContext context)//pay AS bank to a player or other bank <name> [-bank]
+    public void pay(CubeContext context)//pay AS bank to a player or other bank <name> [-bank]
     {
         BankAccount account = context.getArg(0);
         if (!account.isOwner((User)context.getSender()))
@@ -583,7 +582,7 @@ public class BankCommands extends ContainerCommand
         Account target;
         if (context.hasFlag("b"))
         {
-            User user = this.module.getCore().getUserManager().findUser(context.<String>getArg(1));
+            User user = this.module.getCore().getUserManager().findUser(context.getString(1));
             target = this.manager.getUserAccount(user, this.manager.getAutoCreateUserAccount());
             if (target == null)
             {
@@ -593,7 +592,7 @@ public class BankCommands extends ContainerCommand
         }
         else
         {
-            target = this.manager.getBankAccount(context.<String>getArg(1), false);
+            target = this.manager.getBankAccount(context.getString(1), false);
             if (target == null)
             {
                 context.sendTranslated(NEGATIVE, "There is no bank account named {input#bank}!", context.getArg(1));

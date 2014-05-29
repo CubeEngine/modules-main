@@ -19,11 +19,11 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.Locale;
 
+import de.cubeisland.engine.core.command.exception.ReaderException;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.command.ArgumentReader;
-import de.cubeisland.engine.core.command.exception.InvalidArgumentException;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 
@@ -37,12 +37,12 @@ public class BankReader extends ArgumentReader
     }
 
     @Override
-    public Object read(String arg, Locale locale) throws InvalidArgumentException
+    public Object read(String arg, Locale locale) throws ReaderException
     {
         BankAccount target = this.manager.getBankAccount(arg, false);
         if (target == null)
         {
-            throw new InvalidArgumentException(CubeEngine.getI18n().translate(locale,NEGATIVE, "There is no bank account named {input#name}!", arg));
+            throw new ReaderException(CubeEngine.getI18n().translate(locale,NEGATIVE, "There is no bank account named {input#name}!", arg));
         }
         return target;
     }

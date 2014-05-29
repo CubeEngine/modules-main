@@ -22,11 +22,7 @@ import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.exception.IncorrectUsageException;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
@@ -37,6 +33,9 @@ import de.cubeisland.engine.core.user.UserManager;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.TimeUtil;
 import de.cubeisland.engine.core.util.converter.DurationConverter;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsAttachment;
+import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
 import de.cubeisland.engine.reflect.exception.ConversionException;
 import de.cubeisland.engine.reflect.node.StringNode;
 import org.joda.time.Duration;
@@ -64,18 +63,15 @@ public class ChatCommands
     @Command(desc = "Sends a private message to someone", alias = {"tell", "message", "pm", "m", "t", "whisper", "w"})
     @IParams({@Grouped(@Indexed(label = {"player","!console"}, type = {User.class, String.class})),
               @Grouped(value = @Indexed(label = "message"), greedy = true)})
-    public void msg(CommandContext context)
+    public void msg(CubeContext context)
     {
+        // TODO automatically extend reader to declared static label e.g !console
         if ("console".equalsIgnoreCase(context.getArg(0).toString()))
         {
             sendWhisperTo(NON_PLAYER_UUID, context.getStrings(1), context);
             return;
         }
-        User user = context.getArg(0, null);
-        if (user == null)
-        {
-            throw new IncorrectUsageException(context.getSender().getTranslation(NEGATIVE, "Invalid argument at {}: {}", 1, context.getSender().getTranslation(NEGATIVE, "Player {user} not found!", context.getArg(0))));
-        }
+        User user = context.getArg(0);
         if (!this.sendWhisperTo(user.getUniqueId(), context.getStrings(1), context))
         {
             context.sendTranslated(NEGATIVE, "Could not find the player {user} to send the message to. Is the player offline?", user);
@@ -84,7 +80,7 @@ public class ChatCommands
 
     @Command(alias = "r", desc = "Replies to the last person that whispered to you.")
     @IParams(@Grouped(value = @Indexed(label = "message"), greedy = true))
-    public void reply(CommandContext context)
+    public void reply(CubeContext context)
     {
         UUID lastWhisper;
         if (context.getSender() instanceof User)
@@ -106,7 +102,7 @@ public class ChatCommands
         }
     }
 
-    private boolean sendWhisperTo(UUID whisperTarget, String message, CommandContext context)
+    private boolean sendWhisperTo(UUID whisperTarget, String message, CubeContext context)
     {
         if (NON_PLAYER_UUID.equals(whisperTarget))
         {
@@ -157,11 +153,11 @@ public class ChatCommands
 
     @Command(desc = "Broadcasts a message")
     @IParams(@Grouped(value = @Indexed(label = "message"), greedy = true))
-    public void broadcast(CommandContext context)
+    public void broadcast(CubeContext context)
     {
         StringBuilder sb = new StringBuilder();
         int i = 0;
-        while (context.hasArg(i))
+        while (context.hasIndexed(i))
         {
             sb.append(context.getArg(i++)).append(" ");
         }
@@ -171,7 +167,7 @@ public class ChatCommands
     @Command(desc = "Mutes a player")
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(value = @Indexed(label = "duration"), req = false)})
-    public void mute(CommandContext context)
+    public void mute(CubeContext context)
     {
         User user = context.getArg(0);
         BasicsUserEntity basicsUserEntity = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getbUEntity();
@@ -180,11 +176,11 @@ public class ChatCommands
             context.sendTranslated(NEUTRAL, "{user} was already muted!", user);
         }
         Duration dura = module.getConfiguration().commands.defaultMuteTime;
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
             try
             {
-                dura = converter.fromNode(StringNode.of(context.<String>getArg(1)), null);
+                dura = converter.fromNode(StringNode.of(context.getString(1)), null);
             }
             catch (ConversionException e)
             {
@@ -202,7 +198,7 @@ public class ChatCommands
 
     @Command(desc = "Unmutes a player")
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void unmute(CommandContext context)
+    public void unmute(CubeContext context)
     {
         User user = context.getArg(0);
         BasicsUserEntity basicsUserEntity = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getbUEntity();
@@ -212,13 +208,13 @@ public class ChatCommands
     }
 
     @Command(alias = "roll", desc = "Shows a random number from 0 to 100")
-    public void rand(CommandContext context)
+    public void rand(CubeContext context)
     {
         this.um.broadcastStatus(YELLOW, "rolled a {integer}!", context.getSender(), new Random().nextInt(100));
     }
 
     @Command(desc = "Displays the colors")
-    public void chatcolors(CommandContext context)
+    public void chatcolors(CubeContext context)
     {
         context.sendTranslated(POSITIVE, "The following chat codes are available:");
         StringBuilder builder = new StringBuilder();

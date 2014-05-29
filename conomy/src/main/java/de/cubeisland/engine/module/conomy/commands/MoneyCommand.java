@@ -19,14 +19,13 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.Collection;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.UserAccount;
 import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -57,9 +56,9 @@ public class MoneyCommand extends ContainerCommand
         this.delegateChild(new DelegatingContextFilter()
         {
             @Override
-            public String delegateTo(CommandContext context)
+            public String delegateTo(CubeContext context)
             {
-                return context.hasArg(0) ? null : "balance";
+                return context.hasIndexed(0) ? null : "balance";
             }
         });
     }
@@ -73,11 +72,11 @@ public class MoneyCommand extends ContainerCommand
     @Command(desc = "Shows your balance")
     @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
     @Flags(@Flag(longName = "showHidden", name = "f"))
-    public void balance(ParameterizedContext context)
+    public void balance(CubeContext context)
     {
         User user;
         boolean showHidden = context.hasFlag("f") && module.perms().USER_SHOWHIDDEN.isAuthorized(context.getSender());
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             user = context.getArg(0);
         }
@@ -106,7 +105,7 @@ public class MoneyCommand extends ContainerCommand
     @Command(desc = "Shows the players with the highest balance.")
     @IParams(@Grouped(req = false, value = @Indexed(label = "[fromRank-]toRank")))
     @Flags(@Flag(longName = "showhidden", name = "f"))
-    public void top(ParameterizedContext context)
+    public void top(CubeContext context)
     {
         boolean showHidden = context.hasFlag("f");
         if (showHidden)
@@ -116,7 +115,7 @@ public class MoneyCommand extends ContainerCommand
         }
         int fromRank = 1;
         int toRank = 10;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             try
             {
@@ -158,7 +157,7 @@ public class MoneyCommand extends ContainerCommand
               @Grouped(@Indexed(label = "amount"))})
     @NParams(@Named(names = "as", type = User.class))
     @Flags(@Flag(longName = "force", name = "f"))
-    public void pay(ParameterizedContext context)
+    public void pay(CubeContext context)
     {
         String amountString = context.getArg(1);
         Double amount = manager.parse(amountString, context.getSender().getLocale());
@@ -175,14 +174,14 @@ public class MoneyCommand extends ContainerCommand
         String format = manager.format(amount);
         User sender;
         boolean asSomeOneElse = false;
-        if (context.hasParam("as"))
+        if (context.hasNamed("as"))
         {
             if (!module.perms().COMMAND_PAY_ASOTHER.isAuthorized(context.getSender()))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to pay money as someone else!");
                 return;
             }
-            sender = context.getUser("as");
+            sender = context.getArg("as");
             if (sender == null)
             {
                 context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getString("as"));
@@ -212,7 +211,7 @@ public class MoneyCommand extends ContainerCommand
             }
             return;
         }
-        String[] users = StringUtils.explode(",", context.<String>getArg(0));
+        String[] users = StringUtils.explode(",", context.getString(0));
         for (String userString : users)
         {
             User user = this.module.getCore().getUserManager().findUser(userString);

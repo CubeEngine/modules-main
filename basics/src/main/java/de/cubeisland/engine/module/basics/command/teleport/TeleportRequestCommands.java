@@ -21,7 +21,7 @@ import java.util.UUID;
 
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
@@ -48,7 +48,7 @@ public class TeleportRequestCommands
 
     @Command(desc = "Requests to teleport to a player.")
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void tpa(CommandContext context)
+    public void tpa(CubeContext context)
     {
         User sender = null;
         if (context.getSender() instanceof User)
@@ -92,7 +92,7 @@ public class TeleportRequestCommands
 
     @Command(desc = "Requests to teleport a player to you.")
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void tpahere(CommandContext context)
+    public void tpahere(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -131,7 +131,7 @@ public class TeleportRequestCommands
     }
 
     @Command(alias = "tpac", desc = "Accepts any pending teleport request.")
-    public void tpaccept(CommandContext context)
+    public void tpaccept(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -183,7 +183,7 @@ public class TeleportRequestCommands
     }
 
     @Command(desc = "Denies any pending teleport request.")
-    public void tpdeny(CommandContext context)
+    public void tpdeny(CubeContext context)
     {
         User sender = null;
         if (context.getSender() instanceof User)

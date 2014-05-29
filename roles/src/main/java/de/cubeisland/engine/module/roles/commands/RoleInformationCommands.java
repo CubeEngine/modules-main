@@ -23,12 +23,12 @@ import java.util.Set;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.NParams;
 import de.cubeisland.engine.core.command.reflected.context.Named;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -53,7 +53,7 @@ public class RoleInformationCommands extends RoleCommandHelper
     @Command(desc = "Lists all roles in a world or globally")
     @NParams(@Named(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "global", name = "g"))
-    public void list(ParameterizedContext context)
+    public void list(CubeContext context)
     {
         boolean global = context.hasFlag("g");
         World world = global ? null : this.getWorld(context);
@@ -88,7 +88,7 @@ public class RoleInformationCommands extends RoleCommandHelper
     @IParams({@Grouped(@Indexed(label = "[g:]role")),
               @Grouped(@Indexed(label = "permission"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void checkperm(ParameterizedContext context)
+    public void checkperm(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -150,7 +150,7 @@ public class RoleInformationCommands extends RoleCommandHelper
     @IParams(@Grouped(@Indexed(label = "[g:]role")))
     @NParams(@Named(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "all", name = "a"))
-    public void listperm(ParameterizedContext context)
+    public void listperm(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -200,7 +200,7 @@ public class RoleInformationCommands extends RoleCommandHelper
     @IParams(@Grouped(@Indexed(label = "[g:]role")))
     @NParams(@Named(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "all", name = "a"))
-    public void listmetadata(ParameterizedContext context)
+    public void listmetadata(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -242,7 +242,7 @@ public class RoleInformationCommands extends RoleCommandHelper
     @Command(desc = "Lists all parents of given role [in world]")
     @IParams(@Grouped(@Indexed(label = "[g:]role")))
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void listParent(ParameterizedContext context)
+    public void listParent(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -278,7 +278,7 @@ public class RoleInformationCommands extends RoleCommandHelper
     @Command(alias = "prio", desc = "Show the priority of given role [in world]")
     @IParams(@Grouped(@Indexed(label = "[g:]role")))
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void priority(ParameterizedContext context)
+    public void priority(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -297,7 +297,7 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Command(alias = {"default","defaultroles","listdefroles"}, desc = "Lists all default roles [in world]")
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void listDefaultRoles(ParameterizedContext context)
+    public void listDefaultRoles(CubeContext context)
     {
         World world = this.getWorld(context);
         if (world == null) return;

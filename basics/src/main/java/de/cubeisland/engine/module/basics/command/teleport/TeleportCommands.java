@@ -24,8 +24,8 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -79,7 +79,7 @@ public class TeleportCommands
               @Grouped(req = false, value = @Indexed(label = "player", type = User.class))})
     @Flags({@Flag(longName = "force", name = "f"), // is not shown directly in usage
               @Flag(longName = "unsafe", name = "u")})
-    public void tp(ParameterizedContext context)
+    public void tp(CubeContext context)
     {
         User user = null;
         if (context.getSender() instanceof User)
@@ -98,7 +98,7 @@ public class TeleportCommands
             return;
         }
         boolean force = context.hasFlag("f") && module.perms().COMMAND_TP_FORCE.isAuthorized(context.getSender());
-        if (context.hasArg(1)) //tp player1 player2
+        if (context.hasIndexed(1)) //tp player1 player2
         {
             user = target; // The first user is not the target
             target = context.getArg(1);
@@ -179,7 +179,7 @@ public class TeleportCommands
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "unsafe", name = "u")})
-    public void tpall(ParameterizedContext context)
+    public void tpall(CubeContext context)
     {
         User user = context.getArg(0);
         if (user == null)
@@ -223,7 +223,7 @@ public class TeleportCommands
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "unsafe", name = "u")})
-    public void tphere(ParameterizedContext context)
+    public void tphere(CubeContext context)
     {
         User sender = null;
         if (context.getSender() instanceof User)
@@ -268,7 +268,7 @@ public class TeleportCommands
     @Command(desc = "Teleport every player directly to you.")
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "unsafe", name = "u")})
-    public void tphereall(ParameterizedContext context)
+    public void tphereall(CubeContext context)
     {
         User sender = null;
         if (context.getSender() instanceof User)
@@ -314,7 +314,7 @@ public class TeleportCommands
                                @Indexed(label = "z", type = Integer.class)}))
     @NParams(@Named(names = {"world", "w"}, type = World.class))
     @Flags(@Flag(longName = "safe", name = "s"))
-    public void tppos(ParameterizedContext context)
+    public void tppos(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -323,16 +323,16 @@ public class TeleportCommands
             Integer y;
             Integer z;
             World world = sender.getWorld();
-            if (context.hasParam("world"))
+            if (context.hasNamed("world"))
             {
-                world = context.getParam("world");
+                world = context.getArg("world");
                 if (world == null)
                 {
                     context.sendTranslated(NEGATIVE, "World not found!");
                     return;
                 }
             }
-            if (context.hasArg(2))
+            if (context.hasIndexed(2))
             {
                 y = context.getArg(1, null);
                 z = context.getArg(2, null);

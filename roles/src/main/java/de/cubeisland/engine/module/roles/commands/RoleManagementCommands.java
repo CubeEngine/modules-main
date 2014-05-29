@@ -19,12 +19,12 @@ package de.cubeisland.engine.module.roles.commands;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.NParams;
 import de.cubeisland.engine.core.command.reflected.context.Named;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -57,7 +57,7 @@ public class RoleManagementCommands extends RoleCommandHelper
               @Grouped(@Indexed(label = "permission")),
               @Grouped(req = false, value = @Indexed(label = {"!true","!false","!reset"}))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void setpermission(ParameterizedContext context)
+    public void setpermission(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -68,7 +68,7 @@ public class RoleManagementCommands extends RoleCommandHelper
         if (role == null) return;
         String permission = context.getArg(1);
         String setTo = "true";
-        if (context.getArgCount() > 2)
+        if (context.getIndexedCount() > 2)
         {
             setTo = context.getArg(2);
         }
@@ -123,7 +123,7 @@ public class RoleManagementCommands extends RoleCommandHelper
               @Grouped(@Indexed(label = "key")),
               @Grouped(req = false, value = @Indexed(label = "value"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void setmetadata(ParameterizedContext context)
+    public void setmetadata(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -159,7 +159,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @IParams({@Grouped(@Indexed(label = "[g:]role")),
               @Grouped(@Indexed(label = "key"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void resetmetadata(ParameterizedContext context)
+    public void resetmetadata(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -185,7 +185,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Clears the metadata for given role [in world]")
     @IParams(@Grouped(@Indexed(label = "[g:]role")))
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void clearmetadata(ParameterizedContext context)
+    public void clearmetadata(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -209,7 +209,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @IParams({@Grouped(@Indexed(label = "[g:]role")),
               @Grouped(@Indexed(label = "[g:]parentrole"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void addParent(ParameterizedContext context)
+    public void addParent(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -218,7 +218,7 @@ public class RoleManagementCommands extends RoleCommandHelper
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        Role pRole = provider.getRole(context.<String>getArg(1));
+        Role pRole = provider.getRole(context.getString(1));
         if (pRole == null)
         {
             if (global)
@@ -265,7 +265,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @IParams({@Grouped(@Indexed(label = "[g:]role")),
               @Grouped(@Indexed(label = "[g:]parentrole"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void removeParent(ParameterizedContext context)
+    public void removeParent(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -274,7 +274,7 @@ public class RoleManagementCommands extends RoleCommandHelper
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        Role pRole = provider.getRole(context.<String>getArg(1));
+        Role pRole = provider.getRole(context.getString(1));
         if (pRole == null)
         {
             if (global)
@@ -308,7 +308,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @Command(desc = "Removes all parent roles from given role [in world]")
     @IParams(@Grouped(@Indexed(label = "[g:]role")))
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void clearParent(ParameterizedContext context)
+    public void clearParent(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -331,7 +331,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @IParams({@Grouped(@Indexed(label = "[g:]role")),
               @Grouped(@Indexed(label = "priotity"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void setPriority(ParameterizedContext context)
+    public void setPriority(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -344,7 +344,7 @@ public class RoleManagementCommands extends RoleCommandHelper
         Priority priority;
         try
         {
-            priority = converter.fromNode(new StringNode(context.<String>getArg(1)), null);
+            priority = converter.fromNode(new StringNode(context.getString(1)), null);
             role.setPriorityValue(priority.value);
             role.save();
             if (global)
@@ -368,7 +368,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @IParams({@Grouped(@Indexed(label = "[g:]role")),
               @Grouped(@Indexed(label = "new name"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void rename(ParameterizedContext context)
+    public void rename(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -407,7 +407,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @IParams(@Grouped(@Indexed(label = "rolename")))
     @NParams(@Named(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "global", name = "g"))
-    public void create(ParameterizedContext context)
+    public void create(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = context.hasFlag("g");
@@ -436,7 +436,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @Command(desc = "Deletes a role [in world]")
     @IParams(@Grouped(@Indexed(label = "[g:]rolename")))
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void delete(ParameterizedContext context)
+    public void delete(CubeContext context)
     {
         String roleName = context.getArg(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -459,7 +459,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @Command(alias = {"toggledefault", "toggledef"}, desc = "Toggles whether given role is a default role [in world]")
     @IParams(@Grouped(@Indexed(label = "rolename")))
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void toggleDefaultRole(ParameterizedContext context)
+    public void toggleDefaultRole(CubeContext context)
     {
         String roleName = context.getArg(0);
         World world = this.getWorld(context);

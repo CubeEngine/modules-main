@@ -38,10 +38,9 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -83,12 +82,12 @@ public class InformationCommands
     @IParams({@Grouped(value = @Indexed(label = "world"), req = false),
               @Grouped(value = @Indexed(label = "block-x"), req = false),
               @Grouped(value = @Indexed(label = "block-z"), req = false)})
-    public void biome(CommandContext context)
+    public void biome(CubeContext context)
     {
         World world;
         Integer x;
         Integer z;
-        if (context.hasArg(2))
+        if (context.hasIndexed(2))
         {
             world = context.getArg(0, null);
             if (world == null)
@@ -123,10 +122,10 @@ public class InformationCommands
 
     @Command(desc = "Displays the seed of a world.")
     @IParams(@Grouped(value = @Indexed(label = "world"), req = false))
-    public void seed(CommandContext context)
+    public void seed(CubeContext context)
     {
         World world = null;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             world = context.getArg(0, null);
             if (world == null)
@@ -151,7 +150,7 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the direction in which you are looking.")
-    public void compass(CommandContext context)
+    public void compass(CubeContext context)
     {
         CommandSender sender = context.getSender();
         if (sender instanceof User)
@@ -168,7 +167,7 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays your current depth.")
-    public void depth(CommandContext context)
+    public void depth(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -189,7 +188,7 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays your current location.")
-    public void getPos(CommandContext context)
+    public void getPos(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -207,10 +206,10 @@ public class InformationCommands
               @Grouped(value = @Indexed(label = "player", type = User.class), req = false)})
     @Flags({@Flag(longName = "entity", name = "e"),
             @Flag(longName = "mob", name = "m")})
-    public void near(ParameterizedContext context)
+    public void near(CubeContext context)
     {
         User user;
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
             user = context.getArg(1);
         }
@@ -224,7 +223,7 @@ public class InformationCommands
             return;
         }
         int radius = this.module.getConfiguration().commands.nearDefaultRadius;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             radius = context.getArg(0, radius);
         }
@@ -353,7 +352,7 @@ public class InformationCommands
     }
 
     @Command(alias = "pong", desc = "Pong!")
-    public void ping(CommandContext context)
+    public void ping(CubeContext context)
     {
         final String label = context.getLabel().toLowerCase(Locale.ENGLISH);
         if (context.getSender() instanceof ConsoleCommandSender)
@@ -368,7 +367,7 @@ public class InformationCommands
 
     @Command(desc = "Displays chunk, memory and world information.")
     @Flags(@Flag(longName = "reset" , name = "r"))
-    public void lag(ParameterizedContext context)
+    public void lag(CubeContext context)
     {
         if (context.hasFlag("r"))
         {
@@ -446,7 +445,7 @@ public class InformationCommands
 
 
     @Command(desc = "Displays all loaded worlds", alias = {"worldlist","worlds"})
-    public void listWorlds(CommandContext context)
+    public void listWorlds(CubeContext context)
     {
         context.sendTranslated(POSITIVE, "Loaded worlds:");
         String format = " " + ChatFormat.WHITE + "- " + ChatFormat.GOLD + "%s" + ChatFormat.WHITE + ":" + ChatFormat.INDIGO + "%s";

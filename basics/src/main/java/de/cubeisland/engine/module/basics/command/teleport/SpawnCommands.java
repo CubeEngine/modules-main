@@ -20,9 +20,8 @@ package de.cubeisland.engine.module.basics.command.teleport;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -57,7 +56,7 @@ public class SpawnCommands
               @Grouped(req = false, value = {@Indexed(label = "x"),
                                              @Indexed(label = "y"),
                                              @Indexed(label = "z")})})
-    public void setSpawn(CommandContext context)
+    public void setSpawn(CubeContext context)
     {
         User sender = null;
         if (context.getSender() instanceof User)
@@ -68,7 +67,7 @@ public class SpawnCommands
         Integer y;
         Integer z;
         World world;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             world = context.getArg(0);
         }
@@ -82,7 +81,7 @@ public class SpawnCommands
             world = sender.getWorld();
         }
 
-        if (context.hasArg(3))
+        if (context.hasIndexed(3))
         {
             x = context.getArg(1, null);
             y = context.getArg(2, null);
@@ -116,7 +115,7 @@ public class SpawnCommands
     @NParams(@Named(names = {"world", "w"}, type = World.class))
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "all", name = "a")})
-    public void spawn(ParameterizedContext context)
+    public void spawn(CubeContext context)
     {
         User user = null;
         if (context.getSender() instanceof User)
@@ -133,9 +132,9 @@ public class SpawnCommands
         {
             force = true; // if not allowed ignore flag
         }
-        if (context.hasParam("world"))
+        if (context.hasNamed("world"))
         {
-            world = context.getParam("world", null);
+            world = context.getArg("world", null);
             if (world == null)
             {
                 context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.getString("world"));
@@ -172,12 +171,12 @@ public class SpawnCommands
             this.module.getCore().getUserManager().broadcastMessage(POSITIVE, "Teleported everyone to the spawn of {world}!", world);
             return;
         }
-        if (user == null && !context.hasArg(0))
+        if (user == null && !context.hasIndexed(0))
         {
             context.sendTranslated(NEGATIVE, "{text:Pro Tip}: Teleport does not work IRL!");
             return;
         }
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             user = context.getArg(0);
             if (!user.isOnline())
@@ -203,7 +202,7 @@ public class SpawnCommands
 
     @Command(desc = "Teleports you to the spawn of given world")
     @IParams(@Grouped(@Indexed(label = "world", type = World.class)))
-    public void tpworld(CommandContext context)
+    public void tpworld(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {

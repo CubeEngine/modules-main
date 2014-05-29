@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.locker.commands;
 
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -62,15 +62,15 @@ public class LockerCreateCommands extends ContainerCommand
     @Command(name = "private", desc = "creates a private protection")
     @IParams(@Grouped(req = false, value = @Indexed(label = "password")))
     @Flags(@Flag(name = "key", longName = "keybook"))
-    public void cPrivate(ParameterizedContext context)
+    public void cPrivate(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_PRIVATE, context.<String>getArg(0), context.hasFlag("key"));
+        this.setCreateProtection(context.getSender(), C_PRIVATE, context.getString(0), context.hasFlag("key"));
     }
 
     @Alias(names = "cpublic")
     @Command(name = "public", desc = "creates a public protection")
-    public void cPublic(ParameterizedContext context)
+    public void cPublic(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
         this.setCreateProtection(context.getSender(), C_PUBLIC, null, false);
@@ -80,39 +80,39 @@ public class LockerCreateCommands extends ContainerCommand
     @Command(name = "donation", desc = "creates a donation protection")
     @IParams(@Grouped(req = false, value = @Indexed(label = "password")))
     @Flags(@Flag(name = "key", longName = "keybook"))
-    public void cDonation(ParameterizedContext context)
+    public void cDonation(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_DONATION, context.<String>getArg(0), context.hasFlag("key"));
+        this.setCreateProtection(context.getSender(), C_DONATION, context.getString(0), context.hasFlag("key"));
     }
 
     @Alias(names = "cfree")
     @Command(name = "free", desc = "creates a free protection")
     @IParams(@Grouped(req = false, value = @Indexed(label = "password")))
     @Flags(@Flag(name = "key", longName = "keybook"))
-    public void cFree(ParameterizedContext context)
+    public void cFree(CubeContext context)
     {
         if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_FREE, context.<String>getArg(0), context.hasFlag("key"));
+        this.setCreateProtection(context.getSender(), C_FREE, context.getString(0), context.hasFlag("key"));
     }
 
     @Alias(names = "cpassword")
     @Command(name = "password", desc = "creates a donation protection")
     @IParams(@Grouped(@Indexed(label = "password")))
     @Flags(@Flag(name = "key", longName = "keybook"))
-    public void cPassword(ParameterizedContext context) // same as private but with pw
+    public void cPassword(CubeContext context) // same as private but with pw
     {
         if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_PRIVATE, context.<String>getArg(0), context.hasFlag("key"));
+        this.setCreateProtection(context.getSender(), C_PRIVATE, context.getString(0), context.hasFlag("key"));
     }
 
     @Alias(names = "cguarded")
     @Command(name = "guarded", desc = "creates a guarded protection")
     @IParams(@Grouped(req = false, value = @Indexed(label = "password")))
     @Flags(@Flag(name = "key", longName = "keybook"))
-    public void cguarded(ParameterizedContext context) // same as private but with pw
+    public void cguarded(CubeContext context) // same as private but with pw
     {
         if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_GUARDED, context.<String>getArg(0), context.hasFlag("key"));
+        this.setCreateProtection(context.getSender(), C_GUARDED, context.getString(0), context.hasFlag("key"));
     }
 }

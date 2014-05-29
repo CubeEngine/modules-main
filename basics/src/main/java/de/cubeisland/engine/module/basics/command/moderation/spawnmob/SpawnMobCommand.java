@@ -23,7 +23,7 @@ import org.bukkit.util.Vector;
 
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsConfiguration;
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
@@ -50,7 +50,7 @@ public class SpawnMobCommand
     @IParams({@Grouped(@Indexed(label = "<mob>[:data][,<ridingmob>[:data]]")),
               @Grouped(value = @Indexed(label = "amount", type = Integer.class), req = false),
               @Grouped(value = @Indexed(label = "player", type = User.class), req = false)})
-    public void spawnMob(CommandContext context)
+    public void spawnMob(CubeContext context)
     {
         User sender = null;
         if (context.getSender() instanceof User)
@@ -58,7 +58,7 @@ public class SpawnMobCommand
             sender = (User)context.getSender();
         }
         Location loc;
-        if (context.hasArg(2))
+        if (context.hasIndexed(2))
         {
             User user = context.getArg(2);
             if (user == null)
@@ -78,7 +78,7 @@ public class SpawnMobCommand
             loc = sender.getTargetBlock(null, 200).getLocation().add(new Vector(0, 1, 0));
         }
         Integer amount = 1;
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
             amount = context.getArg(1);
             if (amount <= 0)
@@ -93,7 +93,7 @@ public class SpawnMobCommand
             return;
         }
         loc.add(0.5, 0, 0.5);
-        Entity[] entitiesSpawned = spawnMobs(context, context.<String>getArg(0), loc, amount);
+        Entity[] entitiesSpawned = spawnMobs(context, context.getString(0), loc, amount);
         if (entitiesSpawned == null)
         {
             return;

@@ -22,12 +22,11 @@ import java.io.File;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.NParams;
 import de.cubeisland.engine.core.command.reflected.context.Named;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.parameterized.completer.WorldCompleter;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
@@ -62,7 +61,7 @@ public class PortalCommands extends ContainerCommand
     @IParams(@Grouped(@Indexed(label = "name")))
     @NParams({@Named(names = "worlddest", label = "world", completer = WorldCompleter.class, type = World.class),
               @Named(names = "portaldest", label = "portal")})
-    public void create(ParameterizedContext context)
+    public void create(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -70,7 +69,7 @@ public class PortalCommands extends ContainerCommand
             User sender = (User)context.getSender();
             if (selector.getSelection(sender) instanceof Cuboid)
             {
-                if (this.manager.getPortal(context.<String>getArg(0)) == null)
+                if (this.manager.getPortal(context.getString(0)) == null)
                 {
                     Location p1 = selector.getFirstPoint(sender);
                     Location p2 = selector.getSecondPoint(sender);
@@ -80,9 +79,9 @@ public class PortalCommands extends ContainerCommand
                     config.location.destination = new WorldLocation(sender.getLocation());
                     config.owner = sender.getOfflinePlayer();
                     config.world = new ConfigWorld(module.getCore().getWorldManager(), p1.getWorld());
-                    if (context.hasParam("worlddest"))
+                    if (context.hasNamed("worlddest"))
                     {
-                        World world = context.getParam("worlddest", null);
+                        World world = context.getArg("worlddest", null);
                         if (world == null)
                         {
                             context.sendTranslated(NEGATIVE, "World {input} not found!", context.getString("worlddest"));
@@ -90,7 +89,7 @@ public class PortalCommands extends ContainerCommand
                         }
                         config.destination = new Destination(world);
                     }
-                    if (context.hasParam("portaldest"))
+                    if (context.hasNamed("portaldest"))
                     {
                         Portal portal = this.manager.getPortal(context.getString("portaldest"));
                         if (portal == null)
@@ -102,7 +101,7 @@ public class PortalCommands extends ContainerCommand
                     }
                     config.setFile(new File(manager.portalsDir, context.getArg(0) + ".yml"));
                     config.save();
-                    Portal portal = new Portal(module, manager, context.<String>getArg(0), config);
+                    Portal portal = new Portal(module, manager, context.getString(0), config);
                     this.manager.addPortal(portal);
                     sender.attachOrGet(PortalsAttachment.class, module).setPortal(portal);
                     context.sendTranslated(POSITIVE, "Portal {name} created! Select a destination using portal modify destination command", portal.getName());
@@ -122,9 +121,9 @@ public class PortalCommands extends ContainerCommand
     @Alias(names = "mvps")
     @Command(desc = "Selects an existing portal")
     @IParams(@Grouped(@Indexed(label = "portal")))
-    public void select(CommandContext context)
+    public void select(CubeContext context)
     {
-        Portal portal = this.manager.getPortal(context.<String>getArg(0));
+        Portal portal = this.manager.getPortal(context.getString(0));
         if (portal == null)
         {
             context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));
@@ -142,12 +141,12 @@ public class PortalCommands extends ContainerCommand
     @Alias(names ="mvpi")
     @Command(desc = "Show info about a portal")
     @IParams(@Grouped(req = false, value = @Indexed(label = "portal")))
-    public void info(CommandContext context)
+    public void info(CubeContext context)
     {
         Portal portal = null;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
-            portal = manager.getPortal(context.<String>getArg(0));
+            portal = manager.getPortal(context.getString(0));
             if (portal == null)
             {
                 context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));
@@ -170,9 +169,9 @@ public class PortalCommands extends ContainerCommand
     @Alias(names = "mvpr")
     @Command(desc = "Removes a portal permanently")
     @IParams(@Grouped(@Indexed(label = "portal")))
-    public void remove(CommandContext context)
+    public void remove(CubeContext context)
     {
-        Portal portal = this.manager.getPortal(context.<String>getArg(0));
+        Portal portal = this.manager.getPortal(context.getString(0));
         if (portal == null)
         {
             context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));
@@ -184,21 +183,21 @@ public class PortalCommands extends ContainerCommand
 
     @Command(desc = "Shows debug portal information instead of teleporting")
     @IParams(@Grouped(req = false, value = @Indexed(label = {"!on","!off"})))
-    public void debug(CommandContext context)
+    public void debug(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
             PortalsAttachment attachment = ((User)context.getSender()).attachOrGet(PortalsAttachment.class, module);
-            if (context.hasArg(0))
+            if (context.hasIndexed(0))
             {
-                if ("on".equalsIgnoreCase(context.<String>getArg(0)))
+                if ("on".equalsIgnoreCase(context.getString(0)))
                 {
                     if (!attachment.isDebug())
                     {
                         attachment.toggleDebug();
                     }
                 }
-                else if ("off".equalsIgnoreCase(context.<String>getArg(0)))
+                else if ("off".equalsIgnoreCase(context.getString(0)))
                 {
                     if (attachment.isDebug())
                     {

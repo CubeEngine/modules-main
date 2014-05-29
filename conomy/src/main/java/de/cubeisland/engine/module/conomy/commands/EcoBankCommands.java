@@ -19,11 +19,11 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.List;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
@@ -47,7 +47,7 @@ public class EcoBankCommands extends ContainerCommand
     @Command(alias = "grant", desc = "Gives money to a bank or all banks")
     @IParams({@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
-    public void give(ParameterizedContext context)
+    public void give(CubeContext context)
     {
         Double amount = context.getArg(1);
         String format = manager.format(amount);
@@ -74,7 +74,7 @@ public class EcoBankCommands extends ContainerCommand
     @Command(alias = "remove", desc = "Takes money from given bank or all banks")
     @IParams({@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
-    public void take(ParameterizedContext context)
+    public void take(CubeContext context)
     {
         Double amount = context.getArg(1);
         String format = manager.format(amount);
@@ -100,7 +100,7 @@ public class EcoBankCommands extends ContainerCommand
 
     @Command(desc = "Reset the money from given banks")
     @IParams(@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)))
-    public void reset(ParameterizedContext context)
+    public void reset(CubeContext context)
     {
         if ("*".equals(context.getArg(0)))
         {
@@ -126,7 +126,7 @@ public class EcoBankCommands extends ContainerCommand
     @Command(desc = "Sets the money from given banks")
     @IParams({@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
-    public void set(ParameterizedContext context)
+    public void set(CubeContext context)
     {
         Double amount = context.getArg(1);
         String format = this.manager.format(amount);
@@ -153,7 +153,7 @@ public class EcoBankCommands extends ContainerCommand
     @Command(desc = "Scales the money from given banks")
     @IParams({@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)),
               @Grouped(@Indexed(label = "factor", type = Float.class))})
-    public void scale(ParameterizedContext context)
+    public void scale(CubeContext context)
     {
         Float factor = context.getArg(1);
         if ("*".equals(context.getArg(0)))
@@ -178,7 +178,7 @@ public class EcoBankCommands extends ContainerCommand
 
     @Command(desc = "Hides the account of given bank")
     @IParams(@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)))
-    public void hide(ParameterizedContext context)
+    public void hide(CubeContext context)
     {
         if ("*".equals(context.getArg(0)))
         {
@@ -201,7 +201,7 @@ public class EcoBankCommands extends ContainerCommand
 
     @Command(desc = "Unhides the account of given banks")
     @IParams(@Grouped(@Indexed(label = {"bank","!*"})))
-    public void unhide(ParameterizedContext context)
+    public void unhide(CubeContext context)
     {
         if ("*".equals(context.getArg(0)))
         {

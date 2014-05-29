@@ -20,11 +20,10 @@ package de.cubeisland.engine.module.basics.command.moderation;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -56,7 +55,7 @@ public class InventoryCommands
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "quiet", name = "q"),
             @Flag(longName = "ender", name = "e")})
-    public void invsee(ParameterizedContext context)
+    public void invsee(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -110,7 +109,7 @@ public class InventoryCommands
     }
 
     @Command(desc = "Stashes or unstashes your inventory to reuse later")
-    public void stash(CommandContext context)
+    public void stash(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -155,11 +154,11 @@ public class InventoryCommands
     @Flags({@Flag(longName = "removeArmor", name = "ra"),
             @Flag(longName = "quiet", name = "q")})
     @SuppressWarnings("deprecation")
-    public void clearinventory(ParameterizedContext context)
+    public void clearinventory(CubeContext context)
     {
         CommandSender sender = context.getSender();
         final User target;
-        if (context.hasArgs())
+        if (context.hasIndexed())
         {
             target = context.getArg(0);
             if (target == null)

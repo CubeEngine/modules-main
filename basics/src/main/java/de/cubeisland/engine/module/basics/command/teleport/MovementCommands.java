@@ -22,10 +22,9 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.CommandPermission;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -57,7 +56,7 @@ public class MovementCommands
 
     @Command(desc = "Teleports you X amount of blocks into the air and puts a glass block beneath you.")
     @IParams(@Grouped(@Indexed(label = "height", type = Integer.class)))
-    public void up(CommandContext context)
+    public void up(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -97,7 +96,7 @@ public class MovementCommands
     }
 
     @Command(desc = "Teleports to the highest point at your position.")
-    public void top(CommandContext context)
+    public void top(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -115,7 +114,7 @@ public class MovementCommands
     }
 
     @Command(desc = "Teleports you to the next safe spot upwards.")
-    public void ascend(CommandContext context)
+    public void ascend(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -162,7 +161,7 @@ public class MovementCommands
     }
 
     @Command(desc = "Teleports you to the next safe spot downwards.")
-    public void descend(CommandContext context)
+    public void descend(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -198,7 +197,7 @@ public class MovementCommands
     }
 
     @Command(alias = {"jump", "j"}, desc = "Jumps to the position you are looking at.")
-    public void jumpTo(CommandContext context)
+    public void jumpTo(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -220,7 +219,7 @@ public class MovementCommands
     }
 
     @Command(alias = "thru", desc = "Jumps to the position you are looking at.")
-    public void through(CommandContext context)
+    public void through(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -245,7 +244,7 @@ public class MovementCommands
     @Command(desc = "Teleports you to your last location")
     @Flags(@Flag(longName = "unsafe", name = "u"))
     @CommandPermission(checkPermission = false)
-    public void back(ParameterizedContext context)
+    public void back(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -295,7 +294,7 @@ public class MovementCommands
 
     @Command(alias = "put", desc = "Jumps to the position you are looking at.")
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void place(CommandContext context)
+    public void place(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -327,10 +326,10 @@ public class MovementCommands
     @Command(desc = "Swaps you and another players position")
     @IParams({@Grouped(@Indexed(label = "player")),
               @Grouped(value = @Indexed(label = "player", type = User.class),req = false)})
-    public void swap(CommandContext context)
+    public void swap(CubeContext context)
     {
         User sender;
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
             sender = context.getArg(1);
         }
@@ -369,7 +368,7 @@ public class MovementCommands
         {
             if (TeleportCommands.teleport(sender, userLoc, true, false, false))
             {
-                if (context.hasArg(1))
+                if (context.hasIndexed(1))
                 {
                     context.sendTranslated(POSITIVE, "Swapped position of {user} and {user}!", user, sender);
                     return;

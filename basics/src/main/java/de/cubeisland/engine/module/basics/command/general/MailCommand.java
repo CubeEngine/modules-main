@@ -26,7 +26,7 @@ import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.BasicsUser;
 import de.cubeisland.engine.module.basics.storage.Mail;
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.reflected.Alias;
@@ -58,12 +58,12 @@ public class MailCommand extends ContainerCommand
     @Alias(names = "readmail")
     @Command(desc = "Reads your mail.")
     @IParams(@Grouped(value = @Indexed(label = {"player","!console"}, type = {User.class, String.class}), req = false))
-    public void read(CommandContext context)
+    public void read(CubeContext context)
     {
         User sender;
         User mailof = null;
         String nameMailOf = null;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             sender = null;
             if (context.getSender() instanceof User)
@@ -138,7 +138,7 @@ public class MailCommand extends ContainerCommand
     @Alias(names = "spymail")
     @Command(desc = "Shows the mail of other players.")
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void spy(CommandContext context)
+    public void spy(CubeContext context)
     {
         User user = context.getArg(0);
         List<Mail> mails = user.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().getMails();
@@ -161,7 +161,7 @@ public class MailCommand extends ContainerCommand
     @Command(desc = "Sends mails to other players.")
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(value = @Indexed(label = "message"), greedy = true)})
-    public void send(CommandContext context)
+    public void send(CubeContext context)
     {
         User user = context.getArg(0);
         String message = context.getStrings(1);
@@ -172,7 +172,7 @@ public class MailCommand extends ContainerCommand
     @Alias(names = "sendallmail")
     @Command(desc = "Sends mails to all players.")
     @IParams(@Grouped(value = @Indexed(label = "mailid"), greedy = true))
-    public void sendAll(CommandContext context)
+    public void sendAll(CubeContext context)
     {
         Set<User> users = this.module.getCore().getUserManager().getOnlineUsers();
         final TLongSet alreadySend = new TLongHashSet();
@@ -209,7 +209,7 @@ public class MailCommand extends ContainerCommand
 
     @Command(desc = "Removes a single mail")
     @IParams(@Grouped(@Indexed(label = "mailid")))
-    public void remove(CommandContext context)
+    public void remove(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -245,7 +245,7 @@ public class MailCommand extends ContainerCommand
 
     @Command(desc = "Clears your mail.")
     @IParams(@Grouped(value = @Indexed(label = "player", type = User.class), req = false))
-    public void clear(CommandContext context)
+    public void clear(CubeContext context)
     {
         User sender = null;
         if (context.getSender() instanceof User)
@@ -257,7 +257,7 @@ public class MailCommand extends ContainerCommand
             context.sendTranslated(NEGATIVE, "You will never have mail here!");
             return;
         }
-        if (!context.hasArg(0))
+        if (!context.hasIndexed(0))
         {
             sender.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMail();
             context.sendTranslated(NEUTRAL, "Cleared all mails!");

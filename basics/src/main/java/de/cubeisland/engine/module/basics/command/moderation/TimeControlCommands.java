@@ -26,9 +26,8 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.core.command.exception.IncorrectUsageException;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
+import de.cubeisland.engine.core.command.CubeContext;
+import de.cubeisland.engine.core.command.exception.MissingParameterException;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -40,6 +39,7 @@ import de.cubeisland.engine.core.command.reflected.context.Named;
 import de.cubeisland.engine.core.task.TaskManager;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.basics.Basics;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -64,10 +64,10 @@ public class TimeControlCommands
     @IParams(@Grouped(value = @Indexed(label = "time"), req = false))
     @NParams(@Named(names = { "w", "worlds", "in"}))
     @Flags(@Flag(longName = "lock", name = "l"))
-    public void time(ParameterizedContext context)
+    public void time(CubeContext context)
     {
         List<World> worlds;
-        if (context.hasParam("w"))
+        if (context.hasNamed("w"))
         {
             if (context.getString("w").equals("*"))
             {
@@ -94,12 +94,13 @@ public class TimeControlCommands
             }
             else
             {
-                throw new IncorrectUsageException(context.getSender().getTranslation(NEGATIVE, "You have to specify a world when using this command from the console!"));
+
+                throw new MissingParameterException("w", context.getSender().getTranslation(NEGATIVE, "You have to specify a world when using this command from the console!"));
             }
         }
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
-            final Long time = Match.time().matchTimeValue(context.<String>getArg(0));
+            final Long time = Match.time().matchTimeValue(context.getString(0));
             if (time == null)
             {
                 context.sendTranslated(NEGATIVE, "The time you entered is not valid!");
@@ -149,7 +150,7 @@ public class TimeControlCommands
     @IParams({@Grouped(@Indexed(label = {"time","!reset"})),
               @Grouped(req = false, value = @Indexed(label = "player", type = User.class))})
     @Flags(@Flag(longName = "lock", name = "l"))
-    public void ptime(ParameterizedContext context)
+    public void ptime(CubeContext context)
     {
         Long time = 0L;
         boolean other = false;
@@ -174,7 +175,7 @@ public class TimeControlCommands
         {
             user = (User)context.getSender();
         }
-        if (context.hasArg(1))
+        if (context.hasIndexed(1))
         {
             user = context.getArg(1);
             if (!module.perms().COMMAND_PTIME_OTHER.isAuthorized(context.getSender()))

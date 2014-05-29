@@ -21,15 +21,15 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import de.cubeisland.engine.core.command.exception.ReaderException;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.core.command.ArgumentReader;
-import de.cubeisland.engine.core.command.exception.InvalidArgumentException;
 import de.cubeisland.engine.core.util.StringUtils;
 
 public class BankOrAllReader extends ArgumentReader
 {
     @Override
-    public Object read(String arg, Locale locale) throws InvalidArgumentException
+    public Object read(String arg, Locale locale) throws ReaderException
     {
         if ("*".equals(arg))
         {

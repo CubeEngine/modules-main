@@ -19,11 +19,10 @@ package de.cubeisland.engine.module.travel;
 
 import java.util.Set;
 
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.ContainerCommand;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.exception.IncorrectUsageException;
-import de.cubeisland.engine.core.command.exception.InvalidArgumentException;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
+import de.cubeisland.engine.core.command.exception.ReaderException;
 import de.cubeisland.engine.core.user.User;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
@@ -39,10 +38,10 @@ public class TpPointCommand extends ContainerCommand
         iManager = module.getInviteManager();
     }
 
-    protected User getUser(CommandContext context, int i)
+    protected User getUser(CubeContext context, int i)
     {
         User user;
-        if (context.hasArg(i))
+        if (context.hasIndexed(i))
         {
             user = context.getArg(i);
         }
@@ -57,15 +56,15 @@ public class TpPointCommand extends ContainerCommand
         return user;
     }
 
-    protected User getUser(ParameterizedContext context, String owner)
+    protected User getUser(CubeContext context, String owner)
     {
         User user;
-        if (context.hasParam(owner))
+        if (context.hasNamed(owner))
         {
-            user = context.getUser(owner);
+            user = context.getArg(owner);
             if (user == null)
             {
-                throw new InvalidArgumentException(context.getSender().getTranslation(NEGATIVE,
+                throw new ReaderException(context.getSender().getTranslation(NEGATIVE,
                                                                                       "Player {user} not found!",
                                                                                       context.getString(owner)));
             }
@@ -81,7 +80,7 @@ public class TpPointCommand extends ContainerCommand
         return user;
     }
 
-    protected void showList(ParameterizedContext context, User user, Set<? extends TeleportPoint> points)
+    protected void showList(CubeContext context, User user, Set<? extends TeleportPoint> points)
     {
         for (TeleportPoint point : points)
         {

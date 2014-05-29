@@ -21,12 +21,12 @@ import java.util.Set;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.NParams;
 import de.cubeisland.engine.core.command.reflected.context.Named;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -54,7 +54,7 @@ public class UserManagementCommands extends UserCommandHelper
                         @Grouped(@Indexed(label = "role"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
     @Flags(@Flag(name = "t",longName = "temp"))
-    public void assign(ParameterizedContext context)
+    public void assign(CubeContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
@@ -103,13 +103,13 @@ public class UserManagementCommands extends UserCommandHelper
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(@Indexed(label = "role"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void remove(ParameterizedContext context)
+    public void remove(CubeContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
         World world = this.getWorld(context);
         if (world == null) return;
-        Role role = this.manager.getProvider(world).getRole(context.<String>getArg(1));
+        Role role = this.manager.getProvider(world).getRole(context.getString(1));
         if (role == null)
         {
             context.sendTranslated(NEUTRAL, "Could not find the role {name} in {world}.", context.getArg(1), world);
@@ -135,7 +135,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in world]")
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void clear(ParameterizedContext context)
+    public void clear(CubeContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
@@ -167,13 +167,13 @@ public class UserManagementCommands extends UserCommandHelper
               @Grouped(@Indexed(label = "permission")),
               @Grouped(req = false, value = @Indexed(label = {"!true","!false","!reset"}))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void setpermission(ParameterizedContext context)
+    public void setpermission(CubeContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
         String perm = context.getArg(1);
         String setTo = "true";
-        if (context.hasArg(2))
+        if (context.hasIndexed(2))
         {
             setTo = context.getArg(2);
         }
@@ -208,7 +208,7 @@ public class UserManagementCommands extends UserCommandHelper
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(@Indexed(label = "permission"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void resetpermission(ParameterizedContext context)
+    public void resetpermission(CubeContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
@@ -227,7 +227,7 @@ public class UserManagementCommands extends UserCommandHelper
               @Grouped(@Indexed(label = "metaKey")),
               @Grouped(@Indexed(label = "metaValue"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void setmetadata(ParameterizedContext context)
+    public void setmetadata(CubeContext context)
     {
         String metaKey = context.getArg(1);
         String metaVal = context.getArg(2);
@@ -245,7 +245,7 @@ public class UserManagementCommands extends UserCommandHelper
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(@Indexed(label = "metaKey"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void resetmetadata(ParameterizedContext context)
+    public void resetmetadata(CubeContext context)
     {
         String metaKey = context.getArg(1);
         User user = context.getArg(0);
@@ -261,7 +261,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Resets metadata for this user [in world]")
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void clearMetaData(ParameterizedContext context)
+    public void clearMetaData(CubeContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;

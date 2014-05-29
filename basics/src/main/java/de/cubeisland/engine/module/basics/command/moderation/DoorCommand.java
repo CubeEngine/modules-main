@@ -27,8 +27,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.material.Openable;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -62,7 +62,7 @@ public class DoorCommand
               @Flag(longName = "ironDoor", name = "i"),
               @Flag(longName = "trapDoor", name = "t"),
               @Flag(longName = "fenceGate", name = "f")})
-    public void doors(ParameterizedContext context)
+    public void doors(CubeContext context)
     {
         boolean open;
         int radius = context.getArg(1, 0);
@@ -91,12 +91,12 @@ public class DoorCommand
             return;
         }
 
-        if(!context.hasArg(5) && !(context.getSender() instanceof User))
+        if(!context.hasIndexed(5) && !(context.getSender() instanceof User))
         {
             context.sendTranslated(NEGATIVE, "You has to specify a location!");
             return;
         }
-        else if(!context.hasArg(5))
+        else if(!context.hasIndexed(5))
         {
             Location location = ((User) context.getSender()).getLocation();
             world = location.getWorld();

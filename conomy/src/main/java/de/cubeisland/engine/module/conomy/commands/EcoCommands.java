@@ -19,12 +19,11 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.List;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.readers.UserListOrAllReader;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -52,7 +51,7 @@ public class EcoCommands extends ContainerCommand
     @IParams({@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     @Flags(@Flag(longName = "online", name = "o"))
-    public void give(ParameterizedContext context)
+    public void give(CubeContext context)
     {
         Double amount = context.getArg(1);
         String format = manager.format(amount);
@@ -95,7 +94,7 @@ public class EcoCommands extends ContainerCommand
     @IParams({@Grouped(@Indexed(label = {"player","!*"}, type = UserListOrAllReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     @Flags(@Flag(longName = "online", name = "o"))
-    public void take(ParameterizedContext context)
+    public void take(CubeContext context)
     {
         Double amount = context.getArg(1);
         String format = manager.format(amount);
@@ -131,7 +130,7 @@ public class EcoCommands extends ContainerCommand
     @Command(desc = "Reset the money from given user")
     @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)))
     @Flags(@Flag(longName = "online", name = "o"))
-    public void reset(ParameterizedContext context)
+    public void reset(CubeContext context)
     {
         if ("*".equals(context.getArg(0)))
         {
@@ -167,7 +166,7 @@ public class EcoCommands extends ContainerCommand
     @IParams({@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     @Flags(@Flag(longName = "online", name = "o"))
-    public void set(ParameterizedContext context)
+    public void set(CubeContext context)
     {
         Double amount = context.getArg(1);
         String format = this.manager.format(amount);
@@ -204,7 +203,7 @@ public class EcoCommands extends ContainerCommand
     @IParams({@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)),
               @Grouped(@Indexed(label = "factor", type = Float.class))})
     @Flags(@Flag(longName = "online", name = "o"))
-    public void scale(ParameterizedContext context)
+    public void scale(CubeContext context)
     {
         Float factor = context.getArg(1);
         if ("*".equals(context.getArg(0)))
@@ -234,7 +233,7 @@ public class EcoCommands extends ContainerCommand
 
     @Command(desc = "Hides the account of a given player")
     @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)))
-    public void hide(ParameterizedContext context)
+    public void hide(CubeContext context)
     {
         if ("*".equals(context.getArg(0)))
         {
@@ -261,7 +260,7 @@ public class EcoCommands extends ContainerCommand
 
     @Command(desc = "Unhides the account of a given player")
     @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)))
-    public void unhide(ParameterizedContext context)
+    public void unhide(CubeContext context)
     {
         if ("*".equals(context.getArg(0)))
         {
@@ -289,7 +288,7 @@ public class EcoCommands extends ContainerCommand
 
     @Command(desc = "Deletes a users account.")
     @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void delete(CommandContext context)
+    public void delete(CubeContext context)
     {
         User user = context.getArg(0);
         if (this.manager.deleteUserAccount(user))
@@ -303,9 +302,9 @@ public class EcoCommands extends ContainerCommand
     @Command(desc = "Creates a new account")
     @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
     @Flags(@Flag(longName = "force", name = "f"))
-    public void create(ParameterizedContext context)
+    public void create(CubeContext context)
     {
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             if (!module.perms().ECO_CREATE_OTHER.isAuthorized(context.getSender()))
             {
@@ -325,7 +324,7 @@ public class EcoCommands extends ContainerCommand
                     }
                     else
                     {
-                        user = this.module.getCore().getUserManager().findExactUser(context.<String>getArg(0)); // TODO unreachable
+                        user = this.module.getCore().getUserManager().findExactUser(context.getString(0)); // TODO unreachable
                     }
                 }
                 else

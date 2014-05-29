@@ -21,12 +21,12 @@ import java.util.Map;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.NParams;
 import de.cubeisland.engine.core.command.reflected.context.Named;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -54,7 +54,7 @@ public class UserInformationCommands extends UserCommandHelper
     @Command(desc = "Lists roles of a user [in world]")
     @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void list(ParameterizedContext context)
+    public void list(CubeContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
@@ -79,7 +79,7 @@ public class UserInformationCommands extends UserCommandHelper
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(@Indexed(label = "permission"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void checkpermission(ParameterizedContext context)
+    public void checkpermission(CubeContext context)
     {
         User user = context.getArg(0);
         World world = this.getWorld(context);
@@ -139,7 +139,7 @@ public class UserInformationCommands extends UserCommandHelper
     @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
     @NParams(@Named(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "all", name = "a"))
-    public void listpermission(ParameterizedContext context)
+    public void listpermission(CubeContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
@@ -170,7 +170,7 @@ public class UserInformationCommands extends UserCommandHelper
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(@Indexed(label = "metadatakey"))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void checkmetadata(ParameterizedContext context)
+    public void checkmetadata(CubeContext context)
     {
         User user = context.getArg(0);
         World world = this.getWorld(context);
@@ -201,7 +201,7 @@ public class UserInformationCommands extends UserCommandHelper
     @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
     @NParams(@Named(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "all", name = "a"))
-    public void listmetadata(ParameterizedContext context)
+    public void listmetadata(CubeContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;

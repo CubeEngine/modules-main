@@ -30,10 +30,9 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.parameterized.ParameterizedContext;
 import de.cubeisland.engine.core.command.readers.IntegerOrAllReader;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -76,16 +75,17 @@ public class ItemCommands
 
     @Command(desc = "Looks up an item for you!")
     @IParams(@Grouped(req = false, value = @Indexed(label = "item")))
-    public PaginatedResult itemDB(CommandContext context)
+    public PaginatedResult itemDB(CubeContext context)
     {
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
-            TreeSet<Entry<ItemStack, Double>> itemSet = Match.material().itemStackList(context.<String>getArg(0));
+            TreeSet<Entry<ItemStack, Double>> itemSet = Match.material().itemStackList(context.getString(0));
             if (itemSet != null && itemSet.size() > 0)
             {
                 List<String> lines = new ArrayList<>();
 
-                lines.add(context.getSender().getTranslation(POSITIVE, "Best Matched {input#item} ({integer#id}:{short#data}) for {input}", Match.material().getNameFor(itemSet.first().getKey()), itemSet.first().getKey().getType().getId(), itemSet.first().getKey().getDurability(), context.getArg(0)));
+                lines.add(context.getSender().getTranslation(POSITIVE, "Best Matched {input#item} ({integer#id}:{short#data}) for {input}", Match.material().getNameFor(itemSet.first().getKey()), itemSet.first().getKey().getType().getId(), itemSet.first().getKey().getDurability(), context.getArg(
+                    0)));
                 itemSet.remove(itemSet.first());
                 for (Entry<ItemStack, Double> item : itemSet) {
                     lines.add(context.getSender().getTranslation(POSITIVE,
@@ -132,7 +132,7 @@ public class ItemCommands
     @Command(desc = "Changes the display name of the item in your hand.")
     @IParams({@Grouped(@Indexed(label = "name")),
               @Grouped(req = false, value = @Indexed(label = "lore..."),greedy = true)})
-    public void rename(ParameterizedContext context)
+    public void rename(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -144,12 +144,12 @@ public class ItemCommands
                 return;
             }
             ItemMeta meta = item.getItemMeta();
-            String name = ChatFormat.parseFormats(context.<String>getArg(0));
+            String name = ChatFormat.parseFormats(context.getString(0));
             meta.setDisplayName(name);
             ArrayList<String> list = new ArrayList<>();
-            for (int i = 1; i < context.getArgCount(); ++i)
+            for (int i = 1; i < context.getIndexedCount(); ++i)
             {
-                list.add(ChatFormat.parseFormats(context.<String>getArg(i)));
+                list.add(ChatFormat.parseFormats(context.getString(i)));
             }
             meta.setLore(list);
             item.setItemMeta(meta);
@@ -161,7 +161,7 @@ public class ItemCommands
 
     @Command(alias = "skullchange", desc = "Changes a skull to a players skin.")
     @IParams(@Grouped(req = false, value = @Indexed(label = "name")))
-    public void headchange(CommandContext context)
+    public void headchange(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -184,19 +184,19 @@ public class ItemCommands
 
     @Command(desc = "Grants unlimited items")
     @IParams(@Grouped(req = false, value = @Indexed(label = {"!on","!off"})))
-    public void unlimited(CommandContext context)
+    public void unlimited(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
             User sender = (User)context.getSender();
             boolean unlimited;
-            if (context.hasArg(0))
+            if (context.hasIndexed(0))
             {
-                if ("on".equalsIgnoreCase(context.<String>getArg(0)))
+                if ("on".equalsIgnoreCase(context.getString(0)))
                 {
                     unlimited = true;
                 }
-                else if ("off".equalsIgnoreCase(context.<String>getArg(0)))
+                else if ("off".equalsIgnoreCase(context.getString(0)))
                 {
                     unlimited = false;
                 }
@@ -228,9 +228,9 @@ public class ItemCommands
     @IParams({@Grouped(value = @Indexed(label = "enchantment"), req = false),
               @Grouped(value = @Indexed(label = "level"), req = false)})
     @Flags(@Flag(longName = "unsafe", name = "u"))
-    public void enchant(ParameterizedContext context)
+    public void enchant(CubeContext context)
     {
-        if (!context.hasArg(0))
+        if (!context.hasIndexed(0))
         {
             context.sendTranslated(POSITIVE, "Following Enchantments are availiable:\n{input#enchs}", this.getPossibleEnchantments(null));
             return;
@@ -261,7 +261,7 @@ public class ItemCommands
                 return;
             }
             int level = ench.getMaxLevel();
-            if (context.hasArg(1))
+            if (context.hasIndexed(1))
             {
                 level = context.getArg(1, 0);
                 if (level <= 0)
@@ -347,7 +347,7 @@ public class ItemCommands
               @Grouped(value = @Indexed(label = "amount"), req = false)})
     @Flags(@Flag(name = "b", longName = "blacklist"))
     @SuppressWarnings("deprecation")
-    public void give(ParameterizedContext context)
+    public void give(CubeContext context)
     {
         User user = context.getArg(0);
         if (user == null)
@@ -368,7 +368,7 @@ public class ItemCommands
             return;
         }
         int amount = item.getMaxStackSize();
-        if (context.hasArg(2))
+        if (context.hasIndexed(2))
         {
             amount = context.getArg(2, 0);
             if (amount == 0)
@@ -391,7 +391,7 @@ public class ItemCommands
     @NParams(@Named(names = "ench", label = "enchantment[:level]"))
     @Flags(@Flag(longName = "blacklist", name = "b"))
     @SuppressWarnings("deprecation")
-    public void item(ParameterizedContext context)
+    public void item(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -404,7 +404,7 @@ public class ItemCommands
                 return;
             }
             int amount = item.getMaxStackSize();
-            if (context.hasArg(1))
+            if (context.hasIndexed(1))
             {
                 amount = context.getArg(1, 0);
                 if (amount <= 0)
@@ -414,7 +414,7 @@ public class ItemCommands
                 }
             }
 
-            if (context.hasParam("ench"))
+            if (context.hasNamed("ench"))
             {
                 String[] enchs = StringUtils.explode(",", context.getString("ench"));
                 for (String ench : enchs)
@@ -449,7 +449,7 @@ public class ItemCommands
 
     @Command(desc = "Refills the stack in hand")
     @IParams(@Grouped(value = @Indexed(label = {"amount","!*"}, type = IntegerOrAllReader.class), req = false))
-    public void more(CommandContext context)
+    public void more(CubeContext context)
     {
         if (!context.isSender(User.class))
         {
@@ -458,7 +458,7 @@ public class ItemCommands
         }
         User sender = (User)context.getSender();
         Integer amount = 1;
-        if (context.hasArg(0))
+        if (context.hasIndexed(0))
         {
             if ("*".equals(context.getArg(0)))
             {
@@ -500,7 +500,7 @@ public class ItemCommands
     @Command(desc = "Repairs your items")
     @Flags(@Flag(longName = "all", name = "a"))
     // without item in hand
-    public void repair(ParameterizedContext context)
+    public void repair(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
@@ -546,7 +546,7 @@ public class ItemCommands
     }
 
     @Command(desc = "Stacks your items up to 64")
-    public void stack(CommandContext context)
+    public void stack(CubeContext context)
     {
         if (context.getSender() instanceof User)
         {
