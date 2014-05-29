@@ -227,7 +227,7 @@ public class RolesManager
             rolesAttachment.reload();
             if (user.isOnline())
             {
-                rolesAttachment.getCurrentDataHolder().apply(); // recalculates data + apply
+                rolesAttachment.getCurrentDataHolder(); // recalculates data + apply
             }
         }
         this.module.getLog().debug("All roles are now calculated! ({} ms)", Profiler.endProfiling("calculateAllRoles", TimeUnit.MILLISECONDS));
