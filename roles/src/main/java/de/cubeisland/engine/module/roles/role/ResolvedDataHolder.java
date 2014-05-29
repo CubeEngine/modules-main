@@ -246,11 +246,11 @@ public abstract class ResolvedDataHolder extends TempDataStore
 
     protected void roleMissing(String roleName, boolean temp)
     {
-        if (temp)
+        if (provider instanceof GlobalRoleProvider)
         {
-            this.module.getLog().warn("The role {} is not available in {}", roleName, provider.getMainWorld().getName());
+            this.module.getLog().warn("The role {} is not available globally", roleName);
         }
-        else
+        else 
         {
             this.module.getLog().warn("The role {} is not available in {}", roleName, provider.getMainWorld().getName());
         }
