@@ -32,6 +32,7 @@ import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
 import de.cubeisland.engine.core.command.reflected.context.Indexed;
 import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.roles.RoleCompleter;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import de.cubeisland.engine.module.roles.role.Role;
@@ -51,7 +52,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Alias(names = {"manuadd", "assignurole", "addurole", "giveurole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [in world] [-temp]")
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-                        @Grouped(@Indexed(label = "role"))})
+              @Grouped(@Indexed(label = "role", completer = RoleCompleter.class))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
     @Flags(@Flag(name = "t",longName = "temp"))
     public void assign(CubeContext context)
