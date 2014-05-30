@@ -32,19 +32,20 @@ import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.ItemStack;
 
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.module.basics.BasicsUser;
-import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
 import de.cubeisland.engine.core.bukkit.AfterJoinEvent;
 import de.cubeisland.engine.core.bukkit.BukkitUtils;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsAttachment;
+import de.cubeisland.engine.module.basics.BasicsUser;
+import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
 import de.cubeisland.engine.module.roles.RoleAppliedEvent;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 
 public class GeneralsListener implements Listener
 {
@@ -72,7 +73,7 @@ public class GeneralsListener implements Listener
         BasicsUserEntity bUser = this.module.getBasicsUser(event.getPlayer()).getbUEntity();
         if (!module.perms().COMMAND_GOD_KEEP.isAuthorized(event.getPlayer()))
         {
-            bUser.setGodmode(false);
+            bUser.setValue(TABLE_BASIC_USER.GODMODE, false);
         }
         bUser.update();
         if (!module.perms().COMMAND_GAMEMODE_KEEP.isAuthorized(event.getPlayer()))
@@ -87,7 +88,7 @@ public class GeneralsListener implements Listener
         BasicsUserEntity bUser = this.module.getBasicsUser(event.getPlayer()).getbUEntity();
         if (!module.perms().COMMAND_GOD_KEEP.isAuthorized(event.getPlayer()))
         {
-            bUser.setGodmode(false);
+            bUser.setValue(TABLE_BASIC_USER.GODMODE, false);
             BukkitUtils.setInvulnerable(event.getPlayer(), false);
         }
         bUser.update();
@@ -115,7 +116,7 @@ public class GeneralsListener implements Listener
     {
         User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
         BasicsUser bUser = this.module.getBasicsUser(user);
-        if (bUser.getbUEntity().getGodmode())
+        if (bUser.getbUEntity().getValue(TABLE_BASIC_USER.GODMODE))
         {
             if (module.perms().COMMAND_GOD_KEEP.isAuthorized(user))
             {
@@ -123,7 +124,7 @@ public class GeneralsListener implements Listener
             }
             else
             {
-                bUser.getbUEntity().setGodmode(false);
+                bUser.getbUEntity().setValue(TABLE_BASIC_USER.GODMODE, false);
                 bUser.getbUEntity().update();
             }
         }

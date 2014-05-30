@@ -245,7 +245,7 @@ public class UserDatabaseStore extends ResolvedDataHolder
 
     private UInteger getDBWorldId(World world)
     {
-        return UInteger.valueOf(this.module.getCore().getWorldManager().getWorldId(world));
+        return this.module.getCore().getWorldManager().getWorldId(world);
     }
 
     /**

@@ -20,14 +20,15 @@ package de.cubeisland.engine.module.basics;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
-import de.cubeisland.engine.module.basics.storage.Mail;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.storage.database.Database;
 import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
+import de.cubeisland.engine.module.basics.storage.Mail;
 import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
 
+import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
 
@@ -46,7 +47,8 @@ public class BasicsUser
     public BasicsUser(Database database, User user)
     {
         this.dsl = database.getDSL();
-        this.bUEntity = dsl.selectFrom(TABLE_BASIC_USER).where(TABLE_BASIC_USER.KEY.eq(user.getEntity().getKey())).fetchOneInto(TABLE_BASIC_USER);
+        this.bUEntity = dsl.selectFrom(TABLE_BASIC_USER).where(TABLE_BASIC_USER.KEY.eq(user.getEntity().getValue(
+            TABLE_USER.KEY))).fetchOneInto(TABLE_BASIC_USER);
         if (bUEntity == null)
         {
             this.bUEntity = this.dsl.newRecord(TABLE_BASIC_USER).newBasicUser(user);
@@ -56,7 +58,7 @@ public class BasicsUser
 
     public void loadMails()
     {
-        this.mailbox = this.dsl.selectFrom(TABLE_MAIL).where(TABLE_MAIL.USERID.eq(bUEntity.getKey())).fetch();
+        this.mailbox = this.dsl.selectFrom(TABLE_MAIL).where(TABLE_MAIL.USERID.eq(bUEntity.getValue(TABLE_BASIC_USER.KEY))).fetch();
     }
 
     public List<Mail> getMails()
@@ -73,7 +75,7 @@ public class BasicsUser
         List<Mail> mails = new ArrayList<>();
         for (Mail mail : this.getMails())
         {
-            if (mail.getSenderid().longValue() == sender.getId())
+            if (mail.getValue(TABLE_MAIL.SENDERID).longValue() == sender.getId())
             {
                 mails.add(mail);
             }
@@ -87,11 +89,11 @@ public class BasicsUser
         Mail mail;
         if (from instanceof User)
         {
-            mail = this.dsl.newRecord(TABLE_MAIL).newMail(this.bUEntity.getKey(), ((User)from).getEntity().getKey(), message);
+            mail = this.dsl.newRecord(TABLE_MAIL).newMail(this.bUEntity, ((User)from).getEntity().getKey(), message);
         }
         else
         {
-            mail = this.dsl.newRecord(TABLE_MAIL).newMail(this.bUEntity.getKey(), null, message);
+            mail = this.dsl.newRecord(TABLE_MAIL).newMail(this.bUEntity, null, message);
         }
         this.mailbox.add(mail);
         mail.insert();
@@ -104,7 +106,7 @@ public class BasicsUser
 
     public void clearMail()
     {
-        this.dsl.delete(TABLE_MAIL).where(TABLE_MAIL.USERID.eq(this.bUEntity.getKey())).execute();
+        this.dsl.delete(TABLE_MAIL).where(TABLE_MAIL.USERID.eq(this.bUEntity.getValue(TABLE_BASIC_USER.KEY))).execute();
         this.mailbox = new ArrayList<>();
     }
 
@@ -114,7 +116,7 @@ public class BasicsUser
         this.mailbox.removeAll(mailsFrom);
         UInteger senderId = sender == null ? null : sender.getEntity().getKey();
         this.dsl.delete(TABLE_MAIL).where(
-            TABLE_MAIL.USERID.eq(this.bUEntity.getKey()),
+            TABLE_MAIL.USERID.eq(this.bUEntity.getValue(TABLE_BASIC_USER.KEY)),
             TABLE_MAIL.SENDERID.eq(senderId)).execute();
     }
 }

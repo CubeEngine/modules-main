@@ -20,15 +20,21 @@ package de.cubeisland.engine.module.locker.storage;
 import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
 import de.cubeisland.engine.core.util.Version;
 import org.jooq.TableField;
-import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.jooq.impl.SQLDataType.SMALLINT;
 
 public class TableAccessList extends AutoIncrementTable<AccessListModel, UInteger>
 {
     public static TableAccessList TABLE_ACCESS_LIST;
+    public final TableField<AccessListModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
+    public final TableField<AccessListModel, UInteger> USER_ID = createField("user_id", U_INTEGER.nullable(false),this);
+    public final TableField<AccessListModel, UInteger> LOCK_ID = createField("lock_id", U_INTEGER, this);
+    // BitMask granting the user access to a protection (this is NOT restricting) (if ACCESS_PUT is not set on a donation chest it does not matter)
+    public final TableField<AccessListModel, Short> LEVEL = createField("level", SMALLINT.nullable(false),this);
+    public final TableField<AccessListModel, UInteger> OWNER_ID = createField("owner_id", U_INTEGER, this);
 
     public TableAccessList(String prefix)
     {
@@ -43,16 +49,9 @@ public class TableAccessList extends AutoIncrementTable<AccessListModel, UIntege
         TABLE_ACCESS_LIST = this;
     }
 
-    public final TableField<AccessListModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
-    public final TableField<AccessListModel, UInteger> USER_ID = createField("user_id", U_INTEGER.nullable(false), this);
-    public final TableField<AccessListModel, UInteger> LOCK_ID = createField("lock_id", U_INTEGER, this);
-    // BitMask granting the user access to a protection (this is NOT restricting) (if ACCESS_PUT is not set on a donation chest it does not matter)
-    public final TableField<AccessListModel, Short> LEVEL = createField("level", SQLDataType.SMALLINT.nullable(false), this);
-
-    public final TableField<AccessListModel, UInteger> OWNER_ID = createField("owner_id", U_INTEGER, this);
-
     @Override
-    public Class<AccessListModel> getRecordType() {
+    public Class<AccessListModel> getRecordType()
+    {
         return AccessListModel.class;
     }
 }

@@ -26,7 +26,9 @@ import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.*;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.TeleportType.WARP;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PRIVATE;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 
 public class WarpManager extends TelePointManager<Warp>
 {
@@ -38,7 +40,7 @@ public class WarpManager extends TelePointManager<Warp>
     @Override
     public void load()
     {
-        for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.TYPE.eq(TYPE_WARP)).fetch())
+        for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.TYPE.eq(WARP.value)).fetch())
         {
             this.addPoint(new Warp(teleportPoint, this.module));
         }
@@ -52,7 +54,7 @@ public class WarpManager extends TelePointManager<Warp>
         {
             throw new IllegalArgumentException("Tried to create duplicate warp!");
         }
-        TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, name, owner, null, TYPE_WARP, publicVisibility ? VISIBILITY_PUBLIC : VISIBILITY_PRIVATE);
+        TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, name, owner, null, WARP, publicVisibility ? PUBLIC : PRIVATE);
         Warp warp = new Warp(model, this.module);
         model.insert();
         this.addPoint(warp);

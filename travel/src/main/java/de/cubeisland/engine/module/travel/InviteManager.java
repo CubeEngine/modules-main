@@ -31,6 +31,7 @@ import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
+import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
 public class InviteManager
 {
@@ -49,7 +50,7 @@ public class InviteManager
 
     public void invite(TeleportPointModel tPP, User user)
     {
-        TeleportInvite invite = this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getKey(), user.getEntity().getKey());
+        TeleportInvite invite = this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getValue(TABLE_TP_POINT.KEY), user.getEntity().getKey());
         this.invites.add(invite);
         invite.insert();
     }
@@ -68,7 +69,7 @@ public class InviteManager
         Set<UInteger> keys = new HashSet<>();
         for (TeleportInvite tpI : getInvites(tPP))
         {
-            keys.add(tpI.getUserkey());
+            keys.add(tpI.getValue(TABLE_INVITE.USERKEY));
         }
         this.cachedInvites.put(tPP, keys);
         return keys;
@@ -85,7 +86,7 @@ public class InviteManager
         Set<TeleportInvite> invites = new HashSet<>();
         for (TeleportInvite invite : this.invites)
         {
-            if (invite.getUserkey().equals(user.getEntity().getKey()))
+            if (invite.getValue(TABLE_INVITE.USERKEY).equals(user.getEntity().getKey()))
             {
                 invites.add(invite);
             }
@@ -104,7 +105,7 @@ public class InviteManager
         Set<TeleportInvite> invites = new HashSet<>();
         for (TeleportInvite invite : this.invites)
         {
-            if (invite.getTeleportpoint().equals(tPP.getKey()))
+            if (invite.getValue(TABLE_INVITE.TELEPORTPOINT).equals(tPP.getValue(TABLE_TP_POINT.KEY)))
             {
                 invites.add(invite);
             }
@@ -128,9 +129,9 @@ public class InviteManager
         }
         for (TeleportInvite invite : invites)
         {
-            if (invitedUsers.contains(invite.getUserkey()))
+            if (invitedUsers.contains(invite.getValue(TABLE_INVITE.USERKEY)))
             {
-                invitedUsers.remove(invite.getUserkey()); // already invited
+                invitedUsers.remove(invite.getValue(TABLE_INVITE.USERKEY)); // already invited
             }
             else
             {
@@ -139,7 +140,7 @@ public class InviteManager
         }
         for (UInteger invitedUser : invitedUsers)
         {
-            this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getKey(), invitedUser).insert(); // not yet invited
+            this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getValue(TABLE_TP_POINT.KEY), invitedUser).insert(); // not yet invited
         }
     }
 

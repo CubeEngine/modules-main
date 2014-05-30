@@ -17,6 +17,7 @@
  */
 package de.cubeisland.engine.module.basics.command.general;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.bukkit.entity.Player;
@@ -24,11 +25,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 
+import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
-import de.cubeisland.engine.core.user.User;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 
 public class MuteListener implements Listener
 {
@@ -51,7 +53,8 @@ public class MuteListener implements Listener
             if (sender != null)
             {
                 BasicsUserEntity bUser = basics.getBasicsUser(sender).getbUEntity();
-                if (bUser.getMuted() != null && System.currentTimeMillis() < bUser.getMuted().getTime())
+                Timestamp muted = bUser.getValue(TABLE_BASIC_USER.MUTED);
+                if (muted != null && System.currentTimeMillis() < muted.getTime())
                 {
                     event.setCancelled(true);
                     sender.sendTranslated(NEGATIVE, "You try to speak but nothing happens!");

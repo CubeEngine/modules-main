@@ -22,12 +22,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
 import de.cubeisland.engine.module.conomy.account.storage.BankAccessModel;
-import de.cubeisland.engine.core.user.User;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.module.conomy.account.storage.BankAccessModel.*;
+import static de.cubeisland.engine.module.conomy.account.storage.BankAccessModel.AccessLevel.*;
+import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 import static de.cubeisland.engine.module.conomy.account.storage.TableBankAccess.TABLE_BANK_ACCESS;
 
 public class BankAccount extends Account
@@ -45,16 +46,16 @@ public class BankAccount extends Account
 
         for (BankAccessModel access : this.manager.getBankAccess(this.model))
         {
-            switch (access.getAccesslevel())
+            switch (access.getAccessLevel())
             {
                case OWNER:
-                   this.owner.put(access.getUserid(), access);
+                   this.owner.put(access.getValue(TABLE_BANK_ACCESS.USERID), access);
                    break;
                case MEMBER:
-                   this.member.put(access.getUserid(), access);
+                   this.member.put(access.getValue(TABLE_BANK_ACCESS.USERID), access);
                    break;
                case INVITED:
-                   this.invites.put(access.getUserid(), access);
+                   this.invites.put(access.getValue(TABLE_BANK_ACCESS.USERID), access);
             }
         }
     }
@@ -62,7 +63,7 @@ public class BankAccount extends Account
     @Override
     public String getName()
     {
-        return this.model.getName();
+        return this.model.getValue(TABLE_ACCOUNT.NAME);
     }
 
     @Override
@@ -82,7 +83,7 @@ public class BankAccount extends Account
     @Override
     public boolean has(double amount)
     {
-        return (this.model.getValue() - amount * this.manager.fractionalDigitsFactor()) >= this.manager.getMinimumBankBalance();
+        return (this.model.getValue(TABLE_ACCOUNT.VALUE) - amount * this.manager.fractionalDigitsFactor()) >= this.manager.getMinimumBankBalance();
     }
 
     @Override
@@ -111,7 +112,7 @@ public class BankAccount extends Account
         BankAccessModel access = this.member.remove(user.getEntity().getKey());
         if (access != null) // promote new owner
         {
-            access.setAccesslevel(OWNER);
+            access.setAccessLevel(OWNER);
             access.update();
         }
         else // create new owner
@@ -134,7 +135,7 @@ public class BankAccount extends Account
         if (this.isOwner(user))
         {
             BankAccessModel access = this.owner.remove(user.getEntity().getKey());
-            access.setAccesslevel(MEMBER);
+            access.setAccessLevel(MEMBER);
             access.update();
             this.member.put(user.getEntity().getKey(), access);
             return true;
@@ -159,7 +160,7 @@ public class BankAccount extends Account
         }
         else
         {
-            access.setAccesslevel(MEMBER);
+            access.setAccessLevel(MEMBER);
             access.update();
         }
         this.member.put(user.getEntity().getKey(), access);
@@ -250,7 +251,7 @@ public class BankAccount extends Account
         Set<String> invites = new HashSet<>();
         for (BankAccessModel bankAccessModel : this.invites.values())
         {
-            invites.add(this.manager.um.getUser(bankAccessModel.getUserid()).getName());
+            invites.add(this.manager.um.getUser(bankAccessModel.getValue(TABLE_BANK_ACCESS.USERID)).getName());
         }
         return invites;
     }
@@ -260,7 +261,7 @@ public class BankAccount extends Account
         Set<String> owners = new HashSet<>();
         for (BankAccessModel bankAccessModel : this.owner.values())
         {
-            owners.add(this.manager.um.getUser(bankAccessModel.getUserid()).getName());
+            owners.add(this.manager.um.getUser(bankAccessModel.getValue(TABLE_BANK_ACCESS.USERID)).getName());
         }
         return owners;
     }
@@ -270,7 +271,7 @@ public class BankAccount extends Account
         Set<String> members = new HashSet<>();
         for (BankAccessModel bankAccessModel : this.member.values())
         {
-            members.add(this.manager.um.getUser(bankAccessModel.getUserid()).getName());
+            members.add(this.manager.um.getUser(bankAccessModel.getValue(TABLE_BANK_ACCESS.USERID)).getName());
         }
         return members;
     }

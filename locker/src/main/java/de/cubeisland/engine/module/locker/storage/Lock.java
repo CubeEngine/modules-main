@@ -47,10 +47,13 @@ import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.LockerAttachment;
 import org.jooq.Result;
 
+import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.storage.AccessListModel.*;
 import static de.cubeisland.engine.module.locker.storage.LockType.PUBLIC;
 import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
+import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
+import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static org.bukkit.Material.IRON_DOOR_BLOCK;
 import static org.bukkit.Sound.DOOR_CLOSE;
 import static org.bukkit.Sound.DOOR_OPEN;
@@ -202,12 +205,12 @@ public class Lock
             if (model == null)
             {
                 model = this.manager.dsl.newRecord(TABLE_ACCESS_LIST).newAccess(this.model, modifyUser);
-                model.setLevel(level);
+                model.setValue(TABLE_ACCESS_LIST.LEVEL, level);
                 model.insert();
             }
             else
             {
-                model.setLevel(level);
+                model.setValue(TABLE_ACCESS_LIST.LEVEL, level);
                 model.update();
                 return false;
             }
@@ -325,13 +328,14 @@ public class Lock
         synchronized (this.manager.messageDigest)
         {
             this.manager.messageDigest.reset();
-            return Arrays.equals(this.manager.messageDigest.digest(pass.getBytes()), this.model.getPassword());
+            return Arrays.equals(this.manager.messageDigest.digest(pass.getBytes()), this.model.getValue(TABLE_LOCK.PASSWORD));
         }
     }
 
     private Location getLocation(LockLocationModel model)
     {
-        return new Location(this.manager.wm.getWorld(model.getWorldId().longValue()), model.getX(), model.getY(), model.getZ());
+        return new Location(this.manager.wm.getWorld(model.getValue(TABLE_LOCK_LOCATION.WORLD_ID)), model.getValue(
+            TABLE_LOCK_LOCATION.X), model.getValue(TABLE_LOCK_LOCATION.Y), model.getValue(TABLE_LOCK_LOCATION.Z));
     }
 
     public boolean isBlockLock()
@@ -367,7 +371,7 @@ public class Lock
             return;
         }
         if (event.isCancelled()) return;
-        if (this.model.getOwnerId().equals(user.getEntity().getKey())) return; // Its the owner
+        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getKey())) return; // Its the owner
         switch (this.getLockType())
         {
             case PRIVATE: // block changes
@@ -398,7 +402,7 @@ public class Lock
     private AccessListModel getAccess(User user)
     {
         AccessListModel model = this.manager.dsl.selectFrom(TABLE_ACCESS_LIST).
-            where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getId()),
+            where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID)),
                   TABLE_ACCESS_LIST.USER_ID.eq(user.getEntity().getKey())).fetchOne();
         if (model == null)
         {
@@ -513,17 +517,17 @@ public class Lock
 
     public ProtectedType getProtectedType()
     {
-        return ProtectedType.forByte(this.model.getType());
+        return ProtectedType.forByte(this.model.getValue(TABLE_LOCK.PROTECTED_TYPE));
     }
 
     public LockType getLockType()
     {
-        return LockType.forByte(this.model.getLockType());
+        return LockType.forByte(this.model.getValue(TABLE_LOCK.LOCK_TYPE));
     }
 
     public void handleBlockBreak(BlockBreakEvent event, User user)
     {
-        if (this.model.getOwnerId().equals(user.getEntity().getKey()) || module.perms().BREAK_OTHER.isAuthorized(user))
+        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getKey()) || module.perms().BREAK_OTHER.isAuthorized(user))
         {
             this.delete(user);
             return;
@@ -551,7 +555,7 @@ public class Lock
 
     public boolean handleEntityDamage(Cancellable event, User user)
     {
-        if (this.model.getOwnerId().equals(user.getEntity().getKey()) || module.perms().BREAK_OTHER.isAuthorized(user))
+        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getKey()) || module.perms().BREAK_OTHER.isAuthorized(user))
         {
             user.sendTranslated(NEUTRAL, "The magic surrounding this entity quivers as you hit it!");
             return true;
@@ -578,13 +582,13 @@ public class Lock
 
     public boolean isOwner(User user)
     {
-        return this.model.getOwnerId().equals(user.getEntity().getKey());
+        return this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getKey());
     }
 
     public boolean hasAdmin(User user)
     {
         AccessListModel access = this.getAccess(user);
-        return access != null && (access.getLevel() & ACCESS_ADMIN) == ACCESS_ADMIN;
+        return access != null && (access.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN;
     }
 
     public String getColorPass()
@@ -594,12 +598,12 @@ public class Lock
 
     public Long getId()
     {
-        return this.model.getId().longValue();
+        return this.model.getValue(TABLE_LOCK.ID).longValue();
     }
 
     public boolean hasPass()
     {
-        return this.model.getPassword().length > 4;
+        return this.model.getValue(TABLE_LOCK.PASSWORD).length > 4;
     }
 
     private Map<UUID, Long> lastKeyNotify;
@@ -610,7 +614,7 @@ public class Lock
         {
             this.lastKeyNotify = new HashMap<>();
         }
-        User owner = this.manager.um.getUser(this.model.getOwnerId());
+        User owner = this.manager.um.getUser(this.model.getValue(TABLE_LOCK.OWNER_ID));
         Long last = this.lastKeyNotify.get(owner.getUniqueId());
         if (last == null || TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - last) > 60) // 60 sec config ?
         {
@@ -634,7 +638,7 @@ public class Lock
             {
                 this.lastNotify = new HashMap<>();
             }
-            User owner = this.manager.um.getUser(this.model.getOwnerId());
+            User owner = this.manager.um.getUser(this.model.getValue(TABLE_LOCK.OWNER_ID));
             Long last = this.lastNotify.get(owner.getUniqueId());
             if (last == null || TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - last) > 60) // 60 sec config ?
             {
@@ -665,7 +669,7 @@ public class Lock
 
     public User getOwner()
     {
-        return this.manager.module.getCore().getUserManager().getUser(this.model.getOwnerId());
+        return this.manager.module.getCore().getUserManager().getUser(this.model.getValue(TABLE_LOCK.OWNER_ID));
     }
 
     public boolean isPublic()
@@ -675,7 +679,7 @@ public class Lock
 
     public boolean hasFlag(ProtectionFlag flag)
     {
-        return flag.flagValue == (this.model.getFlags() & flag.flagValue);
+        return flag.flagValue == (this.model.getValue(TABLE_LOCK.FLAGS) & flag.flagValue);
     }
 
     public void showInfo(User user)
@@ -684,8 +688,8 @@ public class Lock
         {
             user.sendMessage("");
             user.sendTranslated(POSITIVE, "Protection: #{integer#id} Type: {input#type} by {user}", this.getId(), this.getLockType().name(), this.getOwner());
-            user.sendTranslated(POSITIVE, "protects {input#type} since {input#time}", this.getProtectedType().name(), this.model.getCreated().toString());
-            user.sendTranslated(POSITIVE, "last access was {input#time}", this.model.getLastAccess().toString());
+            user.sendTranslated(POSITIVE, "protects {input#type} since {input#time}", this.getProtectedType().name(), this.model.getValue(TABLE_LOCK.CREATED).toString());
+            user.sendTranslated(POSITIVE, "last access was {input#time}", this.model.getValue(TABLE_LOCK.LAST_ACCESS).toString());
             if (this.hasPass())
             {
                 if (user.attachOrGet(LockerAttachment.class, this.manager.module).hasUnlocked(this))
@@ -722,8 +726,8 @@ public class Lock
                 user.sendTranslated(POSITIVE, "The following users have direct access to this protection");
                 for (AccessListModel listModel : accessors)
                 {
-                    User accessor = this.manager.module.getCore().getUserManager().getUser(listModel.getUserId());
-                    if ((listModel.getLevel() & ACCESS_ADMIN) == ACCESS_ADMIN)
+                    User accessor = this.manager.module.getCore().getUserManager().getUser(listModel.getValue(TABLE_USER.KEY));
+                    if ((listModel.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN)
                     {
                         user.sendMessage("  " + ChatFormat.GREY + "- " + ChatFormat.DARK_GREEN + accessor.getDisplayName() + ChatFormat.GOLD + " [Admin}");
                     }
@@ -795,7 +799,7 @@ public class Lock
     public List<AccessListModel> getAccessors()
     {
         return this.manager.dsl.selectFrom(TABLE_ACCESS_LIST).
-            where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getId())).fetch();
+            where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID))).fetch();
     }
 
     public void unlock(User user, Location soundLoc, String pass)
@@ -958,19 +962,19 @@ public class Lock
 
     public void setOwner(User owner)
     {
-        this.model.setOwnerId(owner.getEntity().getKey());
+        this.model.setValue(TABLE_LOCK.OWNER_ID, owner.getEntity().getKey());
         this.model.update();
     }
 
     public void setFlags(short flags)
     {
-        this.model.setFlags(flags);
+        this.model.setValue(TABLE_LOCK.FLAGS, flags);
         this.model.update();
     }
 
     public short getFlags()
     {
-        return this.model.getFlags();
+        return this.model.getValue(TABLE_LOCK.FLAGS);
     }
 
     public UUID getEntityUID()

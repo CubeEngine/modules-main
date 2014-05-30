@@ -43,6 +43,7 @@ import org.joda.time.Duration;
 import static de.cubeisland.engine.core.command.sender.WrappedCommandSender.NON_PLAYER_UUID;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 
 public class ChatCommands
 {
@@ -170,8 +171,9 @@ public class ChatCommands
     public void mute(CubeContext context)
     {
         User user = context.getArg(0);
-        BasicsUserEntity basicsUserEntity = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getbUEntity();
-        if (basicsUserEntity.getMuted() != null && basicsUserEntity.getMuted().getTime() < System.currentTimeMillis())
+        BasicsUserEntity bUser = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getbUEntity();
+        Timestamp muted = bUser.getValue(TABLE_BASIC_USER.MUTED);
+        if (muted != null && muted.getTime() < System.currentTimeMillis())
         {
             context.sendTranslated(NEUTRAL, "{user} was already muted!", user);
         }
@@ -188,9 +190,9 @@ public class ChatCommands
                 return;
             }
         }
-        basicsUserEntity.setMuted(new Timestamp(System.currentTimeMillis() +
+        bUser.setValue(TABLE_BASIC_USER.MUTED, new Timestamp(System.currentTimeMillis() +
             (dura.getMillis() == 0 ? TimeUnit.DAYS.toMillis(9001) : dura.getMillis())));
-        basicsUserEntity.update();
+        bUser.update();
         String timeString = dura.getMillis() == 0 ? user.getTranslation(NONE, "ever") : TimeUtil.format(user.getLocale(), dura.getMillis());
         user.sendTranslated(NEGATIVE, "You are now muted for {input#amount}!", timeString);
         context.sendTranslated(NEUTRAL, "You muted {user} globally for {input#amount}!", user, timeString);
@@ -202,7 +204,7 @@ public class ChatCommands
     {
         User user = context.getArg(0);
         BasicsUserEntity basicsUserEntity = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getbUEntity();
-        basicsUserEntity.setMuted(null);
+        basicsUserEntity.setValue(TABLE_BASIC_USER.MUTED, null);
         basicsUserEntity.update();
         context.sendTranslated(POSITIVE, "{user} is no longer muted!", user);
     }

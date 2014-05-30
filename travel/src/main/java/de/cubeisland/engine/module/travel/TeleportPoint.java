@@ -25,9 +25,11 @@ import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
+import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.VISIBILITY_PUBLIC;
+import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 
 public abstract class TeleportPoint
 {
@@ -70,19 +72,19 @@ public abstract class TeleportPoint
 
     public User getOwner()
     {
-        return this.module.getCore().getUserManager().getUser(model.getOwnerKey());
+        return this.module.getCore().getUserManager().getUser(model.getValue(TABLE_TP_POINT.OWNER));
     }
 
     public void setOwner(User owner)
     {
-        this.model.setOwnerKey(owner.getEntity().getKey());
+        this.model.setValue(TABLE_TP_POINT.OWNER, owner.getEntity().getKey());
     }
 
     public boolean isOwner(CommandSender user)
     {
         if (user instanceof User)
         {
-            return model.getOwnerKey().equals(((User)user).getEntity().getKey());
+            return model.getValue(TABLE_TP_POINT.OWNER).equals(((User)user).getEntity().getKey());
         }
         return false;
     }
@@ -112,14 +114,14 @@ public abstract class TeleportPoint
         return this.getInvited().contains(user.getEntity().getKey()) || this.isPublic();
     }
 
-    public void setVisibility(short visibility)
+    public void setVisibility(Visibility visibility)
     {
-        model.setVisibility(visibility);
+        model.setValue(TABLE_TP_POINT.VISIBILITY, visibility.value);
     }
 
-    public short getVisibility()
+    public Visibility getVisibility()
     {
-        return model.getVisibility();
+        return Visibility.valueOf(model.getValue(TABLE_TP_POINT.VISIBILITY));
     }
 
     public Set<UInteger> getInvited()
@@ -140,38 +142,39 @@ public abstract class TeleportPoint
     {
         if (this.ownerName == null)
         {
-            this.ownerName = this.module.getCore().getUserManager().getUserName(model.getOwnerKey());
+            this.ownerName = this.module.getCore().getUserManager().getUserName(model.getValue(TABLE_TP_POINT.OWNER));
         }
         return this.ownerName;
     }
 
     public String getName()
     {
-        return model.getName();
+        return model.getValue(TABLE_TP_POINT.NAME);
     }
 
     public void setName(String name)
     {
-        model.setName(name);
+        model.setValue(TABLE_TP_POINT.NAME, name);
     }
 
     public String getWelcomeMsg()
     {
-        if (model.getWelcomemsg() == null || model.getWelcomemsg().isEmpty())
+        String value = model.getValue(TABLE_TP_POINT.WELCOMEMSG);
+        if (value == null || value.isEmpty())
         {
             return null;
         }
-        return model.getWelcomemsg();
+        return value;
     }
 
     public void setWelcomeMsg(String welcomeMsg)
     {
-        model.setWelcomemsg(welcomeMsg);
+        model.setValue(TABLE_TP_POINT.WELCOMEMSG, welcomeMsg);
     }
 
     public boolean isPublic()
     {
-        return this.getVisibility() == VISIBILITY_PUBLIC;
+        return this.getVisibility() == PUBLIC;
     }
 
     public boolean canAccess(User user)

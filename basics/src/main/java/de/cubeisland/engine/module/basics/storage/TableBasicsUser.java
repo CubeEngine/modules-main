@@ -23,13 +23,16 @@ import de.cubeisland.engine.core.storage.database.Table;
 import de.cubeisland.engine.core.util.Version;
 import org.jooq.TableField;
 import org.jooq.types.UInteger;
-import org.jooq.util.mysql.MySQLDataType;
 
 import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
+import static org.jooq.util.mysql.MySQLDataType.DATETIME;
 
 public class TableBasicsUser extends Table<BasicsUserEntity>
 {
     public static TableBasicsUser TABLE_BASIC_USER;
+    public final TableField<BasicsUserEntity, UInteger> KEY = createField("key", U_INTEGER.nullable(false), this);
+    public final TableField<BasicsUserEntity, Timestamp> MUTED = createField("muted", DATETIME, this);
+    public final TableField<BasicsUserEntity, Boolean> GODMODE = createField("godMode", BOOLEAN.nullable(false), this);
 
     public TableBasicsUser(String prefix)
     {
@@ -40,12 +43,9 @@ public class TableBasicsUser extends Table<BasicsUserEntity>
         TABLE_BASIC_USER = this;
     }
 
-    public final TableField<BasicsUserEntity, UInteger> KEY = createField("key", U_INTEGER.nullable(false), this);
-    public final TableField<BasicsUserEntity, Timestamp> MUTED = createField("muted", MySQLDataType.DATETIME, this);
-    public final TableField<BasicsUserEntity, Boolean> GODMODE = createField("godMode", BOOLEAN.nullable(false), this);
-
     @Override
-    public Class<BasicsUserEntity> getRecordType() {
+    public Class<BasicsUserEntity> getRecordType()
+    {
         return BasicsUserEntity.class;
     }
 }

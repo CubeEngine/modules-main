@@ -17,15 +17,12 @@
  */
 package de.cubeisland.engine.module.travel.storage;
 
-import org.jooq.Field;
-import org.jooq.Record2;
-import org.jooq.Row2;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
 
-public class TeleportInvite extends UpdatableRecordImpl<TeleportInvite> implements Record2<UInteger, UInteger>
+public class TeleportInvite extends UpdatableRecordImpl<TeleportInvite>
 {
     public TeleportInvite()
     {
@@ -34,73 +31,8 @@ public class TeleportInvite extends UpdatableRecordImpl<TeleportInvite> implemen
 
     public TeleportInvite newInvite(UInteger teleportPoint, UInteger userKey)
     {
-        this.setTeleportpoint(teleportPoint);
-        this.setUserkey(userKey);
+        this.setValue(TABLE_INVITE.TELEPORTPOINT, teleportPoint);
+        this.setValue(TABLE_INVITE.USERKEY, userKey);
         return this;
-    }
-
-    public void setTeleportpoint(UInteger value)
-    {
-        setValue(0, value);
-    }
-
-    public UInteger getTeleportpoint()
-    {
-        return (UInteger)getValue(0);
-    }
-
-    public void setUserkey(UInteger value)
-    {
-        setValue(1, value);
-    }
-
-    public UInteger getUserkey()
-    {
-        return (UInteger)getValue(1);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Record2<UInteger, UInteger> key()
-    {
-        return (Record2)super.key();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Row2<UInteger, UInteger> fieldsRow()
-    {
-        return (Row2)super.fieldsRow();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Row2<UInteger, UInteger> valuesRow()
-    {
-        return (Row2)super.valuesRow();
-    }
-
-    @Override
-    public Field<UInteger> field1()
-    {
-        return TABLE_INVITE.TELEPORTPOINT;
-    }
-
-    @Override
-    public Field<UInteger> field2()
-    {
-        return TABLE_INVITE.USERKEY;
-    }
-
-    @Override
-    public UInteger value1()
-    {
-        return getTeleportpoint();
-    }
-
-    @Override
-    public UInteger value2()
-    {
-        return getUserkey();
     }
 }

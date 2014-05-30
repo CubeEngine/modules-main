@@ -27,10 +27,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
 
-import de.cubeisland.engine.module.conomy.Conomy;
-import de.cubeisland.engine.module.conomy.ConomyConfiguration;
-import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
-import de.cubeisland.engine.module.conomy.account.storage.BankAccessModel;
 import de.cubeisland.engine.core.logging.LoggingUtil;
 import de.cubeisland.engine.core.module.service.Economy;
 import de.cubeisland.engine.core.user.User;
@@ -38,6 +34,10 @@ import de.cubeisland.engine.core.user.UserManager;
 import de.cubeisland.engine.logging.Log;
 import de.cubeisland.engine.logging.LogLevel;
 import de.cubeisland.engine.logging.target.file.AsyncFileTarget;
+import de.cubeisland.engine.module.conomy.Conomy;
+import de.cubeisland.engine.module.conomy.ConomyConfiguration;
+import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
+import de.cubeisland.engine.module.conomy.account.storage.BankAccessModel;
 import gnu.trove.map.hash.THashMap;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
@@ -107,7 +107,7 @@ public class ConomyManager
                 this.logger.info("LOAD Bank:{} :: {}", name, bankAccount.balance());
             }
             this.bankaccounts.put(name, bankAccount);
-            this.bankaccountsID.put(bankAccount.model.getKey().longValue(), bankAccount);
+            this.bankaccountsID.put(bankAccount.model.getValue(TABLE_ACCOUNT.KEY).longValue(), bankAccount);
         }
         return bankAccount;
     }
@@ -178,7 +178,7 @@ public class ConomyManager
                 UserAccount userAccount = ConomyManager.this.getUserAccount(user, false);
                 if (userAccount != null)
                 {
-                    userAccount.model.setValue(longValue);
+                    userAccount.model.setValue(TABLE_ACCOUNT.VALUE, longValue);
                 }
             }
         }
@@ -186,7 +186,7 @@ public class ConomyManager
         {
             for (BankAccount bankAccount : this.bankaccounts.values())
             {
-                bankAccount.model.setValue(longValue);
+                bankAccount.model.setValue(TABLE_ACCOUNT.VALUE, longValue);
             }
         }
     }
@@ -206,7 +206,7 @@ public class ConomyManager
                 UserAccount userAccount = ConomyManager.this.getUserAccount(user, false);
                 if (userAccount != null)
                 {
-                    userAccount.model.setValue((long)(userAccount.model.getValue() * factor));
+                    userAccount.model.setValue(TABLE_ACCOUNT.VALUE, (long)(userAccount.model.getValue(TABLE_ACCOUNT.VALUE) * factor));
                 }
             }
         }
@@ -214,7 +214,7 @@ public class ConomyManager
         {
             for (BankAccount bankAccount : this.bankaccounts.values())
             {
-                bankAccount.model.setValue((long)(bankAccount.model.getValue() * factor));
+                bankAccount.model.setValue(TABLE_ACCOUNT.VALUE, (long)(bankAccount.model.getValue(TABLE_ACCOUNT.VALUE) * factor));
             }
         }
     }
@@ -236,7 +236,7 @@ public class ConomyManager
                 UserAccount userAccount = ConomyManager.this.getUserAccount(user, false);
                 if (userAccount != null)
                 {
-                    userAccount.model.setValue(userAccount.model.getValue() + longValue);
+                    userAccount.model.setValue(TABLE_ACCOUNT.VALUE, userAccount.model.getValue(TABLE_ACCOUNT.VALUE) + longValue);
                 }
             }
         }
@@ -244,7 +244,7 @@ public class ConomyManager
         {
             for (BankAccount bankAccount : this.bankaccounts.values())
             {
-                bankAccount.model.setValue(bankAccount.model.getValue() + longValue);
+                bankAccount.model.setValue(TABLE_ACCOUNT.VALUE, bankAccount.model.getValue(TABLE_ACCOUNT.VALUE) + longValue);
             }
         }
     }
@@ -361,7 +361,7 @@ public class ConomyManager
         }
         bankAccount.model.delete();
         this.bankaccounts.remove(name);
-        this.bankaccountsID.remove(bankAccount.model.getKey().longValue());
+        this.bankaccountsID.remove(bankAccount.model.getValue(TABLE_ACCOUNT.KEY).longValue());
         return true;
     }
 
@@ -427,11 +427,11 @@ public class ConomyManager
         Set<BankAccount> accounts = new HashSet<>();
         for (AccountModel accountModel : accountModels)
         {
-            BankAccount account = this.bankaccountsID.get(accountModel.getKey().longValue());
+            BankAccount account = this.bankaccountsID.get(accountModel.getValue(TABLE_ACCOUNT.KEY).longValue());
             if (account == null)
             {
                 account = new BankAccount(this, accountModel);
-                this.bankaccountsID.put(accountModel.getKey().longValue(), account);
+                this.bankaccountsID.put(accountModel.getValue(TABLE_ACCOUNT.KEY).longValue(), account);
                 this.bankaccounts.put(account.getName(), account);
             }
             accounts.add(account);
@@ -452,7 +452,7 @@ public class ConomyManager
             return false; // Account name exists!
         }
         this.bankaccounts.remove(bankAccount.getName());
-        bankAccount.model.setName(newName);
+        bankAccount.model.setValue(TABLE_ACCOUNT.NAME, newName);
         bankAccount.model.update();
         this.bankaccounts.put(newName, bankAccount);
         return true;
@@ -473,8 +473,7 @@ public class ConomyManager
         Set<String> banks = new HashSet<>();
         Result<Record1<String>> fetch = this.dsl.select(TABLE_ACCOUNT.NAME).from(TABLE_ACCOUNT).
             where(TABLE_ACCOUNT.NAME.isNotNull()).
-                                                    and(DSL.condition(
-                                                        "(mask & 1 = 0) OR (mask & 1 = 1) = " + hidden)).fetch();
+            and(DSL.condition("(mask & 1 = 0) OR (mask & 1 = 1) = " + hidden)).fetch();
         for (Record1<String> names : fetch)
         {
             banks.add(names.value1());
@@ -490,6 +489,6 @@ public class ConomyManager
 
     public List<BankAccessModel> getBankAccess(AccountModel model)
     {
-        return this.dsl.selectFrom(TABLE_BANK_ACCESS).where(TABLE_BANK_ACCESS.ACCOUNTID.eq(model.getKey())).fetch();
+        return this.dsl.selectFrom(TABLE_BANK_ACCESS).where(TABLE_BANK_ACCESS.ACCOUNTID.eq(model.getValue(TABLE_ACCOUNT.KEY))).fetch();
     }
 }

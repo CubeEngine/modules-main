@@ -19,17 +19,13 @@ package de.cubeisland.engine.module.locker.storage;
 
 import org.bukkit.Location;
 
-import de.cubeisland.engine.core.CubeEngine;
-import org.jooq.Field;
-import org.jooq.Record1;
-import org.jooq.Record8;
-import org.jooq.Row8;
 import org.jooq.impl.UpdatableRecordImpl;
-import org.jooq.types.UInteger;
 
+import static de.cubeisland.engine.core.CubeEngine.getCore;
 import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
+import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 
-public class LockLocationModel extends UpdatableRecordImpl<LockLocationModel> implements Record8<UInteger, UInteger, Integer, Integer, Integer, Integer, Integer, UInteger>
+public class LockLocationModel extends UpdatableRecordImpl<LockLocationModel>
 {
     public LockLocationModel()
     {
@@ -39,184 +35,17 @@ public class LockLocationModel extends UpdatableRecordImpl<LockLocationModel> im
     public LockLocationModel newLocation(LockModel model, Location location)
     {
         this.setLocation(location);
-        this.setLockId(model.getId());
+        this.setValue(TABLE_LOCK_LOCATION.LOCK_ID, model.getValue(TABLE_LOCK.ID));
         return this;
     }
 
     private void setLocation(Location location)
     {
-        this.setWorldId(UInteger.valueOf(CubeEngine.getCore().getWorldManager().getWorldId(location.getWorld())));
-        this.setX(location.getBlockX());
-        this.setY(location.getBlockY());
-        this.setZ(location.getBlockZ());
-        this.setChunkX(location.getChunk().getX());
-        this.setChunkZ(location.getChunk().getZ());
-    }
-
-    public void setId(UInteger value) {
-        setValue(0, value);
-    }
-
-    public UInteger getId() {
-        return (UInteger) getValue(0);
-    }
-
-    public void setWorldId(UInteger value) {
-        setValue(1, value);
-    }
-
-    public UInteger getWorldId() {
-        return (UInteger) getValue(1);
-    }
-
-    public void setX(Integer value) {
-        setValue(2, value);
-    }
-
-    public Integer getX() {
-        return (Integer) getValue(2);
-    }
-
-    public void setY(Integer value) {
-        setValue(3, value);
-    }
-
-    public Integer getY() {
-        return (Integer) getValue(3);
-    }
-
-    public void setZ(Integer value) {
-        setValue(4, value);
-    }
-
-    public Integer getZ() {
-        return (Integer) getValue(4);
-    }
-
-    public void setChunkX(Integer value) {
-        setValue(5, value);
-    }
-
-    public Integer getChunkX() {
-        return (Integer) getValue(5);
-    }
-
-    public void setChunkZ(Integer value) {
-        setValue(6, value);
-    }
-
-    public Integer getChunkZ() {
-        return (Integer) getValue(6);
-    }
-
-    public void setLockId(UInteger value) {
-        setValue(7, value);
-    }
-
-    public UInteger getLockId() {
-        return (UInteger) getValue(7);
-    }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Record1<UInteger> key() {
-        return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record6 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row8<UInteger, UInteger, Integer, Integer, Integer, Integer, Integer, UInteger> fieldsRow() {
-        return (Row8) super.fieldsRow();
-    }
-
-    @Override
-    public Row8<UInteger, UInteger, Integer, Integer, Integer, Integer, Integer, UInteger> valuesRow() {
-        return (Row8) super.valuesRow();
-    }
-
-    @Override
-    public Field<UInteger> field1() {
-        return TABLE_LOCK_LOCATION.ID;
-    }
-
-    @Override
-    public Field<UInteger> field2() {
-        return TABLE_LOCK_LOCATION.WORLD_ID;
-    }
-
-    @Override
-    public Field<Integer> field3() {
-        return TABLE_LOCK_LOCATION.X;
-    }
-
-    @Override
-    public Field<Integer> field4() {
-        return TABLE_LOCK_LOCATION.Y;
-    }
-
-    @Override
-    public Field<Integer> field5() {
-        return TABLE_LOCK_LOCATION.Z;
-    }
-
-    @Override
-    public Field<Integer> field6() {
-        return TABLE_LOCK_LOCATION.CHUNKX;
-    }
-
-    @Override
-    public Field<Integer> field7() {
-        return TABLE_LOCK_LOCATION.CHUNKZ;
-    }
-
-    @Override
-    public Field<UInteger> field8() {
-        return TABLE_LOCK_LOCATION.GUARD_ID;
-    }
-
-    @Override
-    public UInteger value1() {
-        return getId();
-    }
-
-    @Override
-    public UInteger value2() {
-        return getWorldId();
-    }
-
-    @Override
-    public Integer value3() {
-        return getX();
-    }
-
-    @Override
-    public Integer value4() {
-        return getY();
-    }
-
-    @Override
-    public Integer value5() {
-        return getZ();
-    }
-
-    @Override
-    public Integer value6() {
-        return getChunkX();
-    }
-
-    @Override
-    public Integer value7() {
-        return getChunkZ();
-    }
-
-    @Override
-    public UInteger value8() {
-        return getLockId();
+        this.setValue(TABLE_LOCK_LOCATION.WORLD_ID, getCore().getWorldManager().getWorldId(location.getWorld()));
+        this.setValue(TABLE_LOCK_LOCATION.X, location.getBlockX());
+        this.setValue(TABLE_LOCK_LOCATION.Y, location.getBlockY());
+        this.setValue(TABLE_LOCK_LOCATION.Z, location.getBlockZ());
+        this.setValue(TABLE_LOCK_LOCATION.CHUNKX, location.getChunk().getX());
+        this.setValue(TABLE_LOCK_LOCATION.CHUNKZ, location.getChunk().getZ());
     }
 }

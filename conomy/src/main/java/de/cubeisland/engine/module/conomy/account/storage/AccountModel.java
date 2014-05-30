@@ -18,16 +18,13 @@
 package de.cubeisland.engine.module.conomy.account.storage;
 
 import de.cubeisland.engine.core.user.User;
-import org.jooq.Field;
-import org.jooq.Record1;
-import org.jooq.Record5;
-import org.jooq.Row5;
+import de.cubeisland.engine.core.user.UserEntity;
 import org.jooq.impl.UpdatableRecordImpl;
-import org.jooq.types.UInteger;
 
+import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 
-public class AccountModel extends UpdatableRecordImpl<AccountModel> implements Record5<UInteger, UInteger, String, Long, Byte>
+public class AccountModel extends UpdatableRecordImpl<AccountModel>
 {
     public AccountModel()
     {
@@ -36,11 +33,16 @@ public class AccountModel extends UpdatableRecordImpl<AccountModel> implements R
 
     public AccountModel newAccount(User user, String name, long balance, boolean hidden, boolean needsInvite)
     {
-        this.setUserId(user == null ? null : user.getEntity().getKey());
-        this.setName(name);
-        this.setValue(balance);
-        this.setMask((byte)((hidden ? 1 : 0) + (needsInvite ? 2 : 0)));
+        this.setUser(user.getEntity());
+        this.setValue(TABLE_ACCOUNT.NAME, name);
+        this.setValue(TABLE_ACCOUNT.VALUE, balance);
+        this.setValue(TABLE_ACCOUNT.MASK, (byte)((hidden ? 1 : 0) + (needsInvite ? 2 : 0)));
         return this;
+    }
+
+    public void setUser(UserEntity user)
+    {
+        this.setValue(TABLE_ACCOUNT.USER_ID, user.getKey());
     }
 
     public AccountModel newAccount(User user, String name, long balance, boolean hidden)
@@ -50,17 +52,17 @@ public class AccountModel extends UpdatableRecordImpl<AccountModel> implements R
 
     public boolean needsInvite()
     {
-        return (this.getMask() & 2) == 2;
+        return (this.getValue(TABLE_ACCOUNT.MASK) & 2) == 2;
     }
 
     public boolean isHidden()
     {
-        return (this.getMask() & 1) == 1;
+        return (this.getValue(TABLE_ACCOUNT.MASK) & 1) == 1;
     }
 
     public void setNeedsInvite(boolean set)
     {
-        byte mask = this.getMask();
+        byte mask = this.getValue(TABLE_ACCOUNT.MASK);
         if (set)
         {
             mask |= 2;
@@ -69,12 +71,12 @@ public class AccountModel extends UpdatableRecordImpl<AccountModel> implements R
         {
             mask &= ~2;
         }
-        this.setMask(mask);
+        this.setValue(TABLE_ACCOUNT.MASK, mask);
     }
 
     public void setHidden(boolean set)
     {
-        byte mask = this.getMask();
+        byte mask = this.getValue(TABLE_ACCOUNT.MASK);
         if (set)
         {
             mask |= 1;
@@ -83,119 +85,6 @@ public class AccountModel extends UpdatableRecordImpl<AccountModel> implements R
         {
             mask &= ~1;
         }
-        this.setMask(mask);
-    }
-
-    public void setKey(UInteger value) {
-        setValue(0, value);
-    }
-
-    public UInteger getKey() {
-        return (UInteger) getValue(0);
-    }
-
-    public void setUserId(UInteger value) {
-        setValue(1, value);
-    }
-
-    public UInteger getUserId() {
-        return (UInteger) getValue(1);
-    }
-
-    public void setName(String value) {
-        setValue(2, value);
-    }
-
-    public String getName() {
-        return (String) getValue(2);
-    }
-
-    public void setValue(Long value) {
-        setValue(3, value);
-    }
-
-    public Long getValue() {
-        return (Long) getValue(3);
-    }
-
-    public void setMask(Byte value) {
-        setValue(4, value);
-    }
-
-    public Byte getMask() {
-        return (Byte) getValue(4);
-    }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Record1<UInteger> key() {
-        return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record5 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row5<UInteger, UInteger, String, Long, Byte> fieldsRow() {
-        return (Row5) super.fieldsRow();
-    }
-
-    @Override
-    public Row5<UInteger, UInteger, String, Long, Byte> valuesRow() {
-        return (Row5) super.valuesRow();
-    }
-
-    @Override
-    public Field<UInteger> field1() {
-        return TABLE_ACCOUNT.KEY;
-    }
-
-    @Override
-    public Field<UInteger> field2() {
-        return TABLE_ACCOUNT.USER_ID;
-    }
-
-    @Override
-    public Field<String> field3() {
-        return TABLE_ACCOUNT.NAME;
-    }
-
-    @Override
-    public Field<Long> field4() {
-        return TABLE_ACCOUNT.VALUE;
-    }
-
-    @Override
-    public Field<Byte> field5() {
-        return TABLE_ACCOUNT.MASK;
-    }
-
-    @Override
-    public UInteger value1() {
-        return getKey();
-    }
-
-    @Override
-    public UInteger value2() {
-        return getUserId();
-    }
-
-    @Override
-    public String value3() {
-        return getName();
-    }
-
-    @Override
-    public Long value4() {
-        return getValue();
-    }
-
-    @Override
-    public Byte value5() {
-        return getMask();
+        this.setValue(TABLE_ACCOUNT.MASK, mask);
     }
 }

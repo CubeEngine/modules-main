@@ -39,12 +39,13 @@ import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.travel.TpPointCommand;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportInvite;
+import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
 
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.VISIBILITY_PRIVATE;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.VISIBILITY_PUBLIC;
+import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 public class WarpCommand extends TpPointCommand
@@ -379,7 +380,7 @@ public class WarpCommand extends TpPointCommand
                 context.sendMessage(YELLOW + "  " + warp.getName() + ":");
                 for (TeleportInvite invite : invites)
                 {
-                    context.sendMessage("    " + DARK_GREEN + this.module.getCore().getUserManager().getUser(invite.getUserkey()).getDisplayName());
+                    context.sendMessage("    " + DARK_GREEN + this.module.getCore().getUserManager().getUser(invite.getValue(TABLE_INVITE.USERKEY)).getDisplayName());
                 }
             }
         }
@@ -481,7 +482,7 @@ public class WarpCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "This warp is already private!");
             return;
         }
-        warp.setVisibility(VISIBILITY_PRIVATE);
+        warp.setVisibility(Visibility.PRIVATE);
         if (warp.isOwner(context.getSender()))
         {
             context.sendTranslated(POSITIVE, "Your warp {name} is now private", warp.getName());
@@ -512,7 +513,7 @@ public class WarpCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "This warp is already public!");
             return;
         }
-        warp.setVisibility(VISIBILITY_PUBLIC);
+        warp.setVisibility(PUBLIC);
         if (warp.isOwner(context.getSender()))
         {
             context.sendTranslated(POSITIVE, "Your warp {name} is now public", warp.getName());

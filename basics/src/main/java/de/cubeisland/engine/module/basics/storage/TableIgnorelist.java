@@ -27,6 +27,8 @@ import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 public class TableIgnorelist extends Table<IgnoreList>
 {
     public static TableIgnorelist TABLE_IGNORE_LIST;
+    public final TableField<IgnoreList, UInteger> KEY = createField("key", U_INTEGER.nullable(false), this);
+    public final TableField<IgnoreList, UInteger> IGNORE = createField("ignore", U_INTEGER.nullable(false), this);
 
     public TableIgnorelist(String prefix)
     {
@@ -38,11 +40,9 @@ public class TableIgnorelist extends Table<IgnoreList>
         TABLE_IGNORE_LIST = this;
     }
 
-    public final TableField<IgnoreList, UInteger> KEY = createField("key", U_INTEGER.nullable(false), this);
-    public final TableField<IgnoreList, UInteger> IGNORE = createField("ignore", U_INTEGER.nullable(false), this);
-
     @Override
-    public Class<IgnoreList> getRecordType() {
+    public Class<IgnoreList> getRecordType()
+    {
         return IgnoreList.class;
     }
 }

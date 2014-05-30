@@ -92,7 +92,7 @@ public class WorldsCommands extends ContainerCommand
             @Flag(longName = "noload",name = "no")})
     public void create(CubeContext context)
     {
-        World world = this.wm.getWorld(0);
+        World world = this.wm.getWorld(context.getString(0));
         if (world != null)
         {
             if (context.hasFlag("r"))
@@ -112,8 +112,7 @@ public class WorldsCommands extends ContainerCommand
             {
                 try
                 {
-                    Path newPath = path.resolveSibling(context.getArg(0) + "_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss")
-                        .format(new Date()));
+                    Path newPath = path.resolveSibling(context.getArg(0) + "_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()));
                     Files.move(path, newPath);
                     context.sendTranslated(POSITIVE, "Old world moved to {name#folder}", path.getFileName().toString());
                 }
@@ -125,8 +124,7 @@ public class WorldsCommands extends ContainerCommand
             }
             else
             {
-                context.sendTranslated(NEGATIVE, "A world named {name#world} already exists but is not loaded!", context.getArg(
-                    0));
+                context.sendTranslated(NEGATIVE, "A world named {name#world} already exists but is not loaded!", context.getArg(0));
                 return;
             }
         }

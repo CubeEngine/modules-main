@@ -28,6 +28,11 @@ import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 public class TableAccount extends AutoIncrementTable<AccountModel, UInteger>
 {
     public static TableAccount TABLE_ACCOUNT;
+    public final TableField<AccountModel, UInteger> KEY = createField("key", U_INTEGER.nullable(false), this);
+    public final TableField<AccountModel, UInteger> USER_ID = createField("user_id", U_INTEGER, this);
+    public final TableField<AccountModel, String> NAME = createField("name", SQLDataType.VARCHAR.length(64), this);
+    public final TableField<AccountModel, Long> VALUE = createField("value", SQLDataType.BIGINT.nullable(false), this);
+    public final TableField<AccountModel, Byte> MASK = createField("mask", SQLDataType.TINYINT, this);
 
     public TableAccount(String prefix)
     {
@@ -39,14 +44,9 @@ public class TableAccount extends AutoIncrementTable<AccountModel, UInteger>
         TABLE_ACCOUNT = this;
     }
 
-    public final TableField<AccountModel, UInteger> KEY = createField("key", U_INTEGER.nullable(false), this);
-    public final TableField<AccountModel, UInteger> USER_ID = createField("user_id", U_INTEGER, this);
-    public final TableField<AccountModel, String> NAME = createField("name", SQLDataType.VARCHAR.length(64), this);
-    public final TableField<AccountModel, Long> VALUE = createField("value", SQLDataType.BIGINT.nullable(false), this);
-    public final TableField<AccountModel, Byte> MASK = createField("mask", SQLDataType.TINYINT, this);
-
     @Override
-    public Class<AccountModel> getRecordType() {
+    public Class<AccountModel> getRecordType()
+    {
         return AccountModel.class;
     }
 }

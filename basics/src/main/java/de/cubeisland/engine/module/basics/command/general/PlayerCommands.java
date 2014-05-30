@@ -33,13 +33,10 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 
-import de.cubeisland.engine.core.command.CubeContext;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
 import de.cubeisland.engine.core.ban.UserBan;
 import de.cubeisland.engine.core.bukkit.BukkitUtils;
 import de.cubeisland.engine.core.command.CommandSender;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.readers.UserListOrAllReader;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -53,8 +50,12 @@ import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.TimeUtil;
 import de.cubeisland.engine.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsAttachment;
+import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 import static java.text.DateFormat.SHORT;
 
 public class PlayerCommands
@@ -424,7 +425,7 @@ public class PlayerCommands
     {
         if (!force)
         {
-            if (module.perms().COMMAND_KILL_PREVENT.isAuthorized(user) || this.module.getBasicsUser(user).getbUEntity().getGodmode())
+            if (module.perms().COMMAND_KILL_PREVENT.isAuthorized(user) || this.module.getBasicsUser(user).getbUEntity().getValue(TABLE_BASIC_USER.GODMODE))
             {
                 context.sendTranslated(NEGATIVE, "You cannot kill {user}!", user);
                 return false;
@@ -592,7 +593,7 @@ public class PlayerCommands
             {
                 context.sendTranslated(NEUTRAL, "OP: {text:true:color=BRIGHT_GREEN}");
             }
-            Timestamp muted = module.getBasicsUser(user).getbUEntity().getMuted();
+            Timestamp muted = module.getBasicsUser(user).getbUEntity().getValue(TABLE_BASIC_USER.MUTED);
             if (muted != null && muted.getTime() > System.currentTimeMillis())
             {
                 context.sendTranslated(NEUTRAL, "Muted until {input#time}", DateFormat.getDateTimeInstance(SHORT, SHORT, context.getSender().getLocale()).format(muted));
@@ -651,9 +652,9 @@ public class PlayerCommands
             return;
         }
         BasicsUserEntity bUser = module.getBasicsUser(user).getbUEntity();
-        bUser.setGodmode(!bUser.getGodmode());
-        BukkitUtils.setInvulnerable(user, bUser.getGodmode());
-        if (bUser.getGodmode())
+        bUser.setValue(TABLE_BASIC_USER.GODMODE, !bUser.getValue(TABLE_BASIC_USER.GODMODE));
+        BukkitUtils.setInvulnerable(user, bUser.getValue(TABLE_BASIC_USER.GODMODE));
+        if (bUser.getValue(TABLE_BASIC_USER.GODMODE))
         {
             if (other)
             {

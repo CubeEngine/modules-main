@@ -44,8 +44,9 @@ import de.cubeisland.engine.module.travel.storage.TeleportInvite;
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.VISIBILITY_PRIVATE;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.VISIBILITY_PUBLIC;
+import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PRIVATE;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 public class HomeCommand extends TpPointCommand
@@ -369,7 +370,7 @@ public class HomeCommand extends TpPointCommand
                 context.sendMessage(YELLOW + "  " + home.getName() + ":");
                 for (TeleportInvite invite : invites)
                 {
-                    context.sendMessage("    " + DARK_GREEN + this.module.getCore().getUserManager().getUser(invite.getUserkey()).getDisplayName());
+                    context.sendMessage("    " + DARK_GREEN + this.module.getCore().getUserManager().getUser(invite.getValue(TABLE_INVITE.USERKEY)).getDisplayName());
                 }
             }
         }
@@ -483,7 +484,7 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "This home is already private!");
             return;
         }
-        home.setVisibility(VISIBILITY_PRIVATE);
+        home.setVisibility(PRIVATE);
         if (home.isOwner(context.getSender()))
         {
             context.sendTranslated(POSITIVE, "Your home {name} is now private", home.getName());
@@ -514,7 +515,7 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "This home is already public!");
             return;
         }
-        home.setVisibility(VISIBILITY_PUBLIC);
+        home.setVisibility(PUBLIC);
         if (home.isOwner(context.getSender()))
         {
             context.sendTranslated(POSITIVE, "Your home {name} is now public", home.getName());

@@ -27,6 +27,9 @@ import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.*;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.TeleportType.HOME;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PRIVATE;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 
 public class HomeManager extends TelePointManager<Home>
 {
@@ -38,7 +41,7 @@ public class HomeManager extends TelePointManager<Home>
     @Override
     public void load()
     {
-        for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.TYPE.eq(TYPE_HOME)).fetch())
+        for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.TYPE.eq(HOME.value)).fetch())
         {
             this.addPoint(new Home(teleportPoint, this.module));
         }
@@ -52,7 +55,7 @@ public class HomeManager extends TelePointManager<Home>
         {
             throw new IllegalArgumentException("Tried to create duplicate home!");
         }
-        TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, name, owner, null, TYPE_HOME, publicVisibility ? VISIBILITY_PUBLIC : VISIBILITY_PRIVATE);
+        TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, name, owner, null, HOME, publicVisibility ? PUBLIC : PRIVATE);
         Home home = new Home(model, this.module);
         model.insert();
         this.addPoint(home);

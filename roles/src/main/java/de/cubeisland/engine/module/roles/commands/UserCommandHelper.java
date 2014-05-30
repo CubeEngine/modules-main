@@ -70,11 +70,6 @@ public class UserCommandHelper extends ContainerCommand
         return user;
     }
 
-    protected long getWorldId(World world)
-    {
-        return this.getModule().getCore().getWorldManager().getWorldId(world);
-    }
-
     /**
      * Returns the world defined with named param "in" or the users world
      *

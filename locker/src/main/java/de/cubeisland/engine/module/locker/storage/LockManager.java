@@ -88,8 +88,8 @@ public class LockManager implements Listener
 
     public final CommandListener commandListener;
 
-    private final Map<Long, Map<Long, Lock>> loadedLocks = new HashMap<>();
-    private final Map<Long, Map<Long, Set<Lock>>> loadedLocksInChunk = new HashMap<>();
+    private final Map<UInteger, Map<Long, Lock>> loadedLocks = new HashMap<>();
+    private final Map<UInteger, Map<Long, Set<Lock>>> loadedLocksInChunk = new HashMap<>();
     private final Map<UUID, Lock> loadedEntityLocks = new HashMap<>();
     private final Map<Long, Lock> locksById = new HashMap<>();
 
@@ -142,9 +142,9 @@ public class LockManager implements Listener
 
     private ListenableFuture loadFromChunk(Chunk chunk)
     {
-        UInteger world_id = UInteger.valueOf(this.wm.getWorldId(chunk.getWorld()));
+        UInteger world_id = this.wm.getWorldId(chunk.getWorld());
         return this.database.fetchLater(this.database.getDSL().selectFrom(TABLE_LOCK).where(
-            TABLE_LOCK.ID.in(this.database.getDSL().select(TABLE_LOCK_LOCATION.GUARD_ID)
+            TABLE_LOCK.ID.in(this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID)
                                      .from(TABLE_LOCK_LOCATION)
                                      .where(TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id),
                                             TABLE_LOCK_LOCATION.CHUNKX.eq(chunk.getX()),
@@ -156,11 +156,11 @@ public class LockManager implements Listener
                              {
                                  Map<UInteger, Result<LockLocationModel>> locations = LockManager.
                                      this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION)
-                                      .where(TABLE_LOCK_LOCATION.GUARD_ID.in(models.getValues(TABLE_LOCK.ID)))
-                                      .fetch().intoGroups(TABLE_LOCK_LOCATION.GUARD_ID);
+                                      .where(TABLE_LOCK_LOCATION.LOCK_ID.in(models.getValues(TABLE_LOCK.ID)))
+                                      .fetch().intoGroups(TABLE_LOCK_LOCATION.LOCK_ID);
                                  for (LockModel model : models)
                                  {
-                                     Result<LockLocationModel> lockLoc = locations.get(model.getId());
+                                     Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
                                      addLoadedLocationLock(new Lock(LockManager.this, model, lockLoc));
                                  }
                              }
@@ -176,7 +176,7 @@ public class LockManager implements Listener
     private void addLoadedLocationLock(Lock lock)
     {
         this.locksById.put(lock.getId(), lock);
-        Long worldId = null;
+        UInteger worldId = null;
         for (Location loc : lock.getLocations())
         {
             if (worldId == null)
@@ -196,7 +196,7 @@ public class LockManager implements Listener
         }
     }
 
-    private Map<Long, Set<Lock>> getChunkLocksMap(long worldId)
+    private Map<Long, Set<Lock>> getChunkLocksMap(UInteger worldId)
     {
         Map<Long, Set<Lock>> locksInChunkMap = this.loadedLocksInChunk.get(worldId);
         if (locksInChunkMap == null)
@@ -207,7 +207,7 @@ public class LockManager implements Listener
         return locksInChunkMap;
     }
 
-    private Map<Long, Lock> getLocLockMap(long worldId)
+    private Map<Long, Lock> getLocLockMap(UInteger worldId)
     {
         Map<Long, Lock> locksAtLocMap = this.loadedLocks.get(worldId);
         if (locksAtLocMap == null)
@@ -221,7 +221,7 @@ public class LockManager implements Listener
     @EventHandler
     private void onChunkUnload(ChunkUnloadEvent event)
     {
-        long worldId = module.getCore().getWorldManager().getWorldId(event.getWorld());
+        UInteger worldId = module.getCore().getWorldManager().getWorldId(event.getWorld());
         Set<Lock> remove = this.getChunkLocksMap(worldId).remove(getChunkKey(event.getChunk().getX(), event.getChunk().getZ()));
         if (remove == null) return; // nothing to remove
         Map<Long, Lock> locLockMap = this.getLocLockMap(worldId);
@@ -278,7 +278,7 @@ public class LockManager implements Listener
      */
     public Lock getLockAtLocation(Location location, User user, boolean access, boolean repairExpand)
     {
-        long worldId = module.getCore().getWorldManager().getWorldId(location.getWorld());
+        UInteger worldId = module.getCore().getWorldManager().getWorldId(location.getWorld());
         Lock lock = this.getLocLockMap(worldId).get(getLocationKey(location));
         if (repairExpand && lock != null && lock.isSingleBlockLock())
         {
@@ -376,7 +376,7 @@ public class LockManager implements Listener
             {
                 return null;
             }
-            lock.model.setLastAccess(new Timestamp(System.currentTimeMillis()));
+            lock.model.setValue(TABLE_LOCK.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
         }
         return lock;
     }
@@ -394,7 +394,7 @@ public class LockManager implements Listener
         lock.locations.add(location);
         LockLocationModel model = this.dsl.newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location);
         model.insert();
-        long worldId = module.getCore().getWorldManager().getWorldId(location.getWorld());
+        UInteger worldId = module.getCore().getWorldManager().getWorldId(location.getWorld());
         this.getLocLockMap(worldId).put(getLocationKey(location), lock);
     }
 
@@ -417,7 +417,7 @@ public class LockManager implements Listener
                 for (Location location : lock.getLocations())
                 {
                     long chunkKey = getChunkKey(location);
-                    long worldId = module.getCore().getWorldManager().getWorldId(location.getWorld());
+                    UInteger worldId = module.getCore().getWorldManager().getWorldId(location.getWorld());
                     this.getLocLockMap(worldId).remove(getLocationKey(location));
                     Set<Lock> locks = this.getChunkLocksMap(worldId).get(chunkKey);
                     if (locks != null)
@@ -660,7 +660,7 @@ public class LockManager implements Listener
         if (lockModel != null)
         {
             Result<LockLocationModel> fetch = this.dsl.selectFrom(TABLE_LOCK_LOCATION)
-                                                      .where(TABLE_LOCK_LOCATION.GUARD_ID.eq(lockModel.getId()))
+                                                      .where(TABLE_LOCK_LOCATION.LOCK_ID.eq(lockModel.getValue(TABLE_LOCK.ID)))
                                                       .fetch();
             if (fetch.isEmpty())
             {
@@ -708,7 +708,7 @@ public class LockManager implements Listener
                 }
                 else
                 {
-                    accessListModel.setLevel(accessType);
+                    accessListModel.setValue(TABLE_ACCESS_LIST.LEVEL, accessType);
                     accessListModel.update();
                     sender.sendTranslated(POSITIVE, "Updated global access level for {user}!", modifyUser);
                 }

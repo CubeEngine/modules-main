@@ -22,13 +22,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.module.basics.BasicsUser;
-import de.cubeisland.engine.module.basics.storage.Mail;
-import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.ContainerCommand;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -36,14 +32,19 @@ import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.Indexed;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsAttachment;
+import de.cubeisland.engine.module.basics.BasicsUser;
+import de.cubeisland.engine.module.basics.storage.Mail;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
+import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
 
 public class MailCommand extends ContainerCommand
 {
@@ -152,7 +153,7 @@ public class MailCommand extends ContainerCommand
         for (Mail mail : mails)
         {
             i++;
-            sb.append("\n").append(ChatFormat.WHITE).append(i).append(": ").append(mail.getMessage());
+            sb.append("\n").append(ChatFormat.WHITE).append(i).append(": ").append(mail.getValue(TABLE_MAIL.MESSAGE));
         }
         context.sendTranslated(NEUTRAL, "{user}'s mail: {input#mails}", user, ChatFormat.parseFormats(sb.toString()));
     }
@@ -229,7 +230,7 @@ public class MailCommand extends ContainerCommand
             try
             {
                 Mail mail = bUser.getMails().get(mailId);
-                module.getCore().getDB().getDSL().delete(TABLE_MAIL).where(TABLE_MAIL.KEY.eq(mail.getKey())).execute();
+                module.getCore().getDB().getDSL().delete(TABLE_MAIL).where(TABLE_MAIL.KEY.eq(mail.getValue(TABLE_MAIL.KEY))).execute();
                 context.sendTranslated(POSITIVE, "Deleted Mail #{integer#mailid}", mailId);
             }
             catch (IndexOutOfBoundsException e)

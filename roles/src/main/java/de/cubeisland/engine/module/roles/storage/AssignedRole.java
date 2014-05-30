@@ -17,15 +17,12 @@
  */
 package de.cubeisland.engine.module.roles.storage;
 
-import org.jooq.Field;
-import org.jooq.Record3;
-import org.jooq.Row3;
 import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.roles.storage.TableRole.TABLE_ROLE;
 
-public class AssignedRole extends UpdatableRecordImpl<AssignedRole> implements Record3<UInteger, UInteger, String>
+public class AssignedRole extends UpdatableRecordImpl<AssignedRole>
 {
     public AssignedRole()
     {
@@ -34,87 +31,9 @@ public class AssignedRole extends UpdatableRecordImpl<AssignedRole> implements R
 
     public AssignedRole newAssignedRole(UInteger userId, UInteger worldId, String roleName)
     {
-        this.setUserid(userId);
-        this.setWorldid(worldId);
-        this.setRolename(roleName);
+        this.setValue(TABLE_ROLE.USERID, userId);
+        this.setValue(TABLE_ROLE.WORLDID, worldId);
+        this.setValue(TABLE_ROLE.ROLENAME, roleName);
         return this;
-    }
-
-    public void setUserid(UInteger value) {
-        setValue(0, value);
-    }
-
-    public UInteger getUserid() {
-        return (UInteger) getValue(0);
-    }
-
-    public void setWorldid(UInteger value) {
-        setValue(1, value);
-    }
-
-    public UInteger getWorldid() {
-        return (UInteger) getValue(1);
-    }
-
-    public void setRolename(String value) {
-        setValue(2, value);
-    }
-
-    public String getRolename() {
-        return (String) getValue(2);
-    }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Record3<UInteger, UInteger, String> key() {
-        return (Record3) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record3 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row3<UInteger, UInteger, String> fieldsRow() {
-        return (Row3) super.fieldsRow();
-    }
-
-    @Override
-    public Row3<UInteger, UInteger, String> valuesRow() {
-        return (Row3) super.valuesRow();
-    }
-
-    
-    @Override
-    public Field<UInteger> field1() {
-        return TABLE_ROLE.USERID;
-    }
-
-    @Override
-    public Field<UInteger> field2() {
-        return TABLE_ROLE.WORLDID;
-    }
-
-    @Override
-    public Field<String> field3() {
-        return TABLE_ROLE.ROLENAME;
-    }
-
-    @Override
-    public UInteger value1() {
-        return getUserid();
-    }
-
-    @Override
-    public UInteger value2() {
-        return getWorldid();
-    }
-
-    @Override
-    public String value3() {
-        return getRolename();
     }
 }

@@ -18,16 +18,12 @@
 package de.cubeisland.engine.module.locker.storage;
 
 import de.cubeisland.engine.core.user.User;
-import org.jooq.Field;
-import org.jooq.Record1;
-import org.jooq.Record5;
-import org.jooq.Row5;
 import org.jooq.impl.UpdatableRecordImpl;
-import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
+import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 
-public class AccessListModel extends UpdatableRecordImpl<AccessListModel> implements Record5<UInteger, UInteger, UInteger, Short, UInteger>
+public class AccessListModel extends UpdatableRecordImpl<AccessListModel>
 {
     public AccessListModel()
     {
@@ -36,30 +32,29 @@ public class AccessListModel extends UpdatableRecordImpl<AccessListModel> implem
 
     public AccessListModel newAccess(LockModel model, User modifyUser)
     {
-        this.setLockId(model.getId());
-        this.setUserId(modifyUser.getEntity().getKey());
-        this.setLevel(ACCESS_FULL);
+        this.setValue(TABLE_ACCESS_LIST.LOCK_ID, model.getValue(TABLE_LOCK.ID));
+        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getEntity().getKey());
+        this.setValue(TABLE_ACCESS_LIST.LEVEL, ACCESS_FULL);
         return this;
     }
 
-
     public AccessListModel newGlobalAccess(User sender, User modifyUser, short accessType)
     {
-        this.setLockId(null);
-        this.setUserId(modifyUser.getEntity().getKey());
-        this.setLevel(accessType);
-        this.setOwner(sender.getEntity().getKey());
+        this.setValue(TABLE_ACCESS_LIST.LOCK_ID, null);
+        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getEntity().getKey());
+        this.setValue(TABLE_ACCESS_LIST.LEVEL, ACCESS_FULL);
+        this.setValue(TABLE_ACCESS_LIST.OWNER_ID, sender.getEntity().getKey());
         return this;
     }
 
     public boolean canIn()
     {
-        return (this.getLevel() & ACCESS_PUT) == ACCESS_PUT;
+        return (this.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_PUT) == ACCESS_PUT;
     }
 
     public boolean canOut()
     {
-        return (this.getLevel() & ACCESS_TAKE) == ACCESS_TAKE;
+        return (this.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_TAKE) == ACCESS_TAKE;
     }
 
     public static final short ACCESS_TAKE = 1 << 0; // put items in chest
@@ -68,120 +63,4 @@ public class AccessListModel extends UpdatableRecordImpl<AccessListModel> implem
 
     public static final short ACCESS_FULL = ACCESS_TAKE | ACCESS_PUT;
     public static final short ACCESS_ALL = ACCESS_FULL | ACCESS_ADMIN;
-
-    public void setId(UInteger value) {
-        setValue(0, value);
-    }
-
-    public UInteger getId() {
-        return (UInteger) getValue(0);
-    }
-
-    public void setUserId(UInteger value) {
-        setValue(1, value);
-    }
-
-    public UInteger getUserId() {
-        return (UInteger) getValue(1);
-    }
-
-    public void setLockId(UInteger value) {
-        setValue(2, value);
-    }
-
-    public UInteger getLockId() {
-        return (UInteger) getValue(2);
-    }
-
-    public void setLevel(Short value) {
-        setValue(3, value);
-    }
-
-    public Short getLevel() {
-        return (Short) getValue(3);
-    }
-
-    public void setOwner(UInteger value) {
-        setValue(4, value);
-    }
-
-    public UInteger getOwner() {
-        return (UInteger) getValue(4);
-    }
-
-    // -------------------------------------------------------------------------
-    // Primary key information
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Record1<UInteger> key() {
-        return (Record1) super.key();
-    }
-
-    // -------------------------------------------------------------------------
-    // Record4 type implementation
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row5<UInteger, UInteger, UInteger, Short, UInteger> fieldsRow() {
-        return (Row5) super.fieldsRow();
-    }
-
-    @Override
-    public Row5<UInteger, UInteger, UInteger, Short, UInteger> valuesRow() {
-        return (Row5) super.valuesRow();
-    }
-
-    @Override
-    public Field<UInteger> field1() {
-        return TABLE_ACCESS_LIST.ID;
-    }
-
-    @Override
-    public Field<UInteger> field2() {
-        return TABLE_ACCESS_LIST.USER_ID;
-    }
-
-    @Override
-    public Field<UInteger> field3() {
-        return TABLE_ACCESS_LIST.LOCK_ID;
-    }
-
-    @Override
-    public Field<Short> field4() {
-        return TABLE_ACCESS_LIST.LEVEL;
-    }
-
-    @Override
-    public Field<UInteger> field5()
-    {
-        return TABLE_ACCESS_LIST.OWNER_ID;
-    }
-
-    @Override
-    public UInteger value1() {
-        return getId();
-    }
-
-    @Override
-    public UInteger value2() {
-        return getUserId();
-    }
-
-    @Override
-    public UInteger value3() {
-        return getLockId();
-    }
-
-    @Override
-    public Short value4() {
-        return getLevel();
-    }
-
-    @Override
-    public UInteger value5()
-    {
-        return getOwner();
-    }
-
 }

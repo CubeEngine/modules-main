@@ -92,8 +92,7 @@ public class Role extends ResolvedDataHolder implements Comparable<Role>
             {
                 if (entry.getValue().getSecond())
                 {
-                    worldMirrors.add(UInteger
-                                         .valueOf(this.module.getCore().getWorldManager().getWorldId(entry.getKey())));
+                    worldMirrors.add(this.module.getCore().getWorldManager().getWorldId(entry.getKey()));
                 }
             }
             this.manager.dsl.update(TABLE_ROLE).set(TABLE_ROLE.ROLENAME, newName).
@@ -136,7 +135,7 @@ public class Role extends ResolvedDataHolder implements Comparable<Role>
             {
                 if (entry.getValue().getSecond())
                 {
-                    worldMirrors.add(UInteger.valueOf(this.module.getCore().getWorldManager().getWorldId(entry.getKey())));
+                    worldMirrors.add(this.module.getCore().getWorldManager().getWorldId(entry.getKey()));
                 }
             }
             this.manager.dsl.delete(TABLE_ROLE).where(TABLE_ROLE.ROLENAME.eq(this.getName()),

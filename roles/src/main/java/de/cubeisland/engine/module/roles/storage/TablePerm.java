@@ -20,15 +20,19 @@ package de.cubeisland.engine.module.roles.storage;
 import de.cubeisland.engine.core.storage.database.Table;
 import de.cubeisland.engine.core.util.Version;
 import org.jooq.TableField;
-import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.core.world.TableWorld.TABLE_WORLD;
+import static org.jooq.impl.SQLDataType.VARCHAR;
 
 public class TablePerm extends Table<UserPermission>
 {
     public static TablePerm TABLE_PERM;
+    public final TableField<UserPermission, UInteger> USERID = createField("userId", U_INTEGER.nullable(false), this);
+    public final TableField<UserPermission, UInteger> WORLDID = createField("worldId", U_INTEGER.nullable(false), this);
+    public final TableField<UserPermission, String> PERM = createField("perm", VARCHAR.length(255).nullable(false), this);
+    public final TableField<UserPermission, Boolean> ISSET = createField("isSet", BOOLEAN.nullable(false), this);
 
     public TablePerm(String prefix)
     {
@@ -40,13 +44,9 @@ public class TablePerm extends Table<UserPermission>
         TABLE_PERM = this;
     }
 
-    public final TableField<UserPermission, UInteger> USERID = createField("userId", U_INTEGER.nullable(false), this);
-    public final TableField<UserPermission, UInteger> WORLDID = createField("worldId", U_INTEGER.nullable(false), this);
-    public final TableField<UserPermission, String> PERM = createField("perm", SQLDataType.VARCHAR.length(255).nullable(false), this);
-    public final TableField<UserPermission, Boolean> ISSET = createField("isSet", BOOLEAN.nullable(false), this);
-
     @Override
-    public Class<UserPermission> getRecordType() {
+    public Class<UserPermission> getRecordType()
+    {
         return UserPermission.class;
     }
 }

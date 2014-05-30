@@ -20,15 +20,23 @@ package de.cubeisland.engine.module.locker.storage;
 import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
 import de.cubeisland.engine.core.util.Version;
 import org.jooq.TableField;
-import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.core.world.TableWorld.TABLE_WORLD;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.jooq.impl.SQLDataType.INTEGER;
 
 public class TableLockLocations extends AutoIncrementTable<LockLocationModel, UInteger>
 {
     public static TableLockLocations TABLE_LOCK_LOCATION;
+    public final TableField<LockLocationModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
+    public final TableField<LockLocationModel, UInteger> WORLD_ID = createField("world_id", U_INTEGER.nullable(false),this);
+    public final TableField<LockLocationModel, Integer> X = createField("x", INTEGER.nullable(false), this);
+    public final TableField<LockLocationModel, Integer> Y = createField("y", INTEGER.nullable(false), this);
+    public final TableField<LockLocationModel, Integer> Z = createField("z", INTEGER.nullable(false), this);
+    public final TableField<LockLocationModel, Integer> CHUNKX = createField("chunkX", INTEGER.nullable(false), this);
+    public final TableField<LockLocationModel, Integer> CHUNKZ = createField("chunkZ", INTEGER.nullable(false), this);
+    public final TableField<LockLocationModel, UInteger> LOCK_ID = createField("lock_id", U_INTEGER.nullable(false),this);
 
     public TableLockLocations(String prefix)
     {
@@ -37,22 +45,14 @@ public class TableLockLocations extends AutoIncrementTable<LockLocationModel, UI
         this.addIndex(CHUNKX, CHUNKZ);
         this.addUniqueKey(WORLD_ID, X, Y, Z);
         this.addForeignKey(TABLE_WORLD.getPrimaryKey(), WORLD_ID);
-        this.addForeignKey(TABLE_LOCK.getPrimaryKey(), GUARD_ID);
-        this.addFields(ID, WORLD_ID, X,Y,Z, CHUNKX, CHUNKZ, GUARD_ID);
+        this.addForeignKey(TABLE_LOCK.getPrimaryKey(), LOCK_ID);
+        this.addFields(ID, WORLD_ID, X, Y, Z, CHUNKX, CHUNKZ, LOCK_ID);
         TABLE_LOCK_LOCATION = this;
     }
 
-    public final TableField<LockLocationModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
-    public final TableField<LockLocationModel, UInteger> WORLD_ID = createField("world_id", U_INTEGER.nullable(false), this);
-    public final TableField<LockLocationModel, Integer> X = createField("x", SQLDataType.INTEGER.nullable(false), this);
-    public final TableField<LockLocationModel, Integer> Y = createField("y", SQLDataType.INTEGER.nullable(false), this);
-    public final TableField<LockLocationModel, Integer> Z = createField("z", SQLDataType.INTEGER.nullable(false), this);
-    public final TableField<LockLocationModel, Integer> CHUNKX = createField("chunkX", SQLDataType.INTEGER.nullable(false), this);
-    public final TableField<LockLocationModel, Integer> CHUNKZ = createField("chunkZ", SQLDataType.INTEGER.nullable(false), this);
-    public final TableField<LockLocationModel, UInteger> GUARD_ID = createField("lock_id", U_INTEGER.nullable(false), this);
-
     @Override
-    public Class<LockLocationModel> getRecordType() {
+    public Class<LockLocationModel> getRecordType()
+    {
         return LockLocationModel.class;
     }
 }

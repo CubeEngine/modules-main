@@ -28,6 +28,8 @@ import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABL
 public class TableInvite extends Table<TeleportInvite>
 {
     public static TableInvite TABLE_INVITE;
+    public final TableField<TeleportInvite, UInteger> TELEPORTPOINT = createField("teleportpoint", U_INTEGER.nullable(false), this);
+    public final TableField<TeleportInvite, UInteger> USERKEY = createField("userkey", U_INTEGER.nullable(false), this);
 
     public TableInvite(String prefix)
     {
@@ -38,9 +40,6 @@ public class TableInvite extends Table<TeleportInvite>
         this.addFields(TELEPORTPOINT, USERKEY);
         TABLE_INVITE = this;
     }
-
-    public final TableField<TeleportInvite, UInteger> TELEPORTPOINT = createField("teleportpoint", U_INTEGER.nullable(false), this);
-    public final TableField<TeleportInvite, UInteger> USERKEY = createField("userkey", U_INTEGER.nullable(false), this);
 
     @Override
     public Class<TeleportInvite> getRecordType()

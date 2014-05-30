@@ -20,6 +20,8 @@ package de.cubeisland.engine.module.conomy.account;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
 
+import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
+
 public class UserAccount extends Account
 {
     private final Conomy module;
@@ -59,7 +61,7 @@ public class UserAccount extends Account
         {
             return true;
         }
-        return (this.model.getValue() - amount * this.manager.fractionalDigitsFactor()) >= this.getMinBalance();
+        return (this.model.getValue(TABLE_ACCOUNT.VALUE) - amount * this.manager.fractionalDigitsFactor()) >= this.getMinBalance();
     }
 
     @Override

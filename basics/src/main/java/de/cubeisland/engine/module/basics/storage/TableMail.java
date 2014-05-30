@@ -20,32 +20,32 @@ package de.cubeisland.engine.module.basics.storage;
 import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
 import de.cubeisland.engine.core.util.Version;
 import org.jooq.TableField;
-import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
+import static org.jooq.impl.SQLDataType.VARCHAR;
 
 public class TableMail extends AutoIncrementTable<Mail, UInteger>
 {
     public static TableMail TABLE_MAIL;
+    public final TableField<Mail, UInteger> KEY = createField("key", U_INTEGER.nullable(false), this);
+    public final TableField<Mail, String> MESSAGE = createField("message", VARCHAR.length(100).nullable(false), this);
+    public final TableField<Mail, UInteger> USERID = createField("userId", U_INTEGER.nullable(false), this);
+    public final TableField<Mail, UInteger> SENDERID = createField("senderId", U_INTEGER, this);
 
     public TableMail(String prefix)
     {
         super(prefix + "mail", new Version(1));
         this.setAIKey(KEY);
         this.addForeignKey(TABLE_USER.getPrimaryKey(), USERID);
-        this.addForeignKey(TABLE_USER.getPrimaryKey(),  SENDERID);
+        this.addForeignKey(TABLE_USER.getPrimaryKey(), SENDERID);
         this.addFields(KEY, MESSAGE, USERID, SENDERID);
         TABLE_MAIL = this;
     }
 
-    public final TableField<Mail, UInteger> KEY = createField("key", U_INTEGER.nullable(false), this);
-    public final TableField<Mail, String> MESSAGE = createField("message", SQLDataType.VARCHAR.length(100).nullable(false), this);
-    public final TableField<Mail, UInteger> USERID = createField("userId", U_INTEGER.nullable(false), this);
-    public final TableField<Mail, UInteger> SENDERID = createField("senderId", U_INTEGER, this);
-
     @Override
-    public Class<Mail> getRecordType() {
+    public Class<Mail> getRecordType()
+    {
         return Mail.class;
     }
 }

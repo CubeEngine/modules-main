@@ -19,6 +19,8 @@ package de.cubeisland.engine.module.conomy.account;
 
 import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
 
+import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
+
 public abstract class Account
 {
     protected final ConomyManager manager;
@@ -66,7 +68,7 @@ public abstract class Account
 
     private void set0(long amount)
     {
-        this.model.setValue(amount);
+        this.model.setValue(TABLE_ACCOUNT.VALUE, amount);
         this.update();
     }
 
@@ -77,7 +79,7 @@ public abstract class Account
      */
     public void deposit(double amount)
     {
-        this.set0(this.model.getValue() + (long)(amount * this.manager.fractionalDigitsFactor()));
+        this.set0(this.model.getValue(TABLE_ACCOUNT.VALUE) + (long)(amount * this.manager.fractionalDigitsFactor()));
         this.log("DEPOSIT", amount);
     }
 
@@ -88,7 +90,7 @@ public abstract class Account
      */
     public void withdraw(double amount)
     {
-        this.set0(this.model.getValue() - (long)(amount * this.manager.fractionalDigitsFactor()));
+        this.set0(this.model.getValue(TABLE_ACCOUNT.VALUE) - (long)(amount * this.manager.fractionalDigitsFactor()));
         this.log("WITHDRAW" , amount);
     }
 
@@ -110,7 +112,7 @@ public abstract class Account
      */
     public void scale(float factor)
     {
-        this.set0((long)(this.model.getValue() * factor));
+        this.set0((long)(this.model.getValue(TABLE_ACCOUNT.VALUE) * factor));
         this.log("SCALE" , factor);
     }
 
@@ -151,7 +153,7 @@ public abstract class Account
      */
     public double balance()
     {
-        return (double)this.model.getValue() / this.manager.fractionalDigitsFactor();
+        return (double)this.model.getValue(TABLE_ACCOUNT.VALUE) / this.manager.fractionalDigitsFactor();
     }
 
     /**

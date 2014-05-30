@@ -20,15 +20,19 @@ package de.cubeisland.engine.module.roles.storage;
 import de.cubeisland.engine.core.storage.database.Table;
 import de.cubeisland.engine.core.util.Version;
 import org.jooq.TableField;
-import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.core.world.TableWorld.TABLE_WORLD;
+import static org.jooq.impl.SQLDataType.VARCHAR;
 
 public class TableData extends Table<UserMetaData>
 {
     public static TableData TABLE_META;
+    public final TableField<UserMetaData, UInteger> USERID = createField("userId", U_INTEGER.nullable(false), this);
+    public final TableField<UserMetaData, UInteger> WORLDID = createField("worldId", U_INTEGER.nullable(false), this);
+    public final TableField<UserMetaData, String> KEY = createField("key", VARCHAR.length(255).nullable(false), this);
+    public final TableField<UserMetaData, String> VALUE = createField("value", VARCHAR.length(255).nullable(false), this);
 
     public TableData(String prefix)
     {
@@ -40,13 +44,9 @@ public class TableData extends Table<UserMetaData>
         TABLE_META = this;
     }
 
-    public final TableField<UserMetaData, UInteger> USERID = createField("userId", U_INTEGER.nullable(false), this);
-    public final TableField<UserMetaData, UInteger> WORLDID = createField("worldId", U_INTEGER.nullable(false), this);
-    public final TableField<UserMetaData, String> KEY = createField("key", SQLDataType.VARCHAR.length(255).nullable(false), this);
-    public final TableField<UserMetaData, String> VALUE = createField("value", SQLDataType.VARCHAR.length(255).nullable(false), this);
-
     @Override
-    public Class<UserMetaData> getRecordType() {
+    public Class<UserMetaData> getRecordType()
+    {
         return UserMetaData.class;
     }
 }

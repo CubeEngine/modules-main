@@ -24,15 +24,17 @@ import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.module.travel.TeleportPoint;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
+import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
 
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.VISIBILITY_PUBLIC;
+import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
+import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 
 public class Home extends TeleportPoint
 {
     public Home(TeleportPointModel teleportPoint, Travel module)
     {
         super(teleportPoint, module);
-        if (teleportPoint.getVisibility() == VISIBILITY_PUBLIC)
+        if (teleportPoint.getValue(TABLE_TP_POINT.VISIBILITY) == PUBLIC.value)
         {
             this.permission = this.generatePublicPerm();
             return;
@@ -40,11 +42,11 @@ public class Home extends TeleportPoint
         this.permission = null;
     }
 
-    public void setVisibility(short visibility)
+    public void setVisibility(Visibility visibility)
     {
         super.setVisibility(visibility);
         model.update();
-        if (visibility == VISIBILITY_PUBLIC)
+        if (visibility == PUBLIC)
         {
             this.permission = generatePublicPerm();
             this.iManager.removeInvites(this);
@@ -57,8 +59,7 @@ public class Home extends TeleportPoint
     @Override
     protected Permission generatePublicPerm()
     {
-        Permission perm = module.getBasePermission().childWildcard("publichomes").childWildcard("access").child(
-            model.getName().toLowerCase(Locale.ENGLISH), PermDefault.TRUE);
+        Permission perm = module.getBasePermission().childWildcard("publichomes").childWildcard("access").child(this.getName().toLowerCase(Locale.ENGLISH), PermDefault.TRUE);
         module.getCore().getPermissionManager().registerPermission(module, perm);
         return perm;
     }

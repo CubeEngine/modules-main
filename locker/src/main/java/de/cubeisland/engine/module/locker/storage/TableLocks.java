@@ -22,15 +22,36 @@ import java.sql.Timestamp;
 import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
 import de.cubeisland.engine.core.util.Version;
 import org.jooq.TableField;
-import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
-import org.jooq.util.mysql.MySQLDataType;
 
 import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
+import static org.jooq.impl.SQLDataType.*;
+import static org.jooq.util.mysql.MySQLDataType.DATETIME;
 
 public class TableLocks extends AutoIncrementTable<LockModel, UInteger>
 {
     public static TableLocks TABLE_LOCK;
+    public final TableField<LockModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
+    public final TableField<LockModel, UInteger> OWNER_ID = createField("owner_id", U_INTEGER.nullable(false), this);
+    /**
+     * Flags see {@link ProtectionFlag}
+     */
+    public final TableField<LockModel, Short> FLAGS = createField("flags", SMALLINT.nullable(false), this);
+    /**
+     * Protected Type see {@link ProtectedType}
+     */
+    public final TableField<LockModel, Byte> PROTECTED_TYPE = createField("type", TINYINT.nullable(false), this);
+    /**
+     * LockType see {@link LockType}
+     */
+    public final TableField<LockModel, Byte> LOCK_TYPE = createField("lock_type", TINYINT.nullable(false), this);
+    // eg. /cguarded [pass <password>] (flag to create pw book/key?)
+    public final TableField<LockModel, byte[]> PASSWORD = createField("password", VARBINARY.length(128).nullable(false), this);
+    // optional for entity protection:
+    public final TableField<LockModel, Long> ENTITY_UID_LEAST = createField("entity_uid_least", BIGINT, this);
+    public final TableField<LockModel, Long> ENTITY_UID_MOST = createField("entity_uid_most", BIGINT, this);
+    public final TableField<LockModel, Timestamp> LAST_ACCESS = createField("last_access", DATETIME.nullable(false), this);
+    public final TableField<LockModel, Timestamp> CREATED = createField("created", DATETIME.nullable(false), this);
 
     public TableLocks(String prefix)
     {
@@ -38,40 +59,14 @@ public class TableLocks extends AutoIncrementTable<LockModel, UInteger>
         this.setAIKey(ID);
         this.addUniqueKey(ENTITY_UID_LEAST, ENTITY_UID_MOST);
         this.addForeignKey(TABLE_USER.getPrimaryKey(), OWNER_ID);
-        this.addFields(ID, OWNER_ID, FLAGS, PROTECTED_TYPE, LOCK_TYPE, PASSWORD, ENTITY_UID_LEAST, ENTITY_UID_MOST, LAST_ACCESS, CREATED);
+        this.addFields(ID, OWNER_ID, FLAGS, PROTECTED_TYPE, LOCK_TYPE, PASSWORD, ENTITY_UID_LEAST, ENTITY_UID_MOST,
+                       LAST_ACCESS, CREATED);
         TABLE_LOCK = this;
     }
 
-    public final TableField<LockModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
-    public final TableField<LockModel, UInteger> OWNER_ID = createField("owner_id", U_INTEGER.nullable(false), this);
-
-    /**
-     * Flags see {@link ProtectionFlag}
-     */
-    public final TableField<LockModel, Short> FLAGS = createField("flags", SQLDataType.SMALLINT.nullable(false), this);
-
-    /**
-     * Protected Type see {@link ProtectedType}
-     */
-    public final TableField<LockModel, Byte> PROTECTED_TYPE = createField("type", SQLDataType.TINYINT.nullable(false), this);
-
-    /**
-     * LockType see {@link LockType}
-     */
-    public final TableField<LockModel, Byte> LOCK_TYPE = createField("lock_type", SQLDataType.TINYINT.nullable(false), this);
-
-    // eg. /cguarded [pass <password>] (flag to create pw book/key?)
-    public final TableField<LockModel, byte[]> PASSWORD = createField("password", SQLDataType.VARBINARY.length(128).nullable(false), this);
-
-    // optional for entity protection:
-    public final TableField<LockModel, Long> ENTITY_UID_LEAST = createField("entity_uid_least", SQLDataType.BIGINT, this);
-    public final TableField<LockModel, Long> ENTITY_UID_MOST = createField("entity_uid_most", SQLDataType.BIGINT, this);
-
-    public final TableField<LockModel, Timestamp> LAST_ACCESS = createField("last_access", MySQLDataType.DATETIME.nullable(false), this);
-    public final TableField<LockModel, Timestamp> CREATED = createField("created", MySQLDataType.DATETIME.nullable(false), this);
-
     @Override
-    public Class<LockModel> getRecordType() {
+    public Class<LockModel> getRecordType()
+    {
         return LockModel.class;
     }
 }

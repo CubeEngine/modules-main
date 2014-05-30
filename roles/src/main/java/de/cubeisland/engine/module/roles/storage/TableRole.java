@@ -20,15 +20,18 @@ package de.cubeisland.engine.module.roles.storage;
 import de.cubeisland.engine.core.storage.database.Table;
 import de.cubeisland.engine.core.util.Version;
 import org.jooq.TableField;
-import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.core.world.TableWorld.TABLE_WORLD;
+import static org.jooq.impl.SQLDataType.VARCHAR;
 
 public class TableRole extends Table<AssignedRole>
 {
     public static TableRole TABLE_ROLE;
+    public final TableField<AssignedRole, UInteger> USERID = createField("userId", U_INTEGER.nullable(false), this);
+    public final TableField<AssignedRole, UInteger> WORLDID = createField("worldId", U_INTEGER.nullable(false), this);
+    public final TableField<AssignedRole, String> ROLENAME = createField("roleName", VARCHAR.length(255).nullable(false), this);
 
     public TableRole(String prefix)
     {
@@ -40,12 +43,9 @@ public class TableRole extends Table<AssignedRole>
         TABLE_ROLE = this;
     }
 
-    public final TableField<AssignedRole, UInteger> USERID = createField("userId", U_INTEGER.nullable(false), this);
-    public final TableField<AssignedRole, UInteger> WORLDID = createField("worldId", U_INTEGER.nullable(false), this);
-    public final TableField<AssignedRole, String> ROLENAME = createField("roleName", SQLDataType.VARCHAR.length(255).nullable(false), this);
-
     @Override
-    public Class<AssignedRole> getRecordType() {
+    public Class<AssignedRole> getRecordType()
+    {
         return AssignedRole.class;
     }
 }
