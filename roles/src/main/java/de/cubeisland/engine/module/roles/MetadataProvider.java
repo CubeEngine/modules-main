@@ -17,12 +17,12 @@
  */
 package de.cubeisland.engine.module.roles;
 
-import java.util.UUID;
-
-import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import de.cubeisland.engine.core.module.service.Metadata;
 import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.roles.role.Role;
+import de.cubeisland.engine.module.roles.role.RoleProvider;
 import de.cubeisland.engine.module.roles.role.RolesManager;
 import de.cubeisland.engine.module.roles.role.UserDatabaseStore;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
@@ -39,29 +39,84 @@ public class MetadataProvider implements Metadata
     @Override
     public String setMetadata(User user, String key, String value)
     {
-        return setMetadata(user, user.getWorld().getUID(), key, value);
+        return setMetadata(user, user.getWorld(), key, value);
     }
 
     @Override
     public String getMetadata(User user, String key)
     {
-        return getMetadata(user, user.getWorld().getUID(), key);
+        return getMetadata(user, user.getWorld(), key);
     }
 
     @Override
-    public String setMetadata(User user, UUID world, String key, String value)
+    public String setMetadata(User user, World world, String key, String value)
     {
-        UserDatabaseStore dataHolder = this.rolesManager.getRolesAttachment(user).getDataHolder(Bukkit.getWorld(world));
+        UserDatabaseStore dataHolder = this.rolesManager.getRolesAttachment(user).getDataHolder(world);
         ResolvedMetadata resolvedMetadata = dataHolder.getMetadata().get(key);
         dataHolder.setMetadata(key, value);
         return resolvedMetadata == null ? null : resolvedMetadata.getValue();
     }
 
     @Override
-    public String getMetadata(User user, UUID world, String key)
+    public String getMetadata(User user, World world, String key)
     {
-        UserDatabaseStore dataHolder = this.rolesManager.getRolesAttachment(user).getDataHolder(Bukkit.getWorld(world));
+        UserDatabaseStore dataHolder = this.rolesManager.getRolesAttachment(user).getDataHolder(world);
         ResolvedMetadata resolvedMetadata = dataHolder.getMetadata().get(key);
         return resolvedMetadata == null ? null : resolvedMetadata.getValue();
+    }
+
+    @Override
+    public String getRoleMetadata(String roleName, World world, String key)
+    {
+        RoleProvider provider;
+        if (world == null)
+        {
+            provider = this.rolesManager.getGlobalProvider();
+        }
+        else
+        {
+            provider = this.rolesManager.getProvider(world);
+        }
+        if (provider == null)
+        {
+            return null;
+        }
+        Role role = provider.getRole(roleName);
+        if (role == null)
+        {
+            return null;
+        }
+        ResolvedMetadata metadata = role.getMetadata().get(key);
+        if (metadata == null)
+        {
+            return null;
+        }
+        return metadata.getValue();
+    }
+
+    @Override
+    public String setRoleMetadata(String roleName, World world, String key, String value)
+    {
+        RoleProvider provider;
+        if (world == null)
+        {
+            provider = this.rolesManager.getGlobalProvider();
+        }
+        else
+        {
+            provider = this.rolesManager.getProvider(world);
+        }
+        if (provider == null)
+        {
+            return null;
+        }
+        Role role = provider.getRole(roleName);
+        if (role == null)
+        {
+            return null;
+        }
+        String old = role.setMetadata(key, value);
+        role.save();
+        return old;
     }
 }
