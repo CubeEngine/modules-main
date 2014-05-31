@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.WeatherType;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
@@ -30,6 +31,7 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import de.cubeisland.engine.core.command.CubeContext;
+import de.cubeisland.engine.core.command.exception.IncorrectUsageException;
 import de.cubeisland.engine.core.command.exception.MissingParameterException;
 import de.cubeisland.engine.core.command.parameterized.completer.WorldCompleter;
 import de.cubeisland.engine.core.command.readers.IntegerOrAllReader;
@@ -74,10 +76,23 @@ public class WorldControlCommands
     @NParams(@Named(names = "in", label = "world", type = World.class))
     public void weather(CubeContext context)
     {
-        User sender = null;
-        if (context.getSender() instanceof User)
+        World world;
+        if (context.hasNamed("in"))
         {
-            sender = (User)context.getSender();
+            world = context.getArg("in", null);
+            if (world == null)
+            {
+                context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.getArg(1));
+                return;
+            }
+        }
+        else if (context.isSender(User.class))
+        {
+            world = ((User)context.getSender()).getWorld();
+        }
+        else
+        {
+            throw new MissingParameterException("in", context.getSender().getTranslation(NEGATIVE, "If not used ingame you have to specify a world!"));
         }
         boolean sunny = true;
         boolean noThunder = true;
@@ -86,23 +101,23 @@ public class WorldControlCommands
         if (weather == null)
         {
             context.sendTranslated(NEGATIVE, "Invalid weather! {input}", context.getArg(0));
-            context.sendTranslated(NEUTRAL, "Use {name#sun}, {name#rain} or {name#storm}!", "sun", "rain", "storm");
+            context.sendTranslated(NEUTRAL, "Use {name#sun}, {name#rain} or {name#storm}!");
             return;
         }
-        if (weather.equalsIgnoreCase("sun"))
+        switch (weather)
         {
-            sunny = true;
-            noThunder = true;
-        }
-        else if (weather.equalsIgnoreCase("rain"))
-        {
-            sunny = false;
-            noThunder = true;
-        }
-        else if (weather.equalsIgnoreCase("storm"))
-        {
-            sunny = false;
-            noThunder = false;
+            case "sun":
+                sunny = true;
+                noThunder = true;
+                break;
+            case "rain":
+                sunny = false;
+                noThunder = true;
+                break;
+            case "storm":
+                sunny = false;
+                noThunder = false;
+                break;
         }
         if (context.hasIndexed(1))
         {
@@ -114,24 +129,7 @@ public class WorldControlCommands
             }
             duration *= 20;
         }
-        World world;
-        if (context.hasNamed("in"))
-        {
-            world = context.getArg("in", null);
-            if (world == null)
-            {
-                context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.getArg(1));
-                return;
-            }
-        }
-        else
-        {
-            if (sender == null)
-            {
-                throw new MissingParameterException("in", context.getSender().getTranslation(NEGATIVE, "If not used ingame you have to specify a world!"));
-            }
-            world = sender.getWorld();
-        }
+
         if (world.isThundering() != noThunder && world.hasStorm() != sunny) // weather is not changing
         {
             context.sendTranslated(POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather);
@@ -143,6 +141,78 @@ public class WorldControlCommands
         world.setStorm(!sunny);
         world.setThundering(!noThunder);
         world.setWeatherDuration(duration);
+    }
+
+    @Command(alias = "playerweather", desc = "Changes your weather")
+    @IParams(@Grouped(@Indexed(label = {"!clear","!downfall","!reset"})))
+    @NParams(@Named(names = "player", label = "player", type = User.class))
+    public void pweather(CubeContext context)
+    {
+        User user;
+        if (context.hasNamed("player"))
+        {
+            user = context.getArg("player");
+        }
+        else if (context.isSender(User.class))
+        {
+            user = (User)context.getSender();
+        }
+        else
+        {
+            throw new MissingParameterException("player", context.getSender().getTranslation(NEGATIVE, "If not used ingame you have to specify a player!"));
+        }
+        if (!user.isOnline())
+        {
+            context.sendTranslated(NEGATIVE, "{user} is not online!", user);
+            return;
+        }
+        String weather = Match.string().matchString(context.getString(0), "clear", "downfall", "reset");
+        if (weather == null)
+        {
+            context.sendTranslated(NEGATIVE, "Invalid weather! {input}", context.getArg(0));
+            context.sendTranslated(NEUTRAL, "Use {name#clear}, {name#downfall} or {name#reset}!");
+            return;
+        }
+        switch (weather)
+        {
+            case "clear":
+                user.setPlayerWeather(WeatherType.CLEAR);
+                if (user == context.getSender())
+                {
+                    context.sendTranslated(POSITIVE, "Your weather is now clear!");
+                }
+                else
+                {
+                    user.sendTranslated(POSITIVE, "Your weather is now clear!");
+                    context.sendTranslated(POSITIVE, "{user}s weather is now clear!", user);
+                }
+                return;
+            case "downfall":
+                user.setPlayerWeather(WeatherType.DOWNFALL);
+                if (user == context.getSender())
+                {
+                    context.sendTranslated(POSITIVE, "Your weather is now not clear!");
+                }
+                else
+                {
+                    user.sendTranslated(POSITIVE, "Your weather is now not clear!");
+                    context.sendTranslated(POSITIVE, "{user}s weather is now not clear!", user);
+                }
+                return;
+            case "reset":
+                user.resetPlayerWeather();
+                if (user == context.getSender())
+                {
+                    context.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
+                }
+                else
+                {
+                    user.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
+                    context.sendTranslated(POSITIVE, "{user}s weather is now reset to server weather!", user);
+                }
+                return;
+        }
+        throw new IncorrectUsageException("You did something wrong!");
     }
 
     @Command(desc = "Removes entity")
