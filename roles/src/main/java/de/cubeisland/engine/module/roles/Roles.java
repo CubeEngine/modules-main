@@ -86,7 +86,7 @@ public class Roles extends Module
         });
 
         this.getCore().getModuleManager().getServiceManager().registerService(this, Metadata.class, new MetadataProvider(this.rolesManager));
-        this.getCore().getModuleManager().getServiceManager().registerService(this, Permission.class, new PermissionProvider(this.rolesManager));
+        this.getCore().getModuleManager().getServiceManager().registerService(this, Permission.class, new PermissionProvider(this.rolesManager, this.getCore().getPermissionManager()));
     }
 
     @Override
