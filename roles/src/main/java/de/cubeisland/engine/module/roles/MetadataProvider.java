@@ -119,4 +119,10 @@ public class MetadataProvider implements Metadata
         role.save();
         return old;
     }
+
+    @Override
+    public String getName()
+    {
+        return "CubeEngine:Roles";
+    }
 }
