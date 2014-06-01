@@ -20,6 +20,7 @@ package de.cubeisland.engine.module.roles;
 import de.cubeisland.engine.core.command.CommandManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.module.service.Metadata;
+import de.cubeisland.engine.core.module.service.Permission;
 import de.cubeisland.engine.core.storage.database.Database;
 import de.cubeisland.engine.module.roles.commands.ManagementCommands;
 import de.cubeisland.engine.module.roles.commands.RoleCommands;
@@ -85,6 +86,7 @@ public class Roles extends Module
         });
 
         this.getCore().getModuleManager().getServiceManager().registerService(this, Metadata.class, new MetadataProvider(this.rolesManager));
+        this.getCore().getModuleManager().getServiceManager().registerService(this, Permission.class, new PermissionProvider(this.rolesManager));
     }
 
     @Override

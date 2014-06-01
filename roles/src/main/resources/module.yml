@@ -4,3 +4,4 @@ version: ${project.version}
 source-version: ${githead.branch}-${githead.commit}
 provided-services:
 - de.cubeisland.engine.core.module.service.Metadata
+- de.cubeisland.engine.core.module.service.Permission

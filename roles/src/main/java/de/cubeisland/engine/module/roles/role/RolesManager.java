@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.bukkit.OfflinePlayer;
 import org.bukkit.World;
-import org.bukkit.entity.Player;
 
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.Profiler;
@@ -233,7 +233,7 @@ public class RolesManager
         this.module.getLog().debug("All roles are now calculated! ({} ms)", Profiler.endProfiling("calculateAllRoles", TimeUnit.MILLISECONDS));
     }
 
-    public RolesAttachment getRolesAttachment(Player player)
+    public RolesAttachment getRolesAttachment(OfflinePlayer player)
     {
         User user;
         if (player instanceof User)
