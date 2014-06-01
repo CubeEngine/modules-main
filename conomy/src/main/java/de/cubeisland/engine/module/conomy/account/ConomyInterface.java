@@ -129,19 +129,19 @@ public class ConomyInterface implements Economy
     }
 
     @Override
-    public boolean createBank(String name, String ownerName)
+    public boolean createBank(String name, UUID owner)
     {
         if (manager.bankAccountExists(name))
         {
             return false;
         }
         BankAccount bankAccount = manager.getBankAccount(name, true);
-        if (ownerName != null)
+        if (owner != null)
         {
-            User user = this.manager.module.getCore().getUserManager().findExactUser(ownerName);
+            User user = this.manager.module.getCore().getUserManager().getExactUser(owner);
             if (user == null)
             {
-                throw new IllegalArgumentException("Unknown User: " + ownerName);
+                throw new IllegalArgumentException("Unknown User: " + owner);
             }
             bankAccount.promoteToOwner(user);
         }
