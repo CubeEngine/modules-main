@@ -19,6 +19,7 @@ package de.cubeisland.engine.module.portals;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -245,5 +246,10 @@ public class PortalManager implements Listener
         {
             portalList.remove(portal);
         }
+    }
+
+    public Collection<Portal> getPortals()
+    {
+        return portals.values();
     }
 }

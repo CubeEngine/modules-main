@@ -18,20 +18,22 @@
 package de.cubeisland.engine.module.portals;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.parameterized.completer.WorldCompleter;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
+import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.core.command.reflected.context.NParams;
+import de.cubeisland.engine.core.command.reflected.context.Named;
 import de.cubeisland.engine.core.module.service.Selector;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.WorldLocation;
@@ -221,5 +223,29 @@ public class PortalCommands extends ContainerCommand
             return;
         }
         context.sendTranslated(NEGATIVE, "You must be ingame to do this!");
+    }
+
+    @Command(desc = "Lists the portals")
+    @IParams(@Grouped(@Indexed(label = "world", type = World.class)))
+    public void list(CubeContext context)
+    {
+        Set<Portal> portals = new HashSet<>();
+        for (Portal portal : manager.getPortals())
+        {
+            if (portal.getWorld().equals(context.getArg(0)))
+            {
+                portals.add(portal);
+            }
+        }
+        if (portals.isEmpty())
+        {
+            context.sendTranslated(POSITIVE, "There are no portals in {world}", context.getArg(0));
+            return;
+        }
+        context.sendTranslated(POSITIVE, "The following portals are located in {world}", context.getArg(0));
+        for (Portal portal : portals)
+        {
+            context.sendMessage(" - " + portal.getName());
+        }
     }
 }
