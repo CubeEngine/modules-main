@@ -48,6 +48,8 @@ import de.cubeisland.engine.core.command.reflected.context.Named;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.Pair;
+import de.cubeisland.engine.core.util.WorldLocation;
+import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.core.world.WorldManager;
 import de.cubeisland.engine.module.worlds.Multiverse;
@@ -361,13 +363,60 @@ public class WorldsCommands extends ContainerCommand
     @IParams(@Grouped(@Indexed(label = "world")))
     public void info(CubeContext context)
     {
-        WorldConfig config = multiverse.getWorldConfig(context.getString(0));
-        if (config == null)
+        WorldConfig wConfig = multiverse.getWorldConfig(context.getString(0));
+        if (wConfig == null)
         {
             context.sendTranslated(NEGATIVE, "World {input} not found!", context.getArg(0));
+            return;
         }
         context.sendTranslated(POSITIVE, "World information for {input#world}:", context.getArg(0));
-        context.sendMessage("TODO"); // TODO finish worlds info cmd
+        context.sendTranslated(POSITIVE, "Gamemode: {input}", wConfig.gameMode.name());
+        context.sendTranslated(POSITIVE, "Environment: {input}", wConfig.generation.environment.name());
+        if (wConfig.generation.generateStructures)
+        {
+            context.sendTranslated(POSITIVE, "WorldType: {input} with structures", wConfig.generation.worldType.name());
+        }
+        else
+        {
+            context.sendTranslated(POSITIVE, "WorldType: {input}", wConfig.generation.worldType.name());
+        }
+        if (wConfig.generation.customGenerator != null)
+        {
+            context.sendTranslated(POSITIVE, "Using custom Generator: {input}", wConfig.generation.customGenerator);
+        }
+        if (!wConfig.autoLoad)
+        {
+            context.sendTranslated(POSITIVE, "This world will not load automatically!");
+        }
+        context.sendTranslated(POSITIVE, "World scale: {}", wConfig.spawn);
+        if (wConfig.spawn.allowBedRespawn)
+        {
+            context.sendTranslated(POSITIVE, "The respawnworld is {world} and beds are allowed", wConfig.spawn.respawnWorld.getWorld());
+        }
+        else
+        {
+            context.sendTranslated(POSITIVE, "The respawnworld is {world} and beds do not set spawn", wConfig.spawn.respawnWorld.getWorld());
+        }
+        WorldLocation spawn = wConfig.spawn.spawnLocation;
+        context.sendTranslated(POSITIVE, "This worlds spawn is at {vector}", new BlockVector3((int)spawn.x, (int)spawn.y, (int)spawn.z));
+        if (!wConfig.access.free)
+        {
+            context.sendTranslated(POSITIVE, "Players need a permission to enter this world");
+        }
+        // spawning ?
+        // gamerules
+        // pvp
+        // gamemode
+
+        if (wConfig.netherTarget != null)
+        {
+            context.sendTranslated(POSITIVE, "Nether portals lead to {input#world}", wConfig.netherTarget);
+        }
+        if (wConfig.endTarget != null)
+        {
+            context.sendTranslated(POSITIVE, "End portals lead to {input#world}", wConfig.endTarget);
+        }
+        // TODO finish worlds info cmd
     }
     // info
 
