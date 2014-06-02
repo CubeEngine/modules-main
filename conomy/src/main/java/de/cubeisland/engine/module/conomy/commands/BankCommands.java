@@ -19,13 +19,9 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.Set;
 
-import de.cubeisland.engine.core.command.CubeContext;
-import de.cubeisland.engine.module.conomy.Conomy;
-import de.cubeisland.engine.module.conomy.account.Account;
-import de.cubeisland.engine.module.conomy.account.BankAccount;
-import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import de.cubeisland.engine.module.conomy.account.UserAccount;
 import de.cubeisland.engine.core.command.ContainerCommand;
+import de.cubeisland.engine.core.command.CubeContext;
+import de.cubeisland.engine.core.command.exception.ReaderException;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -35,6 +31,11 @@ import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.Indexed;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.conomy.Conomy;
+import de.cubeisland.engine.module.conomy.account.Account;
+import de.cubeisland.engine.module.conomy.account.BankAccount;
+import de.cubeisland.engine.module.conomy.account.ConomyManager;
+import de.cubeisland.engine.module.conomy.account.UserAccount;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -53,21 +54,12 @@ public class BankCommands extends ContainerCommand
     @Alias(names = "bbalance")
     @Command(desc = "Shows the balance of the specified bank")
     @IParams(@Grouped(req = false, value = @Indexed(label = "bank", type = BankAccount.class)))
-    @Flags(@Flag(longName = "showHidden", name = "f"))
     public void balance(CubeContext context)
     {
         if (context.hasIndexed(0))
         {
             BankAccount bankAccount = context.getArg(0);
-            boolean showHidden = context.hasFlag("f") && module.perms().COMMAND_BANK_BALANCE_SHOWHIDDEN.isAuthorized(context.getSender());
-            if (!showHidden && bankAccount.isHidden())
-            {
-                if (context.getSender() instanceof User && !bankAccount.hasAccess((User)context.getSender()))
-                {
-                    context.sendTranslated(NEGATIVE, "There is no bank account named {input#bank}!", context.getArg(0));
-                    return;
-                }
-            }
+            ensureIsVisible(context, bankAccount);
             context.sendTranslated(POSITIVE, "Bank {name#bank} Balance: {input#balance}", bankAccount.getName(), this.manager.format(bankAccount.balance()));
             return;
         }
@@ -127,8 +119,7 @@ public class BankCommands extends ContainerCommand
     public void invite(CubeContext context)
     {
         User user = context.getArg(0);
-        boolean force = context.hasFlag("f")
-            && module.perms().COMMAND_BANK_INVITE_FORCE.isAuthorized(context.getSender());
+        boolean force = context.hasFlag("f") && module.perms().COMMAND_BANK_INVITE_FORCE.isAuthorized(context.getSender());
         if (context.hasIndexed(1))
         {
             BankAccount account = context.getArg(1);
@@ -438,6 +429,7 @@ public class BankCommands extends ContainerCommand
     public void listinvites(CubeContext context)
     {
         BankAccount account = context.getArg(0);
+        ensureIsVisible(context, account);
         if (account.needsInvite())
         {
             if (context.getSender() instanceof User && !account.hasAccess((User)context.getSender()))
@@ -470,6 +462,7 @@ public class BankCommands extends ContainerCommand
     public void listmembers(CubeContext context)
     {
         BankAccount account = context.getArg(0);
+        ensureIsVisible(context, account);
         Set<String> owners = account.getOwners();
         Set<String> members = account.getMembers();
         String format = " - " + ChatFormat.DARK_GREEN;
@@ -499,10 +492,51 @@ public class BankCommands extends ContainerCommand
         }
     }
 
-    // TODO bank Info cmd http://git.cubeisland.de/cubeengine/cubeengine/issues/246
     // Owners Members Invites Balance Hidden
-    public void info(CubeContext context)//list all members with their rank
-    {}
+    @Command(desc = "Shows bank information")
+    @IParams(@Grouped(@Indexed(label = "bank", type = BankAccount.class)))
+    public void info(CubeContext context) //list all members with their rank
+    {
+        BankAccount account = context.getArg(0);
+        ensureIsVisible(context, account);
+        context.sendTranslated(POSITIVE, "Bank Information for {name}:", context.getString(0));
+        context.sendTranslated(POSITIVE, "Owner:");
+        for (String owner : account.getOwners())
+        {
+            context.sendMessage(" - " + owner);
+        }
+        context.sendTranslated(POSITIVE, "Member:");
+        for (String member : account.getMembers())
+        {
+            context.sendMessage(" - " + member);
+        }
+        if (!context.isSender(User.class) || account.isMember((User)context.getSender()))
+        {
+            context.sendTranslated(POSITIVE, "Invited:");
+            for (String invite : account.getInvites())
+            {
+                context.sendMessage(" - " + invite);
+            }
+            context.sendTranslated(POSITIVE, "Current Balance: {input}", manager.format(context.getSender().getLocale(), account.balance()));
+        }
+        if (account.isHidden())
+        {
+            context.sendTranslated(POSITIVE, "This bank is hidden for other players!");
+        }
+    }
+
+    private void ensureIsVisible(CubeContext context, BankAccount account)
+    {
+        if (!account.isHidden() || module.perms().BANK_SHOWHIDDEN.isAuthorized(context.getSender())
+            || !context.isSender(User.class))
+        {
+            return;
+        }
+        if (account.hasAccess((User)context.getSender()))
+        {
+            throw new ReaderException(context.getSender().getTranslation(NEGATIVE, "There is no bank account named {input#name}!", account.getName()));
+        }
+    }
 
     @Command(desc = "Deposits given amount of money into the bank")
     @IParams({@Grouped(@Indexed(label = "bank", type = BankAccount.class)),
