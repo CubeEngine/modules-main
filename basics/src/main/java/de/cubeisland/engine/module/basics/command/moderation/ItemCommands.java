@@ -225,7 +225,7 @@ public class ItemCommands
     }
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
-    @IParams({@Grouped(value = @Indexed(label = "enchantment"), req = false),
+    @IParams({@Grouped(value = @Indexed(label = "enchantment", type = Enchantment.class), req = false),
               @Grouped(value = @Indexed(label = "level"), req = false)})
     @Flags(@Flag(longName = "unsafe", name = "u"))
     public void enchant(CubeContext context)
@@ -248,9 +248,10 @@ public class ItemCommands
             if (ench == null)
             {
                 String possibleEnchs = this.getPossibleEnchantments(item);
+
+                context.sendTranslated(NEGATIVE, "Enchantment {input#enchantment} not found!", context.getString(0));
                 if (possibleEnchs != null)
                 {
-                    context.sendTranslated(NEGATIVE, "Enchantment {input#enchantment} not found!", context.getArg(0));
                     context.sendTranslated(NEUTRAL, "Try one of those instead:");
                     context.sendMessage(possibleEnchs);
                 }
