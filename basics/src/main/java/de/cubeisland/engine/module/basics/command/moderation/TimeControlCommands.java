@@ -138,10 +138,29 @@ public class TimeControlCommands
         }
         else
         {
-            context.sendTranslated(POSITIVE, "The current time is:");
-            for (World world : worlds)
+            if (context.hasFlag("l"))
             {
-                context.sendTranslated(NEUTRAL, "{input#time} ({input#neartime}) in {world}.", Match.time().format(world.getTime()), Match.time().getNearTimeName(world.getTime()), world);
+                for (World world : worlds)
+                {
+                    if (this.lockTask.worlds.containsKey(world.getName()))
+                    {
+                        this.lockTask.remove(world);
+                        context.sendTranslated(POSITIVE, "Time unlocked for {world}!", world);
+                    }
+                    else
+                    {
+                        this.lockTask.add(world);
+                        context.sendTranslated(POSITIVE, "Time locked for {world}!", world);
+                    }
+                }
+            }
+            else
+            {
+                context.sendTranslated(POSITIVE, "The current time is:");
+                for (World world : worlds)
+                {
+                    context.sendTranslated(NEUTRAL, "{input#time} ({input#neartime}) in {world}.", Match.time().format(world.getTime()), Match.time().getNearTimeName(world.getTime()), world);
+                }
             }
         }
     }
