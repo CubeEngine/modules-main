@@ -19,14 +19,16 @@ package de.cubeisland.engine.module.basics.command.teleport;
 
 import java.util.UUID;
 
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
+import org.bukkit.Bukkit;
+
 import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.Indexed;
 import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsAttachment;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -163,7 +165,7 @@ public class TeleportRequestCommands
                 User user = this.basics.getCore().getUserManager().getExactUser(uuid);
                 if (user == null || !user.isOnline())
                 {
-                    context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", uuid);
+                    context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", Bukkit.getPlayer(uuid).getName());
                     return;
                 }
                 if (!TeleportCommands.teleport(user, sender.getLocation(), true, false, true))
