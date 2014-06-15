@@ -226,7 +226,7 @@ public class ItemCommands
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
     @IParams({@Grouped(value = @Indexed(label = "enchantment", type = Enchantment.class), req = false),
-              @Grouped(value = @Indexed(label = "level"), req = false)})
+              @Grouped(value = @Indexed(label = "level", type = Integer.class), req = false)})
     @Flags(@Flag(longName = "unsafe", name = "u"))
     public void enchant(CubeContext context)
     {
