@@ -3,3 +3,5 @@ description: ${project.description}
 version: ${project.version}
 source-version: ${githead.branch}-${githead.commit}
 build-timestamp: "${timestamp}"
+soft-services:
+  - de.cubeisland.engine.core.module.service.Selector

@@ -36,7 +36,10 @@ import de.cubeisland.engine.core.command.reflected.context.NParams;
 import de.cubeisland.engine.core.command.reflected.context.Named;
 import de.cubeisland.engine.core.command.result.confirm.ConfirmResult;
 import de.cubeisland.engine.core.command.sender.ConsoleCommandSender;
+import de.cubeisland.engine.core.module.service.Selector;
 import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.core.util.math.Cuboid;
+import de.cubeisland.engine.core.util.math.shape.Shape;
 import de.cubeisland.engine.module.travel.TpPointCommand;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportInvite;
@@ -528,7 +531,8 @@ public class HomeCommand extends TpPointCommand
     @Command(desc = "Clear all homes (of an user)")
     @IParams(@Grouped(req = false, value = @Indexed(label = "owner", type = User.class)))
     @Flags({@Flag(name = "pub", longName = "public"),
-            @Flag(name = "priv", longName = "private")})
+            @Flag(name = "priv", longName = "private"),
+            @Flag(name = "sel", longName = "selection")})
     public CommandResult clear(final CubeContext context)
     {
         if (this.module.getConfig().clearOnlyFromConsole && !(context.getSender() instanceof ConsoleCommandSender))
@@ -537,54 +541,96 @@ public class HomeCommand extends TpPointCommand
             return null;
         }
         final User user = context.getArg(0, null);
-        if (context.hasIndexed(0))
+        String type = "";
+        if (context.hasFlag("pub"))
         {
-            if (context.hasFlag("pub"))
+            type = context.getCore().getI18n().translate(context.getSender().getLocale(), "public");
+            type += " ";
+        }
+        else if (context.hasFlag("priv"))
+        {
+            type = context.getCore().getI18n().translate(context.getSender().getLocale(), "private");
+            type += " ";
+        }
+        final Location firstPoint;
+        final Location secondPoint;
+        if (context.hasFlag("sel"))
+        {
+            if (!context.getCore().getModuleManager().getServiceManager().isImplemented(Selector.class))
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all public homes ever created by {user}?",
-                                       user);
+                context.sendTranslated(NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
+                return null;
             }
-            else if (context.hasFlag("priv"))
+            if (context.isSender(User.class))
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all private homes ever created by {user}?",
-                                       user);
+                Selector selector = context.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
+                Shape selection = selector.getSelection((User)context.getSender());
+                if (selection instanceof Cuboid)
+                {
+                    firstPoint = selector.getFirstPoint((User)context.getSender());
+                    secondPoint = selector.getSecondPoint((User)context.getSender());
+                }
+                else
+                {
+                    context.sendTranslated(NEGATIVE, "Invalid selection!");
+                    return null;
+                }
+                if (context.hasIndexed(0))
+                {
+                    context.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes created by {user} in your current selection?", type, user);
+                }
+                else
+                {
+                    context.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes created in your current selection?", type);
+                }
             }
             else
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all homes ever created by {user}?",
-                                       user);
+                context.sendTranslated(NEGATIVE, "You have to be in game to use the selection flag");
+                return null;
             }
         }
         else
         {
-            if (context.hasFlag("pub"))
+            firstPoint = null;
+            secondPoint = null;
+            if (context.hasIndexed(0))
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all public homes ever created on this server!?");
-            }
-            else if (context.hasFlag("priv"))
-            {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all private homes ever created on this server?");
+                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes ever created by {user}?", type, user);
             }
             else
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all homes ever created on this server!?");
+                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes ever created on this server?", type);
             }
         }
-        context.sendTranslated(NEUTRAL, "Confirm with: {text:/confirm} before 30 seconds have passed to delete the homes");
+        context.sendTranslated(NEUTRAL,
+                               "Confirm with: {text:/confirm} before 30 seconds have passed to delete the homes");
         return new ConfirmResult(new Runnable()
         {
             @Override
             public void run()
             {
+                if (context.hasFlag("sel"))
+                {
+                    manager.massDelete(user, context.hasFlag("priv"), context.hasFlag("pub"), firstPoint, secondPoint);
+                    if (context.hasIndexed(0))
+                    {
+                        context.sendTranslated(POSITIVE, "The homes of {user} in the selection are now deleted", user);
+                    }
+                    else
+                    {
+                        context.sendTranslated(POSITIVE, "The homes in the selection are now deleted.");
+                    }
+                    return;
+                }
+                manager.massDelete(user, context.hasFlag("priv"), context.hasFlag("pub"));
                 if (context.hasIndexed(0))
                 {
-                    manager.massDelete(user, context.hasFlag("priv"), context.hasFlag("pub"));
-                    context.sendTranslated(POSITIVE, "Deleted homes.");
+                    context.sendTranslated(POSITIVE, "The homes of {user} are now deleted", user);
                 }
                 else
                 {
-                    manager.massDelete(context.hasFlag("priv"), context.hasFlag("pub"));
-                    context.sendTranslated(POSITIVE, "The homes are now deleted");
+                    context.sendTranslated(POSITIVE, "The homes are now deleted.");
                 }
             }
         }, context);

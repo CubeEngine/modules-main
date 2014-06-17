@@ -26,7 +26,6 @@ import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.*;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.TeleportType.HOME;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PRIVATE;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
@@ -61,4 +60,6 @@ public class HomeManager extends TelePointManager<Home>
         this.addPoint(home);
         return home;
     }
+
+
 }

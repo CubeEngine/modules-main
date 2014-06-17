@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
@@ -244,6 +245,11 @@ public abstract class TelePointManager<T extends TeleportPoint>
 
     public void massDelete(User user, boolean privates, boolean publics)
     {
+        if (user == null)
+        {
+            this.massDelete(privates, publics);
+            return;
+        }
         if (!privates && !publics)
         {
             privates = true;
@@ -258,6 +264,25 @@ public abstract class TelePointManager<T extends TeleportPoint>
             if (publics && point.isPublic())
             {
                 this.delete(point);
+            }
+        }
+    }
+
+    public void massDelete(User user, boolean priv, boolean pub, Location firstPoint, Location secondPoint)
+    {
+        Set<T> points = (user == null) ? this.list(priv, pub) : this.list(user, true, false, false);
+        for (T point : points)
+        {
+            if (point.getLocation().getWorld().equals(firstPoint.getWorld()) && point.getLocation().toVector().isInAABB(firstPoint.toVector(), secondPoint.toVector()))
+            {
+                if (priv && !point.isPublic())
+                {
+                    this.delete(point);
+                }
+                if (pub && point.isPublic())
+                {
+                    this.delete(point);
+                }
             }
         }
     }
