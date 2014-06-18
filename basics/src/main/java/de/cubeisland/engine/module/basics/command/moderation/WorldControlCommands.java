@@ -170,7 +170,7 @@ public class WorldControlCommands
         if (weather == null)
         {
             context.sendTranslated(NEGATIVE, "Invalid weather! {input}", context.getArg(0));
-            context.sendTranslated(NEUTRAL, "Use {name#clear}, {name#downfall} or {name#reset}!");
+            context.sendTranslated(NEUTRAL, "Use {name#clear}, {name#downfall} or {name#reset}!", "clear", "downfall", "reset");
             return;
         }
         switch (weather)
