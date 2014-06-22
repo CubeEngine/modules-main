@@ -26,12 +26,10 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
-import de.cubeisland.engine.core.command.CubeContext;
-import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.core.ban.BanManager;
 import de.cubeisland.engine.core.ban.IpBan;
 import de.cubeisland.engine.core.ban.UserBan;
-import de.cubeisland.engine.core.command.readers.UserOrAllReader;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -45,6 +43,7 @@ import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.McUUID;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.TimeConversionException;
+import de.cubeisland.engine.module.basics.Basics;
 
 import static de.cubeisland.engine.core.util.ChatFormat.*;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
@@ -74,20 +73,16 @@ public class KickBanCommands
     }
 
     @Command(desc = "Kicks a player from the server")
-    @IParams({@Grouped(@Indexed(label = {"player","!*"}, type = UserOrAllReader.class)),
+    @IParams({@Grouped(@Indexed(label = {"player","!*"}, type = User.class)),
               @Grouped(value = @Indexed(label = "reason"), req = false, greedy = true)})
     public void kick(CubeContext context)
     {
         String reason;
         reason = this.getReasonFrom(context, 1, module.perms().COMMAND_KICK_NOREASON);
         if (reason == null) return;
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.getString(0)))
         {
-            if (!module.perms().COMMAND_KICK_ALL.isAuthorized(context.getSender()))
-            {
-                context.sendTranslated(NEGATIVE, "You are not allowed to kick everyone!");
-                return;
-            }
+            context.ensurePermission(module.perms().COMMAND_KICK_ALL);
             for (User toKick : this.um.getOnlineUsers())
             {
                 if (!context.getSender().equals(toKick))
@@ -98,11 +93,6 @@ public class KickBanCommands
             return;
         }
         User user = context.getArg(0);
-        if (user == null)
-        {
-            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(0));
-            return;
-        }
         user.kickPlayer(user.getTranslation(NEGATIVE, kickMessage) + "\n\n" + RESET + reason);
         this.um.broadcastMessageWithPerm(NEGATIVE, "{user} was kicked from the server by {user}!", module.perms().KICK_RECEIVEMESSAGE, user, context.getSender());
         this.um.broadcastMessageWithPerm(NONE, reason, module.perms().KICK_RECEIVEMESSAGE);
@@ -356,6 +346,11 @@ public class KickBanCommands
     @IParams(@Grouped(req = false, value = @Indexed(label = {"!ips","!players"})))
     public void banlist(CubeContext context)
     {
+        if (true == true)
+        {
+            context.sendMessage("CURRENTLY NOT SAFE TO USE!!!"); // TODO Get Name from banlist not from Bukkit / querying mojang
+            return;
+        }
         // TODO paging
         boolean players = true;
         if (context.hasIndexed(0))

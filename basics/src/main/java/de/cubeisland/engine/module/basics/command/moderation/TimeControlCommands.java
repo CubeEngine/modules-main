@@ -62,7 +62,7 @@ public class TimeControlCommands
 
     @Command(desc = "Changes the time of a world")
     @IParams(@Grouped(value = @Indexed(label = "time"), req = false))
-    @NParams(@Named(names = { "w", "worlds", "in"}))
+    @NParams(@Named(names = { "w", "worlds", "in"})) // TODO worldlist reader // TODO NParams static label reader
     @Flags(@Flag(longName = "lock", name = "l"))
     public void time(CubeContext context)
     {

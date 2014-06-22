@@ -27,6 +27,7 @@ import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
+import de.cubeisland.engine.core.command.reflected.OnlyIngame;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.Indexed;
@@ -42,7 +43,6 @@ import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
 
@@ -58,7 +58,7 @@ public class MailCommand extends ContainerCommand
 
     @Alias(names = "readmail")
     @Command(desc = "Reads your mail.")
-    @IParams(@Grouped(value = @Indexed(label = {"player","!console"}, type = {User.class, String.class}), req = false))
+    @IParams(@Grouped(value = @Indexed(label = {"player","!console"}, type = User.class), req = false))
     public void read(CubeContext context)
     {
         User sender;
@@ -73,15 +73,14 @@ public class MailCommand extends ContainerCommand
             }
             if (sender == null)
             {
-                context.sendTranslated(NEUTRAL, "If you wanted to look into other players mail use: {text:/mail spy} {input#player}.", context.getArg(
-                    0));
+                context.sendTranslated(NEUTRAL, "If you wanted to look into other players mail use: {text:/mail spy} {input#player}.", context.getArg(0));
                 context.sendTranslated(NEGATIVE, "Otherwise be quiet!");
                 return;
             }
             mailof = context.getArg(0, null);
             if (mailof == null)
             {
-                if (!"console".equalsIgnoreCase(context.getArg(0).toString()))
+                if (!"console".equalsIgnoreCase(context.getString(0)))
                 {
                     context.sendTranslated(NEGATIVE, "User {user} not found!", context.getArg(0));
                     return;
@@ -172,7 +171,7 @@ public class MailCommand extends ContainerCommand
 
     @Alias(names = "sendallmail")
     @Command(desc = "Sends mails to all players.")
-    @IParams(@Grouped(value = @Indexed(label = "mailid"), greedy = true))
+    @IParams(@Grouped(value = @Indexed(label = "message"), greedy = true))
     public void sendAll(CubeContext context)
     {
         Set<User> users = this.module.getCore().getUserManager().getOnlineUsers();
@@ -210,42 +209,31 @@ public class MailCommand extends ContainerCommand
 
     @Command(desc = "Removes a single mail")
     @IParams(@Grouped(@Indexed(label = "mailid")))
+    @OnlyIngame("The console has no mails!")
     public void remove(CubeContext context)
     {
-        if (context.getSender() instanceof User)
+        User user = (User)context.getSender();
+        Integer mailId = context.getArg(0, null);
+        BasicsUser bUser = user.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser();
+        if (bUser.countMail() == 0)
         {
-            User user = (User)context.getSender();
-            Integer mailId = context.getArg(0, null);
-            if (mailId == null)
-            {
-                context.sendTranslated(NEGATIVE, "{input} is not a number!", context.getArg(0));
-                return;
-            }
-            BasicsUser bUser = user.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser();
-            if (bUser.countMail() == 0)
-            {
-                context.sendTranslated(NEUTRAL, "You do not have any mail!");
-                return;
-            }
-            try
-            {
-                Mail mail = bUser.getMails().get(mailId);
-                module.getCore().getDB().getDSL().delete(TABLE_MAIL).where(TABLE_MAIL.KEY.eq(mail.getValue(TABLE_MAIL.KEY))).execute();
-                context.sendTranslated(POSITIVE, "Deleted Mail #{integer#mailid}", mailId);
-            }
-            catch (IndexOutOfBoundsException e)
-            {
-                context.sendTranslated(NEGATIVE, "Invalid Mail Id!");
-            }
+            context.sendTranslated(NEUTRAL, "You do not have any mail!");
+            return;
         }
-        else
+        try
         {
-            context.sendTranslated(NEGATIVE, "The console has no mails!");
+            Mail mail = bUser.getMails().get(mailId);
+            module.getCore().getDB().getDSL().delete(TABLE_MAIL).where(TABLE_MAIL.KEY.eq(mail.getValue(TABLE_MAIL.KEY))).execute();
+            context.sendTranslated(POSITIVE, "Deleted Mail #{integer#mailid}", mailId);
+        }
+        catch (IndexOutOfBoundsException e)
+        {
+            context.sendTranslated(NEGATIVE, "Invalid Mail Id!");
         }
     }
 
     @Command(desc = "Clears your mail.")
-    @IParams(@Grouped(value = @Indexed(label = "player", type = User.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = {"player","!console"}, type = User.class), req = false))
     public void clear(CubeContext context)
     {
         User sender = null;
@@ -264,12 +252,7 @@ public class MailCommand extends ContainerCommand
             context.sendTranslated(NEUTRAL, "Cleared all mails!");
             return;
         }
-        User from = context.getArg(0, null);
-        if (from == null && !"console".equalsIgnoreCase(context.getArg(0).toString()))
-        {
-            context.sendTranslated(NEGATIVE, "User {user} not found!", context.getArg(0));
-            return;
-        }
+        User from = "console".equalsIgnoreCase(context.getString(0)) ? null : context.<User>getArg(0);
         sender.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMailFrom(from);
         context.sendTranslated(NEUTRAL, "Cleared all mail from {user}!", from == null ? "console" : from);
     }

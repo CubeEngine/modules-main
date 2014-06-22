@@ -24,8 +24,8 @@ import de.cubeisland.engine.core.permission.Permission;
 
 public class EntityRemoval
 {
-    private final Permission perm;
     public final Class<?>[] interfaces;
+    private final Permission perm;
 
     EntityRemoval(Permission perm, Class<?>... interfaces)
     {
@@ -35,7 +35,10 @@ public class EntityRemoval
 
     public boolean doesMatch(Entity entity)
     {
-        if (interfaces.length == 0) return this.extra(entity);
+        if (interfaces.length == 0)
+        {
+            return this.extra(entity);
+        }
         for (Class<?> anInterface : interfaces)
         {
             if (anInterface.isAssignableFrom(entity.getClass()))
@@ -53,14 +56,9 @@ public class EntityRemoval
 
     /**
      * Override this to check extra information
-     *
-     * @param entity
-     * @return
      */
     public boolean extra(Entity entity)
     {
         return true;
     }
-
-
 }

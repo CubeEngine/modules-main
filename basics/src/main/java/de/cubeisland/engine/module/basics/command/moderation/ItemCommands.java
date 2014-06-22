@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
-import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -31,10 +30,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import de.cubeisland.engine.core.command.CubeContext;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.core.command.readers.IntegerOrAllReader;
+import de.cubeisland.engine.core.command.exception.TooFewArgumentsException;
 import de.cubeisland.engine.core.command.reflected.Command;
+import de.cubeisland.engine.core.command.reflected.OnlyIngame;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -47,9 +45,12 @@ import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsAttachment;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static org.bukkit.Material.AIR;
+import static org.bukkit.Material.SKULL_ITEM;
 
 /**
  * item-related commands
@@ -84,12 +85,10 @@ public class ItemCommands
             {
                 List<String> lines = new ArrayList<>();
 
-                lines.add(context.getSender().getTranslation(POSITIVE, "Best Matched {input#item} ({integer#id}:{short#data}) for {input}", Match.material().getNameFor(itemSet.first().getKey()), itemSet.first().getKey().getType().getId(), itemSet.first().getKey().getDurability(), context.getArg(
-                    0)));
+                lines.add(context.getSender().getTranslation(POSITIVE, "Best Matched {input#item} ({integer#id}:{short#data}) for {input}", Match.material().getNameFor(itemSet.first().getKey()), itemSet.first().getKey().getType().getId(), itemSet.first().getKey().getDurability(), context.getArg(0)));
                 itemSet.remove(itemSet.first());
                 for (Entry<ItemStack, Double> item : itemSet) {
-                    lines.add(context.getSender().getTranslation(POSITIVE,
-                                                                 "Matched {input#item} ({integer#id}:{short#data}) for {input}",
+                    lines.add(context.getSender().getTranslation(POSITIVE, "Matched {input#item} ({integer#id}:{short#data}) for {input}",
                                                                  Match.material().getNameFor(item.getKey()),
                                                                  item.getKey().getType().getId(),
                                                                  item.getKey().getDurability(), context.getArg(0)));
@@ -101,30 +100,28 @@ public class ItemCommands
                 context.sendTranslated(NEGATIVE, "Could not find any item named {input}!", context.getArg(0));
             }
         }
-        else if (context.getSender() instanceof User)
+        else if (context.isSender(User.class))
         {
             User sender = (User)context.getSender();
-            if (sender.getItemInHand().getType().equals(AIR))
+            if (sender.getItemInHand().getType() == AIR)
             {
                 context.sendTranslated(NEUTRAL, "You hold nothing in your hands!");
+                return null;
+            }
+            ItemStack item = sender.getItemInHand();
+            String found = Match.material().getNameFor(item);
+            if (found == null)
+            {
+                context.sendTranslated(NEGATIVE, "Itemname unknown! Itemdata: {integer#id}:{short#data}", item.getType().getId(), item.getDurability());
             }
             else
             {
-                ItemStack item = sender.getItemInHand();
-                String found = Match.material().getNameFor(item);
-                if (found == null)
-                {
-                    context.sendTranslated(NEGATIVE, "Itemname unknown! Itemdata: {integer#id}:{short#data}", item.getType().getId(), item.getDurability());
-                }
-                else
-                {
-                    context.sendTranslated(POSITIVE, "The Item in your hand is: {input#item} ({integer#id}:{short#data})", found, item.getType().getId(), item.getDurability());
-                }
+                context.sendTranslated(POSITIVE, "The Item in your hand is: {input#item} ({integer#id}:{short#data})", found, item.getType().getId(), item.getDurability());
             }
         }
         else
         {
-            context.sendTranslated(NEGATIVE, "You need 1 parameter!");
+            throw new TooFewArgumentsException(context.getSender());
         }
         return null;
     }
@@ -138,7 +135,7 @@ public class ItemCommands
         {
             User sender = (User)context.getSender();
             ItemStack item = sender.getItemInHand();
-            if (item == null || item.getType().equals(AIR))
+            if (item == null || item.getType() == AIR)
             {
                 context.sendTranslated(NEGATIVE, "You need to hold an item to rename in your hand!");
                 return;
@@ -161,67 +158,59 @@ public class ItemCommands
 
     @Command(alias = "skullchange", desc = "Changes a skull to a players skin.")
     @IParams(@Grouped(req = false, value = @Indexed(label = "name")))
+    @OnlyIngame("This will you only give headaches!")
     public void headchange(CubeContext context)
     {
-        if (context.getSender() instanceof User)
+        User sender = (User)context.getSender();
+        String name = context.getArg(0);
+        if (sender.getItemInHand().getType() == SKULL_ITEM)
         {
-            User sender = (User)context.getSender();
-            String name = context.getArg(0);
-            if (sender.getItemInHand().getType().equals(Material.SKULL_ITEM))
-            {
-                sender.getItemInHand().setDurability((short)3);
-                SkullMeta meta = ((SkullMeta)sender.getItemInHand().getItemMeta());
-                meta.setOwner(name);
-                sender.getItemInHand().setItemMeta(meta);
-                context.sendTranslated(POSITIVE, "You now hold {user}'s head in your hands!", name);
-                return;
-            }
-            context.sendTranslated(NEGATIVE, "You are not holding a head.");
+            sender.getItemInHand().setDurability((short)3);
+            SkullMeta meta = ((SkullMeta)sender.getItemInHand().getItemMeta());
+            meta.setOwner(name);
+            sender.getItemInHand().setItemMeta(meta);
+            context.sendTranslated(POSITIVE, "You now hold {user}'s head in your hands!", name);
             return;
         }
-        context.sendTranslated(NEGATIVE, "This will you only give headaches!");
+        context.sendTranslated(NEGATIVE, "You are not holding a head.");
     }
 
     @Command(desc = "Grants unlimited items")
     @IParams(@Grouped(req = false, value = @Indexed(label = {"!on","!off"})))
+    @OnlyIngame
     public void unlimited(CubeContext context)
     {
-        if (context.getSender() instanceof User)
+        User sender = (User)context.getSender();
+        boolean unlimited;
+        if (context.hasIndexed(0))
         {
-            User sender = (User)context.getSender();
-            boolean unlimited;
-            if (context.hasIndexed(0))
+            if ("on".equalsIgnoreCase(context.getString(0)))
             {
-                if ("on".equalsIgnoreCase(context.getString(0)))
-                {
-                    unlimited = true;
-                }
-                else if ("off".equalsIgnoreCase(context.getString(0)))
-                {
-                    unlimited = false;
-                }
-                else
-                {
-                    context.sendTranslated(NEUTRAL, "Invalid parameter! Use {text:on} or {text:off}!");
-                    return;
-                }
+                unlimited = true;
+            }
+            else if ("off".equalsIgnoreCase(context.getString(0)))
+            {
+                unlimited = false;
             }
             else
             {
-                unlimited = sender.get(BasicsAttachment.class).hasUnlimitedItems();
+                context.sendTranslated(NEUTRAL, "Invalid parameter! Use {text:on} or {text:off}!");
+                return;
             }
-            if (unlimited)
-            {
-                context.sendTranslated(POSITIVE, "You now have unlimited items to build!");
-            }
-            else
-            {
-                context.sendTranslated(NEUTRAL, "You no longer have unlimited items to build!");
-            }
-            sender.get(BasicsAttachment.class).setUnlimitedItems(unlimited);
-            return;
         }
-        context.sendTranslated(NEGATIVE, "This command can only be used by a player!");
+        else
+        {
+            unlimited = sender.get(BasicsAttachment.class).hasUnlimitedItems();
+        }
+        if (unlimited)
+        {
+            context.sendTranslated(POSITIVE, "You now have unlimited items to build!");
+        }
+        else
+        {
+            context.sendTranslated(NEUTRAL, "You no longer have unlimited items to build!");
+        }
+        sender.get(BasicsAttachment.class).setUnlimitedItems(unlimited);
     }
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
@@ -344,24 +333,14 @@ public class ItemCommands
 
     @Command(desc = "Gives the specified Item to a player")
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(@Indexed(label = "material[:data]")),
-              @Grouped(value = @Indexed(label = "amount"), req = false)})
+              @Grouped(@Indexed(label = "material[:data]", type = ItemStack.class)),
+              @Grouped(value = @Indexed(label = "amount", type = Integer.class), req = false)})
     @Flags(@Flag(name = "b", longName = "blacklist"))
     @SuppressWarnings("deprecation")
     public void give(CubeContext context)
     {
         User user = context.getArg(0);
-        if (user == null)
-        {
-            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(0));
-            return;
-        }
-        ItemStack item = context.getArg(1, null);
-        if (item == null)
-        {
-            context.sendTranslated(NEGATIVE, "Unknown Item: {input#item}!", context.getArg(1));
-            return;
-        }
+        ItemStack item = context.getArg(1);
         if (!context.hasFlag("b") && module.perms().ITEM_BLACKLIST.isAuthorized(context.getSender())
             && this.module.getConfiguration().commands.itemBlacklist.contains(item))
         {
@@ -397,7 +376,7 @@ public class ItemCommands
         if (context.getSender() instanceof User)
         {
             User sender = (User)context.getSender();
-            ItemStack item = context.getArg(0, null);
+            ItemStack item = context.getArg(0);
             if (!context.hasFlag("b") && module.perms().ITEM_BLACKLIST.isAuthorized(sender)
                     && this.module.getConfiguration().commands.containsBlackListed(item))
             {
@@ -449,7 +428,7 @@ public class ItemCommands
     }
 
     @Command(desc = "Refills the stack in hand")
-    @IParams(@Grouped(value = @Indexed(label = {"amount","!*"}, type = IntegerOrAllReader.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = {"amount","!*"}, type = Integer.class), req = false))
     public void more(CubeContext context)
     {
         if (!context.isSender(User.class))
@@ -500,111 +479,103 @@ public class ItemCommands
 
     @Command(desc = "Repairs your items")
     @Flags(@Flag(longName = "all", name = "a"))
+    @OnlyIngame("If you do this you'll loose your warranty!")
     // without item in hand
     public void repair(CubeContext context)
     {
-        if (context.getSender() instanceof User)
+        User sender = (User)context.getSender();
+        if (context.hasFlag("a"))
         {
-            User sender = (User)context.getSender();
-            if (context.hasFlag("a"))
+            List<ItemStack> list = new ArrayList<>();
+            list.addAll(Arrays.asList(sender.getInventory().getArmorContents()));
+            list.addAll(Arrays.asList(sender.getInventory().getContents()));
+            int repaired = 0;
+            for (ItemStack item : list)
             {
-                List<ItemStack> list = new ArrayList<>();
-                list.addAll(Arrays.asList(sender.getInventory().getArmorContents()));
-                list.addAll(Arrays.asList(sender.getInventory().getContents()));
-                int repaired = 0;
-                for (ItemStack item : list)
+                if (Match.material().repairable(item))
                 {
-                    if (Match.material().repairable(item))
-                    {
-                        item.setDurability((short)0);
-                        repaired++;
-                    }
+                    item.setDurability((short)0);
+                    repaired++;
                 }
-                if (repaired == 0)
-                {
-                    sender.sendTranslated(NEUTRAL, "No items to repair!");
-                    return;
-                }
-                sender.sendTranslated(POSITIVE, "Repaired {amount} items!", repaired);
+            }
+            if (repaired == 0)
+            {
+                sender.sendTranslated(NEUTRAL, "No items to repair!");
                 return;
             }
-            ItemStack item = sender.getItemInHand();
-            if (Match.material().repairable(item))
-            {
-                if (item.getDurability() == 0)
-                {
-                    sender.sendTranslated(NEUTRAL, "No need to repair this!");
-                    return;
-                }
-                item.setDurability((short)0);
-                sender.sendTranslated(POSITIVE, "Item repaired!");
-                return;
-            }
-            sender.sendTranslated(NEUTRAL, "Item cannot be repaired!");
+            sender.sendTranslated(POSITIVE, "Repaired {amount} items!", repaired);
             return;
         }
-        context.sendTranslated(NEGATIVE, "If you do this you'll loose your warranty!");
+        ItemStack item = sender.getItemInHand();
+        if (Match.material().repairable(item))
+        {
+            if (item.getDurability() == 0)
+            {
+                sender.sendTranslated(NEUTRAL, "No need to repair this!");
+                return;
+            }
+            item.setDurability((short)0);
+            sender.sendTranslated(POSITIVE, "Item repaired!");
+            return;
+        }
+        sender.sendTranslated(NEUTRAL, "Item cannot be repaired!");
     }
 
     @Command(desc = "Stacks your items up to 64")
+    @OnlyIngame("No stacking for you.")
     public void stack(CubeContext context)
     {
-        if (context.getSender() instanceof User)
+        User user = (User)context.getSender();
+        boolean allow64 = module.perms().COMMAND_STACK_FULLSTACK.isAuthorized(user);
+        ItemStack[] items = user.getInventory().getContents();
+        int size = items.length;
+        boolean changed = false;
+        for (int i = 0; i < size; i++)
         {
-            User user = (User)context.getSender();
-            boolean allow64 = module.perms().COMMAND_STACK_FULLSTACK.isAuthorized(user);
-            ItemStack[] items = user.getInventory().getContents();
-            int size = items.length;
-            boolean changed = false;
-            for (int i = 0; i < size; i++)
+            ItemStack item = items[i];
+            // no null / infinite or unstackable items (if not allowed)
+            if (item == null || item.getAmount() <= 0 || (!allow64 && item.getMaxStackSize() == 1))
             {
-                ItemStack item = items[i];
-                // no null / infinite or unstackable items (if not allowed)
-                if (item == null || item.getAmount() <= 0 || (!allow64 && item.getMaxStackSize() == 1))
+                continue;
+            }
+            int max = allow64 ? 64 : item.getMaxStackSize();
+            if (item.getAmount() < max)
+            {
+                int needed = max - item.getAmount();
+                for (int j = i + 1; j < size; j++) // search for same item
                 {
-                    continue;
-                }
-                int max = allow64 ? 64 : item.getMaxStackSize();
-                if (item.getAmount() < max)
-                {
-                    int needed = max - item.getAmount();
-                    for (int j = i + 1; j < size; j++) // search for same item
+                    ItemStack item2 = items[j];
+                    // no null / infinite or unstackable items (if not allowed)
+                    if (item2 == null || item2.getAmount() <= 0 || (!allow64 && item.getMaxStackSize() == 1))
                     {
-                        ItemStack item2 = items[j];
-                        // no null / infinite or unstackable items (if not allowed)
-                        if (item2 == null || item2.getAmount() <= 0 || (!allow64 && item.getMaxStackSize() == 1))
+                        continue;
+                    }
+                    // compare
+                    if (item.isSimilar(item2))
+                    {
+                        if (item2.getAmount() > needed) // not enough place -> fill up stack
                         {
-                            continue;
+                            item.setAmount(max);
+                            item2.setAmount(item2.getAmount() - needed);
+                            break;
                         }
-                        // compare
-                        if (item.isSimilar(item2))
+                        // enough place -> add to stack
                         {
-                            if (item2.getAmount() > needed) // not enough place -> fill up stack
-                            {
-                                item.setAmount(max);
-                                item2.setAmount(item2.getAmount() - needed);
-                                break;
-                            }
-                            // enough place -> add to stack
-                            {
-                                items[j] = null;
-                                item.setAmount(item.getAmount() + item2.getAmount());
-                                needed = max - item.getAmount();
-                            }
-                            changed = true;
+                            items[j] = null;
+                            item.setAmount(item.getAmount() + item2.getAmount());
+                            needed = max - item.getAmount();
                         }
+                        changed = true;
                     }
                 }
             }
-            if (changed)
-            {
-                user.getInventory().setContents(items);
-                user.sendTranslated(POSITIVE, "Items stacked together!");
-                return;
-            }
-            user.sendTranslated(NEUTRAL, "Nothing to stack!");
+        }
+        if (changed)
+        {
+            user.getInventory().setContents(items);
+            user.sendTranslated(POSITIVE, "Items stacked together!");
             return;
         }
-        context.sendTranslated(NEUTRAL, "No stacking for you.");
+        user.sendTranslated(NEUTRAL, "Nothing to stack!");
     }
 }

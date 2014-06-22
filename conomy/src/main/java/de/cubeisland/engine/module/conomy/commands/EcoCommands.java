@@ -19,12 +19,9 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.List;
 
-import de.cubeisland.engine.core.command.CubeContext;
-import de.cubeisland.engine.module.conomy.Conomy;
-import de.cubeisland.engine.module.conomy.account.Account;
-import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.readers.UserListOrAllReader;
+import de.cubeisland.engine.core.command.CubeContext;
+import de.cubeisland.engine.core.command.readers.UserListReader;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -32,6 +29,9 @@ import de.cubeisland.engine.core.command.reflected.context.Grouped;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.Indexed;
 import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.conomy.Conomy;
+import de.cubeisland.engine.module.conomy.account.Account;
+import de.cubeisland.engine.module.conomy.account.ConomyManager;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -48,14 +48,14 @@ public class EcoCommands extends ContainerCommand
     }
 
     @Command(alias = "grant", desc = "Gives money to one or all players.")
-    @IParams({@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)),
+    @IParams({@Grouped(@Indexed(label = {"players","!*"}, type = UserListReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     @Flags(@Flag(longName = "online", name = "o"))
     public void give(CubeContext context)
     {
         Double amount = context.getArg(1);
         String format = manager.format(amount);
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.getString(0)))
         {
             if (context.hasFlag("o"))
             {
@@ -91,14 +91,14 @@ public class EcoCommands extends ContainerCommand
     }
 
     @Command(alias = "remove", desc = "Takes money from given user")
-    @IParams({@Grouped(@Indexed(label = {"player","!*"}, type = UserListOrAllReader.class)),
+    @IParams({@Grouped(@Indexed(label = {"player","!*"}, type = UserListReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     @Flags(@Flag(longName = "online", name = "o"))
     public void take(CubeContext context)
     {
         Double amount = context.getArg(1);
         String format = manager.format(amount);
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.getString(0)))
         {
             if (context.hasFlag("o"))
             {
@@ -128,11 +128,11 @@ public class EcoCommands extends ContainerCommand
     }
 
     @Command(desc = "Reset the money from given user")
-    @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)))
+    @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListReader.class)))
     @Flags(@Flag(longName = "online", name = "o"))
     public void reset(CubeContext context)
     {
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.getString(0)))
         {
             if (context.hasFlag("o"))
             {
@@ -163,14 +163,14 @@ public class EcoCommands extends ContainerCommand
     }
 
     @Command(desc = "Sets the money of a given player")
-    @IParams({@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)),
+    @IParams({@Grouped(@Indexed(label = {"players","!*"}, type = UserListReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     @Flags(@Flag(longName = "online", name = "o"))
     public void set(CubeContext context)
     {
         Double amount = context.getArg(1);
         String format = this.manager.format(amount);
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.getString(0)))
         {
             if (context.hasFlag("o"))
             {
@@ -200,13 +200,13 @@ public class EcoCommands extends ContainerCommand
     }
 
     @Command(desc = "Scales the money of a given player")
-    @IParams({@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)),
+    @IParams({@Grouped(@Indexed(label = {"players","!*"}, type = UserListReader.class)),
               @Grouped(@Indexed(label = "factor", type = Float.class))})
     @Flags(@Flag(longName = "online", name = "o"))
     public void scale(CubeContext context)
     {
         Float factor = context.getArg(1);
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.getString(0)))
         {
             if (context.hasFlag("o"))
             {
@@ -232,10 +232,10 @@ public class EcoCommands extends ContainerCommand
     }
 
     @Command(desc = "Hides the account of a given player")
-    @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)))
+    @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListReader.class)))
     public void hide(CubeContext context)
     {
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.getString(0)))
         {
             this.manager.hideAll(true, false);
             return;
@@ -259,10 +259,10 @@ public class EcoCommands extends ContainerCommand
     }
 
     @Command(desc = "Unhides the account of a given player")
-    @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListOrAllReader.class)))
+    @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListReader.class)))
     public void unhide(CubeContext context)
     {
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.getString(0)))
         {
             this.manager.unhideAll(true, false);
             return;

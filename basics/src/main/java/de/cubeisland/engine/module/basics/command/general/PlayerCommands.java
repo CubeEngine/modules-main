@@ -37,8 +37,9 @@ import de.cubeisland.engine.core.ban.UserBan;
 import de.cubeisland.engine.core.bukkit.BukkitUtils;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.CubeContext;
-import de.cubeisland.engine.core.command.readers.UserListOrAllReader;
+import de.cubeisland.engine.core.command.readers.UserListReader;
 import de.cubeisland.engine.core.command.reflected.Command;
+import de.cubeisland.engine.core.command.reflected.OnlyIngame;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -84,7 +85,7 @@ public class PlayerCommands
     }
 
     @Command(desc = "Refills your hunger bar")
-    @IParams(@Grouped(value = @Indexed(label = "player", type = UserListOrAllReader.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = {"player","!*"}, type = UserListReader.class), req = false))
     public void feed(CubeContext context)
     {
         if (context.hasIndexed(0))
@@ -96,7 +97,7 @@ public class PlayerCommands
             }
             Collection<User> users;
             boolean all = false;
-            if ("*".equals(context.getArg(0)))
+            if ("*".equals(context.getString(0)))
             {
                 all = true;
                 users = this.um.getOnlineUsers();
@@ -139,7 +140,7 @@ public class PlayerCommands
     }
 
     @Command(desc = "Empties the hunger bar")
-    @IParams(@Grouped(value = @Indexed(label = "players", type = UserListOrAllReader.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = {"players","!*"}, type = UserListReader.class), req = false))
     public void starve(CubeContext context)
     {
         if (context.hasIndexed(0))
@@ -151,7 +152,7 @@ public class PlayerCommands
             }
             Collection<User> users;
             boolean all = false;
-            if ("*".equals(context.getArg(0)))
+            if ("*".equals(context.getString(0)))
             {
                 all = true;
                 users = this.um.getOnlineUsers();
@@ -194,7 +195,7 @@ public class PlayerCommands
     }
 
     @Command(desc = "Heals a player")
-    @IParams(@Grouped(value = @Indexed(label = "players", type = UserListOrAllReader.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = {"players","!*"}, type = UserListReader.class), req = false))
     public void heal(CubeContext context)
     {
         if (context.hasIndexed(0))
@@ -206,7 +207,7 @@ public class PlayerCommands
             }
             Collection<User> users;
             boolean all = false;
-            if ("*".equals(context.getArg(0)))
+            if ("*".equals(context.getString(0)))
             {
                 all = true;
                 users = this.um.getOnlineUsers();
@@ -283,7 +284,7 @@ public class PlayerCommands
     }
 
     @Command(alias = "gm", desc = "Changes the gamemode")
-    @IParams({@Grouped(value = @Indexed(label = "player"), req = false),
+    @IParams({@Grouped(value = @Indexed(label = "player", type = User.class), req = false),
               @Grouped(value = @Indexed(label = "gamemode"), req = false)})
     public void gamemode(CubeContext context)
     {
@@ -336,7 +337,7 @@ public class PlayerCommands
     }
 
     @Command(alias = "slay", desc = "Kills a player")
-    @IParams(@Grouped(@Indexed(label = "players", type = UserListOrAllReader.class)))
+    @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListReader.class)))
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "quiet", name = "q"),
             @Flag(longName = "lightning", name = "l")})
@@ -349,7 +350,7 @@ public class PlayerCommands
         {
             List<String> killed = new ArrayList<>();
             Object arg0 = context.getArg(0);
-            if ("*".equals(arg0))
+            if ("*".equals(context.getString(0)))
             {
                 if (!module.perms().COMMAND_KILL_ALL.isAuthorized(context.getSender()))
                 {
@@ -452,11 +453,6 @@ public class PlayerCommands
     public void seen(CubeContext context)
     {
         User user = context.getArg(0);
-        if (user == null)
-        {
-            context.sendTranslated(NEGATIVE, "User {user} not found!", context.getArg(0));
-            return;
-        }
         if (user.isOnline())
         {
             context.sendTranslated(NEUTRAL, "{user} is currently online!", user);
@@ -479,11 +475,6 @@ public class PlayerCommands
     public void sudo(CubeContext context)
     {
         User user = context.getArg(0);
-        if (user == null)
-        {
-            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(0));
-            return;
-        }
         String s = context.getStrings(1);
         if (s.startsWith("/"))
         {
@@ -496,13 +487,9 @@ public class PlayerCommands
     }
 
     @Command(desc = "Kills yourself")
+    @OnlyIngame("You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}")
     public void suicide(CubeContext context)
     {
-        if (!(context.getSender() instanceof User))
-        {
-            context.sendTranslated(NEGATIVE, "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}");
-            return;
-        }
         User sender = (User)context.getSender();
         sender.setHealth(0);
         sender.setLastDamageCause(new EntityDamageEvent(sender, EntityDamageEvent.DamageCause.CUSTOM, sender.getMaxHealth()));
@@ -516,11 +503,7 @@ public class PlayerCommands
         User user;
         if (context.hasIndexed(0))
         {
-            if (!module.perms().COMMAND_AFK_OTHER.isAuthorized(context.getSender()))
-            {
-                context.sendTranslated(NEGATIVE, "You are not allowed to change the afk-state of an other player!");
-                return;
-            }
+            context.ensurePermission(module.perms().COMMAND_AFK_OTHER);
             user = context.getArg(0);
             if (!user.isOnline())
             {
@@ -675,7 +658,7 @@ public class PlayerCommands
     }
 
     @Command(desc = "Changes your walkspeed.")
-    @IParams({@Grouped(@Indexed(label = "speed")),
+    @IParams({@Grouped(@Indexed(label = "speed", type = Float.class)),
               @Grouped(value = @Indexed(label = "player"), req = false)})
     public void walkspeed(CubeContext context)
     {

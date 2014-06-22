@@ -66,7 +66,7 @@ public class ChatCommands
               @Grouped(value = @Indexed(label = "message"), greedy = true)})
     public void msg(CubeContext context)
     {
-        if ("console".equalsIgnoreCase(context.getArg(0).toString()))
+        if ("console".equalsIgnoreCase(context.getString(0)))
         {
             sendWhisperTo(NON_PLAYER_UUID, context.getStrings(1), context);
             return;
@@ -155,13 +155,7 @@ public class ChatCommands
     @IParams(@Grouped(value = @Indexed(label = "message"), greedy = true))
     public void broadcast(CubeContext context)
     {
-        StringBuilder sb = new StringBuilder();
-        int i = 0;
-        while (context.hasIndexed(i))
-        {
-            sb.append(context.getArg(i++)).append(" ");
-        }
-        this.um.broadcastMessage(NEUTRAL, "[{text:Broadcast}] {}", sb.toString());
+        this.um.broadcastMessage(NEUTRAL, "[{text:Broadcast}] {}", context.getStrings(0));
     }
 
     @Command(desc = "Mutes a player")

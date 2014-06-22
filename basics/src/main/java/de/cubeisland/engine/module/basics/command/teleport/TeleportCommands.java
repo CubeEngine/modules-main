@@ -78,7 +78,7 @@ public class TeleportCommands
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(req = false, value = @Indexed(label = "player", type = User.class))})
     @Flags({@Flag(longName = "force", name = "f"), // is not shown directly in usage
-              @Flag(longName = "unsafe", name = "u")})
+            @Flag(longName = "unsafe", name = "u")})
     public void tp(CubeContext context)
     {
         User user = null;
@@ -310,7 +310,7 @@ public class TeleportCommands
 
     @Command(desc = "Direct teleport to a coordinate.")
     @IParams(@Grouped(value = {@Indexed(label = "x", type = Integer.class),
-                               @Indexed(label = "y", req = false, type = Integer.class),
+                               @Indexed(label = "y", type = Integer.class, req = false),
                                @Indexed(label = "z", type = Integer.class)}))
     @NParams(@Named(names = {"world", "w"}, type = World.class))
     @Flags(@Flag(longName = "safe", name = "s"))

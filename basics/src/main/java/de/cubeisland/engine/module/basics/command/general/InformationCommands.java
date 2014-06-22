@@ -39,15 +39,14 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
 import de.cubeisland.engine.core.command.CubeContext;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.core.command.CommandSender;
+import de.cubeisland.engine.core.command.exception.TooFewArgumentsException;
 import de.cubeisland.engine.core.command.reflected.Command;
+import de.cubeisland.engine.core.command.reflected.OnlyIngame;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
 import de.cubeisland.engine.core.command.reflected.context.Indexed;
-import de.cubeisland.engine.core.command.sender.ConsoleCommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.Direction;
@@ -57,6 +56,7 @@ import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.core.util.math.BlockVector2;
 import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.core.util.math.MathHelper;
+import de.cubeisland.engine.module.basics.Basics;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
@@ -79,31 +79,20 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the biome type you are standing in.")
-    @IParams({@Grouped(value = @Indexed(label = "world"), req = false),
-              @Grouped(value = @Indexed(label = "block-x"), req = false),
-              @Grouped(value = @Indexed(label = "block-z"), req = false)})
+    @IParams({@Grouped(value = @Indexed(label = "world", type = World.class), req = false),
+              @Grouped(value = {@Indexed(label = "block-x", type = Integer.class),
+                                @Indexed(label = "block-z", type = Integer.class)}, req = false)})
     public void biome(CubeContext context)
     {
-        World world;
-        Integer x;
-        Integer z;
-        if (context.hasIndexed(2))
+        World world = context.getArg(0, null);
+        if (!context.isSender(User.class) && (!context.hasIndexed(2) || world == null))
         {
-            world = context.getArg(0, null);
-            if (world == null)
-            {
-                context.sendTranslated(NEGATIVE, "Unknown world {input#world}!", context.getArg(0));
-                return;
-            }
-            x = context.getArg(1, null);
-            z = context.getArg(2, null);
-            if (x == null || z == null)
-            {
-                context.sendTranslated(NEGATIVE, "Please provide valid whole number x and/or z coordinates!");
-                return;
-            }
+            context.sendTranslated(NEGATIVE, "Please provide a world and x and z coordinates!");
+            return;
         }
-        else if (context.getSender() instanceof User)
+        Integer x = context.getArg(1, null);
+        Integer z = context.getArg(2, null);
+        if (!context.hasIndexed(2) && context.isSender(User.class))
         {
             User user = (User)context.getSender();
             Location loc = user.getLocation();
@@ -111,98 +100,57 @@ public class InformationCommands
             x = loc.getBlockX();
             z = loc.getBlockZ();
         }
-        else
-        {
-            context.sendTranslated(NEGATIVE, "Please provide a world and x and z coordinates!");
-            return;
-        }
         Biome biome = world.getBiome(x, z);
         context.sendTranslated(NEUTRAL, "Biome at {vector:x\\=:z\\=}: {biome}", new BlockVector2(x, z), biome);
     }
 
     @Command(desc = "Displays the seed of a world.")
-    @IParams(@Grouped(value = @Indexed(label = "world"), req = false))
+    @IParams(@Grouped(value = @Indexed(label = "world", type = World.class), req = false))
     public void seed(CubeContext context)
     {
-        World world = null;
-        if (context.hasIndexed(0))
-        {
-            world = context.getArg(0, null);
-            if (world == null)
-            {
-                context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.getArg(0));
-                return;
-            }
-        }
+        World world = context.getArg(0, null);
         if (world == null)
         {
-            if (context.getSender() instanceof User)
+            if (!context.isSender(User.class))
             {
-                world = ((User)context.getSender()).getWorld();
+                throw new TooFewArgumentsException(context.getSender());
             }
-            else
-            {
-                context.sendTranslated(NEGATIVE, "No world specified!");
-                return;
-            }
+            world = ((User)context.getSender()).getWorld();
         }
         context.sendTranslated(NEUTRAL, "Seed of {world} is {long#seed}", world, world.getSeed());
     }
 
     @Command(desc = "Displays the direction in which you are looking.")
+    @OnlyIngame("{text:ProTip}: I assume you are looking right at your screen, right?")
     public void compass(CubeContext context)
     {
-        CommandSender sender = context.getSender();
-        if (sender instanceof User)
-        {
-            int direction = Math.round(((User)sender).getLocation().getYaw() + 180f + 360f) % 360;
-            String dir;
-            dir = Direction.matchDirection(direction).name();
-            sender.sendTranslated(NEUTRAL, "You are looking to {input#direction}!", dir); // TODO translate direction
-        }
-        else
-        {
-            context.sendTranslated(NEUTRAL, "{text:ProTip}: I assume you are looking right at your screen, right?");
-        }
+        int direction = Math.round(((User)context.getSender()).getLocation().getYaw() + 180f + 360f) % 360;
+        context.sendTranslated(NEUTRAL, "You are looking to {input#direction}!", Direction.matchDirection(direction).name()); // TODO translate direction
     }
 
     @Command(desc = "Displays your current depth.")
+    @OnlyIngame("You dug too deep!")
     public void depth(CubeContext context)
     {
-        if (context.getSender() instanceof User)
+        final int height = ((User)context.getSender()).getLocation().getBlockY();
+        if (height > 62)
         {
-            final int height = ((User)context.getSender()).getLocation().getBlockY();
-            if (height > 62)
-            {
-                context.sendTranslated(POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} above sealevel)", height, height - 62);
-            }
-            else
-            {
-                context.sendTranslated(POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} below sealevel)", height, 62 - height);
-            }
+            context.sendTranslated(POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} above sealevel)", height, height - 62);
+            return;
         }
-        else
-        {
-            context.sendTranslated(NEGATIVE, "You dug too deep!");
-        }
+        context.sendTranslated(POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} below sealevel)", height, 62 - height);
     }
 
     @Command(desc = "Displays your current location.")
+    @OnlyIngame("Your position: {text:Right in front of your screen!:color=RED}")
     public void getPos(CubeContext context)
     {
-        if (context.getSender() instanceof User)
-        {
-            final Location loc = ((User)context.getSender()).getLocation();
-            context.sendTranslated(NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
-        }
-        else
-        {
-            context.sendTranslated(NEUTRAL, "Your position: {text:Right in front of your screen!:color=RED}");
-        }
+        final Location loc = ((User)context.getSender()).getLocation();
+        context.sendTranslated(NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
     }
 
     @Command(desc = "Displays near players(entities/mobs) to you.")
-    @IParams({@Grouped(value = @Indexed(label = "radius"), req = false),
+    @IParams({@Grouped(value = @Indexed(label = "radius", type = Integer.class), req = false),
               @Grouped(value = @Indexed(label = "player", type = User.class), req = false)})
     @Flags({@Flag(longName = "entity", name = "e"),
             @Flag(longName = "mob", name = "m")})
@@ -222,11 +170,7 @@ public class InformationCommands
             context.sendTranslated(NEUTRAL, "I am right {text:behind:color=RED} you!");
             return;
         }
-        int radius = this.module.getConfiguration().commands.nearDefaultRadius;
-        if (context.hasIndexed(0))
-        {
-            radius = context.getArg(0, radius);
-        }
+        int radius = context.getArg(0, this.module.getConfiguration().commands.nearDefaultRadius);
         int squareRadius = radius * radius;
         Location userLocation = user.getLocation();
         List<Entity> list = userLocation.getWorld().getEntities();
@@ -355,14 +299,12 @@ public class InformationCommands
     public void ping(CubeContext context)
     {
         final String label = context.getLabel().toLowerCase(Locale.ENGLISH);
-        if (context.getSender() instanceof ConsoleCommandSender)
-        {
-            context.sendTranslated(NEUTRAL, label + " in the console?");
-        }
-        else
+        if (context.isSender(User.class))
         {
             context.sendTranslated(NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}", ((User)context.getSender()).getPing());
+            return;
         }
+        context.sendTranslated(NEUTRAL, label + " in the console?");
     }
 
     @Command(desc = "Displays chunk, memory and world information.")

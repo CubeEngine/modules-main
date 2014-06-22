@@ -158,14 +158,9 @@ public class InventoryCommands
     {
         CommandSender sender = context.getSender();
         final User target;
-        if (context.hasIndexed())
+        if (context.hasIndexed(0))
         {
             target = context.getArg(0);
-            if (target == null)
-            {
-                sender.sendTranslated(NEGATIVE, "The specified user was not found!");
-                return;
-            }
         }
         else if (sender instanceof User)
         {
@@ -176,14 +171,11 @@ public class InventoryCommands
             sender.sendTranslated(NEGATIVE, "That awkward moment when you realize you do not have an inventory!");
             return;
         }
-        if (sender != target && !module.perms().COMMAND_CLEARINVENTORY_OTHER.isAuthorized(sender))
+        if (!sender.equals(target))
         {
-            context.sendTranslated(NEGATIVE, "You are not allowed to clear the inventory of other users!");
-            return;
-        }
-        if (target != sender && module.perms().COMMAND_CLEARINVENTORY_PREVENT.isAuthorized(target)) // other has prevent
-        {
-            if (!(context.hasFlag("f") && module.perms().COMMAND_CLEARINVENTORY_FORCE.isAuthorized(sender))) // is not forced?
+            context.ensurePermission(module.perms().COMMAND_CLEARINVENTORY_OTHER);
+            if (module.perms().COMMAND_CLEARINVENTORY_PREVENT.isAuthorized(target) && !(context.hasFlag("f")
+                && module.perms().COMMAND_CLEARINVENTORY_FORCE.isAuthorized(sender)))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to clear the inventory of {user}", target);
                 return;
@@ -201,17 +193,15 @@ public class InventoryCommands
         if (sender == target)
         {
             sender.sendTranslated(POSITIVE, "Your inventory has been cleared!");
+            return;
         }
-        else
+        if (module.perms().COMMAND_CLEARINVENTORY_NOTIFY.isAuthorized(target)) // notify
         {
-            if (module.perms().COMMAND_CLEARINVENTORY_NOTIFY.isAuthorized(target)) // notify
+            if (!(module.perms().COMMAND_CLEARINVENTORY_QUIET.isAuthorized(sender) && context.hasFlag("q"))) // quiet
             {
-                if (!(module.perms().COMMAND_CLEARINVENTORY_QUIET.isAuthorized(sender) && context.hasFlag("q"))) // quiet
-                {
-                    target.sendTranslated(NEUTRAL, "Your inventory has been cleared by {sender}!", sender);
-                }
+                target.sendTranslated(NEUTRAL, "Your inventory has been cleared by {sender}!", sender);
             }
-            sender.sendTranslated(POSITIVE, "The inventory of {user} has been cleared!", target);
         }
+        sender.sendTranslated(POSITIVE, "The inventory of {user} has been cleared!", target);
     }
 }

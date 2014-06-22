@@ -34,7 +34,6 @@ import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.exception.IncorrectUsageException;
 import de.cubeisland.engine.core.command.exception.MissingParameterException;
 import de.cubeisland.engine.core.command.parameterized.completer.WorldCompleter;
-import de.cubeisland.engine.core.command.readers.IntegerOrAllReader;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -72,7 +71,7 @@ public class WorldControlCommands
 
     @Command(desc = "Changes the weather")
     @IParams({@Grouped(@Indexed(label = {"!sun","!rain","!storm"})),
-              @Grouped(req = false, value = @Indexed(label = "duration"))})
+              @Grouped(req = false, value = @Indexed(label = "duration", type = Integer.class))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
     public void weather(CubeContext context)
     {
@@ -217,7 +216,7 @@ public class WorldControlCommands
 
     @Command(desc = "Removes entity")
     @IParams({@Grouped(@Indexed(label = "entityType[:itemMaterial]")),
-              @Grouped(req = false, value = @Indexed(label = {"radius","!*"}, type = IntegerOrAllReader.class))})
+              @Grouped(req = false, value = @Indexed(label = {"radius","!*"}, type = Integer.class))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
     public void remove(CubeContext context)
     {
@@ -243,7 +242,7 @@ public class WorldControlCommands
         int radius = this.config.commands.removeDefaultRadius;
         if (context.hasIndexed(1))
         {
-            if ("*".equals(context.getArg(1)))
+            if ("*".equals(context.getString(1)))
             {
                 radius = -1;
             }
@@ -268,7 +267,7 @@ public class WorldControlCommands
             loc = sender.getLocation();
         }
         int entitiesRemoved;
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.getString(0)))
         {
             List<Entity> list = new ArrayList<>();
             for (Entity entity : world.getEntities())
@@ -347,7 +346,7 @@ public class WorldControlCommands
         {
             context.sendTranslated(NEUTRAL, "No entities to remove!");
         }
-        else if ("*".equals(context.getArg(0)))
+        else if ("*".equals(context.getString(0)))
         {
             if (radius == -1)
             {
@@ -370,7 +369,7 @@ public class WorldControlCommands
     @Command(desc = "Gets rid of mobs close to you. Valid types are:\n" +
         "monster, animal, pet, golem, boss, other, creeper, skeleton, spider etc.")
     @IParams({@Grouped(value = @Indexed(label = "types..."), req = false),
-              @Grouped(value = @Indexed(label = "radius"), req = false)})
+              @Grouped(value = @Indexed(label = "radius", type = Integer.class), req = false)})
     @NParams(@Named(names = "in", type = World.class, completer = WorldCompleter.class))
     @Flags({@Flag(longName = "lightning", name = "l"), // die with style
             @Flag(longName = "all", name = "a")})// infinite radius
@@ -425,7 +424,7 @@ public class WorldControlCommands
         boolean allTypes = false;
         if (context.hasIndexed(0))
         {
-            if (context.getArg(0).equals("*"))
+            if ("*".equals(context.getString(0)))
             {
                 allTypes = true;
                 if (!module.perms().COMMAND_BUTCHER_FLAG_ALLTYPE.isAuthorized(context.getSender()))

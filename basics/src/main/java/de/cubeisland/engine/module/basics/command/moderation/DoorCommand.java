@@ -52,16 +52,16 @@ public class DoorCommand
 
     @Command(desc = "Opens or closes doors around the player.")
     @IParams({@Grouped(@Indexed(label = {"!open","!close"})),
-              @Grouped(@Indexed(label = "radius")),
-              @Grouped(req = false, value = {@Indexed(label = "world"),
-                                             @Indexed(label = "x"),
-                                             @Indexed(label = "y"),
-                                             @Indexed(label = "z")})})
+              @Grouped(@Indexed(label = "radius", type = Integer.class)),
+              @Grouped(req = false, value = {@Indexed(label = "world", type = World.class),
+                                             @Indexed(label = "x", type = Integer.class),
+                                             @Indexed(label = "y", type = Integer.class),
+                                             @Indexed(label = "z", type = Integer.class)})})
     @Flags({@Flag(longName = "all", name = "a"),
-              @Flag(longName = "woodenDoor", name = "w"),
-              @Flag(longName = "ironDoor", name = "i"),
-              @Flag(longName = "trapDoor", name = "t"),
-              @Flag(longName = "fenceGate", name = "f")})
+            @Flag(longName = "woodenDoor", name = "w"),
+            @Flag(longName = "ironDoor", name = "i"),
+            @Flag(longName = "trapDoor", name = "t"),
+            @Flag(longName = "fenceGate", name = "f")})
     public void doors(CubeContext context)
     {
         boolean open;
@@ -71,11 +71,11 @@ public class DoorCommand
         Set<Material> openMaterials = EnumSet.noneOf(Material.class);
 
         String task = context.getArg(0);
-        if(task.equalsIgnoreCase("open"))
+        if("open".equalsIgnoreCase(task))
         {
             open = true;
         }
-        else if(task.equalsIgnoreCase("close"))
+        else if("close".equalsIgnoreCase(task))
         {
             open = false;
         }

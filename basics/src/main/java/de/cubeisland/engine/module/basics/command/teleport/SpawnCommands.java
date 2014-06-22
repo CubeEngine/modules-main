@@ -53,9 +53,9 @@ public class SpawnCommands
 
     @Command(desc = "Changes the global respawnpoint")
     @IParams({@Grouped(req = false, value = @Indexed(label = "world", type = World.class)),
-              @Grouped(req = false, value = {@Indexed(label = "x"),
-                                             @Indexed(label = "y"),
-                                             @Indexed(label = "z")})})
+              @Grouped(req = false, value = {@Indexed(label = "x", type = Integer.class),
+                                             @Indexed(label = "y", type = Integer.class),
+                                             @Indexed(label = "z", type = Integer.class)})})
     public void setSpawn(CubeContext context)
     {
         User sender = null;

@@ -19,9 +19,9 @@ package de.cubeisland.engine.module.roles.commands;
 
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.ContainerCommand;
+import de.cubeisland.engine.core.command.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -31,7 +31,8 @@ import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
 public class ManagementCommands extends ContainerCommand
 {
@@ -69,34 +70,22 @@ public class ManagementCommands extends ContainerCommand
     @IParams(@Grouped(req = false, value = @Indexed(label = "world", type = World.class)))
     public void defaultworld(CubeContext context)
     {
-        World world = null;
-        if (context.hasIndexed(0))
+        World world = context.getArg(0);
+        if (world == null)
         {
-            world = context.getArg(0);
-            context.sendTranslated(POSITIVE, "All your roles commands will now have {input#world} as default world!", context.getArg(
-                0));
+            context.sendTranslated(NEUTRAL, "Current world for roles resetted!");
         }
         else
         {
-            context.sendTranslated(NEUTRAL, "Current world for roles resetted!");
+            context.sendTranslated(POSITIVE, "All your roles commands will now have {input#world} as default world!", world);
         }
         CommandSender sender = context.getSender();
         if (sender instanceof User)
         {
-            if (world == null)
-            {
-                ((User)sender).get(RolesAttachment.class).setWorkingWorld(null);
-                return;
-            }
             ((User)sender).get(RolesAttachment.class).setWorkingWorld(world);
             return;
         }
-        if (context.hasIndexed(0))
-        {
-            curWorldOfConsole = world;
-            return;
-        }
-        curWorldOfConsole = null;
+        curWorldOfConsole = world;
     }
 
     // TODO lookup permissions
