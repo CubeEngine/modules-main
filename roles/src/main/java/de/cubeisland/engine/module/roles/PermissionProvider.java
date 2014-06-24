@@ -34,11 +34,13 @@ import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
 
 public class PermissionProvider implements Permission
 {
+    private Roles roles;
     private RolesManager manager;
     private PermissionManager permMananger;
 
-    public PermissionProvider(RolesManager manager, PermissionManager permMananger)
+    public PermissionProvider(Roles roles, RolesManager manager, PermissionManager permMananger)
     {
+        this.roles = roles;
         this.manager = manager;
         this.permMananger = permMananger;
     }
@@ -66,7 +68,7 @@ public class PermissionProvider implements Permission
     {
         if (player.isOnline() && player.getPlayer().getWorld().equals(world))
         {
-            return this.has((CommandSender)player.getPlayer(), permission);
+            return this.has(roles.getCore().getUserManager().getExactUser(player.getUniqueId()), permission);
         }
         ResolvedPermission rPerm = this.manager.getRolesAttachment(player).getDataHolder(world).getPermissions().get(permission);
         return rPerm == null ? getDefaultPerm(permission, (CommandSender)player) : rPerm.isSet();

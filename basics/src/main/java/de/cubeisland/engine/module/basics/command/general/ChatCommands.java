@@ -40,7 +40,7 @@ import de.cubeisland.engine.reflect.exception.ConversionException;
 import de.cubeisland.engine.reflect.node.StringNode;
 import org.joda.time.Duration;
 
-import static de.cubeisland.engine.core.command.sender.WrappedCommandSender.NON_PLAYER_UUID;
+import static de.cubeisland.engine.core.command.CommandSender.NON_PLAYER_UUID;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
