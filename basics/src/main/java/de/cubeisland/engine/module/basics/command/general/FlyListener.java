@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.basics.command.general;
 
-import org.bukkit.craftbukkit.v1_7_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftPlayer;
 
 import org.bukkit.GameMode;
 import org.bukkit.entity.Player;
