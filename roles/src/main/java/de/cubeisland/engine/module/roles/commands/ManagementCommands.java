@@ -77,7 +77,7 @@ public class ManagementCommands extends ContainerCommand
         }
         else
         {
-            context.sendTranslated(POSITIVE, "All your roles commands will now have {input#world} as default world!", world);
+            context.sendTranslated(POSITIVE, "All your roles commands will now have {world} as default world!", world);
         }
         CommandSender sender = context.getSender();
         if (sender instanceof User)
