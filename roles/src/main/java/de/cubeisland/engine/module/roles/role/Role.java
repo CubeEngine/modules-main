@@ -237,7 +237,7 @@ public class Role extends ResolvedDataHolder implements Comparable<Role>
     @Override
     public boolean assignRole(Role role)
     {
-        if (this.inheritsFrom(role))
+        if (role.inheritsFrom(this))
         {
             throw new CircularRoleDependencyException("Cannot add parentrole!");
         }
