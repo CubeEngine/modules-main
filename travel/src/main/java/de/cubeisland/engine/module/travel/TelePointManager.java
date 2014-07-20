@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.bukkit.Location;
-import org.bukkit.util.Vector;
 
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;

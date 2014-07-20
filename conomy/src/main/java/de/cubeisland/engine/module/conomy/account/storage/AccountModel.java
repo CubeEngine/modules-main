@@ -21,7 +21,6 @@ import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserEntity;
 import org.jooq.impl.UpdatableRecordImpl;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 
 public class AccountModel extends UpdatableRecordImpl<AccountModel>

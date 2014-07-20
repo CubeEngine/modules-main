@@ -73,8 +73,8 @@ public class CommandListener implements Listener
     private void setCommandType0(CommandSender sender, CommandType commandType, String s, boolean b)
     {
         if (isNotUser(sender)) return;
-        map.put(((User)sender).getUniqueId(), new Triplet<>(commandType, s, b));
-        if (this.doesPersist(((User)sender).getUniqueId()))
+        map.put((sender).getUniqueId(), new Triplet<>(commandType, s, b));
+        if (this.doesPersist((sender).getUniqueId()))
         {
             sender.sendTranslated(NEUTRAL, "Persist mode is active. Your command will be repeated until reusing {text:/cpersist}");
         }

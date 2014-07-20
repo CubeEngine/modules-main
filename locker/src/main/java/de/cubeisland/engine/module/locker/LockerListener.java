@@ -544,7 +544,7 @@ public class LockerListener implements Listener
             if (((HangingBreakByEntityEvent)event).getRemover() instanceof Player)
             {
                 Lock lock = this.manager.getLockForEntityUID(event.getEntity().getUniqueId());
-                User user = this.module.getCore().getUserManager().getExactUser(((Player)((HangingBreakByEntityEvent)event).getRemover()).getUniqueId());
+                User user = this.module.getCore().getUserManager().getExactUser((((HangingBreakByEntityEvent)event).getRemover()).getUniqueId());
                 if (module.perms().DENY_HANGING.isAuthorized(user))
                 {
                     event.setCancelled(true);
@@ -568,7 +568,7 @@ public class LockerListener implements Listener
             {
                 if (entityProtection.isType(event.getEntityType()) && entityProtection.autoProtect)
                 {
-                    User user = this.module.getCore().getUserManager().getExactUser(((Player)event.getOwner()).getUniqueId());
+                    User user = this.module.getCore().getUserManager().getExactUser((event.getOwner()).getUniqueId());
                     if (this.manager.getLockForEntityUID(event.getEntity().getUniqueId()) == null)
                     {
                         this.manager.createLock(event.getEntity(), user, entityProtection.autoProtectType, null, false);

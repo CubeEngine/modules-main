@@ -57,7 +57,7 @@ public class AccessListModel extends UpdatableRecordImpl<AccessListModel>
         return (this.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_TAKE) == ACCESS_TAKE;
     }
 
-    public static final short ACCESS_TAKE = 1 << 0; // put items in chest
+    public static final short ACCESS_TAKE = 1; // put items in chest
     public static final short ACCESS_PUT = 1 << 1; // take items out of chest
     public static final short ACCESS_ADMIN = 1 << 2; // manage accesslist
 

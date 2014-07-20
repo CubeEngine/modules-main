@@ -35,7 +35,6 @@ import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.storage.IgnoreList;
 import org.jooq.DSLContext;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableIgnorelist.TABLE_IGNORE_LIST;
 

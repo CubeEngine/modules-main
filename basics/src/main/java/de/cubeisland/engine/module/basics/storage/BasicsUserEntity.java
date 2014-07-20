@@ -20,7 +20,6 @@ package de.cubeisland.engine.module.basics.storage;
 import de.cubeisland.engine.core.user.User;
 import org.jooq.impl.UpdatableRecordImpl;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 
 public class BasicsUserEntity extends UpdatableRecordImpl<BasicsUserEntity>

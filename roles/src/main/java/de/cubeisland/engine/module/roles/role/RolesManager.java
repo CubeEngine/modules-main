@@ -301,7 +301,7 @@ public class RolesManager
 
         for (MirrorConfig mirror : config.mirrors)
         {
-            if (!this.worldRoleProviders.keySet().contains(mirror.mainWorld))
+            if (!this.worldRoleProviders.keySet().contains(mirror.mainWorld.getWorld()))
             {
                 this.registerWorldRoleProvider(new WorldRoleProvider(this, mirror));
             }
