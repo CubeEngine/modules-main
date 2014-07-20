@@ -171,11 +171,6 @@ public class SpawnCommands
             this.module.getCore().getUserManager().broadcastMessage(POSITIVE, "Teleported everyone to the spawn of {world}!", world);
             return;
         }
-        if (user == null && !context.hasIndexed(0))
-        {
-            context.sendTranslated(NEGATIVE, "{text:Pro Tip}: Teleport does not work IRL!");
-            return;
-        }
         if (context.hasIndexed(0))
         {
             user = context.getArg(0);
@@ -190,8 +185,13 @@ public class SpawnCommands
                 return;
             }
         }
+        else if (user == null)
+        {
+            context.sendTranslated(NEGATIVE, "{text:Pro Tip}: Teleport does not work IRL!");
+            return;
+        }
         final Location spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
-        final Location userLocation = user.getLocation(); // TODO possible NPE ?
+        final Location userLocation = user.getLocation();
         spawnLocation.setPitch(userLocation.getPitch());
         spawnLocation.setYaw(userLocation.getYaw());
         if (!TeleportCommands.teleport(user, spawnLocation, true, force, true))
