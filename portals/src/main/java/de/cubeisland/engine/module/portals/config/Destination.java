@@ -100,7 +100,7 @@ public class Destination
         }
         else
         {
-            if (entity.getLocation().getWorld() == loc.getWorld())
+            if (entity.getLocation().getWorld() == loc.getWorld() || entity instanceof User)
             {
                 // Same world: No Problem
                 entity.teleport(loc, TeleportCause.PLUGIN);
