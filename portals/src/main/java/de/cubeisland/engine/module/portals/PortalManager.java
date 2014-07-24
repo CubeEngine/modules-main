@@ -27,6 +27,7 @@ import java.util.WeakHashMap;
 
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTeleportEvent;
@@ -122,17 +123,20 @@ public class PortalManager implements Listener
                         Location helperLoc = new Location(null, 0,0,0);
                         for (Entity entity : portal.getWorld().getChunkAt(chunk.getLeft(), chunk.getRight()).getEntities())
                         {
-                            List<Entity> entities = entitesInPortals.get(portal);
-                            if (portal.has(entity.getLocation(helperLoc)))
+                            if (!(entity instanceof Player))
                             {
-                                if (entities == null || entities.isEmpty() || !entities.contains(entity))
+                                List<Entity> entities = entitesInPortals.get(portal);
+                                if (portal.has(entity.getLocation(helperLoc)))
                                 {
-                                    portal.teleport(entity);
+                                    if (entities == null || entities.isEmpty() || !entities.contains(entity))
+                                    {
+                                        portal.teleport(entity);
+                                    }
                                 }
-                            }
-                            else if (entities != null)
-                            {
-                                entities.remove(entity);
+                                else if (entities != null)
+                                {
+                                    entities.remove(entity);
+                                }
                             }
                         }
                     }

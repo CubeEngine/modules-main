@@ -17,12 +17,15 @@
  */
 package de.cubeisland.engine.module.portals.config;
 
+import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
+
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import de.cubeisland.engine.core.CubeEngine;
+import de.cubeisland.engine.core.bukkit.BukkitUtils;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.WorldLocation;
 import de.cubeisland.engine.core.world.ConfigWorld;
@@ -88,10 +91,7 @@ public class Destination
         }
         if (entity.isInsideVehicle())
         {
-            if (entity instanceof User)
-            {
-                ((User)entity).sendTranslated(NEGATIVE, "You have to leave your current vehicle to pass a portal!");
-            }
+            // instead tp vehicle + passenger (triggered by vehicle)
             return;
         }
         if (safe && entity instanceof User)
@@ -100,7 +100,20 @@ public class Destination
         }
         else
         {
-            entity.teleport(loc, TeleportCause.PLUGIN);
+            if (entity.getLocation().getWorld() == loc.getWorld())
+            {
+                // Same world: No Problem
+                entity.teleport(loc, TeleportCause.PLUGIN);
+            }
+            else if (entity instanceof CraftEntity)
+            {
+                // Different world: use NMS stuff
+                BukkitUtils.teleport(manager.module, ((CraftEntity)entity).getHandle(), loc);
+            }
+            else
+            {
+                manager.module.getLog().warn("Could not teleport entity: {}", entity);
+            }
         }
     }
 
