@@ -20,7 +20,7 @@ package de.cubeisland.engine.module.basics.command.teleport;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.CubeContext;
+import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
