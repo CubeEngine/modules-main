@@ -47,6 +47,7 @@ import org.bukkit.event.player.PlayerPortalEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
+import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.InventoryHolder;
 
 import de.cubeisland.engine.core.command.CommandSender;
@@ -58,11 +59,11 @@ import de.cubeisland.engine.core.util.WorldLocation;
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.core.world.WorldManager;
 import de.cubeisland.engine.core.world.WorldSetSpawnEvent;
-import de.cubeisland.engine.reflect.Reflector;
 import de.cubeisland.engine.module.worlds.config.WorldConfig;
 import de.cubeisland.engine.module.worlds.config.WorldsConfig;
 import de.cubeisland.engine.module.worlds.player.PlayerConfig;
 import de.cubeisland.engine.module.worlds.player.PlayerDataConfig;
+import de.cubeisland.engine.reflect.Reflector;
 
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
@@ -268,7 +269,27 @@ public class Multiverse implements Listener
 
     }
 
-    // TODO load World / unload World events
+    @EventHandler
+    public void onWorldLoad(WorldLoadEvent event)
+    {
+        Universe from = this.getUniverseFrom(event.getWorld());
+        if (from == null)
+        {
+            String name = event.getWorld().getName();
+            while (this.getUniverse(name) != null)
+            {
+                name = name + "_";
+            }
+            Set<World> worlds = new HashSet<>();
+            worlds.add(event.getWorld());
+            Universe universe = this.createUniverse(name);
+            this.universes.put(universe.getName(), universe);
+            universe.addWorlds(worlds);
+            WorldConfig wConfig = universe.getWorldConfig(event.getWorld());
+            wConfig.autoLoad = false;
+            wConfig.save();
+        }
+    }
 
     @EventHandler
     public void onSetSpawn(WorldSetSpawnEvent event)
