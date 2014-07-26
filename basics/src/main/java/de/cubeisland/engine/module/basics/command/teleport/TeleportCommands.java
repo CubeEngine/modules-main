@@ -25,7 +25,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
 import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -37,6 +36,7 @@ import de.cubeisland.engine.core.command.reflected.context.Named;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.basics.Basics;
 
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.WHITE;
@@ -215,7 +215,7 @@ public class TeleportCommands
         context.getCore().getUserManager().broadcastMessage(POSITIVE, "Teleporting everyone to {user}", user);
         if (!noTp.isEmpty())
         {
-            context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + ","+ DARK_GREEN, noTp));
+            context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
         }
     }
 
@@ -303,8 +303,7 @@ public class TeleportCommands
         context.getCore().getUserManager().broadcastMessage(POSITIVE, "Teleporting everyone to {sender}", sender);
         if (!noTp.isEmpty())
         {
-            context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}",
-                                   StringUtils.implode(WHITE + ","+ DARK_GREEN,noTp));
+            context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
         }
     }
 
@@ -312,53 +311,63 @@ public class TeleportCommands
     @IParams(@Grouped(value = {@Indexed(label = "x", type = Integer.class),
                                @Indexed(label = "y", type = Integer.class, req = false),
                                @Indexed(label = "z", type = Integer.class)}))
-    @NParams(@Named(names = {"world", "w"}, type = World.class))
+    @NParams({@Named(names = {"world", "w"}, type = World.class),
+              @Named(names = {"player", "p"}, type = User.class)})
     @Flags(@Flag(longName = "safe", name = "s"))
     public void tppos(CubeContext context)
     {
-        if (context.getSender() instanceof User)
+        User user;
+        if (context.hasNamed("player"))
         {
-            User sender = (User)context.getSender();
-            Integer x = context.getArg(0);
-            Integer y;
-            Integer z;
-            World world = sender.getWorld();
-            if (context.hasNamed("world"))
+            user = context.getArg("player");
+        }
+        else if (context.isSender(User.class))
+        {
+            user = (User)context.getSender();
+        }
+        else
+        {
+            context.sendTranslated(NEGATIVE, "{text:Pro Tip}: Teleport does not work IRL!");
+            return;
+        }
+        Integer x = context.getArg(0);
+        Integer y;
+        Integer z;
+        World world = user.getWorld();
+        if (context.hasNamed("world"))
+        {
+            world = context.getArg("world");
+            if (world == null)
             {
-                world = context.getArg("world");
-                if (world == null)
-                {
-                    context.sendTranslated(NEGATIVE, "World not found!");
-                    return;
-                }
+                context.sendTranslated(NEGATIVE, "World not found!");
+                return;
             }
-            if (context.hasIndexed(2))
-            {
-                y = context.getArg(1, null);
-                z = context.getArg(2, null);
-            }
-            else
-            {
-                z = context.getArg(1, null);
-                if (x == null || z == null)
-                {
-                    context.sendTranslated(NEGATIVE, "Coordinates have to be numbers!");
-                    return;
-                }
-                y = sender.getWorld().getHighestBlockAt(x, z).getY() + 1;
-            }
-            if (x == null || y == null || z == null)
+        }
+        if (context.hasIndexed(2))
+        {
+            y = context.getArg(1, null);
+            z = context.getArg(2, null);
+        }
+        else
+        {
+            z = context.getArg(1, null);
+            if (x == null || z == null)
             {
                 context.sendTranslated(NEGATIVE, "Coordinates have to be numbers!");
                 return;
             }
-            Location loc = new Location(world, x, y, z).add(0.5, 0, 0.5);
-            if (TeleportCommands.teleport(sender, loc, context.hasFlag("s") && module.perms().COMMAND_TPPOS_SAFE.isAuthorized(context.getSender()), false, true))
-            {
-                context.sendTranslated(POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new BlockVector3(x, y, z), world);
-            }
+            y = user.getWorld().getHighestBlockAt(x, z).getY() + 1;
+        }
+        if (x == null || y == null || z == null)
+        {
+            context.sendTranslated(NEGATIVE, "Coordinates have to be numbers!");
             return;
         }
-        context.sendTranslated(NEGATIVE, "{text:Pro Tip}: Teleport does not work IRL!");
+        Location loc = new Location(world, x, y, z).add(0.5, 0, 0.5);
+        if (TeleportCommands.teleport(user, loc, context.hasFlag("s")
+            && module.perms().COMMAND_TPPOS_SAFE.isAuthorized(context.getSender()), false, true))
+        {
+            context.sendTranslated(POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new BlockVector3(x, y, z), world);
+        }
     }
 }
