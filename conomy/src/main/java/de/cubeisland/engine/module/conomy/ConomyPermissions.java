@@ -61,6 +61,7 @@ public class ConomyPermissions extends PermissionContainer<Conomy>
 
     public final Permission COMMAND_BANK_DEPOSIT_FORCE = COMMAND_BANK.childWildcard("deposit").child("force");
     public final Permission COMMAND_BANK_WITHDRAW_FORCE = COMMAND_BANK.childWildcard("withdraw").child("force");
+    public final Permission COMMAND_BANK_WITHDRAW_OTHER = COMMAND_BANK.childWildcard("withdraw").child("other");
     public final Permission COMMAND_BANK_PAY_FORCE  = COMMAND_BANK.childWildcard("pay").child("force");
 
     private final Permission COMMAND_BANK_DELETE = COMMAND_BANK.childWildcard("delete");

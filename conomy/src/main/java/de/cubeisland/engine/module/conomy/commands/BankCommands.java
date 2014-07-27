@@ -575,7 +575,7 @@ public class BankCommands extends ContainerCommand
         if (context.getSender() instanceof User)
         {
             BankAccount account = context.getArg(0);
-            if (!account.isOwner((User)context.getSender())) // TODO perm
+            if (!account.isOwner((User)context.getSender()) && !module.perms().COMMAND_BANK_WITHDRAW_OTHER.isAuthorized(context.getSender()))
             {
                 context.sendTranslated(NEGATIVE, "Only owners of the bank are allowed to withdraw from it!");
                 return;

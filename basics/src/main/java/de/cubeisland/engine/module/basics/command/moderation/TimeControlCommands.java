@@ -116,7 +116,7 @@ public class TimeControlCommands
             }
             else
             {
-                context.sendTranslated(POSITIVE, "The time of {amount} worlds have been set to {input#time} ({input#neartime})!", worlds.size(), Match.time().format(time), Match.time().getNearTimeName(time)); // TODO this section could do with a non-plural if there is only 1 world
+                context.sendTranslated(POSITIVE, "The time of {amount} worlds have been set to {input#time} ({input#neartime})!", worlds.size(), Match.time().format(time), Match.time().getNearTimeName(time));
             }
             for (World world : worlds)
             {

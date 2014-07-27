@@ -19,6 +19,8 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.List;
 
+import org.bukkit.OfflinePlayer;
+
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.core.command.readers.UserListReader;
@@ -300,7 +302,7 @@ public class EcoCommands extends ContainerCommand
     }
 
     @Command(desc = "Creates a new account")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
+    @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = OfflinePlayer.class)))
     @Flags(@Flag(longName = "force", name = "f"))
     public void create(CubeContext context)
     {
@@ -311,35 +313,28 @@ public class EcoCommands extends ContainerCommand
                 context.sendTranslated(NEGATIVE, "You are not allowed to create account for other users!");
                 return;
             }
-            User user = context.getArg(0);
-            if (user == null)
+            OfflinePlayer oPlayer = context.getArg(0);
+            if (!oPlayer.hasPlayedBefore() && !oPlayer.isOnline())
             {
-                if (module.perms().ECO_CREATE_FORCE.isAuthorized(context.getSender()))
+                context.sendTranslated(NEUTRAL, "{user} has never played on this server!", context.getArg(0));
+                if (!context.hasFlag("f"))
                 {
-                    if (!context.hasFlag("f"))
-                    {
-                        context.sendTranslated(NEUTRAL, "{user} has never played on this server!", context.getArg(0));
-                        context.sendTranslated(POSITIVE, "Use the -force flag to create the account anyway.");
-                        return;
-                    }
-                    else
-                    {
-                        user = this.module.getCore().getUserManager().findExactUser(context.getString(0)); // TODO unreachable
-                    }
+                    return;
                 }
-                else
+                if (!module.perms().ECO_CREATE_FORCE.isAuthorized(context.getSender()))
                 {
-                    context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(0));
+                    context.sendTranslated(POSITIVE, "Use the -force flag to create the account anyway.");
                     return;
                 }
             }
+            User user = this.module.getCore().getUserManager().getExactUser(oPlayer.getName());
             if (this.manager.getUserAccount(user, false) != null)
             {
-                context.sendTranslated(POSITIVE, "{user} already has an account!", user);
+                context.sendTranslated(POSITIVE, "{user} already has an account!", oPlayer);
                 return;
             }
             this.manager.getUserAccount(user, true);
-            context.sendTranslated(POSITIVE, "Created account for {user}!", user);
+            context.sendTranslated(POSITIVE, "Created account for {user}!", oPlayer);
         }
         else if (context.getSender() instanceof User)
         {
