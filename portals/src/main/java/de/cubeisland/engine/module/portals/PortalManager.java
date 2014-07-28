@@ -36,8 +36,6 @@ import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import de.cubeisland.engine.core.command.reflected.ReflectedCommand;
-import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.LocationUtil;
 import de.cubeisland.engine.core.util.Pair;
@@ -53,7 +51,7 @@ public class PortalManager implements Listener
     private final Map<String, Portal> portals = new HashMap<>();
     private final Map<Long, List<Portal>> chunksWithPortals = new HashMap<>();
 
-    private Map<World, Pair<Integer, Chunk>> randomDestinationSettings;
+    private Map<World, Pair<Integer, Chunk>> randomDestinationSettings = new HashMap<>();
 
     public void setRandomDestinationSetting(World world, Integer radius, Chunk center)
     {

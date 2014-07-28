@@ -23,12 +23,12 @@ import de.cubeisland.engine.module.portals.config.DestinationConverter;
 
 public class Portals extends Module
 {
+    private PortalManager portalManager;
+
     public PortalManager getPortalManager()
     {
         return portalManager;
     }
-
-    private PortalManager portalManager;
 
     @Override
     public void onEnable()
