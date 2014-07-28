@@ -119,6 +119,6 @@ public class Destination
 
     public enum Type
     {
-        PORTAL, WORLD, LOCATION
+        PORTAL, WORLD, LOCATION, RANDOM
     }
 }

@@ -25,7 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.bukkit.Chunk;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -34,6 +36,8 @@ import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
+import de.cubeisland.engine.core.command.reflected.ReflectedCommand;
+import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.LocationUtil;
 import de.cubeisland.engine.core.util.Pair;
@@ -49,6 +53,23 @@ public class PortalManager implements Listener
     private final Map<String, Portal> portals = new HashMap<>();
     private final Map<Long, List<Portal>> chunksWithPortals = new HashMap<>();
 
+    private Map<World, Pair<Integer, Chunk>> randomDestinationSettings;
+
+    public void setRandomDestinationSetting(World world, Integer radius, Chunk center)
+    {
+        this.randomDestinationSettings.put(world, new Pair<>(radius, center));
+    }
+
+    public Pair<Integer, Chunk> getRandomDestinationSetting(World world)
+    {
+        Pair<Integer, Chunk> setting = this.randomDestinationSettings.get(world);
+        if (setting == null)
+        {
+            setting = new Pair<>(30, world.getSpawnLocation().getChunk());
+        }
+        return setting;
+    }
+
     public PortalManager(Portals module)
     {
         this.module = module;
@@ -56,6 +77,7 @@ public class PortalManager implements Listener
         this.portalsDir.mkdir();
         this.module.getCore().getCommandManager().registerCommand(new PortalCommands(this.module, this));
         this.module.getCore().getCommandManager().registerCommand(new PortalModifyCommand(this.module, this), "portals");
+
         this.module.getCore().getEventManager().registerListener(this.module, this);
         this.loadPortals();
         this.module.getCore().getTaskManager().runTimer(module, new Runnable()

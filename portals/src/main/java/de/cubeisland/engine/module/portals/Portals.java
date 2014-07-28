@@ -23,10 +23,17 @@ import de.cubeisland.engine.module.portals.config.DestinationConverter;
 
 public class Portals extends Module
 {
+    public PortalManager getPortalManager()
+    {
+        return portalManager;
+    }
+
+    private PortalManager portalManager;
+
     @Override
     public void onEnable()
     {
         this.getCore().getConfigFactory().getDefaultConverterManager().registerConverter(Destination.class, new DestinationConverter(getCore()));
-        new PortalManager(this);
+        this.portalManager = new PortalManager(this);
     }
 }

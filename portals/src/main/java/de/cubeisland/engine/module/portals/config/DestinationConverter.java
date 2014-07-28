@@ -32,12 +32,12 @@ import de.cubeisland.engine.reflect.node.StringNode;
 
 public class DestinationConverter implements Converter<Destination>
 {
+    private final Core core;
+
     public DestinationConverter(Core core)
     {
         this.core = core;
     }
-
-    private final Core core;
 
     @Override
     public Node toNode(Destination destination, ConverterManager converterManager) throws ConversionException
@@ -46,16 +46,17 @@ public class DestinationConverter implements Converter<Destination>
         result.setExactNode("type", StringNode.of(destination.type.name()));
         switch (destination.type)
         {
-        case PORTAL:
-            result.setExactNode("portal", StringNode.of(destination.portal));
-            break;
-        case WORLD:
-            result.setExactNode("world", StringNode.of(destination.world.getName()));
-            break;
-        case LOCATION:
-            result.setExactNode("world", StringNode.of(destination.world.getName()));
-            result.setExactNode("location", converterManager.convertToNode(destination.location));
-            break;
+            case PORTAL:
+                result.setExactNode("portal", StringNode.of(destination.portal));
+                break;
+            case WORLD:
+            case RANDOM:
+                result.setExactNode("world", StringNode.of(destination.world.getName()));
+                break;
+            case LOCATION:
+                result.setExactNode("world", StringNode.of(destination.world.getName()));
+                result.setExactNode("location", converterManager.convertToNode(destination.location));
+                break;
         }
         return result;
     }
@@ -65,24 +66,34 @@ public class DestinationConverter implements Converter<Destination>
     {
         if (node instanceof MapNode)
         {
-            Map<String,Node> mappedNodes = ((MapNode)node).getValue();
+         Map<String, Node> mappedNodes = ((MapNode)node).getValue();
             try
             {
                 Type type = Type.valueOf(mappedNodes.get("type").asText());
-                Destination destination = new Destination();
+                Destination destination;
+                if (type == Type.RANDOM)
+                {
+                    destination = new RandomDestination();
+                }
+                else
+                {
+                    destination = new Destination();
+                }
                 destination.type = type;
                 switch (type)
                 {
-                case PORTAL:
-                    destination.portal = mappedNodes.get("portal").asText();
-                    break;
-                case WORLD:
-                    destination.world = new ConfigWorld(core.getWorldManager(), mappedNodes.get("world").asText());
-                    break;
-                case LOCATION:
-                    destination.world = new ConfigWorld(core.getWorldManager(), mappedNodes.get("world").asText());
-                    destination.location = converterManager.convertFromNode(mappedNodes.get("location"), WorldLocation.class);
-                    break;
+                    case PORTAL:
+                        destination.portal = mappedNodes.get("portal").asText();
+                        break;
+                    case RANDOM:
+                    case WORLD:
+                        destination.world = new ConfigWorld(core.getWorldManager(), mappedNodes.get("world").asText());
+                        break;
+                    case LOCATION:
+                        destination.world = new ConfigWorld(core.getWorldManager(), mappedNodes.get("world").asText());
+                        destination.location = converterManager.convertFromNode(mappedNodes.get("location"),
+                                                                                WorldLocation.class);
+                        break;
                 }
                 return destination;
             }

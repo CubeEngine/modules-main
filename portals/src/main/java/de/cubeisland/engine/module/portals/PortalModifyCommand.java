@@ -22,8 +22,8 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.core.command.ContainerCommand;
+import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -35,6 +35,7 @@ import de.cubeisland.engine.core.util.WorldLocation;
 import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.core.util.math.shape.Cuboid;
 import de.cubeisland.engine.module.portals.config.Destination;
+import de.cubeisland.engine.module.portals.config.RandomDestination;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -138,6 +139,36 @@ public class PortalModifyCommand extends ContainerCommand
         }
         portal.config.save();
         context.sendTranslated(POSITIVE, "Portal destination set!");
+    }
+
+    @Alias(names = "mvprd")
+    @Command(alias = "randdest", desc = "Changes the destination of the selected portal to a random position each time")
+    @IParams({@Grouped(@Indexed(label = "world", type = World.class)),
+              @Grouped(req = false, value = @Indexed(label = "portal"))})
+    public void randomDestination(CubeContext context)
+    {
+        Portal portal = null;
+        if (context.hasIndexed(1))
+        {
+            portal = manager.getPortal(context.getString(1));
+            if (portal == null)
+            {
+                context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(1));
+                return;
+            }
+        }
+        else if (context.getSender() instanceof User)
+        {
+            portal = ((User)context.getSender()).attachOrGet(PortalsAttachment.class, manager.module).getPortal();
+        }
+        if (portal == null)
+        {
+            context.sendTranslated(NEGATIVE, "You need to define a portal to use!");
+            context.sendMessage(context.getCommand().getUsage(context));
+            return;
+        }
+        World world = context.getArg(0);
+        portal.config.destination = new RandomDestination(world);
     }
 
     @Command(desc = "Changes a portals location")
