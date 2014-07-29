@@ -67,9 +67,9 @@ public class Locker extends Module implements Reloadable
     @Override
     public void onDisable()
     {
-        this.manager.saveAll();
         this.getCore().getEventManager().removeListeners(this);
         this.getCore().getCommandManager().removeCommands(this);
+        this.manager.saveAll();
     }
 
     @Override

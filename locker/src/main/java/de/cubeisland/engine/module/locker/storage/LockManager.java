@@ -599,7 +599,7 @@ public class LockManager implements Listener
         }
         for (Map<Long, Lock> lockMap : this.loadedLocks.values())
         {
-            for (Lock lock :lockMap.values())
+            for (Lock lock : lockMap.values())
             {
                 lock.model.update();
             }
