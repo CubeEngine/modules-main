@@ -145,9 +145,28 @@ public class RolesAttachment extends UserAttachment
         }
     }
 
+    @Override
+    public void onDetach()
+    {
+        this.flushData();
+    }
+
     public void flushData()
     {
+        for (UserDatabaseStore store : this.dataStores.values())
+        {
+            store.removeFromRoles();
+        }
         this.dataStores = new HashMap<>();
+    }
+
+    public void flushData(World world)
+    {
+        UserDatabaseStore removed = this.dataStores.remove(world);
+        if (removed != null)
+        {
+            removed.removeFromRoles();
+        }
     }
 
     public boolean isOfflineMsgReceived()

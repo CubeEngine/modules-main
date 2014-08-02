@@ -20,10 +20,12 @@ package de.cubeisland.engine.module.roles.role;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -209,28 +211,39 @@ public class RolesManager
     {
         this.module.getLog().debug("Calculating all roles...");
         Profiler.startProfiling("calculateAllRoles");
-        for (RoleProvider roleProvider : providerSet)
+        try
         {
-            roleProvider.recalculateRoles();
-        }
-        for (User user : this.module.getCore().getUserManager().getLoadedUsers())
-        {
-            RolesAttachment rolesAttachment = user.get(RolesAttachment.class);
-            if (rolesAttachment == null)
+            List<RolesAttachment> attachments = new ArrayList<>();
+            for (User user : this.module.getCore().getUserManager().getLoadedUsers())
             {
-                if (!user.isOnline())
+                RolesAttachment rolesAttachment = user.get(RolesAttachment.class);
+                if (rolesAttachment == null)
                 {
-                    continue;
+                    if (!user.isOnline())
+                    {
+                        continue;
+                    }
+                    rolesAttachment = user.attachOrGet(RolesAttachment.class,this.module);
                 }
-                rolesAttachment = user.attachOrGet(RolesAttachment.class,this.module);
+                rolesAttachment.reload();
+                attachments.add(rolesAttachment);
             }
-            rolesAttachment.reload();
-            if (user.isOnline())
+            for (RoleProvider roleProvider : providerSet)
             {
-                rolesAttachment.getCurrentDataHolder(); // recalculates data + apply
+                roleProvider.recalculateRoles();
+            }
+            for (RolesAttachment attachment : attachments)
+            {
+                if (attachment.getHolder().isOnline())
+                {
+                    attachment.getCurrentDataHolder().apply();
+                }
             }
         }
-        this.module.getLog().debug("All roles are now calculated! ({} ms)", Profiler.endProfiling("calculateAllRoles", TimeUnit.MILLISECONDS));
+        finally
+        {
+            this.module.getLog().debug("All roles are now calculated! ({} ms)", Profiler.endProfiling("calculateAllRoles", TimeUnit.MILLISECONDS));
+        }
     }
 
     public RolesAttachment getRolesAttachment(OfflinePlayer player)

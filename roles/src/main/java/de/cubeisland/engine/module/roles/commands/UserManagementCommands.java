@@ -83,7 +83,7 @@ public class UserManagementCommands extends UserCommandHelper
             }
             if (attachment.getDataHolder(world).assignTempRole(role))
             {
-                attachment.getCurrentDataHolder();
+                attachment.getCurrentDataHolder().apply();
                 context.sendTranslated(POSITIVE, "Added the role {name} temporarily to {user} in {world}.", roleName, user, world);
                 return;
             }
@@ -92,7 +92,7 @@ public class UserManagementCommands extends UserCommandHelper
         }
         if (attachment.getDataHolder(world).assignRole(role))
         {
-            attachment.getCurrentDataHolder();
+            attachment.getCurrentDataHolder().apply();
             context.sendTranslated(POSITIVE, "Added the role {name} to {user} in {world}.", roleName, user, world);
             return;
         }

@@ -70,11 +70,11 @@ public abstract class ResolvedDataHolder extends TempDataStore
     }
 
     @Override
-    public void calculate(Stack<String> roleStack)
+    public boolean calculate(Stack<String> roleStack)
     {
         if (!this.isDirty())
         {
-            return;
+            return false;
         }
         if (roleStack.contains(this.getName()))
         {
@@ -83,6 +83,12 @@ public abstract class ResolvedDataHolder extends TempDataStore
         }
         roleStack.push(this.getName());
         this.resolveRoles(roleStack);
+
+        if (!this.isDirty()) // calculated via resolveRoles
+        {
+            return false;
+        }
+
         this.resolvedPermissions = new HashMap<>();
         this.calculatePerms(this.getRawPermissions());
         this.calculatePerms(this.getRawTempPermissions());
@@ -93,6 +99,13 @@ public abstract class ResolvedDataHolder extends TempDataStore
 
         this.dirty = false;
         roleStack.pop();
+
+        for (ResolvedDataHolder role : this.dependentRoles)
+        {
+            role.makeDirty();
+        }
+
+        return true;
     }
 
     private void calculatePerms(Map<String, Boolean> perms)

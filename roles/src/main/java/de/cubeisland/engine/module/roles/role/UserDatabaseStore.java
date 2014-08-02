@@ -270,7 +270,7 @@ public class UserDatabaseStore extends ResolvedDataHolder
             user.setPermission(this.getResolvedPermissions());
             for (Role assignedRole : this.getRoles())
             {
-                this.module.getLog().debug(" - {}", assignedRole.getName());
+                this.module.getLog().debug(" - assigned {} to {}", assignedRole.getName(), this.getName());
             }
         }
         this.module.getCore().getEventManager().fireEvent(new RoleAppliedEvent(module, user, this.attachment));
@@ -278,7 +278,7 @@ public class UserDatabaseStore extends ResolvedDataHolder
     }
 
     @Override
-    public void calculate(Stack<String> roleStack)
+    public boolean calculate(Stack<String> roleStack)
     {
         if (this.isDirty())
         {
@@ -291,10 +291,13 @@ public class UserDatabaseStore extends ResolvedDataHolder
                     this.assignTempRole(role);
                 }
             }
-            super.calculate(roleStack);
-            this.module.getLog().debug("Role for {} calculated", this.attachment.getHolder().getDisplayName());
-            this.apply();
+            if (super.calculate(roleStack))
+            {
+                this.module.getLog().debug("Role for {} calculated in {} ({})", this.attachment.getHolder().getDisplayName(), this.world.getName(), this.provider.getMainWorld().getName());
+            }
+            return true;
         }
+        return false;
     }
 
     @Override
@@ -310,6 +313,14 @@ public class UserDatabaseStore extends ResolvedDataHolder
         {
             this.attachment.getHolder().sendTranslated(NEGATIVE, "Your role {name} is not available in {world}", roleName, provider.getMainWorld());
             this.attachment.getHolder().sendTranslated(CRITICAL, "You should report this to an administrator!");
+        }
+    }
+
+    public void removeFromRoles()
+    {
+        for (Role role : this.getRoles())
+        {
+            role.dependentRoles.remove(this);
         }
     }
 

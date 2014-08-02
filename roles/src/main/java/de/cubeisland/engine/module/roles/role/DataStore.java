@@ -61,7 +61,7 @@ public interface DataStore
     Map<String, Boolean> getAllRawPermissions();
     Map<String, String> getAllRawMetadata();
 
-    void calculate(Stack<String> roleStack);
+    boolean calculate(Stack<String> roleStack);
     void makeDirty();
 
     Map<String, ResolvedPermission> getPermissions();

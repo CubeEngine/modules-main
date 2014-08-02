@@ -56,21 +56,18 @@ public class Role extends ResolvedDataHolder implements Comparable<Role>
     }
 
     @Override
-    public void calculate(Stack<String> roleStack)
+    public boolean calculate(Stack<String> roleStack)
     {
-        if (this.isDirty())
+        if (super.calculate(roleStack))
         {
-            super.calculate(roleStack);
             this.module.getLog().debug("   - {} calculated!", this.getName());
-            for (ResolvedDataHolder role : this.dependentRoles)
-            {
-                role.makeDirty();
-            }
             for (ResolvedDataHolder role : this.dependentRoles)
             {
                 role.calculate(new Stack<String>());
             }
+            return true;
         }
+        return false;
     }
 
     public boolean rename(String newName)

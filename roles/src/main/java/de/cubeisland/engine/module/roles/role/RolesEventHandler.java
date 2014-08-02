@@ -42,6 +42,8 @@ public class RolesEventHandler implements Listener
     @EventHandler
     public void onPlayerChangedWorld(PlayerChangedWorldEvent event)
     {
+        /*
+        // TODO this wasn't completly right (we can only not recalculate if all data is shared)
         WorldRoleProvider fromProvider = this.rolesManager.getProvider(event.getFrom());
         WorldRoleProvider toProvider = this.rolesManager.getProvider(event.getPlayer().getWorld());
         if (fromProvider.equals(toProvider))
@@ -52,7 +54,10 @@ public class RolesEventHandler implements Listener
                 return;
             }
         }
-        this.rolesManager.getRolesAttachment(event.getPlayer()).getCurrentDataHolder().apply();
+        */
+        RolesAttachment attachment = this.rolesManager.getRolesAttachment(event.getPlayer());
+        attachment.flushData(event.getFrom());
+        attachment.getCurrentDataHolder().apply();
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
