@@ -64,6 +64,11 @@ public class TeleportRequestCommands
         }
         sender.get(BasicsAttachment.class).removeTpRequestCancelTask();
         final User user = context.getArg(0);
+        if (!user.isOnline())
+        {
+            context.sendTranslated(NEGATIVE, "{user} is not online!");
+            return;
+        }
         user.sendTranslated(POSITIVE, "{sender} wants to teleport to you!", sender);
         user.sendTranslated(NEUTRAL, "Use {text:/tpaccept} to accept or {text:/tpdeny} to deny the request!");
         user.get(BasicsAttachment.class).setPendingTpToRequest(sender.getUniqueId());
@@ -101,6 +106,11 @@ public class TeleportRequestCommands
             User sender = (User)context.getSender();
             sender.get(BasicsAttachment.class).removeTpRequestCancelTask();
             final User user = context.getArg(0);
+            if (!user.isOnline())
+            {
+                context.sendTranslated(NEGATIVE, "{user} is not online!");
+                return;
+            }
             user.sendTranslated(POSITIVE, "{sender} wants to teleport you to them!", sender);
             user.sendTranslated(NEUTRAL, "Use {text:/tpaccept} to accept or {text:/tpdeny} to deny the request!");
             user.get(BasicsAttachment.class).setPendingTpFromRequest(sender.getUniqueId());
