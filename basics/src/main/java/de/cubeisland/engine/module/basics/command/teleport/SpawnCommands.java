@@ -168,7 +168,7 @@ public class SpawnCommands
                     return;
                 }
             }
-            this.module.getCore().getUserManager().broadcastMessage(POSITIVE, "Teleported everyone to the spawn of {world}!", world);
+            this.module.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleported everyone to the spawn of {world}!", world);
             return;
         }
         if (context.hasIndexed(0))

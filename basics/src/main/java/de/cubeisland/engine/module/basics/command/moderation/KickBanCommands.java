@@ -94,7 +94,8 @@ public class KickBanCommands
         }
         User user = context.getArg(0);
         user.kickPlayer(user.getTranslation(NEGATIVE, kickMessage) + "\n\n" + RESET + reason);
-        this.um.broadcastMessageWithPerm(NEGATIVE, "{user} was kicked from the server by {user}!", module.perms().KICK_RECEIVEMESSAGE, user, context.getSender());
+        this.um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was kicked from the server by {user}!",
+                                            module.perms().KICK_RECEIVEMESSAGE, user, context.getSender());
         this.um.broadcastMessageWithPerm(NONE, reason, module.perms().KICK_RECEIVEMESSAGE);
     }
 
@@ -145,10 +146,12 @@ public class KickBanCommands
                     }
                 }
                 context.sendTranslated(NEGATIVE, "You banned the IP: {input#ip}!", ipAdress.getHostAddress());
-                um.broadcastMessageWithPerm(NEGATIVE, "{user} was banned from the server by {sender}!", module.perms().BAN_RECEIVEMESSAGE, user, context.getSender());
+                um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned from the server by {sender}!",
+                                               module.perms().BAN_RECEIVEMESSAGE, user, context.getSender());
                 um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
-                um.broadcastMessageWithPerm(NEGATIVE, "And with it kicked: {user#list}!", module.perms().BAN_RECEIVEMESSAGE,
-                                            StringUtils.implode(RED + "," + DARK_GREEN, bannedUsers));
+                um.broadcastTranslatedWithPerm(NEGATIVE, "And with it kicked: {user#list}!",
+                                               module.perms().BAN_RECEIVEMESSAGE, StringUtils.implode(
+                    RED + "," + DARK_GREEN, bannedUsers));
             }
             else
             {
@@ -170,7 +173,8 @@ public class KickBanCommands
             }
         }
         context.sendTranslated(NEGATIVE, "You banned {user}!", player);
-        um.broadcastMessageWithPerm(NEGATIVE, "{user} was banned from the server by {sender}!", module.perms().BAN_RECEIVEMESSAGE, player, context.getSender());
+        um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned from the server by {sender}!",
+                                       module.perms().BAN_RECEIVEMESSAGE, player, context.getSender());
         um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
     }
 
@@ -234,12 +238,14 @@ public class KickBanCommands
                     bannedUsers.add(user.getName());
                 }
             }
-            um.broadcastMessageWithPerm(NEGATIVE, "The IP {input#ip} was banned from the server by {sender}!", module.perms().BAN_RECEIVEMESSAGE, ipaddress, context.getSender());
+            um.broadcastTranslatedWithPerm(NEGATIVE, "The IP {input#ip} was banned from the server by {sender}!",
+                                           module.perms().BAN_RECEIVEMESSAGE, ipaddress, context.getSender());
             um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
             if (!bannedUsers.isEmpty())
             {
-                um.broadcastMessageWithPerm(NEGATIVE,"And with it kicked: {user#list}!", module.perms().BAN_RECEIVEMESSAGE,
-                                            StringUtils.implode(RED + "," + DARK_GREEN, bannedUsers));
+                um.broadcastTranslatedWithPerm(NEGATIVE, "And with it kicked: {user#list}!",
+                                               module.perms().BAN_RECEIVEMESSAGE, StringUtils.implode(
+                    RED + "," + DARK_GREEN, bannedUsers));
             }
         }
         catch (UnknownHostException e)
@@ -308,8 +314,8 @@ public class KickBanCommands
                 user.kickPlayer(user.getTranslation(NEGATIVE, banMessage) + "\n\n" + RESET + reason);
             }
             context.sendTranslated(POSITIVE, "You banned {user} temporarily!", player);
-            um.broadcastMessageWithPerm(NEGATIVE, "{user} was banned temporarily from the server by {sender}!",
-                                        module.perms().BAN_RECEIVEMESSAGE, player, context.getSender());
+            um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned temporarily from the server by {sender}!",
+                                           module.perms().BAN_RECEIVEMESSAGE, player, context.getSender());
             um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
         }
         catch (TimeConversionException ex)

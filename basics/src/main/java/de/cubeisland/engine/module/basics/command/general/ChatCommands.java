@@ -155,7 +155,7 @@ public class ChatCommands
     @IParams(@Grouped(value = @Indexed(label = "message"), greedy = true))
     public void broadcast(CubeContext context)
     {
-        this.um.broadcastMessage(NEUTRAL, "[{text:Broadcast}] {}", context.getStrings(0));
+        this.um.broadcastMessage(NEUTRAL, "[{text:Broadcast}] {input}", context.getStrings(0));
     }
 
     @Command(desc = "Mutes a player")
