@@ -27,11 +27,6 @@ file_filter = roles/src/main/resources/translations/<lang>.po
 source_file = roles/src/main/resources/translations/messages.pot
 source_lang = en_US
 
-[cubeengine.rulebook]
-file_filter = rulebook/src/main/resources/translations/<lang>.po
-source_file = rulebook/src/main/resources/translations/messages.pot
-source_lang = en_US
-
 [cubeengine.travel]
 file_filter = travel/src/main/resources/translations/<lang>.po
 source_file = travel/src/main/resources/translations/messages.pot
