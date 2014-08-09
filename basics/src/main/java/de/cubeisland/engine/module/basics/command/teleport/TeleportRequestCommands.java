@@ -161,7 +161,7 @@ public class TeleportRequestCommands
                 User user = this.basics.getCore().getUserManager().getExactUser(uuid);
                 if (user == null || !user.isOnline())
                 {
-                    context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", uuid);
+                    context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", user);
                     return;
                 }
                 if (!TeleportCommands.teleport(sender, user.getLocation(), true, false, true))
