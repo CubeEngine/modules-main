@@ -205,7 +205,7 @@ public class ChatCommands
     @Command(alias = "roll", desc = "Shows a random number from 0 to 100")
     public void rand(CubeContext context)
     {
-        this.um.broadcastStatus(YELLOW, "rolled a {integer}!", context.getSender(), new Random().nextInt(100));
+        this.um.broadcastTranslatedStatus(YELLOW, "rolled a {integer}!", context.getSender(), new Random().nextInt(100));
     }
 
     @Command(desc = "Displays the colors")
