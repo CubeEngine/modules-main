@@ -18,6 +18,7 @@
 package de.cubeisland.engine.module.basics.command.teleport;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -26,6 +27,15 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 
 import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.core.command.reflected.Command;
+import de.cubeisland.engine.core.command.reflected.commandparameter.CommandParameters;
+import de.cubeisland.engine.core.command.reflected.commandparameter.Description;
+import de.cubeisland.engine.core.command.reflected.commandparameter.Optional;
+import de.cubeisland.engine.core.command.reflected.commandparameter.ParamFlag;
+import de.cubeisland.engine.core.command.reflected.commandparameter.ParamGroup;
+import de.cubeisland.engine.core.command.reflected.commandparameter.ParamIndexed;
+import de.cubeisland.engine.core.command.reflected.commandparameter.ParamNamed;
+import de.cubeisland.engine.core.command.reflected.commandparameter.Required;
+import de.cubeisland.engine.core.command.reflected.commandparameter.ValueLabel;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -38,6 +48,7 @@ import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.basics.Basics;
 
+import static de.cubeisland.engine.core.command.reflected.commandparameter.ParamIndexed.INFINITE;
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.WHITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
@@ -306,6 +317,47 @@ public class TeleportCommands
             context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
         }
     }
+
+
+    public static class CommandTpPosParam implements CommandParameters
+    {
+        public static class Position implements ParamGroup
+        {
+            @ParamIndexed(0)
+            public Integer x;
+
+            @ParamIndexed(1)
+            @Optional
+            public Integer y;
+
+            @ParamIndexed(2)
+            public Integer z;
+        }
+
+        // No annotation ; interface on class is enough
+        public Position position;
+
+        @ParamNamed({ "w", "world"})
+        public World world;
+
+        //@NoWildcard
+        @ParamNamed({"p", "players"})
+        @ValueLabel("players")
+        @Description("The list of players to teleport to given position separated by comma")
+        //@Completer(UserCompleter.class)
+        //@Reader({AllOnlineUsersReader.class, UserReader.class})
+        @Required
+        public List<User> players;
+
+        @ParamFlag("s")
+        public boolean safe;
+
+        @ParamIndexed(value = 0, greed = INFINITE)
+        public String longgreedymessage;
+
+    }
+
+
 
     @Command(desc = "Direct teleport to a coordinate.")
     @IParams(@Grouped(value = {@Indexed(label = "x", type = Integer.class),
