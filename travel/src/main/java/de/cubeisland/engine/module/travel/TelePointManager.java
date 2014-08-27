@@ -147,7 +147,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
 
     public void delete(T point)
     {
-        point.getModel().delete();
+        point.getModel().asyncDelete();
         this.removePoint(point);
     }
 
@@ -296,7 +296,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
         this.removePoint(point);
 
         point.setName(name);
-        point.model.update();
+        point.model.asyncUpdate();
 
         this.addPoint(point);
         return true;

@@ -19,13 +19,13 @@ package de.cubeisland.engine.module.locker.storage;
 
 import org.bukkit.Location;
 
-import org.jooq.impl.UpdatableRecordImpl;
+import de.cubeisland.engine.core.storage.database.AsyncRecord;
 
 import static de.cubeisland.engine.core.CubeEngine.getCore;
 import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 
-public class LockLocationModel extends UpdatableRecordImpl<LockLocationModel>
+public class LockLocationModel extends AsyncRecord<LockLocationModel>
 {
     public LockLocationModel()
     {

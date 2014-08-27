@@ -17,13 +17,13 @@
  */
 package de.cubeisland.engine.module.locker.storage;
 
+import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.core.user.User;
-import org.jooq.impl.UpdatableRecordImpl;
 
 import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 
-public class AccessListModel extends UpdatableRecordImpl<AccessListModel>
+public class AccessListModel extends AsyncRecord<AccessListModel>
 {
     public AccessListModel()
     {

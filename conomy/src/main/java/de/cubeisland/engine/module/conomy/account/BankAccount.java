@@ -113,12 +113,12 @@ public class BankAccount extends Account
         if (access != null) // promote new owner
         {
             access.setAccessLevel(OWNER);
-            access.update();
+            access.asyncUpdate();
         }
         else // create new owner
         {
             access = this.manager.dsl.newRecord(TABLE_BANK_ACCESS).newAccess(this.model, user, OWNER);
-            access.insert();
+            access.asyncInsert();
         }
         this.owner.put(user.getEntity().getKey(), access);
         return true;
@@ -136,7 +136,7 @@ public class BankAccount extends Account
         {
             BankAccessModel access = this.owner.remove(user.getEntity().getKey());
             access.setAccessLevel(MEMBER);
-            access.update();
+            access.asyncUpdate();
             this.member.put(user.getEntity().getKey(), access);
             return true;
         }
@@ -156,12 +156,12 @@ public class BankAccount extends Account
         if (access == null)
         {
             access = this.manager.dsl.newRecord(TABLE_BANK_ACCESS).newAccess(this.model, user, MEMBER);
-            access.insert();
+            access.asyncInsert();
         }
         else
         {
             access.setAccessLevel(MEMBER);
-            access.update();
+            access.asyncUpdate();
         }
         this.member.put(user.getEntity().getKey(), access);
         return true;
@@ -182,7 +182,7 @@ public class BankAccount extends Account
         }
         if (oldAccess != null)
         {
-            oldAccess.delete();
+            oldAccess.asyncDelete();
             return true;
         }
         return false; // is not member OR moderator
@@ -218,7 +218,7 @@ public class BankAccount extends Account
     {
         if (!needsInvite() || this.hasAccess(user) || this.invites.get(user.getEntity().getKey()) != null) return false;
         BankAccessModel invite = this.manager.dsl.newRecord(TABLE_BANK_ACCESS).newAccess(this.model, user, INVITED);
-        invite.insert();
+        invite.asyncInsert();
         this.invites.put(user.getEntity().getKey(), invite);
         return true;
     }
@@ -227,7 +227,7 @@ public class BankAccount extends Account
     {
         if (!needsInvite() || this.hasAccess(user) || this.invites.get(user.getEntity().getKey()) == null) return false;
         BankAccessModel invite = this.invites.remove(user.getEntity().getKey());
-        invite.delete();
+        invite.asyncDelete();
         return true;
     }
 

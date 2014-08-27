@@ -51,7 +51,7 @@ public abstract class TeleportPoint
 
     public void update()
     {
-        model.update();
+        model.asyncUpdate();
     }
 
     public Location getLocation()

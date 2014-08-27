@@ -56,7 +56,7 @@ public class HomeManager extends TelePointManager<Home>
         }
         TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, name, owner, null, HOME, publicVisibility ? PUBLIC : PRIVATE);
         Home home = new Home(model, this.module);
-        model.insert();
+        model.asyncInsert();
         this.addPoint(home);
         return home;
     }

@@ -97,7 +97,7 @@ public class ConomyManager
                 model = this.dsl.newRecord(TABLE_ACCOUNT).
                     newAccount(null, name, (int)(this.config.defaultBankBalance * this.config.fractionalDigitsFactor()),
                                false, this.config.bankNeedInvite);
-                model.insert();
+                model.asyncInsert();
                 bankAccount = new BankAccount(this, model);
                 this.logger.info("NEW Bank:{} :: {}", name, bankAccount.balance());
             }
@@ -347,7 +347,7 @@ public class ConomyManager
         {
             return false;
         }
-        account.model.delete();
+        account.model.asyncDelete();
         user.detach(AccountAttachment.class);
         return true;
     }
@@ -359,7 +359,7 @@ public class ConomyManager
         {
             return false;
         }
-        bankAccount.model.delete();
+        bankAccount.model.asyncDelete();
         this.bankaccounts.remove(name);
         this.bankaccountsID.remove(bankAccount.model.getValue(TABLE_ACCOUNT.KEY).longValue());
         return true;
@@ -453,7 +453,7 @@ public class ConomyManager
         }
         this.bankaccounts.remove(bankAccount.getName());
         bankAccount.model.setValue(TABLE_ACCOUNT.NAME, newName);
-        bankAccount.model.update();
+        bankAccount.model.asyncUpdate();
         this.bankaccounts.put(newName, bankAccount);
         return true;
     }

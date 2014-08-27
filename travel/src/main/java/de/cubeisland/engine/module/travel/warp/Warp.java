@@ -45,7 +45,7 @@ public class Warp extends TeleportPoint
     public void setVisibility(Visibility visibility)
     {
         super.setVisibility(visibility);
-        model.update();
+        model.asyncUpdate();
         if (visibility == PUBLIC)
         {
             this.permission = generatePublicPerm();

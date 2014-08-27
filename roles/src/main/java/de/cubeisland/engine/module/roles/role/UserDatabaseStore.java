@@ -153,7 +153,7 @@ public class UserDatabaseStore extends ResolvedDataHolder
             return false;
         }
         manager.dsl.newRecord(TABLE_ROLE).newAssignedRole(this.getUserID(),
-            getDBWorldId(this.manager.assignedUserDataMirrors.get(world)), role.getName()).insert();
+            getDBWorldId(this.manager.assignedUserDataMirrors.get(world)), role.getName()).asyncInsert();
         this.removeRoles(role.getRoles());
         if (this.roles.isEmpty())
         {

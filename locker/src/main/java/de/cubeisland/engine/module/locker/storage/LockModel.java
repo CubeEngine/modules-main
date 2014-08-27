@@ -21,14 +21,14 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.StringUtils;
-import org.jooq.impl.UpdatableRecordImpl;
 
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 
-public class LockModel extends UpdatableRecordImpl<LockModel>
+public class LockModel extends AsyncRecord<LockModel>
 {
     public LockModel()
     {
