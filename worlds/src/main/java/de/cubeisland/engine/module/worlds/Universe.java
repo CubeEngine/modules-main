@@ -17,8 +17,6 @@
  */
 package de.cubeisland.engine.module.worlds;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -48,11 +46,10 @@ import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.WorldLocation;
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.core.world.WorldManager;
-import de.cubeisland.engine.reflect.Reflector;
-import de.cubeisland.engine.reflect.codec.YamlCodec;
 import de.cubeisland.engine.module.worlds.config.UniverseConfig;
 import de.cubeisland.engine.module.worlds.config.WorldConfig;
 import de.cubeisland.engine.module.worlds.player.PlayerDataConfig;
+import de.cubeisland.engine.reflect.Reflector;
 
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.DAT;
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;
@@ -375,24 +372,20 @@ public class Universe
         return this.worldConfigs.get(world.getName());
     }
 
-    public void savePlayer(Player player, World world)
+    public void savePlayer(final Player player, World world)
     {
-        PlayerDataConfig config = this.module.getCore().getConfigFactory().create(PlayerDataConfig.class);
+        final PlayerDataConfig config = this.module.getCore().getConfigFactory().create(PlayerDataConfig.class);
         config.applyFromPlayer(player);
 
-        config.setFile(dirPlayers.resolve(player.getUniqueId() + DAT.getExtention()).toFile());
-        config.save();
-
-        // TODO remove yaml saving
-        YamlCodec codec = this.module.getCore().getConfigFactory().getCodecManager().getCodec(YamlCodec.class);
-        try
+        this.module.getCore().getTaskManager().runAsynchronousTask(this.module, new Runnable()
         {
-            codec.saveReflected(config, new FileOutputStream(dirPlayers.resolve(player.getUniqueId() + YAML.getExtention()).toFile()));
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
+            @Override
+            public void run()
+            {
+                config.setFile(dirPlayers.resolve(player.getUniqueId() + DAT.getExtention()).toFile());
+                config.save();
+            }
+        });
         this.module.getLog().debug("PlayerData for {} in {} ({}) saved", player.getDisplayName(), world.getName(), this.getName());
     }
 
