@@ -27,6 +27,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.material.Openable;
 
+import de.cubeisland.engine.command.context.BaseParameter;
 import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.core.command.reflected.Command;
@@ -51,7 +52,7 @@ public class DoorCommand
     }
 
     @Command(desc = "Opens or closes doors around the player.")
-    @IParams({@Grouped(@Indexed(label = {"!open","!close"})),
+    @IParams({@Grouped(@Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"open","close"})),
               @Grouped(@Indexed(label = "radius", type = Integer.class)),
               @Grouped(req = false, value = {@Indexed(label = "world", type = World.class),
                                              @Indexed(label = "x", type = Integer.class),

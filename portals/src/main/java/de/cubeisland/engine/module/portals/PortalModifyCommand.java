@@ -83,7 +83,7 @@ public class PortalModifyCommand extends ContainerCommand
 
     @Alias(names = "mvpd")
     @Command(alias = "dest", desc = "changes the destination of the selected portal")
-    @IParams({@Grouped(@Indexed(label = {"!here","world","p:<portal>"})),
+    @IParams({@Grouped(@Indexed(label = "world", staticValues = "here")),
               @Grouped(req = false, value = @Indexed(label = "portal"))})
     public void destination(CubeContext context)
     {
@@ -117,7 +117,7 @@ public class PortalModifyCommand extends ContainerCommand
             }
             portal.config.destination = new Destination(((User)context.getSender()).getLocation());
         }
-        else if (arg0.startsWith("p:"))
+        else if (arg0.startsWith("p:")) // TODO extract to separate (as its not possible to show in label) cmd /mvppd portaldestination
         {
             Portal destPortal = manager.getPortal(arg0.substring(2));
             if (destPortal == null)

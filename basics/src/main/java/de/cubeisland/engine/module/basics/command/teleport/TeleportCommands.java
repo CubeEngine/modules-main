@@ -318,9 +318,15 @@ public class TeleportCommands
         }
     }
 
+    //@Command(...)
+    public void mycommand(CubeContext ctx, CommandTpPosParam params)
+    {
+
+    }
 
     public static class CommandTpPosParam implements CommandParameters
     {
+        @ParamIndexed(0)
         public static class Position implements ParamGroup
         {
             @ParamIndexed(0)
@@ -337,11 +343,11 @@ public class TeleportCommands
         // No annotation ; interface on class is enough
         public Position position;
 
-        @ParamNamed({ "w", "world"})
+        @ParamNamed(alias = "w")
         public World world;
 
         //@NoWildcard
-        @ParamNamed({"p", "players"})
+        @ParamNamed(alias = "p")
         @ValueLabel("players")
         @Description("The list of players to teleport to given position separated by comma")
         //@Completer(UserCompleter.class)

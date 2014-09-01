@@ -29,6 +29,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import de.cubeisland.engine.command.context.BaseParameter;
 import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.core.command.exception.TooFewArgumentsException;
 import de.cubeisland.engine.core.command.reflected.Command;
@@ -176,7 +177,7 @@ public class ItemCommands
     }
 
     @Command(desc = "Grants unlimited items")
-    @IParams(@Grouped(req = false, value = @Indexed(label = {"!on","!off"})))
+    @IParams(@Grouped(req = false, value = @Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"on","off"})))
     @OnlyIngame
     public void unlimited(CubeContext context)
     {
@@ -428,7 +429,7 @@ public class ItemCommands
     }
 
     @Command(desc = "Refills the stack in hand")
-    @IParams(@Grouped(value = @Indexed(label = {"amount","!*"}, type = Integer.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = "amount", staticValues = "*", type = Integer.class), req = false))
     public void more(CubeContext context)
     {
         if (!context.isSender(User.class))

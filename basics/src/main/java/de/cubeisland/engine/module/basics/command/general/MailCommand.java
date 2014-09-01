@@ -58,7 +58,7 @@ public class MailCommand extends ContainerCommand
 
     @Alias(names = "readmail")
     @Command(desc = "Reads your mail.")
-    @IParams(@Grouped(value = @Indexed(label = {"player","!console"}, type = User.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = "player", staticValues = "console", type = User.class), req = false))
     public void read(CubeContext context)
     {
         User sender;
@@ -233,7 +233,7 @@ public class MailCommand extends ContainerCommand
     }
 
     @Command(desc = "Clears your mail.")
-    @IParams(@Grouped(value = @Indexed(label = {"player","!console"}, type = User.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = "player", staticValues = "console", type = User.class), req = false))
     public void clear(CubeContext context)
     {
         User sender = null;

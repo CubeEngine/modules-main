@@ -20,16 +20,16 @@ package de.cubeisland.engine.module.roles;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.cubeisland.engine.command.Completer;
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.parameterized.Completer;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.commands.ManagementCommands;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 
-public class RoleCompleter implements Completer
+public class RoleCompleter implements Completer<CubeContext>
 {
     @Override
     public List<String> complete(CubeContext context, String token)

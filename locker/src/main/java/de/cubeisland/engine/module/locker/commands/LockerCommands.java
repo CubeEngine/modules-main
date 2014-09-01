@@ -23,10 +23,11 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
+import de.cubeisland.engine.command.context.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.parameterized.Completer;
+import de.cubeisland.engine.command.Completer;
 import de.cubeisland.engine.core.command.reflected.Alias;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -283,7 +284,7 @@ public class LockerCommands extends ContainerCommand
     public static class FlagCompleter implements Completer
     {
         @Override
-        public List<String> complete(CubeContext context, String token)
+        public List<String> complete(CommandContext context, String token)
         {
             String subToken = token;
             if (subToken.contains(","))

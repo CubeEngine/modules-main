@@ -48,7 +48,12 @@ public class ListCommand extends CubeCommand
 
     public ListCommand(Basics basics)
     {
-        super(basics, "list", "Displays all the online players.", new CubeContextFactory());
+        this(basics, "Displays all the online players.");
+    }
+
+    public ListCommand(Basics basics, String desc)
+    {
+        super(basics, "list", desc, new CubeContextFactory());
         this.basics = basics;
     }
 

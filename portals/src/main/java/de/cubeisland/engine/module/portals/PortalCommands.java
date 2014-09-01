@@ -24,6 +24,7 @@ import java.util.Set;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import de.cubeisland.engine.command.context.BaseParameter;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.core.command.parameterized.completer.WorldCompleter;
@@ -184,7 +185,7 @@ public class PortalCommands extends ContainerCommand
     }
 
     @Command(desc = "Shows debug portal information instead of teleporting")
-    @IParams(@Grouped(req = false, value = @Indexed(label = {"!on","!off"})))
+    @IParams(@Grouped(req = false, value = @Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"on","off"})))
     public void debug(CubeContext context)
     {
         if (context.getSender() instanceof User)

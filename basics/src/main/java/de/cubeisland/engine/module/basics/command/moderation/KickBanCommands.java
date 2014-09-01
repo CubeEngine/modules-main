@@ -26,6 +26,7 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
+import de.cubeisland.engine.command.context.BaseParameter;
 import de.cubeisland.engine.core.ban.BanManager;
 import de.cubeisland.engine.core.ban.IpBan;
 import de.cubeisland.engine.core.ban.UserBan;
@@ -73,7 +74,7 @@ public class KickBanCommands
     }
 
     @Command(desc = "Kicks a player from the server")
-    @IParams({@Grouped(@Indexed(label = {"player","!*"}, type = User.class)),
+    @IParams({@Grouped(@Indexed(label = "player", staticValues = "*", type = User.class)),
               @Grouped(value = @Indexed(label = "reason"), req = false, greedy = true)})
     public void kick(CubeContext context)
     {
@@ -349,7 +350,7 @@ public class KickBanCommands
     }
 
     @Command(desc = "View all players banned from this server")
-    @IParams(@Grouped(req = false, value = @Indexed(label = {"!ips","!players"})))
+    @IParams(@Grouped(req = false, value = @Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"ips","players"})))
     public void banlist(CubeContext context)
     {
         if (true == true)

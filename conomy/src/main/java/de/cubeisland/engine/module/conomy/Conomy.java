@@ -22,12 +22,11 @@ import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.storage.TableAccount;
 import de.cubeisland.engine.module.conomy.account.storage.TableBankAccess;
 import de.cubeisland.engine.module.conomy.commands.BankCommands;
-import de.cubeisland.engine.module.conomy.commands.BankOrAllReader;
 import de.cubeisland.engine.module.conomy.commands.BankReader;
 import de.cubeisland.engine.module.conomy.commands.EcoBankCommands;
 import de.cubeisland.engine.module.conomy.commands.EcoCommands;
 import de.cubeisland.engine.module.conomy.commands.MoneyCommand;
-import de.cubeisland.engine.core.command.ArgumentReader;
+import de.cubeisland.engine.command.context.reader.ArgumentReader;
 import de.cubeisland.engine.core.command.CommandManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.module.service.Economy;
@@ -54,7 +53,6 @@ public class Conomy extends Module
         cm.registerCommand(new EcoCommands(this));
 
         ArgumentReader.registerReader(new BankReader(this.manager), BankAccount.class);
-        ArgumentReader.registerReader(new BankOrAllReader());
         cm.registerCommand(new BankCommands(this));
         cm.registerCommand(new EcoBankCommands(this), "eco");
         this.getCore().getModuleManager().getServiceManager().registerService(this, Economy.class, manager.getInterface());

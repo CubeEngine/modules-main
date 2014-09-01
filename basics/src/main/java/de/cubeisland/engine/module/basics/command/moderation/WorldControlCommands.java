@@ -30,9 +30,10 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import de.cubeisland.engine.command.context.BaseParameter;
 import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.exception.IncorrectUsageException;
-import de.cubeisland.engine.core.command.exception.MissingParameterException;
+import de.cubeisland.engine.command.exception.IncorrectUsageException;
+import de.cubeisland.engine.command.exception.MissingParameterException;
 import de.cubeisland.engine.core.command.parameterized.completer.WorldCompleter;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -70,7 +71,7 @@ public class WorldControlCommands
     }
 
     @Command(desc = "Changes the weather")
-    @IParams({@Grouped(@Indexed(label = {"!sun","!rain","!storm"})),
+    @IParams({@Grouped(@Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"sun","rain","storm"})),
               @Grouped(req = false, value = @Indexed(label = "duration", type = Integer.class))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
     public void weather(CubeContext context)
@@ -143,7 +144,7 @@ public class WorldControlCommands
     }
 
     @Command(alias = "playerweather", desc = "Changes your weather")
-    @IParams(@Grouped(@Indexed(label = {"!clear","!downfall","!reset"})))
+    @IParams(@Grouped(@Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"clear","downfall","reset"})))
     @NParams(@Named(names = "player", label = "player", type = User.class))
     public void pweather(CubeContext context)
     {
@@ -216,7 +217,7 @@ public class WorldControlCommands
 
     @Command(desc = "Removes entity")
     @IParams({@Grouped(@Indexed(label = "entityType[:itemMaterial]")),
-              @Grouped(req = false, value = @Indexed(label = {"radius","!*"}, type = Integer.class))})
+              @Grouped(req = false, value = @Indexed(label = "radius", staticValues = "*", type = Integer.class))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
     public void remove(CubeContext context)
     {

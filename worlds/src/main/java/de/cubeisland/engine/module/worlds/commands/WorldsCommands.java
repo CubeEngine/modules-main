@@ -36,8 +36,9 @@ import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.exception.IncorrectUsageException;
+import de.cubeisland.engine.command.exception.IncorrectUsageException;
 import de.cubeisland.engine.core.command.reflected.Command;
+import de.cubeisland.engine.core.command.reflected.OnlyIngame;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
@@ -501,48 +502,40 @@ public class WorldsCommands extends ContainerCommand
     // move to other universe
 
     @Command(desc = "Teleports to the spawn of a world")
-    @IParams(@Grouped(@Indexed(label = {"world","u:<universe>"})))
+    @IParams(@Grouped(@Indexed(label = "world", type = World.class)))
+    @OnlyIngame
     public void spawn(CubeContext context)
     {
-        if (context.getSender() instanceof User)
+        User user = (User)context.getSender();
+        /* TODO spawn to universe
+        if (name.startsWith("u:"))
         {
-            User user = (User)context.getSender();
-            String name = context.getArg(0);
-            if (name.startsWith("u:"))
+            name = name.substring(2);
+            for (Universe universe : this.multiverse.getUniverses())
             {
-                name = name.substring(2);
-                for (Universe universe : this.multiverse.getUniverses())
+                if (universe.getName().equalsIgnoreCase(name))
                 {
-                    if (universe.getName().equalsIgnoreCase(name))
+                    World world = universe.getMainWorld();
+                    WorldConfig worldConfig = universe.getWorldConfig(world);
+                    if (user.safeTeleport(worldConfig.spawn.spawnLocation.getLocationIn(world), TeleportCause.COMMAND, false))
                     {
-                        World world = universe.getMainWorld();
-                        WorldConfig worldConfig = universe.getWorldConfig(world);
-                        if (user.safeTeleport(worldConfig.spawn.spawnLocation.getLocationIn(world), TeleportCause.COMMAND, false))
-                        {
-                            context.sendTranslated(POSITIVE, "You are now at the spawn of {world} (main world of the universe {name})", world, name);
-                            return;
-                        } // else tp failed
+                        context.sendTranslated(POSITIVE, "You are now at the spawn of {world} (main world of the universe {name})", world, name);
                         return;
-                    }
+                    } // else tp failed
+                    return;
                 }
-                context.sendTranslated(NEGATIVE, "Universe {input} not found!", name);
-                return;
             }
-            World world = this.wm.getWorld(name);
-            if (world == null)
-            {
-                context.sendTranslated(NEGATIVE, "World {input} not found!", name);
-                return;
-            }
-            WorldConfig worldConfig = this.multiverse.getUniverseFrom(world).getWorldConfig(world);
-            if (user.safeTeleport(worldConfig.spawn.spawnLocation.getLocationIn(world), TeleportCause.COMMAND, false))
-            {
-                context.sendTranslated(POSITIVE, "You are now at the spawn of {world}!", world);
-                return;
-            } // else tp failed
+            context.sendTranslated(NEGATIVE, "Universe {input} not found!", name);
             return;
         }
-        context.sendTranslated(NEGATIVE, "This command can only be used ingame!");
+        */
+        World world = context.getArg(0);
+        WorldConfig worldConfig = this.multiverse.getUniverseFrom(world).getWorldConfig(world);
+        if (user.safeTeleport(worldConfig.spawn.spawnLocation.getLocationIn(world), TeleportCause.COMMAND, false))
+        {
+            context.sendTranslated(POSITIVE, "You are now at the spawn of {world}!", world);
+            return;
+        } // else tp failed
     }
 
     @Command(desc = "Loads a player's state for their current world")

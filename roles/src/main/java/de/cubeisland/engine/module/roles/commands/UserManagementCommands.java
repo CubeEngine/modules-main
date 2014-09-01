@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.command.context.BaseParameter;
 import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -166,7 +167,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(alias = "setperm", desc = "Sets a permission for this user [in world]")
     @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
               @Grouped(@Indexed(label = "permission")),
-              @Grouped(req = false, value = @Indexed(label = {"!true","!false","!reset"}))})
+              @Grouped(req = false, value = @Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"true","false","reset"}))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
     public void setpermission(CubeContext context)
     {

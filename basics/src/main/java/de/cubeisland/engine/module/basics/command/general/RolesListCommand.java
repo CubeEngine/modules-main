@@ -36,8 +36,7 @@ public class RolesListCommand extends ListCommand
 
     public RolesListCommand(Basics basics)
     {
-        super(basics);
-        setDescription("Displays all the online players ordered by role.");
+        super(basics, "Displays all the online players ordered by role.");
     }
 
     @Override

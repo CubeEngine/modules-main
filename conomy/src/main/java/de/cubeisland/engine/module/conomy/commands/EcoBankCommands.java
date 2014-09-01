@@ -19,6 +19,7 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.List;
 
+import de.cubeisland.engine.command.context.reader.SimpleListReader;
 import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
@@ -45,7 +46,7 @@ public class EcoBankCommands extends ContainerCommand
     }
 
     @Command(alias = "grant", desc = "Gives money to a bank or all banks")
-    @IParams({@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)),
+    @IParams({@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     public void give(CubeContext context)
     {
@@ -72,7 +73,7 @@ public class EcoBankCommands extends ContainerCommand
     }
 
     @Command(alias = "remove", desc = "Takes money from given bank or all banks")
-    @IParams({@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)),
+    @IParams({@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     public void take(CubeContext context)
     {
@@ -99,7 +100,7 @@ public class EcoBankCommands extends ContainerCommand
     }
 
     @Command(desc = "Reset the money from given banks")
-    @IParams(@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)))
+    @IParams(@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)))
     public void reset(CubeContext context)
     {
         if ("*".equals(context.getArg(0)))
@@ -124,7 +125,7 @@ public class EcoBankCommands extends ContainerCommand
     }
 
     @Command(desc = "Sets the money from given banks")
-    @IParams({@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)),
+    @IParams({@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)),
               @Grouped(@Indexed(label = "amount", type = Double.class))})
     public void set(CubeContext context)
     {
@@ -151,7 +152,7 @@ public class EcoBankCommands extends ContainerCommand
     }
 
     @Command(desc = "Scales the money from given banks")
-    @IParams({@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)),
+    @IParams({@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)),
               @Grouped(@Indexed(label = "factor", type = Float.class))})
     public void scale(CubeContext context)
     {
@@ -177,7 +178,7 @@ public class EcoBankCommands extends ContainerCommand
     }
 
     @Command(desc = "Hides the account of given bank")
-    @IParams(@Grouped(@Indexed(label = {"bank","!*"}, type = BankOrAllReader.class)))
+    @IParams(@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)))
     public void hide(CubeContext context)
     {
         if ("*".equals(context.getArg(0)))
@@ -200,7 +201,7 @@ public class EcoBankCommands extends ContainerCommand
     }
 
     @Command(desc = "Unhides the account of given banks")
-    @IParams(@Grouped(@Indexed(label = {"bank","!*"})))
+    @IParams(@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)))
     public void unhide(CubeContext context)
     {
         if ("*".equals(context.getArg(0)))

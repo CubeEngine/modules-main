@@ -21,8 +21,8 @@ import java.util.Set;
 
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.exception.IncorrectUsageException;
-import de.cubeisland.engine.core.command.exception.ReaderException;
+import de.cubeisland.engine.command.exception.IncorrectUsageException;
+import de.cubeisland.engine.command.exception.ReaderException;
 import de.cubeisland.engine.core.user.User;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;

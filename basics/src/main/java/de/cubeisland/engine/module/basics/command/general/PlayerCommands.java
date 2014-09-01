@@ -37,7 +37,6 @@ import de.cubeisland.engine.core.ban.UserBan;
 import de.cubeisland.engine.core.bukkit.BukkitUtils;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.readers.UserListReader;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.OnlyIngame;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
@@ -85,7 +84,7 @@ public class PlayerCommands
     }
 
     @Command(desc = "Refills your hunger bar")
-    @IParams(@Grouped(value = @Indexed(label = {"player","!*"}, type = UserListReader.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = "player", staticValues = "*", type = User.class, reader = List.class), req = false))
     public void feed(CubeContext context)
     {
         if (context.hasIndexed(0))
@@ -140,7 +139,7 @@ public class PlayerCommands
     }
 
     @Command(desc = "Empties the hunger bar")
-    @IParams(@Grouped(value = @Indexed(label = {"players","!*"}, type = UserListReader.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = "players", staticValues = "*", type = User.class, reader = List.class), req = false))
     public void starve(CubeContext context)
     {
         if (context.hasIndexed(0))
@@ -195,7 +194,7 @@ public class PlayerCommands
     }
 
     @Command(desc = "Heals a player")
-    @IParams(@Grouped(value = @Indexed(label = {"players","!*"}, type = UserListReader.class), req = false))
+    @IParams(@Grouped(value = @Indexed(label = "players", staticValues = "*", type = User.class, reader = List.class), req = false))
     public void heal(CubeContext context)
     {
         if (context.hasIndexed(0))
@@ -337,7 +336,7 @@ public class PlayerCommands
     }
 
     @Command(alias = "slay", desc = "Kills a player")
-    @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListReader.class)))
+    @IParams(@Grouped(@Indexed(label = "players", staticValues = "*", type = User.class, reader = List.class)))
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "quiet", name = "q"),
             @Flag(longName = "lightning", name = "l")})

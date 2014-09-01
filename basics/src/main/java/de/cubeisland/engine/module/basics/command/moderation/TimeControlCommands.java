@@ -27,7 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.exception.MissingParameterException;
+import de.cubeisland.engine.command.exception.MissingParameterException;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -166,7 +166,7 @@ public class TimeControlCommands
     }
 
     @Command(desc = "Changes the time for a player")
-    @IParams({@Grouped(@Indexed(label = {"time","!reset"})),
+    @IParams({@Grouped(@Indexed(label = "time", staticValues = "reset")),
               @Grouped(req = false, value = @Indexed(label = "player", type = User.class))})
     @Flags(@Flag(longName = "lock", name = "l"))
     public void ptime(CubeContext context)

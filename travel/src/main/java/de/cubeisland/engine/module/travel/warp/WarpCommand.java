@@ -277,7 +277,7 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(desc = "List all available warps")
-    @IParams(@Grouped(req = false, value = @Indexed(label = {"owner","!*"}, type = {User.class, String.class})))
+    @IParams(@Grouped(req = false, value = @Indexed(label = "owner", staticValues = "*", type = User.class)))
     @Flags({@Flag(name = "pub", longName = "public"),
             @Flag(name = "o", longName = "owned"),
             @Flag(name = "i", longName = "invited")})

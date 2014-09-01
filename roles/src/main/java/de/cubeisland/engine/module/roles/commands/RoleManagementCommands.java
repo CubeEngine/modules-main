@@ -19,6 +19,7 @@ package de.cubeisland.engine.module.roles.commands;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.command.context.BaseParameter;
 import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.core.command.reflected.context.Flag;
 import de.cubeisland.engine.core.command.reflected.context.Flags;
@@ -55,7 +56,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @Command(alias = "setperm",  desc = "Sets the permission for given role [in world]")
     @IParams({@Grouped(@Indexed(label = "[g:]role")),
               @Grouped(@Indexed(label = "permission")),
-              @Grouped(req = false, value = @Indexed(label = {"!true","!false","!reset"}))})
+              @Grouped(req = false, value = @Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"true","false","reset"}))})
     @NParams(@Named(names = "in", label = "world", type = World.class))
     public void setpermission(CubeContext context)
     {

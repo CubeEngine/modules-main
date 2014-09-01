@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Random;
 
 import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.readers.UserListReader;
 import de.cubeisland.engine.core.command.reflected.Command;
 import de.cubeisland.engine.core.command.reflected.context.Grouped;
 import de.cubeisland.engine.core.command.reflected.context.IParams;
@@ -84,7 +83,7 @@ public class IgnoreCommands
     }
 
     @Command(desc = "Ignores all messages from players")
-    @IParams(@Grouped(@Indexed(label = "players", type = UserListReader.class)))
+    @IParams(@Grouped(@Indexed(label = "players", type = User.class, reader = List.class)))
     public void ignore(CubeContext context)
     {
         if (context.getSender() instanceof User)
@@ -118,7 +117,7 @@ public class IgnoreCommands
     }
 
     @Command(desc = "Stops ignoring all messages from a player")
-    @IParams(@Grouped(@Indexed(label = "players", type = UserListReader.class)))
+    @IParams(@Grouped(@Indexed(label = "players", type = User.class, reader = List.class)))
     public void unignore(CubeContext context)
     {
         if (context.getSender() instanceof User)

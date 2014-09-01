@@ -62,7 +62,7 @@ public class ChatCommands
 
 
     @Command(desc = "Sends a private message to someone", alias = {"tell", "message", "pm", "m", "t", "whisper", "w"})
-    @IParams({@Grouped(@Indexed(label = {"player","!console"}, type = User.class)),
+    @IParams({@Grouped(@Indexed(label = "player", staticValues = "console", type = User.class)),
               @Grouped(value = @Indexed(label = "message"), greedy = true)})
     public void msg(CubeContext context)
     {
