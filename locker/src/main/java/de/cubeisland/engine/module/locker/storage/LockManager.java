@@ -453,7 +453,7 @@ public class LockManager implements Listener
     public Lock createLock(Material material, Location location, User user, LockType lockType, String password, boolean createKeyBook)
     {
         LockModel model = this.dsl.newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
-        model.createPassword(this, password).asyncInsert();
+        model.createPassword(this, password).insert(); // TODO async and the rest on callback
         List<Location> locations = new ArrayList<>();
         Block block = location.getBlock();
         // Handle MultiBlock Protections
@@ -509,7 +509,7 @@ public class LockManager implements Listener
         }
         for (Location loc : locations)
         {
-            this.dsl.newRecord(TABLE_LOCK_LOCATION).newLocation(model, loc).asyncInsert();
+            this.dsl.newRecord(TABLE_LOCK_LOCATION).newLocation(model, loc).insert(); // TODO async Insert AND on callback do the other stuff
         }
         Lock lock = new Lock(this, model, locations);
         this.addLoadedLocationLock(lock);
