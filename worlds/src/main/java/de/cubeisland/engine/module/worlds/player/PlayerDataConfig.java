@@ -18,11 +18,14 @@
 package de.cubeisland.engine.module.worlds.player;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
 import de.cubeisland.engine.core.CubeEngine;
@@ -113,8 +116,9 @@ public class PlayerDataConfig extends ReflectedFile<NBTCodec>
 
     public void applyFromPlayer(Player player)
     {
+        PlayerInventory playerInventory = player.getInventory();
         this.lastName = player.getName();
-        this.heldItemSlot = player.getInventory().getHeldItemSlot();
+        this.heldItemSlot = playerInventory.getHeldItemSlot();
         this.maxHealth = player.getMaxHealth();
         this.health = player.getHealth();
         this.foodLevel = player.getFoodLevel();
@@ -123,9 +127,19 @@ public class PlayerDataConfig extends ReflectedFile<NBTCodec>
         this.lvl = player.getLevel();
         this.exp = player.getExp();
         this.fireTicks = player.getFireTicks();
-        this.activePotionEffects = player.getActivePotionEffects();
-        this.inventory = player.getInventory();
-        this.enderChest = player.getEnderChest();
+        this.activePotionEffects = new ArrayList<>(player.getActivePotionEffects());
+
+        ItemStack[] contents = playerInventory.getContents();
+        ItemStack[] armorContents = playerInventory.getArmorContents();
+        ItemStack[] allContents = Arrays.copyOf(contents, contents.length + 9);
+        System.arraycopy(armorContents, 0, allContents, contents.length, armorContents.length);
+        this.inventory = Bukkit.createInventory(player, allContents.length);
+        this.inventory.setContents(allContents);
+
+        ItemStack[] enderContents = player.getEnderChest().getContents();
+
+        this.enderChest = Bukkit.createInventory(player, enderContents.length);
+        this.enderChest.setContents(enderContents);
     }
 
     public void setHead(String... head)
