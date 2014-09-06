@@ -21,14 +21,14 @@ import javax.persistence.Transient;
 
 import org.bukkit.Location;
 
+import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.core.user.User;
 import org.apache.commons.lang.Validate;
-import org.jooq.impl.UpdatableRecordImpl;
 
 import static de.cubeisland.engine.core.CubeEngine.getCore;
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
-public class TeleportPointModel extends UpdatableRecordImpl<TeleportPointModel>
+public class TeleportPointModel extends AsyncRecord<TeleportPointModel>
 {
     @Transient
     private transient Location location;

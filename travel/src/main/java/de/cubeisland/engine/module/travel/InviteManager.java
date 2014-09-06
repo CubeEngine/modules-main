@@ -52,7 +52,7 @@ public class InviteManager
     {
         TeleportInvite invite = this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getValue(TABLE_TP_POINT.KEY), user.getEntity().getKey());
         this.invites.add(invite);
-        invite.insert();
+        invite.asyncInsert();
     }
 
     /**
@@ -135,12 +135,12 @@ public class InviteManager
             }
             else
             {
-                invite.delete(); // no longer invited
+                invite.asyncDelete(); // no longer invited
             }
         }
         for (UInteger invitedUser : invitedUsers)
         {
-            this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getValue(TABLE_TP_POINT.KEY), invitedUser).insert(); // not yet invited
+            this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getValue(TABLE_TP_POINT.KEY), invitedUser).asyncInsert(); // not yet invited
         }
     }
 

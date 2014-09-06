@@ -169,6 +169,7 @@ public class PortalModifyCommand extends ContainerCommand
         }
         World world = context.getArg(0);
         portal.config.destination = new RandomDestination(world);
+        portal.config.save();
     }
 
     @Command(desc = "Changes a portals location")

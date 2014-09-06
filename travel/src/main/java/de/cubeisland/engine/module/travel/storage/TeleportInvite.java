@@ -17,12 +17,12 @@
  */
 package de.cubeisland.engine.module.travel.storage;
 
-import org.jooq.impl.UpdatableRecordImpl;
+import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
 
-public class TeleportInvite extends UpdatableRecordImpl<TeleportInvite>
+public class TeleportInvite extends AsyncRecord<TeleportInvite>
 {
     public TeleportInvite()
     {

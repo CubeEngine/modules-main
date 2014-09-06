@@ -21,9 +21,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 import de.cubeisland.engine.core.CubeEngine;
+import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
-import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
@@ -31,7 +31,7 @@ import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
 
 @Entity
 @Table(name = "mail")
-public class Mail extends UpdatableRecordImpl<Mail>
+public class Mail extends AsyncRecord<Mail>
 {
     public Mail()
     {

@@ -75,7 +75,7 @@ public class GeneralsListener implements Listener
         {
             bUser.setValue(TABLE_BASIC_USER.GODMODE, false);
         }
-        bUser.update();
+        bUser.asyncUpdate();
         if (!module.perms().COMMAND_GAMEMODE_KEEP.isAuthorized(event.getPlayer()))
         {
             event.getPlayer().setGameMode(Bukkit.getServer().getDefaultGameMode()); // reset gamemode to default on the server
@@ -91,7 +91,7 @@ public class GeneralsListener implements Listener
             bUser.setValue(TABLE_BASIC_USER.GODMODE, false);
             BukkitUtils.setInvulnerable(event.getPlayer(), false);
         }
-        bUser.update();
+        bUser.asyncUpdate();
         if (!module.perms().COMMAND_GAMEMODE_KEEP.isAuthorized(event.getPlayer()))
         {
             event.getPlayer().setGameMode(Bukkit.getServer().getDefaultGameMode()); // reset gamemode to default on the server
@@ -125,7 +125,7 @@ public class GeneralsListener implements Listener
             else
             {
                 bUser.getbUEntity().setValue(TABLE_BASIC_USER.GODMODE, false);
-                bUser.getbUEntity().update();
+                bUser.getbUEntity().asyncUpdate();
             }
         }
     }
