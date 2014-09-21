@@ -16,276 +16,354 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: de.cubeisland.engine:worlds:1.0.0-SNAPSHOT\n"
+"Project-Id-Version: de.cubeisland.engine.module:worlds:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2014-05-17 05:00:19+0200\n"
+"POT-Creation-Date: 2014-09-21 03:27:29+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: en_US\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:73
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:77
 msgid "Creates a new universe"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:81
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:85
 msgid "Creates a new world"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:372
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:423
 msgid "Lists the players in a world"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:191
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:193
 msgid "Loads a world from configuration"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:404
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:457
 msgid "Moves a world into another universe"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:300
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:302
 msgid "Remove a world"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:393
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:445
 msgid "Sets the main world"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:359
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:362
 msgid "Show info about a world"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:450
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:503
 msgid "Teleports to the spawn of a world"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:252
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:254
 msgid "Unload a loaded world"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:265
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:267
 msgid "/worlds setmainworld <world>"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:185
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:187
 msgid "A critical Error occured while creating the world!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:126
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:129
 msgid "A world named {name#world} already exists but is not loaded!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:102
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:106
 msgid "A world named {world} already exists and is loaded!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:264
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:266
 msgid "Cannot unload main world of main universe!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:328
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:331
 msgid "Configuration and folder for the world {name#world} removed!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:333
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:336
 msgid "Configuration for the world {name#world} removed!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/Multiverse.java:261
+#: de/cubeisland/engine/module/worlds/Multiverse.java:262
 msgid "Cooling plasma a bit to make {world} in the universe {name#universe}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:120
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:123
 msgid "Could not backup old world folder! Aborting Worldcreation"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:215
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:217
 msgid "Could not load {name#world}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:435
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:488
 msgid "Could not reload the universes"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:278
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:280
 msgid "Could not teleport every player out of the world to unload!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:290
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:292
 msgid "Could not unload {world}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/Multiverse.java:250
+#: de/cubeisland/engine/module/worlds/Multiverse.java:251
 msgid "Discovered a new Universe! Heating up stars..."
 msgstr ""
 
-#: de/cubeisland/engine/worlds/Multiverse.java:132
+#: de/cubeisland/engine/module/worlds/Multiverse.java:133
 msgid "Discovering unknown worlds..."
 msgstr ""
 
-#: de/cubeisland/engine/worlds/Multiverse.java:134
-#: de/cubeisland/engine/worlds/Multiverse.java:164
+#: de/cubeisland/engine/module/worlds/Multiverse.java:135
+#: de/cubeisland/engine/module/worlds/Multiverse.java:165
 msgid "Finishing research..."
 msgstr ""
 
-#: de/cubeisland/engine/worlds/Multiverse.java:264
+#: de/cubeisland/engine/module/worlds/Multiverse.java:265
 msgid "Found a cold rock named {world} in the universe {name#universe}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/Multiverse.java:171
+#: de/cubeisland/engine/module/worlds/Multiverse.java:172
 msgid "Found {amount#universes} universes with {amount#worlds} worlds!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/Multiverse.java:153
+#: de/cubeisland/engine/module/worlds/Multiverse.java:154
 msgid "Found {amount} new worlds in the universe {name#universe}!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:500
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:555
 msgid "Loaded {user}'s data from file!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:116
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:119
 msgid "Old world moved to {name#folder}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:509
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:565
 msgid "Saved {user}'s data to file!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/Multiverse.java:161
+#: de/cubeisland/engine/module/worlds/Multiverse.java:162
 msgid "Scraping together Matter..."
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:282
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:284
 msgid "Teleported all players out of {world}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:382
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:434
 msgid "The following players are in {world}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:340
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:343
 msgid "The following worlds do exist:"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:442
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:495
 msgid "The world you are in got moved into an other universe!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:199
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:201
 msgid "The world {world} is already loaded!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:378
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:430
 msgid "There are no players in {world}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:491
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:545
 msgid "This command can only be used ingame!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:413
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:474
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:466
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:528
 msgid "Universe {input} not found!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:227
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:229
 msgid "Universe {name} not found!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:286
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:288
 msgid "Unloaded the world {world}!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:367
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:372
 msgid "World information for {input#world}:"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:446
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:499
 msgid "World successfully moved!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:248
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:313
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:365
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:480
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:250
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:316
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:369
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:534
 msgid "World {input} not found!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:211
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:244
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:213
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:246
 msgid "World {world} loaded!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/Multiverse.java:334
+#: de/cubeisland/engine/module/worlds/Multiverse.java:355
 msgid "You are not allowed to enter the universe {name#universe}!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:468
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:522
 msgid ""
 "You are now at the spawn of {world} (main world of the universe {name})"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:486
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:540
 msgid "You are now at the spawn of {world}!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:151
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:153
 msgid "You have to provide a universe in which to create the world!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:98
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:102
 msgid "You have to unload a world before recreating it!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:307
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:310
 msgid "You have to unload the world first!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:237
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:239
 msgid "You need to specify a universe to load the world into!"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:352
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:355
 msgid "{name#world} {input#environement:color=INDIGO} in the universe {name}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:348
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:351
 msgid ""
 "{name#world} {input#environement:color=INDIGO} {text:(not loaded):color=RED} "
 "in the universe {name}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/Multiverse.java:258
+#: de/cubeisland/engine/module/worlds/Multiverse.java:259
 msgid ""
 "{world} gets formed by crushing rocks together in the universe "
 "{name#universe}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:418
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:471
 msgid "{world} is already in the universe {name}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:399
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:452
 msgid "{world} is now the main world of the universe {name}"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:337
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:340
 msgid "Lists all worlds"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:494
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:548
 msgid "Loads a player's state for their current world"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:503
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:558
 msgid "Save a player's state for their current world"
 msgstr ""
 
-#: de/cubeisland/engine/worlds/commands/WorldsCommands.java:294
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:296
 msgid "There is still one player on that map!"
 msgid_plural "There are still {amount} players on that map!"
 msgstr[0] ""
 msgstr[1] ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:417
+msgid "End portals lead to {input#world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:374
+msgid "Environment: {input}"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:373
+msgid "Gamemode: {input}"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:413
+msgid "Nether portals lead to {input#world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:404
+msgid "Players need a permission to enter this world"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:394
+msgid "The respawnworld is {world} and beds are allowed"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:398
+msgid "The respawnworld is {world} and beds do not set spawn"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:389
+msgid "This world will not load automatically!"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:401
+msgid "This worlds spawn is at {vector}"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:385
+msgid "Using custom Generator: {input}"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:391
+msgid "World scale: {}"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:381
+msgid "WorldType: {input}"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:377
+msgid "WorldType: {input} with structures"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:71
+msgid "Worlds commands"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:78
+msgid "name"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:549
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:559
+msgid "player"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:504
+msgid "u:<universe>"
+msgstr ""
+
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:255
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:303
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:363
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:424
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:446
+#: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:504
+msgid "world"
+msgstr ""
