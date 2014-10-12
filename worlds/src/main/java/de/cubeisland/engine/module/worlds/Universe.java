@@ -450,9 +450,13 @@ public class Universe
         WorldConfig fromConfig = this.worldConfigs.get(from.getWorld().getName());
         World toWorld = this.wm.getWorld(fromConfig.netherTarget);
         WorldConfig toConfig = this.multiverse.getUniverseFrom(toWorld).getWorldConfig(toWorld);
+
         double factor = fromConfig.scale / toConfig.scale;
-        agent.setSearchRadius((int)(128 / (factor * 8)));
-        agent.setCreationRadius((int)(16 / (factor * 8)));
+        double searchFactor = toConfig.scale / fromConfig.scale;
+        searchFactor = searchFactor > factor ? factor : searchFactor;
+
+        agent.setSearchRadius((int) (128d / (searchFactor * 8)));
+        agent.setCreationRadius((int) (16d / (searchFactor * 8)));
         return new Location(toWorld, from.getX() * factor, from.getY(), from.getZ() * factor, from.getYaw(), from.getPitch());
     }
 
