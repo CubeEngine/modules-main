@@ -34,18 +34,15 @@ import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.command.exception.IncorrectUsageException;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.OnlyIngame;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.old.IncorrectUsageException;
+import de.cubeisland.engine.command.old.Restricted;
+import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.Pair;
@@ -61,7 +58,8 @@ import de.cubeisland.engine.module.worlds.config.WorldConfig;
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
-public class WorldsCommands extends ContainerCommand
+@Command(name = "worlds", desc = "Worlds commands")
+public class WorldsCommands extends CommandContainer
 {
     private Worlds module;
     private final Multiverse multiverse;
@@ -69,31 +67,32 @@ public class WorldsCommands extends ContainerCommand
 
     public WorldsCommands(Worlds module, Multiverse multiverse)
     {
-        super(module, "worlds", "Worlds commands");
+        super(module);
         this.module = module;
         this.multiverse = multiverse;
         this.wm = module.getCore().getWorldManager();
     }
 
     @Command(desc = "Creates a new universe")
-    @IParams(@Grouped(@Indexed(label = "name")))
-    public void createuniverse(CubeContext context)
+    @Params(positional = @Param(label = "name"))
+    public void createuniverse(CommandContext context)
     {
         context.sendMessage("TODO");
         // TODO universe create cmd
     }
 
     @Command(desc = "Creates a new world")
-    @IParams({@Grouped(@Indexed(label = "name")),
-              @Grouped(req = false, value = @Indexed(label = "universe"))})
-    @NParams({@Named(names = {"environment","env"}, type = Environment.class),
-              @Named(names = "seed"),
-              @Named(names = {"worldtype","type"}, type = WorldType.class),
-              @Named(names = {"structure","struct"}, label = "true|false", type = Boolean.class),
-              @Named(names = {"generator","gen"})})
+    @Params(positional = {@Param(label = "name"),
+                          @Param(req = false, label = "universe")},
+            nonpositional = {
+                @Param(names = {"environment","env"}, type = Environment.class),
+                @Param(names = "seed"),
+                @Param(names = {"worldtype","type"}, type = WorldType.class),
+                @Param(names = {"structure","struct"}, label = "true|false", type = Boolean.class),
+                @Param(names = {"generator","gen"})})
     @Flags({@Flag(longName = "recreate",name = "r"),
             @Flag(longName = "noload",name = "no")})
-    public void create(CubeContext context)
+    public void create(CommandContext context)
     {
         World world = this.wm.getWorld(context.getString(0));
         if (world != null)
@@ -115,7 +114,7 @@ public class WorldsCommands extends ContainerCommand
             {
                 try
                 {
-                    Path newPath = path.resolveSibling(context.getArg(0) + "_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()));
+                    Path newPath = path.resolveSibling(context.get(0) + "_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date()));
                     Files.move(path, newPath);
                     context.sendTranslated(POSITIVE, "Old world moved to {name#folder}", path.getFileName().toString());
                 }
@@ -127,14 +126,15 @@ public class WorldsCommands extends ContainerCommand
             }
             else
             {
-                context.sendTranslated(NEGATIVE, "A world named {name#world} already exists but is not loaded!", context.getArg(0));
+                context.sendTranslated(NEGATIVE, "A world named {name#world} already exists but is not loaded!", context.get(
+                    0));
                 return;
             }
         }
-        WorldConfig config = this.getModule().getCore().getConfigFactory().create(WorldConfig.class);
+        WorldConfig config = this.module.getCore().getConfigFactory().create(WorldConfig.class);
         Path dir;
         Universe universe;
-        if (context.hasIndexed(1))
+        if (context.hasPositional(1))
         {
             universe = multiverse.getUniverse(context.getString(1));
             if (universe == null)
@@ -143,22 +143,22 @@ public class WorldsCommands extends ContainerCommand
             }
             dir = universe.getDirectory();
         }
-        else if (context.getSender() instanceof User)
+        else if (context.getSource() instanceof User)
         {
-            universe = multiverse.getUniverseFrom(((User)context.getSender()).getWorld());
+            universe = multiverse.getUniverseFrom(((User)context.getSource()).getWorld());
             dir = universe.getDirectory();
         }
 
         else
         {
             context.sendTranslated(NEGATIVE, "You have to provide a universe in which to create the world!");
-            context.sendMessage(context.getCommand().getUsage(context));
+            context.sendMessage(context.getCommand().getDescriptor().getUsage(context.getSource()));
             return;
         }
-        config.setFile(dir.resolve(context.getArg(0) + YAML.getExtention()).toFile());
+        config.setFile(dir.resolve(context.get(0) + YAML.getExtention()).toFile());
         if (context.hasNamed("env"))
         {
-            config.generation.environment = context.getArg("env", Environment.NORMAL);
+            config.generation.environment = context.get("env", Environment.NORMAL);
         }
         if (context.hasNamed("seed"))
         {
@@ -166,11 +166,11 @@ public class WorldsCommands extends ContainerCommand
         }
         if (context.hasNamed("type"))
         {
-            config.generation.worldType = context.getArg("type", WorldType.NORMAL);
+            config.generation.worldType = context.get("type", WorldType.NORMAL);
         }
         if (context.hasNamed("struct"))
         {
-            config.generation.generateStructures = context.getArg("struct", true);
+            config.generation.generateStructures = context.get("struct", true);
         }
         if (context.hasNamed("gen"))
         {
@@ -186,15 +186,15 @@ public class WorldsCommands extends ContainerCommand
             catch (IOException e)
             {
                 context.sendTranslated(CRITICAL, "A critical Error occured while creating the world!");
-                this.getModule().getLog().error(e, e.getLocalizedMessage());
+                this.module.getLog().error(e, e.getLocalizedMessage());
             }
         }
     }
 
     @Command(desc = "Loads a world from configuration")
-    @IParams({@Grouped(@Indexed(label = "world")),
-              @Grouped(req = false, value = @Indexed(label = "universe"))})
-    public void load(CubeContext context)
+    @Params(positional = {@Param(label = "world"),
+                          @Param(req = false, label = "universe")})
+    public void load(CommandContext context)
     {
         World world = this.wm.getWorld(context.getString(0));
         if (world != null)
@@ -204,7 +204,7 @@ public class WorldsCommands extends ContainerCommand
         }
         if (multiverse.hasWorld(context.getString(0)) != null)
         {
-            if (context.hasIndexed(1))
+            if (context.hasPositional(1))
             {
                 throw new IncorrectUsageException("You've given too many arguments.");
             }
@@ -215,25 +215,25 @@ public class WorldsCommands extends ContainerCommand
             }
             else
             {
-                context.sendTranslated(NEGATIVE, "Could not load {name#world}", context.getArg(0));
+                context.sendTranslated(NEGATIVE, "Could not load {name#world}", context.get(0));
             }
         }
         else if (Files.exists(Bukkit.getServer().getWorldContainer().toPath().resolve(context.getString(0))))
         {
 
             Universe universe;
-            if (context.hasIndexed(1))
+            if (context.hasPositional(1))
             {
                 universe = this.multiverse.getUniverse(context.getString(1));
                 if (universe == null)
                 {
-                    context.sendTranslated(NEGATIVE, "Universe {name} not found!", context.getArg(1));
+                    context.sendTranslated(NEGATIVE, "Universe {name} not found!", context.get(1));
                     return;
                 }
             }
-            else if (context.getSender() instanceof User)
+            else if (context.getSource() instanceof User)
             {
-                universe = this.multiverse.getUniverseFrom(((User)context.getSender()).getWorld());
+                universe = this.multiverse.getUniverseFrom(((User)context.getSource()).getWorld());
             }
             else
             {
@@ -248,16 +248,16 @@ public class WorldsCommands extends ContainerCommand
         }
         else
         {
-            context.sendTranslated(NEGATIVE, "World {input} not found!", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "World {input} not found!", context.get(0));
         }
     }
 
     @Command(desc = "Unload a loaded world")
-    @IParams(@Grouped(@Indexed(label = "world", type = World.class)))
+    @Params(positional = @Param(label = "world", type = World.class))
     @Flags(@Flag(longName = "force", name = "f"))
-    public void unload(CubeContext context)
+    public void unload(CommandContext context)
     {
-        World world = context.getArg(0);
+        World world = context.get(0);
         World tpWorld = this.multiverse.getUniverseFrom(world).getMainWorld();
         if (tpWorld == world)
         {
@@ -301,9 +301,9 @@ public class WorldsCommands extends ContainerCommand
     }
 
     @Command(desc = "Remove a world")
-    @IParams(@Grouped(@Indexed(label = "world")))
+    @Params(positional = @Param(label = "world"))
     @Flags(@Flag(name = "f", longName = "folder"))
-    public void remove(CubeContext context)
+    public void remove(CommandContext context)
     {
         World world = this.wm.getWorld(context.getString(0));
         if (world != null)
@@ -314,11 +314,11 @@ public class WorldsCommands extends ContainerCommand
         Universe universe = multiverse.hasWorld(context.getString(0));
         if (universe == null)
         {
-            context.sendTranslated(NEGATIVE, "World {input} not found!", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "World {input} not found!", context.get(0));
             return;
         }
         universe.removeWorld(context.getString(0));
-        if (context.hasFlag("f") && module.perms().REMOVE_WORLDFOLDER.isAuthorized(context.getSender()))
+        if (context.hasFlag("f") && module.perms().REMOVE_WORLDFOLDER.isAuthorized(context.getSource()))
         {
             Path path = Bukkit.getServer().getWorldContainer().toPath().resolve(context.getString(0));
             try
@@ -329,17 +329,17 @@ public class WorldsCommands extends ContainerCommand
             {
                 module.getLog().error(e, "Error while deleting world folder!");
             }
-            context.sendTranslated(NEGATIVE, "Configuration and folder for the world {name#world} removed!", context.getArg(
+            context.sendTranslated(NEGATIVE, "Configuration and folder for the world {name#world} removed!", context.get(
                 0));
         }
         else
         {
-            context.sendTranslated(NEGATIVE, "Configuration for the world {name#world} removed!", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "Configuration for the world {name#world} removed!", context.get(0));
         }
     }
 
     @Command(desc = "Lists all worlds")
-    public void list(CubeContext context)
+    public void list(CommandContext context)
     {
         context.sendTranslated(POSITIVE, "The following worlds do exist:");
         for (Universe universe : this.multiverse.getUniverses())
@@ -361,16 +361,16 @@ public class WorldsCommands extends ContainerCommand
     // list / list worlds that you can enter
 
     @Command(desc = "Show info about a world")
-    @IParams(@Grouped(@Indexed(label = "world")))
-    public void info(CubeContext context)
+    @Params(positional = @Param(label = "world"))
+    public void info(CommandContext context)
     {
         WorldConfig wConfig = multiverse.getWorldConfig(context.getString(0));
         if (wConfig == null)
         {
-            context.sendTranslated(NEGATIVE, "World {input} not found!", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "World {input} not found!", context.get(0));
             return;
         }
-        context.sendTranslated(POSITIVE, "World information for {input#world}:", context.getArg(0));
+        context.sendTranslated(POSITIVE, "World information for {input#world}:", context.get(0));
         context.sendTranslated(POSITIVE, "Gamemode: {input}", wConfig.gameMode.name());
         context.sendTranslated(POSITIVE, "Environment: {input}", wConfig.generation.environment.name());
         if (wConfig.generation.generateStructures)
@@ -422,10 +422,10 @@ public class WorldsCommands extends ContainerCommand
     // info
 
     @Command(desc = "Lists the players in a world")
-    @IParams(@Grouped(@Indexed(label = "world", type = World.class)))
-    public void listplayers(CubeContext context)
+    @Params(positional = @Param(label = "world", type = World.class))
+    public void listplayers(CommandContext context)
     {
-        World world = context.getArg(0);
+        World world = context.get(0);
         if (world.getPlayers().isEmpty())
         {
             context.sendTranslated(NEUTRAL, "There are no players in {world}", world);
@@ -444,10 +444,10 @@ public class WorldsCommands extends ContainerCommand
     // create nether & create end commands / auto link to world / only works for NORMAL Env worlds
 
     @Command(desc = "Sets the main world")
-    @IParams(@Grouped(@Indexed(label = "world", type = World.class)))
-    public void setMainWorld(CubeContext context)
+    @Params(positional = @Param(label = "world", type = World.class))
+    public void setMainWorld(CommandContext context)
     {
-        World world = context.getArg(0);
+        World world = context.get(0);
         Universe universe = multiverse.getUniverseFrom(world);
         universe.getConfig().mainWorld = new ConfigWorld(this.wm, world);
         context.sendTranslated(POSITIVE, "{world} is now the main world of the universe {name}", world, universe.getName());
@@ -456,15 +456,15 @@ public class WorldsCommands extends ContainerCommand
     // set main universe
 
     @Command(desc = "Moves a world into another universe")
-    @IParams({@Grouped(@Indexed(label = "world", type = World.class)),
-              @Grouped(@Indexed(label = "universe"))})
-    public void move(CubeContext context)
+    @Params(positional = {@Param(label = "world", type = World.class),
+                          @Param(label = "universe")})
+    public void move(CommandContext context)
     {
-        World world = context.getArg(0);
+        World world = context.get(0);
         Universe universe = this.multiverse.getUniverse(context.getString(1));
         if (universe == null)
         {
-            context.sendTranslated(NEGATIVE, "Universe {input} not found!", context.getArg(1));
+            context.sendTranslated(NEGATIVE, "Universe {input} not found!", context.get(1));
             return;
         }
         if (universe.hasWorld(world.getName()))
@@ -487,12 +487,12 @@ public class WorldsCommands extends ContainerCommand
         catch (IOException e)
         {
             context.sendTranslated(CRITICAL, "Could not reload the universes");
-            this.getModule().getLog().error(e, "Error while reloading after moving world to universe");
+            this.module.getLog().error(e, "Error while reloading after moving world to universe");
             return;
         }
         for (Player player : world.getPlayers())
         {
-            User user = this.getModule().getCore().getUserManager().getExactUser(player.getUniqueId());
+            User user = this.module.getCore().getUserManager().getExactUser(player.getUniqueId());
             user.sendTranslated(POSITIVE, "The world you are in got moved into an other universe!");
             oldUniverse.savePlayer(user, world);
             universe.loadPlayer(user);
@@ -502,11 +502,11 @@ public class WorldsCommands extends ContainerCommand
     // move to other universe
 
     @Command(desc = "Teleports to the spawn of a world")
-    @IParams(@Grouped(@Indexed(label = "world", type = World.class)))
-    @OnlyIngame
-    public void spawn(CubeContext context)
+    @Params(positional = @Param(label = "world", type = World.class))
+    @Restricted(value = User.class)
+    public void spawn(CommandContext context)
     {
-        User user = (User)context.getSender();
+        User user = (User)context.getSource();
         /* TODO spawn to universe
         if (name.startsWith("u:"))
         {
@@ -529,7 +529,7 @@ public class WorldsCommands extends ContainerCommand
             return;
         }
         */
-        World world = context.getArg(0);
+        World world = context.get(0);
         WorldConfig worldConfig = this.multiverse.getUniverseFrom(world).getWorldConfig(world);
         if (user.safeTeleport(worldConfig.spawn.spawnLocation.getLocationIn(world), TeleportCause.COMMAND, false))
         {
@@ -539,20 +539,20 @@ public class WorldsCommands extends ContainerCommand
     }
 
     @Command(desc = "Loads a player's state for their current world")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void loadPlayer(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class))
+    public void loadPlayer(CommandContext context)
     {
-        User user = context.getArg(0);
+        User user = context.get(0);
         Universe universe = multiverse.getUniverseFrom(user.getWorld());
         universe.loadPlayer(user);
         context.sendTranslated(POSITIVE, "Loaded {user}'s data from file!", user);
     }
 
     @Command(desc = "Save a player's state for their current world")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void savePlayer(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class))
+    public void savePlayer(CommandContext context)
     {
-        User user = context.getArg(0);
+        User user = context.get(0);
         Universe universe = multiverse.getUniverseFrom(user.getWorld());
         universe.savePlayer(user, user.getWorld());
         context.sendTranslated(POSITIVE, "Saved {user}'s data to file!", user.getDisplayName());

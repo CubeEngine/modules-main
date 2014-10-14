@@ -28,11 +28,10 @@ import java.util.TreeSet;
 
 import org.bukkit.Bukkit;
 
-import de.cubeisland.engine.core.command.CommandResult;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.result.CommandResult;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.CubeCommand;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.context.CubeContextFactory;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.module.basics.Basics;
@@ -41,19 +40,13 @@ import de.cubeisland.engine.module.basics.BasicsAttachment;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
-public class ListCommand extends CubeCommand
+public class ListCommand
 {
     protected static final Comparator<User> USER_COMPARATOR = new UserComparator();
     private final Basics basics;
 
     public ListCommand(Basics basics)
     {
-        this(basics, "Displays all the online players.");
-    }
-
-    public ListCommand(Basics basics, String desc)
-    {
-        super(basics, "list", desc, new CubeContextFactory());
         this.basics = basics;
     }
 
@@ -65,10 +58,10 @@ public class ListCommand extends CubeCommand
         return grouped;
     }
 
-    @Override
-    public CommandResult run(CubeContext context)
+    @Command(desc = "Displays all the online players.")
+    public CommandResult list(CommandContext context)
     {
-        final CommandSender sender = context.getSender();
+        final CommandSender sender = context.getSource();
         final SortedSet<User> users = new TreeSet<>(USER_COMPARATOR);
 
         for (User user : context.getCore().getUserManager().getOnlineUsers())

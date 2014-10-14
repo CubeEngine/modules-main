@@ -19,46 +19,46 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.List;
 
-import de.cubeisland.engine.command.context.reader.SimpleListReader;
-import de.cubeisland.engine.core.command.context.CubeContext;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.parameter.reader.SimpleListReader;
+import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
-import de.cubeisland.engine.core.user.User;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
-public class EcoBankCommands extends ContainerCommand
+@Command(name = "bank", desc = "Administrative commands for Conomy Banks.")
+public class EcoBankCommands extends CommandContainer
 {
     private final Conomy module;
     private final ConomyManager manager;
 
     public EcoBankCommands(Conomy module)
     {
-        super(module, "bank", "Administrative commands for Conomy Banks.");
+        super(module);
         this.module = module;
         this.manager = module.getManager();
     }
 
     @Command(alias = "grant", desc = "Gives money to a bank or all banks")
-    @IParams({@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)),
-              @Grouped(@Indexed(label = "amount", type = Double.class))})
-    public void give(CubeContext context)
+    @Params(positional = {@Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class), // TODO static values "*"
+                          @Param(label = "amount", type = Double.class)})
+    public void give(CommandContext context)
     {
-        Double amount = context.getArg(1);
+        Double amount = context.get(1);
         String format = manager.format(amount);
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.get(0)))
         {
             this.manager.transactionAll(false, true, amount);
             context.sendTranslated(POSITIVE, "You gave {input#amount} to every bank!", format);
             return;
         }
-        for (BankAccount target : context.<List<BankAccount>>getArg(0))
+        for (BankAccount target : context.<List<BankAccount>>get(0))
         {
             this.manager.transaction(null, target, amount, true);
             context.sendTranslated(POSITIVE, "You gave {input#amount} to the bank {input#bank}!", format, target.getName());
@@ -66,26 +66,26 @@ public class EcoBankCommands extends ContainerCommand
             {
                 if (target.isOwner(user))
                 {
-                    user.sendTranslated(POSITIVE, "{user} granted {input#amount} to your bank {input#bank}!", context.getSender(), format, target.getName());
+                    user.sendTranslated(POSITIVE, "{user} granted {input#amount} to your bank {input#bank}!", context.getSource(), format, target.getName());
                 }
             }
         }
     }
 
     @Command(alias = "remove", desc = "Takes money from given bank or all banks")
-    @IParams({@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)),
-              @Grouped(@Indexed(label = "amount", type = Double.class))})
-    public void take(CubeContext context)
+    @Params(positional = {@Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class),// TODO static values "*"
+                          @Param(label = "amount", type = Double.class)})
+    public void take(CommandContext context)
     {
-        Double amount = context.getArg(1);
+        Double amount = context.get(1);
         String format = manager.format(amount);
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.get(0)))
         {
             this.manager.transactionAll(false, true, -amount);
             context.sendTranslated(POSITIVE, "You took {input#amount} from every bank!", format);
             return;
         }
-        for (BankAccount target : context.<List<BankAccount>>getArg(0))
+        for (BankAccount target : context.<List<BankAccount>>get(0))
         {
             this.manager.transaction(target, null, amount, true);
             context.sendTranslated(POSITIVE, "You took {input#amount} from the bank {input#bank}!", format, target.getName());
@@ -93,23 +93,23 @@ public class EcoBankCommands extends ContainerCommand
             {
                 if (target.isOwner(onlineUser))
                 {
-                    onlineUser.sendTranslated(POSITIVE, "{user} charged your bank {input#bank} for {input#amount}!", context.getSender(), target.getName(), format);
+                    onlineUser.sendTranslated(POSITIVE, "{user} charged your bank {input#bank} for {input#amount}!", context.getSource(), target.getName(), format);
                 }
             }
         }
     }
 
     @Command(desc = "Reset the money from given banks")
-    @IParams(@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)))
-    public void reset(CubeContext context)
+    @Params(positional = @Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class)) // TODO static values "*"
+    public void reset(CommandContext context)
     {
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.get(0)))
         {
             this.manager.setAll(false, true, this.manager.getDefaultBankBalance());
             context.sendTranslated(POSITIVE, "You reset every bank account!");
             return;
         }
-        for (BankAccount target : context.<List<BankAccount>>getArg(0))
+        for (BankAccount target : context.<List<BankAccount>>get(0))
         {
             target.reset();
             String format = this.manager.format(this.manager.getDefaultBalance());
@@ -118,26 +118,26 @@ public class EcoBankCommands extends ContainerCommand
             {
                 if (target.isOwner(onlineUser))
                 {
-                    onlineUser.sendTranslated(POSITIVE, "{user} reset the money of your bank {input#bank} to {input#balance}!", context.getSender(), target.getName(), format);
+                    onlineUser.sendTranslated(POSITIVE, "{user} reset the money of your bank {input#bank} to {input#balance}!", context.getSource(), target.getName(), format);
                 }
             }
         }
     }
 
     @Command(desc = "Sets the money from given banks")
-    @IParams({@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)),
-              @Grouped(@Indexed(label = "amount", type = Double.class))})
-    public void set(CubeContext context)
+    @Params(positional = {@Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class), // TODO static values "*"
+                          @Param(label = "amount", type = Double.class)})
+    public void set(CommandContext context)
     {
-        Double amount = context.getArg(1);
+        Double amount = context.get(1);
         String format = this.manager.format(amount);
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.get(0)))
         {
             this.manager.setAll(false, true, amount);
             context.sendTranslated(POSITIVE, "You have set every bank account to {input#balance}!", format);
             return;
         }
-        for (BankAccount target : context.<List<BankAccount>>getArg(0))
+        for (BankAccount target : context.<List<BankAccount>>get(0))
         {
             target.set(amount);
             context.sendTranslated(POSITIVE, "The money of bank account {input#bank} got set to {input#balance}!", target.getName(), format);
@@ -145,25 +145,25 @@ public class EcoBankCommands extends ContainerCommand
             {
                 if (target.isOwner(onlineUser))
                 {
-                    onlineUser.sendTranslated(POSITIVE, "{user} set the money of your bank {input#bank} to {input#balance}!", context.getSender(), target.getName(), format);
+                    onlineUser.sendTranslated(POSITIVE, "{user} set the money of your bank {input#bank} to {input#balance}!", context.getSource(), target.getName(), format);
                 }
             }
         }
     }
 
     @Command(desc = "Scales the money from given banks")
-    @IParams({@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)),
-              @Grouped(@Indexed(label = "factor", type = Float.class))})
-    public void scale(CubeContext context)
+    @Params(positional = {@Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class), // TODO static values "*"
+                          @Param(label = "factor", type = Float.class)})
+    public void scale(CommandContext context)
     {
-        Float factor = context.getArg(1);
-        if ("*".equals(context.getArg(0)))
+        Float factor = context.get(1);
+        if ("*".equals(context.get(0)))
         {
             this.manager.scaleAll(false, true, factor);
             context.sendTranslated(POSITIVE, "Scaled the balance of every bank by {decimal#factor}!", factor);
             return;
         }
-        for (BankAccount target : context.<List<BankAccount>>getArg(0))
+        for (BankAccount target : context.<List<BankAccount>>get(0))
         {
             target.scale(factor);
             context.sendTranslated(POSITIVE, "Scaled the balance of the bank {input#bank} by {decimal#factor}!", target.getName(), factor);
@@ -171,22 +171,22 @@ public class EcoBankCommands extends ContainerCommand
             {
                 if (target.isOwner(onlineUser))
                 {
-                    onlineUser.sendTranslated(POSITIVE, "{user} scaled the money of your bank {input#bank} by {decimal#factor}", context.getSender().getName(), target.getName(), factor);
+                    onlineUser.sendTranslated(POSITIVE, "{user} scaled the money of your bank {input#bank} by {decimal#factor}", context.getSource().getName(), target.getName(), factor);
                 }
             }
         }
     }
 
     @Command(desc = "Hides the account of given bank")
-    @IParams(@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)))
-    public void hide(CubeContext context)
+    @Params(positional = @Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class)) // TODO static values "*"
+    public void hide(CommandContext context)
     {
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.get(0)))
         {
             this.manager.hideAll(false, true);
             return;
         }
-        for (BankAccount target : context.<List<BankAccount>>getArg(0))
+        for (BankAccount target : context.<List<BankAccount>>get(0))
         {
             if (target.isHidden())
             {
@@ -201,15 +201,15 @@ public class EcoBankCommands extends ContainerCommand
     }
 
     @Command(desc = "Unhides the account of given banks")
-    @IParams(@Grouped(@Indexed(label = "bank", staticValues = "*", type = BankAccount.class, reader = SimpleListReader.class)))
-    public void unhide(CubeContext context)
+    @Params(positional = @Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class)) // TODO static values "*"
+    public void unhide(CommandContext context)
     {
-        if ("*".equals(context.getArg(0)))
+        if ("*".equals(context.get(0)))
         {
             this.manager.unhideAll(false, true);
             return;
         }
-        for (BankAccount target : context.<List<BankAccount>>getArg(0))
+        for (BankAccount target : context.<List<BankAccount>>get(0))
         {
             if (target.isHidden())
             {

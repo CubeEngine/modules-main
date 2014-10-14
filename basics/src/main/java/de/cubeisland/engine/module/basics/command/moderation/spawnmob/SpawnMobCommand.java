@@ -21,15 +21,14 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsConfiguration;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsConfiguration;
 
 import static de.cubeisland.engine.module.basics.command.moderation.spawnmob.SpawnMob.spawnMobs;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
@@ -47,23 +46,23 @@ public class SpawnMobCommand
     }
 
     @Command(desc = "Spawns the specified Mob")
-    @IParams({@Grouped(@Indexed(label = "<mob>[:data][,<ridingmob>[:data]]")),
-              @Grouped(value = @Indexed(label = "amount", type = Integer.class), req = false),
-              @Grouped(value = @Indexed(label = "player", type = User.class), req = false)})
-    public void spawnMob(CubeContext context)
+    @Params(positional = {@Param(label = "<mob>[:data][,<ridingmob>[:data]]"),
+              @Param(label = "amount", type = Integer.class, req = false),
+              @Param(label = "player", type = User.class, req = false)})
+    public void spawnMob(CommandContext context)
     {
         User sender = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            sender = (User)context.getSender();
+            sender = (User)context.getSource();
         }
         Location loc;
-        if (context.hasIndexed(2))
+        if (context.hasPositional(2))
         {
-            User user = context.getArg(2);
+            User user = context.get(2);
             if (user == null)
             {
-                context.sendTranslated(NEGATIVE, "User {user} not found!", context.getArg(2));
+                context.sendTranslated(NEGATIVE, "User {user} not found!", context.get(2));
                 return;
             }
             loc = user.getLocation();
@@ -78,9 +77,9 @@ public class SpawnMobCommand
             loc = sender.getTargetBlock(null, 200).getLocation().add(new Vector(0, 1, 0));
         }
         Integer amount = 1;
-        if (context.hasIndexed(1))
+        if (context.hasPositional(1))
         {
-            amount = context.getArg(1);
+            amount = context.get(1);
             if (amount <= 0)
             {
                 context.sendTranslated(NEUTRAL, "And how am i supposed to know which mobs to despawn?");
@@ -109,9 +108,9 @@ public class SpawnMobCommand
             while (entitySpawned.getPassenger() != null)
             {
                 entitySpawned = entitySpawned.getPassenger();
-                message = context.getSender().getTranslation(NONE, "{input#entity} riding {input}", Match.entity().getNameFor(entitySpawned.getType()), message);
+                message = context.getSource().getTranslation(NONE, "{input#entity} riding {input}", Match.entity().getNameFor(entitySpawned.getType()), message);
             }
-            message = context.getSender().getTranslation(POSITIVE, "Spawned {amount} {input#message}!", amount, message);
+            message = context.getSource().getTranslation(POSITIVE, "Spawned {amount} {input#message}!", amount, message);
             context.sendMessage(message);
         }
     }

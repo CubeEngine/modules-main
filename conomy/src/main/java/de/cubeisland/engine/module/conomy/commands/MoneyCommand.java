@@ -19,17 +19,14 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.Collection;
 
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Alias;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command_old.reflected.Alias;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.StringUtils;
@@ -43,25 +40,29 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 
-public class MoneyCommand extends ContainerCommand
+@Command(name = "money", desc = "Manage your money")
+public class MoneyCommand extends CommandContainer
 {
     private final Conomy module;
     private final ConomyManager manager;
 
     public MoneyCommand(Conomy module)
     {
-        super(module, "money", "Manages your money.");
+        super(module);
         this.module = module;
         this.manager = module.getManager();
 
+        // TODO delegation
+        /*
         this.delegateChild(new DelegatingContextFilter()
         {
             @Override
-            public String delegateTo(CubeContext context)
+            public String delegateTo(CommandContext context)
             {
-                return context.hasIndexed(0) ? null : "balance";
+                return context.hasPositional(0) ? null : "balance";
             }
         });
+        */
     }
 
     private UserAccount getUserAccount(User user)
@@ -71,24 +72,24 @@ public class MoneyCommand extends ContainerCommand
 
     @Alias(names = {"balance", "moneybalance", "pmoney"})
     @Command(desc = "Shows your balance")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
+    @Params(positional = @Param(req = false, label = "player", type = User.class))
     @Flags(@Flag(longName = "showHidden", name = "f"))
-    public void balance(CubeContext context)
+    public void balance(CommandContext context)
     {
         User user;
-        boolean showHidden = context.hasFlag("f") && module.perms().USER_SHOWHIDDEN.isAuthorized(context.getSender());
-        if (context.hasIndexed(0))
+        boolean showHidden = context.hasFlag("f") && module.perms().USER_SHOWHIDDEN.isAuthorized(context.getSource());
+        if (context.hasPositional(0))
         {
-            user = context.getArg(0);
+            user = context.get(0);
         }
         else
         {
-            if (!(context.getSender() instanceof User))
+            if (!(context.getSource() instanceof User))
             {
                 context.sendTranslated(NEGATIVE, "If you are out of money, better go work than typing silly commands in the console.");
                 return;
             }
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
         UserAccount account = this.getUserAccount(user);
         if (account != null)
@@ -104,23 +105,23 @@ public class MoneyCommand extends ContainerCommand
 
     @Alias(names = {"toplist", "balancetop", "topmoney"})
     @Command(desc = "Shows the players with the highest balance.")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "[fromRank-]toRank")))
+    @Params(positional = @Param(req = false, label = "[fromRank-]toRank"))
     @Flags(@Flag(longName = "showhidden", name = "f"))
-    public void top(CubeContext context)
+    public void top(CommandContext context)
     {
         boolean showHidden = context.hasFlag("f");
         if (showHidden)
         {
-            if (!module.perms().USER_SHOWHIDDEN.isAuthorized(context.getSender()))
+            if (!module.perms().USER_SHOWHIDDEN.isAuthorized(context.getSource()))
                 showHidden = false;
         }
         int fromRank = 1;
         int toRank = 10;
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
             try
             {
-                String range = context.getArg(0);
+                String range = context.get(0);
                 if (range.contains("-"))
                 {
                     fromRank = Integer.parseInt(range.substring(0, range.indexOf("-")));
@@ -154,14 +155,14 @@ public class MoneyCommand extends ContainerCommand
 
     @Alias(names = {"pay"})
     @Command(alias = "give", desc = "Transfer the given amount to another account.")
-    @IParams({@Grouped(@Indexed(label = "player")),
-              @Grouped(@Indexed(label = "amount"))})
-    @NParams(@Named(names = "as", type = User.class))
+    @Params(positional = {@Param(label = "player"), // TODO type User reader Listreader
+                          @Param(label = "amount")},
+            nonpositional = @Param(names = "as", type = User.class))
     @Flags(@Flag(longName = "force", name = "f"))
-    public void pay(CubeContext context)
+    public void pay(CommandContext context)
     {
-        String amountString = context.getArg(1);
-        Double amount = manager.parse(amountString, context.getSender().getLocale());
+        String amountString = context.get(1);
+        Double amount = manager.parse(amountString, context.getSource().getLocale());
         if (amount == null)
         {
             context.sendTranslated(NEGATIVE, "Invalid amount!");
@@ -177,12 +178,12 @@ public class MoneyCommand extends ContainerCommand
         boolean asSomeOneElse = false;
         if (context.hasNamed("as"))
         {
-            if (!module.perms().COMMAND_PAY_ASOTHER.isAuthorized(context.getSender()))
+            if (!module.perms().COMMAND_PAY_ASOTHER.isAuthorized(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to pay money as someone else!");
                 return;
             }
-            sender = context.getArg("as");
+            sender = context.get("as");
             if (sender == null)
             {
                 context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getString("as"));
@@ -192,12 +193,12 @@ public class MoneyCommand extends ContainerCommand
         }
         else
         {
-            if (!(context.getSender() instanceof User))
+            if (!(context.getSource() instanceof User))
             {
                 context.sendTranslated(NEGATIVE, "Please specify a player to use their account.");
                 return;
             }
-            sender = (User)context.getSender();
+            sender = (User)context.getSource();
         }
         Account source = this.manager.getUserAccount(sender, false);
         if (source == null)
@@ -218,7 +219,7 @@ public class MoneyCommand extends ContainerCommand
             User user = this.module.getCore().getUserManager().findUser(userString);
             if (user == null)
             {
-                context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(0));
+                context.sendTranslated(NEGATIVE, "Player {user} not found!", context.get(0));
                 continue;
             }
             Account target = this.manager.getUserAccount(user, false);
@@ -227,7 +228,7 @@ public class MoneyCommand extends ContainerCommand
                 context.sendTranslated(NEGATIVE, "{user} does not have an account!", user);
                 continue;
             }
-            if (!(context.hasFlag("f") && module.perms().COMMAND_MONEY_PAY_FORCE.isAuthorized(context.getSender()))) //force allowed
+            if (!(context.hasFlag("f") && module.perms().COMMAND_MONEY_PAY_FORCE.isAuthorized(context.getSource()))) //force allowed
             {
                 if (!source.has(amount))
                 {

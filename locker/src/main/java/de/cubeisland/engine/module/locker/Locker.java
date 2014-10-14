@@ -56,11 +56,11 @@ public class Locker extends Module implements Reloadable
         db.registerTable(TableLockLocations.class);
         db.registerTable(TableAccessList.class);
         manager = new LockManager(this);
-        LockerCommands mainCmd = new LockerCommands(this, manager);
-        this.getCore().getCommandManager().registerCommand(mainCmd);
-        this.getCore().getCommandManager().registerCommand(new LockerCreateCommands(this, manager), "locker");
-        this.getCore().getCommandManager().registerCommand(new LockerAdminCommands(this, manager), "locker");
-        perms = new LockerPerm(this, mainCmd);
+        LockerCommands lockerCmd = new LockerCommands(this, manager);
+        this.getCore().getCommandManager().addCommand(lockerCmd);
+        lockerCmd.addCommand(new LockerCreateCommands(this, manager));
+        lockerCmd.addCommand(new LockerAdminCommands(this, manager));
+        perms = new LockerPerm(this, lockerCmd);
         listener = new LockerListener(this, manager);
     }
 
@@ -82,10 +82,10 @@ public class Locker extends Module implements Reloadable
         db.registerTable(TableLockLocations.class);
         db.registerTable(TableAccessList.class);
         manager = new LockManager(this);
-        LockerCommands mainCmd = new LockerCommands(this, manager);
-        this.getCore().getCommandManager().registerCommand(mainCmd);
-        this.getCore().getCommandManager().registerCommand(new LockerCreateCommands(this, manager), "locker");
-        this.getCore().getCommandManager().registerCommand(new LockerAdminCommands(this, manager), "locker");
+        LockerCommands lockerCmd = new LockerCommands(this, manager);
+        this.getCore().getCommandManager().addCommand(lockerCmd);
+        lockerCmd.addCommand(new LockerCreateCommands(this, manager));
+        lockerCmd.addCommand(new LockerAdminCommands(this, manager));
         listener = new LockerListener(this, manager);
     }
 

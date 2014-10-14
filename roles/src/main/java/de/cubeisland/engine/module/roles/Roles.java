@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.roles;
 
-import de.cubeisland.engine.core.command.CommandManager;
+import de.cubeisland.engine.core.command_old.CommandManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.module.service.Metadata;
 import de.cubeisland.engine.core.module.service.Permission;
@@ -65,12 +65,16 @@ public class Roles extends Module
         this.getCore().getUserManager().addDefaultAttachment(RolesAttachment.class, this);
 
         final CommandManager cm = this.getCore().getCommandManager();
-        cm.registerCommand(new RoleCommands(this));
-        cm.registerCommand(new RoleManagementCommands(this), "roles");
-        cm.registerCommands(this, new RoleInformationCommands(this), "roles", "role");
-        cm.registerCommand(new UserManagementCommands(this), "roles");
-        cm.registerCommands(this, new UserInformationCommands(this), "roles", "user");
-        cm.registerCommand(new ManagementCommands(this), "roles");
+        RoleCommands cmdRoles = new RoleCommands(this);
+        cm.addCommand(cmdRoles);
+        RoleManagementCommands cmdRole = new RoleManagementCommands(this);
+        cmdRoles.addCommand(cmdRole);
+        cm.addCommands(cmdRole, this, new RoleInformationCommands(this));
+
+        UserManagementCommands cmdUsers = new UserManagementCommands(this);
+        cmdRoles.addCommand(cmdUsers);
+        cm.addCommands(cmdUsers, this, new UserInformationCommands(this));
+        cmdRoles.addCommand(new ManagementCommands(this));
 
         this.getCore().getEventManager().registerListener(this, new RolesEventHandler(this));
 

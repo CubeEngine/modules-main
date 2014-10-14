@@ -20,30 +20,30 @@ package de.cubeisland.engine.module.roles;
 import java.util.ArrayList;
 import java.util.List;
 
-import de.cubeisland.engine.command.Completer;
+import de.cubeisland.engine.command.completer.Completer;
 import de.cubeisland.engine.core.CubeEngine;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.commands.ManagementCommands;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 
-public class RoleCompleter implements Completer<CubeContext>
+public class RoleCompleter implements Completer<CommandContext>
 {
     @Override
-    public List<String> complete(CubeContext context, String token)
+    public List<String> complete(CommandContext context, String token)
     {
+        // TODO use token??
         Roles module = CubeEngine.getCore().getModuleManager().getModule(Roles.class);
-        final CommandSender sender = context.getSender();
+        final CommandSender sender = context.getSource();
         List<String> roles = new ArrayList<>();
         if (sender instanceof User)
         {
             User user = (User)sender;
             if (user.get(RolesAttachment.class).getWorkingWorld() != null)
             {
-                for (Role role : module.getRolesManager().getProvider(user.get(
-                    RolesAttachment.class).getWorkingWorld()).getRoles())
+                for (Role role : module.getRolesManager().getProvider(user.get(RolesAttachment.class).getWorkingWorld()).getRoles())
                 {
                     roles.add(role.getName());
                 }

@@ -21,11 +21,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserManager;
 import de.cubeisland.engine.core.util.ChatFormat;
@@ -83,14 +82,14 @@ public class IgnoreCommands
     }
 
     @Command(desc = "Ignores all messages from players")
-    @IParams(@Grouped(@Indexed(label = "players", type = User.class, reader = List.class)))
-    public void ignore(CubeContext context)
+    @Params(positional = @Param(label = "players", type = User.class, reader = List.class))
+    public void ignore(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             List<String> added = new ArrayList<>();
-            for (User user : context.<List<User>>getArg(0))
+            for (User user : context.<List<User>>get(0))
             {
                 if (!this.addIgnore(sender, user))
                 {
@@ -117,14 +116,14 @@ public class IgnoreCommands
     }
 
     @Command(desc = "Stops ignoring all messages from a player")
-    @IParams(@Grouped(@Indexed(label = "players", type = User.class, reader = List.class)))
-    public void unignore(CubeContext context)
+    @Params(positional = @Param(label = "players", type = User.class, reader = List.class))
+    public void unignore(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             List<String> added = new ArrayList<>();
-            for (User user : context.<List<User>>getArg(0))
+            for (User user : context.<List<User>>get(0))
             {
                 if (!this.removeIgnore(sender, user))
                 {

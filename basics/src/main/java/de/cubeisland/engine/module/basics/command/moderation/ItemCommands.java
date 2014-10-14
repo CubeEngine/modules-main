@@ -29,19 +29,15 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
-import de.cubeisland.engine.command.context.BaseParameter;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.exception.TooFewArgumentsException;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.OnlyIngame;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
-import de.cubeisland.engine.core.command.result.paginated.PaginatedResult;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.old.Restricted;
+import de.cubeisland.engine.command.old.TooFewArgumentsException;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command_old.result.paginated.PaginatedResult;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.StringUtils;
@@ -49,6 +45,7 @@ import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 
+import static de.cubeisland.engine.command.parameter.property.Greed.INFINITE_GREED;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static org.bukkit.Material.AIR;
 import static org.bukkit.Material.SKULL_ITEM;
@@ -76,34 +73,35 @@ public class ItemCommands
     }
 
     @Command(desc = "Looks up an item for you!")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "item")))
-    public PaginatedResult itemDB(CubeContext context)
+    @Params(positional = @Param(req = false, label = "item"))
+    public PaginatedResult itemDB(CommandContext context)
     {
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
             TreeSet<Entry<ItemStack, Double>> itemSet = Match.material().itemStackList(context.getString(0));
             if (itemSet != null && itemSet.size() > 0)
             {
                 List<String> lines = new ArrayList<>();
 
-                lines.add(context.getSender().getTranslation(POSITIVE, "Best Matched {input#item} ({integer#id}:{short#data}) for {input}", Match.material().getNameFor(itemSet.first().getKey()), itemSet.first().getKey().getType().getId(), itemSet.first().getKey().getDurability(), context.getArg(0)));
+                lines.add(context.getSource().getTranslation(POSITIVE, "Best Matched {input#item} ({integer#id}:{short#data}) for {input}", Match.material().getNameFor(itemSet.first().getKey()), itemSet.first().getKey().getType().getId(), itemSet.first().getKey().getDurability(), context.get(
+                    0)));
                 itemSet.remove(itemSet.first());
                 for (Entry<ItemStack, Double> item : itemSet) {
-                    lines.add(context.getSender().getTranslation(POSITIVE, "Matched {input#item} ({integer#id}:{short#data}) for {input}",
+                    lines.add(context.getSource().getTranslation(POSITIVE, "Matched {input#item} ({integer#id}:{short#data}) for {input}",
                                                                  Match.material().getNameFor(item.getKey()),
                                                                  item.getKey().getType().getId(),
-                                                                 item.getKey().getDurability(), context.getArg(0)));
+                                                                 item.getKey().getDurability(), context.get(0)));
                 }
                 return new PaginatedResult(context, lines);
             }
             else
             {
-                context.sendTranslated(NEGATIVE, "Could not find any item named {input}!", context.getArg(0));
+                context.sendTranslated(NEGATIVE, "Could not find any item named {input}!", context.get(0));
             }
         }
-        else if (context.isSender(User.class))
+        else if (context.isSource(User.class))
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             if (sender.getItemInHand().getType() == AIR)
             {
                 context.sendTranslated(NEUTRAL, "You hold nothing in your hands!");
@@ -122,19 +120,19 @@ public class ItemCommands
         }
         else
         {
-            throw new TooFewArgumentsException(context.getSender());
+            throw new TooFewArgumentsException();
         }
         return null;
     }
 
     @Command(desc = "Changes the display name of the item in your hand.")
-    @IParams({@Grouped(@Indexed(label = "name")),
-              @Grouped(req = false, value = @Indexed(label = "lore..."),greedy = true)})
-    public void rename(CubeContext context)
+    @Params(positional = {@Param(label = "name"),
+              @Param(req = false, label = "lore...", greed = INFINITE_GREED)})
+    public void rename(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             ItemStack item = sender.getItemInHand();
             if (item == null || item.getType() == AIR)
             {
@@ -145,7 +143,7 @@ public class ItemCommands
             String name = ChatFormat.parseFormats(context.getString(0));
             meta.setDisplayName(name);
             ArrayList<String> list = new ArrayList<>();
-            for (int i = 1; i < context.getIndexedCount(); ++i)
+            for (int i = 1; i < context.getPositionalCount(); ++i)
             {
                 list.add(ChatFormat.parseFormats(context.getString(i)));
             }
@@ -158,12 +156,12 @@ public class ItemCommands
     }
 
     @Command(alias = "skullchange", desc = "Changes a skull to a players skin.")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "name")))
-    @OnlyIngame("This will you only give headaches!")
-    public void headchange(CubeContext context)
+    @Params(positional = @Param(req = false, label = "name"))
+    @Restricted(value = User.class, msg = "This will you only give headaches!")
+    public void headchange(CommandContext context)
     {
-        User sender = (User)context.getSender();
-        String name = context.getArg(0);
+        User sender = (User)context.getSource();
+        String name = context.get(0);
         if (sender.getItemInHand().getType() == SKULL_ITEM)
         {
             sender.getItemInHand().setDurability((short)3);
@@ -177,13 +175,13 @@ public class ItemCommands
     }
 
     @Command(desc = "Grants unlimited items")
-    @IParams(@Grouped(req = false, value = @Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"on","off"})))
-    @OnlyIngame
-    public void unlimited(CubeContext context)
+    @Params(positional = @Param(req = false, names = {"on","off"}))
+    @Restricted(User.class)
+    public void unlimited(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         boolean unlimited;
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
             if ("on".equalsIgnoreCase(context.getString(0)))
             {
@@ -215,26 +213,26 @@ public class ItemCommands
     }
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
-    @IParams({@Grouped(value = @Indexed(label = "enchantment", type = Enchantment.class), req = false),
-              @Grouped(value = @Indexed(label = "level", type = Integer.class), req = false)})
+    @Params(positional = {@Param(label = "enchantment", type = Enchantment.class, req = false),
+              @Param(label = "level", type = Integer.class, req = false)})
     @Flags(@Flag(longName = "unsafe", name = "u"))
-    public void enchant(CubeContext context)
+    public void enchant(CommandContext context)
     {
-        if (!context.hasIndexed(0))
+        if (!context.hasPositional(0))
         {
             context.sendTranslated(POSITIVE, "Following Enchantments are availiable:\n{input#enchs}", this.getPossibleEnchantments(null));
             return;
         }
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             ItemStack item = sender.getItemInHand();
             if (item.getType().equals(AIR))
             {
                 context.sendTranslated(NEUTRAL, "{text:ProTip}: You cannot enchant your fists!");
                 return;
             }
-            Enchantment ench = context.getArg(0, null);
+            Enchantment ench = context.get(0, null);
             if (ench == null)
             {
                 String possibleEnchs = this.getPossibleEnchantments(item);
@@ -252,9 +250,9 @@ public class ItemCommands
                 return;
             }
             int level = ench.getMaxLevel();
-            if (context.hasIndexed(1))
+            if (context.hasPositional(1))
             {
-                level = context.getArg(1, 0);
+                level = context.get(1, 0);
                 if (level <= 0)
                 {
                     context.sendTranslated(NEGATIVE, "The enchantment level has to be a number greater than 0!");
@@ -333,25 +331,25 @@ public class ItemCommands
     }
 
     @Command(desc = "Gives the specified Item to a player")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(@Indexed(label = "material[:data]", type = ItemStack.class)),
-              @Grouped(value = @Indexed(label = "amount", type = Integer.class), req = false)})
+    @Params(positional = {@Param(label = "player", type = User.class),
+              @Param(label = "material[:data]", type = ItemStack.class),
+              @Param(label = "amount", type = Integer.class, req = false)})
     @Flags(@Flag(name = "b", longName = "blacklist"))
     @SuppressWarnings("deprecation")
-    public void give(CubeContext context)
+    public void give(CommandContext context)
     {
-        User user = context.getArg(0);
-        ItemStack item = context.getArg(1);
-        if (!context.hasFlag("b") && module.perms().ITEM_BLACKLIST.isAuthorized(context.getSender())
+        User user = context.get(0);
+        ItemStack item = context.get(1);
+        if (!context.hasFlag("b") && module.perms().ITEM_BLACKLIST.isAuthorized(context.getSource())
             && this.module.getConfiguration().commands.itemBlacklist.contains(item))
         {
             context.sendTranslated(NEGATIVE, "This item is blacklisted!");
             return;
         }
         int amount = item.getMaxStackSize();
-        if (context.hasIndexed(2))
+        if (context.hasPositional(2))
         {
-            amount = context.getArg(2, 0);
+            amount = context.get(2, 0);
             if (amount == 0)
             {
                 context.sendTranslated(NEGATIVE, "The amount has to be a number greater than 0!");
@@ -363,21 +361,21 @@ public class ItemCommands
         user.updateInventory();
         String matname = Match.material().getNameFor(item);
         context.sendTranslated(POSITIVE, "You gave {user} {amount} {input#item}!", user, amount, matname);
-        user.sendTranslated(POSITIVE, "{user} just gave you {amount} {input#item}!", context.getSender().getName(), amount, matname);
+        user.sendTranslated(POSITIVE, "{user} just gave you {amount} {input#item}!", context.getSource().getName(), amount, matname);
     }
 
     @Command(alias = "i", desc = "Gives the specified Item to you")
-    @IParams({@Grouped(@Indexed(label = "material[:data]", type = ItemStack.class)),
-              @Grouped(value = @Indexed(label = "amount", type = Integer.class), req = false)})
-    @NParams(@Named(names = "ench", label = "enchantment[:level]"))
+    @Params(positional = {@Param(label = "material[:data]", type = ItemStack.class),
+              @Param(label = "amount", type = Integer.class, req = false)},
+            nonpositional = @Param(names = "ench", label = "enchantment[:level]"))
     @Flags(@Flag(longName = "blacklist", name = "b"))
     @SuppressWarnings("deprecation")
-    public void item(CubeContext context)
+    public void item(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
-            ItemStack item = context.getArg(0);
+            User sender = (User)context.getSource();
+            ItemStack item = context.get(0);
             if (!context.hasFlag("b") && module.perms().ITEM_BLACKLIST.isAuthorized(sender)
                     && this.module.getConfiguration().commands.containsBlackListed(item))
             {
@@ -385,9 +383,9 @@ public class ItemCommands
                 return;
             }
             int amount = item.getMaxStackSize();
-            if (context.hasIndexed(1))
+            if (context.hasPositional(1))
             {
-                amount = context.getArg(1, 0);
+                amount = context.get(1, 0);
                 if (amount <= 0)
                 {
                     context.sendTranslated(NEGATIVE, "The amount has to be a Number greater than 0!");
@@ -429,19 +427,19 @@ public class ItemCommands
     }
 
     @Command(desc = "Refills the stack in hand")
-    @IParams(@Grouped(value = @Indexed(label = "amount", staticValues = "*", type = Integer.class), req = false))
-    public void more(CubeContext context)
+    @Params(positional = @Param(label = "amount", type = Integer.class, req = false)) // TODO staticvalues staticValues = "*",
+    public void more(CommandContext context)
     {
-        if (!context.isSender(User.class))
+        if (!context.isSource(User.class))
         {
             context.sendTranslated(NEGATIVE, "You can't get enough of it, can you?");
             return;
         }
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         Integer amount = 1;
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
-            if ("*".equals(context.getArg(0)))
+            if ("*".equals(context.get(0)))
             {
                 for (ItemStack item : sender.getInventory().getContents())
                 {
@@ -453,7 +451,7 @@ public class ItemCommands
                 sender.sendTranslated(POSITIVE, "Refilled all stacks!");
                 return;
             }
-            amount = context.getArg(0);
+            amount = context.get(0);
             if (amount <= 1)
             {
                 context.sendTranslated(NEGATIVE, "Invalid amount {input#amount}", amount);
@@ -480,11 +478,11 @@ public class ItemCommands
 
     @Command(desc = "Repairs your items")
     @Flags(@Flag(longName = "all", name = "a"))
-    @OnlyIngame("If you do this you'll loose your warranty!")
+    @Restricted(value = User.class, msg = "If you do this you'll loose your warranty!")
     // without item in hand
-    public void repair(CubeContext context)
+    public void repair(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         if (context.hasFlag("a"))
         {
             List<ItemStack> list = new ArrayList<>();
@@ -523,10 +521,10 @@ public class ItemCommands
     }
 
     @Command(desc = "Stacks your items up to 64")
-    @OnlyIngame("No stacking for you.")
-    public void stack(CubeContext context)
+    @Restricted(value = User.class, msg = "No stacking for you.")
+    public void stack(CommandContext context)
     {
-        User user = (User)context.getSender();
+        User user = (User)context.getSource();
         boolean allow64 = module.perms().COMMAND_STACK_FULLSTACK.isAuthorized(user);
         ItemStack[] items = user.getInventory().getContents();
         int size = items.length;

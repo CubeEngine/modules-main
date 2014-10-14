@@ -19,9 +19,9 @@ package de.cubeisland.engine.module.roles.commands;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.context.CubeContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.world.WorldManager;
@@ -31,7 +31,7 @@ import de.cubeisland.engine.module.roles.role.RolesManager;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
-public class UserCommandHelper extends ContainerCommand
+public class UserCommandHelper extends CommandContainer
 {
     protected final RolesManager manager;
     protected final WorldManager worldManager;
@@ -42,24 +42,24 @@ public class UserCommandHelper extends ContainerCommand
 
     public UserCommandHelper(Roles module)
     {
-        super(module, "user", "Manage users.");
+        super(module);
         this.manager = module.getRolesManager();
         this.worldManager = module.getCore().getWorldManager();
         this.module = module;
     }
 
-    protected User getUser(CubeContext context, int pos)
+    protected User getUser(CommandContext context, int pos)
     {
         User user = null;
-        if (context.hasIndexed(pos))
+        if (context.hasPositional(pos))
         {
-            user = context.getArg(pos);
+            user = context.get(pos);
         }
         else
         {
-            if (context.getSender() instanceof User)
+            if (context.getSource() instanceof User)
             {
-                user = (User)context.getSender();
+                user = (User)context.getSource();
             }
             if (user == null)
             {
@@ -76,19 +76,19 @@ public class UserCommandHelper extends ContainerCommand
      * @param context
      * @return
      */
-    protected World getWorld(CubeContext context)
+    protected World getWorld(CommandContext context)
     {
         World world;
         if (context.hasNamed("in"))
         {
-            world = context.getArg("in");
+            world = context.get("in");
             if (world == null)
             {
                 context.sendTranslated(NEGATIVE, "World {world} not found!", context.getString("in"));
             }
             return world;
         }
-        CommandSender sender = context.getSender();
+        CommandSender sender = context.getSource();
         if (sender instanceof User)
         {
             User user = (User)sender;

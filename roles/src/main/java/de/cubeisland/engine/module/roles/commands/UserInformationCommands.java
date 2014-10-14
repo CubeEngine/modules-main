@@ -21,16 +21,13 @@ import java.util.Map;
 
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
-import de.cubeisland.engine.core.command.reflected.Alias;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command_old.reflected.Alias;
 import de.cubeisland.engine.core.permission.PermDefault;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.Roles;
@@ -43,6 +40,7 @@ import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
+@Command(name = "user", desc = "Manage users")
 public class UserInformationCommands extends UserCommandHelper
 {
     public UserInformationCommands(Roles module)
@@ -52,9 +50,9 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(names = "listuroles")
     @Command(desc = "Lists roles of a user [in world]")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void list(CubeContext context)
+    @Params(positional = @Param(req = false, label = "player", type = User.class),
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void list(CommandContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
@@ -76,17 +74,17 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(names = "checkuperm")
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in world]")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(@Indexed(label = "permission"))})
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void checkpermission(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+                          @Param(label = "permission")},
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void checkpermission(CommandContext context)
     {
-        User user = context.getArg(0);
+        User user = context.get(0);
         World world = this.getWorld(context);
         if (world == null) return;
         RolesAttachment rolesAttachment = this.manager.getRolesAttachment(user);
         // Search for permission
-        String permission = context.getArg(1);
+        String permission = context.get(1);
         ResolvedPermission resolvedPermission = rolesAttachment.getDataHolder(world).getPermissions().get(permission);
         if (user.isOp())
         {
@@ -136,10 +134,10 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(names = "listuperm")
     @Command(alias = "listperm", desc = "List permission assigned to a user in a world")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
-    @NParams(@Named(names = "in", label = "world", type = World.class))
+    @Params(positional = @Param(req = false, label = "player", type = User.class),
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "all", name = "a"))
-    public void listpermission(CubeContext context)
+    public void listpermission(CommandContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
@@ -167,17 +165,17 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(names = "checkumeta")
     @Command(alias = {"checkdata", "checkmeta"}, desc = "Checks for metadata of a user [in world]")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(@Indexed(label = "metadatakey"))})
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void checkmetadata(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+                          @Param(label = "metadatakey")},
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void checkmetadata(CommandContext context)
     {
-        User user = context.getArg(0);
+        User user = context.get(0);
         World world = this.getWorld(context);
         if (world == null) return;
         RolesAttachment rolesAttachment = this.manager.getRolesAttachment(user);
         // Check metadata
-        String metaKey = context.getArg(1);
+        String metaKey = context.get(1);
         UserDatabaseStore dataHolder = rolesAttachment.getDataHolder(world);
         Map<String,ResolvedMetadata> metadata = dataHolder.getMetadata();
         if (!metadata.containsKey(metaKey))
@@ -198,10 +196,10 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(names = "listumeta")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists assigned metadata from a user [in world]")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
-    @NParams(@Named(names = "in", label = "world", type = World.class))
+    @Params(positional = @Param(req = false, label = "player", type = User.class),
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "all", name = "a"))
-    public void listmetadata(CubeContext context)
+    public void listmetadata(CommandContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;

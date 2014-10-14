@@ -19,68 +19,68 @@ package de.cubeisland.engine.module.travel;
 
 import java.util.Set;
 
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.command.exception.IncorrectUsageException;
-import de.cubeisland.engine.command.exception.ReaderException;
+import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.command.old.IncorrectUsageException;
+import de.cubeisland.engine.command.old.ReaderException;
 import de.cubeisland.engine.core.user.User;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 
-public class TpPointCommand extends ContainerCommand
+public class TpPointCommand extends CommandContainer
 {
     protected InviteManager iManager;
 
-    public TpPointCommand(Travel module, String name, String desc)
+    public TpPointCommand(Travel module)
     {
-        super(module, name, desc);
+        super(module);
         iManager = module.getInviteManager();
     }
 
-    protected User getUser(CubeContext context, int i)
+    protected User getUser(CommandContext context, int i)
     {
         User user;
-        if (context.hasIndexed(i))
+        if (context.hasPositional(i))
         {
-            user = context.getArg(i);
+            user = context.get(i);
         }
-        else if (context.isSender(User.class))
+        else if (context.isSource(User.class))
         {
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
         else
         {
-            throw new IncorrectUsageException(context.getSender().getTranslation(NEGATIVE, "You need to provide a owner"));
+            throw new IncorrectUsageException(context.getSource().getTranslation(NEGATIVE, "You need to provide a owner"));
         }
         return user;
     }
 
-    protected User getUser(CubeContext context, String owner)
+    protected User getUser(CommandContext context, String owner)
     {
         User user;
         if (context.hasNamed(owner))
         {
-            user = context.getArg(owner);
+            user = context.get(owner);
             if (user == null)
             {
-                throw new ReaderException(context.getSender().getTranslation(NEGATIVE,
+                throw new ReaderException(context.getSource().getTranslation(NEGATIVE,
                                                                                       "Player {user} not found!",
                                                                                       context.getString(owner)));
             }
         }
-        else if (context.isSender(User.class))
+        else if (context.isSource(User.class))
         {
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
         else
         {
-            throw new IncorrectUsageException(context.getSender().getTranslation(NEGATIVE, "You need to provide a owner"));
+            throw new IncorrectUsageException(context.getSource().getTranslation(NEGATIVE, "You need to provide a owner"));
         }
         return user;
     }
 
-    protected void showList(CubeContext context, User user, Set<? extends TeleportPoint> points)
+    protected void showList(CommandContext context, User user, Set<? extends TeleportPoint> points)
     {
         for (TeleportPoint point : points)
         {

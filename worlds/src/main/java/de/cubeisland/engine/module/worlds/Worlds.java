@@ -80,7 +80,7 @@ public class Worlds extends Module
         {
             throw new ModuleLoadError(e);
         }
-        this.getCore().getCommandManager().registerCommand(new WorldsCommands(this, multiverse));
+        this.getCore().getCommandManager().addCommand(new WorldsCommands(this, multiverse));
         this.perms = new WorldsPermissions(this);
     }
 

@@ -18,37 +18,23 @@
 package de.cubeisland.engine.module.basics.command.teleport;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.commandparameter.CommandParameters;
-import de.cubeisland.engine.core.command.reflected.commandparameter.Description;
-import de.cubeisland.engine.core.command.reflected.commandparameter.Optional;
-import de.cubeisland.engine.core.command.reflected.commandparameter.ParamFlag;
-import de.cubeisland.engine.core.command.reflected.commandparameter.ParamGroup;
-import de.cubeisland.engine.core.command.reflected.commandparameter.ParamIndexed;
-import de.cubeisland.engine.core.command.reflected.commandparameter.ParamNamed;
-import de.cubeisland.engine.core.command.reflected.commandparameter.Required;
-import de.cubeisland.engine.core.command.reflected.commandparameter.ValueLabel;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.basics.Basics;
 
-import static de.cubeisland.engine.core.command.reflected.commandparameter.ParamIndexed.INFINITE;
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.WHITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
@@ -86,21 +72,21 @@ public class TeleportCommands
     }
 
     @Command(desc = "Teleport directly to a player.")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(req = false, value = @Indexed(label = "player", type = User.class))})
+    @Params(positional = {@Param(label = "player", type = User.class),
+             @Param(req = false, label = "player", type = User.class)})
     @Flags({@Flag(longName = "force", name = "f"), // is not shown directly in usage
             @Flag(longName = "unsafe", name = "u")})
-    public void tp(CubeContext context)
+    public void tp(CommandContext context)
     {
         User user = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
-        User target = context.getArg(0);
+        User target = context.get(0);
         if (target == null)
         {
-            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.get(0));
             return;
         }
         if (!target.isOnline())
@@ -108,14 +94,14 @@ public class TeleportCommands
             context.sendTranslated(NEGATIVE, "Teleportation only works with online players!");
             return;
         }
-        boolean force = context.hasFlag("f") && module.perms().COMMAND_TP_FORCE.isAuthorized(context.getSender());
-        if (context.hasIndexed(1)) //tp player1 player2
+        boolean force = context.hasFlag("f") && module.perms().COMMAND_TP_FORCE.isAuthorized(context.getSource());
+        if (context.hasPositional(1)) //tp player1 player2
         {
             user = target; // The first user is not the target
-            target = context.getArg(1);
+            target = context.get(1);
             if (target == null)
             {
-                context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(1));
+                context.sendTranslated(NEGATIVE, "Player {user} not found!", context.get(1));
                 return;
             }
             if (!target.isOnline())
@@ -123,14 +109,14 @@ public class TeleportCommands
                 context.sendTranslated(NEGATIVE, "Teleportation only works with online players!");
                 return;
             }
-            if (target != context.getSender() && !module.perms().COMMAND_TP_OTHER.isAuthorized(context.getSender())) // teleport other persons
+            if (target != context.getSource() && !module.perms().COMMAND_TP_OTHER.isAuthorized(context.getSource())) // teleport other persons
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to teleport other people!");
                 return;
             }
             if (!force) // if force no need to check
             {
-                if (user != context.getSender())
+                if (user != context.getSource())
                 {
                     if (module.perms().TELEPORT_PREVENT_TP.isAuthorized(user)) // teleport the user
                     {
@@ -138,11 +124,11 @@ public class TeleportCommands
                         return;
                     }
                 } // else equals tp -> no need to check tp perm
-                if (target != context.getSender())
+                if (target != context.getSource())
                 {
                     if (module.perms().TELEPORT_PREVENT_TPTO.isAuthorized(target)) // teleport to the target
                     {
-                        if (module.perms().COMMAND_TP_FORCE.isAuthorized(context.getSender()))
+                        if (module.perms().COMMAND_TP_FORCE.isAuthorized(context.getSource()))
                         {
                             context.sendTranslated(POSITIVE, "Use the {text:-force (-f)} flag to teleport to this player."); //Show force flag if has permission
                         }
@@ -162,7 +148,7 @@ public class TeleportCommands
         }
         if (!force && module.perms().TELEPORT_PREVENT_TPTO.isAuthorized(target))// Check if no force & target does not prevent
         {
-            if (module.perms().COMMAND_TP_FORCE.isAuthorized(context.getSender()))
+            if (module.perms().COMMAND_TP_FORCE.isAuthorized(context.getSource()))
             {
                 context.sendTranslated(POSITIVE, "Use the {text:-force (-f)} flag to teleport to this player."); //Show force flag if has permission
             }
@@ -172,7 +158,7 @@ public class TeleportCommands
         boolean safe = !context.hasFlag("u");
         if (user.equals(target))
         {
-            if (context.getSender() == user)
+            if (context.getSource() == user)
             {
                 context.sendTranslated(NEUTRAL, "You found yourself!");
                 return;
@@ -187,15 +173,15 @@ public class TeleportCommands
     }
 
     @Command(desc = "Teleports everyone directly to a player.")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
+    @Params(positional = @Param(label = "player", type = User.class))
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "unsafe", name = "u")})
-    public void tpall(CubeContext context)
+    public void tpall(CommandContext context)
     {
-        User user = context.getArg(0);
+        User user = context.get(0);
         if (user == null)
         {
-            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.get(0));
             return;
         }
         if (!user.isOnline())
@@ -203,7 +189,7 @@ public class TeleportCommands
             context.sendTranslated(NEGATIVE, "You cannot teleport to an offline player!");
             return;
         }
-        boolean force = context.hasFlag("f") && module.perms().COMMAND_TPALL_FORCE.isAuthorized(context.getSender());
+        boolean force = context.hasFlag("f") && module.perms().COMMAND_TPALL_FORCE.isAuthorized(context.getSource());
         boolean safe = !context.hasFlag("u");
         if (!force && module.perms().TELEPORT_PREVENT_TPTO.isAuthorized(user))
         {
@@ -211,7 +197,7 @@ public class TeleportCommands
             return;
         }
         ArrayList<String> noTp = new ArrayList<>();
-        for (Player player : context.getSender().getServer().getOnlinePlayers())
+        for (Player player : context.getSource().getServer().getOnlinePlayers())
         {
             if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(player))
             {
@@ -231,25 +217,25 @@ public class TeleportCommands
     }
 
     @Command(desc = "Teleport a player directly to you.")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
+    @Params(positional = @Param(label = "player", type = User.class))
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "unsafe", name = "u")})
-    public void tphere(CubeContext context)
+    public void tphere(CommandContext context)
     {
         User sender = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            sender = (User)context.getSender();
+            sender = (User)context.getSource();
         }
         if (sender == null)
         {
             context.sendTranslated(NEGATIVE, "{text:Pro Tip}: Teleport does not work IRL!");
             return;
         }
-        User target = context.getArg(0);
+        User target = context.get(0);
         if (target == null)
         {
-            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.get(0));
             return;
         }
         if (!target.isOnline())
@@ -257,7 +243,7 @@ public class TeleportCommands
             context.sendTranslated(NEGATIVE, "You cannot teleport an offline player to you!");
             return;
         }
-        boolean force = context.hasFlag("f") && module.perms().COMMAND_TPHERE_FORCE.isAuthorized(context.getSender());
+        boolean force = context.hasFlag("f") && module.perms().COMMAND_TPHERE_FORCE.isAuthorized(context.getSource());
         boolean safe = !context.hasFlag("u");
         if (sender.equals(target))
         {
@@ -279,12 +265,12 @@ public class TeleportCommands
     @Command(desc = "Teleport every player directly to you.")
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "unsafe", name = "u")})
-    public void tphereall(CubeContext context)
+    public void tphereall(CommandContext context)
     {
         User sender = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            sender = (User)context.getSender();
+            sender = (User)context.getSource();
         }
         if (sender == null)
         {
@@ -292,12 +278,12 @@ public class TeleportCommands
             return;
         }
         boolean force = false;
-        if (context.hasFlag("f") && module.perms().COMMAND_TPHEREALL_FORCE.isAuthorized(context.getSender()))
+        if (context.hasFlag("f") && module.perms().COMMAND_TPHEREALL_FORCE.isAuthorized(context.getSource()))
         {
             force = true; // if not allowed ignore flag
         }
         ArrayList<String> noTp = new ArrayList<>();
-        for (Player player : context.getSender().getServer().getOnlinePlayers())
+        for (Player player : context.getSource().getServer().getOnlinePlayers())
         {
             if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(player))
             {
@@ -317,98 +303,50 @@ public class TeleportCommands
             context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
         }
     }
-
-    //@Command(...)
-    public void mycommand(CubeContext ctx, CommandTpPosParam params)
-    {
-
-    }
-
-    public static class CommandTpPosParam implements CommandParameters
-    {
-        @ParamIndexed(0)
-        public static class Position implements ParamGroup
-        {
-            @ParamIndexed(0)
-            public Integer x;
-
-            @ParamIndexed(1)
-            @Optional
-            public Integer y;
-
-            @ParamIndexed(2)
-            public Integer z;
-        }
-
-        // No annotation ; interface on class is enough
-        public Position position;
-
-        @ParamNamed(alias = "w")
-        public World world;
-
-        //@NoWildcard
-        @ParamNamed(alias = "p")
-        @ValueLabel("players")
-        @Description("The list of players to teleport to given position separated by comma")
-        //@Completer(UserCompleter.class)
-        //@Reader({AllOnlineUsersReader.class, UserReader.class})
-        @Required
-        public List<User> players;
-
-        @ParamFlag("s")
-        public boolean safe;
-
-        @ParamIndexed(value = 0, greed = INFINITE)
-        public String longgreedymessage;
-
-    }
-
-
-
     @Command(desc = "Direct teleport to a coordinate.")
-    @IParams(@Grouped(value = {@Indexed(label = "x", type = Integer.class),
-                               @Indexed(label = "y", type = Integer.class, req = false),
-                               @Indexed(label = "z", type = Integer.class)}))
-    @NParams({@Named(names = {"world", "w"}, type = World.class),
-              @Named(names = {"player", "p"}, type = User.class)})
+    @Params(positional = {@Param(label = "x", type = Integer.class),
+                         @Param(label = "y", type = Integer.class), // TODO optional y coord
+                         @Param(label = "z", type = Integer.class)},
+            nonpositional = {@Param(names = {"world", "w"}, type = World.class),
+                             @Param(names = {"player", "p"}, type = User.class)})
     @Flags(@Flag(longName = "safe", name = "s"))
-    public void tppos(CubeContext context)
+    public void tppos(CommandContext context)
     {
         User user;
         if (context.hasNamed("player"))
         {
-            user = context.getArg("player");
+            user = context.get("player");
         }
-        else if (context.isSender(User.class))
+        else if (context.isSource(User.class))
         {
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
         else
         {
             context.sendTranslated(NEGATIVE, "{text:Pro Tip}: Teleport does not work IRL!");
             return;
         }
-        Integer x = context.getArg(0);
+        Integer x = context.get(0);
         Integer y;
         Integer z;
         World world = user.getWorld();
         if (context.hasNamed("world"))
         {
-            world = context.getArg("world");
+            world = context.get("world");
             if (world == null)
             {
                 context.sendTranslated(NEGATIVE, "World not found!");
                 return;
             }
         }
-        if (context.hasIndexed(2))
+        if (context.hasPositional(2))
         {
-            y = context.getArg(1, null);
-            z = context.getArg(2, null);
+            y = context.get(1, null);
+            z = context.get(2, null);
         }
         else
         {
-            z = context.getArg(1, null);
+            z = context.get(1, null);
             if (x == null || z == null)
             {
                 context.sendTranslated(NEGATIVE, "Coordinates have to be numbers!");
@@ -423,7 +361,7 @@ public class TeleportCommands
         }
         Location loc = new Location(world, x, y, z).add(0.5, 0, 0.5);
         if (TeleportCommands.teleport(user, loc, context.hasFlag("s")
-            && module.perms().COMMAND_TPPOS_SAFE.isAuthorized(context.getSender()), false, true))
+            && module.perms().COMMAND_TPPOS_SAFE.isAuthorized(context.getSource()), false, true))
         {
             context.sendTranslated(POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new BlockVector3(x, y, z), world);
         }

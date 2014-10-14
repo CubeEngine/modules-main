@@ -20,18 +20,17 @@ package de.cubeisland.engine.module.basics.command.moderation;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.InventoryGuardFactory;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsAttachment;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -51,19 +50,19 @@ public class InventoryCommands
     }
 
     @Command(desc = "Allows you to see into the inventory of someone else.")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
+    @Params(positional = @Param(label = "player", type = User.class))
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "quiet", name = "q"),
             @Flag(longName = "ender", name = "e")})
-    public void invsee(CubeContext context)
+    public void invsee(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
-            User user = context.getArg(0);
+            User sender = (User)context.getSource();
+            User user = context.get(0);
             if (user == null)
             {
-                context.sendTranslated(NEGATIVE, "User {user} not found!", context.getArg(0));
+                context.sendTranslated(NEGATIVE, "User {user} not found!", context.get(0));
                 return;
             }
             boolean denyModify = false;
@@ -92,7 +91,7 @@ public class InventoryCommands
             }
             if (module.perms().COMMAND_INVSEE_NOTIFY.isAuthorized(user))
             {
-                if (!(context.hasFlag("q") && module.perms().COMMAND_INVSEE_QUIET.isAuthorized(context.getSender())))
+                if (!(context.hasFlag("q") && module.perms().COMMAND_INVSEE_QUIET.isAuthorized(context.getSource())))
                 {
                     user.sendTranslated(NEUTRAL, "{sender} is looking into your inventory.", sender);
                 }
@@ -109,11 +108,11 @@ public class InventoryCommands
     }
 
     @Command(desc = "Stashes or unstashes your inventory to reuse later")
-    public void stash(CubeContext context)
+    public void stash(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             ItemStack[] stashedInv = sender.get(BasicsAttachment.class).getStashedInventory();
             ItemStack[] stashedArmor = sender.get(BasicsAttachment.class).getStashedArmor();
             ItemStack[] invToStash = sender.getInventory().getContents().clone();
@@ -150,17 +149,17 @@ public class InventoryCommands
     }
 
     @Command(alias = {"ci", "clear"}, desc = "Clears the inventory")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
+    @Params(positional = @Param(req = false, label = "player", type = User.class))
     @Flags({@Flag(longName = "removeArmor", name = "ra"),
             @Flag(longName = "quiet", name = "q")})
     @SuppressWarnings("deprecation")
-    public void clearinventory(CubeContext context)
+    public void clearinventory(CommandContext context)
     {
-        CommandSender sender = context.getSender();
+        CommandSender sender = context.getSource();
         final User target;
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
-            target = context.getArg(0);
+            target = context.get(0);
         }
         else if (sender instanceof User)
         {

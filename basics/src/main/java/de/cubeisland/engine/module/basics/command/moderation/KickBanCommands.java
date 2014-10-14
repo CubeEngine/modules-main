@@ -26,17 +26,15 @@ import java.util.Set;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 
-import de.cubeisland.engine.command.context.BaseParameter;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.core.ban.BanManager;
 import de.cubeisland.engine.core.ban.IpBan;
 import de.cubeisland.engine.core.ban.UserBan;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserManager;
@@ -46,6 +44,7 @@ import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.TimeConversionException;
 import de.cubeisland.engine.module.basics.Basics;
 
+import static de.cubeisland.engine.command.parameter.property.Greed.INFINITE_GREED;
 import static de.cubeisland.engine.core.util.ChatFormat.*;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -74,9 +73,9 @@ public class KickBanCommands
     }
 
     @Command(desc = "Kicks a player from the server")
-    @IParams({@Grouped(@Indexed(label = "player", staticValues = "*", type = User.class)),
-              @Grouped(value = @Indexed(label = "reason"), req = false, greedy = true)})
-    public void kick(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class), // TODO static values , staticValues = "*",
+              @Param(label = "reason", req = false, greed = INFINITE_GREED)})
+    public void kick(CommandContext context)
     {
         String reason;
         reason = this.getReasonFrom(context, 1, module.perms().COMMAND_KICK_NOREASON);
@@ -86,29 +85,29 @@ public class KickBanCommands
             context.ensurePermission(module.perms().COMMAND_KICK_ALL);
             for (User toKick : this.um.getOnlineUsers())
             {
-                if (!context.getSender().equals(toKick))
+                if (!context.getSource().equals(toKick))
                 {
                     toKick.kickPlayer(toKick.getTranslation(NEGATIVE, kickMessage) + "\n\n" + RESET + reason);
                 }
             }
             return;
         }
-        User user = context.getArg(0);
+        User user = context.get(0);
         user.kickPlayer(user.getTranslation(NEGATIVE, kickMessage) + "\n\n" + RESET + reason);
         this.um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was kicked from the server by {user}!",
-                                            module.perms().KICK_RECEIVEMESSAGE, user, context.getSender());
+                                            module.perms().KICK_RECEIVEMESSAGE, user, context.getSource());
         this.um.broadcastMessageWithPerm(NONE, reason, module.perms().KICK_RECEIVEMESSAGE);
     }
 
     @Command(alias = "kickban", desc = "Bans a player permanently on your server.")
-    @IParams({@Grouped(@Indexed(label = "player", type = OfflinePlayer.class)),
-              @Grouped(value = @Indexed(label = "reason"), req = false, greedy = true)})
+    @Params(positional = {@Param(label = "player", type = OfflinePlayer.class),
+              @Param(label = "reason", req = false, greed = INFINITE_GREED)})
     @Flags({@Flag(longName = "ipban", name = "ip"),
             @Flag(longName = "force", name = "f")})
-    public void ban(CubeContext context)
+    public void ban(CommandContext context)
     {
         if (this.cannotBanUser(context)) return;
-        OfflinePlayer player = context.getArg(0);
+        OfflinePlayer player = context.get(0);
         User user = null;
         if (player.hasPlayedBefore() || player.isOnline())
         {
@@ -136,7 +135,7 @@ public class KickBanCommands
                     context.sendTranslated(NEGATIVE, "{user} is already IP banned!", player);
                     return;
                 }
-                this.banManager.addBan(new IpBan(ipAdress,context.getSender().getName(), reason));
+                this.banManager.addBan(new IpBan(ipAdress,context.getSource().getName(), reason));
                 Set<String> bannedUsers = new HashSet<>();
                 for (User ipPlayer : um.getOnlineUsers())
                 {
@@ -148,11 +147,11 @@ public class KickBanCommands
                 }
                 context.sendTranslated(NEGATIVE, "You banned the IP: {input#ip}!", ipAdress.getHostAddress());
                 um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned from the server by {sender}!",
-                                               module.perms().BAN_RECEIVEMESSAGE, user, context.getSender());
+                                               module.perms().BAN_RECEIVEMESSAGE, user, context.getSource());
                 um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
                 um.broadcastTranslatedWithPerm(NEGATIVE, "And with it kicked: {user#list}!",
                                                module.perms().BAN_RECEIVEMESSAGE, StringUtils.implode(
-                    RED + "," + DARK_GREEN, bannedUsers));
+                        RED + "," + DARK_GREEN, bannedUsers));
             }
             else
             {
@@ -167,7 +166,7 @@ public class KickBanCommands
                 context.sendTranslated(NEGATIVE, "{user} is already banned!", player);
                 return;
             }
-            this.banManager.addBan(new UserBan(player.getName(), context.getSender().getName(), reason));
+            this.banManager.addBan(new UserBan(player.getName(), context.getSource().getName(), reason));
             if (user != null && user.isOnline())
             {
                 user.kickPlayer(user.getTranslation(NEGATIVE, banMessage) + "\n\n" + RESET + reason);
@@ -175,18 +174,18 @@ public class KickBanCommands
         }
         context.sendTranslated(NEGATIVE, "You banned {user}!", player);
         um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned from the server by {sender}!",
-                                       module.perms().BAN_RECEIVEMESSAGE, player, context.getSender());
+                                       module.perms().BAN_RECEIVEMESSAGE, player, context.getSource());
         um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
     }
 
-    private String getReasonFrom(CubeContext context, int at, Permission permNeeded)
+    private String getReasonFrom(CommandContext context, int at, Permission permNeeded)
     {
         String reason = "";
-        if (context.hasIndexed(at))
+        if (context.hasPositional(at))
         {
             reason = ChatFormat.parseFormats(context.getStrings(at));
         }
-        else if (!permNeeded.isAuthorized(context.getSender()))
+        else if (!permNeeded.isAuthorized(context.getSource()))
         {
             context.sendTranslated(NEGATIVE, "You need to specify a reason!");
             return null;
@@ -195,10 +194,10 @@ public class KickBanCommands
     }
 
     @Command(alias = "pardon", desc = "Unbans a previously banned player.")
-    @IParams(@Grouped(@Indexed(label = "player")))
-    public void unban(CubeContext context)
+    @Params(positional = @Param(label = "player"))
+    public void unban(CommandContext context)
     {
-        String userName = context.getArg(0);
+        String userName = context.get(0);
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(userName);
         if (offlinePlayer.getUniqueId().version() == 3)
         {
@@ -213,11 +212,11 @@ public class KickBanCommands
     }
 
     @Command(alias = "banip", desc = "Bans the IP from this server.")
-    @IParams({@Grouped(@Indexed(label = "IP address")),
-              @Grouped(value = @Indexed(label = "reason"), req = false, greedy = true)})
-    public void ipban(CubeContext context)
+    @Params(positional = {@Param(label = "IP address"),
+              @Param(label = "reason", req = false, greed = INFINITE_GREED)})
+    public void ipban(CommandContext context)
     {
-        String ipaddress = context.getArg(0);
+        String ipaddress = context.get(0);
         try
         {
             InetAddress address = InetAddress.getByName(ipaddress);
@@ -228,7 +227,7 @@ public class KickBanCommands
             }
             String reason = this.getReasonFrom(context,1, module.perms().COMMAND_IPBAN_NOREASON);
             if (reason == null) return;
-            this.banManager.addBan(new IpBan(address,context.getSender().getName(), reason));
+            this.banManager.addBan(new IpBan(address,context.getSource().getName(), reason));
             context.sendTranslated(NEGATIVE, "You banned the IP {input#ip} from your server!", address.getHostAddress());
             Set<String> bannedUsers = new HashSet<>();
             for (User user : um.getOnlineUsers())
@@ -240,7 +239,7 @@ public class KickBanCommands
                 }
             }
             um.broadcastTranslatedWithPerm(NEGATIVE, "The IP {input#ip} was banned from the server by {sender}!",
-                                           module.perms().BAN_RECEIVEMESSAGE, ipaddress, context.getSender());
+                                           module.perms().BAN_RECEIVEMESSAGE, ipaddress, context.getSource());
             um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
             if (!bannedUsers.isEmpty())
             {
@@ -256,10 +255,10 @@ public class KickBanCommands
     }
 
     @Command(alias = {"unbanip", "pardonip"}, desc = "Bans the IP from this server.")
-    @IParams(@Grouped(@Indexed(label = "IP address")))
-    public void ipunban(CubeContext context)
+    @Params(positional = @Param(label = "IP address"))
+    public void ipunban(CommandContext context)
     {
-        String ipadress = context.getArg(0);
+        String ipadress = context.get(0);
         try
         {
             InetAddress address = InetAddress.getByName(ipadress);
@@ -279,14 +278,14 @@ public class KickBanCommands
     }
 
     @Command(alias = "tban", desc = "Bans a player for a given time.")
-    @IParams({@Grouped(@Indexed(label = "player", type = OfflinePlayer.class)),
-              @Grouped(@Indexed(label = "time")),
-              @Grouped(value = @Indexed(label = "reason"), req = false, greedy = true)})
+    @Params(positional = {@Param(label = "player", type = OfflinePlayer.class),
+              @Param(label = "time"),
+              @Param(label = "reason", req = false, greed = INFINITE_GREED)})
     @Flags(@Flag(longName = "force", name = "f"))
-    public void tempban(CubeContext context)
+    public void tempban(CommandContext context)
     {
         if (this.cannotBanUser(context)) return;
-        OfflinePlayer player = context.getArg(0);
+        OfflinePlayer player = context.get(0);
         User user = null;
         if (player.hasPlayedBefore() || player.isOnline())
         {
@@ -308,7 +307,7 @@ public class KickBanCommands
         {
             long millis = StringUtils.convertTimeToMillis(context.getString(1));
             Date toDate = new Date(System.currentTimeMillis() + millis);
-            this.banManager.addBan(new UserBan(player.getName(),context.getSender().getName(), reason, toDate));
+            this.banManager.addBan(new UserBan(player.getName(),context.getSource().getName(), reason, toDate));
             if (player.isOnline())
             {
                 if (user == null) throw new IllegalStateException();
@@ -316,7 +315,7 @@ public class KickBanCommands
             }
             context.sendTranslated(POSITIVE, "You banned {user} temporarily!", player);
             um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned temporarily from the server by {sender}!",
-                                           module.perms().BAN_RECEIVEMESSAGE, player, context.getSender());
+                                           module.perms().BAN_RECEIVEMESSAGE, player, context.getSource());
             um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
         }
         catch (TimeConversionException ex)
@@ -325,7 +324,7 @@ public class KickBanCommands
         }
     }
 
-    private boolean cannotBanUser(CubeContext context)
+    private boolean cannotBanUser(CommandContext context)
     {
         if (!Bukkit.getOnlineMode())
         {
@@ -343,15 +342,15 @@ public class KickBanCommands
     }
 
     @Command(desc = "Reloads the ban lists")
-    public void reloadbans(CubeContext context)
+    public void reloadbans(CommandContext context)
     {
         this.banManager.reloadBans();
         context.sendTranslated(POSITIVE, "Reloadhe ban lists successfully!");
     }
 
     @Command(desc = "View all players banned from this server")
-    @IParams(@Grouped(req = false, value = @Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"ips","players"})))
-    public void banlist(CubeContext context)
+    @Params(positional = @Param(req = false, names = {"ips","players"}))
+    public void banlist(CommandContext context)
     {
         if (true == true)
         {
@@ -360,7 +359,7 @@ public class KickBanCommands
         }
         // TODO paging
         boolean players = true;
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
             if ("players".equalsIgnoreCase(context.getString(0)))
             {
@@ -372,7 +371,7 @@ public class KickBanCommands
             }
             else
             {
-                context.sendTranslated(NEUTRAL, context.getCommand().getUsage(context));
+                return;
             }
         }
         if (players)

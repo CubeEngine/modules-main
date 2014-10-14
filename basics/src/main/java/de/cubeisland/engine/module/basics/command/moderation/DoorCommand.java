@@ -27,18 +27,16 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.material.Openable;
 
-import de.cubeisland.engine.command.context.BaseParameter;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.math.Vector3;
 import de.cubeisland.engine.core.util.math.shape.Sphere;
+import de.cubeisland.engine.module.basics.Basics;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 
@@ -52,26 +50,26 @@ public class DoorCommand
     }
 
     @Command(desc = "Opens or closes doors around the player.")
-    @IParams({@Grouped(@Indexed(label = BaseParameter.STATIC_LABEL, staticValues = {"open","close"})),
-              @Grouped(@Indexed(label = "radius", type = Integer.class)),
-              @Grouped(req = false, value = {@Indexed(label = "world", type = World.class),
-                                             @Indexed(label = "x", type = Integer.class),
-                                             @Indexed(label = "y", type = Integer.class),
-                                             @Indexed(label = "z", type = Integer.class)})})
+    @Params(positional = {@Param(names = {"open","close"}),
+                          @Param(label = "radius", type = Integer.class),
+                          @Param(req = false, label = "world", type = World.class),
+                          @Param(req = false, label = "x", type = Integer.class),
+                          @Param(req = false, label = "y", type = Integer.class),
+                          @Param(req = false, label = "z", type = Integer.class)})
     @Flags({@Flag(longName = "all", name = "a"),
             @Flag(longName = "woodenDoor", name = "w"),
             @Flag(longName = "ironDoor", name = "i"),
             @Flag(longName = "trapDoor", name = "t"),
             @Flag(longName = "fenceGate", name = "f")})
-    public void doors(CubeContext context)
+    public void doors(CommandContext context)
     {
         boolean open;
-        int radius = context.getArg(1, 0);
+        int radius = context.get(1, 0);
         Vector3 vector;
         World world;
         Set<Material> openMaterials = EnumSet.noneOf(Material.class);
 
-        String task = context.getArg(0);
+        String task = context.get(0);
         if("open".equalsIgnoreCase(task))
         {
             open = true;
@@ -92,41 +90,41 @@ public class DoorCommand
             return;
         }
 
-        if(!context.hasIndexed(5) && !(context.getSender() instanceof User))
+        if(!context.hasPositional(5) && !(context.getSource() instanceof User))
         {
             context.sendTranslated(NEGATIVE, "You has to specify a location!");
             return;
         }
-        else if(!context.hasIndexed(5))
+        else if(!context.hasPositional(5))
         {
-            Location location = ((User) context.getSender()).getLocation();
+            Location location = ((User) context.getSource()).getLocation();
             world = location.getWorld();
             vector = new Vector3(location.getX(), location.getY(), location.getZ());
         }
         else
         {
-            world = context.getArg(2, null);
+            world = context.get(2, null);
             if(world == null)
             {
-                context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.getArg(2));
+                context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.get(2));
                 return;
             }
-            Integer x = context.getArg(3, null);
+            Integer x = context.get(3, null);
             if(x == null)
             {
-                context.sendTranslated(NEGATIVE, "Invalid x-value {input}!", context.getArg(3));
+                context.sendTranslated(NEGATIVE, "Invalid x-value {input}!", context.get(3));
                 return;
             }
-            Integer y = context.getArg(4, null);
+            Integer y = context.get(4, null);
             if(y == null)
             {
-                context.sendTranslated(NEGATIVE, "Invalid y-value {input}!", context.getArg(4));
+                context.sendTranslated(NEGATIVE, "Invalid y-value {input}!", context.get(4));
                 return;
             }
-            Integer z = context.getArg(5, null);
+            Integer z = context.get(5, null);
             if(z == null)
             {
-                context.sendTranslated(NEGATIVE, "Invalid z-value {input}!", context.getArg(5));
+                context.sendTranslated(NEGATIVE, "Invalid z-value {input}!", context.get(5));
                 return;
             }
             vector = new Vector3(x, y, z);

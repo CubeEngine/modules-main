@@ -19,14 +19,13 @@ package de.cubeisland.engine.module.roles.commands;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Alias;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.core.command_old.reflected.Alias;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
@@ -34,19 +33,21 @@ import de.cubeisland.engine.module.roles.role.RolesAttachment;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
-public class ManagementCommands extends ContainerCommand
+@Command(name = "admin", desc = "Manages the module", alias = "manadmin")
+public class ManagementCommands extends CommandContainer
 {
+    private Roles module;
+
     public ManagementCommands(Roles module)
     {
-        super(module, "admin", "Manages the module.");
-        this.registerAlias(new String[]{"manadmin"},new String[]{});
+        super(module);
+        this.module = module;
     }
 
     @Alias(names = "manload")
     @Command(desc = "Reloads all roles from config")
-    public void reload(CubeContext context)
+    public void reload(CommandContext context)
     {
-        Roles module = (Roles)this.getModule();
         module.getConfiguration().reload();
         module.getRolesManager().initRoleProviders();
         module.getRolesManager().recalculateAllRoles();
@@ -55,10 +56,9 @@ public class ManagementCommands extends ContainerCommand
 
     @Alias(names = "mansave")
     @Command(desc = "Overrides all configs with current settings")
-    public void save(CubeContext context)
+    public void save(CommandContext context)
     {
         // database is up to date so only saving configs
-        Roles module = (Roles)this.getModule();
         module.getConfiguration().save();
         module.getRolesManager().saveAll();
         context.sendTranslated(POSITIVE, "{text:Roles} all configurations saved!");
@@ -67,10 +67,10 @@ public class ManagementCommands extends ContainerCommand
     public static World curWorldOfConsole = null;
 
     @Command(desc = "Sets or resets the current default world")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "world", type = World.class)))
-    public void defaultworld(CubeContext context)
+    @Params(positional = @Param(req = false, label = "world", type = World.class))
+    public void defaultworld(CommandContext context)
     {
-        World world = context.getArg(0);
+        World world = context.get(0);
         if (world == null)
         {
             context.sendTranslated(NEUTRAL, "Current world for roles resetted!");
@@ -79,7 +79,7 @@ public class ManagementCommands extends ContainerCommand
         {
             context.sendTranslated(POSITIVE, "All your roles commands will now have {world} as default world!", world);
         }
-        CommandSender sender = context.getSender();
+        CommandSender sender = context.getSource();
         if (sender instanceof User)
         {
             ((User)sender).get(RolesAttachment.class).setWorkingWorld(world);

@@ -17,7 +17,8 @@
  */
 package de.cubeisland.engine.module.locker;
 
-import de.cubeisland.engine.core.command.CubeCommand;
+import de.cubeisland.engine.command.Dispatcher;
+import de.cubeisland.engine.core.command.property.PermissionProvider;
 import de.cubeisland.engine.core.permission.PermDefault;
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.permission.PermissionContainer;
@@ -29,32 +30,32 @@ public class LockerPerm extends PermissionContainer<Locker>
     public LockerPerm(Locker module, LockerCommands mainCmd)
     {
         super(module);
-        CubeCommand createCmd = mainCmd.getChild("create");
-        PROTECT.attach(mainCmd.getChild("info").getPermission(),
-                       mainCmd.getChild("persist").getPermission(),
-                       mainCmd.getChild("remove").getPermission(),
-                       mainCmd.getChild("unlock").getPermission(),
-                       mainCmd.getChild("modify").getPermission(),
-                       mainCmd.getChild("unlock").getPermission(),
-                       mainCmd.getChild("key").getPermission(),
-                       mainCmd.getChild("flag").getPermission(),
-                       mainCmd.getChild("give").getPermission(),
-                       createCmd.getChild("private").getPermission(),
-                       createCmd.getChild("public").getPermission(),
-                       createCmd.getChild("donation").getPermission(),
-                       createCmd.getChild("free").getPermission(),
-                       createCmd.getChild("password").getPermission(),
-                       createCmd.getChild("guarded").getPermission(),
+        Dispatcher createCmd = (Dispatcher)mainCmd.getCommand("create");
+        PROTECT.attach(mainCmd.getCommand("info").getDescriptor().valueFor(PermissionProvider.class),
+                       mainCmd.getCommand("persist").getDescriptor().valueFor(PermissionProvider.class),
+                       mainCmd.getCommand("remove").getDescriptor().valueFor(PermissionProvider.class),
+                       mainCmd.getCommand("unlock").getDescriptor().valueFor(PermissionProvider.class),
+                       mainCmd.getCommand("modify").getDescriptor().valueFor(PermissionProvider.class),
+                       mainCmd.getCommand("unlock").getDescriptor().valueFor(PermissionProvider.class),
+                       mainCmd.getCommand("key").getDescriptor().valueFor(PermissionProvider.class),
+                       mainCmd.getCommand("flag").getDescriptor().valueFor(PermissionProvider.class),
+                       mainCmd.getCommand("give").getDescriptor().valueFor(PermissionProvider.class),
+                       createCmd.getCommand("private").getDescriptor().valueFor(PermissionProvider.class),
+                       createCmd.getCommand("public").getDescriptor().valueFor(PermissionProvider.class),
+                       createCmd.getCommand("donation").getDescriptor().valueFor(PermissionProvider.class),
+                       createCmd.getCommand("free").getDescriptor().valueFor(PermissionProvider.class),
+                       createCmd.getCommand("password").getDescriptor().valueFor(PermissionProvider.class),
+                       createCmd.getCommand("guarded").getDescriptor().valueFor(PermissionProvider.class),
                        CMD_INFO_SHOW_OWNER);
         MODERATOR.attach(PROTECT, SHOW_OWNER, CMD_INFO_OTHER, ACCESS_OTHER, CMD_REMOVE_OTHER);
-        CubeCommand adminCmd = mainCmd.getChild("admin");
+        Dispatcher adminCmd = (Dispatcher)mainCmd.getCommand("admin");
         ADMIN.attach(BREAK_OTHER, EXPAND_OTHER, CMD_REMOVE_OTHER, CMD_KEY_OTHER, CMD_MODIFY_OTHER, CMD_GIVE_OTHER, EXPAND_OTHER,
-                     adminCmd.getChild("view").getPermission(),
-                     adminCmd.getChild("remove").getPermission(),
-                     adminCmd.getChild("tp").getPermission(),
-                     adminCmd.getChild("purge").getPermission(),
-            //         adminCmd.getChild("cleanup").getPermission(),
-              //       adminCmd.getChild("list").getPermission(),
+                     adminCmd.getCommand("view").getDescriptor().valueFor(PermissionProvider.class),
+                     adminCmd.getCommand("remove").getDescriptor().valueFor(PermissionProvider.class),
+                     adminCmd.getCommand("tp").getDescriptor().valueFor(PermissionProvider.class),
+                     adminCmd.getCommand("purge").getDescriptor().valueFor(PermissionProvider.class),
+            //         adminCmd.getChild("cleanup").getDescriptor().valueFor(PermissionProvider.class),
+              //       adminCmd.getChild("list").getDescriptor().valueFor(PermissionProvider.class),
             MODERATOR);
         this.registerAllPermissions();
     }

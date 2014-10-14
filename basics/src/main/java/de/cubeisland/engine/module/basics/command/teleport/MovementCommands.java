@@ -21,22 +21,23 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.CommandPermission;
-import de.cubeisland.engine.core.command.reflected.OnlyIngame;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.old.Restricted;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.annotation.CommandPermission;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.BlockUtil;
 import de.cubeisland.engine.core.util.LocationUtil;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 import static org.bukkit.Material.AIR;
 import static org.bukkit.Material.GLASS;
 import static org.bukkit.block.BlockFace.DOWN;
@@ -56,12 +57,12 @@ public class MovementCommands
     }
 
     @Command(desc = "Teleports you X amount of blocks into the air and puts a glass block beneath you.")
-    @IParams(@Grouped(@Indexed(label = "height", type = Integer.class)))
-    @OnlyIngame("Pro Tip: Teleport does not work IRL!")
-    public void up(CubeContext context)
+    @Params(positional = @Param(label = "height", type = Integer.class))
+    @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
+    public void up(CommandContext context)
     {
-        User sender = (User)context.getSender();
-        int height = context.getArg(0, -1);
+        User sender = (User)context.getSource();
+        int height = context.get(0, -1);
         if ((height < 0))
         {
             context.sendTranslated(NEGATIVE, "Invalid height. The height has to be a whole number greater than 0!");
@@ -92,10 +93,10 @@ public class MovementCommands
     }
 
     @Command(desc = "Teleports to the highest point at your position.")
-    @OnlyIngame("Pro Tip: Teleport does not work IRL!")
-    public void top(CubeContext context)
+    @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
+    public void top(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         Location loc = sender.getLocation();
         BlockUtil.getHighestBlockAt(loc).getLocation(loc);
         loc.add(.5, 0, .5);
@@ -106,10 +107,10 @@ public class MovementCommands
     }
 
     @Command(desc = "Teleports you to the next safe spot upwards.")
-    @OnlyIngame("Pro Tip: Teleport does not work IRL!")
-    public void ascend(CubeContext context)
+    @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
+    public void ascend(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         Location userLocation = sender.getLocation();
         Block curBlock = userLocation.add(0,2,0).getBlock();
         //go upwards until hitting solid blocks
@@ -148,10 +149,10 @@ public class MovementCommands
     }
 
     @Command(desc = "Teleports you to the next safe spot downwards.")
-    @OnlyIngame("Pro Tip: Teleport does not work IRL!")
-    public void descend(CubeContext context)
+    @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
+    public void descend(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         final Location userLocation = sender.getLocation();
         final Location currentLocation = userLocation.clone();
         //go downwards until hitting solid blocks
@@ -180,10 +181,10 @@ public class MovementCommands
     }
 
     @Command(alias = {"jump", "j"}, desc = "Jumps to the position you are looking at.")
-    @OnlyIngame("Jumping in the console is not allowed! Go play outside!")
-    public void jumpTo(CubeContext context)
+    @Restricted(value = User.class, msg = "Jumping in the console is not allowed! Go play outside!")
+    public void jumpTo(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         Location loc = sender.getTargetBlock(this.module.getConfiguration().navigation.jumpToMaxRange).getLocation();
         if (loc.getBlock().getType() == AIR)
         {
@@ -198,10 +199,10 @@ public class MovementCommands
     }
 
     @Command(alias = "thru", desc = "Jumps to the position you are looking at.")
-    @OnlyIngame("Passing through firewalls in the console is not allowed! Go play outside!")
-    public void through(CubeContext context)
+    @Restricted(value = User.class, msg = "Passing through firewalls in the console is not allowed! Go play outside!")
+    public void through(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         Location loc = LocationUtil.getBlockBehindWall(sender, this.module.getConfiguration().navigation.thru.maxRange,
                                                                this.module.getConfiguration().navigation.thru.maxWallThickness);
         if (loc == null)
@@ -218,10 +219,10 @@ public class MovementCommands
     @Command(desc = "Teleports you to your last location")
     @Flags(@Flag(longName = "unsafe", name = "u"))
     @CommandPermission(checkPermission = false)
-    @OnlyIngame("Unfortunately teleporting is still not implemented in the game {text:'Life'}!")
-    public void back(CubeContext context)
+    @Restricted(value = User.class, msg = "Unfortunately teleporting is still not implemented in the game {text:'Life'}!")
+    public void back(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         boolean backPerm = module.perms().COMMAND_BACK_USE.isAuthorized(sender);
         boolean safe = !context.hasFlag("u");
         if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(sender))
@@ -263,12 +264,12 @@ public class MovementCommands
     }
 
     @Command(alias = "put", desc = "Places a player to the position you are looking at.")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    @OnlyIngame
-    public void place(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class))
+    @Restricted(value = User.class)
+    public void place(CommandContext context)
     {
-        User sender = (User)context.getSender();
-        User user = context.getArg(0);
+        User sender = (User)context.getSource();
+        User user = context.get(0);
         if (!user.isOnline())
         {
             context.sendTranslated(NEGATIVE, "You cannot move an offline player!");
@@ -289,21 +290,21 @@ public class MovementCommands
     }
 
     @Command(desc = "Swaps you and another players position")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(value = @Indexed(label = "player", type = User.class),req = false)})
-    public void swap(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+              @Param(label = "player", type = User.class,req = false)})
+    public void swap(CommandContext context)
     {
         User sender;
-        if (context.hasIndexed(1))
+        if (context.hasPositional(1))
         {
-            sender = context.getArg(1);
+            sender = context.get(1);
         }
         else
         {
             sender = null;
-            if (context.getSender() instanceof User)
+            if (context.getSource() instanceof User)
             {
-                sender = (User)context.getSender();
+                sender = (User)context.getSource();
             }
             if (sender == null)
             {
@@ -312,7 +313,7 @@ public class MovementCommands
                 return;
             }
         }
-        User user = context.getArg(0);
+        User user = context.get(0);
         if (!user.isOnline() || !sender.isOnline())
         {
             context.sendTranslated(NEGATIVE, "You cannot move an offline player!");
@@ -320,7 +321,7 @@ public class MovementCommands
         }
         if (user == sender)
         {
-            if (context.getSender() instanceof Player)
+            if (context.getSource() instanceof Player)
             {
                 context.sendTranslated(NEGATIVE, "Swapping positions with yourself!? Are you kidding me?");
                 return;
@@ -333,7 +334,7 @@ public class MovementCommands
         {
             if (TeleportCommands.teleport(sender, userLoc, true, false, false))
             {
-                if (context.hasIndexed(1))
+                if (context.hasPositional(1))
                 {
                     context.sendTranslated(POSITIVE, "Swapped position of {user} and {user}!", user, sender);
                     return;

@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.travel;
 
 import java.util.concurrent.TimeUnit;
 
-import de.cubeisland.engine.core.command.CommandManager;
+import de.cubeisland.engine.core.command_old.CommandManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.storage.database.Database;
 import de.cubeisland.engine.core.util.Profiler;
@@ -61,9 +61,9 @@ public class Travel extends Module
 
         final CommandManager cm = this.getCore().getCommandManager();
         HomeCommand homeCmd = new HomeCommand(this);
-        cm.registerCommand(homeCmd);
+        cm.addCommand(homeCmd);
         WarpCommand warpCmd = new WarpCommand(this);
-        cm.registerCommand(warpCmd);
+        cm.addCommand(warpCmd);
         this.getCore().getEventManager().registerListener(this, new HomeListener(this));
 
         this.permissions = new TravelPerm(this, homeCmd, warpCmd);
