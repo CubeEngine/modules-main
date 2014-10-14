@@ -25,6 +25,8 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
+import de.cubeisland.engine.core.permission.NotifyPermissionRegistrationCompletedEvent;
+
 import de.cubeisland.engine.core.user.UserAuthorizedEvent;
 import de.cubeisland.engine.module.roles.Roles;
 
@@ -81,5 +83,13 @@ public class RolesEventHandler implements Listener
         RolesAttachment rolesAttachment = this.rolesManager.getRolesAttachment(event.getUser());
         rolesAttachment.flushData();
         rolesAttachment.getCurrentDataHolder().apply(); // Pre-Calculate + apply
+    }
+
+    @EventHandler
+    public void onPermissionRegister(NotifyPermissionRegistrationCompletedEvent event)
+    {
+        this.module.getLog().debug("{} registered new Permissions. Reloading Roles...", event.getModule().getName());
+        this.rolesManager.initRoleProviders();
+        this.rolesManager.recalculateAllRoles();
     }
 }

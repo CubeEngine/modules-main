@@ -60,6 +60,7 @@ public class TpWorldPermissions extends PermissionContainer<Basics>
         if (perm == null)
         {
             perm = initWorldPermission(world);
+            this.module.getCore().getPermissionManager().notifyPermissionRegistrationCompleted(this.module, perm);
         }
         return perm;
     }

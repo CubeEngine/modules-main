@@ -16,243 +16,289 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: de.cubeisland.engine:portals:1.0.0-SNAPSHOT\n"
+"Project-Id-Version: de.cubeisland.engine.module:portals:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2014-05-17 05:00:19+0200\n"
+"POT-Creation-Date: 2014-09-21 03:27:29+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Language: en_US\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:142
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:175
 msgid "Changes a portals location"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:51
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:53
 msgid "Changes the owner of a portal"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:59
+#: de/cubeisland/engine/module/portals/PortalCommands.java:62
 msgid "Creates a new Portal"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:182
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:215
 msgid "Modifies the location where a player exits when teleporting a portal"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:166
+#: de/cubeisland/engine/module/portals/PortalCommands.java:172
 msgid "Removes a portal permanently"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:120
+#: de/cubeisland/engine/module/portals/PortalCommands.java:124
 msgid "Selects an existing portal"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:139
+#: de/cubeisland/engine/module/portals/PortalCommands.java:144
 msgid "Show info about a portal"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:179
+#: de/cubeisland/engine/module/portals/PortalCommands.java:186
 msgid "Shows debug portal information instead of teleporting"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:219
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:252
 msgid "Toggles safe teleportation for this portal"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:255
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:288
 msgid "Toggles whether entities can teleport with this portal"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:83
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:85
 msgid "changes the destination of the selected portal"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:108
+#: de/cubeisland/engine/module/portals/PortalCommands.java:112
 msgid "A portal named {input} already exists!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:208
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:241
 msgid "A portals exit cannot be in an other world than its location!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/config/Destination.java:74
+#: de/cubeisland/engine/module/portals/config/Destination.java:77
 msgid "Destination portal {input} does not exist!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:112
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:176
+#: de/cubeisland/engine/module/portals/PortalCommands.java:116
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:209
 msgid "Please select a cuboid first!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/Portal.java:103
+#: de/cubeisland/engine/module/portals/Portal.java:103
 msgid "Portal Information for {name#portal}"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:139
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:141
 msgid "Portal destination set!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:132
+#: de/cubeisland/engine/module/portals/PortalCommands.java:137
 msgid "Portal selected: {name}"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:95
-#: de/cubeisland/engine/portals/PortalCommands.java:126
-#: de/cubeisland/engine/portals/PortalCommands.java:148
-#: de/cubeisland/engine/portals/PortalCommands.java:172
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:63
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:94
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:123
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:158
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:195
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:229
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:265
+#: de/cubeisland/engine/module/portals/PortalCommands.java:99
+#: de/cubeisland/engine/module/portals/PortalCommands.java:131
+#: de/cubeisland/engine/module/portals/PortalCommands.java:154
+#: de/cubeisland/engine/module/portals/PortalCommands.java:179
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:65
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:96
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:125
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:156
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:191
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:228
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:262
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:298
 msgid "Portal {input} not found!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:105
+#: de/cubeisland/engine/module/portals/PortalCommands.java:109
 msgid ""
 "Portal {name} created! Select a destination using portal modify destination "
 "command"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:176
+#: de/cubeisland/engine/module/portals/PortalCommands.java:183
 msgid "Portal {name} deleted"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:173
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:206
 msgid "Portal {name} updated to your current selection!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:113
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:115
 msgid ""
 "The Portal Agency will bring you your portal for just {text:$ 1337} within "
 "{amount} weeks"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:213
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:246
 msgid "The portal exit of portal {name} was set to your current location!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:251
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:284
 msgid "The portal {name} will also teleport to an unsafe destination"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:247
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:280
 msgid "The portal {name} will not teleport to an unsafe destination"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:287
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:320
 msgid "The portal {name} will only teleport players"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:283
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:316
 msgid "The portal {name} will teleport entities too"
 msgstr ""
 
-#: de/cubeisland/engine/portals/Portal.java:106
+#: de/cubeisland/engine/module/portals/Portal.java:106
 msgid "This Portal has safe teleport enabled"
 msgstr ""
 
-#: de/cubeisland/engine/portals/Portal.java:110
+#: de/cubeisland/engine/module/portals/Portal.java:110
 msgid "This Portal will teleport non-players too"
 msgstr ""
 
-#: de/cubeisland/engine/portals/Portal.java:118
+#: de/cubeisland/engine/module/portals/Portal.java:118
 msgid "This portal has no destination yet"
 msgstr ""
 
-#: de/cubeisland/engine/portals/Portal.java:125
+#: de/cubeisland/engine/module/portals/Portal.java:125
 msgid "This portal teleports to another portal: {name#portal}"
 msgstr ""
 
-#: de/cubeisland/engine/portals/Portal.java:75
+#: de/cubeisland/engine/module/portals/Portal.java:75
 msgid "This portal {name} has no destination yet!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:214
+#: de/cubeisland/engine/module/portals/PortalCommands.java:221
 msgid "Toggled debug mode!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:85
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:133
+#: de/cubeisland/engine/module/portals/PortalCommands.java:89
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:135
 msgid "World {input} not found!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalsAttachment.java:59
+#: de/cubeisland/engine/module/portals/PortalsAttachment.java:59
 msgid "You are no longer in portal debug mode!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalsAttachment.java:55
+#: de/cubeisland/engine/module/portals/PortalsAttachment.java:55
 msgid "You are now in portal debug mode!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:179
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:216
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:212
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:249
 msgid "You have to be ingame to do this!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/config/Destination.java:93
-msgid "You have to leave your current vehicle to pass a portal!"
-msgstr ""
-
-#: de/cubeisland/engine/portals/PortalCommands.java:116
-#: de/cubeisland/engine/portals/PortalCommands.java:135
-#: de/cubeisland/engine/portals/PortalCommands.java:218
+#: de/cubeisland/engine/module/portals/PortalCommands.java:120
+#: de/cubeisland/engine/module/portals/PortalCommands.java:140
+#: de/cubeisland/engine/module/portals/PortalCommands.java:225
 msgid "You must be ingame to do this!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:158
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:73
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:104
+#: de/cubeisland/engine/module/portals/PortalCommands.java:164
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:75
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:106
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:166
 msgid "You need to define a portal to use!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:164
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:201
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:239
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:275
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:197
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:234
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:272
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:308
 msgid "You need to define a portal!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:201
+#: de/cubeisland/engine/module/portals/PortalCommands.java:208
 msgid "[Portals] Debug {text:OFF}"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalCommands.java:210
+#: de/cubeisland/engine/module/portals/PortalCommands.java:217
 msgid "[Portals] Debug {text:ON}"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalManager.java:199
+#: de/cubeisland/engine/module/portals/PortalManager.java:224
 msgid "{text:[Portals] Debug\\::color=YELLOW} Entered portal: {name}"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalManager.java:195
+#: de/cubeisland/engine/module/portals/PortalManager.java:220
 msgid "{text:[Portals] Debug\\::color=YELLOW} Move in portal: {name}"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalManager.java:101
+#: de/cubeisland/engine/module/portals/PortalManager.java:123
 msgid "{text:[Portals] Debug\\::color=YELLOW} Teleported into portal: {name}"
 msgstr ""
 
-#: de/cubeisland/engine/portals/PortalModifyCommand.java:79
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:81
 msgid "{user} is now the owner of {name#portal}!"
 msgstr ""
 
-#: de/cubeisland/engine/portals/Portal.java:112
+#: de/cubeisland/engine/module/portals/Portal.java:112
 msgid "{user} is the owner of this portal"
 msgstr ""
 
-#: de/cubeisland/engine/portals/Portal.java:113
+#: de/cubeisland/engine/module/portals/Portal.java:113
 msgid "Location: {vector} to {vector} in {name#world}"
 msgstr ""
 
-#: de/cubeisland/engine/portals/Portal.java:128
+#: de/cubeisland/engine/module/portals/Portal.java:128
 msgid "This portal teleports to the spawn of {name#world}"
 msgstr ""
 
-#: de/cubeisland/engine/portals/Portal.java:131
+#: de/cubeisland/engine/module/portals/Portal.java:131
 msgid "This portal teleports to {vector} in {name#world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/portals/PortalCommands.java:187
+msgid "!off"
+msgstr ""
+
+#: de/cubeisland/engine/module/portals/PortalCommands.java:187
+msgid "!on"
+msgstr ""
+
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:145
+msgid ""
+"Changes the destination of the selected portal to a random position each "
+"time"
+msgstr ""
+
+#: de/cubeisland/engine/module/portals/PortalCommands.java:228
+msgid "Lists the portals"
+msgstr ""
+
+#: de/cubeisland/engine/module/portals/PortalCommands.java:245
+msgid "The following portals are located in {world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/portals/PortalCommands.java:242
+msgid "There are no portals in {world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:48
+msgid "modifies a portal"
+msgstr ""
+
+#: de/cubeisland/engine/module/portals/PortalCommands.java:63
+msgid "name"
+msgstr ""
+
+#: de/cubeisland/engine/module/portals/PortalCommands.java:125
+#: de/cubeisland/engine/module/portals/PortalCommands.java:145
+#: de/cubeisland/engine/module/portals/PortalCommands.java:173
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:176
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:216
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:253
+#: de/cubeisland/engine/module/portals/PortalModifyCommand.java:289
+msgid "portal"
+msgstr ""
+
+#: de/cubeisland/engine/module/portals/PortalCommands.java:229
+msgid "world"
 msgstr ""
