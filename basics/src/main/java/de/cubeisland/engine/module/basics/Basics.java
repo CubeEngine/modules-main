@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 import org.bukkit.entity.Player;
 
 import de.cubeisland.engine.core.bukkit.EventManager;
-import de.cubeisland.engine.core.command_old.CommandManager;
+import de.cubeisland.engine.core.command.CommandManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.storage.database.Database;
 import de.cubeisland.engine.core.util.Profiler;

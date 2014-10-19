@@ -38,7 +38,7 @@ import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.old.IncorrectUsageException;
 import de.cubeisland.engine.command.old.MissingParameterException;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command_old.parameterized.completer.WorldCompleter;
+import de.cubeisland.engine.core.command.completer.WorldCompleter;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.matcher.Match;

@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.roles;
 
-import de.cubeisland.engine.core.command_old.CommandManager;
+import de.cubeisland.engine.core.command.CommandManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.module.service.Metadata;
 import de.cubeisland.engine.core.module.service.Permission;
