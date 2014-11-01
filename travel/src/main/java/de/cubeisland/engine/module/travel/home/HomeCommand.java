@@ -266,15 +266,15 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "Homes may not have names that are longer than 32 characters or contain colon(:)'s!");
             return;
         }
+        String oldName = home.getName();
         if (manager.rename(home, newName))
         {
             if (home.isOwner(context.getSender()))
             {
-                context.sendTranslated(POSITIVE, "Your home {name} has been renamed to {name}", home.getName(), newName);
+                context.sendTranslated(POSITIVE, "Your home {name} has been renamed to {name}", oldName, newName);
                 return;
             }
-            context.sendTranslated(POSITIVE, "The home {name} of {user} has been renamed to {name}", home.getName(),
-                                   user, newName);
+            context.sendTranslated(POSITIVE, "The home {name} of {user} has been renamed to {name}", oldName, user, newName);
             return;
         }
         context.sendTranslated(POSITIVE, "Could not rename the home to {name}", newName);
