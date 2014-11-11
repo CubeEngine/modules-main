@@ -31,7 +31,7 @@ import de.cubeisland.engine.command.Restricted;
 import de.cubeisland.engine.command.result.CommandResult;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.core.command_old.result.confirm.ConfirmResult;
+import de.cubeisland.engine.core.command.result.confirm.ConfirmResult;
 import de.cubeisland.engine.core.command.sender.ConsoleCommandSender;
 import de.cubeisland.engine.core.module.service.Selector;
 import de.cubeisland.engine.core.user.User;

@@ -37,7 +37,7 @@ import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.Restricted;
 import de.cubeisland.engine.command.parameter.TooFewArgumentsException;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command_old.result.paginated.PaginatedResult;
+import de.cubeisland.engine.core.command.result.paginated.PaginatedResult;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.StringUtils;

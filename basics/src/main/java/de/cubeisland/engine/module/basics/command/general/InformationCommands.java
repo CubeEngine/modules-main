@@ -44,6 +44,8 @@ import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.Restricted;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.command.parameter.TooFewArgumentsException;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
@@ -60,7 +62,9 @@ import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
+import static de.cubeisland.engine.core.util.ChatFormat.*;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static java.util.Locale.ENGLISH;
 
 public class InformationCommands
 {
@@ -78,19 +82,16 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the biome type you are standing in.")
-    @Params(positional = {@Param(label = "world", type = World.class, req = false),
-                          @Param(label = "block-x", type = Integer.class, req = false),
-                          @Param(label = "block-z", type = Integer.class, req = false)})
-    public void biome(CommandContext context)
+    public void biome(CommandContext context,
+                      @Label("world") @Optional World world,
+                      @Label("block-x") @Optional Integer x,
+                      @Label("block-z") @Optional Integer z)
     {
-        World world = context.get(0, null);
         if (!context.isSource(User.class) && (!context.hasPositional(2) || world == null))
         {
             context.sendTranslated(NEGATIVE, "Please provide a world and x and z coordinates!");
             return;
         }
-        Integer x = context.get(1, null);
-        Integer z = context.get(2, null);
         if (!context.hasPositional(2) && context.isSource(User.class))
         {
             User user = (User)context.getSource();
@@ -104,10 +105,8 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the seed of a world.")
-    @Params(positional = @Param(label = "world", type = World.class, req = false))
-    public void seed(CommandContext context)
+    public void seed(CommandContext context, @Label("world") @Optional World world)
     {
-        World world = context.get(0, null);
         if (world == null)
         {
             if (!context.isSource(User.class))
@@ -213,7 +212,7 @@ public class InformationCommands
                     String key;
                     if (entity instanceof Player)
                     {
-                        key = ChatFormat.DARK_GREEN + "player";
+                        key = DARK_GREEN + "player";
                     }
                     else if (entity instanceof LivingEntity)
                     {
@@ -243,10 +242,10 @@ public class InformationCommands
         StringBuilder groupedOutput = new StringBuilder();
         for (String key : groupedEntities.keySet())
         {
-            groupedOutput.append("\n").append(ChatFormat.GOLD).append(groupedEntities.get(key).getRight()).append("x ")
-                         .append(key).append(ChatFormat.WHITE).append(" (").append(ChatFormat.GOLD)
+            groupedOutput.append("\n").append(GOLD).append(groupedEntities.get(key).getRight()).append("x ")
+                         .append(key).append(WHITE).append(" (").append(GOLD)
                          .append(MathHelper.round(groupedEntities.get(key).getLeft())).append("m")
-                         .append(ChatFormat.WHITE).append(")");
+                         .append(WHITE).append(")");
         }
         if (outputlist.isEmpty())
         {
@@ -255,7 +254,7 @@ public class InformationCommands
         else
         {
             String result;
-            result = StringUtils.implode(ChatFormat.WHITE + ", ", outputlist);
+            result = StringUtils.implode(WHITE + ", ", outputlist);
             result += groupedOutput.toString();
             if (context.getSource().equals(user))
             {
@@ -273,7 +272,7 @@ public class InformationCommands
         String s;
         if (entity instanceof Player)
         {
-            s = ChatFormat.DARK_GREEN + ((Player)entity).getName();
+            s = DARK_GREEN + ((Player)entity).getName();
         }
         else if (entity instanceof LivingEntity)
         {
@@ -290,14 +289,14 @@ public class InformationCommands
                 s = ChatFormat.GREY + Match.entity().getNameFor(entity.getType());
             }
         }
-        s += ChatFormat.WHITE + " (" + ChatFormat.GOLD + distance + "m" + ChatFormat.WHITE + ")";
+        s += WHITE + " (" + GOLD + distance + "m" + WHITE + ")";
         list.add(s);
     }
 
     @Command(alias = "pong", desc = "Pong!")
     public void ping(CommandContext context)
     {
-        final String label = context.getInvocation().getLabels().get(0).toLowerCase(Locale.ENGLISH);
+        final String label = context.getInvocation().getLabels().get(0).toLowerCase(ENGLISH);
         if (context.isSource(User.class))
         {
             context.sendTranslated(NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}", ((User)context.getSource()).getPing());
@@ -307,20 +306,17 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays chunk, memory and world information.")
-    @Flags(@Flag(longName = "reset" , name = "r"))
-    public void lag(CommandContext context)
+    public void lag(CommandContext context, @Flag(name = "r", longName = "reset") boolean reset)
     {
-        if (context.hasFlag("r"))
+        if (reset)
         {
             if (module.perms().COMMAND_LAG_RESET.isAuthorized(context.getSource()))
             {
                 this.module.getLagTimer().resetLowestTPS();
                 context.sendTranslated(POSITIVE, "Reset lowest TPS!");
+                return;
             }
-            else
-            {
-                context.sendTranslated(NEGATIVE, "You are not allowed to do this!");
-            }
+            context.sendTranslated(NEGATIVE, "You are not allowed to do this!");
             return;
         }
         //Uptime:
@@ -333,12 +329,16 @@ public class InformationCommands
         context.sendTranslated(POSITIVE, "Uptime: {input#uptime}", formatter.print(dura.toPeriod()));
         //TPS:
         float tps = this.module.getLagTimer().getAverageTPS();
-        String color = tps == 20 ? ChatFormat.DARK_GREEN.toString() : tps > 17 ? ChatFormat.YELLOW.toString() : tps > 10 ? ChatFormat.RED.toString() : tps == 0 ? (ChatFormat.YELLOW.toString() + "NaN") : ChatFormat.DARK_RED.toString();
+        String color = tps == 20 ? DARK_GREEN.toString() :
+                       tps > 17 ?  YELLOW.toString() :
+                       tps > 10 ?  RED.toString() :
+                       tps == 0 ?  (YELLOW.toString() + "NaN") :
+                                   DARK_RED.toString();
         context.sendTranslated(POSITIVE, "Current TPS: {input#color}{decimal#tps:1}", color, tps);
         Pair<Long, Float> lowestTPS = this.module.getLagTimer().getLowestTPS();
         if (lowestTPS.getRight() != 20)
         {
-            color = ChatFormat.parseFormats(tps > 17 ? ChatFormat.YELLOW.toString() : tps > 10 ? ChatFormat.RED.toString() : ChatFormat.DARK_RED.toString());
+            color = ChatFormat.parseFormats(tps > 17 ? YELLOW.toString() : tps > 10 ? RED.toString() : DARK_RED.toString());
             Date date = new Date(lowestTPS.getLeft());
             context.sendTranslated(POSITIVE, "Lowest TPS was {}{decimal#tps:1} ({input#date})", color, lowestTPS.getRight(), df.format(date));
             long timeSinceLastLowTPS = System.currentTimeMillis() - this.module.getLagTimer().getLastLowTPS();
@@ -357,20 +357,20 @@ public class InformationCommands
         {
             if (memUsePercent > 95)
             {
-                memused = ChatFormat.DARK_RED.toString();
+                memused = DARK_RED.toString();
             }
             else
             {
-                memused = ChatFormat.RED.toString();
+                memused = RED.toString();
             }
         }
         else if (memUsePercent > 60)
         {
-            memused = ChatFormat.YELLOW.toString();
+            memused = YELLOW.toString();
         }
         else
         {
-            memused = ChatFormat.DARK_GREEN.toString();
+            memused = DARK_GREEN.toString();
         }
         memused += memUse;
         context.sendTranslated(POSITIVE, "Memory Usage: {input#memused}/{integer#memcom}/{integer#memMax} MB", memused, memCom, memMax);
@@ -389,7 +389,7 @@ public class InformationCommands
     public void listWorlds(CommandContext context)
     {
         context.sendTranslated(POSITIVE, "Loaded worlds:");
-        String format = " " + ChatFormat.WHITE + "- " + ChatFormat.GOLD + "%s" + ChatFormat.WHITE + ":" + ChatFormat.INDIGO + "%s";
+        String format = " " + WHITE + "- " + GOLD + "%s" + WHITE + ":" + INDIGO + "%s";
         for (World world : Bukkit.getServer().getWorlds())
         {
             context.sendMessage(String.format(format, world.getName(), world.getEnvironment().name()));
