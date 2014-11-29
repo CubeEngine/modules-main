@@ -726,7 +726,7 @@ public class Lock
                 user.sendTranslated(POSITIVE, "The following users have direct access to this protection");
                 for (AccessListModel listModel : accessors)
                 {
-                    User accessor = this.manager.module.getCore().getUserManager().getUser(listModel.getValue(TABLE_USER.KEY));
+                    User accessor = this.manager.module.getCore().getUserManager().getUser(listModel.getValue(TABLE_ACCESS_LIST.USER_ID));
                     if ((listModel.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN)
                     {
                         user.sendMessage("  " + ChatFormat.GREY + "- " + ChatFormat.DARK_GREEN + accessor.getDisplayName() + ChatFormat.GOLD + " [Admin}");
