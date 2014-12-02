@@ -32,7 +32,7 @@ import org.bukkit.entity.Skeleton;
 import org.bukkit.inventory.ItemStack;
 
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.command.old.IncorrectUsageException;
+import de.cubeisland.engine.command.parameter.IncorrectUsageException;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.matcher.Match;
 

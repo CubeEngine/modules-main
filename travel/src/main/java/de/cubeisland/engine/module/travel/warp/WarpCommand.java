@@ -27,7 +27,7 @@ import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.Restricted;
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.command.result.confirm.ConfirmResult;

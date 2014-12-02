@@ -31,7 +31,7 @@ import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.old.MissingParameterException;
+import de.cubeisland.engine.command.parameter.IncorrectUsageException;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.task.TaskManager;
 import de.cubeisland.engine.core.user.User;
@@ -91,8 +91,8 @@ public class TimeControlCommands
             }
             else
             {
-
-                throw new MissingParameterException("w", context.getSource().getTranslation(NEGATIVE, "You have to specify a world when using this command from the console!"));
+                context.sendTranslated(NEGATIVE, "You have to specify a world when using this command from the console!");
+                return;
             }
         }
         if (context.hasPositional(0))

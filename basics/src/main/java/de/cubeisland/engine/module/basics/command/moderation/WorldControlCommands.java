@@ -35,8 +35,7 @@ import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.old.IncorrectUsageException;
-import de.cubeisland.engine.command.old.MissingParameterException;
+import de.cubeisland.engine.command.parameter.IncorrectUsageException;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.completer.WorldCompleter;
 import de.cubeisland.engine.core.user.User;
@@ -88,7 +87,8 @@ public class WorldControlCommands
         }
         else
         {
-            throw new MissingParameterException("in", context.getSource().getTranslation(NEGATIVE, "If not used ingame you have to specify a world!"));
+            context.sendTranslated(NEGATIVE, "You have to specify a world when using this command from the console!");
+            return;
         }
         boolean sunny = true;
         boolean noThunder = true;
@@ -155,7 +155,8 @@ public class WorldControlCommands
         }
         else
         {
-            throw new MissingParameterException("player", context.getSource().getTranslation(NEGATIVE, "If not used ingame you have to specify a player!"));
+            context.sendTranslated(NEGATIVE, "You have to specify a player when using this command from the console!");
+            return;
         }
         if (!user.isOnline())
         {

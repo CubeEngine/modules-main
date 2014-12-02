@@ -21,16 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.cubeisland.engine.command.Restricted;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Reader;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserManager;
-import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.storage.IgnoreList;
@@ -95,7 +92,11 @@ public class IgnoreCommands
             List<String> added = new ArrayList<>();
             for (User user : users)
             {
-                if (!this.addIgnore(sender, user))
+                if (user == context.getSource())
+                {
+                    context.sendTranslated(NEGATIVE, "If you do not feel like talking to yourself just don't talk.");
+                }
+                else if (!this.addIgnore(sender, user))
                 {
                     if (module.perms().COMMAND_IGNORE_PREVENT.isAuthorized(user))
                     {
