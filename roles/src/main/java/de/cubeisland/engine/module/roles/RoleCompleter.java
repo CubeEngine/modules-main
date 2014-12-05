@@ -20,6 +20,7 @@ package de.cubeisland.engine.module.roles;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.cubeisland.engine.command.CommandInvocation;
 import de.cubeisland.engine.command.completer.Completer;
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.command.CommandContext;
@@ -29,14 +30,14 @@ import de.cubeisland.engine.module.roles.commands.ManagementCommands;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 
-public class RoleCompleter implements Completer<CommandContext>
+public class RoleCompleter implements Completer
 {
     @Override
-    public List<String> complete(CommandContext context, String token)
+    public List<String> getSuggestions(CommandInvocation invocation)
     {
         // TODO use token??
         Roles module = CubeEngine.getCore().getModuleManager().getModule(Roles.class);
-        final CommandSender sender = context.getSource();
+        final CommandSender sender = (CommandSender)invocation.getCommandSource();
         List<String> roles = new ArrayList<>();
         if (sender instanceof User)
         {

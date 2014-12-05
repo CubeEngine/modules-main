@@ -22,13 +22,13 @@ import java.util.List;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
+import de.cubeisland.engine.command.CommandInvocation;
 import de.cubeisland.engine.command.completer.Completer;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.methodic.context.BaseCommandContext;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
@@ -279,14 +279,14 @@ public class LockerCommands extends CommandContainer
     public static class FlagCompleter implements Completer
     {
         @Override
-        public List<String> complete(BaseCommandContext context, String token)
+        public List<String> getSuggestions(CommandInvocation invocation)
         {
-            String subToken = token;
+            String subToken = invocation.currentToken();
             if (subToken.contains(","))
             {
                 subToken = subToken.substring(subToken.lastIndexOf(",") + 1);
             }
-            return ProtectionFlag.getTabCompleteList(token, subToken);
+            return ProtectionFlag.getTabCompleteList(invocation.currentToken(), subToken);
         }
     }
 
