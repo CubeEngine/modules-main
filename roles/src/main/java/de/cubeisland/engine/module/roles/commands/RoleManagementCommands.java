@@ -40,7 +40,8 @@ import de.cubeisland.engine.reflect.node.StringNode;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
-@Command(name = "role", desc = "Manage roles", alias = "manrole")
+@Alias("manrole")
+@Command(name = "role", desc = "Manage roles")
 public class RoleManagementCommands extends RoleCommandHelper
 {
     public RoleManagementCommands(Roles module)
@@ -48,12 +49,12 @@ public class RoleManagementCommands extends RoleCommandHelper
         super(module);
     }
 
-    @Alias(names = "setrperm")
+    @Alias("setrperm")
     @Command(alias = "setperm",  desc = "Sets the permission for given role [in world]")
     @Params(positional = {@Param(label = "[g:]role"),
                           @Param(label = "permission"),
                           @Param(req = false, names = {"true","false","reset"})},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+          nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void setpermission(CommandContext context)
     {
         String roleName = context.get(0);
@@ -114,12 +115,12 @@ public class RoleManagementCommands extends RoleCommandHelper
         }
     }
 
-    @Alias(names = "setrdata")
+    @Alias(value = "setrdata")
     @Command(alias = {"setdata", "setmeta"}, desc = "Sets the metadata for given role [in world]")
     @Params(positional = {@Param(label = "[g:]role"),
                           @Param(label = "key"),
                           @Param(req = false, label = "value")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void setmetadata(CommandContext context)
     {
         String roleName = context.get(0);
@@ -151,11 +152,11 @@ public class RoleManagementCommands extends RoleCommandHelper
         context.sendTranslated(POSITIVE, "Metadata {input#key} set to {input#value} for the role {name} in {world}!", key, value, role.getName(), world);
     }
 
-    @Alias(names = "resetrdata")
+    @Alias(value = "resetrdata")
     @Command(alias = {"resetdata", "resetmeta"}, desc = "Resets the metadata for given role [in world]")
     @Params(positional = {@Param(label = "[g:]role"),
                           @Param(label = "key")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void resetmetadata(CommandContext context)
     {
         String roleName = context.get(0);
@@ -178,10 +179,10 @@ public class RoleManagementCommands extends RoleCommandHelper
         }
     }
 
-    @Alias(names = "clearrdata")
+    @Alias(value = "clearrdata")
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Clears the metadata for given role [in world]")
     @Params(positional = @Param(label = "[g:]role"),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void clearmetadata(CommandContext context)
     {
         String roleName = context.get(0);
@@ -201,11 +202,11 @@ public class RoleManagementCommands extends RoleCommandHelper
         context.sendTranslated(NEUTRAL, "Metadata cleared for the role {name} in {world}!", role.getName(), world);
     }
 
-    @Alias(names = {"addrparent","manradd"})
+    @Alias(value = {"addrparent","manradd"})
     @Command(desc = "Adds a parent role to given role [in world]")
     @Params(positional = {@Param(label = "[g:]role"),
                           @Param(label = "[g:]parentrole")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void addParent(CommandContext context)
     {
         String roleName = context.get(0);
@@ -257,11 +258,11 @@ public class RoleManagementCommands extends RoleCommandHelper
         }
     }
 
-    @Alias(names = "remrparent")
+    @Alias(value = "remrparent")
     @Command(desc = "Removes a parent role from given role [in world]")
     @Params(positional = {@Param(label = "[g:]role"),
                           @Param(label = "[g:]parentrole")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void removeParent(CommandContext context)
     {
         String roleName = context.get(0);
@@ -301,10 +302,10 @@ public class RoleManagementCommands extends RoleCommandHelper
         context.sendTranslated(NEUTRAL, "{name#role} is not a parent role of the role {name} in {world}!", pRole.getName(), role.getName(), world);
     }
 
-    @Alias(names = "clearrparent")
+    @Alias(value = "clearrparent")
     @Command(desc = "Removes all parent roles from given role [in world]")
     @Params(positional = @Param(label = "[g:]role"),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void clearParent(CommandContext context)
     {
         String roleName = context.get(0);
@@ -323,11 +324,11 @@ public class RoleManagementCommands extends RoleCommandHelper
         context.sendTranslated(NEUTRAL, "All parent roles of the role {name} in {world} cleared!", role.getName(), world);
     }
 
-    @Alias(names = "setrolepriority")
+    @Alias(value = "setrolepriority")
     @Command(alias = "setprio", desc = "Sets the priority of given role [in world]")
     @Params(positional = {@Param(label = "[g:]role"),
                           @Param(label = "priority")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void setPriority(CommandContext context)
     {
         String roleName = context.get(0);
@@ -360,11 +361,11 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     }
 
-    @Alias(names = "renamerole")
+    @Alias(value = "renamerole")
     @Command(desc = "Renames given role [in world]")
     @Params(positional = {@Param(label = "[g:]role"),
                           @Param(label = "new name")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void rename(CommandContext context)
     {
         String roleName = context.get(0);
@@ -399,10 +400,10 @@ public class RoleManagementCommands extends RoleCommandHelper
         context.sendTranslated(NEGATIVE, "Renaming failed! The role {name} already exists in {world}!", newName, world);
     }
 
-    @Alias(names = "createrole")
+    @Alias(value = "createrole")
     @Command(desc = "Creates a new role [in world]")
     @Params(positional = @Param(label = "rolename"),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "global", name = "g"))
     public void create(CommandContext context)
     {
@@ -429,10 +430,10 @@ public class RoleManagementCommands extends RoleCommandHelper
         context.sendTranslated(NEUTRAL, "There is already a role named {name} in {world}.", roleName, world);
     }
 
-    @Alias(names = "deleteRole")
+    @Alias(value = "deleteRole")
     @Command(desc = "Deletes a role [in world]")
     @Params(positional = @Param(label = "[g:]rolename"),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void delete(CommandContext context)
     {
         String roleName = context.get(0);
@@ -455,7 +456,7 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Command(alias = {"toggledefault", "toggledef"}, desc = "Toggles whether given role is a default role [in world]")
     @Params(positional = @Param(label = "rolename"),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
+        nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void toggleDefaultRole(CommandContext context)
     {
         String roleName = context.get(0);

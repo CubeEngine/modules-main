@@ -61,7 +61,7 @@ public class LockerCommands extends CommandContainer
         this.manager = manager;
     }
 
-    @Alias(names = "cinfo")
+    @Alias(value = "cinfo")
     @Command(desc = "Shows information about a protection")
     @Flags(@Flag(longName = "persist", name = "p"))
     public void info(CommandContext context)
@@ -109,7 +109,7 @@ public class LockerCommands extends CommandContainer
         context.sendTranslated(POSITIVE, "Right click to show protection-info");
     }
 
-    @Alias(names = "cpersist")
+    @Alias(value = "cpersist")
     @Command(desc = "persists your last locker command")
     public void persist(CommandContext context)
     {
@@ -124,7 +124,7 @@ public class LockerCommands extends CommandContainer
         }
     }
 
-    @Alias(names = "cremove")
+    @Alias(value = "cremove")
     @Command(desc = "Shows information about a protection")
     @Flags(@Flag(longName = "persist", name = "p"))
     public void remove(CommandContext context)
@@ -138,7 +138,7 @@ public class LockerCommands extends CommandContainer
         context.sendTranslated(POSITIVE, "Right click a protection to remove it!");
     }
 
-    @Alias(names = "cunlock")
+    @Alias(value = "cunlock")
     @Command(desc = "Unlocks a password protected chest")
     @Params(positional = @Param(label = "password"))
     @Flags(@Flag(longName = "persist", name = "p"))
@@ -153,7 +153,7 @@ public class LockerCommands extends CommandContainer
         context.sendTranslated(POSITIVE, "Right click to unlock a password protected chest!");
     }
 
-    @Alias(names = "cmodify")
+    @Alias(value = "cmodify")
     @Command(desc = "adds or removes player from the accesslist")
     @Params(positional = @Param(label = "players"))
     @Flags({@Flag(name = "g", longName = "global"),
@@ -194,7 +194,7 @@ public class LockerCommands extends CommandContainer
         }
     }
 
-    @Alias(names = "cgive")
+    @Alias(value = "cgive")
     @Command(desc = "gives a protection to someone else")
     @Params(positional = @Param(label = "player", type = User.class))
     @Flags(@Flag(longName = "persist", name = "p"))
@@ -208,7 +208,7 @@ public class LockerCommands extends CommandContainer
         this.manager.commandListener.setCommandType(context.getSource(), GIVE, context.<User>get(0).getName());
     }
 
-    @Alias(names = "ckey")
+    @Alias(value = "ckey")
     @Command(desc = "creates a KeyBook or invalidates previous KeyBooks")
     @Flags({@Flag(longName = "invalidate", name = "i"),
             @Flag(longName = "persist", name = "p")})
@@ -236,7 +236,7 @@ public class LockerCommands extends CommandContainer
         }
     }
 
-    @Alias(names = "cflag")
+    @Alias(value = "cflag")
     @Command(desc = "Sets or unsets flags")
     @Params(nonpositional = {@Param(names = "set", label = "flags...", completer = FlagCompleter.class),
                              @Param(names = "unset", label = "flags...", completer = FlagCompleter.class)})

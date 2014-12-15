@@ -91,7 +91,7 @@ public class PortalModifyCommand extends CommandContainer
         return portal;
     }
 
-    @Alias(names = "mvpd")
+    @Alias(value = "mvpd")
     @Command(alias = "dest", desc = "changes the destination of the selected portal")
     @Params(positional = {@Param(label = "world", names = "here"), // TODO treat "names" on positional parameter as allowed fixed values?
                           @Param(req = false, label = "portal")})
@@ -136,7 +136,7 @@ public class PortalModifyCommand extends CommandContainer
         context.sendTranslated(POSITIVE, "Portal destination set!");
     }
 
-    @Alias(names = "mvprd")
+    @Alias(value = "mvprd")
     @Command(alias = "randdest", desc = "Changes the destination of the selected portal to a random position each time")
     @Params(positional = {@Param(label = "world", type = World.class),
                           @Param(req = false, label = "portal")})

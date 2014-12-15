@@ -116,7 +116,7 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Restricted(User.class)
-    @Alias(names = {"createwarp", "mkwarp", "makewarp"})
+    @Alias(value = {"createwarp", "mkwarp", "makewarp"})
     @Command(alias = "make", desc = "Create a warp")
     @Params(positional = @Param( label = "name"))
     @Flags(@Flag(name = "priv", longName = "private")) // TODO flag permission "private"
@@ -215,7 +215,7 @@ public class WarpCommand extends TpPointCommand
                                warp.getName(), user);
     }
 
-    @Alias(names = {"removewarp", "deletewarp", "delwarp", "remwarp"})
+    @Alias(value = {"removewarp", "deletewarp", "delwarp", "remwarp"})
     @Command(alias = "delete", desc = "Remove a warp")
     @Params(positional = {@Param( label = "warp"),
               @Param( req = false, label = "owner", type = User.class)})
@@ -525,7 +525,7 @@ public class WarpCommand extends TpPointCommand
         context.sendTranslated(POSITIVE, "The warp {name} of {user} is now public", warp.getOwnerName(), warp.getName());
     }
 
-    @Alias(names = {"clearwarps"})
+    @Alias(value = {"clearwarps"})
     @Command(desc = "Clear all warps (of a player)")
     @Params(positional = @Param( req = false, label = "player", type = User.class))
     @Flags({@Flag(name = "pub", longName = "public"),

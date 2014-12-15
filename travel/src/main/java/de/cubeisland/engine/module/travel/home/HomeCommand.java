@@ -121,7 +121,7 @@ public class HomeCommand extends TpPointCommand
         context.sendTranslated(CRITICAL, "The teleportation got aborted!");
     }
 
-    @Alias(names = {"sethome"})
+    @Alias(value = {"sethome"})
     @Command(alias = {"create", "sethome", "createhome"}, desc = "Set your home")
     @Params(positional = @Param(req = false, label = "name"))
     @Flags(@Flag(longName = "public", name = "pub")) // TODO flag permission "public"
@@ -215,7 +215,7 @@ public class HomeCommand extends TpPointCommand
         context.sendTranslated(POSITIVE, "The home {name} of {user} has been moved to your current location", home.getName(), user);
     }
 
-    @Alias(names = {"remhome", "removehome", "delhome", "deletehome"})
+    @Alias(value = {"remhome", "removehome", "delhome", "deletehome"})
     @Command(alias = {"delete", "rem", "del"}, desc = "Remove a home")
     @Params(positional = {@Param(req = false, label = "name"),
                           @Param(req = false, label = "owner", type = User.class)})
@@ -280,7 +280,7 @@ public class HomeCommand extends TpPointCommand
         context.sendTranslated(POSITIVE, "Could not rename the home to {name}", newName);
     }
 
-    @Alias(names = {"listhomes", "homes"})
+    @Alias(value = {"listhomes", "homes"})
     @Command(alias = "listhomes", desc = "Lists homes a player can access")
     @Params(positional = @Param(req = false, label = "owner", type = User.class))
     @Flags({@Flag(name = "pub", longName = "public"),
@@ -528,7 +528,7 @@ public class HomeCommand extends TpPointCommand
         context.sendTranslated(POSITIVE, "The home {name} of {user} is now public", home.getOwnerName(), home.getName());
     }
 
-    @Alias(names = {"clearhomes"})
+    @Alias(value = {"clearhomes"})
     @Command(desc = "Clear all homes (of an user)")
     @Params(positional = @Param(req = false, label = "owner", type = User.class))
     @Flags({@Flag(name = "pub", longName = "public"),

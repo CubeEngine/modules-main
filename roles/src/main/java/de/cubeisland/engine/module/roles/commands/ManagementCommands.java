@@ -44,7 +44,7 @@ public class ManagementCommands extends CommandContainer
         this.module = module;
     }
 
-    @Alias(names = "manload")
+    @Alias(value = "manload")
     @Command(desc = "Reloads all roles from config")
     public void reload(CommandContext context)
     {
@@ -54,7 +54,7 @@ public class ManagementCommands extends CommandContainer
         context.sendTranslated(POSITIVE, "{text:Roles} reload getSuggestions!");
     }
 
-    @Alias(names = "mansave")
+    @Alias(value = "mansave")
     @Command(desc = "Overrides all configs with current settings")
     public void save(CommandContext context)
     {

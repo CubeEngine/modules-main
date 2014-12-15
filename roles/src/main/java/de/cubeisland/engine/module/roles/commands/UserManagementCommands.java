@@ -38,7 +38,8 @@ import de.cubeisland.engine.module.roles.role.UserDatabaseStore;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
-@Command(name = "user", desc = "Manage users", alias = "manuser")
+@Alias("manuser")
+@Command(name = "user", desc = "Manage users")
 public class UserManagementCommands extends UserCommandHelper
 {
     public UserManagementCommands(Roles module)
@@ -46,7 +47,7 @@ public class UserManagementCommands extends UserCommandHelper
         super(module);
     }
 
-    @Alias(names = {"manuadd", "assignurole", "addurole", "giveurole"})
+    @Alias({"manuadd", "assignurole", "addurole", "giveurole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [in world] [-temp]")
     @Params(positional = {@Param(label = "player", type = User.class),
                           @Param(label = "role", completer = RoleCompleter.class)},
@@ -96,7 +97,7 @@ public class UserManagementCommands extends UserCommandHelper
         context.sendTranslated(NEUTRAL, "{user} already has the role {name} in {world}.", user, roleName, world);
     }
 
-    @Alias(names = {"remurole", "manudel"})
+    @Alias(value = {"remurole", "manudel"})
     @Command(desc = "Removes a role from the player [in world]")
     @Params(positional = {@Param(label = "player", type = User.class),
                           @Param(label = "role")},
@@ -129,7 +130,7 @@ public class UserManagementCommands extends UserCommandHelper
         context.sendTranslated(NEUTRAL, "{user} did not have the role {name} in {world}.", user, role.getName(), world);
     }
 
-    @Alias(names = {"clearurole", "manuclear"})
+    @Alias(value = {"clearurole", "manuclear"})
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in world]")
     @Params(positional = @Param(label = "player", type = User.class),
             nonpositional = @Param(names = "in", label = "world", type = World.class))
@@ -159,7 +160,7 @@ public class UserManagementCommands extends UserCommandHelper
         }
     }
 
-    @Alias(names = "setuperm")
+    @Alias(value = "setuperm")
     @Command(alias = "setperm", desc = "Sets a permission for this user [in world]")
     @Params(positional = {@Param(label = "player", type = User.class),
                           @Param(label = "permission"),
@@ -201,7 +202,7 @@ public class UserManagementCommands extends UserCommandHelper
         }
     }
 
-    @Alias(names = "resetuperm")
+    @Alias(value = "resetuperm")
     @Command(alias = "resetperm", desc = "Resets a permission for this user [in world]")
     @Params(positional = {@Param(label = "player", type = User.class),
               @Param(label = "permission")},
@@ -219,7 +220,7 @@ public class UserManagementCommands extends UserCommandHelper
         context.sendTranslated(NEUTRAL, "Permission {input} of {user} resetted!", perm, user);
     }
 
-    @Alias(names = {"setudata","setumeta","setumetadata"})
+    @Alias(value = {"setudata","setumeta","setumetadata"})
     @Command(alias = {"setdata", "setmeta"}, desc = "Sets metadata for this user [in world]")
     @Params(positional = {@Param(label = "player", type = User.class),
                           @Param(label = "metaKey"),
@@ -238,7 +239,7 @@ public class UserManagementCommands extends UserCommandHelper
         context.sendTranslated(POSITIVE, "Metadata {input#key} of {user} set to {input#value} in {world}!", metaKey, user, metaVal, world);
     }
 
-    @Alias(names = {"resetudata","resetumeta","resetumetadata"})
+    @Alias(value = {"resetudata","resetumeta","resetumetadata"})
     @Command(alias = {"resetdata", "resetmeta", "deletedata", "deletemetadata", "deletemeta"}, desc = "Resets metadata for this user [in world]")
     @Params(positional = {@Param(label = "player", type = User.class),
                           @Param(label = "metaKey")},
@@ -255,7 +256,7 @@ public class UserManagementCommands extends UserCommandHelper
         context.sendTranslated(NEUTRAL, "Metadata {input#key} of {user} removed in {world}!", metaKey, user, world);
     }
 
-    @Alias(names = {"clearudata","clearumeta","clearumetadata"})
+    @Alias(value = {"clearudata","clearumeta","clearumetadata"})
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Resets metadata for this user [in world]")
     @Params(positional = @Param(label = "player", type = User.class),
             nonpositional = @Param(names = "in", label = "world", type = World.class))

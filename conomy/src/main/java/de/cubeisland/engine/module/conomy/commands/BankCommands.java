@@ -51,7 +51,7 @@ public class BankCommands extends CommandContainer
         this.manager = module.getManager();
     }
 
-    @Alias(names = "bbalance")
+    @Alias(value = "bbalance")
     @Command(desc = "Shows the balance of the specified bank")
     @Params(positional = @Param(req = false, label = "bank", type = BankAccount.class))
     public void balance(CommandContext context)

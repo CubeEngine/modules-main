@@ -55,7 +55,7 @@ public class PortalCommands extends CommandContainer
         this.manager = manager;
     }
 
-    @Alias(names = "mvpc")
+    @Alias(value = "mvpc")
     @Command(desc = "Creates a new Portal")
     @Params(positional = @Param(label = "name"),
             nonpositional = {@Param(names = "worlddest", label = "world", completer = WorldCompleter.class, type = World.class),
@@ -117,7 +117,7 @@ public class PortalCommands extends CommandContainer
         context.sendTranslated(NEGATIVE, "You must be ingame to do this!");
     }
 
-    @Alias(names = "mvps")
+    @Alias(value = "mvps")
     @Command(desc = "Selects an existing portal")
     @Params(positional = @Param(label = "portal"))
     public void select(CommandContext context)
@@ -137,7 +137,7 @@ public class PortalCommands extends CommandContainer
         context.sendTranslated(NEGATIVE, "You must be ingame to do this!");
     }
 
-    @Alias(names ="mvpi")
+    @Alias(value ="mvpi")
     @Command(desc = "Show info about a portal")
     @Params(positional = @Param(req = false, label = "portal"))
     public void info(CommandContext context)
@@ -164,7 +164,7 @@ public class PortalCommands extends CommandContainer
         portal.showInfo(context.getSource());
     }
 
-    @Alias(names = "mvpr")
+    @Alias(value = "mvpr")
     @Command(desc = "Removes a portal permanently")
     @Params(positional = @Param(label = "portal"))
     public void remove(CommandContext context)

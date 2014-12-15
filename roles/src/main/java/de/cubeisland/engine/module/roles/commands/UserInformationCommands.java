@@ -48,7 +48,7 @@ public class UserInformationCommands extends UserCommandHelper
         super(module);
     }
 
-    @Alias(names = "listuroles")
+    @Alias(value = "listuroles")
     @Command(desc = "Lists roles of a user [in world]")
     @Params(positional = @Param(req = false, label = "player", type = User.class),
             nonpositional = @Param(names = "in", label = "world", type = World.class))
@@ -72,7 +72,7 @@ public class UserInformationCommands extends UserCommandHelper
         }
     }
 
-    @Alias(names = "checkuperm")
+    @Alias(value = "checkuperm")
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in world]")
     @Params(positional = {@Param(label = "player", type = User.class),
                           @Param(label = "permission")},
@@ -132,7 +132,7 @@ public class UserInformationCommands extends UserCommandHelper
         context.sendTranslated(NEUTRAL, "{input#permission} in the role {name}!", permission, store.getName());
     }
 
-    @Alias(names = "listuperm")
+    @Alias(value = "listuperm")
     @Command(alias = "listperm", desc = "List permission assigned to a user in a world")
     @Params(positional = @Param(req = false, label = "player", type = User.class),
             nonpositional = @Param(names = "in", label = "world", type = World.class))
@@ -163,7 +163,7 @@ public class UserInformationCommands extends UserCommandHelper
         }
     }
 
-    @Alias(names = "checkumeta")
+    @Alias(value = "checkumeta")
     @Command(alias = {"checkdata", "checkmeta"}, desc = "Checks for metadata of a user [in world]")
     @Params(positional = {@Param(label = "player", type = User.class),
                           @Param(label = "metadatakey")},
@@ -194,7 +194,7 @@ public class UserInformationCommands extends UserCommandHelper
         }
     }
 
-    @Alias(names = "listumeta")
+    @Alias(value = "listumeta")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists assigned metadata from a user [in world]")
     @Params(positional = @Param(req = false, label = "player", type = User.class),
             nonpositional = @Param(names = "in", label = "world", type = World.class))

@@ -47,7 +47,7 @@ public class RoleInformationCommands extends RoleCommandHelper
         super(module);
     }
 
-    @Alias(names = "listroles")
+    @Alias(value = "listroles")
     @Command(desc = "Lists all roles in a world or globally")
     @Params(nonpositional = @Param(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "global", name = "g"))
@@ -81,7 +81,7 @@ public class RoleInformationCommands extends RoleCommandHelper
         }
     }
 
-    @Alias(names = "checkrperm")
+    @Alias(value = "checkrperm")
     @Command(alias = "checkpermission", desc = "Checks the permission in given role [in world]")
     @Params(positional = {@Param(label = "[g:]role"),
                           @Param(label = "permission")},
@@ -143,7 +143,7 @@ public class RoleInformationCommands extends RoleCommandHelper
         context.sendTranslated(NEUTRAL, "The permission {name} is not assigned to the role {name} in {world}.", permission, role.getName(), world);
     }
 
-    @Alias(names = "listrperm")
+    @Alias(value = "listrperm")
     @Command(alias = "listpermission", desc = "Lists all permissions of given role [in world]")
     @Params(positional = @Param(label = "[g:]role"),
             nonpositional = @Param(names = "in", label = "world", type = World.class))
@@ -193,7 +193,7 @@ public class RoleInformationCommands extends RoleCommandHelper
         }
     }
 
-    @Alias(names = "listrdata")
+    @Alias(value = "listrdata")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists all metadata of given role [in world]")
     @Params(positional = @Param(label = "[g:]role"),
             nonpositional = @Param(names = "in", label = "world", type = World.class))
@@ -236,7 +236,7 @@ public class RoleInformationCommands extends RoleCommandHelper
         }
     }
 
-    @Alias(names = "listrparent")
+    @Alias(value = "listrparent")
     @Command(desc = "Lists all parents of given role [in world]")
     @Params(positional = @Param(label = "[g:]role"),
             nonpositional = @Param(names = "in", label = "world", type = World.class))

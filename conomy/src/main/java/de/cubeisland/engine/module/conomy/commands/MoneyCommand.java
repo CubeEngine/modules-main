@@ -70,7 +70,7 @@ public class MoneyCommand extends CommandContainer
         return this.manager.getUserAccount(user, this.module.getConfig().autocreateUserAcc);
     }
 
-    @Alias(names = {"balance", "moneybalance", "pmoney"})
+    @Alias(value = {"balance", "moneybalance", "pmoney"})
     @Command(desc = "Shows your balance")
     @Params(positional = @Param(req = false, label = "player", type = User.class))
     @Flags(@Flag(longName = "showHidden", name = "f"))
@@ -103,7 +103,7 @@ public class MoneyCommand extends CommandContainer
         context.sendTranslated(NEGATIVE, "No account found for {user}!", user);
     }
 
-    @Alias(names = {"toplist", "balancetop", "topmoney"})
+    @Alias(value = {"toplist", "balancetop", "topmoney"})
     @Command(desc = "Shows the players with the highest balance.")
     @Params(positional = @Param(req = false, label = "[fromRank-]toRank"))
     @Flags(@Flag(longName = "showhidden", name = "f"))
@@ -153,7 +153,7 @@ public class MoneyCommand extends CommandContainer
         }
     }
 
-    @Alias(names = {"pay"})
+    @Alias(value = {"pay"})
     @Command(alias = "give", desc = "Transfer the given amount to another account.")
     @Params(positional = {@Param(label = "player"), // TODO type User reader Listreader
                           @Param(label = "amount")},

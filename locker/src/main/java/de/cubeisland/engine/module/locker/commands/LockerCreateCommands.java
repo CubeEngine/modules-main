@@ -58,7 +58,7 @@ public class LockerCreateCommands extends CommandContainer
         }
     }
 
-    @Alias(names = "cprivate")
+    @Alias(value = "cprivate")
     @Command(name = "private", desc = "creates a private protection")
     @Params(positional = @Param(req = false, label = "password"))
     @Flags(@Flag(name = "key", longName = "keybook"))
@@ -68,7 +68,7 @@ public class LockerCreateCommands extends CommandContainer
         this.setCreateProtection(context.getSource(), C_PRIVATE, context.getString(0), context.hasFlag("key"));
     }
 
-    @Alias(names = "cpublic")
+    @Alias(value = "cpublic")
     @Command(name = "public", desc = "creates a public protection")
     public void cPublic(CommandContext context)
     {
@@ -76,7 +76,7 @@ public class LockerCreateCommands extends CommandContainer
         this.setCreateProtection(context.getSource(), C_PUBLIC, null, false);
     }
 
-    @Alias(names = "cdonation")
+    @Alias(value = "cdonation")
     @Command(name = "donation", desc = "creates a donation protection")
     @Params(positional = @Param(req = false, label = "password"))
     @Flags(@Flag(name = "key", longName = "keybook"))
@@ -86,7 +86,7 @@ public class LockerCreateCommands extends CommandContainer
         this.setCreateProtection(context.getSource(), C_DONATION, context.getString(0), context.hasFlag("key"));
     }
 
-    @Alias(names = "cfree")
+    @Alias(value = "cfree")
     @Command(name = "free", desc = "creates a free protection")
     @Params(positional = @Param(req = false, label = "password"))
     @Flags(@Flag(name = "key", longName = "keybook"))
@@ -96,7 +96,7 @@ public class LockerCreateCommands extends CommandContainer
         this.setCreateProtection(context.getSource(), C_FREE, context.getString(0), context.hasFlag("key"));
     }
 
-    @Alias(names = "cpassword")
+    @Alias(value = "cpassword")
     @Command(name = "password", desc = "creates a donation protection")
     @Params(positional = @Param(label = "password"))
     @Flags(@Flag(name = "key", longName = "keybook"))
@@ -106,7 +106,7 @@ public class LockerCreateCommands extends CommandContainer
         this.setCreateProtection(context.getSource(), C_PRIVATE, context.getString(0), context.hasFlag("key"));
     }
 
-    @Alias(names = "cguarded")
+    @Alias(value = "cguarded")
     @Command(name = "guarded", desc = "creates a guarded protection")
     @Params(positional = @Param(req = false, label = "password"))
     @Flags(@Flag(name = "key", longName = "keybook"))

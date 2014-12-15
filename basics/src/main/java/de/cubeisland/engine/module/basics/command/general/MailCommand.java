@@ -57,7 +57,7 @@ public class MailCommand extends CommandContainer
         this.module = module;
     }
 
-    @Alias(names = "readmail")
+    @Alias(value = "readmail")
     @Command(desc = "Reads your mail.")
     @Params(positional = @Param(label = "player", type = User.class, req = false)) // TODO staticValues = "console",
     public void read(CommandContext context)
@@ -137,7 +137,7 @@ public class MailCommand extends CommandContainer
         context.sendTranslated(POSITIVE, "Your mail: {input#mails}", ChatFormat.parseFormats(sb.toString()));
     }
 
-    @Alias(names = "spymail")
+    @Alias(value = "spymail")
     @Command(desc = "Shows the mail of other players.")
     @Params(positional = @Param(label = "player", type = User.class))
     public void spy(CommandContext context)
@@ -159,7 +159,7 @@ public class MailCommand extends CommandContainer
         context.sendTranslated(NEUTRAL, "{user}'s mail: {input#mails}", user, ChatFormat.parseFormats(sb.toString()));
     }
 
-    @Alias(names = "sendmail")
+    @Alias(value = "sendmail")
     @Command(desc = "Sends mails to other players.")
     @Params(positional = {@Param(label = "player", type = User.class),
                           @Param(label = "message", greed = INFINITE_GREED)})
@@ -171,7 +171,7 @@ public class MailCommand extends CommandContainer
         context.sendTranslated(POSITIVE, "Mail send to {user}!", user);
     }
 
-    @Alias(names = "sendallmail")
+    @Alias(value = "sendallmail")
     @Command(desc = "Sends mails to all players.")
     @Params(positional = @Param(label = "message", greed = INFINITE_GREED))
     public void sendAll(CommandContext context)
