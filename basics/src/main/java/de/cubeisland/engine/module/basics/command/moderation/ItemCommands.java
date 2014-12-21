@@ -45,7 +45,7 @@ import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 
-import static de.cubeisland.engine.command.parameter.property.Greed.INFINITE_GREED;
+import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static org.bukkit.Material.AIR;
 import static org.bukkit.Material.SKULL_ITEM;
@@ -127,7 +127,7 @@ public class ItemCommands
 
     @Command(desc = "Changes the display name of the item in your hand.")
     @Params(positional = {@Param(label = "name"),
-              @Param(req = false, label = "lore...", greed = INFINITE_GREED)})
+              @Param(req = false, label = "lore...", greed = INFINITE)})
     public void rename(CommandContext context)
     {
         if (context.getSource() instanceof User)

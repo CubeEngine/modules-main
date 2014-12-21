@@ -37,7 +37,7 @@ import de.cubeisland.engine.module.travel.TpPointCommand;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportInvite;
 
-import static de.cubeisland.engine.command.parameter.property.Greed.INFINITE_GREED;
+import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
@@ -152,7 +152,7 @@ public class WarpCommand extends TpPointCommand
 
     @Command(desc = "Set the welcome message of warps", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
     @Params(positional = {@Param( label = "warp"),
-                          @Param( req = false, label = "welcome message", greed = INFINITE_GREED)},
+                          @Param( req = false, label = "welcome message", greed = INFINITE)},
             nonpositional = @Param(names = "owner", type = User.class)) // TODO named param permission "other"
     @Flags(@Flag(longName = "append", name = "a"))
     public void greeting(CommandContext context)

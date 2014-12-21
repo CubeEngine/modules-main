@@ -53,7 +53,7 @@ import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
 
-import static de.cubeisland.engine.command.parameter.property.Greed.INFINITE_GREED;
+import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 import static java.text.DateFormat.SHORT;
@@ -467,7 +467,7 @@ public class PlayerCommands
 
     @Command(desc = "Makes a player send a message (including commands)")
     @Params(positional = {@Param(label = "player", type = User.class),
-              @Param(label = "message", greed = INFINITE_GREED)})
+              @Param(label = "message", greed = INFINITE)})
     public void sudo(CommandContext context)
     {
         User user = context.get(0);

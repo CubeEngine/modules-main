@@ -20,7 +20,6 @@ package de.cubeisland.engine.module.basics.command.general;
 import java.sql.Timestamp;
 import java.util.Random;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Param;
@@ -42,7 +41,7 @@ import de.cubeisland.engine.reflect.exception.ConversionException;
 import de.cubeisland.engine.reflect.node.StringNode;
 import org.joda.time.Duration;
 
-import static de.cubeisland.engine.command.parameter.property.Greed.INFINITE_GREED;
+import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.command.CommandSender.NON_PLAYER_UUID;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
@@ -65,7 +64,7 @@ public class ChatCommands
 
     @Command(desc = "Sends a private message to someone", alias = {"tell", "message", "pm", "m", "t", "whisper", "w"})
     @Params(positional = {@Param(label = "player", type = User.class), // TODO staticValues = "console",
-                         @Param(label = "message", greed = INFINITE_GREED)})
+                         @Param(label = "message", greed = INFINITE)})
     public void msg(CommandContext context)
     {
         if ("console".equalsIgnoreCase(context.getString(0)))
@@ -81,7 +80,7 @@ public class ChatCommands
     }
 
     @Command(alias = "r", desc = "Replies to the last person that whispered to you.")
-    public void reply(CommandContext context, @Label("message") @Greed(INFINITE_GREED) String message)
+    public void reply(CommandContext context, @Label("message") @Greed(INFINITE) String message)
     {
         UUID lastWhisper;
         if (context.getSource() instanceof User)
@@ -153,7 +152,7 @@ public class ChatCommands
     }
 
     @Command(desc = "Broadcasts a message")
-    public void broadcast(CommandContext context, @Label("message") @Greed(INFINITE_GREED) String message)
+    public void broadcast(CommandContext context, @Label("message") @Greed(INFINITE) String message)
     {
         this.um.broadcastMessage(NEUTRAL, "[{text:Broadcast}] {input}", message);
     }

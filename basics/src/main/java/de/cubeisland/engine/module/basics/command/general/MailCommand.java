@@ -42,7 +42,7 @@ import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.command.parameter.property.Greed.INFINITE_GREED;
+import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
 
@@ -162,7 +162,7 @@ public class MailCommand extends CommandContainer
     @Alias(value = "sendmail")
     @Command(desc = "Sends mails to other players.")
     @Params(positional = {@Param(label = "player", type = User.class),
-                          @Param(label = "message", greed = INFINITE_GREED)})
+                          @Param(label = "message", greed = INFINITE)})
     public void send(CommandContext context)
     {
         User user = context.get(0);
@@ -173,7 +173,7 @@ public class MailCommand extends CommandContainer
 
     @Alias(value = "sendallmail")
     @Command(desc = "Sends mails to all players.")
-    @Params(positional = @Param(label = "message", greed = INFINITE_GREED))
+    @Params(positional = @Param(label = "message", greed = INFINITE))
     public void sendAll(CommandContext context)
     {
         Set<User> users = this.module.getCore().getUserManager().getOnlineUsers();
