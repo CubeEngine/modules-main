@@ -152,7 +152,7 @@ public class WorldsCommands extends CommandContainer
         else
         {
             context.sendTranslated(NEGATIVE, "You have to provide a universe in which to create the world!");
-            context.sendMessage(context.getCommand().getDescriptor().getUsage(context.getSource()));
+            context.sendMessage(context.getUsage());
             return;
         }
         config.setFile(dir.resolve(context.get(0) + YAML.getExtention()).toFile());

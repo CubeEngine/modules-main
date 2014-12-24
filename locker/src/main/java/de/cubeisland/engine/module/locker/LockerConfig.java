@@ -25,7 +25,7 @@ import javax.persistence.Transient;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import de.cubeisland.engine.reflect.ReflectedYaml;
+import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.core.CubeEngine;
