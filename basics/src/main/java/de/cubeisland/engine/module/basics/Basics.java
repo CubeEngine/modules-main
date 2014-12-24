@@ -21,6 +21,11 @@ import java.util.concurrent.TimeUnit;
 
 import org.bukkit.entity.Player;
 
+import de.cubeisland.engine.core.bukkit.EventManager;
+import de.cubeisland.engine.core.command.CommandManager;
+import de.cubeisland.engine.core.module.Module;
+import de.cubeisland.engine.core.storage.database.Database;
+import de.cubeisland.engine.core.util.Profiler;
 import de.cubeisland.engine.module.basics.command.general.ChatCommands;
 import de.cubeisland.engine.module.basics.command.general.ColoredSigns;
 import de.cubeisland.engine.module.basics.command.general.FlyListener;
@@ -49,12 +54,6 @@ import de.cubeisland.engine.module.basics.command.teleport.TeleportRequestComman
 import de.cubeisland.engine.module.basics.storage.TableBasicsUser;
 import de.cubeisland.engine.module.basics.storage.TableIgnorelist;
 import de.cubeisland.engine.module.basics.storage.TableMail;
-import de.cubeisland.engine.core.bukkit.EventManager;
-import de.cubeisland.engine.core.command.CommandManager;
-import de.cubeisland.engine.core.command.reflected.ReflectedCommand;
-import de.cubeisland.engine.core.module.Module;
-import de.cubeisland.engine.core.storage.database.Database;
-import de.cubeisland.engine.core.util.Profiler;
 import de.cubeisland.engine.module.roles.Roles;
 
 public class Basics extends Module
@@ -90,49 +89,49 @@ public class Basics extends Module
         this.getLog().trace("{} ms - General-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         //General:
         IgnoreCommands ignoreCommands = new IgnoreCommands(this);
-        cm.registerCommands(this, ignoreCommands , ReflectedCommand.class);
-        cm.registerCommands(this, new ChatCommands(this), ReflectedCommand.class);
-        cm.registerCommands(this, new InformationCommands(this), ReflectedCommand.class);
-        cm.registerCommand(new MailCommand(this));
-        cm.registerCommands(this, new PlayerCommands(this), ReflectedCommand.class);
+        cm.addCommands(cm, this, ignoreCommands);
+        cm.addCommands(cm, this, new ChatCommands(this));
+        cm.addCommands(cm, this, new InformationCommands(this));
+        cm.addCommand(new MailCommand(this));
+        cm.addCommands(cm, this, new PlayerCommands(this));
         this.getLog().trace("{} ms - General-Listener", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         em.registerListener(this, new GeneralsListener(this));
         em.registerListener(this, new MuteListener(this, ignoreCommands));
         this.getLog().trace("{} ms - Moderation-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         //Moderation:
-        cm.registerCommands(this, new InventoryCommands(this), ReflectedCommand.class);
-        cm.registerCommands(this, new ItemCommands(this), ReflectedCommand.class);
-        cm.registerCommands(this, new KickBanCommands(this), ReflectedCommand.class);
-        cm.registerCommands(this, new SpawnMobCommand(this), ReflectedCommand.class);
-        cm.registerCommands(this, new TimeControlCommands(this), ReflectedCommand.class);
-        cm.registerCommands(this, new WorldControlCommands(this), ReflectedCommand.class);
+        cm.addCommands(cm, this, new InventoryCommands(this));
+        cm.addCommands(cm, this, new ItemCommands(this));
+        cm.addCommands(cm, this, new KickBanCommands(this));
+        cm.addCommands(cm, this, new SpawnMobCommand(this));
+        cm.addCommands(cm, this, new TimeControlCommands(this));
+        cm.addCommands(cm, this, new WorldControlCommands(this));
 
         Module roles = getCore().getModuleManager().getModule("roles");
         if (roles != null && roles instanceof Roles)
         {
-            cm.registerCommand(new RolesListCommand(this));
+            cm.addCommands(cm, this, new RolesListCommand(this));
         }
         else
         {
             this.getLog().info("No Roles-Module found!");
-            cm.registerCommand(new ListCommand(this));
+            cm.addCommands(cm, this, new ListCommand(this));
         }
         
         em.registerListener(this, new PaintingListener(this));
 
         this.getLog().trace("{} ms - Teleport-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         //Teleport:
-        cm.registerCommands(this, new MovementCommands(this), ReflectedCommand.class);
-        cm.registerCommands(this, new SpawnCommands(this), ReflectedCommand.class);
-        cm.registerCommands(this, new TeleportCommands(this), ReflectedCommand.class);
-        cm.registerCommands(this, new TeleportRequestCommands(this), ReflectedCommand.class);
+        cm.addCommands(cm, this, new MovementCommands(this));
+        cm.addCommands(cm, this, new SpawnCommands(this));
+        cm.addCommands(cm, this, new TeleportCommands(this));
+        cm.addCommands(cm, this, new TeleportRequestCommands(this));
         this.getLog().trace("{} ms - Teleport/Fly-Listener", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         em.registerListener(this, new TeleportListener(this));
         em.registerListener(this, new FlyListener(this));
 
         this.lagTimer = new LagTimer(this);
 
-        cm.registerCommands(this,  new DoorCommand(this), ReflectedCommand.class );
+        cm.addCommands(cm, this, new DoorCommand(this));
 
         this.getLog().trace("{} ms - done", Profiler.endProfiling("basicsEnable", TimeUnit.MILLISECONDS));
     }

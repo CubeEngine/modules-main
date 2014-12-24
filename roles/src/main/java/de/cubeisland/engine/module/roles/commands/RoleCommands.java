@@ -17,13 +17,15 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
-import de.cubeisland.engine.core.command.ContainerCommand;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.module.roles.Roles;
 
-public class RoleCommands extends ContainerCommand
+@Command(name = "roles", desc = "Manages the roles")
+public class RoleCommands extends CommandContainer
 {
     public RoleCommands(Roles module)
     {
-        super(module, "roles", "Manages the roles");
+        super(module);
     }
 }

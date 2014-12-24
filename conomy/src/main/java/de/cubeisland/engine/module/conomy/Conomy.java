@@ -17,21 +17,19 @@
  */
 package de.cubeisland.engine.module.conomy;
 
+import de.cubeisland.engine.core.command.CommandManager;
+import de.cubeisland.engine.core.module.Module;
+import de.cubeisland.engine.core.module.service.Economy;
+import de.cubeisland.engine.core.storage.database.Database;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.storage.TableAccount;
 import de.cubeisland.engine.module.conomy.account.storage.TableBankAccess;
 import de.cubeisland.engine.module.conomy.commands.BankCommands;
-import de.cubeisland.engine.module.conomy.commands.BankOrAllReader;
 import de.cubeisland.engine.module.conomy.commands.BankReader;
 import de.cubeisland.engine.module.conomy.commands.EcoBankCommands;
 import de.cubeisland.engine.module.conomy.commands.EcoCommands;
 import de.cubeisland.engine.module.conomy.commands.MoneyCommand;
-import de.cubeisland.engine.core.command.ArgumentReader;
-import de.cubeisland.engine.core.command.CommandManager;
-import de.cubeisland.engine.core.module.Module;
-import de.cubeisland.engine.core.module.service.Economy;
-import de.cubeisland.engine.core.storage.database.Database;
 
 public class Conomy extends Module
 {
@@ -50,13 +48,13 @@ public class Conomy extends Module
         this.manager = new ConomyManager(this);
         perms = new ConomyPermissions(this);
         final CommandManager cm = this.getCore().getCommandManager();
-        cm.registerCommand(new MoneyCommand(this));
-        cm.registerCommand(new EcoCommands(this));
+        cm.addCommand(new MoneyCommand(this));
+        EcoCommands ecoCommands = new EcoCommands(this);
+        cm.addCommand(ecoCommands);
 
-        ArgumentReader.registerReader(new BankReader(this.manager), BankAccount.class);
-        ArgumentReader.registerReader(new BankOrAllReader());
-        cm.registerCommand(new BankCommands(this));
-        cm.registerCommand(new EcoBankCommands(this), "eco");
+        cm.getReaderManager().registerReader(new BankReader(this.manager), BankAccount.class);
+        cm.addCommand(new BankCommands(this));
+        ecoCommands.addCommand(new EcoBankCommands(this));
         this.getCore().getModuleManager().getServiceManager().registerService(this, Economy.class, manager.getInterface());
     }
 

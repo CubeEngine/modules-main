@@ -22,18 +22,15 @@ import java.util.Set;
 
 import org.bukkit.Location;
 
-import de.cubeisland.engine.core.command.CommandResult;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Alias;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.OnlyIngame;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.filter.Restricted;
+import de.cubeisland.engine.command.result.CommandResult;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.command.result.confirm.ConfirmResult;
 import de.cubeisland.engine.core.command.sender.ConsoleCommandSender;
 import de.cubeisland.engine.core.module.service.Selector;
@@ -44,6 +41,7 @@ import de.cubeisland.engine.module.travel.TpPointCommand;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportInvite;
 
+import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
@@ -52,6 +50,7 @@ import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visi
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
+@Command(name = "home", desc = "Teleport to your home")
 public class HomeCommand extends TpPointCommand
 {
     private final HomeManager manager;
@@ -59,27 +58,28 @@ public class HomeCommand extends TpPointCommand
 
     public HomeCommand(Travel module)
     {
-        super(module, "home", "Teleport to your home");
+        super(module);
         this.module = module;
         this.manager = module.getHomeManager();
-        this.delegateChild(new DelegatingContextFilter()
+        // TODO delegation
+        /*this.delegateChild(new DelegatingContextFilter()
         {
             @Override
-            public String delegateTo(CubeContext context)
+            public String delegateTo(CommandContext context)
             {
-                return context.isSender(User.class) ? "tp" : null;
+                return context.isSource(User.class) ? "tp" : null;
             }
-        });
+        });*/
     }
 
-    @OnlyIngame
+    @Restricted(User.class)
     @Command(desc = "Teleport to a home")
-    @IParams({@Grouped(req = false, value = @Indexed(label = "home")),
-              @Grouped(req = false, value = @Indexed(label = "owner", type = User.class))})
-    public void tp(CubeContext context)
+    @Params(positional = {@Param(req = false, label = "home"),
+                          @Param(req = false, label = "owner", type = User.class)})
+    public void tp(CommandContext context)
     {
         User user = this.getUser(context, 1);
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         String name = context.getString(0, "home");
         Home home = this.manager.findOne(user, name);
         if (home == null)
@@ -121,15 +121,15 @@ public class HomeCommand extends TpPointCommand
         context.sendTranslated(CRITICAL, "The teleportation got aborted!");
     }
 
-    @Alias(names = {"sethome"})
+    @Alias(value = {"sethome"})
     @Command(alias = {"create", "sethome", "createhome"}, desc = "Set your home")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "name")))
-    @Flags(@Flag(longName = "public", name = "pub", permission = "public"))
-    @OnlyIngame("Ok so I'll need your new address then. No seriously this won't work!")
-    public void set(CubeContext context)
+    @Params(positional = @Param(req = false, label = "name"))
+    @Flags(@Flag(longName = "public", name = "pub")) // TODO flag permission "public"
+    @Restricted(value = User.class, msg = "Ok so I'll need your new address then. No seriously this won't work!")
+    public void set(CommandContext context)
     {
-        User sender = (User)context.getSender();
-        if (this.manager.getCount(sender) >= this.module.getConfig().homes.max && !module.getPermissions().HOME_SET_MORE.isAuthorized(context.getSender()))
+        User sender = (User)context.getSource();
+        if (this.manager.getCount(sender) >= this.module.getConfig().homes.max && !module.getPermissions().HOME_SET_MORE.isAuthorized(context.getSource()))
         {
             context.sendTranslated(NEGATIVE, "You have reached your maximum number of homes!");
             context.sendTranslated(NEUTRAL, "You have to delete a home to make a new one");
@@ -151,14 +151,14 @@ public class HomeCommand extends TpPointCommand
     }
 
     @Command(desc = "Set the welcome message of homes", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
-    @IParams({@Grouped(@Indexed(label = "home")),
-              @Grouped(req = false, value = @Indexed(label = "welcome message"), greedy = true)})
-    @NParams(@Named(names = "owner", type = User.class, permission = "other"))
+    @Params(positional = {@Param(label = "home"),
+                          @Param(req = false, label = "welcome message", greed = INFINITE)},
+            nonpositional = @Param(names = "owner", type = User.class)) // TODO param permission "other"
     @Flags(@Flag(longName = "append", name = "a"))
-    public void greeting(CubeContext context)
+    public void greeting(CommandContext context)
     {
         User user = this.getUser(context, "owner");
-        String name = context.getArg(0);
+        String name = context.get(0);
         Home home = this.manager.getExact(user, name);
         if (home == null)
         {
@@ -174,7 +174,7 @@ public class HomeCommand extends TpPointCommand
             home.setWelcomeMsg(context.getStrings(1));
         }
         home.update();
-        if (home.isOwner(context.getSender()))
+        if (home.isOwner(context.getSource()))
         {
             context.sendTranslated(POSITIVE, "The welcome message for your home {name} is now set to:", home.getName());
         }
@@ -185,11 +185,11 @@ public class HomeCommand extends TpPointCommand
         context.sendMessage(home.getWelcomeMsg());
     }
 
-    @OnlyIngame("I am calling the moving company right now!")
+    @Restricted(value = User.class, msg = "I am calling the moving company right now!")
     @Command(alias = {"replace"}, desc = "Move a home")
-    @IParams({@Grouped(req = false, value = @Indexed(label = "name")),
-              @Grouped(req = false, value = @Indexed(label = "owner", type = User.class))})
-    public void move(CubeContext context)
+    @Params(positional = {@Param(req = false, label = "name"),
+                          @Param(req = false, label = "owner", type = User.class)})
+    public void move(CommandContext context)
     {
         User user = this.getUser(context, 1);
         String name = context.getString(0, "home");
@@ -200,11 +200,11 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEUTRAL, "Use {text:/sethome} to set your home");
             return;
         }
-        if (!home.isOwner(context.getSender()))
+        if (!home.isOwner(context.getSource()))
         {
             context.ensurePermission(module.getPermissions().HOME_MOVE_OTHER);
         }
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         home.setLocation(sender.getLocation());
         home.update();
         if (home.isOwner(sender))
@@ -215,11 +215,11 @@ public class HomeCommand extends TpPointCommand
         context.sendTranslated(POSITIVE, "The home {name} of {user} has been moved to your current location", home.getName(), user);
     }
 
-    @Alias(names = {"remhome", "removehome", "delhome", "deletehome"})
+    @Alias(value = {"remhome", "removehome", "delhome", "deletehome"})
     @Command(alias = {"delete", "rem", "del"}, desc = "Remove a home")
-    @IParams({@Grouped(req = false, value = @Indexed(label = "name")),
-              @Grouped(req = false, value = @Indexed(label = "owner", type = User.class))})
-    public void remove(CubeContext context)
+    @Params(positional = {@Param(req = false, label = "name"),
+                          @Param(req = false, label = "owner", type = User.class)})
+    public void remove(CommandContext context)
     {
         User user = this.getUser(context, 1);
         String name = context.getString(0, "home");
@@ -229,12 +229,12 @@ public class HomeCommand extends TpPointCommand
             homeNotFoundMessage(context, user, name);
             return;
         }
-        if (!home.isOwner(context.getSender()))
+        if (!home.isOwner(context.getSource()))
         {
             context.ensurePermission(module.getPermissions().HOME_REMOVE_OTHER);
         }
         this.manager.delete(home);
-        if (user.equals(context.getSender()))
+        if (user.equals(context.getSource()))
         {
             context.sendTranslated(POSITIVE, "Your home {name} has been removed!", name);
             return;
@@ -243,24 +243,24 @@ public class HomeCommand extends TpPointCommand
     }
 
     @Command(desc = "Rename a home")
-    @IParams({@Grouped(@Indexed(label = "home")),
-              @Grouped(@Indexed(label = "new name"))})
-    @NParams(@Named(names = "owner", type = User.class))
-    public void rename(CubeContext context)
+    @Params(positional = {@Param(label = "home"),
+                          @Param(label = "new name")},
+            nonpositional = @Param(names = "owner", type = User.class))
+    public void rename(CommandContext context)
     {
         User user = getUser(context, "owner");
-        String name = context.getArg(0);
+        String name = context.get(0);
         Home home = manager.getExact(user, name);
         if (home == null)
         {
             homeNotFoundMessage(context, user, name);
             return;
         }
-        if (!home.isOwner(context.getSender()))
+        if (!home.isOwner(context.getSource()))
         {
             context.ensurePermission(module.getPermissions().HOME_RENAME_OTHER);
         }
-        String newName = context.getArg(1);
+        String newName = context.get(1);
         if (name.contains(":") || name.length() >= 32)
         {
             context.sendTranslated(NEGATIVE, "Homes may not have names that are longer than 32 characters or contain colon(:)'s!");
@@ -269,7 +269,7 @@ public class HomeCommand extends TpPointCommand
         String oldName = home.getName();
         if (manager.rename(home, newName))
         {
-            if (home.isOwner(context.getSender()))
+            if (home.isOwner(context.getSource()))
             {
                 context.sendTranslated(POSITIVE, "Your home {name} has been renamed to {name}", oldName, newName);
                 return;
@@ -280,29 +280,30 @@ public class HomeCommand extends TpPointCommand
         context.sendTranslated(POSITIVE, "Could not rename the home to {name}", newName);
     }
 
-    @Alias(names = {"listhomes", "homes"})
+    @Alias(value = {"listhomes", "homes"})
     @Command(alias = "listhomes", desc = "Lists homes a player can access")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "owner", type = User.class)))
+    @Params(positional = @Param(req = false, label = "owner", type = User.class))
     @Flags({@Flag(name = "pub", longName = "public"),
             @Flag(name = "o", longName = "owned"),
             @Flag(name = "i", longName = "invited")})
-    public void list(CubeContext context) throws Exception
+    public void list(CommandContext context) throws Exception
     {
-        if ((context.hasIndexed(0) && "*".equals(context.getArg(0))) || !(context.hasIndexed(0) || context.isSender(User.class)))
+        if ((context.hasPositional(0) && "*".equals(context.getString(0))) || !(context.hasPositional(0) || context.isSource(
+            User.class)))
         {
             context.ensurePermission(module.getPermissions().HOME_LIST_OTHER);
             this.listAll(context);
             return;
         }
         User user = this.getUser(context, 0);
-        if (!user.equals(context.getSender()))
+        if (!user.equals(context.getSource()))
         {
             context.ensurePermission(module.getPermissions().HOME_LIST_OTHER);
         }
         Set<Home> homes = this.manager.list(user, context.hasFlag("o"), context.hasFlag("pub"), context.hasFlag("i"));
         if (homes.isEmpty())
         {
-            if (user.equals(context.getSender()))
+            if (user.equals(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "No homes are available to you!");
                 return;
@@ -310,7 +311,7 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "No homes are available to {user}!", user);
             return;
         }
-        if (user.equals(context.getSender()))
+        if (user.equals(context.getSource()))
         {
             context.sendTranslated(NEUTRAL, "The following homes are available to you:");
         }
@@ -321,7 +322,7 @@ public class HomeCommand extends TpPointCommand
         showList(context, user, homes);
     }
 
-    private void listAll(CubeContext context)
+    private void listAll(CommandContext context)
     {
         int count = this.manager.getCount();
         if (count == 0)
@@ -334,9 +335,9 @@ public class HomeCommand extends TpPointCommand
     }
 
     @Command(alias = {"ilist", "invited"}, desc = "List all players invited to your homes")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "home")))
-    @NParams(@Named(names = "owner", type = User.class, permission = "other"))
-    public void invitedList(CubeContext context)
+    @Params(positional = @Param(req = false, label = "home"),
+            nonpositional = @Param(names = "owner", type = User.class)) // TODO permission "other"
+    public void invitedList(CommandContext context)
     {
         User user = this.getUser(context, "owner");
         Set<Home> homes = new HashSet<>();
@@ -349,7 +350,7 @@ public class HomeCommand extends TpPointCommand
         }
         if (homes.isEmpty())
         {
-            if (user.equals(context.getSender()))
+            if (user.equals(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "You have no homes with players invited to them!");
                 return;
@@ -357,7 +358,7 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "{user} has no homes with players invited to them!", user);
             return;
         }
-        if (user.equals(context.getSender()))
+        if (user.equals(context.getSource()))
         {
             context.sendTranslated(NEUTRAL, "Your following homes have players invited to them:");
         }
@@ -379,13 +380,13 @@ public class HomeCommand extends TpPointCommand
         }
     }
 
-    @OnlyIngame("How about making a phone call to invite someone instead?")
+    @Restricted(value = User.class, msg = "How about making a phone call to invite someone instead?")
     @Command(desc = "Invite a user to one of your homes")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(req = false, value = @Indexed(label = "home"))})
-    public void invite(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+                          @Param(req = false, label = "home")})
+    public void invite(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         String name = context.getString(1, "home");
         Home home = this.manager.getExact(sender, name);
         if (home == null || !home.isOwner(sender))
@@ -398,10 +399,10 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "You can't invite a person to a public home.");
             return;
         }
-        User invited = context.getArg(0);
+        User invited = context.get(0);
         if (invited == null)
         {
-            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.get(0));
             return;
         }
         if (invited.equals(sender))
@@ -422,13 +423,13 @@ public class HomeCommand extends TpPointCommand
         context.sendTranslated(POSITIVE, "{user} is now invited to your home {name}", invited, home.getName());
     }
 
-    @OnlyIngame
+    @Restricted(User.class)
     @Command(desc = "Uninvite a player from one of your homes")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(req = false, value = @Indexed(label = "home"))})
-    public void unInvite(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+                          @Param(req = false, label = "home")})
+    public void unInvite(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         String name = context.getString(1, "home");
         Home home = this.manager.getExact(sender, name);
         if (home == null || !home.isOwner(sender))
@@ -441,10 +442,10 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "This home is public. Make it private to disallow others to access it.");
             return;
         }
-        User invited = context.getArg(0);
+        User invited = context.get(0);
         if (invited == null)
         {
-            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "Player {user} not found!", context.get(0));
             return;
         }
         if (invited.equals(sender))
@@ -466,12 +467,12 @@ public class HomeCommand extends TpPointCommand
     }
 
     @Command(name = "private", alias = {"makeprivate", "setprivate"}, desc = "Make one of your homes private")
-    @IParams({@Grouped(req = false, value = @Indexed(label = "home")),
-              @Grouped(req = false, value = @Indexed(label = "owner", type = User.class))})
-    public void makePrivate(CubeContext context)
+    @Params(positional = {@Param(req = false, label = "home"),
+                          @Param(req = false, label = "owner", type = User.class)})
+    public void makePrivate(CommandContext context)
     {
         User user = this.getUser(context, 1);
-        if (!user.equals(context.getSender()))
+        if (!user.equals(context.getSource()))
         {
             context.ensurePermission(module.getPermissions().HOME_PRIVATE_OTHER);
         }
@@ -488,7 +489,7 @@ public class HomeCommand extends TpPointCommand
             return;
         }
         home.setVisibility(PRIVATE);
-        if (home.isOwner(context.getSender()))
+        if (home.isOwner(context.getSource()))
         {
             context.sendTranslated(POSITIVE, "Your home {name} is now private", home.getName());
             return;
@@ -497,12 +498,12 @@ public class HomeCommand extends TpPointCommand
     }
 
     @Command(name = "public", alias = {"makepublic", "setpublic"}, desc = "Make one of your homes public")
-    @IParams({@Grouped(req = false, value = @Indexed(label = "home")),
-              @Grouped(req = false, value = @Indexed(label = "owner", type = User.class))})
-    public void makePublic(CubeContext context)
+    @Params(positional = {@Param(req = false, label = "home"),
+                          @Param(req = false, label = "owner", type = User.class)})
+    public void makePublic(CommandContext context)
     {
         User user = this.getUser(context, 1);
-        if (!user.equals(context.getSender()))
+        if (!user.equals(context.getSource()))
         {
             context.ensurePermission(module.getPermissions().HOME_PUBLIC_OTHER);
         }
@@ -519,7 +520,7 @@ public class HomeCommand extends TpPointCommand
             return;
         }
         home.setVisibility(PUBLIC);
-        if (home.isOwner(context.getSender()))
+        if (home.isOwner(context.getSource()))
         {
             context.sendTranslated(POSITIVE, "Your home {name} is now public", home.getName());
             return;
@@ -527,29 +528,29 @@ public class HomeCommand extends TpPointCommand
         context.sendTranslated(POSITIVE, "The home {name} of {user} is now public", home.getOwnerName(), home.getName());
     }
 
-    @Alias(names = {"clearhomes"})
+    @Alias(value = {"clearhomes"})
     @Command(desc = "Clear all homes (of an user)")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "owner", type = User.class)))
+    @Params(positional = @Param(req = false, label = "owner", type = User.class))
     @Flags({@Flag(name = "pub", longName = "public"),
             @Flag(name = "priv", longName = "private"),
             @Flag(name = "sel", longName = "selection")})
-    public CommandResult clear(final CubeContext context)
+    public CommandResult clear(final CommandContext context)
     {
-        if (this.module.getConfig().clearOnlyFromConsole && !(context.getSender() instanceof ConsoleCommandSender))
+        if (this.module.getConfig().clearOnlyFromConsole && !(context.getSource() instanceof ConsoleCommandSender))
         {
             context.sendTranslated(NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return null;
         }
-        final User user = context.getArg(0, null);
+        final User user = context.get(0, null);
         String type = "";
         if (context.hasFlag("pub"))
         {
-            type = context.getCore().getI18n().translate(context.getSender().getLocale(), "public");
+            type = context.getCore().getI18n().translate(context.getSource().getLocale(), "public");
             type += " ";
         }
         else if (context.hasFlag("priv"))
         {
-            type = context.getCore().getI18n().translate(context.getSender().getLocale(), "private");
+            type = context.getCore().getI18n().translate(context.getSource().getLocale(), "private");
             type += " ";
         }
         final Location firstPoint;
@@ -561,21 +562,21 @@ public class HomeCommand extends TpPointCommand
                 context.sendTranslated(NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
                 return null;
             }
-            if (context.isSender(User.class))
+            if (context.isSource(User.class))
             {
                 Selector selector = context.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
-                Shape selection = selector.getSelection((User)context.getSender());
+                Shape selection = selector.getSelection((User)context.getSource());
                 if (selection instanceof Cuboid)
                 {
-                    firstPoint = selector.getFirstPoint((User)context.getSender());
-                    secondPoint = selector.getSecondPoint((User)context.getSender());
+                    firstPoint = selector.getFirstPoint((User)context.getSource());
+                    secondPoint = selector.getSecondPoint((User)context.getSource());
                 }
                 else
                 {
                     context.sendTranslated(NEGATIVE, "Invalid selection!");
                     return null;
                 }
-                if (context.hasIndexed(0))
+                if (context.hasPositional(0))
                 {
                     context.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes created by {user} in your current selection?", type, user);
                 }
@@ -594,7 +595,7 @@ public class HomeCommand extends TpPointCommand
         {
             firstPoint = null;
             secondPoint = null;
-            if (context.hasIndexed(0))
+            if (context.hasPositional(0))
             {
                 context.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes ever created by {user}?", type, user);
             }
@@ -613,7 +614,7 @@ public class HomeCommand extends TpPointCommand
                 if (context.hasFlag("sel"))
                 {
                     manager.massDelete(user, context.hasFlag("priv"), context.hasFlag("pub"), firstPoint, secondPoint);
-                    if (context.hasIndexed(0))
+                    if (context.hasPositional(0))
                     {
                         context.sendTranslated(POSITIVE, "The homes of {user} in the selection are now deleted", user);
                     }
@@ -624,7 +625,7 @@ public class HomeCommand extends TpPointCommand
                     return;
                 }
                 manager.massDelete(user, context.hasFlag("priv"), context.hasFlag("pub"));
-                if (context.hasIndexed(0))
+                if (context.hasPositional(0))
                 {
                     context.sendTranslated(POSITIVE, "The homes of {user} are now deleted", user);
                 }
@@ -636,7 +637,7 @@ public class HomeCommand extends TpPointCommand
         }, context);
     }
 
-    private void homeInDeletedWorldMessage(CubeContext context, User user, Home home)
+    private void homeInDeletedWorldMessage(CommandContext context, User user, Home home)
     {
         if (home.isOwner(user))
         {
@@ -646,9 +647,9 @@ public class HomeCommand extends TpPointCommand
         context.sendTranslated(NEGATIVE, "The home {name} of {user} is in a world that no longer exists!", home.getName(), home.getOwnerName());
     }
 
-    private void homeNotFoundMessage(CubeContext context, User user, String name)
+    private void homeNotFoundMessage(CommandContext context, User user, String name)
     {
-        if (context.getSender().equals(user))
+        if (context.getSource().equals(user))
         {
             context.sendTranslated(NEGATIVE, "You have no home named {name#home}!", name);
             return;

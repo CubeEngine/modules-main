@@ -22,13 +22,12 @@ import java.util.Random;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Alias;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.module.service.Selector;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.WorldLocation;
@@ -39,41 +38,28 @@ import de.cubeisland.engine.module.portals.config.RandomDestination;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
-public class PortalModifyCommand extends ContainerCommand
+@Command(name = "modify", desc = "modifies a portal", alias = "mvpm")
+public class PortalModifyCommand extends CommandContainer
 {
+    private Portals module;
     private final PortalManager manager;
 
     public PortalModifyCommand(Portals module, PortalManager manager)
     {
-        super(module, "modify", "modifies a portal");
-        this.registerAlias(new String[]{"mvpm"}, new String[0]);
+        super(module);
+        this.module = module;
         this.manager = manager;
     }
 
     @Command(desc = "Changes the owner of a portal")
-    @IParams({@Grouped(@Indexed(label = "owner", type = User.class)),
-              @Grouped(req = false, value = @Indexed(label = "portal"))})
-    public void owner(CubeContext context)
+    @Params(positional = {@Param(label = "owner", type = User.class),
+                          @Param(req = false, label = "portal")})
+    public void owner(CommandContext context)
     {
-        User user = context.getArg(0);
-        Portal portal = null;
-        if (context.hasIndexed(1))
-        {
-            portal = manager.getPortal(context.getString(1));
-            if (portal == null)
-            {
-                context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(1));
-                return;
-            }
-        }
-        else if (context.getSender() instanceof User)
-        {
-            portal = ((User)context.getSender()).attachOrGet(PortalsAttachment.class, getModule()).getPortal();
-        }
+        User user = context.get(0);
+        Portal portal = getPortal(context, 1);
         if (portal == null)
         {
-            context.sendTranslated(NEGATIVE, "You need to define a portal to use!");
-            context.sendMessage(context.getCommand().getUsage(context));
             return;
         }
         portal.config.owner = user.getOfflinePlayer();
@@ -81,43 +67,52 @@ public class PortalModifyCommand extends ContainerCommand
         context.sendTranslated(POSITIVE, "{user} is now the owner of {name#portal}!", user, portal.getName());
     }
 
-    @Alias(names = "mvpd")
-    @Command(alias = "dest", desc = "changes the destination of the selected portal")
-    @IParams({@Grouped(@Indexed(label = {"!here","world","p:<portal>"})),
-              @Grouped(req = false, value = @Indexed(label = "portal"))})
-    public void destination(CubeContext context)
+    private Portal getPortal(CommandContext context, int index)
     {
         Portal portal = null;
-        if (context.hasIndexed(1))
+        if (context.hasPositional(index))
         {
-            portal = manager.getPortal(context.getString(1));
+            portal = manager.getPortal(context.getString(index));
             if (portal == null)
             {
-                context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(1));
-                return;
+                context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getString(index));
+                return null;
             }
         }
-        else if (context.getSender() instanceof User)
+        else if (context.getSource() instanceof User)
         {
-            portal = ((User)context.getSender()).attachOrGet(PortalsAttachment.class, getModule()).getPortal();
+            portal = ((User)context.getSource()).attachOrGet(PortalsAttachment.class, module).getPortal();
         }
         if (portal == null)
         {
             context.sendTranslated(NEGATIVE, "You need to define a portal to use!");
-            context.sendMessage(context.getCommand().getUsage(context));
+            return null;
+        }
+        return portal;
+    }
+
+    @Alias(value = "mvpd")
+    @Command(alias = "dest", desc = "changes the destination of the selected portal")
+    @Params(positional = {@Param(label = "world", names = "here"), // TODO treat "names" on positional parameter as allowed fixed values?
+                          @Param(req = false, label = "portal")})
+    public void destination(CommandContext context)
+    {
+        Portal portal = getPortal(context, 1);
+        if (portal == null)
+        {
             return;
         }
-        String arg0 = context.getArg(0);
+        String arg0 = context.get(0);
         if ("here".equalsIgnoreCase(arg0))
         {
-            if (!(context.getSender() instanceof User))
+            if (!(context.getSource() instanceof User))
             {
                 context.sendTranslated(NEUTRAL, "The Portal Agency will bring you your portal for just {text:$ 1337} within {amount} weeks", new Random().nextInt(51)+1);
                 return;
             }
-            portal.config.destination = new Destination(((User)context.getSender()).getLocation());
+            portal.config.destination = new Destination(((User)context.getSource()).getLocation());
         }
-        else if (arg0.startsWith("p:"))
+        else if (arg0.startsWith("p:")) // TODO extract to separate (as its not possible to show in label) cmd /mvppd portaldestination
         {
             Portal destPortal = manager.getPortal(arg0.substring(2));
             if (destPortal == null)
@@ -129,7 +124,7 @@ public class PortalModifyCommand extends ContainerCommand
         }
         else
         {
-            World world = this.getModule().getCore().getWorldManager().getWorld(arg0);
+            World world = this.module.getCore().getWorldManager().getWorld(arg0);
             if (world == null)
             {
                 context.sendTranslated(NEGATIVE, "World {input} not found!", arg0);
@@ -141,61 +136,45 @@ public class PortalModifyCommand extends ContainerCommand
         context.sendTranslated(POSITIVE, "Portal destination set!");
     }
 
-    @Alias(names = "mvprd")
+    @Alias(value = "mvprd")
     @Command(alias = "randdest", desc = "Changes the destination of the selected portal to a random position each time")
-    @IParams({@Grouped(@Indexed(label = "world", type = World.class)),
-              @Grouped(req = false, value = @Indexed(label = "portal"))})
-    public void randomDestination(CubeContext context)
+    @Params(positional = {@Param(label = "world", type = World.class),
+                          @Param(req = false, label = "portal")})
+    public void randomDestination(CommandContext context)
     {
-        Portal portal = null;
-        if (context.hasIndexed(1))
-        {
-            portal = manager.getPortal(context.getString(1));
-            if (portal == null)
-            {
-                context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(1));
-                return;
-            }
-        }
-        else if (context.getSender() instanceof User)
-        {
-            portal = ((User)context.getSender()).attachOrGet(PortalsAttachment.class, manager.module).getPortal();
-        }
+        Portal portal = getPortal(context, 1);
         if (portal == null)
         {
-            context.sendTranslated(NEGATIVE, "You need to define a portal to use!");
-            context.sendMessage(context.getCommand().getUsage(context));
             return;
         }
-        World world = context.getArg(0);
+        World world = context.get(0);
         portal.config.destination = new RandomDestination(world);
         portal.config.save();
     }
 
     @Command(desc = "Changes a portals location")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "portal")))
-    public void location(CubeContext context)
+    @Params(positional = @Param(req = false, label = "portal"))
+    public void location(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
-            Selector selector = this.getModule().getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
+            User sender = (User)context.getSource();
+            Selector selector = this.module.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
             if (selector.getSelection(sender) instanceof Cuboid)
             {
-                Portal portal = sender.attachOrGet(PortalsAttachment.class, getModule()).getPortal();
-                if (context.hasIndexed(0))
+                Portal portal = sender.attachOrGet(PortalsAttachment.class, module).getPortal();
+                if (context.hasPositional(0))
                 {
                     portal = manager.getPortal(context.getString(0));
                     if (portal == null)
                     {
-                        context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));
+                        context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.get(0));
                         return;
                     }
                 }
                 if (portal == null)
                 {
                     context.sendTranslated(NEGATIVE, "You need to define a portal!");
-                    context.sendMessage(context.getCommand().getUsage(context));
                     return;
                 }
                 Location p1 = selector.getFirstPoint(sender);
@@ -213,26 +192,25 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Modifies the location where a player exits when teleporting a portal")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "portal")))
-    public void exit(CubeContext context)
+    @Params(positional = @Param(req = false, label = "portal"))
+    public void exit(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
-            Portal portal = sender.attachOrGet(PortalsAttachment.class, getModule()).getPortal();
-            if (context.hasIndexed(0))
+            User sender = (User)context.getSource();
+            Portal portal = sender.attachOrGet(PortalsAttachment.class, module).getPortal();
+            if (context.hasPositional(0))
             {
                 portal = manager.getPortal(context.getString(0));
                 if (portal == null)
                 {
-                    context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));
+                    context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.get(0));
                     return;
                 }
             }
             if (portal == null)
             {
                 context.sendTranslated(NEGATIVE, "You need to define a portal!");
-                context.sendMessage(context.getCommand().getUsage(context));
                 return;
             }
             Location location = sender.getLocation();
@@ -250,27 +228,12 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Toggles safe teleportation for this portal")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "portal")))
-    public void togglesafe(CubeContext context)
+    @Params(positional = @Param(req = false, label = "portal"))
+    public void togglesafe(CommandContext context)
     {
-        Portal portal = null;
-        if (context.hasIndexed(0))
-        {
-            portal = manager.getPortal(context.getString(0));
-            if (portal == null)
-            {
-                context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));
-                return;
-            }
-        }
-        else if (context.getSender() instanceof User)
-        {
-            portal = ((User)context.getSender()).attachOrGet(PortalsAttachment.class, getModule()).getPortal();
-        }
+        Portal portal = getPortal(context, 0);
         if (portal == null)
         {
-            context.sendTranslated(NEGATIVE, "You need to define a portal!");
-            context.sendMessage(context.getCommand().getUsage(context));
             return;
         }
         portal.config.safeTeleport = !portal.config.safeTeleport;
@@ -286,27 +249,12 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Toggles whether entities can teleport with this portal")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "portal")))
-    public void entity(CubeContext context)
+    @Params(positional = @Param(req = false, label = "portal"))
+    public void entity(CommandContext context)
     {
-        Portal portal = null;
-        if (context.hasIndexed(0))
-        {
-            portal = manager.getPortal(context.getString(0));
-            if (portal == null)
-            {
-                context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getArg(0));
-                return;
-            }
-        }
-        else if (context.getSender() instanceof User)
-        {
-            portal = ((User)context.getSender()).attachOrGet(PortalsAttachment.class, getModule()).getPortal();
-        }
+        Portal portal = getPortal(context, 0);
         if (portal == null)
         {
-            context.sendTranslated(NEGATIVE, "You need to define a portal!");
-            context.sendMessage(context.getCommand().getUsage(context));
             return;
         }
         portal.config.teleportNonPlayers = !portal.config.teleportNonPlayers;

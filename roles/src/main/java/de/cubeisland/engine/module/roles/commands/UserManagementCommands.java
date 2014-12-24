@@ -21,16 +21,13 @@ import java.util.Set;
 
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
-import de.cubeisland.engine.core.command.reflected.Alias;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.RoleCompleter;
 import de.cubeisland.engine.module.roles.Roles;
@@ -41,34 +38,35 @@ import de.cubeisland.engine.module.roles.role.UserDatabaseStore;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
+@Alias("manuser")
+@Command(name = "user", desc = "Manage users")
 public class UserManagementCommands extends UserCommandHelper
 {
     public UserManagementCommands(Roles module)
     {
         super(module);
-        this.registerAlias(new String[]{"manuser"},new String[]{});
     }
 
-    @Alias(names = {"manuadd", "assignurole", "addurole", "giveurole"})
+    @Alias({"manuadd", "assignurole", "addurole", "giveurole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [in world] [-temp]")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(@Indexed(label = "role", completer = RoleCompleter.class))})
-    @NParams(@Named(names = "in", label = "world", type = World.class))
+    @Params(positional = {@Param(label = "player", type = User.class),
+                          @Param(label = "role", completer = RoleCompleter.class)},
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
     @Flags(@Flag(name = "t",longName = "temp"))
-    public void assign(CubeContext context)
+    public void assign(CommandContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
         World world = this.getWorld(context);
         if (world == null) return;
-        String roleName = context.getArg(1);
+        String roleName = context.get(1);
         Role role = this.manager.getProvider(world).getRole(roleName);
         if (role == null)
         {
             context.sendTranslated(NEUTRAL, "Could not find the role {name} in {world}.", roleName, world);
             return;
         }
-        if (!role.canAssignAndRemove(context.getSender()))
+        if (!role.canAssignAndRemove(context.getSource()))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to assign the role {name} in {world}!", role.getName(), world);
             return;
@@ -99,12 +97,12 @@ public class UserManagementCommands extends UserCommandHelper
         context.sendTranslated(NEUTRAL, "{user} already has the role {name} in {world}.", user, roleName, world);
     }
 
-    @Alias(names = {"remurole", "manudel"})
+    @Alias(value = {"remurole", "manudel"})
     @Command(desc = "Removes a role from the player [in world]")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(@Indexed(label = "role"))})
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void remove(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+                          @Param(label = "role")},
+            nonpositional = @Param(names = "in", label = "world"))
+    public void remove(CommandContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
@@ -113,10 +111,10 @@ public class UserManagementCommands extends UserCommandHelper
         Role role = this.manager.getProvider(world).getRole(context.getString(1));
         if (role == null)
         {
-            context.sendTranslated(NEUTRAL, "Could not find the role {name} in {world}.", context.getArg(1), world);
+            context.sendTranslated(NEUTRAL, "Could not find the role {name} in {world}.", context.get(1), world);
             return;
         }
-        if (!role.canAssignAndRemove(context.getSender()))
+        if (!role.canAssignAndRemove(context.getSource()))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to remove the role {name} in {world}!", role.getName(), world);
             return;
@@ -132,11 +130,11 @@ public class UserManagementCommands extends UserCommandHelper
         context.sendTranslated(NEUTRAL, "{user} did not have the role {name} in {world}.", user, role.getName(), world);
     }
 
-    @Alias(names = {"clearurole", "manuclear"})
+    @Alias(value = {"clearurole", "manuclear"})
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in world]")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void clear(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class),
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void clear(CommandContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
@@ -162,21 +160,21 @@ public class UserManagementCommands extends UserCommandHelper
         }
     }
 
-    @Alias(names = "setuperm")
+    @Alias(value = "setuperm")
     @Command(alias = "setperm", desc = "Sets a permission for this user [in world]")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(@Indexed(label = "permission")),
-              @Grouped(req = false, value = @Indexed(label = {"!true","!false","!reset"}))})
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void setpermission(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+                          @Param(label = "permission"),
+                          @Param(req = false, names = {"true","false","reset"})},
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void setpermission(CommandContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
-        String perm = context.getArg(1);
+        String perm = context.get(1);
         String setTo = "true";
-        if (context.hasIndexed(2))
+        if (context.hasPositional(2))
         {
-            setTo = context.getArg(2);
+            setTo = context.get(2);
         }
         try
         {
@@ -204,16 +202,16 @@ public class UserManagementCommands extends UserCommandHelper
         }
     }
 
-    @Alias(names = "resetuperm")
+    @Alias(value = "resetuperm")
     @Command(alias = "resetperm", desc = "Resets a permission for this user [in world]")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(@Indexed(label = "permission"))})
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void resetpermission(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+              @Param(label = "permission")},
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void resetpermission(CommandContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;
-        String perm = context.getArg(1);
+        String perm = context.get(1);
         World world = this.getWorld(context);
         if (world == null) return;
         RolesAttachment attachment = this.manager.getRolesAttachment(user);
@@ -222,17 +220,17 @@ public class UserManagementCommands extends UserCommandHelper
         context.sendTranslated(NEUTRAL, "Permission {input} of {user} resetted!", perm, user);
     }
 
-    @Alias(names = {"setudata","setumeta","setumetadata"})
+    @Alias(value = {"setudata","setumeta","setumetadata"})
     @Command(alias = {"setdata", "setmeta"}, desc = "Sets metadata for this user [in world]")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(@Indexed(label = "metaKey")),
-              @Grouped(@Indexed(label = "metaValue"))})
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void setmetadata(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+                          @Param(label = "metaKey"),
+                          @Param(label = "metaValue")},
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void setmetadata(CommandContext context)
     {
-        String metaKey = context.getArg(1);
-        String metaVal = context.getArg(2);
-        User user = context.getArg(0);
+        String metaKey = context.get(1);
+        String metaVal = context.get(2);
+        User user = context.get(0);
         World world = this.getWorld(context);
         if (world == null) return;
         RolesAttachment attachment = this.manager.getRolesAttachment(user);
@@ -241,15 +239,15 @@ public class UserManagementCommands extends UserCommandHelper
         context.sendTranslated(POSITIVE, "Metadata {input#key} of {user} set to {input#value} in {world}!", metaKey, user, metaVal, world);
     }
 
-    @Alias(names = {"resetudata","resetumeta","resetumetadata"})
+    @Alias(value = {"resetudata","resetumeta","resetumetadata"})
     @Command(alias = {"resetdata", "resetmeta", "deletedata", "deletemetadata", "deletemeta"}, desc = "Resets metadata for this user [in world]")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(@Indexed(label = "metaKey"))})
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void resetmetadata(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+                          @Param(label = "metaKey")},
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void resetmetadata(CommandContext context)
     {
-        String metaKey = context.getArg(1);
-        User user = context.getArg(0);
+        String metaKey = context.get(1);
+        User user = context.get(0);
         World world = this.getWorld(context);
         if (world == null) return;
         RolesAttachment attachment = this.manager.getRolesAttachment(user);
@@ -258,11 +256,11 @@ public class UserManagementCommands extends UserCommandHelper
         context.sendTranslated(NEUTRAL, "Metadata {input#key} of {user} removed in {world}!", metaKey, user, world);
     }
 
-    @Alias(names = {"clearudata","clearumeta","clearumetadata"})
+    @Alias(value = {"clearudata","clearumeta","clearumetadata"})
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Resets metadata for this user [in world]")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void clearMetaData(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class),
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void clearMetaData(CommandContext context)
     {
         User user = this.getUser(context, 0);
         if (user == null) return;

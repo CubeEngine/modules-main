@@ -21,11 +21,10 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
@@ -49,13 +48,13 @@ public class TeleportRequestCommands
     }
 
     @Command(desc = "Requests to teleport to a player.")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void tpa(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class))
+    public void tpa(CommandContext context)
     {
         User sender = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            sender = (User)context.getSender();
+            sender = (User)context.getSource();
         }
         if (sender == null)
         {
@@ -63,7 +62,7 @@ public class TeleportRequestCommands
             return;
         }
         sender.get(BasicsAttachment.class).removeTpRequestCancelTask();
-        final User user = context.getArg(0);
+        final User user = context.get(0);
         if (!user.isOnline())
         {
             context.sendTranslated(NEGATIVE, "{user} is not online!");
@@ -98,14 +97,14 @@ public class TeleportRequestCommands
     }
 
     @Command(desc = "Requests to teleport a player to you.")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void tpahere(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class))
+    public void tpahere(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             sender.get(BasicsAttachment.class).removeTpRequestCancelTask();
-            final User user = context.getArg(0);
+            final User user = context.get(0);
             if (!user.isOnline())
             {
                 context.sendTranslated(NEGATIVE, "{user} is not online!");
@@ -143,11 +142,11 @@ public class TeleportRequestCommands
     }
 
     @Command(alias = "tpac", desc = "Accepts any pending teleport request.")
-    public void tpaccept(CubeContext context)
+    public void tpaccept(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             UUID uuid = sender.get(BasicsAttachment.class).getPendingTpToRequest();
             if (uuid == null)
             {
@@ -195,12 +194,12 @@ public class TeleportRequestCommands
     }
 
     @Command(desc = "Denies any pending teleport request.")
-    public void tpdeny(CubeContext context)
+    public void tpdeny(CommandContext context)
     {
         User sender = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            sender = (User)context.getSender();
+            sender = (User)context.getSource();
         }
         if (sender == null)
         {

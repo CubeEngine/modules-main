@@ -19,9 +19,9 @@ package de.cubeisland.engine.module.roles.commands;
 
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
+import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.world.WorldManager;
 import de.cubeisland.engine.module.roles.Roles;
@@ -34,7 +34,7 @@ import static de.cubeisland.engine.core.util.ChatFormat.*;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 
-public abstract class RoleCommandHelper extends ContainerCommand
+public abstract class RoleCommandHelper extends CommandContainer
 {
     protected static final String GLOBAL_PREFIX = "g:";
     protected final RolesManager manager;
@@ -46,18 +46,18 @@ public abstract class RoleCommandHelper extends ContainerCommand
 
     public RoleCommandHelper(Roles module)
     {
-        super(module, "role", "Manage roles.");
+        super(module);
         this.manager = module.getRolesManager();
         this.module = module;
         this.worldManager = module.getCore().getWorldManager();
     }
 
-    protected World getWorld(CubeContext context)
+    protected World getWorld(CommandContext context)
     {
         World world;
         if (!context.hasNamed("in"))
         {
-            CommandSender sender = context.getSender();
+            CommandSender sender = context.getSource();
             if (sender instanceof User)
             {
                 User user = (User)sender;
@@ -85,7 +85,7 @@ public abstract class RoleCommandHelper extends ContainerCommand
         }
         else
         {
-            world = context.getArg("in");
+            world = context.get("in");
             if (world == null)
             {
                 context.sendTranslated(NEGATIVE, "World {input} not found!", context.getString("in"));
@@ -95,7 +95,7 @@ public abstract class RoleCommandHelper extends ContainerCommand
         return world;
     }
 
-    protected Role getRole(CubeContext context, RoleProvider provider, String name, World world)
+    protected Role getRole(CommandContext context, RoleProvider provider, String name, World world)
     {
         Role role = provider.getRole(name);
         if (role == null)

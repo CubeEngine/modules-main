@@ -33,7 +33,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 
 import de.cubeisland.engine.reflect.Section;
-import de.cubeisland.engine.reflect.ReflectedYaml;
+import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.util.WorldLocation;

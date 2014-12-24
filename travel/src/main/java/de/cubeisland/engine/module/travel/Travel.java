@@ -61,9 +61,9 @@ public class Travel extends Module
 
         final CommandManager cm = this.getCore().getCommandManager();
         HomeCommand homeCmd = new HomeCommand(this);
-        cm.registerCommand(homeCmd);
+        cm.addCommand(homeCmd);
         WarpCommand warpCmd = new WarpCommand(this);
-        cm.registerCommand(warpCmd);
+        cm.addCommand(warpCmd);
         this.getCore().getEventManager().registerListener(this, new HomeListener(this));
 
         this.permissions = new TravelPerm(this, homeCmd, warpCmd);

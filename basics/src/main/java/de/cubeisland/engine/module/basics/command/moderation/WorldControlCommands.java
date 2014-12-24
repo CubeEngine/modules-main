@@ -30,18 +30,14 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.exception.IncorrectUsageException;
-import de.cubeisland.engine.core.command.exception.MissingParameterException;
-import de.cubeisland.engine.core.command.parameterized.completer.WorldCompleter;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.parameter.IncorrectUsageException;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.completer.WorldCompleter;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.matcher.Match;
@@ -70,28 +66,29 @@ public class WorldControlCommands
     }
 
     @Command(desc = "Changes the weather")
-    @IParams({@Grouped(@Indexed(label = {"!sun","!rain","!storm"})),
-              @Grouped(req = false, value = @Indexed(label = "duration", type = Integer.class))})
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void weather(CubeContext context)
+    @Params(positional = {@Param(names = {"sun","rain","storm"}),
+                        @Param(req = false, label = "duration", type = Integer.class)},
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void weather(CommandContext context)
     {
         World world;
         if (context.hasNamed("in"))
         {
-            world = context.getArg("in", null);
+            world = context.get("in", null);
             if (world == null)
             {
-                context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.getArg(1));
+                context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.get(1));
                 return;
             }
         }
-        else if (context.isSender(User.class))
+        else if (context.isSource(User.class))
         {
-            world = ((User)context.getSender()).getWorld();
+            world = ((User)context.getSource()).getWorld();
         }
         else
         {
-            throw new MissingParameterException("in", context.getSender().getTranslation(NEGATIVE, "If not used ingame you have to specify a world!"));
+            context.sendTranslated(NEGATIVE, "You have to specify a world when using this command from the console!");
+            return;
         }
         boolean sunny = true;
         boolean noThunder = true;
@@ -99,7 +96,7 @@ public class WorldControlCommands
         String weather = Match.string().matchString(context.getString(0), "sun", "rain", "storm");
         if (weather == null)
         {
-            context.sendTranslated(NEGATIVE, "Invalid weather! {input}", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "Invalid weather! {input}", context.get(0));
             context.sendTranslated(NEUTRAL, "Use {name#sun}, {name#rain} or {name#storm}!");
             return;
         }
@@ -118,9 +115,9 @@ public class WorldControlCommands
                 noThunder = false;
                 break;
         }
-        if (context.hasIndexed(1))
+        if (context.hasPositional(1))
         {
-            duration = context.getArg(1, 0);
+            duration = context.get(1, 0);
             if (duration == 0)
             {
                 context.sendTranslated(NEGATIVE, "The given duration is invalid!");
@@ -143,22 +140,23 @@ public class WorldControlCommands
     }
 
     @Command(alias = "playerweather", desc = "Changes your weather")
-    @IParams(@Grouped(@Indexed(label = {"!clear","!downfall","!reset"})))
-    @NParams(@Named(names = "player", label = "player", type = User.class))
-    public void pweather(CubeContext context)
+    @Params(positional = @Param(names=  {"clear","downfall","reset"}),
+            nonpositional = @Param(names = "player", label = "player", type = User.class))
+    public void pweather(CommandContext context)
     {
         User user;
         if (context.hasNamed("player"))
         {
-            user = context.getArg("player");
+            user = context.get("player");
         }
-        else if (context.isSender(User.class))
+        else if (context.isSource(User.class))
         {
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
         else
         {
-            throw new MissingParameterException("player", context.getSender().getTranslation(NEGATIVE, "If not used ingame you have to specify a player!"));
+            context.sendTranslated(NEGATIVE, "You have to specify a player when using this command from the console!");
+            return;
         }
         if (!user.isOnline())
         {
@@ -168,7 +166,7 @@ public class WorldControlCommands
         String weather = Match.string().matchString(context.getString(0), "clear", "downfall", "reset");
         if (weather == null)
         {
-            context.sendTranslated(NEGATIVE, "Invalid weather! {input}", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "Invalid weather! {input}", context.get(0));
             context.sendTranslated(NEUTRAL, "Use {name#clear}, {name#downfall} or {name#reset}!", "clear", "downfall", "reset");
             return;
         }
@@ -176,7 +174,7 @@ public class WorldControlCommands
         {
             case "clear":
                 user.setPlayerWeather(WeatherType.CLEAR);
-                if (user == context.getSender())
+                if (user == context.getSource())
                 {
                     context.sendTranslated(POSITIVE, "Your weather is now clear!");
                 }
@@ -188,7 +186,7 @@ public class WorldControlCommands
                 return;
             case "downfall":
                 user.setPlayerWeather(WeatherType.DOWNFALL);
-                if (user == context.getSender())
+                if (user == context.getSource())
                 {
                     context.sendTranslated(POSITIVE, "Your weather is now not clear!");
                 }
@@ -200,7 +198,7 @@ public class WorldControlCommands
                 return;
             case "reset":
                 user.resetPlayerWeather();
-                if (user == context.getSender())
+                if (user == context.getSource())
                 {
                     context.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
                 }
@@ -215,20 +213,20 @@ public class WorldControlCommands
     }
 
     @Command(desc = "Removes entity")
-    @IParams({@Grouped(@Indexed(label = "entityType[:itemMaterial]")),
-              @Grouped(req = false, value = @Indexed(label = {"radius","!*"}, type = Integer.class))})
-    @NParams(@Named(names = "in", label = "world", type = World.class))
-    public void remove(CubeContext context)
+    @Params(positional = {@Param(label = "entityType[:itemMaterial]"),
+                          @Param(req = false, label = "radius", type = Integer.class)}, // TODO staticValues = "*",
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
+    public void remove(CommandContext context)
     {
         User sender = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            sender = (User)context.getSender();
+            sender = (User)context.getSource();
         }
         World world;
         if (context.hasNamed("in"))
         {
-            world = context.getArg("in");
+            world = context.get("in");
         }
         else
         {
@@ -240,7 +238,7 @@ public class WorldControlCommands
             world = sender.getWorld();
         }
         int radius = this.config.commands.removeDefaultRadius;
-        if (context.hasIndexed(1))
+        if (context.hasPositional(1))
         {
             if ("*".equals(context.getString(1)))
             {
@@ -253,7 +251,7 @@ public class WorldControlCommands
             }
             else
             {
-                radius = context.getArg(1, 0);
+                radius = context.get(1, 0);
             }
             if (radius <= 0)
             {
@@ -283,7 +281,7 @@ public class WorldControlCommands
         {
             List<Entity> list = world.getEntities(); // All entites remaining in that list will not get deleted!
             String[] s_entityTypes = StringUtils.explode(",", context.getString(0));
-            List<org.bukkit.entity.EntityType> types = new ArrayList<>();
+            List<EntityType> types = new ArrayList<>();
             for (String s_entityType : s_entityTypes)
             {
                 if (s_entityType.contains(":"))
@@ -368,17 +366,17 @@ public class WorldControlCommands
 
     @Command(desc = "Gets rid of mobs close to you. Valid types are:\n" +
         "monster, animal, pet, golem, boss, other, creeper, skeleton, spider etc.")
-    @IParams({@Grouped(value = @Indexed(label = "types..."), req = false),
-              @Grouped(value = @Indexed(label = "radius", type = Integer.class), req = false)})
-    @NParams(@Named(names = "in", type = World.class, completer = WorldCompleter.class))
+    @Params(positional = {@Param(label = "types...", req = false),
+              @Param(label = "radius", type = Integer.class, req = false)},
+            nonpositional =@Param(names = "in", type = World.class, completer = WorldCompleter.class))
     @Flags({@Flag(longName = "lightning", name = "l"), // die with style
             @Flag(longName = "all", name = "a")})// infinite radius
-    public void butcher(CubeContext context)
+    public void butcher(CommandContext context)
     {
         User sender = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            sender = (User)context.getSender();
+            sender = (User)context.getSource();
         }
         Location loc;
         int radius = this.config.commands.butcherDefaultRadius;
@@ -392,29 +390,29 @@ public class WorldControlCommands
         {
             loc = sender.getLocation();
         }
-        if (context.hasIndexed(1))
+        if (context.hasPositional(1))
         {
-            radius = context.getArg(1, 0);
+            radius = context.get(1, 0);
             if (radius < 0 && !(radius == -1 && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context
-                                                                                                         .getSender())))
+                                                                                                         .getSource())))
             {
                 context.sendTranslated(NEGATIVE, "The radius has to be a number greater than 0!");
                 return;
             }
         }
-        if (context.hasFlag("a") && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context.getSender()))
+        if (context.hasFlag("a") && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context.getSource()))
         {
             radius = -1;
         }
         boolean lightning = false;
-        if (context.hasFlag("l") && module.perms().COMMAND_BUTCHER_FLAG_LIGHTNING.isAuthorized(context.getSender()))
+        if (context.hasFlag("l") && module.perms().COMMAND_BUTCHER_FLAG_LIGHTNING.isAuthorized(context.getSource()))
         {
             lightning = true;
         }
         List<Entity> list;
-        if (context.getSender() instanceof User && !(radius == -1))
+        if (context.getSource() instanceof User && !(radius == -1))
         {
-            list = ((User)context.getSender()).getNearbyEntities(radius, radius, radius);
+            list = ((User)context.getSource()).getNearbyEntities(radius, radius, radius);
         }
         else
         {
@@ -422,12 +420,12 @@ public class WorldControlCommands
         }
         String[] s_types = { "monster" };
         boolean allTypes = false;
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
             if ("*".equals(context.getString(0)))
             {
                 allTypes = true;
-                if (!module.perms().COMMAND_BUTCHER_FLAG_ALLTYPE.isAuthorized(context.getSender()))
+                if (!module.perms().COMMAND_BUTCHER_FLAG_ALLTYPE.isAuthorized(context.getSource()))
                 {
                     context.sendTranslated(NEGATIVE, "You are not allowed to butcher all types of living entities at once!");
                     return;
@@ -466,7 +464,7 @@ public class WorldControlCommands
                 }
                 for (Entity entity : list)
                 {
-                    if (entityRemoval.doesMatch(entity) && entityRemoval.isAllowed(context.getSender()))
+                    if (entityRemoval.doesMatch(entity) && entityRemoval.isAllowed(context.getSource()))
                     {
                         remList.add(entity);
                     }

@@ -25,7 +25,6 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
@@ -38,15 +37,16 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.exception.TooFewArgumentsException;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.OnlyIngame;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.filter.Restricted;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.command.parameter.TooFewArgumentsException;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.Direction;
@@ -61,7 +61,9 @@ import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
+import static de.cubeisland.engine.core.util.ChatFormat.*;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static java.util.Locale.ENGLISH;
 
 public class InformationCommands
 {
@@ -79,22 +81,19 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the biome type you are standing in.")
-    @IParams({@Grouped(value = @Indexed(label = "world", type = World.class), req = false),
-              @Grouped(value = {@Indexed(label = "block-x", type = Integer.class),
-                                @Indexed(label = "block-z", type = Integer.class)}, req = false)})
-    public void biome(CubeContext context)
+    public void biome(CommandContext context,
+                      @Label("world") @Optional World world,
+                      @Label("block-x") @Optional Integer x,
+                      @Label("block-z") @Optional Integer z)
     {
-        World world = context.getArg(0, null);
-        if (!context.isSender(User.class) && (!context.hasIndexed(2) || world == null))
+        if (!context.isSource(User.class) && (!context.hasPositional(2) || world == null))
         {
             context.sendTranslated(NEGATIVE, "Please provide a world and x and z coordinates!");
             return;
         }
-        Integer x = context.getArg(1, null);
-        Integer z = context.getArg(2, null);
-        if (!context.hasIndexed(2) && context.isSender(User.class))
+        if (!context.hasPositional(2) && context.isSource(User.class))
         {
-            User user = (User)context.getSender();
+            User user = (User)context.getSource();
             Location loc = user.getLocation();
             world = loc.getWorld();
             x = loc.getBlockX();
@@ -105,34 +104,32 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the seed of a world.")
-    @IParams(@Grouped(value = @Indexed(label = "world", type = World.class), req = false))
-    public void seed(CubeContext context)
+    public void seed(CommandContext context, @Label("world") @Optional World world)
     {
-        World world = context.getArg(0, null);
         if (world == null)
         {
-            if (!context.isSender(User.class))
+            if (!context.isSource(User.class))
             {
-                throw new TooFewArgumentsException(context.getSender());
+                throw new TooFewArgumentsException();
             }
-            world = ((User)context.getSender()).getWorld();
+            world = ((User)context.getSource()).getWorld();
         }
         context.sendTranslated(NEUTRAL, "Seed of {world} is {long#seed}", world, world.getSeed());
     }
 
     @Command(desc = "Displays the direction in which you are looking.")
-    @OnlyIngame("{text:ProTip}: I assume you are looking right at your screen, right?")
-    public void compass(CubeContext context)
+    @Restricted(value = User.class, msg = "{text:ProTip}: I assume you are looking right at your screen, right?")
+    public void compass(CommandContext context)
     {
-        int direction = Math.round(((User)context.getSender()).getLocation().getYaw() + 180f + 360f) % 360;
+        int direction = Math.round(((User)context.getSource()).getLocation().getYaw() + 180f + 360f) % 360;
         context.sendTranslated(NEUTRAL, "You are looking to {input#direction}!", Direction.matchDirection(direction).name()); // TODO translate direction
     }
 
     @Command(desc = "Displays your current depth.")
-    @OnlyIngame("You dug too deep!")
-    public void depth(CubeContext context)
+    @Restricted(value = User.class, msg = "You dug too deep!")
+    public void depth(CommandContext context)
     {
-        final int height = ((User)context.getSender()).getLocation().getBlockY();
+        final int height = ((User)context.getSource()).getLocation().getBlockY();
         if (height > 62)
         {
             context.sendTranslated(POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} above sealevel)", height, height - 62);
@@ -142,35 +139,35 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays your current location.")
-    @OnlyIngame("Your position: {text:Right in front of your screen!:color=RED}")
-    public void getPos(CubeContext context)
+    @Restricted(value = User.class, msg = "Your position: {text:Right in front of your screen!:color=RED}")
+    public void getPos(CommandContext context)
     {
-        final Location loc = ((User)context.getSender()).getLocation();
+        final Location loc = ((User)context.getSource()).getLocation();
         context.sendTranslated(NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
     }
 
     @Command(desc = "Displays near players(entities/mobs) to you.")
-    @IParams({@Grouped(value = @Indexed(label = "radius", type = Integer.class), req = false),
-              @Grouped(value = @Indexed(label = "player", type = User.class), req = false)})
+    @Params(positional = {@Param(label = "radius", type = Integer.class, req = false),
+              @Param(label = "player", type = User.class, req = false)})
     @Flags({@Flag(longName = "entity", name = "e"),
             @Flag(longName = "mob", name = "m")})
-    public void near(CubeContext context)
+    public void near(CommandContext context)
     {
         User user;
-        if (context.hasIndexed(1))
+        if (context.hasPositional(1))
         {
-            user = context.getArg(1);
+            user = context.get(1);
         }
-        else if (context.getSender() instanceof User)
+        else if (context.getSource() instanceof User)
         {
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
         else
         {
             context.sendTranslated(NEUTRAL, "I am right {text:behind:color=RED} you!");
             return;
         }
-        int radius = context.getArg(0, this.module.getConfiguration().commands.nearDefaultRadius);
+        int radius = context.get(0, this.module.getConfiguration().commands.nearDefaultRadius);
         int squareRadius = radius * radius;
         Location userLocation = user.getLocation();
         List<Entity> list = userLocation.getWorld().getEntities();
@@ -214,7 +211,7 @@ public class InformationCommands
                     String key;
                     if (entity instanceof Player)
                     {
-                        key = ChatFormat.DARK_GREEN + "player";
+                        key = DARK_GREEN + "player";
                     }
                     else if (entity instanceof LivingEntity)
                     {
@@ -244,10 +241,10 @@ public class InformationCommands
         StringBuilder groupedOutput = new StringBuilder();
         for (String key : groupedEntities.keySet())
         {
-            groupedOutput.append("\n").append(ChatFormat.GOLD).append(groupedEntities.get(key).getRight()).append("x ")
-                         .append(key).append(ChatFormat.WHITE).append(" (").append(ChatFormat.GOLD)
+            groupedOutput.append("\n").append(GOLD).append(groupedEntities.get(key).getRight()).append("x ")
+                         .append(key).append(WHITE).append(" (").append(GOLD)
                          .append(MathHelper.round(groupedEntities.get(key).getLeft())).append("m")
-                         .append(ChatFormat.WHITE).append(")");
+                         .append(WHITE).append(")");
         }
         if (outputlist.isEmpty())
         {
@@ -256,9 +253,9 @@ public class InformationCommands
         else
         {
             String result;
-            result = StringUtils.implode(ChatFormat.WHITE + ", ", outputlist);
+            result = StringUtils.implode(WHITE + ", ", outputlist);
             result += groupedOutput.toString();
-            if (context.getSender().equals(user))
+            if (context.getSource().equals(user))
             {
                 context.sendTranslated(NEUTRAL, "Found those nearby you:\n{}", result);
             }
@@ -274,7 +271,7 @@ public class InformationCommands
         String s;
         if (entity instanceof Player)
         {
-            s = ChatFormat.DARK_GREEN + ((Player)entity).getName();
+            s = DARK_GREEN + ((Player)entity).getName();
         }
         else if (entity instanceof LivingEntity)
         {
@@ -291,55 +288,56 @@ public class InformationCommands
                 s = ChatFormat.GREY + Match.entity().getNameFor(entity.getType());
             }
         }
-        s += ChatFormat.WHITE + " (" + ChatFormat.GOLD + distance + "m" + ChatFormat.WHITE + ")";
+        s += WHITE + " (" + GOLD + distance + "m" + WHITE + ")";
         list.add(s);
     }
 
     @Command(alias = "pong", desc = "Pong!")
-    public void ping(CubeContext context)
+    public void ping(CommandContext context)
     {
-        final String label = context.getLabel().toLowerCase(Locale.ENGLISH);
-        if (context.isSender(User.class))
+        final String label = context.getInvocation().getLabels().get(0).toLowerCase(ENGLISH);
+        if (context.isSource(User.class))
         {
-            context.sendTranslated(NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}", ((User)context.getSender()).getPing());
+            context.sendTranslated(NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}", ((User)context.getSource()).getPing());
             return;
         }
         context.sendTranslated(NEUTRAL, label + " in the console?");
     }
 
     @Command(desc = "Displays chunk, memory and world information.")
-    @Flags(@Flag(longName = "reset" , name = "r"))
-    public void lag(CubeContext context)
+    public void lag(CommandContext context, @Flag(name = "r", longName = "reset") boolean reset)
     {
-        if (context.hasFlag("r"))
+        if (reset)
         {
-            if (module.perms().COMMAND_LAG_RESET.isAuthorized(context.getSender()))
+            if (module.perms().COMMAND_LAG_RESET.isAuthorized(context.getSource()))
             {
                 this.module.getLagTimer().resetLowestTPS();
                 context.sendTranslated(POSITIVE, "Reset lowest TPS!");
+                return;
             }
-            else
-            {
-                context.sendTranslated(NEGATIVE, "You are not allowed to do this!");
-            }
+            context.sendTranslated(NEGATIVE, "You are not allowed to do this!");
             return;
         }
         //Uptime:
         context.sendTranslated(POSITIVE, "[{text:CubeEngine-Basics:color=RED}]");
         DateFormat df = SimpleDateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT,
-                     context.getSender().getLocale());
+                     context.getSource().getLocale());
         Date start = new Date(ManagementFactory.getRuntimeMXBean().getStartTime());
         Duration dura = new Duration(start.getTime(), System.currentTimeMillis());
         context.sendTranslated(POSITIVE, "Server has been running since {input#uptime}", df.format(start));
         context.sendTranslated(POSITIVE, "Uptime: {input#uptime}", formatter.print(dura.toPeriod()));
         //TPS:
         float tps = this.module.getLagTimer().getAverageTPS();
-        String color = tps == 20 ? ChatFormat.DARK_GREEN.toString() : tps > 17 ? ChatFormat.YELLOW.toString() : tps > 10 ? ChatFormat.RED.toString() : tps == 0 ? (ChatFormat.YELLOW.toString() + "NaN") : ChatFormat.DARK_RED.toString();
+        String color = tps == 20 ? DARK_GREEN.toString() :
+                       tps > 17 ?  YELLOW.toString() :
+                       tps > 10 ?  RED.toString() :
+                       tps == 0 ?  (YELLOW.toString() + "NaN") :
+                                   DARK_RED.toString();
         context.sendTranslated(POSITIVE, "Current TPS: {input#color}{decimal#tps:1}", color, tps);
         Pair<Long, Float> lowestTPS = this.module.getLagTimer().getLowestTPS();
         if (lowestTPS.getRight() != 20)
         {
-            color = ChatFormat.parseFormats(tps > 17 ? ChatFormat.YELLOW.toString() : tps > 10 ? ChatFormat.RED.toString() : ChatFormat.DARK_RED.toString());
+            color = ChatFormat.parseFormats(tps > 17 ? YELLOW.toString() : tps > 10 ? RED.toString() : DARK_RED.toString());
             Date date = new Date(lowestTPS.getLeft());
             context.sendTranslated(POSITIVE, "Lowest TPS was {}{decimal#tps:1} ({input#date})", color, lowestTPS.getRight(), df.format(date));
             long timeSinceLastLowTPS = System.currentTimeMillis() - this.module.getLagTimer().getLastLowTPS();
@@ -358,20 +356,20 @@ public class InformationCommands
         {
             if (memUsePercent > 95)
             {
-                memused = ChatFormat.DARK_RED.toString();
+                memused = DARK_RED.toString();
             }
             else
             {
-                memused = ChatFormat.RED.toString();
+                memused = RED.toString();
             }
         }
         else if (memUsePercent > 60)
         {
-            memused = ChatFormat.YELLOW.toString();
+            memused = YELLOW.toString();
         }
         else
         {
-            memused = ChatFormat.DARK_GREEN.toString();
+            memused = DARK_GREEN.toString();
         }
         memused += memUse;
         context.sendTranslated(POSITIVE, "Memory Usage: {input#memused}/{integer#memcom}/{integer#memMax} MB", memused, memCom, memMax);
@@ -387,10 +385,10 @@ public class InformationCommands
 
 
     @Command(desc = "Displays all loaded worlds", alias = {"worldlist","worlds"})
-    public void listWorlds(CubeContext context)
+    public void listWorlds(CommandContext context)
     {
         context.sendTranslated(POSITIVE, "Loaded worlds:");
-        String format = " " + ChatFormat.WHITE + "- " + ChatFormat.GOLD + "%s" + ChatFormat.WHITE + ":" + ChatFormat.INDIGO + "%s";
+        String format = " " + WHITE + "- " + GOLD + "%s" + WHITE + ":" + INDIGO + "%s";
         for (World world : Bukkit.getServer().getWorlds())
         {
             context.sendMessage(String.format(format, world.getName(), world.getEnvironment().name()));

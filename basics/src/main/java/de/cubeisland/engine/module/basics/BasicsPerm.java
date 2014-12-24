@@ -173,7 +173,7 @@ public class BasicsPerm extends PermissionContainer<Basics>
      */
     public final Permission COMMAND_TP_OTHER = COMMAND_TP.child("other");
 
-    public final Permission COMMAND_TPPOS_SAFE = COMMAND.child("tppos").child("safe");
+    public final Permission COMMAND_TPPOS_SAFE = COMMAND.childWildcard("tppos").child("safe");
 
     private final Permission TELEPORT = getBasePerm().childWildcard("teleport");
     private final Permission TELEPORT_PREVENT = TELEPORT.newWildcard("prevent");

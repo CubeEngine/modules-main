@@ -21,20 +21,20 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.readers.UserListReader;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.filter.Restricted;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Reader;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserManager;
-import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.storage.IgnoreList;
 import org.jooq.DSLContext;
 
+import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
+import static de.cubeisland.engine.core.util.ChatFormat.WHITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableIgnorelist.TABLE_IGNORE_LIST;
 
@@ -84,16 +84,19 @@ public class IgnoreCommands
     }
 
     @Command(desc = "Ignores all messages from players")
-    @IParams(@Grouped(@Indexed(label = "players", type = UserListReader.class)))
-    public void ignore(CubeContext context)
+    public void ignore(CommandContext context, @Label("players") @Reader(User.class) List<User> users)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             List<String> added = new ArrayList<>();
-            for (User user : context.<List<User>>getArg(0))
+            for (User user : users)
             {
-                if (!this.addIgnore(sender, user))
+                if (user == context.getSource())
+                {
+                    context.sendTranslated(NEGATIVE, "If you do not feel like talking to yourself just don't talk.");
+                }
+                else if (!this.addIgnore(sender, user))
                 {
                     if (module.perms().COMMAND_IGNORE_PREVENT.isAuthorized(user))
                     {
@@ -108,7 +111,7 @@ public class IgnoreCommands
                 }
             }
             context.sendTranslated(POSITIVE, "You added {user#list} to your ignore list!",
-                                   StringUtils.implode(ChatFormat.WHITE + ", " + ChatFormat.DARK_GREEN, added));
+                                   StringUtils.implode(WHITE + ", " + DARK_GREEN, added));
             return;
         }
         int rand1 = new Random().nextInt(6)+1;
@@ -118,28 +121,23 @@ public class IgnoreCommands
     }
 
     @Command(desc = "Stops ignoring all messages from a player")
-    @IParams(@Grouped(@Indexed(label = "players", type = UserListReader.class)))
-    public void unignore(CubeContext context)
+    @Restricted(value = User.class, msg = "Congratulations! You are now looking at this text!")
+    public void unignore(CommandContext context, @Label("players") @Reader(User.class) List<User> users)
     {
-        if (context.getSender() instanceof User)
+        User sender = (User)context.getSource();
+        List<String> added = new ArrayList<>();
+        for (User user : users)
         {
-            User sender = (User)context.getSender();
-            List<String> added = new ArrayList<>();
-            for (User user : context.<List<User>>getArg(0))
+            if (!this.removeIgnore(sender, user))
             {
-                if (!this.removeIgnore(sender, user))
-                {
-                    context.sendTranslated(NEGATIVE, "You haven't ignored {user}!", user);
-                }
-                else
-                {
-                    added.add(user.getName());
-                }
+                context.sendTranslated(NEGATIVE, "You haven't ignored {user}!", user);
             }
-            context.sendTranslated(POSITIVE, "You removed {user#list} from your ignore list!",
-                                   StringUtils.implode(ChatFormat.WHITE + ", " + ChatFormat.DARK_GREEN, added));
-            return;
+            else
+            {
+                added.add(user.getName());
+            }
         }
-        context.sendTranslated(NEGATIVE, "Congratulations! You are now looking at this text!");
+        context.sendTranslated(POSITIVE, "You removed {user#list} from your ignore list!",
+                               StringUtils.implode(WHITE + ", " + DARK_GREEN, added));
     }
 }

@@ -17,16 +17,15 @@
  */
 package de.cubeisland.engine.module.locker.commands;
 
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Alias;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.commands.CommandListener.CommandType;
 import de.cubeisland.engine.module.locker.storage.LockManager;
@@ -35,13 +34,14 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
 import static de.cubeisland.engine.module.locker.commands.LockerCommands.isNotUser;
 
-public class LockerCreateCommands extends ContainerCommand
+@Command(name = "create", desc = "Creates various protections")
+public class LockerCreateCommands extends CommandContainer
 {
     private final LockManager manager;
 
     public LockerCreateCommands(Locker module, LockManager manager)
     {
-        super(module, "create", "Creates various protections");
+        super(module);
         this.manager = manager;
     }
 
@@ -58,61 +58,61 @@ public class LockerCreateCommands extends ContainerCommand
         }
     }
 
-    @Alias(names = "cprivate")
+    @Alias(value = "cprivate")
     @Command(name = "private", desc = "creates a private protection")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "password")))
+    @Params(positional = @Param(req = false, label = "password"))
     @Flags(@Flag(name = "key", longName = "keybook"))
-    public void cPrivate(CubeContext context)
+    public void cPrivate(CommandContext context)
     {
-        if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_PRIVATE, context.getString(0), context.hasFlag("key"));
+        if (isNotUser(context.getSource())) return;
+        this.setCreateProtection(context.getSource(), C_PRIVATE, context.getString(0), context.hasFlag("key"));
     }
 
-    @Alias(names = "cpublic")
+    @Alias(value = "cpublic")
     @Command(name = "public", desc = "creates a public protection")
-    public void cPublic(CubeContext context)
+    public void cPublic(CommandContext context)
     {
-        if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_PUBLIC, null, false);
+        if (isNotUser(context.getSource())) return;
+        this.setCreateProtection(context.getSource(), C_PUBLIC, null, false);
     }
 
-    @Alias(names = "cdonation")
+    @Alias(value = "cdonation")
     @Command(name = "donation", desc = "creates a donation protection")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "password")))
+    @Params(positional = @Param(req = false, label = "password"))
     @Flags(@Flag(name = "key", longName = "keybook"))
-    public void cDonation(CubeContext context)
+    public void cDonation(CommandContext context)
     {
-        if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_DONATION, context.getString(0), context.hasFlag("key"));
+        if (isNotUser(context.getSource())) return;
+        this.setCreateProtection(context.getSource(), C_DONATION, context.getString(0), context.hasFlag("key"));
     }
 
-    @Alias(names = "cfree")
+    @Alias(value = "cfree")
     @Command(name = "free", desc = "creates a free protection")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "password")))
+    @Params(positional = @Param(req = false, label = "password"))
     @Flags(@Flag(name = "key", longName = "keybook"))
-    public void cFree(CubeContext context)
+    public void cFree(CommandContext context)
     {
-        if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_FREE, context.getString(0), context.hasFlag("key"));
+        if (isNotUser(context.getSource())) return;
+        this.setCreateProtection(context.getSource(), C_FREE, context.getString(0), context.hasFlag("key"));
     }
 
-    @Alias(names = "cpassword")
+    @Alias(value = "cpassword")
     @Command(name = "password", desc = "creates a donation protection")
-    @IParams(@Grouped(@Indexed(label = "password")))
+    @Params(positional = @Param(label = "password"))
     @Flags(@Flag(name = "key", longName = "keybook"))
-    public void cPassword(CubeContext context) // same as private but with pw
+    public void cPassword(CommandContext context) // same as private but with pw
     {
-        if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_PRIVATE, context.getString(0), context.hasFlag("key"));
+        if (isNotUser(context.getSource())) return;
+        this.setCreateProtection(context.getSource(), C_PRIVATE, context.getString(0), context.hasFlag("key"));
     }
 
-    @Alias(names = "cguarded")
+    @Alias(value = "cguarded")
     @Command(name = "guarded", desc = "creates a guarded protection")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "password")))
+    @Params(positional = @Param(req = false, label = "password"))
     @Flags(@Flag(name = "key", longName = "keybook"))
-    public void cguarded(CubeContext context) // same as private but with pw
+    public void cguarded(CommandContext context) // same as private but with pw
     {
-        if (isNotUser(context.getSender())) return;
-        this.setCreateProtection(context.getSender(), C_GUARDED, context.getString(0), context.hasFlag("key"));
+        if (isNotUser(context.getSource())) return;
+        this.setCreateProtection(context.getSource(), C_GUARDED, context.getString(0), context.hasFlag("key"));
     }
 }

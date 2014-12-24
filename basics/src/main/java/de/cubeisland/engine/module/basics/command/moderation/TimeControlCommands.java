@@ -26,16 +26,13 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.exception.MissingParameterException;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.parameter.IncorrectUsageException;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.task.TaskManager;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.matcher.Match;
@@ -61,10 +58,10 @@ public class TimeControlCommands
     }
 
     @Command(desc = "Changes the time of a world")
-    @IParams(@Grouped(value = @Indexed(label = "time"), req = false))
-    @NParams(@Named(names = { "w", "worlds", "in"})) // TODO worldlist reader // TODO NParams static label reader
+    @Params(positional = @Param(label = "time", req = false),
+            nonpositional = @Param(names = { "w", "worlds", "in"})) // TODO worldlist reader // TODO NParams static label reader
     @Flags(@Flag(longName = "lock", name = "l"))
-    public void time(CubeContext context)
+    public void time(CommandContext context)
     {
         List<World> worlds;
         if (context.hasNamed("w"))
@@ -88,17 +85,17 @@ public class TimeControlCommands
         }
         else
         {
-            if (context.getSender() instanceof User)
+            if (context.getSource() instanceof User)
             {
-                worlds = Arrays.asList(((User)context.getSender()).getWorld());
+                worlds = Arrays.asList(((User)context.getSource()).getWorld());
             }
             else
             {
-
-                throw new MissingParameterException("w", context.getSender().getTranslation(NEGATIVE, "You have to specify a world when using this command from the console!"));
+                context.sendTranslated(NEGATIVE, "You have to specify a world when using this command from the console!");
+                return;
             }
         }
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
             final Long time = Match.time().matchTimeValue(context.getString(0));
             if (time == null)
@@ -166,15 +163,15 @@ public class TimeControlCommands
     }
 
     @Command(desc = "Changes the time for a player")
-    @IParams({@Grouped(@Indexed(label = {"time","!reset"})),
-              @Grouped(req = false, value = @Indexed(label = "player", type = User.class))})
+    @Params(positional = {@Param(label = "time"), // TODO staticValues = "reset"
+                          @Param(req = false, label = "player", type = User.class)})
     @Flags(@Flag(longName = "lock", name = "l"))
-    public void ptime(CubeContext context)
+    public void ptime(CommandContext context)
     {
         Long time = 0L;
         boolean other = false;
         boolean reset = false;
-        String timeString = context.getArg(0);
+        String timeString = context.get(0);
         if (timeString.equalsIgnoreCase("reset"))
         {
             reset = true;
@@ -190,14 +187,14 @@ public class TimeControlCommands
         }
 
         User user = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
-        if (context.hasIndexed(1))
+        if (context.hasPositional(1))
         {
-            user = context.getArg(1);
-            if (!module.perms().COMMAND_PTIME_OTHER.isAuthorized(context.getSender()))
+            user = context.get(1);
+            if (!module.perms().COMMAND_PTIME_OTHER.isAuthorized(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to change the time of other players!");
                 return;

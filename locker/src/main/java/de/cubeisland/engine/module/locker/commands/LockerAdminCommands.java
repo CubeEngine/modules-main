@@ -20,12 +20,11 @@ package de.cubeisland.engine.module.locker.commands;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.InventoryHolder;
 
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.storage.Lock;
@@ -34,22 +33,23 @@ import de.cubeisland.engine.module.locker.storage.LockManager;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
-public class LockerAdminCommands extends ContainerCommand
+@Command(name = "admin", desc = "Administrate the protections")
+public class LockerAdminCommands extends CommandContainer
 {
     private final LockManager manager;
 
     public LockerAdminCommands(Locker module, LockManager manager)
     {
-        super(module, "admin", "Administrate the protections");
+        super(module);
         this.manager = manager;
     }
 
-    private Lock getLockById(CubeContext context, Integer id)
+    private Lock getLockById(CommandContext context, Integer id)
     {
-        if (LockerCommands.isNotUser(context.getSender())) return null;
+        if (LockerCommands.isNotUser(context.getSource())) return null;
         if (id == null)
         {
-            context.sendTranslated(NEGATIVE, "{input} is not a valid id!", context.getArg(0));
+            context.sendTranslated(NEGATIVE, "{input} is not a valid id!", context.get(0));
             return null;
         }
         Lock lockById = this.manager.getLockById(id);
@@ -61,10 +61,10 @@ public class LockerAdminCommands extends ContainerCommand
     }
 
     @Command(desc = "Opens a protected chest by protection id")
-    @IParams(@Grouped(@Indexed(label = "id", type = Integer.class)))
-    public void view(CubeContext context)
+    @Params(positional = @Param(label = "id", type = Integer.class))
+    public void view(CommandContext context)
     {
-        Lock lock = this.getLockById(context, context.<Integer>getArg(0));
+        Lock lock = this.getLockById(context, context.<Integer>get(0));
         switch (lock.getProtectedType())
         {
             case CONTAINER:
@@ -72,7 +72,7 @@ public class LockerAdminCommands extends ContainerCommand
             case ENTITY_CONTAINER_LIVING:
                 if (lock.isBlockLock())
                 {
-                    ((User)context.getSender()).openInventory(((InventoryHolder)lock.getFirstLocation().getBlock()
+                    ((User)context.getSource()).openInventory(((InventoryHolder)lock.getFirstLocation().getBlock()
                                                                                         .getState()).getInventory());
                 }
                 else
@@ -86,23 +86,23 @@ public class LockerAdminCommands extends ContainerCommand
     }
 
     @Command(desc = "Deletes a protection by its id")
-    @IParams(@Grouped(@Indexed(label = "id", type = Integer.class)))
-    public void remove(CubeContext context)
+    @Params(positional = @Param(label = "id", type = Integer.class))
+    public void remove(CommandContext context)
     {
-        Lock lock = this.getLockById(context, context.<Integer>getArg(0, null));
+        Lock lock = this.getLockById(context, context.<Integer>get(0, null));
         if (lock == null) return;
-        lock.delete((User)context.getSender());
+        lock.delete((User)context.getSource());
     }
 
     @Command(desc = "Teleport to a protection")
-    @IParams(@Grouped(@Indexed(label = "id", type = Integer.class)))
-    public void tp(CubeContext context)
+    @Params(positional = @Param(label = "id", type = Integer.class))
+    public void tp(CommandContext context)
     {
-        Lock lock = this.getLockById(context, context.<Integer>getArg(0, null));
+        Lock lock = this.getLockById(context, context.<Integer>get(0, null));
         if (lock == null) return;
         if (lock.isBlockLock())
         {
-            ((User)context.getSender()).safeTeleport(lock.getFirstLocation(), TeleportCause.PLUGIN, false);
+            ((User)context.getSource()).safeTeleport(lock.getFirstLocation(), TeleportCause.PLUGIN, false);
         }
         else
         {
@@ -111,22 +111,22 @@ public class LockerAdminCommands extends ContainerCommand
     }
 
     @Command(desc = "Deletes all locks of given player")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void purge(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class))
+    public void purge(CommandContext context)
     {
-        User user = context.getArg(0);
+        User user = context.get(0);
         this.manager.purgeLocksFrom(user);
         context.sendTranslated(POSITIVE, "All locks for {user} are now deleted!", user);
     }
 
     // TODO admin cmds
 
-    public void cleanup(CubeContext context)
+    public void cleanup(CommandContext context)
     {
         // cleanup remove not accessed protections / time in config
     }
 
-    public void list(CubeContext context)
+    public void list(CommandContext context)
     {
         // find & show all protections of a user/selection
     }

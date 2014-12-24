@@ -33,18 +33,16 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent;
 
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.core.ban.UserBan;
 import de.cubeisland.engine.core.bukkit.BukkitUtils;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.core.command.readers.UserListReader;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.OnlyIngame;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserManager;
 import de.cubeisland.engine.core.util.ChatFormat;
@@ -55,6 +53,7 @@ import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
 
+import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 import static java.text.DateFormat.SHORT;
@@ -85,12 +84,12 @@ public class PlayerCommands
     }
 
     @Command(desc = "Refills your hunger bar")
-    @IParams(@Grouped(value = @Indexed(label = {"player","!*"}, type = UserListReader.class), req = false))
-    public void feed(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class, reader = List.class, req = false)) // TODO staticValues = "*",
+    public void feed(CommandContext context)
     {
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
-            if (!module.perms().COMMAND_FEED_OTHER.isAuthorized(context.getSender()))
+            if (!module.perms().COMMAND_FEED_OTHER.isAuthorized(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to feed other players!");
                 return;
@@ -107,18 +106,18 @@ public class PlayerCommands
                     return;
                 }
                 context.sendTranslated(POSITIVE, "You made everyone fat!");
-                this.um.broadcastStatus(ChatFormat.BRIGHT_GREEN + "shared food with everyone.", context.getSender()); // TODO MessageType separate for translate Messages and messages from external input e.g. /me
+                this.um.broadcastStatus(ChatFormat.BRIGHT_GREEN + "shared food with everyone.", context.getSource()); // TODO MessageType separate for translate Messages and messages from external input e.g. /me
             }
             else
             {
-                users = context.<List<User>>getArg(0);
+                users = context.<List<User>>get(0);
                 context.sendTranslated(POSITIVE, "Fed {amount} players!", users.size());
             }
             for (User user : users)
             {
                 if (!all)
                 {
-                    user.sendTranslated(POSITIVE, "You got fed by {user}!", context.getSender());
+                    user.sendTranslated(POSITIVE, "You got fed by {user}!", context.getSource());
                 }
                 user.setFoodLevel(20);
                 user.setSaturation(20);
@@ -126,9 +125,9 @@ public class PlayerCommands
             }
             return;
         }
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             sender.setFoodLevel(20);
             sender.setSaturation(20);
             sender.setExhaustion(0);
@@ -136,16 +135,15 @@ public class PlayerCommands
             return;
         }
         context.sendTranslated(NEGATIVE, "Don't feed the troll!");
-        context.sendMessage(context.getCommand().getUsage(context));
     }
 
     @Command(desc = "Empties the hunger bar")
-    @IParams(@Grouped(value = @Indexed(label = {"players","!*"}, type = UserListReader.class), req = false))
-    public void starve(CubeContext context)
+    @Params(positional = @Param(label = "players", type = User.class, reader = List.class, req = false)) // TODO  staticValues = "*",
+    public void starve(CommandContext context)
     {
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
-            if (!module.perms().COMMAND_STARVE_OTHER.isAuthorized(context.getSender()))
+            if (!module.perms().COMMAND_STARVE_OTHER.isAuthorized(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to let other players starve!");
                 return;
@@ -162,11 +160,11 @@ public class PlayerCommands
                     return;
                 }
                 context.sendTranslated(NEUTRAL, "You let everyone starve to death!");
-                this.um.broadcastStatus(ChatFormat.YELLOW + "took away all food.", context.getSender());
+                this.um.broadcastStatus(ChatFormat.YELLOW + "took away all food.", context.getSource());
             }
             else
             {
-                users = context.getArg(0);
+                users = context.get(0);
                 context.sendTranslated(POSITIVE, "Starved {amount} players!", users.size());
             }
             for (User user : users)
@@ -181,9 +179,9 @@ public class PlayerCommands
             }
             return;
         }
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             sender.setFoodLevel(0);
             sender.setSaturation(0);
             sender.setExhaustion(4);
@@ -191,16 +189,15 @@ public class PlayerCommands
             return;
         }
         context.sendTranslated(NEGATIVE, "\n\n\n\n\n\n\n\n\n\n\n\n\nI'll give you only one line to eat!");
-        context.sendMessage(context.getCommand().getUsage(context));
     }
 
     @Command(desc = "Heals a player")
-    @IParams(@Grouped(value = @Indexed(label = {"players","!*"}, type = UserListReader.class), req = false))
-    public void heal(CubeContext context)
+    @Params(positional = @Param(label = "players", type = User.class, reader = List.class, req = false)) // TODO  staticValues = "*",
+    public void heal(CommandContext context)
     {
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
-            if (!module.perms().COMMAND_HEAL_OTHER.isAuthorized(context.getSender()))
+            if (!module.perms().COMMAND_HEAL_OTHER.isAuthorized(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to heal other players!");
                 return;
@@ -217,32 +214,31 @@ public class PlayerCommands
                     return;
                 }
                 context.sendTranslated(POSITIVE, "You healed everyone!");
-                this.um.broadcastStatus(ChatFormat.BRIGHT_GREEN + "healed every player.", context.getSender());
+                this.um.broadcastStatus(ChatFormat.BRIGHT_GREEN + "healed every player.", context.getSource());
             }
             else
             {
-                users = context.getArg(0);
+                users = context.get(0);
                 context.sendTranslated(POSITIVE, "Healed {amount} players!", users.size());
             }
             for (User user : users)
             {
                 if (!all)
                 {
-                    user.sendTranslated(POSITIVE, "You got healed by {sender}!", context.getSender().getName());
+                    user.sendTranslated(POSITIVE, "You got healed by {sender}!", context.getSource().getName());
                 }
                 user.setHealth(user.getMaxHealth());
             }
             return;
         }
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             sender.setHealth(sender.getMaxHealth());
             sender.sendTranslated(POSITIVE, "You are now healed!");
             return;
         }
         context.sendTranslated(NEGATIVE, "Only time can heal your wounds!");
-        context.sendMessage(context.getCommand().getUsage(context));
     }
 
     private GameMode getGameMode(String name)
@@ -284,20 +280,20 @@ public class PlayerCommands
     }
 
     @Command(alias = "gm", desc = "Changes the gamemode")
-    @IParams({@Grouped(value = @Indexed(label = "player", type = User.class), req = false),
-              @Grouped(value = @Indexed(label = "gamemode"), req = false)})
-    public void gamemode(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class, req = false),
+              @Param(label = "gamemode", req = false)})
+    public void gamemode(CommandContext context)
     {
-        CommandSender sender = context.getSender();
+        CommandSender sender = context.getSource();
         User target = null;
-        if (context.getIndexedCount() > 0)
+        if (context.getPositionalCount() > 0)
         {
-            if (context.getIndexedCount() > 1 || getGameMode(context.getString(0)) == null)
+            if (context.getPositionalCount() > 1 || getGameMode(context.getString(0)) == null)
             {
                 target = um.findUser(context.getString(0));
                 if (target == null)
                 {
-                    context.sendTranslated(NEGATIVE, "User {user} not found!", context.getArg(0));
+                    context.sendTranslated(NEGATIVE, "User {user} not found!", context.get(0));
                     return;
                 }
             }
@@ -319,7 +315,7 @@ public class PlayerCommands
             context.sendTranslated(NEGATIVE, "You are not allowed to change the game mode of an other player!");
             return;
         }
-        GameMode newMode = getGameMode(context.getString(context.getIndexedCount() - 1));
+        GameMode newMode = getGameMode(context.getString(context.getPositionalCount() - 1));
         if (newMode == null)
         {
             newMode = toggleGameMode(target.getGameMode());
@@ -337,29 +333,29 @@ public class PlayerCommands
     }
 
     @Command(alias = "slay", desc = "Kills a player")
-    @IParams(@Grouped(@Indexed(label = {"players","!*"}, type = UserListReader.class)))
+    @Params(positional = @Param(label = "players", type = User.class, reader = List.class)) // TODO staticValues = "*",
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "quiet", name = "q"),
             @Flag(longName = "lightning", name = "l")})
-    public void kill(CubeContext context)
+    public void kill(CommandContext context)
     {
-        boolean lightning = context.hasFlag("l") && module.perms().COMMAND_KILL_LIGHTNING.isAuthorized(context.getSender());
-        boolean force = context.hasFlag("f") && module.perms().COMMAND_KILL_FORCE.isAuthorized(context.getSender());
-        boolean quiet = context.hasFlag("q") && module.perms().COMMAND_KILL_QUIET.isAuthorized(context.getSender());
-        if (context.hasIndexed(0))
+        boolean lightning = context.hasFlag("l") && module.perms().COMMAND_KILL_LIGHTNING.isAuthorized(context.getSource());
+        boolean force = context.hasFlag("f") && module.perms().COMMAND_KILL_FORCE.isAuthorized(context.getSource());
+        boolean quiet = context.hasFlag("q") && module.perms().COMMAND_KILL_QUIET.isAuthorized(context.getSource());
+        if (context.hasPositional(0))
         {
             List<String> killed = new ArrayList<>();
-            Object arg0 = context.getArg(0);
+            Object arg0 = context.get(0);
             if ("*".equals(context.getString(0)))
             {
-                if (!module.perms().COMMAND_KILL_ALL.isAuthorized(context.getSender()))
+                if (!module.perms().COMMAND_KILL_ALL.isAuthorized(context.getSource()))
                 {
                     context.sendTranslated(NEGATIVE, "You are not allowed to kill everyone!");
                     return;
                 }
                 for (User user : context.getCore().getUserManager().getOnlineUsers())
                 {
-                    if (!user.equals(context.getSender()))
+                    if (!user.equals(context.getSource()))
                     {
                         if (this.kill(user, lightning, context, false, force, quiet))
                         {
@@ -370,7 +366,7 @@ public class PlayerCommands
             }
             else
             {
-                for (User user : context.<List<User>>getArg(0))
+                for (User user : context.<List<User>>get(0))
                 {
                     if (this.kill(user, lightning, context, false, force, quiet))
                     {
@@ -394,9 +390,9 @@ public class PlayerCommands
             context.sendTranslated(POSITIVE, "You killed {user#list}!", StringUtils.implode(",", killed));
             return;
         }
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
+            User sender = (User)context.getSource();
             TreeSet<Entity> entities = sender.getTargets(150);
             User user = null;
             for (Entity entity : entities)
@@ -422,7 +418,7 @@ public class PlayerCommands
         context.sendTranslated(NEGATIVE, "Please specify a victim!");
     }
 
-    private boolean kill(User user, boolean lightning, CubeContext context, boolean showMessage, boolean force, boolean quiet)
+    private boolean kill(User user, boolean lightning, CommandContext context, boolean showMessage, boolean force, boolean quiet)
     {
         if (!force)
         {
@@ -443,16 +439,16 @@ public class PlayerCommands
         }
         if (!quiet && module.perms().COMMAND_KILL_NOTIFY.isAuthorized(user))
         {
-            user.sendTranslated(NEUTRAL, "You were killed by {user}", context.getSender());
+            user.sendTranslated(NEUTRAL, "You were killed by {user}", context.getSource());
         }
         return true;
     }
 
     @Command(desc = "Shows when given player was online the last time")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void seen(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class))
+    public void seen(CommandContext context)
     {
-        User user = context.getArg(0);
+        User user = context.get(0);
         if (user.isOnline())
         {
             context.sendTranslated(NEUTRAL, "{user} is currently online!", user);
@@ -462,24 +458,30 @@ public class PlayerCommands
         if (System.currentTimeMillis() - lastPlayed > 7 * 24 * 60 * 60 * 1000) // If greater than 7 days show distance not date
         {
             Date date = new Date(lastPlayed);
-            DateFormat format = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, context.getSender().getLocale());
+            DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getSource().getLocale());
             context.sendTranslated(NEUTRAL, "{user} is offline since {input#time}", user, format.format(date));
             return;
         }
-        context.sendTranslated(NEUTRAL, "{user} was last seen {input#date}.", user, TimeUtil.format(context.getSender().getLocale(), new Date(lastPlayed)));
+        context.sendTranslated(NEUTRAL, "{user} was last seen {input#date}.", user, TimeUtil.format(context.getSource().getLocale(), new Date(lastPlayed)));
     }
 
     @Command(desc = "Makes a player send a message (including commands)")
-    @IParams({@Grouped(@Indexed(label = "player", type = User.class)),
-              @Grouped(value = @Indexed(label = "message"), greedy = true)})
-    public void sudo(CubeContext context)
+    @Params(positional = {@Param(label = "player", type = User.class),
+              @Param(label = "message", greed = INFINITE)})
+    public void sudo(CommandContext context)
     {
-        User user = context.getArg(0);
+        User user = context.get(0);
         String s = context.getStrings(1);
         if (s.startsWith("/"))
         {
-            this.module.getCore().getCommandManager().runCommand(user,s.substring(1));
-            context.sendTranslated(POSITIVE, "Command {input#command} executed as {user}", s, user);
+            if (this.module.getCore().getCommandManager().runCommand(user,s.substring(1)))
+            {
+                context.sendTranslated(POSITIVE, "Command {input#command} executed as {user}", s, user);
+            }
+            else
+            {
+                context.sendTranslated(NEGATIVE, "Command was not executed succesfully!");
+            }
             return;
         }
         user.chat(s);
@@ -487,33 +489,33 @@ public class PlayerCommands
     }
 
     @Command(desc = "Kills yourself")
-    @OnlyIngame("You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}")
-    public void suicide(CubeContext context)
+    @Restricted(value = User.class, msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}") // TODO replace User.class /w interface that has life stuff?
+    public void suicide(CommandContext context)
     {
-        User sender = (User)context.getSender();
+        User sender = (User)context.getSource();
         sender.setHealth(0);
         sender.setLastDamageCause(new EntityDamageEvent(sender, EntityDamageEvent.DamageCause.CUSTOM, sender.getMaxHealth()));
         context.sendTranslated(NEGATIVE, "You ended your life. Why? {text:\\:(:color=DARK_RED}");
     }
 
     @Command(desc = "Displays that you are afk")
-    @IParams(@Grouped(value = @Indexed(label = "player", type = User.class), req = false))
-    public void afk(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class, req = false))
+    public void afk(CommandContext context)
     {
         User user;
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
             context.ensurePermission(module.perms().COMMAND_AFK_OTHER);
-            user = context.getArg(0);
+            user = context.get(0);
             if (!user.isOnline())
             {
                 context.sendTranslated(NEGATIVE, "{user} is not online!", user);
                 return;
             }
         }
-        else if (context.getSender() instanceof User)
+        else if (context.getSource() instanceof User)
         {
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
         else
         {
@@ -534,10 +536,10 @@ public class PlayerCommands
     }
 
     @Command(desc = "Displays informations from a player!")
-    @IParams(@Grouped(@Indexed(label = "player", type = User.class)))
-    public void whois(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class))
+    public void whois(CommandContext context)
     {
-        User user = context.getArg(0);
+        User user = context.get(0);
         if (!user.isOnline())
         {
             context.sendTranslated(NEUTRAL, "Nickname: {user} ({text:offline})", user);
@@ -579,7 +581,7 @@ public class PlayerCommands
             Timestamp muted = module.getBasicsUser(user).getbUEntity().getValue(TABLE_BASIC_USER.MUTED);
             if (muted != null && muted.getTime() > System.currentTimeMillis())
             {
-                context.sendTranslated(NEUTRAL, "Muted until {input#time}", DateFormat.getDateTimeInstance(SHORT, SHORT, context.getSender().getLocale()).format(muted));
+                context.sendTranslated(NEUTRAL, "Muted until {input#time}", DateFormat.getDateTimeInstance(SHORT, SHORT, context.getSource().getLocale()).format(muted));
             }
             if (user.getGameMode() != GameMode.CREATIVE)
             {
@@ -596,38 +598,38 @@ public class PlayerCommands
         {
             UserBan ban = this.module.getCore().getBanManager().getUserBan(user.getUniqueId());
             String expires;
-            DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getSender().getLocale());
+            DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getSource().getLocale());
             if (ban.getExpires() != null)
             {
                 expires = format.format(ban.getExpires());
             }
             else
             {
-                expires = context.getSender().getTranslation(NONE, "for ever");
+                expires = context.getSource().getTranslation(NONE, "for ever");
             }
             context.sendTranslated(NEUTRAL, "Banned by {user} on {input#date}: {input#reason} ({input#expire})", ban.getSource(), format.format(ban.getCreated()), ban.getReason(), expires);
         }
     }
 
     @Command(desc = "Toggles the god-mode!")
-    @IParams(@Grouped(value = @Indexed(label = "player", type = User.class), req = false))
-    public void god(CubeContext context)
+    @Params(positional = @Param(label = "player", type = User.class, req = false))
+    public void god(CommandContext context)
     {
         User user;
         boolean other = false;
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
-            if (!module.perms().COMMAND_GOD_OTHER.isAuthorized(context.getSender()))
+            if (!module.perms().COMMAND_GOD_OTHER.isAuthorized(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to god others!");
                 return;
             }
-            user = context.getArg(0);
+            user = context.get(0);
             other = true;
         }
-        else if (context.getSender() instanceof User)
+        else if (context.getSource() instanceof User)
         {
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
         else
         {
@@ -658,20 +660,20 @@ public class PlayerCommands
     }
 
     @Command(desc = "Changes your walkspeed.")
-    @IParams({@Grouped(@Indexed(label = "speed", type = Float.class)),
-              @Grouped(value = @Indexed(label = "player"), req = false)})
-    public void walkspeed(CubeContext context)
+    @Params(positional = {@Param(label = "speed", type = Float.class),
+                          @Param(label = "player", req = false)})
+    public void walkspeed(CommandContext context)
     {
         User sender = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            sender = (User)context.getSender();
+            sender = (User)context.getSource();
         }
         User user = sender;
         boolean other = false;
-        if (context.hasIndexed(1))
+        if (context.hasPositional(1))
         {
-            user = context.getArg(1);
+            user = context.get(1);
             if (user.equals(sender))
             {
                 other = true;
@@ -687,13 +689,13 @@ public class PlayerCommands
             context.sendTranslated(NEGATIVE, "{user} is offline!", user.getName());
             return;
         }
-        if (other && !module.perms().COMMAND_WALKSPEED_OTHER.isAuthorized(context.getSender())) // PermissionChecks
+        if (other && !module.perms().COMMAND_WALKSPEED_OTHER.isAuthorized(context.getSource())) // PermissionChecks
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to change the walk speed of other user!");
             return;
         }
         user.setWalkSpeed(0.2f);
-        Float speed = context.getArg(0, null);
+        Float speed = context.get(0, null);
         if (speed != null && speed >= 0 && speed <= 10)
         {
             user.setWalkSpeed(speed / 10f);
@@ -708,21 +710,21 @@ public class PlayerCommands
     }
 
     @Command(desc = "Lets you fly away")
-    @IParams({@Grouped(value = @Indexed(label = "flyspeed", type = Float.class), req = false),
-              @Grouped(value = @Indexed(label = "player", type = User.class), req = false)})
-    public void fly(CubeContext context)
+    @Params(positional = {@Param(label = "flyspeed", type = Float.class, req = false),
+                          @Param(label = "player", type = User.class, req = false)})
+    public void fly(CommandContext context)
     {
-        final CommandSender sender = context.getSender();
+        final CommandSender sender = context.getSource();
         User target;
-        if (context.hasIndexed(1))
+        if (context.hasPositional(1))
         {
-            target = context.getArg(1);
+            target = context.get(1);
         }
         else
         {
-            if (context.getSender() instanceof User)
+            if (context.getSource() instanceof User)
             {
-                target = (User) context.getSender();
+                target = (User) context.getSource();
             }
             else
             {
@@ -732,15 +734,15 @@ public class PlayerCommands
             }
         }
         // PermissionChecks
-        if (sender != target && !module.perms().COMMAND_FLY_OTHER.isAuthorized(context.getSender()))
+        if (sender != target && !module.perms().COMMAND_FLY_OTHER.isAuthorized(context.getSource()))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to change the fly mode of other player!");
             return;
         }
         //I Believe I Can Fly ...
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
-            Float speed = context.getArg(0);
+            Float speed = context.get(0);
             if (speed != null && speed >= 0 && speed <= 10)
             {
                 target.setFlySpeed(speed / 10f);

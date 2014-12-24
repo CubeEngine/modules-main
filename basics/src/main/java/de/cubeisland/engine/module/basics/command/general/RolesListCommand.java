@@ -23,6 +23,9 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.result.CommandResult;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
@@ -37,7 +40,6 @@ public class RolesListCommand extends ListCommand
     public RolesListCommand(Basics basics)
     {
         super(basics);
-        setDescription("Displays all the online players ordered by role.");
     }
 
     @Override
@@ -104,5 +106,12 @@ public class RolesListCommand extends ListCommand
             }
             return i;
         }
+    }
+
+    @Override
+    @Command(desc = "Displays all the online players ordered by role.")
+    public CommandResult list(CommandContext context)
+    {
+        return super.list(context);
     }
 }

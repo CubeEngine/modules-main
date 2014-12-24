@@ -20,19 +20,16 @@ package de.cubeisland.engine.module.basics.command.teleport;
 import org.bukkit.Location;
 import org.bukkit.World;
 
-import de.cubeisland.engine.core.command.context.CubeContext;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.core.command.reflected.Command;
-import de.cubeisland.engine.core.command.reflected.context.Flag;
-import de.cubeisland.engine.core.command.reflected.context.Flags;
-import de.cubeisland.engine.core.command.reflected.context.Grouped;
-import de.cubeisland.engine.core.command.reflected.context.IParams;
-import de.cubeisland.engine.core.command.reflected.context.Indexed;
-import de.cubeisland.engine.core.command.reflected.context.NParams;
-import de.cubeisland.engine.core.command.reflected.context.Named;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.core.world.WorldSetSpawnEvent;
+import de.cubeisland.engine.module.basics.Basics;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -52,24 +49,24 @@ public class SpawnCommands
     }
 
     @Command(desc = "Changes the global respawnpoint")
-    @IParams({@Grouped(req = false, value = @Indexed(label = "world", type = World.class)),
-              @Grouped(req = false, value = {@Indexed(label = "x", type = Integer.class),
-                                             @Indexed(label = "y", type = Integer.class),
-                                             @Indexed(label = "z", type = Integer.class)})})
-    public void setSpawn(CubeContext context)
+    @Params(positional = {@Param(req = false, label = "world", type = World.class),
+              @Param(req = false, label = "x", type = Integer.class),
+              @Param(req = false, label = "y", type = Integer.class),
+              @Param(req = false, label = "z", type = Integer.class)})
+    public void setSpawn(CommandContext context)
     {
         User sender = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            sender = (User)context.getSender();
+            sender = (User)context.getSource();
         }
         Integer x;
         Integer y;
         Integer z;
         World world;
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
-            world = context.getArg(0);
+            world = context.get(0);
         }
         else
         {
@@ -81,11 +78,11 @@ public class SpawnCommands
             world = sender.getWorld();
         }
 
-        if (context.hasIndexed(3))
+        if (context.hasPositional(3))
         {
-            x = context.getArg(1, null);
-            y = context.getArg(2, null);
-            z = context.getArg(3, null);
+            x = context.get(1, null);
+            y = context.get(2, null);
+            z = context.get(3, null);
             if (x == null || y == null || z == null)
             {
                 context.sendTranslated(NEGATIVE, "Coordinates are invalid!");
@@ -111,16 +108,16 @@ public class SpawnCommands
     }
 
     @Command(desc = "Teleport directly to the worlds spawn.")
-    @IParams(@Grouped(req = false, value = @Indexed(label = "player", type = User.class)))
-    @NParams(@Named(names = {"world", "w"}, type = World.class))
+    @Params(positional = @Param(req = false, label = "player", type = User.class),
+            nonpositional = @Param(names = {"world", "w"}, type = World.class))
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "all", name = "a")})
-    public void spawn(CubeContext context)
+    public void spawn(CommandContext context)
     {
         User user = null;
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            user = (User)context.getSender();
+            user = (User)context.getSource();
         }
         World world = module.getConfiguration().mainWorld;
         if (world == null && user != null)
@@ -128,13 +125,13 @@ public class SpawnCommands
             world = user.getWorld();
         }
         boolean force = false;
-        if (context.hasFlag("f") && module.perms().COMMAND_SPAWN_FORCE.isAuthorized(context.getSender()))
+        if (context.hasFlag("f") && module.perms().COMMAND_SPAWN_FORCE.isAuthorized(context.getSource()))
         {
             force = true; // if not allowed ignore flag
         }
         if (context.hasNamed("world"))
         {
-            world = context.getArg("world", null);
+            world = context.get("world", null);
             if (world == null)
             {
                 context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.getString("world"));
@@ -148,7 +145,7 @@ public class SpawnCommands
         }
         if (context.hasFlag("a"))
         {
-            if (!module.perms().COMMAND_SPAWN_ALL.isAuthorized(context.getSender()))
+            if (!module.perms().COMMAND_SPAWN_ALL.isAuthorized(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to spawn everyone!");
                 return;
@@ -171,9 +168,9 @@ public class SpawnCommands
             this.module.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleported everyone to the spawn of {world}!", world);
             return;
         }
-        if (context.hasIndexed(0))
+        if (context.hasPositional(0))
         {
-            user = context.getArg(0);
+            user = context.get(0);
             if (!user.isOnline())
             {
                 context.sendTranslated(NEGATIVE, "You cannot teleport an offline player to spawn!");
@@ -201,13 +198,13 @@ public class SpawnCommands
     }
 
     @Command(desc = "Teleports you to the spawn of given world")
-    @IParams(@Grouped(@Indexed(label = "world", type = World.class)))
-    public void tpworld(CubeContext context)
+    @Params(positional = @Param(label = "world", type = World.class))
+    public void tpworld(CommandContext context)
     {
-        if (context.getSender() instanceof User)
+        if (context.getSource() instanceof User)
         {
-            User sender = (User)context.getSender();
-            World world = context.getArg(0);
+            User sender = (User)context.getSource();
+            World world = context.get(0);
             final Location spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
             final Location userLocation = sender.getLocation();
             spawnLocation.setPitch(userLocation.getPitch());
