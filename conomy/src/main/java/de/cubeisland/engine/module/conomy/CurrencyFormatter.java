@@ -15,45 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.portals;
+package de.cubeisland.engine.module.conomy;
 
-import de.cubeisland.engine.core.user.UserAttachment;
+import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
+import de.cubeisland.engine.messagecompositor.macro.MacroContext;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
-
-public class PortalsAttachment extends UserAttachment
+public class CurrencyFormatter extends AbstractFormatter<Double>
 {
-    private boolean isInPortal = false;
-    private Portal portal;
-    private boolean debug = false;
+    private Conomy module;
 
-    public Portal getPortal()
+    public CurrencyFormatter(Conomy module)
     {
-        return portal;
+        this.module = module;
+        this.names.add("currency");
     }
 
-    public void setPortal(Portal portal)
+    @Override
+    public String process(Double object, MacroContext context)
     {
-        this.portal = portal;
-    }
-
-    public boolean isInPortal()
-    {
-        return isInPortal;
-    }
-
-    public void setInPortal(boolean isInPortal)
-    {
-        this.isInPortal = isInPortal;
-    }
-
-    public void toggleDebug()
-    {
-        this.debug = !this.debug;
-    }
-
-    public boolean isDebug()
-    {
-        return debug;
+        return module.getManager().format(object);
     }
 }

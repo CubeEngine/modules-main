@@ -47,6 +47,9 @@ public class Conomy extends Module
         this.config = this.loadConfig(ConomyConfiguration.class);
         this.manager = new ConomyManager(this);
         perms = new ConomyPermissions(this);
+
+        this.getCore().getI18n().getCompositor().registerMacro(new CurrencyFormatter(this));
+
         final CommandManager cm = this.getCore().getCommandManager();
         cm.addCommand(new MoneyCommand(this));
         EcoCommands ecoCommands = new EcoCommands(this);

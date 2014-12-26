@@ -17,6 +17,8 @@
  */
 package de.cubeisland.engine.module.portals.config;
 
+import java.util.Random;
+
 import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
 
 import org.bukkit.Location;
@@ -24,6 +26,10 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import de.cubeisland.engine.command.CommandInvocation;
+import de.cubeisland.engine.command.parameter.reader.ArgumentReader;
+import de.cubeisland.engine.command.parameter.reader.ReaderException;
+import de.cubeisland.engine.command.parameter.reader.ReaderManager;
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.bukkit.BukkitUtils;
 import de.cubeisland.engine.core.user.User;
@@ -31,6 +37,8 @@ import de.cubeisland.engine.core.util.WorldLocation;
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.Portal;
 import de.cubeisland.engine.module.portals.PortalManager;
+import de.cubeisland.engine.module.portals.Portals;
+import sun.misc.REException;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 
@@ -121,4 +129,49 @@ public class Destination
     {
         PORTAL, WORLD, LOCATION, RANDOM
     }
+
+    public static class DestinationReader implements ArgumentReader<Destination>
+    {
+        private final Portals module;
+        private final Random random = new Random();
+
+        public DestinationReader(Portals module)
+        {
+            this.module = module;
+        }
+
+        @Override
+        public Destination read(ReaderManager manager, Class type, CommandInvocation invocation) throws ReaderException
+        {
+            String token = invocation.consume(1);
+            if ("here".equalsIgnoreCase(token))
+            {
+                if ((invocation.getCommandSource() instanceof User))
+                {
+                    return new Destination(((User)invocation.getCommandSource()).getLocation());
+                }
+                throw new ReaderException("The Portal Agency will bring you your portal for just {text:$ 1337} within {input#amount} weeks", String.valueOf(random.nextInt(51)+1));
+            }
+            else if (token.startsWith("p:")) // portal dest
+            {
+                Portal destPortal = module.getPortalManager().getPortal(token.substring(2));
+                if (destPortal == null)
+                {
+                    throw new ReaderException("Portal {input} not found!", token.substring(2));
+                }
+                return new Destination(destPortal);
+            }
+            else // world
+            {
+                World world = this.module.getCore().getWorldManager().getWorld(token);
+                if (world == null)
+                {
+                    throw new ReaderException("World {input} not found!", token);
+                }
+                return new Destination(world);
+            }
+        }
+    }
+
+    // TODO completer for destination
 }

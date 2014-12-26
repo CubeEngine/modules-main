@@ -21,8 +21,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.bukkit.Chunk;
@@ -276,5 +278,18 @@ public class PortalManager implements Listener
     public Collection<Portal> getPortals()
     {
         return portals.values();
+    }
+
+    public Set<Portal> getPortals(World world)
+    {
+        Set<Portal> result = new HashSet<>();
+        for (Portal portal : getPortals())
+        {
+            if (portal.getWorld().equals(world))
+            {
+                result.add(portal);
+            }
+        }
+        return result;
     }
 }

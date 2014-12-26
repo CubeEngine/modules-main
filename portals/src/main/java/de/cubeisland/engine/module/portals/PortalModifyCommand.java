@@ -17,17 +17,17 @@
  */
 package de.cubeisland.engine.module.portals;
 
-import java.util.Random;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import de.cubeisland.engine.command.alias.Alias;
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Default;
+import de.cubeisland.engine.command.methodic.parametric.Desc;
+import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.module.service.Selector;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.WorldLocation;
@@ -36,9 +36,11 @@ import de.cubeisland.engine.core.util.math.shape.Cuboid;
 import de.cubeisland.engine.module.portals.config.Destination;
 import de.cubeisland.engine.module.portals.config.RandomDestination;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
-@Command(name = "modify", desc = "modifies a portal", alias = "mvpm")
+@Alias("mvpm")
+@Command(name = "modify", desc = "modifies a portal")
 public class PortalModifyCommand extends CommandContainer
 {
     private Portals module;
@@ -52,220 +54,94 @@ public class PortalModifyCommand extends CommandContainer
     }
 
     @Command(desc = "Changes the owner of a portal")
-    @Params(positional = {@Param(label = "owner", type = User.class),
-                          @Param(req = false, label = "portal")})
-    public void owner(CommandContext context)
+    public void owner(CommandContext context, @Label("owner") User user, @Default @Label("portal") Portal portal)
     {
-        User user = context.get(0);
-        Portal portal = getPortal(context, 1);
-        if (portal == null)
-        {
-            return;
-        }
         portal.config.owner = user.getOfflinePlayer();
         portal.config.save();
         context.sendTranslated(POSITIVE, "{user} is now the owner of {name#portal}!", user, portal.getName());
     }
 
-    private Portal getPortal(CommandContext context, int index)
-    {
-        Portal portal = null;
-        if (context.hasPositional(index))
-        {
-            portal = manager.getPortal(context.getString(index));
-            if (portal == null)
-            {
-                context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.getString(index));
-                return null;
-            }
-        }
-        else if (context.getSource() instanceof User)
-        {
-            portal = ((User)context.getSource()).attachOrGet(PortalsAttachment.class, module).getPortal();
-        }
-        if (portal == null)
-        {
-            context.sendTranslated(NEGATIVE, "You need to define a portal to use!");
-            return null;
-        }
-        return portal;
-    }
-
     @Alias(value = "mvpd")
     @Command(alias = "dest", desc = "changes the destination of the selected portal")
-    @Params(positional = {@Param(label = "world", names = "here"), // TODO treat "names" on positional parameter as allowed fixed values?
-                          @Param(req = false, label = "portal")})
-    public void destination(CommandContext context)
+    public void destination(CommandContext context,
+        @Label("destination")
+        @Desc("A destination can be: here, <world> or p:<portal>")
+        Destination destination,
+        @Default
+        @Label("portal")
+        Portal portal)
     {
-        Portal portal = getPortal(context, 1);
-        if (portal == null)
-        {
-            return;
-        }
-        String arg0 = context.get(0);
-        if ("here".equalsIgnoreCase(arg0))
-        {
-            if (!(context.getSource() instanceof User))
-            {
-                context.sendTranslated(NEUTRAL, "The Portal Agency will bring you your portal for just {text:$ 1337} within {amount} weeks", new Random().nextInt(51)+1);
-                return;
-            }
-            portal.config.destination = new Destination(((User)context.getSource()).getLocation());
-        }
-        else if (arg0.startsWith("p:")) // TODO extract to separate (as its not possible to show in label) cmd /mvppd portaldestination
-        {
-            Portal destPortal = manager.getPortal(arg0.substring(2));
-            if (destPortal == null)
-            {
-                context.sendTranslated(NEGATIVE, "Portal {input} not found!", arg0.substring(2));
-                return;
-            }
-            portal.config.destination = new Destination(destPortal);
-        }
-        else
-        {
-            World world = this.module.getCore().getWorldManager().getWorld(arg0);
-            if (world == null)
-            {
-                context.sendTranslated(NEGATIVE, "World {input} not found!", arg0);
-                return;
-            }
-            portal.config.destination = new Destination(world);
-        }
+        portal.config.destination = destination;
         portal.config.save();
         context.sendTranslated(POSITIVE, "Portal destination set!");
     }
 
     @Alias(value = "mvprd")
     @Command(alias = "randdest", desc = "Changes the destination of the selected portal to a random position each time")
-    @Params(positional = {@Param(label = "world", type = World.class),
-                          @Param(req = false, label = "portal")})
-    public void randomDestination(CommandContext context)
+    public void randomDestination(CommandContext context, @Label("world") World world, @Default @Label("portal") Portal portal)
     {
-        Portal portal = getPortal(context, 1);
-        if (portal == null)
-        {
-            return;
-        }
-        World world = context.get(0);
-        portal.config.destination = new RandomDestination(world);
-        portal.config.save();
+        this.destination(context, new RandomDestination(world), portal);
     }
 
     @Command(desc = "Changes a portals location")
-    @Params(positional = @Param(req = false, label = "portal"))
-    public void location(CommandContext context)
+    @Restricted(value = User.class, msg = "You have to be ingame to do this!")
+    public void location(CommandContext context, @Default @Label("portal") Portal portal)
     {
-        if (context.getSource() instanceof User)
+        User sender = (User)context.getSource();
+        Selector selector = this.module.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
+        if (!(selector.getSelection(sender) instanceof Cuboid))
         {
-            User sender = (User)context.getSource();
-            Selector selector = this.module.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
-            if (selector.getSelection(sender) instanceof Cuboid)
-            {
-                Portal portal = sender.attachOrGet(PortalsAttachment.class, module).getPortal();
-                if (context.hasPositional(0))
-                {
-                    portal = manager.getPortal(context.getString(0));
-                    if (portal == null)
-                    {
-                        context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.get(0));
-                        return;
-                    }
-                }
-                if (portal == null)
-                {
-                    context.sendTranslated(NEGATIVE, "You need to define a portal!");
-                    return;
-                }
-                Location p1 = selector.getFirstPoint(sender);
-                Location p2 = selector.getSecondPoint(sender);
-                portal.config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
-                portal.config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
-                portal.config.save();
-                context.sendTranslated(POSITIVE, "Portal {name} updated to your current selection!", portal.getName());
-                return;
-            }
             context.sendTranslated(NEGATIVE, "Please select a cuboid first!");
             return;
         }
-        context.sendTranslated(NEGATIVE, "You have to be ingame to do this!");
+        Location p1 = selector.getFirstPoint(sender);
+        Location p2 = selector.getSecondPoint(sender);
+        portal.config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
+        portal.config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
+        portal.config.save();
+        context.sendTranslated(POSITIVE, "Portal {name} updated to your current selection!", portal.getName());
     }
 
     @Command(desc = "Modifies the location where a player exits when teleporting a portal")
-    @Params(positional = @Param(req = false, label = "portal"))
-    public void exit(CommandContext context)
+    @Restricted(value = User.class, msg = "You have to be ingame to do this!")
+    public void exit(CommandContext context, @Default @Label("portl") Portal portal)
     {
-        if (context.getSource() instanceof User)
+        User sender = (User)context.getSource();
+        Location location = sender.getLocation();
+        if (portal.config.world.getWorld() != location.getWorld())
         {
-            User sender = (User)context.getSource();
-            Portal portal = sender.attachOrGet(PortalsAttachment.class, module).getPortal();
-            if (context.hasPositional(0))
-            {
-                portal = manager.getPortal(context.getString(0));
-                if (portal == null)
-                {
-                    context.sendTranslated(NEGATIVE, "Portal {input} not found!", context.get(0));
-                    return;
-                }
-            }
-            if (portal == null)
-            {
-                context.sendTranslated(NEGATIVE, "You need to define a portal!");
-                return;
-            }
-            Location location = sender.getLocation();
-            if (portal.config.world.getWorld() != location.getWorld())
-            {
-                context.sendTranslated(NEGATIVE, "A portals exit cannot be in an other world than its location!");
-                return;
-            }
-            portal.config.location.destination = new WorldLocation(location);
-            portal.config.save();
-            context.sendTranslated(POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
+            // TODO range check? range in config
+            context.sendTranslated(NEGATIVE, "A portals exit cannot be in an other world than its location!");
             return;
         }
-        context.sendTranslated(NEGATIVE, "You have to be ingame to do this!");
+        portal.config.location.destination = new WorldLocation(location);
+        portal.config.save();
+        context.sendTranslated(POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
     }
 
     @Command(desc = "Toggles safe teleportation for this portal")
-    @Params(positional = @Param(req = false, label = "portal"))
-    public void togglesafe(CommandContext context)
+    public void togglesafe(CommandContext context, @Default @Label("portal") Portal portal)
     {
-        Portal portal = getPortal(context, 0);
-        if (portal == null)
-        {
-            return;
-        }
         portal.config.safeTeleport = !portal.config.safeTeleport;
         portal.config.save();
         if (portal.config.safeTeleport)
         {
             context.sendTranslated(POSITIVE, "The portal {name} will not teleport to an unsafe destination", portal.getName());
+            return;
         }
-        else
-        {
-            context.sendTranslated(POSITIVE, "The portal {name} will also teleport to an unsafe destination", portal.getName());
-        }
+        context.sendTranslated(POSITIVE, "The portal {name} will also teleport to an unsafe destination", portal.getName());
     }
 
     @Command(desc = "Toggles whether entities can teleport with this portal")
-    @Params(positional = @Param(req = false, label = "portal"))
-    public void entity(CommandContext context)
+    public void entity(CommandContext context, @Default @Label("portal") Portal portal)
     {
-        Portal portal = getPortal(context, 0);
-        if (portal == null)
-        {
-            return;
-        }
         portal.config.teleportNonPlayers = !portal.config.teleportNonPlayers;
         portal.config.save();
         if (portal.config.teleportNonPlayers)
         {
             context.sendTranslated(POSITIVE, "The portal {name} will teleport entities too", portal.getName());
+            return;
         }
-        else
-        {
-            context.sendTranslated(POSITIVE, "The portal {name} will only teleport players", portal.getName());
-        }
+        context.sendTranslated(POSITIVE, "The portal {name} will only teleport players", portal.getName());
     }
 }
