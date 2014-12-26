@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.portals.config;
 
 import java.util.Random;
 
-import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
