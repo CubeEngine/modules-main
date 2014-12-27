@@ -33,7 +33,8 @@ public class Portals extends Module
     @Override
     public void onEnable()
     {
-        this.getCore().getConfigFactory().getDefaultConverterManager().registerConverter(Destination.class, new DestinationConverter(getCore()));
+        this.getCore().getConfigFactory().getDefaultConverterManager().registerConverter(
+            new DestinationConverter(getCore()), Destination.class);
         this.getCore().getCommandManager().getReaderManager().registerReader(new PortalReader(this), Portal.class);
         this.portalManager = new PortalManager(this);
     }

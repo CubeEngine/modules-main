@@ -34,9 +34,9 @@ import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RoleProvider;
 import de.cubeisland.engine.module.roles.role.WorldRoleProvider;
-import de.cubeisland.engine.reflect.codec.converter.Converter;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.StringNode;
+import de.cubeisland.engine.converter.converter.ClassedConverter;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.node.StringNode;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -338,11 +338,11 @@ public class RoleManagementCommands extends RoleCommandHelper
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        Converter<Priority> converter = new PriorityConverter();
+        ClassedConverter<Priority> converter = new PriorityConverter();
         Priority priority;
         try
         {
-            priority = converter.fromNode(new StringNode(context.getString(1)), null);
+            priority = converter.fromNode(new StringNode(context.getString(1)), Priority.class, null);
             role.setPriorityValue(priority.value);
             role.save();
             if (global)

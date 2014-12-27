@@ -26,18 +26,17 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
-import de.cubeisland.engine.reflect.codec.converter.Converter;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.IntNode;
-import de.cubeisland.engine.reflect.node.ListNode;
-import de.cubeisland.engine.reflect.node.MapNode;
-import de.cubeisland.engine.reflect.node.Node;
-import de.cubeisland.engine.reflect.node.ShortNode;
-import de.cubeisland.engine.reflect.node.StringNode;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.converter.SimpleConverter;
+import de.cubeisland.engine.converter.node.IntNode;
+import de.cubeisland.engine.converter.node.ListNode;
+import de.cubeisland.engine.converter.node.MapNode;
+import de.cubeisland.engine.converter.node.Node;
+import de.cubeisland.engine.converter.node.ShortNode;
+import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.core.bukkit.NBTUtils;
 
-public class InventoryConverter implements Converter<Inventory>
+public class InventoryConverter extends SimpleConverter<Inventory>
 {
     private final Server server;
 
@@ -47,7 +46,7 @@ public class InventoryConverter implements Converter<Inventory>
     }
 
     @Override
-    public Node toNode(Inventory object, ConverterManager manager) throws ConversionException
+    public Node toNode(Inventory object) throws ConversionException
     {
         MapNode node = MapNode.emptyMap();
         ItemStack[] contents = object.getContents();
@@ -90,7 +89,7 @@ public class InventoryConverter implements Converter<Inventory>
     }
 
     @Override
-    public Inventory fromNode(Node node, ConverterManager manager) throws ConversionException
+    public Inventory fromNode(Node node) throws ConversionException
     {
         if (node instanceof MapNode)
         {

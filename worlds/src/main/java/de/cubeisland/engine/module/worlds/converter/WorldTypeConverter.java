@@ -19,21 +19,22 @@ package de.cubeisland.engine.module.worlds.converter;
 
 import org.bukkit.WorldType;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
-import de.cubeisland.engine.reflect.codec.converter.Converter;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.Node;
+import de.cubeisland.engine.converter.ConverterManager;
+import de.cubeisland.engine.converter.converter.ClassedConverter;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.converter.SimpleConverter;
+import de.cubeisland.engine.converter.node.Node;
 
-public class WorldTypeConverter implements Converter<WorldType>
+public class WorldTypeConverter extends SimpleConverter<WorldType>
 {
     @Override
-    public Node toNode(WorldType object, ConverterManager manager) throws ConversionException
+    public Node toNode(WorldType object) throws ConversionException
     {
         return Node.wrapIntoNode(object.toString());
     }
 
     @Override
-    public WorldType fromNode(Node node, ConverterManager manager) throws ConversionException
+    public WorldType fromNode(Node node) throws ConversionException
     {
         try
         {

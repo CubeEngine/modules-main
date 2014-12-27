@@ -19,21 +19,20 @@ package de.cubeisland.engine.module.worlds.converter;
 
 import org.bukkit.GameMode;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
-import de.cubeisland.engine.reflect.codec.converter.Converter;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.Node;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.converter.SimpleConverter;
+import de.cubeisland.engine.converter.node.Node;
 
-public class GameModeConverter implements Converter<GameMode>
+public class GameModeConverter extends SimpleConverter<GameMode>
 {
     @Override
-    public Node toNode(GameMode object, ConverterManager manager) throws ConversionException
+    public Node toNode(GameMode object) throws ConversionException
     {
         return Node.wrapIntoNode(object.toString());
     }
 
     @Override
-    public GameMode fromNode(Node node, ConverterManager manager) throws ConversionException
+    public GameMode fromNode(Node node) throws ConversionException
     {
         try
         {

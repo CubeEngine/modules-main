@@ -19,21 +19,20 @@ package de.cubeisland.engine.module.worlds.converter;
 
 import org.bukkit.World.Environment;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
-import de.cubeisland.engine.reflect.codec.converter.Converter;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.Node;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.converter.SimpleConverter;
+import de.cubeisland.engine.converter.node.Node;
 
-public class EnvironmentConverter implements Converter<Environment>
+public class EnvironmentConverter extends SimpleConverter<Environment>
 {
     @Override
-    public Node toNode(Environment object, ConverterManager manager) throws ConversionException
+    public Node toNode(Environment object) throws ConversionException
     {
         return Node.wrapIntoNode(object.toString());
     }
 
     @Override
-    public Environment fromNode(Node node, ConverterManager manager) throws ConversionException
+    public Environment fromNode(Node node) throws ConversionException
     {
         try
         {

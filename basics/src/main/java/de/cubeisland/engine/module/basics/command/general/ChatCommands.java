@@ -37,8 +37,8 @@ import de.cubeisland.engine.core.util.converter.DurationConverter;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.StringNode;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.node.StringNode;
 import org.joda.time.Duration;
 
 import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
@@ -173,7 +173,7 @@ public class ChatCommands
         {
             try
             {
-                dura = converter.fromNode(StringNode.of(duration), null);
+                dura = converter.fromNode(StringNode.of(duration), null, null);
             }
             catch (ConversionException e)
             {

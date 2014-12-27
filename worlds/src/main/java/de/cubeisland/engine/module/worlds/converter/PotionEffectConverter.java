@@ -20,20 +20,19 @@ package de.cubeisland.engine.module.worlds.converter;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
-import de.cubeisland.engine.reflect.codec.converter.Converter;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.ByteNode;
-import de.cubeisland.engine.reflect.node.IntNode;
-import de.cubeisland.engine.reflect.node.MapNode;
-import de.cubeisland.engine.reflect.node.Node;
-import de.cubeisland.engine.reflect.node.NullNode;
-import de.cubeisland.engine.reflect.node.StringNode;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.converter.SimpleConverter;
+import de.cubeisland.engine.converter.node.ByteNode;
+import de.cubeisland.engine.converter.node.IntNode;
+import de.cubeisland.engine.converter.node.MapNode;
+import de.cubeisland.engine.converter.node.Node;
+import de.cubeisland.engine.converter.node.NullNode;
+import de.cubeisland.engine.converter.node.StringNode;
 
-public class PotionEffectConverter implements Converter<PotionEffect>
+public class PotionEffectConverter extends SimpleConverter<PotionEffect>
 {
     @Override
-    public Node toNode(PotionEffect object, ConverterManager manager) throws ConversionException
+    public Node toNode(PotionEffect object) throws ConversionException
     {
         MapNode mapNode = MapNode.emptyMap();
         mapNode.setExactNode("amplifier", Node.wrapIntoNode(object.getAmplifier()));
@@ -44,7 +43,7 @@ public class PotionEffectConverter implements Converter<PotionEffect>
     }
 
     @Override
-    public PotionEffect fromNode(Node node, ConverterManager manager) throws ConversionException
+    public PotionEffect fromNode(Node node) throws ConversionException
     {
         if (node instanceof NullNode)
         {
