@@ -22,6 +22,7 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Stack;
 
@@ -32,7 +33,6 @@ import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.reflect.exception.InvalidReflectedObjectException;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
-import gnu.trove.map.hash.THashMap;
 
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;
 
@@ -42,8 +42,8 @@ public abstract class RoleProvider
     protected final RolesManager manager;
     protected final Permission basePerm;
 
-    protected THashMap<String, RoleConfig> configs;
-    protected THashMap<String, Role> roles;
+    protected HashMap<String, RoleConfig> configs;
+    protected HashMap<String, Role> roles;
 
     protected RoleProvider(RolesManager manager, Permission basePerm)
     {
@@ -85,8 +85,8 @@ public abstract class RoleProvider
      */
     protected void loadConfigurations()
     {
-        this.configs = new THashMap<>();
-        this.roles = new THashMap<>();
+        this.configs = new HashMap<>();
+        this.roles = new HashMap<>();
         for (User user : this.module.getCore().getUserManager().getLoadedUsers())
         {
             RolesAttachment rolesAttachment = user.get(RolesAttachment.class);

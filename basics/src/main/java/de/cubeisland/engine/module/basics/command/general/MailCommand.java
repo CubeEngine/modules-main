@@ -19,25 +19,27 @@ package de.cubeisland.engine.module.basics.command.general;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import de.cubeisland.engine.command.alias.Alias;
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.filter.Restricted;
+import de.cubeisland.engine.command.methodic.parametric.Greed;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.BasicsUser;
 import de.cubeisland.engine.module.basics.storage.Mail;
-import gnu.trove.set.TLongSet;
-import gnu.trove.set.hash.TLongHashSet;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.types.UInteger;
@@ -59,53 +61,24 @@ public class MailCommand extends CommandContainer
 
     @Alias(value = "readmail")
     @Command(desc = "Reads your mail.")
-    @Params(positional = @Param(label = "player", type = User.class, req = false)) // TODO staticValues = "console",
-    public void read(CommandContext context)
+    public void read(CommandContext context, @Optional @Label("player") User mailof)  // TODO staticValues = "console",
     {
-        User sender;
-        User mailof = null;
-        String nameMailOf = null;
-        if (context.hasPositional(0))
+        User sender = null;
+        if (context.getSource() instanceof User)
         {
-            sender = null;
-            if (context.getSource() instanceof User)
-            {
-                sender = (User)context.getSource();
-            }
-            if (sender == null)
-            {
-                context.sendTranslated(NEUTRAL, "If you wanted to look into other players mail use: {text:/mail spy} {input#player}.", context.get(
-                    0));
-                context.sendTranslated(NEGATIVE, "Otherwise be quiet!");
-                return;
-            }
-            mailof = context.get(0, null);
+            sender = (User)context.getSource();
+        }
+        if (sender == null)
+        {
             if (mailof == null)
             {
-                if (!"console".equalsIgnoreCase(context.getString(0)))
-                {
-                    context.sendTranslated(NEGATIVE, "User {user} not found!", context.get(0));
-                    return;
-                }
-                nameMailOf = "CONSOLE";
-            }
-            else
-            {
-                nameMailOf = mailof.getDisplayName();
-            }
-        }
-        else
-        {
-            sender = null;
-            if (context.getSource() instanceof User)
-            {
-                sender = (User)context.getSource();
-            }
-            if (sender == null)
-            {
                 context.sendTranslated(NEUTRAL, "Log into the game to check your mailbox!");
+
                 return;
             }
+            context.sendTranslated(NEUTRAL, "If you wanted to look into other players mail use: {text:/mail spy} {input#player}.", mailof);
+            context.sendTranslated(NEGATIVE, "Otherwise be quiet!");
+            return;
         }
         BasicsUser bUser = sender.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser();
         if (bUser.countMail() == 0)
@@ -124,25 +97,22 @@ public class MailCommand extends CommandContainer
         }
         if (mails.isEmpty()) // Mailbox is not empty but no message from that player
         {
-            context.sendTranslated(NEUTRAL, "You do not have any mail from {user}.", nameMailOf);
+            context.sendTranslated(NEUTRAL, "You do not have any mail from {user}.", mailof);
             return;
         }
         StringBuilder sb = new StringBuilder();
-        int i = 0;
-        for (Mail mail : mails)
+        for (int i = 0; i < mails.size(); i++)
         {
-            i++;
-            sb.append("\n").append(ChatFormat.WHITE).append(i).append(": ").append(mail.readMail());
+            Mail mail = mails.get(i);
+            sb.append("\n").append(ChatFormat.WHITE).append(i+1).append(": ").append(mail.readMail());
         }
         context.sendTranslated(POSITIVE, "Your mail: {input#mails}", ChatFormat.parseFormats(sb.toString()));
     }
 
     @Alias(value = "spymail")
     @Command(desc = "Shows the mail of other players.")
-    @Params(positional = @Param(label = "player", type = User.class))
-    public void spy(CommandContext context)
+    public void spy(CommandContext context, @Label("player") User user)
     {
-        User user = context.get(0);
         List<Mail> mails = user.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().getMails();
         if (mails.isEmpty()) // Mailbox is not empty but no message from that player
         {
@@ -161,29 +131,23 @@ public class MailCommand extends CommandContainer
 
     @Alias(value = "sendmail")
     @Command(desc = "Sends mails to other players.")
-    @Params(positional = {@Param(label = "player", type = User.class),
-                          @Param(label = "message", greed = INFINITE)})
-    public void send(CommandContext context)
+    public void send(CommandContext context, @Label("player") User user, @Label("message") @Greed(INFINITE) String message)
     {
-        User user = context.get(0);
-        String message = context.getStrings(1);
         this.mail(message, context.getSource(), user);
         context.sendTranslated(POSITIVE, "Mail send to {user}!", user);
     }
 
     @Alias(value = "sendallmail")
     @Command(desc = "Sends mails to all players.")
-    @Params(positional = @Param(label = "message", greed = INFINITE))
-    public void sendAll(CommandContext context)
+    public void sendAll(CommandContext context, final @Label("message") @Greed(INFINITE) String message)
     {
         Set<User> users = this.module.getCore().getUserManager().getOnlineUsers();
-        final TLongSet alreadySend = new TLongHashSet();
+        final Set<Long> alreadySend = new HashSet<>();
         User sender = null;
         if (context.getSource() instanceof User)
         {
             sender = (User)context.getSource();
         }
-        final String message = context.getStrings(0);
         for (User user : users)
         {
             user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().addMail(sender, message);
@@ -210,12 +174,10 @@ public class MailCommand extends CommandContainer
     }
 
     @Command(desc = "Removes a single mail")
-    @Params(positional = @Param(label = "mailid"))
     @Restricted(value = User.class, msg = "The console has no mails!")
-    public void remove(CommandContext context)
+    public void remove(CommandContext context, @Label("mailid") Integer mailId)
     {
         User user = (User)context.getSource();
-        Integer mailId = context.get(0, null);
         BasicsUser bUser = user.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser();
         if (bUser.countMail() == 0)
         {

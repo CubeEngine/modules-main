@@ -19,9 +19,7 @@ package de.cubeisland.engine.module.locker.storage;
 
 import java.util.Arrays;
 import java.util.Collection;
-
-import gnu.trove.map.TByteObjectMap;
-import gnu.trove.map.hash.TByteObjectHashMap;
+import java.util.HashMap;
 
 import static de.cubeisland.engine.module.locker.storage.ProtectedType.*;
 
@@ -33,7 +31,7 @@ public enum LockType
     DONATION(4, CONTAINER, ENTITY_CONTAINER, ENTITY_CONTAINER_LIVING),
     FREE(5, CONTAINER, ENTITY_CONTAINER, ENTITY_CONTAINER_LIVING);
 
-    private final static TByteObjectMap<LockType> lockTypes = new TByteObjectHashMap<>();
+    private final static HashMap<Byte, LockType> lockTypes = new HashMap<>();
 
     public final byte id;
     public final Collection<ProtectedType> supportedTypes;

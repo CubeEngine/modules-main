@@ -43,7 +43,6 @@ import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
-import static de.cubeisland.engine.module.locker.commands.LockerCommands.isNotUser;
 import static de.cubeisland.engine.module.locker.storage.LockType.*;
 
 public class CommandListener implements Listener
@@ -72,7 +71,6 @@ public class CommandListener implements Listener
 
     private void setCommandType0(CommandSender sender, CommandType commandType, String s, boolean b)
     {
-        if (isNotUser(sender)) return;
         map.put((sender).getUniqueId(), new Triplet<>(commandType, s, b));
         if (this.doesPersist((sender).getUniqueId()))
         {
