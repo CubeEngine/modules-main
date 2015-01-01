@@ -367,7 +367,7 @@ public class ItemCommands
     @Command(alias = "i", desc = "Gives the specified Item to you")
     @Params(positional = {@Param(label = "material[:data]", type = ItemStack.class),
               @Param(label = "amount", type = Integer.class, req = false)},
-            nonpositional = @Param(names = "ench", label = "enchantment[:level]"))
+            nonpositional = @Param(req = false, names = "ench", label = "enchantment[:level]"))
     @Flags(@Flag(longName = "blacklist", name = "b"))
     @SuppressWarnings("deprecation")
     public void item(CommandContext context)
