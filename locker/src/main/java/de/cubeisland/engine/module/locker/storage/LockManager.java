@@ -545,7 +545,7 @@ public class LockManager implements Listener
     {
         LockModel model = this.dsl.newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(entity.getType()), entity.getUniqueId());
         model.createPassword(this, password);
-        model.asyncInsert();
+        model.insert();
         Lock lock = new Lock(this, model);
         this.loadedEntityLocks.put(entity.getUniqueId(), lock);
         this.locksById.put(lock.getId(), lock);
