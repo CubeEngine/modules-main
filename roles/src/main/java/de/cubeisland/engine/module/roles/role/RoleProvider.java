@@ -111,7 +111,7 @@ public abstract class RoleProvider
                 }
             }
         }
-        catch (IOException|InvalidReflectedObjectException e)
+        catch (IOException | InvalidReflectedObjectException e)
         {
             this.module.getLog().warn(e, "Failed to load a configuration");
         }
