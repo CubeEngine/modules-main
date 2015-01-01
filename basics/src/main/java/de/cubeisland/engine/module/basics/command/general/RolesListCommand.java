@@ -27,9 +27,9 @@ import java.util.TreeMap;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.result.CommandResult;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 

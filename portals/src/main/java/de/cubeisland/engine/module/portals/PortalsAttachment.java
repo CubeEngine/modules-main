@@ -19,8 +19,6 @@ package de.cubeisland.engine.module.portals;
 
 import de.cubeisland.engine.core.user.UserAttachment;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
-
 public class PortalsAttachment extends UserAttachment
 {
     private boolean isInPortal = false;

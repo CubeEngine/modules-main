@@ -26,9 +26,9 @@ import de.cubeisland.engine.core.util.Profiler;
 import de.cubeisland.engine.module.travel.home.HomeCommand;
 import de.cubeisland.engine.module.travel.home.HomeListener;
 import de.cubeisland.engine.module.travel.home.HomeManager;
-import de.cubeisland.engine.module.travel.warp.WarpCommand;
 import de.cubeisland.engine.module.travel.storage.TableInvite;
 import de.cubeisland.engine.module.travel.storage.TableTeleportPoint;
+import de.cubeisland.engine.module.travel.warp.WarpCommand;
 import de.cubeisland.engine.module.travel.warp.WarpManager;
 
 public class Travel extends Module

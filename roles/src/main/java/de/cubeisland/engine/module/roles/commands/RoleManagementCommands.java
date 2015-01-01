@@ -19,13 +19,16 @@ package de.cubeisland.engine.module.roles.commands;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.converter.ClassedConverter;
+import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.PriorityConverter;
@@ -34,10 +37,8 @@ import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RoleProvider;
 import de.cubeisland.engine.module.roles.role.WorldRoleProvider;
-import de.cubeisland.engine.converter.converter.ClassedConverter;
-import de.cubeisland.engine.converter.ConversionException;
-import de.cubeisland.engine.converter.node.StringNode;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 @Alias("manrole")
@@ -53,7 +54,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @Command(alias = "setperm",  desc = "Sets the permission for given role [in world]")
     @Params(positional = {@Param(label = "[g:]role"),
                           @Param(label = "permission"),
-                          @Param(req = false, names = {"true","false","reset"})},
+                          @Param(req = OPTIONAL, names = {"true","false","reset"})},
           nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void setpermission(CommandContext context)
     {
@@ -119,7 +120,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @Command(alias = {"setdata", "setmeta"}, desc = "Sets the metadata for given role [in world]")
     @Params(positional = {@Param(label = "[g:]role"),
                           @Param(label = "key"),
-                          @Param(req = false, label = "value")},
+                          @Param(req = OPTIONAL, label = "value")},
         nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void setmetadata(CommandContext context)
     {

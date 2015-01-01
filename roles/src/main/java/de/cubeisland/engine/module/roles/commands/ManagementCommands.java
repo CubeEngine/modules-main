@@ -19,17 +19,18 @@ package de.cubeisland.engine.module.roles.commands;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
@@ -67,7 +68,7 @@ public class ManagementCommands extends CommandContainer
     public static World curWorldOfConsole = null;
 
     @Command(desc = "Sets or resets the current default world")
-    @Params(positional = @Param(req = false, label = "world", type = World.class))
+    @Params(positional = @Param(req = OPTIONAL, label = "world", type = World.class))
     public void defaultworld(CommandContext context)
     {
         World world = context.get(0);

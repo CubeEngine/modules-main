@@ -26,7 +26,6 @@ import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
 
 import de.cubeisland.engine.core.permission.NotifyPermissionRegistrationCompletedEvent;
-
 import de.cubeisland.engine.core.user.UserAuthorizedEvent;
 import de.cubeisland.engine.module.roles.Roles;
 

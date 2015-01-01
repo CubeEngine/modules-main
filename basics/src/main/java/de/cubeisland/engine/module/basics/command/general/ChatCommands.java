@@ -22,11 +22,11 @@ import java.util.Random;
 import java.util.UUID;
 
 import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.methodic.parametric.Greed;
 import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.sender.ConsoleCommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -37,8 +37,6 @@ import de.cubeisland.engine.core.util.converter.DurationConverter;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
-import de.cubeisland.engine.converter.ConversionException;
-import de.cubeisland.engine.converter.node.StringNode;
 import org.joda.time.Duration;
 
 import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;

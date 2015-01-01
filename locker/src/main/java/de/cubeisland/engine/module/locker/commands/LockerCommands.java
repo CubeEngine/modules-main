@@ -23,6 +23,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import de.cubeisland.engine.command.CommandInvocation;
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.completer.Completer;
 import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
@@ -33,8 +34,6 @@ import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.math.BlockVector3;

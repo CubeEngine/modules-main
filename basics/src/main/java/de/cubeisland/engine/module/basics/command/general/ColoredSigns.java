@@ -23,8 +23,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
 
-import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.basics.Basics;
 
 public class ColoredSigns implements Listener
 {

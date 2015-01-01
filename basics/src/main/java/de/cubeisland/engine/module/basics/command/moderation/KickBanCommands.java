@@ -45,6 +45,7 @@ import de.cubeisland.engine.core.util.TimeConversionException;
 import de.cubeisland.engine.module.basics.Basics;
 
 import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.ChatFormat.*;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -74,7 +75,7 @@ public class KickBanCommands
 
     @Command(desc = "Kicks a player from the server")
     @Params(positional = {@Param(label = "player", type = User.class), // TODO static values , staticValues = "*",
-              @Param(label = "reason", req = false, greed = INFINITE)})
+              @Param(label = "reason", req = OPTIONAL, greed = INFINITE)})
     public void kick(CommandContext context)
     {
         String reason;
@@ -101,7 +102,7 @@ public class KickBanCommands
 
     @Command(alias = "kickban", desc = "Bans a player permanently on your server.")
     @Params(positional = {@Param(label = "player", type = OfflinePlayer.class),
-              @Param(label = "reason", req = false, greed = INFINITE)})
+              @Param(label = "reason", req = OPTIONAL, greed = INFINITE)})
     @Flags({@Flag(longName = "ipban", name = "ip"),
             @Flag(longName = "force", name = "f")})
     public void ban(CommandContext context)
@@ -213,7 +214,7 @@ public class KickBanCommands
 
     @Command(alias = "banip", desc = "Bans the IP from this server.")
     @Params(positional = {@Param(label = "IP address"),
-              @Param(label = "reason", req = false, greed = INFINITE)})
+              @Param(label = "reason", req = OPTIONAL, greed = INFINITE)})
     public void ipban(CommandContext context)
     {
         String ipaddress = context.get(0);
@@ -280,7 +281,7 @@ public class KickBanCommands
     @Command(alias = "tban", desc = "Bans a player for a given time.")
     @Params(positional = {@Param(label = "player", type = OfflinePlayer.class),
               @Param(label = "time"),
-              @Param(label = "reason", req = false, greed = INFINITE)})
+              @Param(label = "reason", req = OPTIONAL, greed = INFINITE)})
     @Flags(@Flag(longName = "force", name = "f"))
     public void tempban(CommandContext context)
     {
@@ -349,7 +350,7 @@ public class KickBanCommands
     }
 
     @Command(desc = "View all players banned from this server")
-    @Params(positional = @Param(req = false, names = {"ips","players"}))
+    @Params(positional = @Param(req = OPTIONAL, names = {"ips","players"}))
     public void banlist(CommandContext context)
     {
         if (true == true)

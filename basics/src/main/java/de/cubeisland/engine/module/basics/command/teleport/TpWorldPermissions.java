@@ -22,10 +22,10 @@ import java.util.Map;
 
 import org.bukkit.World;
 
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsPerm;
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.permission.PermissionContainer;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsPerm;
 
 /**
  * Dynamically registered Permissions for each world.

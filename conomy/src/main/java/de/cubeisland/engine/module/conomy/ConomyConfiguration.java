@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.conomy;
 
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
+import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 
 @SuppressWarnings("all")
 public class ConomyConfiguration extends ReflectedYaml

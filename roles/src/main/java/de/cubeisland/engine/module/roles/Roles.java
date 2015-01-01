@@ -17,6 +17,7 @@
  */
 package de.cubeisland.engine.module.roles;
 
+import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.core.command.CommandManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.module.service.Metadata;
@@ -40,7 +41,6 @@ import de.cubeisland.engine.module.roles.role.RolesManager;
 import de.cubeisland.engine.module.roles.storage.TableData;
 import de.cubeisland.engine.module.roles.storage.TablePerm;
 import de.cubeisland.engine.module.roles.storage.TableRole;
-import de.cubeisland.engine.converter.ConverterManager;
 
 public class Roles extends Module
 {

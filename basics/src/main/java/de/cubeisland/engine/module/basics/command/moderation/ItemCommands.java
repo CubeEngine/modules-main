@@ -29,12 +29,12 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
 
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.parameter.TooFewArgumentsException;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.result.paginated.PaginatedResult;
@@ -46,6 +46,7 @@ import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 
 import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static org.bukkit.Material.AIR;
 import static org.bukkit.Material.SKULL_ITEM;
@@ -73,7 +74,7 @@ public class ItemCommands
     }
 
     @Command(desc = "Looks up an item for you!")
-    @Params(positional = @Param(req = false, label = "item"))
+    @Params(positional = @Param(req = OPTIONAL, label = "item"))
     public PaginatedResult itemDB(CommandContext context)
     {
         if (context.hasPositional(0))
@@ -127,7 +128,7 @@ public class ItemCommands
 
     @Command(desc = "Changes the display name of the item in your hand.")
     @Params(positional = {@Param(label = "name"),
-              @Param(req = false, label = "lore...", greed = INFINITE)})
+              @Param(req = OPTIONAL, label = "lore...", greed = INFINITE)})
     public void rename(CommandContext context)
     {
         if (context.getSource() instanceof User)
@@ -156,7 +157,7 @@ public class ItemCommands
     }
 
     @Command(alias = "skullchange", desc = "Changes a skull to a players skin.")
-    @Params(positional = @Param(req = false, label = "name"))
+    @Params(positional = @Param(req = OPTIONAL, label = "name"))
     @Restricted(value = User.class, msg = "This will you only give headaches!")
     public void headchange(CommandContext context)
     {
@@ -175,7 +176,7 @@ public class ItemCommands
     }
 
     @Command(desc = "Grants unlimited items")
-    @Params(positional = @Param(req = false, names = {"on","off"}))
+    @Params(positional = @Param(req = OPTIONAL, names = {"on","off"}))
     @Restricted(User.class)
     public void unlimited(CommandContext context)
     {
@@ -213,8 +214,8 @@ public class ItemCommands
     }
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
-    @Params(positional = {@Param(label = "enchantment", type = Enchantment.class, req = false),
-              @Param(label = "level", type = Integer.class, req = false)})
+    @Params(positional = {@Param(label = "enchantment", type = Enchantment.class, req = OPTIONAL),
+              @Param(label = "level", type = Integer.class, req = OPTIONAL)})
     @Flags(@Flag(longName = "unsafe", name = "u"))
     public void enchant(CommandContext context)
     {
@@ -333,7 +334,7 @@ public class ItemCommands
     @Command(desc = "Gives the specified Item to a player")
     @Params(positional = {@Param(label = "player", type = User.class),
               @Param(label = "material[:data]", type = ItemStack.class),
-              @Param(label = "amount", type = Integer.class, req = false)})
+              @Param(label = "amount", type = Integer.class, req = OPTIONAL)})
     @Flags(@Flag(name = "b", longName = "blacklist"))
     @SuppressWarnings("deprecation")
     public void give(CommandContext context)
@@ -366,8 +367,8 @@ public class ItemCommands
 
     @Command(alias = "i", desc = "Gives the specified Item to you")
     @Params(positional = {@Param(label = "material[:data]", type = ItemStack.class),
-              @Param(label = "amount", type = Integer.class, req = false)},
-            nonpositional = @Param(req = false, names = "ench", label = "enchantment[:level]"))
+              @Param(label = "amount", type = Integer.class, req = OPTIONAL)},
+            nonpositional = @Param(names = "ench", label = "enchantment[:level]"))
     @Flags(@Flag(longName = "blacklist", name = "b"))
     @SuppressWarnings("deprecation")
     public void item(CommandContext context)
@@ -427,7 +428,7 @@ public class ItemCommands
     }
 
     @Command(desc = "Refills the stack in hand")
-    @Params(positional = @Param(label = "amount", type = Integer.class, req = false)) // TODO staticvalues staticValues = "*",
+    @Params(positional = @Param(label = "amount", type = Integer.class, req = OPTIONAL)) // TODO staticvalues staticValues = "*",
     public void more(CommandContext context)
     {
         if (!context.isSource(User.class))

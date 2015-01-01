@@ -35,6 +35,7 @@ import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.basics.Basics;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.WHITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
@@ -73,7 +74,7 @@ public class TeleportCommands
 
     @Command(desc = "Teleport directly to a player.")
     @Params(positional = {@Param(label = "player", type = User.class),
-             @Param(req = false, label = "player", type = User.class)})
+             @Param(req = OPTIONAL, label = "player", type = User.class)})
     @Flags({@Flag(longName = "force", name = "f"), // is not shown directly in usage
             @Flag(longName = "unsafe", name = "u")})
     public void tp(CommandContext context)

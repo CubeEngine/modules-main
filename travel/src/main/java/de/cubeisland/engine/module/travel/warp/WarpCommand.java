@@ -22,14 +22,14 @@ import java.util.Set;
 
 import org.bukkit.Location;
 
+import de.cubeisland.engine.command.alias.Alias;
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.command.result.confirm.ConfirmResult;
 import de.cubeisland.engine.core.command.sender.ConsoleCommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -38,6 +38,7 @@ import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportInvite;
 
 import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
@@ -72,7 +73,7 @@ public class WarpCommand extends TpPointCommand
     @Restricted(User.class)
     @Command(desc = "Teleport to a warp")
     @Params(positional = {@Param( label = "warp"),
-                          @Param( req = false, label = "owner", type = User.class)})
+                          @Param( req = OPTIONAL, label = "owner", type = User.class)})
     public void tp(CommandContext context)
     {
         User user = getUser(context, 1);
@@ -152,7 +153,7 @@ public class WarpCommand extends TpPointCommand
 
     @Command(desc = "Set the welcome message of warps", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
     @Params(positional = {@Param( label = "warp"),
-                          @Param( req = false, label = "welcome message", greed = INFINITE)},
+                          @Param( req = OPTIONAL, label = "welcome message", greed = INFINITE)},
             nonpositional = @Param(names = "owner", type = User.class)) // TODO named param permission "other"
     @Flags(@Flag(longName = "append", name = "a"))
     public void greeting(CommandContext context)
@@ -188,7 +189,7 @@ public class WarpCommand extends TpPointCommand
     @Restricted(User.class)
     @Command(desc = "Move a warp")
     @Params(positional = {@Param( label = "warp"),
-                          @Param( req = false, label = "owner", type = User.class)})
+                          @Param( req = OPTIONAL, label = "owner", type = User.class)})
     public void move(CommandContext context)
     {
         User user = this.getUser(context, 1);
@@ -218,7 +219,7 @@ public class WarpCommand extends TpPointCommand
     @Alias(value = {"removewarp", "deletewarp", "delwarp", "remwarp"})
     @Command(alias = "delete", desc = "Remove a warp")
     @Params(positional = {@Param( label = "warp"),
-              @Param( req = false, label = "owner", type = User.class)})
+              @Param( req = OPTIONAL, label = "owner", type = User.class)})
     public void remove(CommandContext context)
     {
         User user = getUser(context, 1);
@@ -280,7 +281,7 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(desc = "List all available warps")
-    @Params(positional = @Param( req = false, label = "owner", type = User.class))
+    @Params(positional = @Param( req = OPTIONAL, label = "owner", type = User.class))
     @Flags({@Flag(name = "pub", longName = "public"),
             @Flag(name = "o", longName = "owned"),
             @Flag(name = "i", longName = "invited")})
@@ -344,7 +345,7 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(alias = {"ilist", "invited"}, desc = "List all players invited to your warps")
-    @Params(positional = @Param( req = false, label = "warp"),
+    @Params(positional = @Param( req = OPTIONAL, label = "warp"),
             nonpositional = @Param(names = "owner", type = User.class)) // TODO named permission "other"
     public void invitedList(CommandContext context)
     {
@@ -464,8 +465,8 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(name = "private", alias = "makeprivate", desc = "Make a players warp private")
-    @Params(positional = {@Param( req = false, label = "warp"),
-              @Param( req = false, label = "owner", type = User.class)})
+    @Params(positional = {@Param( req = OPTIONAL, label = "warp"),
+              @Param( req = OPTIONAL, label = "owner", type = User.class)})
     public void makePrivate(CommandContext context)
     {
         User user = this.getUser(context, 1);
@@ -495,8 +496,8 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(name = "public", desc = "Make a users warp public")
-    @Params(positional = {@Param( req = false, label = "warp"),
-              @Param( req = false, label = "owner", type = User.class)})
+    @Params(positional = {@Param( req = OPTIONAL, label = "warp"),
+              @Param( req = OPTIONAL, label = "owner", type = User.class)})
     public void makePublic(CommandContext context)
     {
         User user = this.getUser(context, 1);
@@ -527,7 +528,7 @@ public class WarpCommand extends TpPointCommand
 
     @Alias(value = {"clearwarps"})
     @Command(desc = "Clear all warps (of a player)")
-    @Params(positional = @Param( req = false, label = "player", type = User.class))
+    @Params(positional = @Param( req = OPTIONAL, label = "player", type = User.class))
     @Flags({@Flag(name = "pub", longName = "public"),
             @Flag(name = "priv", longName = "private")})
     public ConfirmResult clear(final CommandContext context)

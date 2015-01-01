@@ -21,13 +21,13 @@ import java.util.Set;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.RoleCompleter;
 import de.cubeisland.engine.module.roles.Roles;
@@ -36,6 +36,7 @@ import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 import de.cubeisland.engine.module.roles.role.UserDatabaseStore;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 @Alias("manuser")
@@ -164,7 +165,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(alias = "setperm", desc = "Sets a permission for this user [in world]")
     @Params(positional = {@Param(label = "player", type = User.class),
                           @Param(label = "permission"),
-                          @Param(req = false, names = {"true","false","reset"})},
+                          @Param(req = OPTIONAL, names = {"true","false","reset"})},
             nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void setpermission(CommandContext context)
     {

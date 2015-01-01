@@ -31,13 +31,13 @@ import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.parameter.IncorrectUsageException;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.task.TaskManager;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 /**
@@ -58,7 +58,7 @@ public class TimeControlCommands
     }
 
     @Command(desc = "Changes the time of a world")
-    @Params(positional = @Param(label = "time", req = false),
+    @Params(positional = @Param(label = "time", req = OPTIONAL),
             nonpositional = @Param(names = { "w", "worlds", "in"})) // TODO worldlist reader // TODO NParams static label reader
     @Flags(@Flag(longName = "lock", name = "l"))
     public void time(CommandContext context)
@@ -164,7 +164,7 @@ public class TimeControlCommands
 
     @Command(desc = "Changes the time for a player")
     @Params(positional = {@Param(label = "time"), // TODO staticValues = "reset"
-                          @Param(req = false, label = "player", type = User.class)})
+                          @Param(req = OPTIONAL, label = "player", type = User.class)})
     @Flags(@Flag(longName = "lock", name = "l"))
     public void ptime(CommandContext context)
     {

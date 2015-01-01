@@ -30,9 +30,9 @@ import org.bukkit.World;
 
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.reflect.exception.InvalidReflectedObjectException;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
+import de.cubeisland.engine.reflect.exception.InvalidReflectedObjectException;
 
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;
 

@@ -21,12 +21,12 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.annotation.CommandPermission;
 import de.cubeisland.engine.core.user.User;
@@ -35,9 +35,8 @@ import de.cubeisland.engine.core.util.LocationUtil;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
+import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static org.bukkit.Material.AIR;
 import static org.bukkit.Material.GLASS;
 import static org.bukkit.block.BlockFace.DOWN;
@@ -291,7 +290,7 @@ public class MovementCommands
 
     @Command(desc = "Swaps you and another players position")
     @Params(positional = {@Param(label = "player", type = User.class),
-              @Param(label = "player", type = User.class,req = false)})
+              @Param(label = "player", type = User.class,req = OPTIONAL)})
     public void swap(CommandContext context)
     {
         User sender;

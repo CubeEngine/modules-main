@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.travel;
 
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
+import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 
 @SuppressWarnings("all")
 public class TravelConfig extends ReflectedYaml

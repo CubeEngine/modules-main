@@ -19,8 +19,6 @@ package de.cubeisland.engine.module.worlds.converter;
 
 import org.bukkit.WorldType;
 
-import de.cubeisland.engine.converter.ConverterManager;
-import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.Node;

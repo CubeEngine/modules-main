@@ -44,6 +44,7 @@ import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsConfiguration;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.ChatFormat.GOLD;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
@@ -67,7 +68,7 @@ public class WorldControlCommands
 
     @Command(desc = "Changes the weather")
     @Params(positional = {@Param(names = {"sun","rain","storm"}),
-                        @Param(req = false, label = "duration", type = Integer.class)},
+                        @Param(req = OPTIONAL, label = "duration", type = Integer.class)},
             nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void weather(CommandContext context)
     {
@@ -214,7 +215,7 @@ public class WorldControlCommands
 
     @Command(desc = "Removes entity")
     @Params(positional = {@Param(label = "entityType[:itemMaterial]"),
-                          @Param(req = false, label = "radius", type = Integer.class)}, // TODO staticValues = "*",
+                          @Param(req = OPTIONAL, label = "radius", type = Integer.class)}, // TODO staticValues = "*",
             nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void remove(CommandContext context)
     {
@@ -366,8 +367,8 @@ public class WorldControlCommands
 
     @Command(desc = "Gets rid of mobs close to you. Valid types are:\n" +
         "monster, animal, pet, golem, boss, other, creeper, skeleton, spider etc.")
-    @Params(positional = {@Param(label = "types...", req = false),
-              @Param(label = "radius", type = Integer.class, req = false)},
+    @Params(positional = {@Param(label = "types...", req = OPTIONAL),
+              @Param(label = "radius", type = Integer.class, req = OPTIONAL)},
             nonpositional =@Param(names = "in", type = World.class, completer = WorldCompleter.class))
     @Flags({@Flag(longName = "lightning", name = "l"), // die with style
             @Flag(longName = "all", name = "a")})// infinite radius

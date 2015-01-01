@@ -38,7 +38,6 @@ import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.Portal;
 import de.cubeisland.engine.module.portals.PortalManager;
 import de.cubeisland.engine.module.portals.Portals;
-import sun.misc.REException;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 

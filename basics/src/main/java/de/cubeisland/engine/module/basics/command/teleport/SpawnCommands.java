@@ -31,6 +31,7 @@ import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.core.world.WorldSetSpawnEvent;
 import de.cubeisland.engine.module.basics.Basics;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 /**
@@ -49,10 +50,10 @@ public class SpawnCommands
     }
 
     @Command(desc = "Changes the global respawnpoint")
-    @Params(positional = {@Param(req = false, label = "world", type = World.class),
-              @Param(req = false, label = "x", type = Integer.class),
-              @Param(req = false, label = "y", type = Integer.class),
-              @Param(req = false, label = "z", type = Integer.class)})
+    @Params(positional = {@Param(req = OPTIONAL, label = "world", type = World.class),
+              @Param(req = OPTIONAL, label = "x", type = Integer.class),
+              @Param(req = OPTIONAL, label = "y", type = Integer.class),
+              @Param(req = OPTIONAL, label = "z", type = Integer.class)})
     public void setSpawn(CommandContext context)
     {
         User sender = null;
@@ -108,7 +109,7 @@ public class SpawnCommands
     }
 
     @Command(desc = "Teleport directly to the worlds spawn.")
-    @Params(positional = @Param(req = false, label = "player", type = User.class),
+    @Params(positional = @Param(req = OPTIONAL, label = "player", type = User.class),
             nonpositional = @Param(names = {"world", "w"}, type = World.class))
     @Flags({@Flag(longName = "force", name = "f"),
             @Flag(longName = "all", name = "a")})
