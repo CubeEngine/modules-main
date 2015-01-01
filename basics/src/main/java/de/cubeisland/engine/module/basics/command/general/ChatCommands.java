@@ -63,17 +63,15 @@ public class ChatCommands
     }
 
     @Command(desc = "Sends a private message to someone", alias = {"tell", "message", "pm", "m", "t", "whisper", "w"})
-    @Params(positional = {@Param(label = "player", type = User.class), // TODO staticValues = "console",
-                         @Param(label = "message", greed = INFINITE)})
-    public void msg(CommandContext context)
+    public void msg(CommandContext context, @Label("player") User user, @Label("message") @Greed(INFINITE) String message)
     {
+        // TODO allow console as "user" or make it work somehow
         if ("console".equalsIgnoreCase(context.getString(0)))
         {
             sendWhisperTo(NON_PLAYER_UUID, context.getStrings(1), context);
             return;
         }
-        User user = context.get(0);
-        if (!this.sendWhisperTo(user.getUniqueId(), context.getStrings(1), context))
+        if (!this.sendWhisperTo(user.getUniqueId(), message, context))
         {
             context.sendTranslated(NEGATIVE, "Could not find the player {user} to send the message to. Is the player offline?", user);
         }

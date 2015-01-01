@@ -197,26 +197,17 @@ public class MailCommand extends CommandContainer
     }
 
     @Command(desc = "Clears your mail.")
-    @Params(positional = @Param(label = "player", type = User.class, req = false)) // TODO  staticValues = "console",
-    public void clear(CommandContext context)
+    @Restricted(value = User.class, msg = "You will never have mail here!")
+    public void clear(CommandContext context, @Optional @Label("player") User from)
     {
-        User sender = null;
-        if (context.getSource() instanceof User)
-        {
-            sender = (User)context.getSource();
-        }
-        if (sender == null)
-        {
-            context.sendTranslated(NEGATIVE, "You will never have mail here!");
-            return;
-        }
+        User sender = (User)context.getSource();
         if (!context.hasPositional(0))
         {
             sender.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMail();
             context.sendTranslated(NEUTRAL, "Cleared all mails!");
             return;
         }
-        User from = "console".equalsIgnoreCase(context.getString(0)) ? null : context.<User>get(0);
+        // TODO console User from = "console".equalsIgnoreCase(context.getString(0)) ? null : context.<User>get(0);
         sender.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMailFrom(from);
         context.sendTranslated(NEUTRAL, "Cleared all mail from {user}!", from == null ? "console" : from);
     }
