@@ -52,7 +52,7 @@ public class ManagementCommands extends CommandContainer
         module.getConfiguration().reload();
         module.getRolesManager().initRoleProviders();
         module.getRolesManager().recalculateAllRoles();
-        context.sendTranslated(POSITIVE, "{text:Roles} reload getSuggestions!");
+        context.sendTranslated(POSITIVE, "{text:Roles} reload complete!");
     }
 
     @Alias(value = "mansave")
