@@ -760,7 +760,7 @@ public class Lock
                 }
                 else
                 {
-                    user.sendTranslated(POSITIVE, "You sense that the strong magic aura protecting this wont let you through without the right passphrase");
+                    user.sendTranslated(POSITIVE, "You sense that the strong magic aura protecting this won't let you through without the right passphrase");
                 }
             }
             else
