@@ -17,7 +17,9 @@
  */
 package de.cubeisland.engine.module.basics;
 
+import java.io.File;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.bukkit.Bukkit;
@@ -150,4 +152,16 @@ public class BasicsConfiguration extends ReflectedYaml
 
     @Name("overstacked.prevent-anvil-and-brewing")
     public boolean preventOverstackedItems = true;
+
+    @Override
+    public void onLoaded(File loadedFrom)
+    {
+        for (Iterator<ItemStack> it = this.commands.itemBlacklist.iterator(); it.hasNext(); )
+        {
+            if (it.next() == null)
+            {
+                it.remove();
+            }
+        }
+    }
 }
