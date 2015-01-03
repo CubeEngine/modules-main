@@ -20,19 +20,18 @@ package de.cubeisland.engine.module.roles.config;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
-import de.cubeisland.engine.reflect.codec.converter.Converter;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.ListNode;
-import de.cubeisland.engine.reflect.node.MapNode;
-import de.cubeisland.engine.reflect.node.Node;
-import de.cubeisland.engine.reflect.node.NullNode;
-import de.cubeisland.engine.reflect.node.StringNode;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.converter.SimpleConverter;
+import de.cubeisland.engine.converter.node.ListNode;
+import de.cubeisland.engine.converter.node.MapNode;
+import de.cubeisland.engine.converter.node.Node;
+import de.cubeisland.engine.converter.node.NullNode;
+import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.core.util.Triplet;
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.module.roles.Roles;
 
-public class MirrorConfigConverter implements Converter<MirrorConfig>
+public class MirrorConfigConverter extends SimpleConverter<MirrorConfig>
 {
     private final Roles module;
 
@@ -42,7 +41,7 @@ public class MirrorConfigConverter implements Converter<MirrorConfig>
     }
 
     @Override
-    public Node toNode(MirrorConfig mirror, ConverterManager manager) throws ConversionException
+    public Node toNode(MirrorConfig mirror) throws ConversionException
     {
         MapNode resultMap = MapNode.emptyMap();
         resultMap.setNode(new StringNode(mirror.mainWorld.getName()), NullNode.emptyNode());
@@ -71,7 +70,7 @@ public class MirrorConfigConverter implements Converter<MirrorConfig>
 
     @Override
     @SuppressWarnings("unchecked")
-    public MirrorConfig fromNode(Node node, ConverterManager manager) throws ConversionException
+    public MirrorConfig fromNode(Node node) throws ConversionException
     {
         MapNode readMap = (MapNode)node;
         if (readMap.isEmpty())

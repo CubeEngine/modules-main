@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.conomy.account;
 
+import de.cubeisland.engine.core.user.UserAttachment;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
-import de.cubeisland.engine.core.user.UserAttachment;
 
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 

@@ -36,7 +36,6 @@ import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.exception.CircularRoleDependencyException;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
-import gnu.trove.map.hash.THashMap;
 
 public abstract class ResolvedDataHolder extends TempDataStore
 {
@@ -307,7 +306,7 @@ public abstract class ResolvedDataHolder extends TempDataStore
     @Override
     public Map<String, Boolean> getAllRawPermissions()
     {
-        Map<String,Boolean> result = new THashMap<>();
+        Map<String,Boolean> result = new HashMap<>();
         for (Role assignedRole : this.resolvedRoles)
         {
             result.putAll(assignedRole.getAllRawPermissions());
@@ -319,7 +318,7 @@ public abstract class ResolvedDataHolder extends TempDataStore
     @Override
     public Map<String, String> getAllRawMetadata()
     {
-        Map<String,String> result = new THashMap<>();
+        Map<String,String> result = new HashMap<>();
         for (Role assignedRole : this.resolvedRoles)
         {
             result.putAll(assignedRole.getAllRawMetadata());

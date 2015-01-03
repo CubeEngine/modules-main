@@ -110,7 +110,7 @@ public class KeyBook
                .parseFormats(currentHolder.getTranslation(NEUTRAL, "This KeyBook")), ChatFormat
                .parseFormats(currentHolder.getTranslation(NEUTRAL, "looks old and")), ChatFormat
                .parseFormats(currentHolder.getTranslation(NEUTRAL, "used up. It")), ChatFormat
-               .parseFormats(currentHolder.getTranslation(NEUTRAL, "wont let you")), ChatFormat
+               .parseFormats(currentHolder.getTranslation(NEUTRAL, "won't let you")), ChatFormat
                .parseFormats(currentHolder.getTranslation(NEUTRAL, "open any containers!"))));
         item.setItemMeta(itemMeta);
         item.setType(PAPER);

@@ -47,7 +47,6 @@ import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.LockerAttachment;
 import org.jooq.Result;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.storage.AccessListModel.*;
 import static de.cubeisland.engine.module.locker.storage.LockType.PUBLIC;
@@ -761,7 +760,7 @@ public class Lock
                 }
                 else
                 {
-                    user.sendTranslated(POSITIVE, "You sense that the strong magic aura protecting this wont let you through without the right passphrase");
+                    user.sendTranslated(POSITIVE, "You sense that the strong magic aura protecting this won't let you through without the right passphrase");
                 }
             }
             else

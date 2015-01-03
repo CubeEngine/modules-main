@@ -17,8 +17,8 @@
  */
 package de.cubeisland.engine.module.worlds.player;
 
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import de.cubeisland.engine.core.world.ConfigWorld;
+import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 
 @SuppressWarnings("all")
 public class PlayerConfig extends ReflectedYaml

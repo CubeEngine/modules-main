@@ -17,6 +17,7 @@
  */
 package de.cubeisland.engine.module.roles;
 
+import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.core.command.CommandManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.module.service.Metadata;
@@ -40,7 +41,6 @@ import de.cubeisland.engine.module.roles.role.RolesManager;
 import de.cubeisland.engine.module.roles.storage.TableData;
 import de.cubeisland.engine.module.roles.storage.TablePerm;
 import de.cubeisland.engine.module.roles.storage.TableRole;
-import de.cubeisland.engine.reflect.codec.ConverterManager;
 
 public class Roles extends Module
 {
@@ -51,9 +51,9 @@ public class Roles extends Module
     public void onEnable()
     {
         ConverterManager cManager = this.getCore().getConfigFactory().getDefaultConverterManager();
-        cManager.registerConverter(PermissionTree.class, new PermissionTreeConverter(this));
-        cManager.registerConverter(Priority.class, new PriorityConverter());
-        cManager.registerConverter(MirrorConfig.class, new MirrorConfigConverter(this));
+        cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);
+        cManager.registerConverter(new PriorityConverter(), Priority.class);
+        cManager.registerConverter(new MirrorConfigConverter(this), MirrorConfig.class);
 
         Database db = this.getCore().getDB();
         db.registerTable(TableRole.class);

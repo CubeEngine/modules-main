@@ -17,13 +17,14 @@
  */
 package de.cubeisland.engine.module.roles.config;
 
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.map.hash.TIntObjectHashMap;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class Priority
 {
-    private static final TIntObjectHashMap<Priority> prio = new TIntObjectHashMap<>();
-    private static final THashMap<String, Priority> prioNames = new THashMap<>();
+    private static final Map<Integer, Priority> prio = new HashMap<>();
+    private static final Map<String, Priority> prioNames = new HashMap<>();
     public static final Priority ABSULTEZERO = new Priority(-273, "ABSULTEZERO");
     public static final Priority MINIMUM = new Priority(0, "MINIMUM");
     public static final Priority LOWEST = new Priority(125, "LOWEST");

@@ -22,11 +22,11 @@ import java.util.Random;
 import java.util.UUID;
 
 import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.methodic.parametric.Greed;
 import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.sender.ConsoleCommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -37,8 +37,6 @@ import de.cubeisland.engine.core.util.converter.DurationConverter;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.StringNode;
 import org.joda.time.Duration;
 
 import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
@@ -63,17 +61,15 @@ public class ChatCommands
     }
 
     @Command(desc = "Sends a private message to someone", alias = {"tell", "message", "pm", "m", "t", "whisper", "w"})
-    @Params(positional = {@Param(label = "player", type = User.class), // TODO staticValues = "console",
-                         @Param(label = "message", greed = INFINITE)})
-    public void msg(CommandContext context)
+    public void msg(CommandContext context, @Label("player") User user, @Label("message") @Greed(INFINITE) String message)
     {
+        // TODO allow console as "user" or make it work somehow
         if ("console".equalsIgnoreCase(context.getString(0)))
         {
             sendWhisperTo(NON_PLAYER_UUID, context.getStrings(1), context);
             return;
         }
-        User user = context.get(0);
-        if (!this.sendWhisperTo(user.getUniqueId(), context.getStrings(1), context))
+        if (!this.sendWhisperTo(user.getUniqueId(), message, context))
         {
             context.sendTranslated(NEGATIVE, "Could not find the player {user} to send the message to. Is the player offline?", user);
         }
@@ -173,7 +169,7 @@ public class ChatCommands
         {
             try
             {
-                dura = converter.fromNode(StringNode.of(duration), null);
+                dura = converter.fromNode(StringNode.of(duration), null, null);
             }
             catch (ConversionException e)
             {

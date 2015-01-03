@@ -32,13 +32,13 @@ import org.bukkit.World.Environment;
 import org.bukkit.WorldCreator;
 import org.bukkit.WorldType;
 
-import de.cubeisland.engine.reflect.Section;
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.util.WorldLocation;
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.module.worlds.Worlds;
+import de.cubeisland.engine.reflect.Section;
+import de.cubeisland.engine.reflect.annotations.Comment;
+import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 
 @SuppressWarnings("all")
 public class WorldConfig extends ReflectedYaml

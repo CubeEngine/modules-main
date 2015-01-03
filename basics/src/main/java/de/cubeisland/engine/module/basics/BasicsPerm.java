@@ -19,10 +19,10 @@ package de.cubeisland.engine.module.basics;
 
 import java.util.concurrent.TimeUnit;
 
-import de.cubeisland.engine.module.basics.command.teleport.TpWorldPermissions;
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.permission.PermissionContainer;
 import de.cubeisland.engine.core.util.Profiler;
+import de.cubeisland.engine.module.basics.command.teleport.TpWorldPermissions;
 
 import static de.cubeisland.engine.core.permission.PermDefault.FALSE;
 

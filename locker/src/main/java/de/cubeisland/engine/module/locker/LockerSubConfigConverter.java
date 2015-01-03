@@ -20,23 +20,22 @@ package de.cubeisland.engine.module.locker;
 import java.util.ArrayList;
 import java.util.Map.Entry;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
-import de.cubeisland.engine.reflect.codec.converter.Converter;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.BooleanNode;
-import de.cubeisland.engine.reflect.node.ListNode;
-import de.cubeisland.engine.reflect.node.MapNode;
-import de.cubeisland.engine.reflect.node.Node;
-import de.cubeisland.engine.reflect.node.NullNode;
-import de.cubeisland.engine.reflect.node.StringNode;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.converter.SimpleConverter;
+import de.cubeisland.engine.converter.node.BooleanNode;
+import de.cubeisland.engine.converter.node.ListNode;
+import de.cubeisland.engine.converter.node.MapNode;
+import de.cubeisland.engine.converter.node.Node;
+import de.cubeisland.engine.converter.node.NullNode;
+import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.module.locker.storage.LockType;
 import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
 
-public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> implements Converter<C>
+public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> extends SimpleConverter<C>
 {
     @Override
-    public Node toNode(C object, ConverterManager manager) throws ConversionException
+    public Node toNode(C object) throws ConversionException
     {
         MapNode root = MapNode.emptyMap();
         MapNode config = MapNode.emptyMap();
@@ -66,7 +65,7 @@ public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> 
     }
 
     @Override
-    public C fromNode(Node node, ConverterManager manager) throws ConversionException
+    public C fromNode(Node node) throws ConversionException
     {
         if (node instanceof NullNode) return null;
         C configuration;

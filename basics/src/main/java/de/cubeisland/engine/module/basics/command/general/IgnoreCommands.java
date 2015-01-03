@@ -22,10 +22,10 @@ import java.util.List;
 import java.util.Random;
 
 import de.cubeisland.engine.command.filter.Restricted;
+import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Reader;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserManager;
 import de.cubeisland.engine.core.util.StringUtils;

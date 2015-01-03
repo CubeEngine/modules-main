@@ -19,13 +19,13 @@ package de.cubeisland.engine.module.locker.storage;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 import de.cubeisland.engine.core.util.matcher.Match;
-import gnu.trove.map.TByteObjectMap;
-import gnu.trove.map.hash.TByteObjectHashMap;
 
 import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;
 
@@ -41,7 +41,7 @@ public enum ProtectedType
     ENTITY_CONTAINER_LIVING(8),
     ;
 
-    private final static TByteObjectMap<ProtectedType> protectedTypes = new TByteObjectHashMap<>();
+    private final static Map<Byte, ProtectedType> protectedTypes = new HashMap<>();
 
     public final byte id;
     public final Collection<ProtectionFlag> supportedFlags;

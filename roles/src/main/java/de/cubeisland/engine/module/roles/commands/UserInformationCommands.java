@@ -21,13 +21,13 @@ import java.util.Map;
 
 import org.bukkit.World;
 
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.permission.PermDefault;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.Roles;
@@ -38,6 +38,7 @@ import de.cubeisland.engine.module.roles.role.UserDatabaseStore;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 @Command(name = "user", desc = "Manage users")
@@ -50,7 +51,7 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(value = "listuroles")
     @Command(desc = "Lists roles of a user [in world]")
-    @Params(positional = @Param(req = false, label = "player", type = User.class),
+    @Params(positional = @Param(req = OPTIONAL, label = "player", type = User.class),
             nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void list(CommandContext context)
     {
@@ -134,7 +135,7 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(value = "listuperm")
     @Command(alias = "listperm", desc = "List permission assigned to a user in a world")
-    @Params(positional = @Param(req = false, label = "player", type = User.class),
+    @Params(positional = @Param(req = OPTIONAL, label = "player", type = User.class),
             nonpositional = @Param(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "all", name = "a"))
     public void listpermission(CommandContext context)
@@ -196,7 +197,7 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(value = "listumeta")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists assigned metadata from a user [in world]")
-    @Params(positional = @Param(req = false, label = "player", type = User.class),
+    @Params(positional = @Param(req = OPTIONAL, label = "player", type = User.class),
             nonpositional = @Param(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "all", name = "a"))
     public void listmetadata(CommandContext context)

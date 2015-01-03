@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.locker;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
+import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.module.Reloadable;
 import de.cubeisland.engine.core.storage.database.Database;
@@ -48,8 +48,8 @@ public class Locker extends Module implements Reloadable
     public void onEnable()
     {
         ConverterManager cManager = this.getCore().getConfigFactory().getDefaultConverterManager();
-        cManager.registerConverter(BlockLockerConfiguration.class, new BlockLockerConfigConverter());
-        cManager.registerConverter(EntityLockerConfiguration.class, new EntityLockerConfigConverter());
+        cManager.registerConverter(new BlockLockerConfigConverter(), BlockLockerConfiguration.class);
+        cManager.registerConverter(new EntityLockerConfigConverter(), EntityLockerConfiguration.class);
         this.config = this.loadConfig(LockerConfig.class);
         Database db = this.getCore().getDB();
         db.registerTable(TableLocks.class);

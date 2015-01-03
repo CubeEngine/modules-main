@@ -30,8 +30,9 @@ import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsConfiguration;
 
-import static de.cubeisland.engine.module.basics.command.moderation.spawnmob.SpawnMob.spawnMobs;
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.basics.command.moderation.spawnmob.SpawnMob.spawnMobs;
 
 /**
  * The /spawnmob command.
@@ -47,8 +48,8 @@ public class SpawnMobCommand
 
     @Command(desc = "Spawns the specified Mob")
     @Params(positional = {@Param(label = "<mob>[:data][,<ridingmob>[:data]]"),
-              @Param(label = "amount", type = Integer.class, req = false),
-              @Param(label = "player", type = User.class, req = false)})
+              @Param(label = "amount", type = Integer.class, req = OPTIONAL),
+              @Param(label = "player", type = User.class, req = OPTIONAL)})
     public void spawnMob(CommandContext context)
     {
         User sender = null;
@@ -114,6 +115,4 @@ public class SpawnMobCommand
             context.sendMessage(message);
         }
     }
-
-
 }

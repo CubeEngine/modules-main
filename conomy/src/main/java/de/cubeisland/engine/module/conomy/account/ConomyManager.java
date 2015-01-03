@@ -20,6 +20,7 @@ package de.cubeisland.engine.module.conomy.account;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -38,7 +39,6 @@ import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.ConomyConfiguration;
 import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
 import de.cubeisland.engine.module.conomy.account.storage.BankAccessModel;
-import gnu.trove.map.hash.THashMap;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -55,8 +55,8 @@ public class ConomyManager
     protected final DSLContext dsl;
     protected final UserManager um;
     private final ThreadFactory threadFactory;
-    private final Map<String, BankAccount> bankaccounts = new THashMap<>();
-    private final Map<Long, BankAccount> bankaccountsID = new THashMap<>();
+    private final Map<String, BankAccount> bankaccounts = new HashMap<>();
+    private final Map<Long, BankAccount> bankaccountsID = new HashMap<>();
     private final Economy conomyInterface;
     private Thread thread = null;
 

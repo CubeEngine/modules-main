@@ -37,12 +37,10 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.Flags;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.filter.Restricted;
+import de.cubeisland.engine.command.methodic.parametric.Default;
 import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.command.parameter.TooFewArgumentsException;
@@ -147,27 +145,17 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays near players(entities/mobs) to you.")
-    @Params(positional = {@Param(label = "radius", type = Integer.class, req = false),
-              @Param(label = "player", type = User.class, req = false)})
-    @Flags({@Flag(longName = "entity", name = "e"),
-            @Flag(longName = "mob", name = "m")})
-    public void near(CommandContext context)
+    public void near(CommandContext context,
+                     @Optional @Label("radius") Integer radius,
+                     @Default @Optional @Label("player") User user,
+                     @Flag(longName = "entity", name = "e") boolean entityFlag,
+                     @Flag(longName = "mob", name = "m") boolean mobFlag)
     {
-        User user;
-        if (context.hasPositional(1))
+        //new cmd system showing default message via @Default context.sendTranslated(NEUTRAL, "I am right {text:behind:color=RED} you!");
+        if (radius == null)
         {
-            user = context.get(1);
+            radius = this.module.getConfiguration().commands.nearDefaultRadius; // TODO create defaultProvider for this
         }
-        else if (context.getSource() instanceof User)
-        {
-            user = (User)context.getSource();
-        }
-        else
-        {
-            context.sendTranslated(NEUTRAL, "I am right {text:behind:color=RED} you!");
-            return;
-        }
-        int radius = context.get(0, this.module.getConfiguration().commands.nearDefaultRadius);
         int squareRadius = radius * radius;
         Location userLocation = user.getLocation();
         List<Entity> list = userLocation.getWorld().getEntities();
@@ -178,20 +166,17 @@ public class InformationCommands
         {
             entity.getLocation(entityLocation);
             double distance = entityLocation.distanceSquared(userLocation);
-            if (!entityLocation.equals(userLocation))
+            if (!entityLocation.equals(userLocation) && distance < squareRadius)
             {
-                if (distance < squareRadius)
+                if (entityFlag || (mobFlag && entity instanceof LivingEntity) || entity instanceof Player)
                 {
-                    if (context.hasFlag("e") || (context.hasFlag("m") && entity instanceof LivingEntity) || entity instanceof Player)
+                    List<Entity> sublist = sortedMap.get(distance);
+                    if (sublist == null)
                     {
-                        List<Entity> sublist = sortedMap.get(distance);
-                        if (sublist == null)
-                        {
-                            sublist = new ArrayList<>();
-                        }
-                        sublist.add(entity);
-                        sortedMap.put(distance, sublist);
+                        sublist = new ArrayList<>();
                     }
+                    sublist.add(entity);
+                    sortedMap.put(distance, sublist);
                 }
             }
         }

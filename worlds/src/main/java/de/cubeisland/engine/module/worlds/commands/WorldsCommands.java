@@ -34,13 +34,13 @@ import org.bukkit.WorldType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.parameter.IncorrectUsageException;
-import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
@@ -55,6 +55,7 @@ import de.cubeisland.engine.module.worlds.Universe;
 import de.cubeisland.engine.module.worlds.Worlds;
 import de.cubeisland.engine.module.worlds.config.WorldConfig;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
@@ -83,7 +84,7 @@ public class WorldsCommands extends CommandContainer
 
     @Command(desc = "Creates a new world")
     @Params(positional = {@Param(label = "name"),
-                          @Param(req = false, label = "universe")},
+                          @Param(req = OPTIONAL, label = "universe")},
             nonpositional = {
                 @Param(names = {"environment","env"}, type = Environment.class),
                 @Param(names = "seed"),
@@ -193,7 +194,7 @@ public class WorldsCommands extends CommandContainer
 
     @Command(desc = "Loads a world from configuration")
     @Params(positional = {@Param(label = "world"),
-                          @Param(req = false, label = "universe")})
+                          @Param(req = OPTIONAL, label = "universe")})
     public void load(CommandContext context)
     {
         World world = this.wm.getWorld(context.getString(0));

@@ -17,7 +17,9 @@
  */
 package de.cubeisland.engine.module.basics;
 
+import java.io.File;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 import org.bukkit.Bukkit;
@@ -25,10 +27,10 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
+import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 
@@ -150,4 +152,16 @@ public class BasicsConfiguration extends ReflectedYaml
 
     @Name("overstacked.prevent-anvil-and-brewing")
     public boolean preventOverstackedItems = true;
+
+    @Override
+    public void onLoaded(File loadedFrom)
+    {
+        for (Iterator<ItemStack> it = this.commands.itemBlacklist.iterator(); it.hasNext(); )
+        {
+            if (it.next() == null)
+            {
+                it.remove();
+            }
+        }
+    }
 }

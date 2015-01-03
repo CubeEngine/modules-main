@@ -19,6 +19,7 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.Set;
 
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
@@ -27,7 +28,6 @@ import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.parameter.reader.ReaderException;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.module.conomy.Conomy;
@@ -36,6 +36,7 @@ import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.UserAccount;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 @Command(name = "bank", desc = "Manages your money in banks.")
@@ -53,7 +54,7 @@ public class BankCommands extends CommandContainer
 
     @Alias(value = "bbalance")
     @Command(desc = "Shows the balance of the specified bank")
-    @Params(positional = @Param(req = false, label = "bank", type = BankAccount.class))
+    @Params(positional = @Param(req = OPTIONAL, label = "bank", type = BankAccount.class))
     public void balance(CommandContext context)
     {
         if (context.hasPositional(0))
@@ -78,7 +79,7 @@ public class BankCommands extends CommandContainer
     }
 
     @Command(desc = "Lists all banks")
-    @Params(positional = @Param(req = false, label = "owner", type = User.class))
+    @Params(positional = @Param(req = OPTIONAL, label = "owner", type = User.class))
     public void list(CommandContext context) //Lists all banks [of given player]
     {
         String format = " - " + ChatFormat.YELLOW;
@@ -114,7 +115,7 @@ public class BankCommands extends CommandContainer
 
     @Command(desc = "Invites a user to a bank")
     @Params(positional = {@Param(label = "player", type = User.class),
-                          @Param(req = false, label = "bank", type = BankAccount.class)})
+                          @Param(req = OPTIONAL, label = "bank", type = BankAccount.class)})
     @Flags(@Flag(longName = "force", name = "f"))
     public void invite(CommandContext context)
     {
@@ -163,7 +164,7 @@ public class BankCommands extends CommandContainer
 
     @Command(desc = "Joins a bank")
     @Params(positional = {@Param(label = "bank", type = BankAccount.class),
-                         @Param(req = false, label = "player", type = User.class)})
+                         @Param(req = OPTIONAL, label = "player", type = User.class)})
     @Flags(@Flag(longName = "force", name = "f"))
     public void join(CommandContext context)
     {
@@ -225,8 +226,8 @@ public class BankCommands extends CommandContainer
     }
 
     @Command(desc = "Leaves a bank")
-    @Params(positional = {@Param(req = false, label = "bank", type = BankAccount.class),
-                          @Param(req = false, label = "player", type = User.class)})
+    @Params(positional = {@Param(req = OPTIONAL, label = "bank", type = BankAccount.class),
+                          @Param(req = OPTIONAL, label = "player", type = User.class)})
     public void leave(CommandContext context)
     {
         if (context.hasPositional(0))

@@ -18,6 +18,7 @@
 package de.cubeisland.engine.module.basics.command.general;
 
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
@@ -26,12 +27,11 @@ import java.util.TreeMap;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.result.CommandResult;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
-import gnu.trove.set.hash.THashSet;
 
 public class RolesListCommand extends ListCommand
 {
@@ -45,7 +45,7 @@ public class RolesListCommand extends ListCommand
     @Override
     protected SortedMap<String, Set<User>> groupUsers(Set<User> users)
     {
-        Set<User> noRoleSet = new THashSet<>();
+        Set<User> noRoleSet = new HashSet<>();
         TreeMap<Role, Set<User>> groupedRoles = new TreeMap<>(ROLE_COMPARATOR);
         for (User user : users)
         {
@@ -66,7 +66,7 @@ public class RolesListCommand extends ListCommand
                     Set<User> list = groupedRoles.get(role);
                     if (list == null)
                     {
-                        groupedRoles.put(role, list = new THashSet<>());
+                        groupedRoles.put(role, list = new HashSet<>());
                     }
                     list.add(user);
                 }

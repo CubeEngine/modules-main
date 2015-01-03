@@ -20,9 +20,9 @@ package de.cubeisland.engine.module.locker.commands;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.InventoryHolder;
 
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
@@ -46,7 +46,6 @@ public class LockerAdminCommands extends CommandContainer
 
     private Lock getLockById(CommandContext context, Integer id)
     {
-        if (LockerCommands.isNotUser(context.getSource())) return null;
         if (id == null)
         {
             context.sendTranslated(NEGATIVE, "{input} is not a valid id!", context.get(0));
@@ -61,10 +60,10 @@ public class LockerAdminCommands extends CommandContainer
     }
 
     @Command(desc = "Opens a protected chest by protection id")
-    @Params(positional = @Param(label = "id", type = Integer.class))
-    public void view(CommandContext context)
+    @Restricted(value = User.class, msg = "This command can only be used in game")
+    public void view(CommandContext context, @Label("id") Integer id)
     {
-        Lock lock = this.getLockById(context, context.<Integer>get(0));
+        Lock lock = this.getLockById(context, id);
         switch (lock.getProtectedType())
         {
             case CONTAINER:
@@ -86,19 +85,19 @@ public class LockerAdminCommands extends CommandContainer
     }
 
     @Command(desc = "Deletes a protection by its id")
-    @Params(positional = @Param(label = "id", type = Integer.class))
-    public void remove(CommandContext context)
+    @Restricted(value = User.class, msg = "This command can only be used in game")
+    public void remove(CommandContext context, @Label("id") Integer id)
     {
-        Lock lock = this.getLockById(context, context.<Integer>get(0, null));
+        Lock lock = this.getLockById(context, id);
         if (lock == null) return;
         lock.delete((User)context.getSource());
     }
 
     @Command(desc = "Teleport to a protection")
-    @Params(positional = @Param(label = "id", type = Integer.class))
-    public void tp(CommandContext context)
+    @Restricted(value = User.class, msg = "This command can only be used in game")
+    public void tp(CommandContext context, @Label("id") Integer id)
     {
-        Lock lock = this.getLockById(context, context.<Integer>get(0, null));
+        Lock lock = this.getLockById(context, id);
         if (lock == null) return;
         if (lock.isBlockLock())
         {
@@ -111,10 +110,8 @@ public class LockerAdminCommands extends CommandContainer
     }
 
     @Command(desc = "Deletes all locks of given player")
-    @Params(positional = @Param(label = "player", type = User.class))
-    public void purge(CommandContext context)
+    public void purge(CommandContext context, @Label("player") User user)
     {
-        User user = context.get(0);
         this.manager.purgeLocksFrom(user);
         context.sendTranslated(POSITIVE, "All locks for {user} are now deleted!", user);
     }

@@ -25,10 +25,10 @@ import javax.persistence.Transient;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
-import de.cubeisland.engine.core.CubeEngine;
+import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 
 import static de.cubeisland.engine.module.locker.storage.LockType.PRIVATE;
 import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;

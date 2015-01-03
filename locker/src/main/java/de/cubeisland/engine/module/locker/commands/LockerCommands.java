@@ -23,16 +23,17 @@ import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 
 import de.cubeisland.engine.command.CommandInvocation;
+import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.completer.Completer;
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.math.BlockVector3;
@@ -63,11 +64,10 @@ public class LockerCommands extends CommandContainer
 
     @Alias(value = "cinfo")
     @Command(desc = "Shows information about a protection")
-    @Flags(@Flag(longName = "persist", name = "p"))
-    public void info(CommandContext context)
+    @Restricted(value = User.class, msg = "This command can only be used in game")
+    public void info(CommandContext context, @Flag(longName = "persist", name = "p") boolean persist)
     {
-        if (isNotUser(context.getSource())) return;
-        if (context.hasFlag("p"))
+        if (persist)
         {
             this.persist(context);
         }
@@ -111,9 +111,9 @@ public class LockerCommands extends CommandContainer
 
     @Alias(value = "cpersist")
     @Command(desc = "persists your last locker command")
+    @Restricted(value = User.class, msg = "This command can only be used in game")
     public void persist(CommandContext context)
     {
-        if (isNotUser(context.getSource())) return;
         if (this.manager.commandListener.persist((User)context.getSource()))
         {
             context.sendTranslated(POSITIVE, "Your commands will now persist!");
@@ -126,11 +126,10 @@ public class LockerCommands extends CommandContainer
 
     @Alias(value = "cremove")
     @Command(desc = "Shows information about a protection")
-    @Flags(@Flag(longName = "persist", name = "p"))
-    public void remove(CommandContext context)
+    @Restricted(value = User.class, msg = "This command can only be used in game")
+    public void remove(CommandContext context, @Flag(longName = "persist", name = "p") boolean persist)
     {
-        if (isNotUser(context.getSource())) return;
-        if (context.hasFlag("p"))
+        if (persist)
         {
             this.persist(context);
         }
@@ -140,27 +139,25 @@ public class LockerCommands extends CommandContainer
 
     @Alias(value = "cunlock")
     @Command(desc = "Unlocks a password protected chest")
-    @Params(positional = @Param(label = "password"))
-    @Flags(@Flag(longName = "persist", name = "p"))
-    public void unlock(CommandContext context)
+    @Restricted(value = User.class, msg = "This command can only be used in game")
+    public void unlock(CommandContext context, @Label("password") String password, @Flag(longName = "persist", name = "p") boolean persist)
     {
-        if (isNotUser(context.getSource())) return;
-        if (context.hasFlag("p"))
+        if (persist)
         {
             this.persist(context);
         }
-        this.manager.commandListener.setCommandType(context.getSource(), CommandType.UNLOCK, context.getString(0));
+        this.manager.commandListener.setCommandType(context.getSource(), CommandType.UNLOCK, password);
         context.sendTranslated(POSITIVE, "Right click to unlock a password protected chest!");
     }
 
     @Alias(value = "cmodify")
     @Command(desc = "adds or removes player from the accesslist")
+    @Restricted(value = User.class, msg = "This command can only be used in game")
     @Params(positional = @Param(label = "players"))
     @Flags({@Flag(name = "g", longName = "global"),
             @Flag(longName = "persist", name = "p")})
-    public void modify(CommandContext context)
+    public void modify(CommandContext context) // TODO use parameterized cmd
     {
-        if (isNotUser(context.getSource())) return;
         if (context.hasFlag("p"))
         {
             this.persist(context);
@@ -196,35 +193,31 @@ public class LockerCommands extends CommandContainer
 
     @Alias(value = "cgive")
     @Command(desc = "gives a protection to someone else")
-    @Params(positional = @Param(label = "player", type = User.class))
-    @Flags(@Flag(longName = "persist", name = "p"))
-    public void give(CommandContext context)
+    @Restricted(value = User.class, msg = "This command can only be used in game")
+    public void give(CommandContext context, @Label("player") User user, @Flag(longName = "persist", name = "p") boolean persist)
     {
-        if (isNotUser(context.getSource())) return;
-        if (context.hasFlag("p"))
+        if (persist)
         {
             this.persist(context);
         }
-        this.manager.commandListener.setCommandType(context.getSource(), GIVE, context.<User>get(0).getName());
+        this.manager.commandListener.setCommandType(context.getSource(), GIVE, user.getName());
     }
 
     @Alias(value = "ckey")
     @Command(desc = "creates a KeyBook or invalidates previous KeyBooks")
-    @Flags({@Flag(longName = "invalidate", name = "i"),
-            @Flag(longName = "persist", name = "p")})
-    public void key(CommandContext context)
+    @Restricted(value = User.class, msg = "This command can only be used in game")
+    public void key(CommandContext context, @Flag(longName = "invalidate", name = "i") boolean invalidate, @Flag(longName = "persist", name = "p") boolean persist)
     {
         if (!this.module.getConfig().allowKeyBooks)
         {
             context.sendTranslated(NEGATIVE, "KeyBooks are deactivated!");
             return;
         }
-        if (isNotUser(context.getSource())) return;
-        if (context.hasFlag("p"))
+        if (persist)
         {
             this.persist(context);
         }
-        if (context.hasFlag("i"))
+        if (invalidate)
         {
             this.manager.commandListener.setCommandType(context.getSource(), INVALIDATE_KEYS, context.getString(0));
             context.sendTranslated(POSITIVE, "Right click a protection to invalidate old KeyBooks for it!");
@@ -241,9 +234,9 @@ public class LockerCommands extends CommandContainer
     @Params(nonpositional = {@Param(names = "set", label = "flags...", completer = FlagCompleter.class),
                              @Param(names = "unset", label = "flags...", completer = FlagCompleter.class)})
     @Flags(@Flag(longName = "persist", name = "p"))
-    public void flag(CommandContext context)
+    @Restricted(value = User.class, msg = "This command can only be used in game")
+    public void flag(CommandContext context) // TODO use parameterized cmd
     {
-        if (isNotUser(context.getSource())) return;
         if (context.hasNamed())
         {
             context.sendTranslated(NEUTRAL, "You need to define which flags to {text:set} or {text:unset}!");
@@ -288,15 +281,5 @@ public class LockerCommands extends CommandContainer
             }
             return ProtectionFlag.getTabCompleteList(invocation.currentToken(), subToken);
         }
-    }
-
-    public static boolean isNotUser(CommandSender sender)
-    {
-        if (!(sender instanceof User))
-        {
-            sender.sendTranslated(NEGATIVE, "This command can only be used ingame");
-            return true;
-        }
-        return false;
     }
 }

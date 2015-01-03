@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.portals.config;
 
 import java.util.Random;
 
-import org.bukkit.craftbukkit.v1_7_R4.entity.CraftEntity;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -38,7 +38,6 @@ import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.Portal;
 import de.cubeisland.engine.module.portals.PortalManager;
 import de.cubeisland.engine.module.portals.Portals;
-import sun.misc.REException;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 

@@ -20,16 +20,15 @@ package de.cubeisland.engine.module.roles.config;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
-import de.cubeisland.engine.reflect.codec.converter.Converter;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.ListNode;
-import de.cubeisland.engine.reflect.node.MapNode;
-import de.cubeisland.engine.reflect.node.Node;
-import de.cubeisland.engine.reflect.node.StringNode;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.converter.SimpleConverter;
+import de.cubeisland.engine.converter.node.ListNode;
+import de.cubeisland.engine.converter.node.MapNode;
+import de.cubeisland.engine.converter.node.Node;
+import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.module.roles.Roles;
 
-public class PermissionTreeConverter implements Converter<PermissionTree>
+public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
 {
     private final Roles module;
 
@@ -39,7 +38,7 @@ public class PermissionTreeConverter implements Converter<PermissionTree>
     }
 
     @Override
-    public Node toNode(PermissionTree permTree, ConverterManager manager) throws ConversionException
+    public Node toNode(PermissionTree permTree) throws ConversionException
     {
         Map<String, Object> easyMap = new LinkedHashMap<>();
         for (Map.Entry<String, Boolean> entry : permTree.getPermissions().entrySet())
@@ -136,7 +135,7 @@ public class PermissionTreeConverter implements Converter<PermissionTree>
     }
 
     @Override
-    public PermissionTree fromNode(Node node, ConverterManager manager) throws ConversionException
+    public PermissionTree fromNode(Node node) throws ConversionException
     {
         PermissionTree permTree = new PermissionTree();
         if (node instanceof ListNode)

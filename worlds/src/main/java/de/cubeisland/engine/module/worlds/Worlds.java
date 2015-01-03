@@ -27,7 +27,7 @@ import org.bukkit.WorldType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.potion.PotionEffect;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
+import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.core.config.codec.NBTCodec;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.module.exception.ModuleLoadError;
@@ -55,18 +55,18 @@ public class Worlds extends Module
     public void onLoad()
     {
         ConverterManager manager = this.getCore().getConfigFactory().getDefaultConverterManager();
-        manager.registerConverter(Difficulty.class, new DiffcultyConverter());
-        manager.registerConverter(Environment.class, new EnvironmentConverter());
-        manager.registerConverter(GameMode.class, new GameModeConverter());
-        manager.registerConverter(WorldType.class, new WorldTypeConverter());
+        manager.registerConverter(new DiffcultyConverter(), Difficulty.class);
+        manager.registerConverter(new EnvironmentConverter(), Environment.class);
+        manager.registerConverter(new GameModeConverter(), GameMode.class);
+        manager.registerConverter(new WorldTypeConverter(), WorldType.class);
 ///*TODO remove saving into yml too
-        manager.registerConverter(Inventory.class, new InventoryConverter(Bukkit.getServer()));
-        manager.registerConverter(PotionEffect.class, new PotionEffectConverter());
+        manager.registerConverter(new InventoryConverter(Bukkit.getServer()), Inventory.class);
+        manager.registerConverter(new PotionEffectConverter(), PotionEffect.class);
 //*/
         NBTCodec codec = this.getCore().getConfigFactory().getCodecManager().getCodec(NBTCodec.class);
         manager = codec.getConverterManager();
-        manager.registerConverter(Inventory.class, new InventoryConverter(Bukkit.getServer()));
-        manager.registerConverter(PotionEffect.class, new PotionEffectConverter());
+        manager.registerConverter(new InventoryConverter(Bukkit.getServer()), Inventory.class);
+        manager.registerConverter(new PotionEffectConverter(), PotionEffect.class);
     }
 
     @Override

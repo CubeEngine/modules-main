@@ -38,6 +38,7 @@ import de.cubeisland.engine.core.util.math.Vector3;
 import de.cubeisland.engine.core.util.math.shape.Sphere;
 import de.cubeisland.engine.module.basics.Basics;
 
+import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 
 public class DoorCommand
@@ -52,10 +53,10 @@ public class DoorCommand
     @Command(desc = "Opens or closes doors around the player.")
     @Params(positional = {@Param(names = {"open","close"}),
                           @Param(label = "radius", type = Integer.class),
-                          @Param(req = false, label = "world", type = World.class),
-                          @Param(req = false, label = "x", type = Integer.class),
-                          @Param(req = false, label = "y", type = Integer.class),
-                          @Param(req = false, label = "z", type = Integer.class)})
+                          @Param(req = OPTIONAL, label = "world", type = World.class),
+                          @Param(req = OPTIONAL, label = "x", type = Integer.class),
+                          @Param(req = OPTIONAL, label = "y", type = Integer.class),
+                          @Param(req = OPTIONAL, label = "z", type = Integer.class)})
     @Flags({@Flag(longName = "all", name = "a"),
             @Flag(longName = "woodenDoor", name = "w"),
             @Flag(longName = "ironDoor", name = "i"),

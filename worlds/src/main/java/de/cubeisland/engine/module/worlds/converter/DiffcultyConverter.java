@@ -19,21 +19,20 @@ package de.cubeisland.engine.module.worlds.converter;
 
 import org.bukkit.Difficulty;
 
-import de.cubeisland.engine.reflect.codec.ConverterManager;
-import de.cubeisland.engine.reflect.codec.converter.Converter;
-import de.cubeisland.engine.reflect.exception.ConversionException;
-import de.cubeisland.engine.reflect.node.Node;
+import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.converter.SimpleConverter;
+import de.cubeisland.engine.converter.node.Node;
 
-public class DiffcultyConverter implements Converter<Difficulty>
+public class DiffcultyConverter extends SimpleConverter<Difficulty>
 {
     @Override
-    public Node toNode(Difficulty object, ConverterManager manager) throws ConversionException
+    public Node toNode(Difficulty object) throws ConversionException
     {
         return Node.wrapIntoNode(object.toString());
     }
 
     @Override
-    public Difficulty fromNode(Node node, ConverterManager manager) throws ConversionException
+    public Difficulty fromNode(Node node) throws ConversionException
     {
         try
         {

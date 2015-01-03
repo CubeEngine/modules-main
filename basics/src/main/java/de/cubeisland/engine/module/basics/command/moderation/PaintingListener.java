@@ -33,8 +33,8 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 
-import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.basics.Basics;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;

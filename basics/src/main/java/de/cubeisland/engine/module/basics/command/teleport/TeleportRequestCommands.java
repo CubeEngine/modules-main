@@ -21,10 +21,10 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 
+import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
