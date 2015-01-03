@@ -235,8 +235,8 @@ public class HomeCommand extends TpPointCommand
 
     @Command(desc = "Rename a home")
     public void rename(CommandContext context,
-                       @Label("name") @Optional String name,
-                       @Label("new name") @Optional String newName,
+                       @Label("name") String name,
+                       @Label("new name") String newName,
                        @Default @Label("owner") @Optional User owner)
     {
         Home home = manager.getExact(owner, name);
@@ -391,7 +391,7 @@ public class HomeCommand extends TpPointCommand
         home.invite(invited);
         if (invited.isOnline())
         {
-            invited.sendTranslated(NEUTRAL, "{user} invited you to their home. To teleport to it use: /home {name#home} {user}", sender, home.getName(), sender);
+            invited.sendTranslated(NEUTRAL, "{user} invited you to their home. To teleport to it use: /home {name#home} {name}", sender, home.getName(), sender.getName());
         }
         context.sendTranslated(POSITIVE, "{user} is now invited to your home {name}", invited, home.getName());
     }

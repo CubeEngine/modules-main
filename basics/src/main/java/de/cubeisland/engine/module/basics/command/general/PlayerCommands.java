@@ -587,7 +587,11 @@ public class PlayerCommands
             if (speed >= 0 && speed <= 10)
             {
                 target.setFlySpeed(speed / 10f);
-                context.sendTranslated(POSITIVE, "You can now fly at {decimal#speed:2}!", speed);
+                target.sendTranslated(POSITIVE, "You can now fly at {decimal#speed:2}!", speed);
+                if (!target.equals(context.getSource()))
+                {
+                    context.sendTranslated(POSITIVE, "{player} can now fly at {decimal#speed:2}!", target, speed);
+                }
             }
             else
             {
@@ -605,9 +609,17 @@ public class PlayerCommands
         if (target.getAllowFlight())
         {
             target.setFlySpeed(0.1f);
-            context.sendTranslated(POSITIVE, "You can now fly!");
+            target.sendTranslated(POSITIVE, "You can now fly!");
+            if (!target.equals(context.getSource()))
+            {
+                context.sendTranslated(POSITIVE, "{player} can now fly!", target);
+            }
             return;
         }
-        context.sendTranslated(NEUTRAL, "You cannot fly anymore!");
+        target.sendTranslated(NEUTRAL, "You cannot fly anymore!");
+        if (!target.equals(context.getSource()))
+        {
+            context.sendTranslated(POSITIVE, "{player} cannot fly anymore!", target);
+        }
     }
 }

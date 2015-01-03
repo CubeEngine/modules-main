@@ -115,6 +115,4 @@ public class SpawnMobCommand
             context.sendMessage(message);
         }
     }
-
-
 }
