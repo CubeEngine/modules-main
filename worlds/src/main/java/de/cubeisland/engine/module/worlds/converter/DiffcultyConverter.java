@@ -22,13 +22,14 @@ import org.bukkit.Difficulty;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.Node;
+import de.cubeisland.engine.converter.node.StringNode;
 
 public class DiffcultyConverter extends SimpleConverter<Difficulty>
 {
     @Override
     public Node toNode(Difficulty object) throws ConversionException
     {
-        return Node.wrapIntoNode(object.toString());
+        return new StringNode(object.name());
     }
 
     @Override

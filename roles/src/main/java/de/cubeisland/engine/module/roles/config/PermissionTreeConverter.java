@@ -84,14 +84,14 @@ public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
                             else
                             {
                                 String subKey = ((MapNode)subValue).getValue().keySet().iterator().next();
-                                subMap.setNode(StringNode.of(entry.getKey() + "." + subKey), ((MapNode)subValue).getExactNode(subKey));
+                                subMap.set(entry.getKey() + "." + subKey, ((MapNode)subValue).get(subKey));
                                 result.addNode(subMap);
                             }
                         }
                         continue;
                     }
                 }
-                subMap.setNode(StringNode.of(entry.getKey()), values);
+                subMap.set(entry.getKey(), values);
                 result.addNode(subMap);
             }
         }

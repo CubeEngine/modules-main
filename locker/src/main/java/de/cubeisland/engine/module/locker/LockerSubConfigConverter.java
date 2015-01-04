@@ -41,11 +41,11 @@ public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> 
         MapNode config = MapNode.emptyMap();
         if (!object.enable)
         {
-            config.setNode(StringNode.of("enable"), BooleanNode.falseNode());
+            config.set("enable", BooleanNode.falseNode());
         }
         if (object.autoProtect)
         {
-            config.setNode(StringNode.of("auto-protect"), StringNode.of(object.autoProtectType.name()));
+            config.set("auto-protect", StringNode.of(object.autoProtectType.name()));
         }
         if (object.defaultFlags != null && !object.defaultFlags.isEmpty())
         {
@@ -54,13 +54,13 @@ public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> 
             {
                 flags.addNode(StringNode.of(defaultFlag.name()));
             }
-            config.setNode(StringNode.of("default-flags"), flags);
+            config.set("default-flags", flags);
         }
         if (config.isEmpty())
         {
             return StringNode.of(object.getTitle());
         }
-        root.setNode(StringNode.of(object.getTitle()), config);
+        root.set(object.getTitle(), config);
         return root;
     }
 
@@ -78,7 +78,7 @@ public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> 
             MapNode root = (MapNode)node;
             if (root.isEmpty()) return null;
             String next = root.getOriginalKey(root.getValue().keySet().iterator().next());
-            MapNode config = (MapNode)root.getExactNode(next);
+            MapNode config = (MapNode)root.get(next);
             configuration = fromString(next);
             for (Entry<String, Node> entry : config.getValue().entrySet())
             {

@@ -43,19 +43,19 @@ public class DestinationConverter extends SingleClassConverter<Destination>
     public Node toNode(Destination destination, ConverterManager converterManager) throws ConversionException
     {
         MapNode result = MapNode.emptyMap();
-        result.setExactNode("type", StringNode.of(destination.type.name()));
+        result.set("type", StringNode.of(destination.type.name()));
         switch (destination.type)
         {
             case PORTAL:
-                result.setExactNode("portal", StringNode.of(destination.portal));
+                result.set("portal", StringNode.of(destination.portal));
                 break;
             case WORLD:
             case RANDOM:
-                result.setExactNode("world", StringNode.of(destination.world.getName()));
+                result.set("world", StringNode.of(destination.world.getName()));
                 break;
             case LOCATION:
-                result.setExactNode("world", StringNode.of(destination.world.getName()));
-                result.setExactNode("location", converterManager.convertToNode(destination.location));
+                result.set("world", StringNode.of(destination.world.getName()));
+                result.set("location", converterManager.convertToNode(destination.location));
                 break;
         }
         return result;

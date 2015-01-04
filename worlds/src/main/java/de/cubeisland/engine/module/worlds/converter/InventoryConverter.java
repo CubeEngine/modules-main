@@ -51,8 +51,8 @@ public class InventoryConverter extends SimpleConverter<Inventory>
         MapNode node = MapNode.emptyMap();
         ItemStack[] contents = object.getContents();
         ListNode list = ListNode.emptyList();
-        node.setExactNode("Size", new IntNode(object.getSize() + 9));
-        node.setExactNode("Contents", list);
+        node.set("Size", new IntNode(object.getSize() + 9));
+        node.set("Contents", list);
         for (int i = 0; i < contents.length; i++)
         {
             ItemStack itemStack = contents[i];
@@ -79,12 +79,12 @@ public class InventoryConverter extends SimpleConverter<Inventory>
     private void addItem(ListNode list, ItemStack itemStack, int index)
     {
         MapNode item = MapNode.emptyMap();
-        item.setExactNode("Slot", new IntNode(index));
-        item.setExactNode("Count", new IntNode(itemStack.getAmount()));
-        item.setExactNode("Damage", new ShortNode(itemStack.getDurability()));
-        item.setExactNode("Item", StringNode.of(itemStack.getType().name()));
+        item.set("Slot", new IntNode(index));
+        item.set("Count", new IntNode(itemStack.getAmount()));
+        item.set("Damage", new ShortNode(itemStack.getDurability()));
+        item.set("Item", StringNode.of(itemStack.getType().name()));
         NBTTagCompound tag = CraftItemStack.asNMSCopy(itemStack).getTag();
-        item.setExactNode("tag", tag == null ? MapNode.emptyMap() : NBTUtils.convertNBTToNode(tag));
+        item.set("tag", tag == null ? MapNode.emptyMap() : NBTUtils.convertNBTToNode(tag));
         list.addNode(item);
     }
 
@@ -93,22 +93,22 @@ public class InventoryConverter extends SimpleConverter<Inventory>
     {
         if (node instanceof MapNode)
         {
-            Node size = ((MapNode)node).getExactNode("Size");
+            Node size = ((MapNode)node).get("Size");
             if (size instanceof IntNode)
             {
                 Inventory inventory = server.createInventory(null, ((IntNode)size).getValue());
-                Node contents = ((MapNode)node).getExactNode("Contents");
+                Node contents = ((MapNode)node).get("Contents");
                 if (contents instanceof ListNode)
                 {
                     for (Node listedNode : ((ListNode)contents).getValue())
                     {
                         if (listedNode instanceof MapNode)
                         {
-                            Node slot = ((MapNode)listedNode).getExactNode("Slot");
-                            Node count = ((MapNode)listedNode).getExactNode("Count");
-                            Node damage = ((MapNode)listedNode).getExactNode("Damage");
-                            Node item = ((MapNode)listedNode).getExactNode("Item");
-                            Node tag = ((MapNode)listedNode).getExactNode("tag");
+                            Node slot = ((MapNode)listedNode).get("Slot");
+                            Node count = ((MapNode)listedNode).get("Count");
+                            Node damage = ((MapNode)listedNode).get("Damage");
+                            Node item = ((MapNode)listedNode).get("Item");
+                            Node tag = ((MapNode)listedNode).get("tag");
                             if (slot instanceof IntNode && count instanceof IntNode && damage instanceof ShortNode &&
                                 item instanceof StringNode && (tag instanceof MapNode))
                             {

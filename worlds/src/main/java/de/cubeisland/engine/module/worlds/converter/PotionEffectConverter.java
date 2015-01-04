@@ -17,11 +17,17 @@
  */
 package de.cubeisland.engine.module.worlds.converter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.converter.ConverterManager;
+import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
+import de.cubeisland.engine.converter.converter.SingleClassConverter;
 import de.cubeisland.engine.converter.node.ByteNode;
 import de.cubeisland.engine.converter.node.IntNode;
 import de.cubeisland.engine.converter.node.MapNode;
@@ -29,21 +35,21 @@ import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.NullNode;
 import de.cubeisland.engine.converter.node.StringNode;
 
-public class PotionEffectConverter extends SimpleConverter<PotionEffect>
+public class PotionEffectConverter extends SingleClassConverter<PotionEffect>
 {
     @Override
-    public Node toNode(PotionEffect object) throws ConversionException
+    public Node toNode(PotionEffect object, ConverterManager manager) throws ConversionException
     {
-        MapNode mapNode = MapNode.emptyMap();
-        mapNode.setExactNode("amplifier", Node.wrapIntoNode(object.getAmplifier()));
-        mapNode.setExactNode("duration", Node.wrapIntoNode(object.getDuration()));
-        mapNode.setExactNode("type", Node.wrapIntoNode(object.getType().getName()));
-        mapNode.setExactNode("ambient", Node.wrapIntoNode(object.isAmbient()));
-        return mapNode;
+        Map<String, Object> map = new HashMap<>();
+        map.put("amplifier", object.getAmplifier());
+        map.put("duration", object.getDuration());
+        map.put("type", object.getType().getName());
+        map.put("ambient", object.isAmbient());
+        return manager.convertToNode(map);
     }
 
     @Override
-    public PotionEffect fromNode(Node node) throws ConversionException
+    public PotionEffect fromNode(Node node, ConverterManager manager) throws ConversionException
     {
         if (node instanceof NullNode)
         {
@@ -51,10 +57,10 @@ public class PotionEffectConverter extends SimpleConverter<PotionEffect>
         }
         if (node instanceof MapNode)
         {
-            Node amplifier = ((MapNode)node).getExactNode("amplifier");
-            Node duration = ((MapNode)node).getExactNode("duration");
-            Node type = ((MapNode)node).getExactNode("type");
-            Node ambient = ((MapNode)node).getExactNode("ambient");
+            Node amplifier = ((MapNode)node).get("amplifier");
+            Node duration = ((MapNode)node).get("duration");
+            Node type = ((MapNode)node).get("type");
+            Node ambient = ((MapNode)node).get("ambient");
             if (amplifier instanceof IntNode && duration instanceof IntNode && type instanceof StringNode && ambient instanceof ByteNode)
             {
                 PotionEffectType byName = PotionEffectType.getByName(type.asText());

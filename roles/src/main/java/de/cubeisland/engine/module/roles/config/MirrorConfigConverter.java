@@ -44,13 +44,13 @@ public class MirrorConfigConverter extends SimpleConverter<MirrorConfig>
     public Node toNode(MirrorConfig mirror) throws ConversionException
     {
         MapNode resultMap = MapNode.emptyMap();
-        resultMap.setNode(new StringNode(mirror.mainWorld.getName()), NullNode.emptyNode());
+        resultMap.set(mirror.mainWorld.getName(), NullNode.emptyNode());
         for (Entry<ConfigWorld, Triplet<Boolean, Boolean, Boolean>> entry : mirror.mirrors.entrySet())
         {
             if (!entry.getKey().getName().equals(mirror.mainWorld.getName()))
             {
                 ListNode values = ListNode.emptyList();
-                resultMap.setNode(StringNode.of(entry.getKey().getName()), values);
+                resultMap.set(entry.getKey().getName(), values);
                 if (entry.getValue().getFirst())
                 {
                     values.addNode(StringNode.of("roles"));

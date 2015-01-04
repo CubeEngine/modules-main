@@ -22,13 +22,14 @@ import org.bukkit.WorldType;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.Node;
+import de.cubeisland.engine.converter.node.StringNode;
 
 public class WorldTypeConverter extends SimpleConverter<WorldType>
 {
     @Override
     public Node toNode(WorldType object) throws ConversionException
     {
-        return Node.wrapIntoNode(object.toString());
+        return new StringNode(object.name());
     }
 
     @Override
