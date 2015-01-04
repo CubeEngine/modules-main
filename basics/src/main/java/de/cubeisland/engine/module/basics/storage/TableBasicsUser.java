@@ -37,9 +37,9 @@ public class TableBasicsUser extends Table<BasicsUserEntity>
     public TableBasicsUser(String prefix)
     {
         super(prefix + "basicuser", new Version(1));
-        this.setPrimaryKey(KEY);
-        this.addForeignKey(TABLE_USER.getPrimaryKey(), KEY);
-        this.addFields(KEY, MUTED, GODMODE);
+        setPrimaryKey(KEY);
+        addForeignKey(TABLE_USER.getPrimaryKey(), KEY);
+        addFields(KEY, MUTED, GODMODE);
         TABLE_BASIC_USER = this;
     }
 

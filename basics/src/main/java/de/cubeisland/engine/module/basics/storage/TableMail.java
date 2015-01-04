@@ -36,10 +36,10 @@ public class TableMail extends AutoIncrementTable<Mail, UInteger>
     public TableMail(String prefix)
     {
         super(prefix + "mail", new Version(1));
-        this.setAIKey(KEY);
-        this.addForeignKey(TABLE_USER.getPrimaryKey(), USERID);
-        this.addForeignKey(TABLE_USER.getPrimaryKey(), SENDERID);
-        this.addFields(KEY, MESSAGE, USERID, SENDERID);
+        setAIKey(KEY);
+        addForeignKey(TABLE_USER.getPrimaryKey(), USERID);
+        addForeignKey(TABLE_USER.getPrimaryKey(), SENDERID);
+        addFields(KEY, MESSAGE, USERID, SENDERID);
         TABLE_MAIL = this;
     }
 
