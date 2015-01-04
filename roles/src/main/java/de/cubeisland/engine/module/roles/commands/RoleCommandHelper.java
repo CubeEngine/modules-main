@@ -17,8 +17,6 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
-import org.bukkit.World;
-
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
@@ -29,10 +27,10 @@ import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RoleProvider;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 import de.cubeisland.engine.module.roles.role.RolesManager;
+import org.bukkit.World;
 
 import static de.cubeisland.engine.core.util.ChatFormat.*;
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 public abstract class RoleCommandHelper extends CommandContainer
 {
@@ -52,45 +50,37 @@ public abstract class RoleCommandHelper extends CommandContainer
         this.worldManager = module.getCore().getWorldManager();
     }
 
-    protected World getWorld(CommandContext context)
+    protected World getWorld(CommandContext context, World world)
     {
-        World world;
-        if (!context.hasNamed("in"))
+        if (world != null)
         {
-            CommandSender sender = context.getSource();
-            if (sender instanceof User)
+            return world;
+        }
+        CommandSender sender = context.getSource();
+        if (sender instanceof User)
+        {
+            User user = (User)sender;
+            world = user.attachOrGet(RolesAttachment.class, this.module).getWorkingWorld();
+            if (world == null)
             {
-                User user = (User)sender;
-                world = user.attachOrGet(RolesAttachment.class,this.module).getWorkingWorld();
-                if (world == null)
-                {
-                    world = user.getWorld();
-                }
-                else
-                {
-                    context.sendTranslated(NEUTRAL, "You are using {world} as current world.", world);
-                }
+                world = user.getWorld();
             }
             else
             {
-                if (ManagementCommands.curWorldOfConsole == null)
-                {
-                    context.sendTranslated(NEGATIVE, "You have to provide a world with {text:in world}!");
-                    context.sendTranslated(NEUTRAL, "Or you can define a default world with {text:/roles admin defaultworld <world>}");
-                    return null;
-                }
-                world = ManagementCommands.curWorldOfConsole;
                 context.sendTranslated(NEUTRAL, "You are using {world} as current world.", world);
             }
         }
         else
         {
-            world = context.get("in");
-            if (world == null)
+            if (ManagementCommands.curWorldOfConsole == null)
             {
-                context.sendTranslated(NEGATIVE, "World {input} not found!", context.getString("in"));
+                context.sendTranslated(NEGATIVE, "You have to provide a world with {text:in world}!");
+                context.sendTranslated(NEUTRAL,
+                                       "Or you can define a default world with {text:/roles admin defaultworld <world>}");
                 return null;
             }
+            world = ManagementCommands.curWorldOfConsole;
+            context.sendTranslated(NEUTRAL, "You are using {world} as current world.", world);
         }
         return world;
     }

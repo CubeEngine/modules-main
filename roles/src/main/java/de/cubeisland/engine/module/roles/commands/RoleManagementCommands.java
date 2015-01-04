@@ -17,6 +17,10 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
+import de.cubeisland.engine.command.methodic.parametric.Default;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Named;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
 import org.bukkit.World;
 
 import de.cubeisland.engine.command.alias.Alias;
@@ -52,30 +56,20 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Alias("setrperm")
     @Command(alias = "setperm",  desc = "Sets the permission for given role [in world]")
-    @Params(positional = {@Param(label = "[g:]role"),
-                          @Param(label = "permission"),
-                          @Param(req = OPTIONAL, names = {"true","false","reset"})},
-          nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void setpermission(CommandContext context)
+    public void setpermission(CommandContext context, @Label("[g:]role") String roleName,
+                              @Label("permission") String permission,
+                              @Default PermissionValue type,
+                              @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        String permission = context.get(1);
-        String setTo = "true";
-        if (context.getPositionalCount() > 2)
+        switch (type)
         {
-            setTo = context.get(2);
-        }
-        try
-        {
-            PermissionValue type = PermissionValue.valueOf(setTo.toUpperCase());
-            if (type == PermissionValue.RESET)
-            {
+            case RESET:
                 if (global)
                 {
                     context.sendTranslated(NEUTRAL, "{name#permission} has been reset for the global role {name}!", permission, role.getName());
@@ -84,9 +78,8 @@ public class RoleManagementCommands extends RoleCommandHelper
                 {
                     context.sendTranslated(NEUTRAL, "{name#permission} has been reset for the role {name} in {world}!", permission, role.getName(), world);
                 }
-            }
-            else if (type == PermissionValue.TRUE)
-            {
+                break;
+            case TRUE:
                 if (global)
                 {
                     context.sendTranslated(POSITIVE, "{name#permission} set to {text:true:color=DARK_GREEN} for the global role {name}!", permission, role.getName());
@@ -95,9 +88,8 @@ public class RoleManagementCommands extends RoleCommandHelper
                 {
                     context.sendTranslated(POSITIVE, "{name#permission} set to {text:true:color=DARK_GREEN} for the role {name} in {world}!", permission, role.getName(), world);
                 }
-            }
-            else if (type == PermissionValue.FALSE)
-            {
+                break;
+            case FALSE:
                 if (global)
                 {
                     context.sendTranslated(NEGATIVE, "{name#permission} set to {text:false:color=DARK_RED} for the global role {name}!", permission, role.getName());
@@ -106,33 +98,25 @@ public class RoleManagementCommands extends RoleCommandHelper
                 {
                     context.sendTranslated(NEGATIVE, "{name#permission} set to {text:false:color=DARK_RED} for the role {name} in {world}!", permission, role.getName(), world);
                 }
-            }
-            role.setPermission(permission, type);
-            role.save();
+                break;
         }
-        catch (IllegalArgumentException e)
-        {
-            context.sendTranslated(NEGATIVE, "Unknown setting: {input} Use {text:true},{text:false} or {text:reset}!", setTo);
-        }
+        role.setPermission(permission, type);
+        role.save();
     }
 
     @Alias(value = "setrdata")
     @Command(alias = {"setdata", "setmeta"}, desc = "Sets the metadata for given role [in world]")
-    @Params(positional = {@Param(label = "[g:]role"),
-                          @Param(label = "key"),
-                          @Param(req = OPTIONAL, label = "value")},
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void setmetadata(CommandContext context)
+    public void setmetadata(CommandContext context, @Label("[g:]role") String roleName,
+                            @Label("key") String key,
+                            @Optional@Label("value") String value,
+                            @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        String key = context.get(1);
-        String value = context.get(2);
         role.setMetadata(key, value);
         role.save();
         if (value == null)
@@ -155,40 +139,19 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Alias(value = "resetrdata")
     @Command(alias = {"resetdata", "resetmeta"}, desc = "Resets the metadata for given role [in world]")
-    @Params(positional = {@Param(label = "[g:]role"),
-                          @Param(label = "key")},
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void resetmetadata(CommandContext context)
+    public void resetmetadata(CommandContext context, @Label("[g:]role") String roleName,
+                              @Label("key") String key,
+                              @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
-        boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
-        if (!global && world == null) return;
-        RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
-        Role role = this.getRole(context, provider, roleName, world);
-        if (role == null) return;
-        String key = context.get(1);
-        role.setMetadata(key,null);
-        role.save();
-        if (global)
-        {
-            context.sendTranslated(NEUTRAL, "Metadata {input#key} reset for the global role {name}!", key, role.getName());
-        }
-        else
-        {
-            context.sendTranslated(NEUTRAL, "Metadata {input#key} reset for the role {name} in {world}!", key, role.getName(), world);
-        }
+        this.setmetadata(context, roleName, key, null, world);
     }
 
     @Alias(value = "clearrdata")
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Clears the metadata for given role [in world]")
-    @Params(positional = @Param(label = "[g:]role"),
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void clearmetadata(CommandContext context)
+    public void clearmetadata(CommandContext context, @Label("[g:]role") String roleName, @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
@@ -205,19 +168,17 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Alias(value = {"addrparent","manradd"})
     @Command(desc = "Adds a parent role to given role [in world]")
-    @Params(positional = {@Param(label = "[g:]role"),
-                          @Param(label = "[g:]parentrole")},
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void addParent(CommandContext context)
+    public void addParent(CommandContext context, @Label("[g:]role") String roleName,
+                          @Label("[g:]parentrole") String parentRoleName,
+                          @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        Role pRole = provider.getRole(context.getString(1));
+        Role pRole = provider.getRole(parentRoleName);
         if (pRole == null)
         {
             if (global)
@@ -230,28 +191,28 @@ public class RoleManagementCommands extends RoleCommandHelper
         }
         try
         {
-            if (role.assignRole(pRole))
+            if (!role.assignRole(pRole))
             {
-                role.save();
                 if (global)
                 {
-                    if (pRole.isGlobal())
-                    {
-                        context.sendTranslated(NEGATIVE, "{name#role} is a global role and cannot inherit from a non-global role!", role.getName());
-                        return;
-                    }
-                    context.sendTranslated(POSITIVE, "Added {name#role} as parent role for the global role {name}!", pRole.getName(), role.getName());
+                    context.sendTranslated(NEUTRAL, "{name#role} is already parent role of the global role {name}!", pRole.getName(), role.getName());
                     return;
                 }
-                context.sendTranslated(POSITIVE, "Added {name#role} as parent role for the role {name} in {world}", pRole.getName(), role.getName(), world);
+                context.sendTranslated(NEUTRAL, "{name#role} is already parent role of the role {name} in {world}!", pRole.getName(), role.getName(), world);
                 return;
             }
+            role.save();
             if (global)
             {
-                context.sendTranslated(NEUTRAL, "{name#role} is already parent role of the global role {name}!", pRole.getName(), role.getName());
+                if (pRole.isGlobal())
+                {
+                    context.sendTranslated(NEGATIVE, "{name#role} is a global role and cannot inherit from a non-global role!", role.getName());
+                    return;
+                }
+                context.sendTranslated(POSITIVE, "Added {name#role} as parent role for the global role {name}!", pRole.getName(), role.getName());
                 return;
             }
-            context.sendTranslated(NEUTRAL, "{name#role} is already parent role of the role {name} in {world}!", pRole.getName(), role.getName(), world);
+            context.sendTranslated(POSITIVE, "Added {name#role} as parent role for the role {name} in {world}", pRole.getName(), role.getName(), world);
         }
         catch (CircularRoleDependencyException ex)
         {
@@ -261,19 +222,17 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Alias(value = "remrparent")
     @Command(desc = "Removes a parent role from given role [in world]")
-    @Params(positional = {@Param(label = "[g:]role"),
-                          @Param(label = "[g:]parentrole")},
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void removeParent(CommandContext context)
+    public void removeParent(CommandContext context, @Label("[g:]role") String roleName,
+                             @Label("[g:]parentrole") String parentRoleName,
+                             @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        Role pRole = provider.getRole(context.getString(1));
+        Role pRole = provider.getRole(parentRoleName);
         if (pRole == null)
         {
             if (global)
@@ -305,13 +264,11 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Alias(value = "clearrparent")
     @Command(desc = "Removes all parent roles from given role [in world]")
-    @Params(positional = @Param(label = "[g:]role"),
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void clearParent(CommandContext context)
+    public void clearParent(CommandContext context, @Label("[g:]role") String roleName,
+                            @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
@@ -327,14 +284,12 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Alias(value = "setrolepriority")
     @Command(alias = "setprio", desc = "Sets the priority of given role [in world]")
-    @Params(positional = {@Param(label = "[g:]role"),
-                          @Param(label = "priority")},
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void setPriority(CommandContext context)
+    public void setPriority(CommandContext context, @Label("[g:]role") String roleName,
+                            @Label("priority") String priorityName,
+                            @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
@@ -343,17 +298,15 @@ public class RoleManagementCommands extends RoleCommandHelper
         Priority priority;
         try
         {
-            priority = converter.fromNode(new StringNode(context.getString(1)), Priority.class, null);
+            priority = converter.fromNode(new StringNode(priorityName), Priority.class, null);
             role.setPriorityValue(priority.value);
             role.save();
             if (global)
             {
-                context.sendTranslated(POSITIVE, "Priority of the global role {name} set to {input#priority}!", role.getName(), context.get(
-                    1));
+                context.sendTranslated(POSITIVE, "Priority of the global role {name} set to {input#priority}!", role.getName(), priorityName);
                 return;
             }
-            context.sendTranslated(POSITIVE, "Priority of the role {name} set to {input#priority} in {world}!", role.getName(), context.get(
-                1), world);
+            context.sendTranslated(POSITIVE, "Priority of the role {name} set to {input#priority} in {world}!", role.getName(), priorityName, world);
         }
         catch (ConversionException ex)
         {
@@ -364,19 +317,16 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Alias(value = "renamerole")
     @Command(desc = "Renames given role [in world]")
-    @Params(positional = {@Param(label = "[g:]role"),
-                          @Param(label = "new name")},
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void rename(CommandContext context)
+    public void rename(CommandContext context, @Label("[g:]role") String roleName,
+                       @Label("new name") String newName,
+                       @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        String newName = context.get(1);
         String oldName = role.getName();
         if (role.getName().equalsIgnoreCase(newName))
         {
@@ -403,14 +353,11 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Alias(value = "createrole")
     @Command(desc = "Creates a new role [in world]")
-    @Params(positional = @Param(label = "rolename"),
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    @Flags(@Flag(longName = "global", name = "g"))
-    public void create(CommandContext context)
+    public void create(CommandContext context, @Label("rolename") String roleName,
+                       @Named("in") @Label("world") World world,
+                       @Flag(longName = "global", name = "g") boolean global)
     {
-        String roleName = context.get(0);
-        boolean global = context.hasFlag("g");
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         if (provider.createRole(roleName) != null)
@@ -433,13 +380,11 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Alias(value = "deleteRole")
     @Command(desc = "Deletes a role [in world]")
-    @Params(positional = @Param(label = "[g:]rolename"),
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void delete(CommandContext context)
+    public void delete(CommandContext context, @Label("[g:]role") String roleName,
+                       @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
@@ -456,12 +401,10 @@ public class RoleManagementCommands extends RoleCommandHelper
 
 
     @Command(alias = {"toggledefault", "toggledef"}, desc = "Toggles whether given role is a default role [in world]")
-    @Params(positional = @Param(label = "rolename"),
-        nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void toggleDefaultRole(CommandContext context)
+    public void toggleDefaultRole(CommandContext context, @Label("[g:]role") String roleName,
+                                  @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
-        World world = this.getWorld(context);
+        world = this.getWorld(context, world);
         if (world == null) return;
         WorldRoleProvider provider = this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);

@@ -19,6 +19,10 @@ package de.cubeisland.engine.module.roles.commands;
 
 import java.util.Set;
 
+import de.cubeisland.engine.command.methodic.parametric.Complete;
+import de.cubeisland.engine.command.methodic.parametric.Default;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Named;
 import org.bukkit.World;
 
 import de.cubeisland.engine.command.alias.Alias;
@@ -50,17 +54,14 @@ public class UserManagementCommands extends UserCommandHelper
 
     @Alias({"manuadd", "assignurole", "addurole", "giveurole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [in world] [-temp]")
-    @Params(positional = {@Param(label = "player", type = User.class),
-                          @Param(label = "role", completer = RoleCompleter.class)},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    @Flags(@Flag(name = "t",longName = "temp"))
-    public void assign(CommandContext context)
+    public void assign(CommandContext context,
+                       @Default @Label("player") User user,
+                       @Label("role") @Complete(RoleCompleter.class) String roleName,
+                       @Named("in") @Label("world") World world,
+                       @Flag(name = "t",longName = "temp") boolean temp)
     {
-        User user = this.getUser(context, 0);
-        if (user == null) return;
-        World world = this.getWorld(context);
+        world = this.getWorld(context, world);
         if (world == null) return;
-        String roleName = context.get(1);
         Role role = this.manager.getProvider(world).getRole(roleName);
         if (role == null)
         {
@@ -73,7 +74,7 @@ public class UserManagementCommands extends UserCommandHelper
             return;
         }
         RolesAttachment attachment = this.manager.getRolesAttachment(user);
-        if (context.hasFlag("t"))
+        if (temp)
         {
             if (!user.isOnline())
             {
@@ -100,19 +101,17 @@ public class UserManagementCommands extends UserCommandHelper
 
     @Alias(value = {"remurole", "manudel"})
     @Command(desc = "Removes a role from the player [in world]")
-    @Params(positional = {@Param(label = "player", type = User.class),
-                          @Param(label = "role")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void remove(CommandContext context)
+    public void remove(CommandContext context,
+                       @Default @Label("player") User user,
+                       @Label("role") @Complete(RoleCompleter.class) String roleName,
+                       @Named("in") @Label("world") World world)
     {
-        User user = this.getUser(context, 0);
-        if (user == null) return;
-        World world = this.getWorld(context);
+        world = this.getWorld(context, world);
         if (world == null) return;
-        Role role = this.manager.getProvider(world).getRole(context.getString(1));
+        Role role = this.manager.getProvider(world).getRole(roleName);
         if (role == null)
         {
-            context.sendTranslated(NEUTRAL, "Could not find the role {name} in {world}.", context.get(1), world);
+            context.sendTranslated(NEUTRAL, "Could not find the role {name} in {world}.", roleName, world);
             return;
         }
         if (!role.canAssignAndRemove(context.getSource()))
@@ -133,13 +132,11 @@ public class UserManagementCommands extends UserCommandHelper
 
     @Alias(value = {"clearurole", "manuclear"})
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in world]")
-    @Params(positional = @Param(label = "player", type = User.class),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void clear(CommandContext context)
+    public void clear(CommandContext context,
+                      @Default @Label("player") User user,
+                      @Named("in") @Label("world") World world)
     {
-        User user = this.getUser(context, 0);
-        if (user == null) return;
-        World world = this.getWorld(context);
+        world = this.getWorld(context, world);
         if (world == null) return;
         RolesAttachment attachment = this.manager.getRolesAttachment(user);
         UserDatabaseStore dataHolder = attachment.getDataHolder(world);
@@ -163,57 +160,38 @@ public class UserManagementCommands extends UserCommandHelper
 
     @Alias(value = "setuperm")
     @Command(alias = "setperm", desc = "Sets a permission for this user [in world]")
-    @Params(positional = {@Param(label = "player", type = User.class),
-                          @Param(label = "permission"),
-                          @Param(req = OPTIONAL, names = {"true","false","reset"})},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void setpermission(CommandContext context)
+    public void setpermission(CommandContext context,
+                              @Default @Label("player") User user,
+                              @Label("permission") String perm,
+                              @Default PermissionValue value,
+                              @Named("in") @Label("world") World world)
     {
-        User user = this.getUser(context, 0);
-        if (user == null) return;
-        String perm = context.get(1);
-        String setTo = "true";
-        if (context.hasPositional(2))
+        world = this.getWorld(context, world);
+        if (world == null) return;
+        RolesAttachment attachment = this.manager.getRolesAttachment(user);
+        attachment.getDataHolder(world).setPermission(perm, value);
+        attachment.getCurrentDataHolder().apply();
+        switch (value)
         {
-            setTo = context.get(2);
-        }
-        try
-        {
-            PermissionValue value = PermissionValue.valueOf(setTo.toUpperCase());
-            World world = this.getWorld(context);
-            if (world == null) return;
-            RolesAttachment attachment = this.manager.getRolesAttachment(user);
-            attachment.getDataHolder(world).setPermission(perm, value);
-            attachment.getCurrentDataHolder().apply();
-            if (value == PermissionValue.RESET)
-            {
+            case RESET:
                 context.sendTranslated(NEUTRAL, "Permission {input} of {user} reset!", perm, user);
                 return;
-            }
-            if (value == PermissionValue.TRUE)
-            {
+            case TRUE:
                 context.sendTranslated(POSITIVE, "Permission {input} of {user} set to true!", perm, user);
                 return;
-            }
-            context.sendTranslated(NEGATIVE, "Permission {input} of {user} set to false!", perm, user);
-        }
-        catch (IllegalArgumentException e)
-        {
-            context.sendTranslated(NEGATIVE, "Unknown setting: \"Unknown setting: {input} Use {text:true},{text:false} or {text:reset}!", setTo);
+            case FALSE:
+                context.sendTranslated(NEGATIVE, "Permission {input} of {user} set to false!", perm, user);
         }
     }
 
     @Alias(value = "resetuperm")
     @Command(alias = "resetperm", desc = "Resets a permission for this user [in world]")
-    @Params(positional = {@Param(label = "player", type = User.class),
-              @Param(label = "permission")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void resetpermission(CommandContext context)
+    public void resetpermission(CommandContext context,
+                                @Default @Label("player") User user,
+                                @Label("permission") String perm,
+                                @Named("in") @Label("world") World world)
     {
-        User user = this.getUser(context, 0);
-        if (user == null) return;
-        String perm = context.get(1);
-        World world = this.getWorld(context);
+        world = this.getWorld(context, world);
         if (world == null) return;
         RolesAttachment attachment = this.manager.getRolesAttachment(user);
         attachment.getDataHolder(world).setPermission(perm, PermissionValue.RESET);
@@ -223,16 +201,13 @@ public class UserManagementCommands extends UserCommandHelper
 
     @Alias(value = {"setudata","setumeta","setumetadata"})
     @Command(alias = {"setdata", "setmeta"}, desc = "Sets metadata for this user [in world]")
-    @Params(positional = {@Param(label = "player", type = User.class),
-                          @Param(label = "metaKey"),
-                          @Param(label = "metaValue")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void setmetadata(CommandContext context)
+    public void setmetadata(CommandContext context,
+                            @Default @Label("player") User user,
+                            @Label("metaKey") String metaKey,
+                            @Label("metaValue") String metaVal,
+                            @Named("in") @Label("world") World world)
     {
-        String metaKey = context.get(1);
-        String metaVal = context.get(2);
-        User user = context.get(0);
-        World world = this.getWorld(context);
+        world = this.getWorld(context, world);
         if (world == null) return;
         RolesAttachment attachment = this.manager.getRolesAttachment(user);
         attachment.getDataHolder(world).setMetadata(metaKey, metaVal);
@@ -242,14 +217,12 @@ public class UserManagementCommands extends UserCommandHelper
 
     @Alias(value = {"resetudata","resetumeta","resetumetadata"})
     @Command(alias = {"resetdata", "resetmeta", "deletedata", "deletemetadata", "deletemeta"}, desc = "Resets metadata for this user [in world]")
-    @Params(positional = {@Param(label = "player", type = User.class),
-                          @Param(label = "metaKey")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void resetmetadata(CommandContext context)
+    public void resetmetadata(CommandContext context,
+                              @Default @Label("player") User user,
+                              @Label("metaKey") String metaKey,
+                              @Named("in") @Label("world") World world)
     {
-        String metaKey = context.get(1);
-        User user = context.get(0);
-        World world = this.getWorld(context);
+        world = this.getWorld(context, world);
         if (world == null) return;
         RolesAttachment attachment = this.manager.getRolesAttachment(user);
         attachment.getDataHolder(world).removeMetadata(metaKey);
@@ -259,13 +232,11 @@ public class UserManagementCommands extends UserCommandHelper
 
     @Alias(value = {"clearudata","clearumeta","clearumetadata"})
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Resets metadata for this user [in world]")
-    @Params(positional = @Param(label = "player", type = User.class),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void clearMetaData(CommandContext context)
+    public void clearMetaData(CommandContext context,
+                              @Default @Label("player") User user,
+                              @Named("in") @Label("world") World world)
     {
-        User user = this.getUser(context, 0);
-        if (user == null) return;
-        World world = this.getWorld(context);
+        world = this.getWorld(context, world);
         if (world == null) return;
         RolesAttachment attachment = this.manager.getRolesAttachment(user);
         attachment.getDataHolder(world).clearMetadata();

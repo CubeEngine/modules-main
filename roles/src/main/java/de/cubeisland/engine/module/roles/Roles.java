@@ -65,6 +65,7 @@ public class Roles extends Module
         this.getCore().getUserManager().addDefaultAttachment(RolesAttachment.class, this);
 
         final CommandManager cm = this.getCore().getCommandManager();
+        cm.getReaderManager().registerDefaultProvider(new DefaultPermissionValueProvider());
         RoleCommands cmdRoles = new RoleCommands(this);
         cm.addCommand(cmdRoles);
         RoleManagementCommands cmdRole = new RoleManagementCommands(this);

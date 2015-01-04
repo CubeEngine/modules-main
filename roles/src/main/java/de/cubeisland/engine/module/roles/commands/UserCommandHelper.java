@@ -48,44 +48,17 @@ public class UserCommandHelper extends CommandContainer
         this.module = module;
     }
 
-    protected User getUser(CommandContext context, int pos)
-    {
-        User user = null;
-        if (context.hasPositional(pos))
-        {
-            user = context.get(pos);
-        }
-        else
-        {
-            if (context.getSource() instanceof User)
-            {
-                user = (User)context.getSource();
-            }
-            if (user == null)
-            {
-                context.sendTranslated(NEGATIVE, "You have to specify a player.");
-                return null;
-            }
-        }
-        return user;
-    }
-
     /**
      * Returns the world defined with named param "in" or the users world
      *
      * @param context
+     * @param world
      * @return
      */
-    protected World getWorld(CommandContext context)
+    protected World getWorld(CommandContext context, World world)
     {
-        World world;
-        if (context.hasNamed("in"))
+        if (world != null)
         {
-            world = context.get("in");
-            if (world == null)
-            {
-                context.sendTranslated(NEGATIVE, "World {world} not found!", context.getString("in"));
-            }
             return world;
         }
         CommandSender sender = context.getSource();

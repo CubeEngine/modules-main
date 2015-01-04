@@ -21,6 +21,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Named;
 import org.bukkit.World;
 
 import de.cubeisland.engine.command.alias.Alias;
@@ -49,16 +51,14 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "listroles")
     @Command(desc = "Lists all roles in a world or globally")
-    @Params(nonpositional = @Param(names = "in", label = "world", type = World.class))
-    @Flags(@Flag(longName = "global", name = "g"))
-    public void list(CommandContext context)
+    public void list(CommandContext context, @Named("in") @Label("world") World world, @Flag(longName = "global", name = "g") boolean global)
     {
-        boolean global = context.hasFlag("g");
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         if (provider.getRoles().isEmpty())
         {
+
             if (global)
             {
                 context.sendTranslated(NEGATIVE, "There are no global roles!");
@@ -83,64 +83,61 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "checkrperm")
     @Command(alias = "checkpermission", desc = "Checks the permission in given role [in world]")
-    @Params(positional = {@Param(label = "[g:]role"),
-                          @Param(label = "permission")},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void checkperm(CommandContext context)
+    public void checkperm(CommandContext context, @Label("[g:]role") String roleName,
+                          @Label("permission") String permission,
+                          @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        String permission = context.get(1);
         ResolvedPermission myPerm = role.getPermissions().get(permission);
-        if (myPerm != null)
+        if (myPerm == null)
         {
-            if (myPerm.isSet())
+            if (global)
             {
-                if (global)
-                {
-                    context.sendTranslated(POSITIVE, "{name#permission} is set to {text:true:color=DARK_GREEN} for the global role {name}.", permission, role.getName());
-                }
-                else
-                {
-                    context.sendTranslated(POSITIVE, "{name#permission} is set to {text:true:color=DARK_GREEN} for the role {name} in {world}.", permission, role.getName(), world);
-                }
+                context.sendTranslated(NEUTRAL, "The permission {name} is not assigned to the global role {name}.", permission, role.getName());
+                return;
+            }
+            context.sendTranslated(NEUTRAL, "The permission {name} is not assigned to the role {name} in {world}.", permission, role.getName(), world);
+            return;
+        }
+        if (myPerm.isSet())
+        {
+            if (global)
+            {
+                context.sendTranslated(POSITIVE, "{name#permission} is set to {text:true:color=DARK_GREEN} for the global role {name}.", permission, role.getName());
             }
             else
             {
-                if (global)
-                {
-                    context.sendTranslated(NEGATIVE, "{name#permission} is set to {text:false:color=DARK_RED} for the global role {name}.", permission, role.getName());
-                }
-                else
-                {
-                    context.sendTranslated(NEGATIVE, "{name#permission} is set to {text:false:color=DARK_RED} for the role {name} in {world}.", permission, role.getName(), world);
-                }
+                context.sendTranslated(POSITIVE, "{name#permission} is set to {text:true:color=DARK_GREEN} for the role {name} in {world}.", permission, role.getName(), world);
             }
-            if (!(myPerm.getOriginPermission() == null && myPerm.getOrigin() == role))
-            {
-                context.sendTranslated(NEUTRAL, "Permission inherited from:");
-                if (myPerm.getOriginPermission() == null)
-                {
-                    context.sendTranslated(NEUTRAL, "{name#permission} in the role {name}!", myPerm.getKey(), myPerm.getOrigin().getName());
-                }
-                else
-                {
-                    context.sendTranslated(NEUTRAL, "{name#permission} in the role {name}!", myPerm.getOriginPermission(), myPerm.getOrigin().getName());
-                }
-            }
-            return;
         }
-        if (global)
+        else
         {
-            context.sendTranslated(NEUTRAL, "The permission {name} is not assigned to the global role {name}.", permission, role.getName());
-            return;
+            if (global)
+            {
+                context.sendTranslated(NEGATIVE, "{name#permission} is set to {text:false:color=DARK_RED} for the global role {name}.", permission, role.getName());
+            }
+            else
+            {
+                context.sendTranslated(NEGATIVE, "{name#permission} is set to {text:false:color=DARK_RED} for the role {name} in {world}.", permission, role.getName(), world);
+            }
         }
-        context.sendTranslated(NEUTRAL, "The permission {name} is not assigned to the role {name} in {world}.", permission, role.getName(), world);
+        if (!(myPerm.getOriginPermission() == null && myPerm.getOrigin() == role))
+        {
+            context.sendTranslated(NEUTRAL, "Permission inherited from:");
+            if (myPerm.getOriginPermission() == null)
+            {
+                context.sendTranslated(NEUTRAL, "{name#permission} in the role {name}!", myPerm.getKey(), myPerm.getOrigin().getName());
+            }
+            else
+            {
+                context.sendTranslated(NEUTRAL, "{name#permission} in the role {name}!", myPerm.getOriginPermission(), myPerm.getOrigin().getName());
+            }
+        }
     }
 
     @Alias(value = "listrperm")
@@ -148,16 +145,17 @@ public class RoleInformationCommands extends RoleCommandHelper
     @Params(positional = @Param(label = "[g:]role"),
             nonpositional = @Param(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "all", name = "a"))
-    public void listperm(CommandContext context)
+    public void listperm(CommandContext context, @Label("[g:]role") String roleName,
+                         @Named("in") @Label("world") World world,
+                         @Flag(longName = "all", name = "a") boolean all)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        Map<String,Boolean> rawPerms = context.hasFlag("a") ? role.getAllRawPermissions() : role.getRawPermissions();
+        Map<String,Boolean> rawPerms = all ? role.getAllRawPermissions() : role.getRawPermissions();
         if (rawPerms.isEmpty())
         {
             if (global)
@@ -176,7 +174,7 @@ public class RoleInformationCommands extends RoleCommandHelper
         {
             context.sendTranslated(POSITIVE, "Permissions of the role {name} in {world}:", role.getName(), world);
         }
-        if (context.hasFlag("a"))
+        if (all)
         {
             context.sendTranslated(POSITIVE, "(Including inherited permissions)");
         }
@@ -198,16 +196,17 @@ public class RoleInformationCommands extends RoleCommandHelper
     @Params(positional = @Param(label = "[g:]role"),
             nonpositional = @Param(names = "in", label = "world", type = World.class))
     @Flags(@Flag(longName = "all", name = "a"))
-    public void listmetadata(CommandContext context)
+    public void listmetadata(CommandContext context, @Label("[g:]role") String roleName,
+                             @Named("in") @Label("world") World world,
+                             @Flag(longName = "all", name = "a") boolean all)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        Map<String, String> rawMetadata = context.hasFlag("a") ? role.getAllRawMetadata() : role.getRawMetadata();
+        Map<String, String> rawMetadata = all ? role.getAllRawMetadata() : role.getRawMetadata();
         if (rawMetadata.isEmpty())
         {
             if (global)
@@ -226,7 +225,7 @@ public class RoleInformationCommands extends RoleCommandHelper
         {
             context.sendTranslated(POSITIVE, "Metadata of the role {name} in {world}:", role.getName(), world);
         }
-        if (context.hasFlag("a"))
+        if (all)
         {
             context.sendTranslated(POSITIVE, "(Including inherited metadata)");
         }
@@ -238,13 +237,10 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "listrparent")
     @Command(desc = "Lists all parents of given role [in world]")
-    @Params(positional = @Param(label = "[g:]role"),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void listParent(CommandContext context)
+    public void listParent(CommandContext context, @Label("[g:]role") String roleName, @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
@@ -274,13 +270,10 @@ public class RoleInformationCommands extends RoleCommandHelper
     }
 
     @Command(alias = "prio", desc = "Show the priority of given role [in world]")
-    @Params(positional = @Param(label = "[g:]role"),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void priority(CommandContext context)
+    public void priority(CommandContext context, @Label("[g:]role") String roleName, @Named("in") @Label("world") World world)
     {
-        String roleName = context.get(0);
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
-        World world = global ? null : this.getWorld(context);
+        world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
@@ -294,10 +287,9 @@ public class RoleInformationCommands extends RoleCommandHelper
     }
 
     @Command(alias = {"default","defaultroles","listdefroles"}, desc = "Lists all default roles [in world]")
-    @Params(nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void listDefaultRoles(CommandContext context)
+    public void listDefaultRoles(CommandContext context, @Named("in") @Label("world") World world)
     {
-        World world = this.getWorld(context);
+        world = this.getWorld(context, world);
         if (world == null) return;
         WorldRoleProvider provider = this.manager.getProvider(world);
         Set<Role> defaultRoles = provider.getDefaultRoles();
