@@ -102,7 +102,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(desc = "Removes a role from the player [in world]")
     @Params(positional = {@Param(label = "player", type = User.class),
                           @Param(label = "role")},
-            nonpositional = @Param(names = "in", label = "world"))
+            nonpositional = @Param(names = "in", label = "world", type = World.class))
     public void remove(CommandContext context)
     {
         User user = this.getUser(context, 0);
