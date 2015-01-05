@@ -28,6 +28,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -48,8 +51,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.material.Door;
 
 import de.cubeisland.engine.core.storage.database.Database;
-import de.cubeisland.engine.core.task.FutureCallback;
-import de.cubeisland.engine.core.task.ListenableFuture;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserManager;
 import de.cubeisland.engine.core.util.StringUtils;
@@ -123,13 +124,17 @@ public class LockManager implements Listener
         }
         if (future != null)
         {
-            future.addCallback(new FutureCallback()
+            Futures.addCallback(future, new FutureCallback()
             {
                 @Override
                 public void onSuccess(Object o)
                 {
                     LockManager.this.module.getLog().info("Finished loading locks");
                 }
+
+                @Override
+                public void onFailure(Throwable throwable)
+                {}
             });
         }
     }
@@ -140,37 +145,37 @@ public class LockManager implements Listener
         this.loadFromChunk(event.getChunk());
     }
 
-    private ListenableFuture loadFromChunk(Chunk chunk)
+    private ListenableFuture<Result<LockModel>> loadFromChunk(Chunk chunk)
     {
         UInteger world_id = this.wm.getWorldId(chunk.getWorld());
-        return this.database.fetchLater(this.database.getDSL().selectFrom(TABLE_LOCK).where(
-            TABLE_LOCK.ID.in(this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID)
-                                     .from(TABLE_LOCK_LOCATION)
-                                     .where(TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id),
-                                            TABLE_LOCK_LOCATION.CHUNKX.eq(chunk.getX()),
-                                            TABLE_LOCK_LOCATION.CHUNKZ.eq(chunk.getZ()))))).
-                         addCallback(new FutureCallback<Result<LockModel>>()
-                         {
-                             @Override
-                             public void onSuccess(Result<LockModel> models)
-                             {
-                                 Map<UInteger, Result<LockLocationModel>> locations = LockManager.
-                                     this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION)
-                                      .where(TABLE_LOCK_LOCATION.LOCK_ID.in(models.getValues(TABLE_LOCK.ID)))
-                                      .fetch().intoGroups(TABLE_LOCK_LOCATION.LOCK_ID);
-                                 for (LockModel model : models)
-                                 {
-                                     Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
-                                     addLoadedLocationLock(new Lock(LockManager.this, model, lockLoc));
-                                 }
-                             }
+        ListenableFuture<Result<LockModel>> future = this.database.query(this.database.getDSL().selectFrom(
+            TABLE_LOCK).where(TABLE_LOCK.ID.in(this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID).from(
+                                  TABLE_LOCK_LOCATION).where(TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id),
+                                                             TABLE_LOCK_LOCATION.CHUNKX.eq(chunk.getX()),
+                                                             TABLE_LOCK_LOCATION.CHUNKZ.eq(chunk.getZ())))));
+        Futures.addCallback(future, new com.google.common.util.concurrent.FutureCallback<Result<LockModel>>()
+        {
+            @Override
+            public void onSuccess(Result<LockModel> models)
+            {
+                Map<UInteger, Result<LockLocationModel>> locations = LockManager.
+                    this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION)
+                                 .where(TABLE_LOCK_LOCATION.LOCK_ID.in(models.getValues(TABLE_LOCK.ID)))
+                                 .fetch().intoGroups(TABLE_LOCK_LOCATION.LOCK_ID);
+                for (LockModel model : models)
+                {
+                    Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
+                    addLoadedLocationLock(new Lock(LockManager.this, model, lockLoc));
+                }
+            }
 
-                             @Override
-                             public void onFailure(Throwable t)
-                             {
-                                 module.getLog().error("Error while getting locks from database", t);
-                             }
-                         });
+            @Override
+            public void onFailure(Throwable t)
+            {
+                module.getLog().error("Error while getting locks from database", t);
+            }
+        });
+        return future;
     }
 
     private void addLoadedLocationLock(Lock lock)
