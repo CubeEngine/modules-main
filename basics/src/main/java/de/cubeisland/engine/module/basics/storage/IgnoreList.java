@@ -17,12 +17,12 @@
  */
 package de.cubeisland.engine.module.basics.storage;
 
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.core.user.User;
+import org.jooq.impl.UpdatableRecordImpl;
 
 import static de.cubeisland.engine.module.basics.storage.TableIgnorelist.TABLE_IGNORE_LIST;
 
-public class IgnoreList extends AsyncRecord<IgnoreList>
+public class IgnoreList extends UpdatableRecordImpl<IgnoreList>
 {
     public IgnoreList()
     {

@@ -56,7 +56,7 @@ public class WarpManager extends TelePointManager<Warp>
         }
         TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, name, owner, null, WARP, publicVisibility ? PUBLIC : PRIVATE);
         Warp warp = new Warp(model, this.module);
-        model.asyncInsert();
+        model.insert();
         this.addPoint(warp);
         return warp;
     }

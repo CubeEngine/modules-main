@@ -17,14 +17,14 @@
  */
 package de.cubeisland.engine.module.roles.storage;
 
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
+import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.roles.role.DataStore.PermissionValue.TRUE;
 import static de.cubeisland.engine.module.roles.storage.TablePerm.TABLE_PERM;
 
-public class UserPermission extends AsyncRecord<UserPermission>
+public class UserPermission extends UpdatableRecordImpl<UserPermission>
 {
     public UserPermission()
     {

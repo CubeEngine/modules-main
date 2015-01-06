@@ -17,12 +17,12 @@
  */
 package de.cubeisland.engine.module.roles.storage;
 
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
+import org.jooq.impl.UpdatableRecordImpl;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.roles.storage.TableData.TABLE_META;
 
-public class UserMetaData extends AsyncRecord<UserMetaData>
+public class UserMetaData extends UpdatableRecordImpl<UserMetaData>
 {
     public UserMetaData()
     {

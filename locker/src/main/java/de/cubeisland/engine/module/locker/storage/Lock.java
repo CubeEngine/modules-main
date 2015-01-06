@@ -108,7 +108,7 @@ public class Lock
     public void invalidateKeyBooks()
     {
         this.model.createPassword(this.manager, null);
-        this.model.asyncUpdate();
+        this.model.update();
     }
 
 
@@ -205,19 +205,19 @@ public class Lock
             {
                 model = this.manager.dsl.newRecord(TABLE_ACCESS_LIST).newAccess(this.model, modifyUser);
                 model.setValue(TABLE_ACCESS_LIST.LEVEL, level);
-                model.asyncInsert();
+                model.insert();
             }
             else
             {
                 model.setValue(TABLE_ACCESS_LIST.LEVEL, level);
-                model.asyncUpdate();
+                model.update();
                 return false;
             }
         }
         else // remove lock
         {
             if (model == null) return false;
-            model.asyncDelete();
+            model.delete();
         }
         return true;
     }
@@ -962,13 +962,13 @@ public class Lock
     public void setOwner(User owner)
     {
         this.model.setValue(TABLE_LOCK.OWNER_ID, owner.getEntity().getKey());
-        this.model.asyncUpdate();
+        this.model.update();
     }
 
     public void setFlags(short flags)
     {
         this.model.setValue(TABLE_LOCK.FLAGS, flags);
-        this.model.asyncUpdate();
+        this.model.update();
     }
 
     public short getFlags()

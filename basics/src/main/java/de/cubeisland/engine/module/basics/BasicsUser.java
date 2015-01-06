@@ -52,7 +52,7 @@ public class BasicsUser
         if (bUEntity == null)
         {
             this.bUEntity = this.dsl.newRecord(TABLE_BASIC_USER).newBasicUser(user);
-            this.bUEntity.asyncInsert();
+            this.bUEntity.insert();
         }
     }
 
@@ -96,7 +96,7 @@ public class BasicsUser
             mail = this.dsl.newRecord(TABLE_MAIL).newMail(this.bUEntity, null, message);
         }
         this.mailbox.add(mail);
-        mail.asyncInsert();
+        mail.insert();
     }
 
     public int countMail()

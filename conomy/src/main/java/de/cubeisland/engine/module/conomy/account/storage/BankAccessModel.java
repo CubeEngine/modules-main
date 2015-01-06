@@ -17,14 +17,14 @@
  */
 package de.cubeisland.engine.module.conomy.account.storage;
 
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserEntity;
+import org.jooq.impl.UpdatableRecordImpl;
 
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 import static de.cubeisland.engine.module.conomy.account.storage.TableBankAccess.TABLE_BANK_ACCESS;
 
-public class BankAccessModel extends AsyncRecord<BankAccessModel>
+public class BankAccessModel extends UpdatableRecordImpl<BankAccessModel>
 {
     public enum AccessLevel
     {
