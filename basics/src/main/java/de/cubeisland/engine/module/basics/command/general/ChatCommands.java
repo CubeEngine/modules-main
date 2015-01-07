@@ -179,7 +179,7 @@ public class ChatCommands
         }
         bUser.setValue(TABLE_BASIC_USER.MUTED, new Timestamp(System.currentTimeMillis() +
             (dura.getMillis() == 0 ? DAYS.toMillis(9001) : dura.getMillis())));
-        bUser.update();
+        bUser.asyncUpdate();
         String timeString = dura.getMillis() == 0 ? user.getTranslation(NONE, "ever") : TimeUtil.format(
             user.getLocale(), dura.getMillis());
         user.sendTranslated(NEGATIVE, "You are now muted for {input#amount}!", timeString);
@@ -191,7 +191,7 @@ public class ChatCommands
     {
         BasicsUserEntity basicsUserEntity = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getbUEntity();
         basicsUserEntity.setValue(TABLE_BASIC_USER.MUTED, null);
-        basicsUserEntity.update();
+        basicsUserEntity.asyncUpdate();
         context.sendTranslated(POSITIVE, "{user} is no longer muted!", user);
     }
 

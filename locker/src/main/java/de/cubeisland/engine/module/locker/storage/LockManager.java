@@ -248,7 +248,7 @@ public class LockManager implements Listener
                         {
                             locLockMap.remove(getLocationKey(loc));
                         }
-                        lock.model.update();
+                        lock.model.asyncUpdate();
                     }
                     // else the other chunk is still loaded -> do not remove!
                     return;
@@ -258,7 +258,7 @@ public class LockManager implements Listener
             {
                 locLockMap.remove(getLocationKey(loc));
             }
-            lock.model.update(); // updates if changed (last_access timestamp)
+            lock.model.asyncUpdate(); // updates if changed (last_access timestamp)
         }
     }
 
@@ -398,7 +398,7 @@ public class LockManager implements Listener
         expect(this.getLockAtLocation(location, null, false, false) == null , "Cannot extend Lock onto another!");
         lock.locations.add(location);
         LockLocationModel model = this.dsl.newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location);
-        model.insert();
+        model.asyncInsert();
         UInteger worldId = module.getCore().getWorldManager().getWorldId(location.getWorld());
         this.getLocLockMap(worldId).put(getLocationKey(location), lock);
     }
@@ -416,7 +416,7 @@ public class LockManager implements Listener
         if (destroyed || lock.isOwner(user) || module.perms().CMD_REMOVE_OTHER.isAuthorized(user))
         {
             this.locksById.remove(lock.getId());
-            lock.model.delete();
+            lock.model.asyncDelete();
             if (lock.isBlockLock())
             {
                 for (Location location : lock.getLocations())
@@ -528,7 +528,7 @@ public class LockManager implements Listener
                 if (flags != 0)
                 {
                     lock.setFlags((short)(lock.getFlags() | flags));
-                    lock.model.update();
+                    lock.model.asyncUpdate();
                 }
                 break;
             }
@@ -564,7 +564,7 @@ public class LockManager implements Listener
                 if (flags != 0)
                 {
                     lock.setFlags((short)(lock.getFlags() | flags));
-                    lock.model.update();
+                    lock.model.asyncUpdate();
                 }
                 break;
             }
@@ -600,13 +600,13 @@ public class LockManager implements Listener
     {
         for (Lock lock : this.loadedEntityLocks.values())
         {
-            lock.model.update();
+            lock.model.asyncUpdate();
         }
         for (Map<Long, Lock> lockMap : this.loadedLocks.values())
         {
             for (Lock lock : lockMap.values())
             {
-                lock.model.update();
+                lock.model.asyncUpdate();
             }
         }
     }
@@ -708,13 +708,13 @@ public class LockManager implements Listener
                 if (accessListModel == null)
                 {
                     accessListModel = this.dsl.newRecord(TABLE_ACCESS_LIST).newGlobalAccess(sender, modifyUser, accessType);
-                    accessListModel.insert();
+                    accessListModel.asyncInsert();
                     sender.sendTranslated(POSITIVE, "Global access for {user} set!", modifyUser);
                 }
                 else
                 {
                     accessListModel.setValue(TABLE_ACCESS_LIST.LEVEL, accessType);
-                    accessListModel.update();
+                    accessListModel.asyncUpdate();
                     sender.sendTranslated(POSITIVE, "Updated global access level for {user}!", modifyUser);
                 }
             }
@@ -726,7 +726,7 @@ public class LockManager implements Listener
                 }
                 else
                 {
-                    accessListModel.delete();
+                    accessListModel.asyncDelete();
                     sender.sendTranslated(POSITIVE, "Removed global access from {user}", modifyUser);
                 }
             }

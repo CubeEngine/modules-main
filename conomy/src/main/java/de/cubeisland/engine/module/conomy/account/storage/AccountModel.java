@@ -17,13 +17,13 @@
  */
 package de.cubeisland.engine.module.conomy.account.storage;
 
+import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserEntity;
-import org.jooq.impl.UpdatableRecordImpl;
 
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 
-public class AccountModel extends UpdatableRecordImpl<AccountModel>
+public class AccountModel extends AsyncRecord<AccountModel>
 {
     public AccountModel()
     {
