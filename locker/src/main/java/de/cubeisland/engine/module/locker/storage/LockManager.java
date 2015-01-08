@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -73,6 +74,7 @@ import static de.cubeisland.engine.module.locker.storage.ProtectedType.getProtec
 import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
 import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static java.util.concurrent.CompletableFuture.allOf;
 import static org.bukkit.Material.CHEST;
 import static org.bukkit.Material.TRAPPED_CHEST;
 
@@ -437,13 +439,14 @@ public class LockManager implements Listener
     public CompletableFuture<Lock> createLock(Material material, Location location, User user, LockType lockType, String password, boolean createKeyBook)
     {
         LockModel model = this.dsl.newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
-        return model.createPassword(this, password).insertAsync().thenApply(m -> {
+        return model.createPassword(this, password).insertAsync().thenCompose(m -> {
             List<Location> locations = new ArrayList<>();
             Block block = location.getBlock();
             // Handle MultiBlock Protections
             if (material == CHEST)
             {
-                if (block.getState() instanceof Chest && ((Chest)block.getState()).getInventory().getHolder() instanceof DoubleChest)
+                if (block.getState() instanceof Chest
+                    && ((Chest)block.getState()).getInventory().getHolder() instanceof DoubleChest)
                 {
                     DoubleChest dc = (DoubleChest)((Chest)block.getState()).getInventory().getHolder();
                     locations.add(((BlockState)dc.getLeftSide()).getLocation());
@@ -475,8 +478,10 @@ public class LockManager implements Listener
                             {
                                 Door botDoor = (Door)botBlock.getState().getData();
                                 Door topDoor = (Door)botBlock.getRelative(BlockFace.UP).getState().getData();
-                                Door relativeTop = (Door)botBlock.getRelative(blockFace).getRelative(BlockFace.UP).getState().getData();
-                                if (botDoor.getFacing() == relativeBot.getFacing() && topDoor.getData() != relativeTop.getData()) // Facing same & opposite hinge
+                                Door relativeTop = (Door)botBlock.getRelative(blockFace).getRelative(
+                                    BlockFace.UP).getState().getData();
+                                if (botDoor.getFacing() == relativeBot.getFacing()
+                                    && topDoor.getData() != relativeTop.getData()) // Facing same & opposite hinge
                                 {
                                     locations.add(botBlock.getRelative(blockFace).getLocation());
                                     locations.add(locations.get(2).clone().add(0, 1, 0));
@@ -491,28 +496,28 @@ public class LockManager implements Listener
             {
                 locations.add(location);
             }
-            for (Location loc : locations)
-            {
-                this.dsl.newRecord(TABLE_LOCK_LOCATION).newLocation(model, loc).insert(); // TODO async Insert AND on callback do the other stuff
-            }
-            Lock lock = new Lock(this, model, locations);
-            this.addLoadedLocationLock(lock);
-            lock.showCreatedMessage(user);
-            lock.attemptCreatingKeyBook(user, createKeyBook);
-            for (BlockLockerConfiguration blockprotection : this.module.getConfig().blockprotections)
-            {
-                if (blockprotection.isType(material))
+            return allOf(locations.parallelStream().map(loc -> dsl.newRecord(TABLE_LOCK_LOCATION).newLocation(model,
+                                                                                                              loc)).map(
+                AsyncRecord::insertAsync).toArray(CompletableFuture[]::new)).thenApply((v) -> {
+                Lock lock = new Lock(this, model, locations);
+                this.addLoadedLocationLock(lock);
+                lock.showCreatedMessage(user);
+                lock.attemptCreatingKeyBook(user, createKeyBook);
+                for (BlockLockerConfiguration blockProtection : this.module.getConfig().blockprotections)
                 {
-                    short flags = blockprotection.getFlags();
-                    if (flags != 0)
+                    if (blockProtection.isType(material))
                     {
-                        lock.setFlags((short)(lock.getFlags() | flags));
-                        lock.model.updateAsync();
+                        short flags = blockProtection.getFlags();
+                        if (flags != 0)
+                        {
+                            lock.setFlags((short)(lock.getFlags() | flags));
+                            lock.model.updateAsync();
+                        }
+                        break;
                     }
-                    break;
                 }
-            }
-            return lock;
+                return lock;
+            });
         });
     }
 
@@ -714,9 +719,9 @@ public class LockManager implements Listener
         }
     }
 
-    public void purgeLocksFrom(User user)
+    public CompletableFuture<Integer> purgeLocksFrom(User user)
     {
-        this.dsl.delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(user.getEntity().getKey())).execute();
+        return module.getCore().getDB().execute(this.dsl.delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(user.getEntity().getKey())));
     }
 
 }
