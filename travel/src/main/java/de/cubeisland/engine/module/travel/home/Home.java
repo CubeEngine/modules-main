@@ -45,7 +45,7 @@ public class Home extends TeleportPoint
     public void setVisibility(Visibility visibility)
     {
         super.setVisibility(visibility);
-        model.asyncUpdate();
+        model.updateAsync();
         if (visibility == PUBLIC)
         {
             this.permission = generatePublicPerm();

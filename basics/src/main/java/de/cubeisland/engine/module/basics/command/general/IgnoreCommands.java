@@ -58,7 +58,7 @@ public class IgnoreCommands
             return false;
         }
         IgnoreList ignoreList = this.dsl.newRecord(TABLE_IGNORE_LIST).newIgnore(user, ignored);
-        ignoreList.asyncInsert();
+        ignoreList.insertAsync();
         return true;
     }
 

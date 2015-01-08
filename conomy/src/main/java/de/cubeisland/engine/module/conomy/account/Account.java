@@ -50,7 +50,7 @@ public abstract class Account
      */
     protected void update()
     {
-        this.model.asyncUpdate();
+        this.model.updateAsync();
     }
 
     /**
