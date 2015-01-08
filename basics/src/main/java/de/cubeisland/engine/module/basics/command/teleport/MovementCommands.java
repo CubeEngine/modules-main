@@ -112,8 +112,9 @@ public class MovementCommands
         User sender = (User)context.getSource();
         Location userLocation = sender.getLocation();
         Block curBlock = userLocation.add(0,2,0).getBlock();
+        final int maxHeight = curBlock.getWorld().getMaxHeight();
         //go upwards until hitting solid blocks
-        while (curBlock.getType() == AIR)
+        while (curBlock.getType() == AIR && curBlock.getY() < maxHeight)
         {
             Block rel = curBlock.getRelative(UP);
             if (rel.getY() < userLocation.getBlockY())
@@ -126,7 +127,7 @@ public class MovementCommands
         Block standOn = curBlock;
         curBlock = curBlock.getRelative(UP);
         // go upwards until hitting 2 airblocks again
-        while (!(curBlock.getType() == AIR && curBlock.getRelative(DOWN).getType() == AIR))
+        while (!(curBlock.getType() == AIR && curBlock.getRelative(DOWN).getType() == AIR) && curBlock.getY() < maxHeight)
         {
             Block rel = curBlock.getRelative(UP);
             if (rel.getY() == 0)
@@ -135,7 +136,7 @@ public class MovementCommands
             }
             curBlock = rel;
         }
-        if (userLocation.getY() + 0.5 > curBlock.getY())
+        if (curBlock.getY() >= maxHeight)
         {
             context.sendTranslated(NEGATIVE, "You cannot ascend here");
             return;
@@ -155,19 +156,19 @@ public class MovementCommands
         final Location userLocation = sender.getLocation();
         final Location currentLocation = userLocation.clone();
         //go downwards until hitting solid blocks
-        while (currentLocation.getBlock().getType() == AIR && currentLocation.getBlockY() < currentLocation.getWorld().getMaxHeight())
+        while (currentLocation.getBlock().getType() == AIR && currentLocation.getBlockY() > 0)
         {
             currentLocation.add(0, -1, 0);
         }
         // go downwards until hitting 2 airblocks & a solid block again
         while (!((currentLocation.getBlock().getType() == AIR)
             && (currentLocation.getBlock().getRelative(UP).getType() == AIR)
-            && (!(currentLocation.getBlock().getRelative(DOWN).getType() == AIR)))
-            && currentLocation.getBlockY() + 1 < currentLocation.getWorld().getMaxHeight())
+            && (currentLocation.getBlock().getRelative(DOWN).getType() != AIR))
+            && currentLocation.getBlockY() > 0)
         {
             currentLocation.add(0, -1, 0);
         }
-        if ((currentLocation.getY() <= 0) || (currentLocation.getY() >= userLocation.getY()))
+        if (currentLocation.getY() <= 1)
         {
             context.sendTranslated(NEGATIVE, "You cannot descend here");
             return;
