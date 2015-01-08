@@ -124,7 +124,6 @@ public class MovementCommands
             }
             curBlock = rel;
         }
-        Block standOn = curBlock;
         curBlock = curBlock.getRelative(UP);
         // go upwards until hitting 2 airblocks again
         while (!(curBlock.getType() == AIR && curBlock.getRelative(DOWN).getType() == AIR) && curBlock.getY() < maxHeight)
@@ -141,7 +140,7 @@ public class MovementCommands
             context.sendTranslated(NEGATIVE, "You cannot ascend here");
             return;
         }
-        userLocation.setY(standOn.getY() + 1);
+        userLocation.setY(curBlock.getY() + 1);
         if (TeleportCommands.teleport(sender, userLocation, true, false, true))
         {
             context.sendTranslated(POSITIVE, "Ascended a level!");
