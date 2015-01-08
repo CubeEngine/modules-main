@@ -36,7 +36,7 @@ public class BasicsUser
 {
     private final DSLContext dsl;
 
-    public BasicsUserEntity getbUEntity()
+    public BasicsUserEntity getEntity()
     {
         return bUEntity;
     }

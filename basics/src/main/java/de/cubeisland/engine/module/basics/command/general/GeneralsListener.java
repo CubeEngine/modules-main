@@ -70,7 +70,7 @@ public class GeneralsListener implements Listener
     @EventHandler
     public void onLeave(PlayerQuitEvent event)
     {
-        BasicsUserEntity bUser = this.module.getBasicsUser(event.getPlayer()).getbUEntity();
+        BasicsUserEntity bUser = this.module.getBasicsUser(event.getPlayer()).getEntity();
         if (!module.perms().COMMAND_GOD_KEEP.isAuthorized(event.getPlayer()))
         {
             bUser.setValue(TABLE_BASIC_USER.GODMODE, false);
@@ -85,7 +85,7 @@ public class GeneralsListener implements Listener
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event)
     {
-        BasicsUserEntity bUser = this.module.getBasicsUser(event.getPlayer()).getbUEntity();
+        BasicsUserEntity bUser = this.module.getBasicsUser(event.getPlayer()).getEntity();
         if (!module.perms().COMMAND_GOD_KEEP.isAuthorized(event.getPlayer()))
         {
             bUser.setValue(TABLE_BASIC_USER.GODMODE, false);
@@ -116,7 +116,7 @@ public class GeneralsListener implements Listener
     {
         User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
         BasicsUser bUser = this.module.getBasicsUser(user);
-        if (bUser.getbUEntity().getValue(TABLE_BASIC_USER.GODMODE))
+        if (bUser.getEntity().getValue(TABLE_BASIC_USER.GODMODE))
         {
             if (module.perms().COMMAND_GOD_KEEP.isAuthorized(user))
             {
@@ -124,8 +124,8 @@ public class GeneralsListener implements Listener
             }
             else
             {
-                bUser.getbUEntity().setValue(TABLE_BASIC_USER.GODMODE, false);
-                bUser.getbUEntity().updateAsync();
+                bUser.getEntity().setValue(TABLE_BASIC_USER.GODMODE, false);
+                bUser.getEntity().updateAsync();
             }
         }
     }

@@ -158,7 +158,7 @@ public class ChatCommands
                      @Label("player") User user,
                      @Label("duration") @Optional String duration)
     {
-        BasicsUserEntity bUser = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getbUEntity();
+        BasicsUserEntity bUser = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getEntity();
         Timestamp muted = bUser.getValue(TABLE_BASIC_USER.MUTED);
         if (muted != null && muted.getTime() < System.currentTimeMillis())
         {
@@ -189,7 +189,7 @@ public class ChatCommands
     @Command(desc = "Unmutes a player")
     public void unmute(CommandContext context, @Label("player") User user)
     {
-        BasicsUserEntity basicsUserEntity = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getbUEntity();
+        BasicsUserEntity basicsUserEntity = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getEntity();
         basicsUserEntity.setValue(TABLE_BASIC_USER.MUTED, null);
         basicsUserEntity.updateAsync();
         context.sendTranslated(POSITIVE, "{user} is no longer muted!", user);

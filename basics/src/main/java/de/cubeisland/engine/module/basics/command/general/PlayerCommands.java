@@ -333,7 +333,7 @@ public class PlayerCommands
     {
         if (!force)
         {
-            if (module.perms().COMMAND_KILL_PREVENT.isAuthorized(user) || this.module.getBasicsUser(user).getbUEntity().getValue(TABLE_BASIC_USER.GODMODE))
+            if (module.perms().COMMAND_KILL_PREVENT.isAuthorized(user) || this.module.getBasicsUser(user).getEntity().getValue(TABLE_BASIC_USER.GODMODE))
             {
                 context.sendTranslated(NEGATIVE, "You cannot kill {user}!", user);
                 return false;
@@ -467,7 +467,7 @@ public class PlayerCommands
             {
                 context.sendTranslated(NEUTRAL, "OP: {text:true:color=BRIGHT_GREEN}");
             }
-            Timestamp muted = module.getBasicsUser(user).getbUEntity().getValue(TABLE_BASIC_USER.MUTED);
+            Timestamp muted = module.getBasicsUser(user).getEntity().getValue(TABLE_BASIC_USER.MUTED);
             if (muted != null && muted.getTime() > System.currentTimeMillis())
             {
                 context.sendTranslated(NEUTRAL, "Muted until {input#time}", DateFormat.getDateTimeInstance(SHORT, SHORT, context.getSource().getLocale()).format(muted));
@@ -513,7 +513,7 @@ public class PlayerCommands
             }
             other = true;
         }
-        BasicsUserEntity bUser = module.getBasicsUser(user).getbUEntity();
+        BasicsUserEntity bUser = module.getBasicsUser(user).getEntity();
         bUser.setValue(TABLE_BASIC_USER.GODMODE, !bUser.getValue(TABLE_BASIC_USER.GODMODE));
         BukkitUtils.setInvulnerable(user, bUser.getValue(TABLE_BASIC_USER.GODMODE));
         if (bUser.getValue(TABLE_BASIC_USER.GODMODE))

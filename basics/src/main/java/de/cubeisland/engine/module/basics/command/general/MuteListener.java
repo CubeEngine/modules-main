@@ -52,7 +52,7 @@ public class MuteListener implements Listener
             User sender = this.basics.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
             if (sender != null)
             {
-                BasicsUserEntity bUser = basics.getBasicsUser(sender).getbUEntity();
+                BasicsUserEntity bUser = basics.getBasicsUser(sender).getEntity();
                 Timestamp muted = bUser.getValue(TABLE_BASIC_USER.MUTED);
                 if (muted != null && System.currentTimeMillis() < muted.getTime())
                 {
