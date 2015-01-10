@@ -51,7 +51,7 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "listroles")
     @Command(desc = "Lists all roles in a world or globally")
-    public void list(CommandContext context, @Named("in") World world, @Flag(longName = "global", name = "g") boolean global)
+    public void list(CommandContext context, @Named("in") World world, @Flag boolean global)
     {
         world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
@@ -140,9 +140,7 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "listrperm")
     @Command(alias = "listpermission", desc = "Lists all permissions of given role [in world]")
-    public void listperm(CommandContext context, @Label("[g:]role") String roleName,
-                         @Named("in") World world,
-                         @Flag(longName = "all", name = "a") boolean all)
+    public void listperm(CommandContext context, @Label("[g:]role") String roleName, @Named("in") World world, @Flag  boolean all)
     {
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
         world = global ? null : this.getWorld(context, world);
@@ -188,9 +186,7 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "listrdata")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists all metadata of given role [in world]")
-    public void listmetadata(CommandContext context, @Label("[g:]role") String roleName,
-                             @Named("in") World world,
-                             @Flag(longName = "all", name = "a") boolean all)
+    public void listmetadata(CommandContext context, @Label("[g:]role") String roleName, @Named("in") World world, @Flag boolean all)
     {
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
         world = global ? null : this.getWorld(context, world);

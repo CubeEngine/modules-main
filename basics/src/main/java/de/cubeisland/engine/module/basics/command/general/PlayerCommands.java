@@ -287,9 +287,7 @@ public class PlayerCommands
 
     @Command(alias = "slay", desc = "Kills a player")
     public void kill(CommandContext context, UserList players, // TODO default line of sight player
-                     @Flag(longName = "force", name = "f") boolean force,
-                     @Flag(longName = "quiet", name = "q") boolean quiet,
-                     @Flag(longName = "lightning", name = "l") boolean lightning)
+                     @Flag boolean force, @Flag boolean quiet, @Flag boolean lightning)
     {
         lightning = lightning && module.perms().COMMAND_KILL_LIGHTNING.isAuthorized(context.getSource());
         force = force && module.perms().COMMAND_KILL_FORCE.isAuthorized(context.getSource());

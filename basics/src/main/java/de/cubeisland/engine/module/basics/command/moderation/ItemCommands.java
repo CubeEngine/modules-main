@@ -23,6 +23,12 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.TreeSet;
 
+import de.cubeisland.engine.command.methodic.parametric.Default;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Named;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.command.parameter.FixedValues;
+import de.cubeisland.engine.core.command.readers.EnchantmentReader;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
@@ -175,34 +181,31 @@ public class ItemCommands
         context.sendTranslated(NEGATIVE, "You are not holding a head.");
     }
 
+    public enum OnOff implements FixedValues
+    {
+        ON(true), OFF(false);
+        public final boolean value;
+
+        OnOff(boolean value)
+        {
+            this.value = value;
+        }
+
+        @Override
+        public String getName()
+        {
+            return this.name().toLowerCase();
+        }
+    }
+
     @Command(desc = "Grants unlimited items")
     @Params(positional = @Param(req = OPTIONAL, names = {"on","off"}))
     @Restricted(User.class)
-    public void unlimited(CommandContext context)
+    public void unlimited(CommandContext context, @Optional OnOff unlimited)
     {
         User sender = (User)context.getSource();
-        boolean unlimited;
-        if (context.hasPositional(0))
-        {
-            if ("on".equalsIgnoreCase(context.getString(0)))
-            {
-                unlimited = true;
-            }
-            else if ("off".equalsIgnoreCase(context.getString(0)))
-            {
-                unlimited = false;
-            }
-            else
-            {
-                context.sendTranslated(NEUTRAL, "Invalid parameter! Use {text:on} or {text:off}!");
-                return;
-            }
-        }
-        else
-        {
-            unlimited = sender.get(BasicsAttachment.class).hasUnlimitedItems();
-        }
-        if (unlimited)
+        boolean setTo = unlimited != null ? unlimited.value : !sender.get(BasicsAttachment.class).hasUnlimitedItems();
+        if (setTo)
         {
             context.sendTranslated(POSITIVE, "You now have unlimited items to build!");
         }
@@ -210,193 +213,121 @@ public class ItemCommands
         {
             context.sendTranslated(NEUTRAL, "You no longer have unlimited items to build!");
         }
-        sender.get(BasicsAttachment.class).setUnlimitedItems(unlimited);
+        sender.get(BasicsAttachment.class).setUnlimitedItems(setTo);
     }
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
-    @Params(positional = {@Param(label = "enchantment", type = Enchantment.class, req = OPTIONAL),
-              @Param(label = "level", type = Integer.class, req = OPTIONAL)})
-    @Flags(@Flag(longName = "unsafe", name = "u"))
-    public void enchant(CommandContext context)
+    @Restricted(value = User.class, msg = "Want to be Harry Potter?")
+    public void enchant(CommandContext context, @Default Enchantment enchantment, @Optional Integer level, @Flag boolean unsafe)
     {
-        if (!context.hasPositional(0))
+        User sender = (User)context.getSource();
+        ItemStack item = sender.getItemInHand();
+        if (item.getType() == AIR)
         {
-            context.sendTranslated(POSITIVE, "Following Enchantments are availiable:\n{input#enchs}", this.getPossibleEnchantments(null));
+            context.sendTranslated(NEUTRAL, "{text:ProTip}: You cannot enchant your fists!");
             return;
         }
-        if (context.getSource() instanceof User)
-        {
-            User sender = (User)context.getSource();
-            ItemStack item = sender.getItemInHand();
-            if (item.getType().equals(AIR))
-            {
-                context.sendTranslated(NEUTRAL, "{text:ProTip}: You cannot enchant your fists!");
-                return;
-            }
-            Enchantment ench = context.get(0, null);
-            if (ench == null)
-            {
-                String possibleEnchs = this.getPossibleEnchantments(item);
 
-                context.sendTranslated(NEGATIVE, "Enchantment {input#enchantment} not found!", context.getString(0));
-                if (possibleEnchs != null)
-                {
-                    context.sendTranslated(NEUTRAL, "Try one of those instead:");
-                    context.sendMessage(possibleEnchs);
-                }
-                else
-                {
-                    context.sendTranslated(NEGATIVE, "You can not enchant this item!");
-                }
-                return;
-            }
-            int level = ench.getMaxLevel();
-            if (context.hasPositional(1))
+        level = level == null ? enchantment.getMaxLevel() : level;
+        if (level <= 0)
+        {
+            context.sendTranslated(NEGATIVE, "The enchantment level has to be a number greater than 0!");
+            return;
+        }
+        if (unsafe)
+        {
+            if (!module.perms().COMMAND_ENCHANT_UNSAFE.isAuthorized(sender))
             {
-                level = context.get(1, 0);
-                if (level <= 0)
-                {
-                    context.sendTranslated(NEGATIVE, "The enchantment level has to be a number greater than 0!");
-                    return;
-                }
-            }
-            if (context.hasFlag("u"))
-            {
-                if (module.perms().COMMAND_ENCHANT_UNSAFE.isAuthorized(sender))
-                {
-                    if (item.getItemMeta() instanceof EnchantmentStorageMeta)
-                    {
-                        EnchantmentStorageMeta itemMeta = (EnchantmentStorageMeta)item.getItemMeta();
-                        itemMeta.addStoredEnchant(ench, level, true);
-                        item.setItemMeta(itemMeta);
-                        return;
-                    }
-                    // TODO enchant item event when bukkit event is not only for enchanting via table #WaitForBukkit
-                    item.addUnsafeEnchantment(ench, level);
-                    context.sendTranslated(POSITIVE, "Added unsafe enchantment: {input#enchantment} {integer#level} to your item!", Match.enchant().nameFor(ench), level);
-                    return;
-                }
                 context.sendTranslated(NEGATIVE, "You are not allowed to add unsafe enchantments!");
                 return;
             }
-            if (ench.canEnchantItem(item))
+            if (item.getItemMeta() instanceof EnchantmentStorageMeta)
             {
-                if (level >= ench.getStartLevel() && level <= ench.getMaxLevel())
-                {
-                    item.addUnsafeEnchantment(ench, level);
-                    context.sendTranslated(POSITIVE, "Added enchantment: {input#enchantment} {integer#level} to your item!", Match.enchant().nameFor(ench), level);
-                    return;
-                }
-                context.sendTranslated(NEGATIVE, "This enchantment level is not allowed!");
+                EnchantmentStorageMeta itemMeta = (EnchantmentStorageMeta)item.getItemMeta();
+                itemMeta.addStoredEnchant(enchantment, level, true);
+                item.setItemMeta(itemMeta);
                 return;
             }
-            String possibleEnchs = this.getPossibleEnchantments(item);
-            if (possibleEnchs != null)
-            {
-                context.sendTranslated(NEGATIVE, "This enchantment is not allowed for this item!", possibleEnchs);
-                context.sendTranslated(NEUTRAL, "Try one of those instead:");
-                context.sendMessage(possibleEnchs);
-                return;
-            }
-            context.sendTranslated(NEGATIVE, "You can not enchant this item!");
+            // TODO enchant item event when bukkit event is not only for enchanting via table #WaitForBukkit
+            item.addUnsafeEnchantment(enchantment, level);
+            context.sendTranslated(POSITIVE,
+                                   "Added unsafe enchantment: {input#enchantment} {integer#level} to your item!",
+                                   Match.enchant().nameFor(enchantment), level);
             return;
         }
-        context.sendTranslated(NEUTRAL, "Want to be Harry Potter?");
-    }
-
-    private String getPossibleEnchantments(ItemStack item)
-    {
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (Enchantment enchantment : Enchantment.values())
+        if (enchantment.canEnchantItem(item))
         {
-            if (item == null || enchantment.canEnchantItem(item))
+            if (level >= enchantment.getStartLevel() && level <= enchantment.getMaxLevel())
             {
-                if (first)
-                {
-                    sb.append(ChatFormat.YELLOW).append(Match.enchant().nameFor(enchantment));
-                    first = false;
-                }
-                else
-                {
-                    sb.append(ChatFormat.WHITE).append(", ").append(ChatFormat.YELLOW).append(Match.enchant()
-                                                                                                   .nameFor(enchantment));
-                }
+                item.addUnsafeEnchantment(enchantment, level);
+                context.sendTranslated(POSITIVE,
+                                       "Added enchantment: {input#enchantment} {integer#level} to your item!", Match.enchant().nameFor(enchantment), level);
+                return;
             }
+            context.sendTranslated(NEGATIVE, "This enchantment level is not allowed!");
+            return;
         }
-        if (sb.length() == 0)
+        String possibleEnchs = EnchantmentReader.getPossibleEnchantments(item);
+        if (possibleEnchs != null)
         {
-            return null;
-       }
-        return sb.toString();
+            context.sendTranslated(NEGATIVE, "This enchantment is not allowed for this item!", possibleEnchs);
+            context.sendTranslated(NEUTRAL, "Try one of those instead:");
+            context.sendMessage(possibleEnchs);
+            return;
+        }
+        context.sendTranslated(NEGATIVE, "You can not enchant this item!");
     }
 
-    @Command(desc = "Gives the specified Item to a player")
-    @Params(positional = {@Param(label = "player", type = User.class),
-              @Param(label = "material[:data]", type = ItemStack.class),
-              @Param(label = "amount", type = Integer.class, req = OPTIONAL)})
-    @Flags(@Flag(name = "b", longName = "blacklist"))
     @SuppressWarnings("deprecation")
-    public void give(CommandContext context)
+    @Command(desc = "Gives the specified Item to a player")
+    public void give(CommandContext context, User player, @Label("material[:data]") ItemStack item, @Optional Integer amount, @Flag boolean blacklist)
     {
-        User user = context.get(0);
-        ItemStack item = context.get(1);
-        if (!context.hasFlag("b") && module.perms().ITEM_BLACKLIST.isAuthorized(context.getSource())
+        if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(context.getSource())
             && this.module.getConfiguration().commands.itemBlacklist.contains(item))
         {
             context.sendTranslated(NEGATIVE, "This item is blacklisted!");
             return;
         }
-        int amount = item.getMaxStackSize();
-        if (context.hasPositional(2))
+        amount = amount == null ? item.getMaxStackSize() : amount;
+        if (amount <= 0)
         {
-            amount = context.get(2, 0);
-            if (amount == 0)
-            {
-                context.sendTranslated(NEGATIVE, "The amount has to be a number greater than 0!");
-                return;
-            }
+            context.sendTranslated(NEGATIVE, "The amount has to be a number greater than 0!");
+            return;
         }
         item.setAmount(amount);
-        user.getInventory().addItem(item);
-        user.updateInventory();
+        player.getInventory().addItem(item);
+        player.updateInventory();
         String matname = Match.material().getNameFor(item);
-        context.sendTranslated(POSITIVE, "You gave {user} {amount} {input#item}!", user, amount, matname);
-        user.sendTranslated(POSITIVE, "{user} just gave you {amount} {input#item}!", context.getSource().getName(), amount, matname);
+        context.sendTranslated(POSITIVE, "You gave {user} {amount} {input#item}!", player, amount, matname);
+        player.sendTranslated(POSITIVE, "{user} just gave you {amount} {input#item}!", context.getSource().getName(), amount, matname);
     }
 
     @Command(alias = "i", desc = "Gives the specified Item to you")
-    @Params(positional = {@Param(label = "material[:data]", type = ItemStack.class),
-              @Param(label = "amount", type = Integer.class, req = OPTIONAL)},
-            nonpositional = @Param(names = "ench", label = "enchantment[:level]"))
-    @Flags(@Flag(longName = "blacklist", name = "b"))
     @SuppressWarnings("deprecation")
-    public void item(CommandContext context)
+    public void item(CommandContext context, @Label("material[:data]") ItemStack item,
+                     @Optional Integer amount,
+                     @Named("ench") @Label("enchantment[:level]") String enchantmentString,
+                     @Flag boolean blacklist)
     {
         if (context.getSource() instanceof User)
         {
             User sender = (User)context.getSource();
-            ItemStack item = context.get(0);
-            if (!context.hasFlag("b") && module.perms().ITEM_BLACKLIST.isAuthorized(sender)
+            if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(sender)
                     && this.module.getConfiguration().commands.containsBlackListed(item))
             {
                 context.sendTranslated(NEGATIVE, "This item is blacklisted!");
                 return;
             }
-            int amount = item.getMaxStackSize();
-            if (context.hasPositional(1))
+            amount = amount == null ? item.getMaxStackSize() : amount;
+            if (amount <= 0)
             {
-                amount = context.get(1, 0);
-                if (amount <= 0)
-                {
-                    context.sendTranslated(NEGATIVE, "The amount has to be a Number greater than 0!");
-                    return;
-                }
+                context.sendTranslated(NEGATIVE, "The amount has to be a number greater than 0!");
+                return;
             }
 
-            if (context.hasNamed("ench"))
+            if (enchantmentString != null)
             {
-                String[] enchs = StringUtils.explode(",", context.getString("ench"));
+                String[] enchs = StringUtils.explode(",", enchantmentString);
                 for (String ench : enchs)
                 {
                     int enchLvl = 0;
@@ -428,8 +359,7 @@ public class ItemCommands
     }
 
     @Command(desc = "Refills the stack in hand")
-    @Params(positional = @Param(label = "amount", type = Integer.class, req = OPTIONAL)) // TODO staticvalues staticValues = "*",
-    public void more(CommandContext context)
+    public void more(CommandContext context, @Optional Integer amount, @Flag boolean all) // TODO staticvalues staticValues = "*",
     {
         if (!context.isSource(User.class))
         {
@@ -437,27 +367,23 @@ public class ItemCommands
             return;
         }
         User sender = (User)context.getSource();
-        Integer amount = 1;
-        if (context.hasPositional(0))
+        if (all)
         {
-            if ("*".equals(context.get(0)))
+            for (ItemStack item : sender.getInventory().getContents())
             {
-                for (ItemStack item : sender.getInventory().getContents())
+                if (item.getType() != AIR)
                 {
-                    if (item.getType() != AIR)
-                    {
-                        item.setAmount(64);
-                    }
+                    item.setAmount(64);
                 }
-                sender.sendTranslated(POSITIVE, "Refilled all stacks!");
-                return;
             }
-            amount = context.get(0);
-            if (amount <= 1)
-            {
-                context.sendTranslated(NEGATIVE, "Invalid amount {input#amount}", amount);
-                return;
-            }
+            sender.sendTranslated(POSITIVE, "Refilled all stacks!");
+            return;
+        }
+        amount = amount == null ? 1 : amount;
+        if (amount < 1)
+        {
+            context.sendTranslated(NEGATIVE, "Invalid amount {input#amount}", amount);
+            return;
         }
         if (sender.getItemInHand() == null || sender.getItemInHand().getType() == AIR)
         {
@@ -478,13 +404,11 @@ public class ItemCommands
     }
 
     @Command(desc = "Repairs your items")
-    @Flags(@Flag(longName = "all", name = "a"))
     @Restricted(value = User.class, msg = "If you do this you'll loose your warranty!")
-    // without item in hand
-    public void repair(CommandContext context)
+    public void repair(CommandContext context, @Flag boolean all)
     {
         User sender = (User)context.getSource();
-        if (context.hasFlag("a"))
+        if (all)
         {
             List<ItemStack> list = new ArrayList<>();
             list.addAll(Arrays.asList(sender.getInventory().getArmorContents()));

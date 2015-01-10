@@ -155,7 +155,7 @@ public class HomeCommand extends TpPointCommand
                          String home,
                          @Optional @Label("welcome message") @Greed(INFINITE) String message,
                          @Default @Named("owner") User owner,
-                         @Flag(longName = "append", name = "a") boolean append)
+                         @Flag boolean append)
     {
         Home h = this.manager.getExact(owner, home);
         if (h == null)
@@ -269,8 +269,8 @@ public class HomeCommand extends TpPointCommand
     @Command(alias = "listhomes", desc = "Lists homes a player can access")
     public void list(CommandContext context, @Default User owner,
                      @Flag(name = "pub", longName = "public") boolean isPublic,
-                     @Flag(name = "o", longName = "owned") boolean owned,
-                     @Flag(name = "i", longName = "invited") boolean invited) throws Exception
+                     @Flag boolean owned,
+                     @Flag boolean invited) throws Exception
     {
         if (!owner.equals(context.getSource()))
         {
@@ -490,7 +490,7 @@ public class HomeCommand extends TpPointCommand
     public CommandResult clear(final CommandContext context, final User owner,
                                @Flag(name = "pub", longName = "public") final boolean isPublic,
                                @Flag(name = "priv", longName = "private") final boolean isPrivate,
-                               @Flag(name = "sel", longName = "selection") final boolean isSelection)
+                               @Flag(name = "sel", longName = "selection") final boolean selection)
     {
         if (this.module.getConfig().clearOnlyFromConsole && !(context.getSource() instanceof ConsoleCommandSender))
         {
@@ -510,7 +510,7 @@ public class HomeCommand extends TpPointCommand
         }
         final Location firstPoint;
         final Location secondPoint;
-        if (isSelection)
+        if (selection)
         {
             if (!context.getCore().getModuleManager().getServiceManager().isImplemented(Selector.class))
             {
@@ -523,8 +523,8 @@ public class HomeCommand extends TpPointCommand
                 return null;
             }
             Selector selector = context.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
-            Shape selection = selector.getSelection((User)context.getSource());
-            if (!(selection instanceof Cuboid))
+            Shape shape = selector.getSelection((User)context.getSource());
+            if (!(shape instanceof Cuboid))
             {
                 context.sendTranslated(NEGATIVE, "Invalid selection!");
                 return null;
@@ -559,7 +559,7 @@ public class HomeCommand extends TpPointCommand
             @Override
             public void run()
             {
-                if (isSelection)
+                if (selection)
                 {
                     manager.massDelete(owner, isPrivate, isPublic, firstPoint, secondPoint);
                     if (context.hasPositional(0))

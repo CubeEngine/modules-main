@@ -69,8 +69,7 @@ public class MoneyCommand extends CommandContainer
 
     @Alias(value = {"balance", "moneybalance", "pmoney"})
     @Command(desc = "Shows your balance")
-    public void balance(CommandContext context, @Optional User player,
-                        @Flag(longName = "showHidden", name = "f") boolean force)
+    public void balance(CommandContext context, @Optional User player, @Flag boolean force)
     {
         if (player == null)
         {
@@ -145,7 +144,7 @@ public class MoneyCommand extends CommandContainer
     @Alias(value = "pay")
     @Command(alias = "give", desc = "Transfer the given amount to another account.")
     public void pay(CommandContext context, @Label("*|<players>") UserList users, Double amount,
-                    @Named("as") User player, @Flag(longName = "force", name = "f") boolean force)
+                    @Named("as") User player, @Flag boolean force)
     {
         if (amount < 0)
         {

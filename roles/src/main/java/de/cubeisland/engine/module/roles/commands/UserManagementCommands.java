@@ -58,7 +58,7 @@ public class UserManagementCommands extends UserCommandHelper
                        @Default User player,
                        @Complete(RoleCompleter.class) String role,
                        @Named("in") World world,
-                       @Flag(name = "t",longName = "temp") boolean temp)
+                       @Flag boolean temp)
     {
         world = this.getWorld(context, world);
         if (world == null) return;

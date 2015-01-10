@@ -133,10 +133,7 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(value = "listuperm")
     @Command(alias = "listperm", desc = "List permission assigned to a user in a world")
-    public void listpermission(CommandContext context,
-                               @Default User player,
-                               @Named("in") World world,
-                               @Flag(longName = "all", name = "a") boolean all)
+    public void listpermission(CommandContext context, @Default User player, @Named("in") World world, @Flag boolean all)
     {
         world = this.getWorld(context, world);
         if (world == null)
@@ -192,8 +189,7 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(value = "listumeta")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists assigned metadata from a user [in world]")
-    public void listmetadata(CommandContext context, @Default User player, @Named("in") World world,
-                             @Flag(longName = "all", name = "a") boolean all)
+    public void listmetadata(CommandContext context, @Default User player, @Named("in") World world, @Flag boolean all)
     {
         world = this.getWorld(context, world);
         if (world == null)

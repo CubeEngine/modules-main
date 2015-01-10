@@ -216,14 +216,13 @@ public class MovementCommands
     }
 
     @Command(desc = "Teleports you to your last location")
-    @Flags(@Flag(longName = "unsafe", name = "u"))
     @CommandPermission(checkPermission = false)
     @Restricted(value = User.class, msg = "Unfortunately teleporting is still not implemented in the game {text:'Life'}!")
-    public void back(CommandContext context)
+    public void back(CommandContext context, @Flag boolean unsafe)
     {
         User sender = (User)context.getSource();
         boolean backPerm = module.perms().COMMAND_BACK_USE.isAuthorized(sender);
-        boolean safe = !context.hasFlag("u");
+        boolean safe = !unsafe
         if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(sender))
         {
             Location loc = sender.get(BasicsAttachment.class).getDeathLocation();

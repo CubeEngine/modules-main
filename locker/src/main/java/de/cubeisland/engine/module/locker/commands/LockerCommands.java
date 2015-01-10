@@ -65,7 +65,7 @@ public class LockerCommands extends CommandContainer
     @Alias(value = "cinfo")
     @Command(desc = "Shows information about a protection")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void info(CommandContext context, @Flag(longName = "persist", name = "p") boolean persist)
+    public void info(CommandContext context, @Flag boolean persist)
     {
         if (persist)
         {
@@ -127,7 +127,7 @@ public class LockerCommands extends CommandContainer
     @Alias(value = "cremove")
     @Command(desc = "Shows information about a protection")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void remove(CommandContext context, @Flag(longName = "persist", name = "p") boolean persist)
+    public void remove(CommandContext context, @Flag boolean persist)
     {
         if (persist)
         {
@@ -140,7 +140,7 @@ public class LockerCommands extends CommandContainer
     @Alias(value = "cunlock")
     @Command(desc = "Unlocks a password protected chest")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void unlock(CommandContext context, String password, @Flag(longName = "persist", name = "p") boolean persist)
+    public void unlock(CommandContext context, String password, @Flag boolean persist)
     {
         if (persist)
         {
@@ -194,7 +194,7 @@ public class LockerCommands extends CommandContainer
     @Alias(value = "cgive")
     @Command(desc = "gives a protection to someone else")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void give(CommandContext context, User player, @Flag(longName = "persist", name = "p") boolean persist)
+    public void give(CommandContext context, User player, @Flag boolean persist)
     {
         if (persist)
         {
@@ -206,7 +206,7 @@ public class LockerCommands extends CommandContainer
     @Alias(value = "ckey")
     @Command(desc = "creates a KeyBook or invalidates previous KeyBooks")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void key(CommandContext context, @Flag(longName = "invalidate", name = "i") boolean invalidate, @Flag(longName = "persist", name = "p") boolean persist)
+    public void key(CommandContext context, @Flag boolean invalidate, @Flag boolean persist)
     {
         if (!this.module.getConfig().allowKeyBooks)
         {

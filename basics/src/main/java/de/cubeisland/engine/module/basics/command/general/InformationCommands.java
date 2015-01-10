@@ -145,11 +145,7 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays near players(entities/mobs) to you.")
-    public void near(CommandContext context,
-                     @Optional Integer radius,
-                     @Default @Optional User player,
-                     @Flag(longName = "entity", name = "e") boolean entityFlag,
-                     @Flag(longName = "mob", name = "m") boolean mobFlag)
+    public void near(CommandContext context, @Optional Integer radius, @Default User player, @Flag boolean entity, @Flag boolean mob)
     {
         //new cmd system showing default message via @Default context.sendTranslated(NEUTRAL, "I am right {text:behind:color=RED} you!");
         if (radius == null)
@@ -162,20 +158,20 @@ public class InformationCommands
         LinkedList<String> outputlist = new LinkedList<>();
         TreeMap<Double, List<Entity>> sortedMap = new TreeMap<>();
         final Location entityLocation = new Location(null, 0, 0, 0);
-        for (Entity entity : list)
+        for (Entity e : list)
         {
-            entity.getLocation(entityLocation);
+            e.getLocation(entityLocation);
             double distance = entityLocation.distanceSquared(userLocation);
             if (!entityLocation.equals(userLocation) && distance < squareRadius)
             {
-                if (entityFlag || (mobFlag && entity instanceof LivingEntity) || entity instanceof Player)
+                if (entity || (mob && e instanceof LivingEntity) || e instanceof Player)
                 {
                     List<Entity> sublist = sortedMap.get(distance);
                     if (sublist == null)
                     {
                         sublist = new ArrayList<>();
                     }
-                    sublist.add(entity);
+                    sublist.add(e);
                     sortedMap.put(distance, sublist);
                 }
             }
@@ -185,30 +181,30 @@ public class InformationCommands
         for (double dist : sortedMap.keySet())
         {
             i++;
-            for (Entity entity : sortedMap.get(dist))
+            for (Entity e : sortedMap.get(dist))
             {
                 if (i <= 10)
                 {
-                    this.addNearInformation(outputlist, entity, Math.sqrt(dist));
+                    this.addNearInformation(outputlist, e, Math.sqrt(dist));
                 }
                 else
                 {
                     String key;
-                    if (entity instanceof Player)
+                    if (e instanceof Player)
                     {
                         key = DARK_GREEN + "player";
                     }
-                    else if (entity instanceof LivingEntity)
+                    else if (e instanceof LivingEntity)
                     {
-                        key = ChatFormat.DARK_AQUA + Match.entity().getNameFor(entity.getType());
+                        key = ChatFormat.DARK_AQUA + Match.entity().getNameFor(e.getType());
                     }
-                    else if (entity instanceof Item)
+                    else if (e instanceof Item)
                     {
-                        key = ChatFormat.GREY + Match.material().getNameFor(((Item)entity).getItemStack());
+                        key = ChatFormat.GREY + Match.material().getNameFor(((Item)e).getItemStack());
                     }
                     else
                     {
-                        key = ChatFormat.GREY + Match.entity().getNameFor(entity.getType());
+                        key = ChatFormat.GREY + Match.entity().getNameFor(e.getType());
                     }
                     Pair<Double, Integer> pair = groupedEntities.get(key);
                     if (pair == null)
@@ -290,7 +286,7 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays chunk, memory and world information.")
-    public void lag(CommandContext context, @Flag(name = "r", longName = "reset") boolean reset)
+    public void lag(CommandContext context, @Flag boolean reset)
     {
         if (reset)
         {

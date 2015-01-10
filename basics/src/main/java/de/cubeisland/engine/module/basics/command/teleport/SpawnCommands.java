@@ -17,6 +17,7 @@
  */
 package de.cubeisland.engine.module.basics.command.teleport;
 
+import de.cubeisland.engine.core.user.UserList;
 import org.bukkit.Location;
 import org.bukkit.World;
 

@@ -52,9 +52,9 @@ public class InventoryCommands
     @Command(desc = "Allows you to see into the inventory of someone else.")
     @Restricted(value = User.class, msg = "This command can only be used by a player!")
     public void invsee(CommandContext context, User player,
-                       @Flag(longName = "force", name = "f") boolean force,
-                       @Flag(longName = "quiet", name = "q") boolean quiet,
-                       @Flag(longName = "ender", name = "e") boolean ender)
+                       @Flag boolean force,
+                       @Flag boolean quiet,
+                       @Flag boolean ender)
     {
         User sender = (User)context.getSource();
         boolean denyModify = false;
@@ -133,8 +133,8 @@ public class InventoryCommands
     @SuppressWarnings("deprecation")
     public void clearinventory(CommandContext context, @Default User player,
                                @Flag(longName = "removeArmor", name = "ra") boolean removeArmor,
-                               @Flag(longName = "quiet", name = "q") boolean quiet,
-                               @Flag(longName = "force", name = "f") boolean force)
+                               @Flag boolean quiet,
+                               @Flag boolean force)
     {
         //sender.sendTranslated(NEGATIVE, "That awkward moment when you realize you do not have an inventory!");
         CommandSender sender = context.getSource();

@@ -353,9 +353,7 @@ public class RoleManagementCommands extends RoleCommandHelper
 
     @Alias(value = "createrole")
     @Command(desc = "Creates a new role [in world]")
-    public void create(CommandContext context, String rolename,
-                       @Named("in") World world,
-                       @Flag(longName = "global", name = "g") boolean global)
+    public void create(CommandContext context, String rolename, @Named("in") World world, @Flag boolean global)
     {
         world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;

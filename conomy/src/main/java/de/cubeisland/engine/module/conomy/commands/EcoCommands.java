@@ -47,8 +47,7 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(alias = "grant", desc = "Gives money to one or all players.")
-    public void give(CommandContext context, @Label("*|<players>") UserList users, Double amount,
-                     @Flag(longName = "online", name = "0") boolean online)
+    public void give(CommandContext context, @Label("*|<players>") UserList users, Double amount, @Flag boolean online)
     {
         if (users.isAll())
         {
@@ -89,8 +88,7 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(alias = "remove", desc = "Takes money from given user")
-    public void take(CommandContext context, @Label("*|<players>") UserList users, Double amount,
-                     @Flag(longName = "online", name = "o") boolean online)
+    public void take(CommandContext context, @Label("*|<players>") UserList users, Double amount, @Flag boolean online)
     {
         if (users.isAll())
         {
@@ -125,7 +123,7 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(desc = "Reset the money from given user")
-    public void reset(CommandContext context, @Label("*|<players>") UserList users, @Flag(longName = "online", name = "o") boolean online)
+    public void reset(CommandContext context, @Label("*|<players>") UserList users, @Flag boolean online)
     {
         if (users.isAll())
         {
@@ -161,8 +159,7 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(desc = "Sets the money of a given player")
-    public void set(CommandContext context, @Label("*|<players>") UserList users, Double amount,
-                    @Flag(longName = "online", name = "o") boolean online)
+    public void set(CommandContext context, @Label("*|<players>") UserList users, Double amount, @Flag boolean online)
     {
         if (users.isAll())
         {
@@ -197,16 +194,14 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(desc = "Scales the money of a given player")
-    public void scale(CommandContext context, @Label("*|<players>") UserList users, Float factor,
-                      @Flag(longName = "online", name = "o") boolean online)
+    public void scale(CommandContext context, @Label("*|<players>") UserList users, Float factor, @Flag boolean online)
     {
         if (users.isAll())
         {
             if (online)
             {
                 this.manager.scaleAllOnline(factor);
-                context.sendTranslated(POSITIVE, "Scaled the balance of every online player by {decimal#factor}!",
-                                       factor);
+                context.sendTranslated(POSITIVE, "Scaled the balance of every online player by {decimal#factor}!", factor);
                 return;
             }
             this.manager.scaleAll(true, false, factor);
@@ -297,8 +292,7 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(desc = "Creates a new account")
-    public void create(CommandContext context, @Optional OfflinePlayer player,
-                       @Flag(longName = "force", name = "f") boolean force)
+    public void create(CommandContext context, @Optional OfflinePlayer player, @Flag boolean force)
     {
         if (player == null)
         {
