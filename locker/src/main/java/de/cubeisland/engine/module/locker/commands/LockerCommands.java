@@ -140,7 +140,7 @@ public class LockerCommands extends CommandContainer
     @Alias(value = "cunlock")
     @Command(desc = "Unlocks a password protected chest")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void unlock(CommandContext context, @Label("password") String password, @Flag(longName = "persist", name = "p") boolean persist)
+    public void unlock(CommandContext context, String password, @Flag(longName = "persist", name = "p") boolean persist)
     {
         if (persist)
         {
@@ -194,13 +194,13 @@ public class LockerCommands extends CommandContainer
     @Alias(value = "cgive")
     @Command(desc = "gives a protection to someone else")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void give(CommandContext context, @Label("player") User user, @Flag(longName = "persist", name = "p") boolean persist)
+    public void give(CommandContext context, User player, @Flag(longName = "persist", name = "p") boolean persist)
     {
         if (persist)
         {
             this.persist(context);
         }
-        this.manager.commandListener.setCommandType(context.getSource(), GIVE, user.getName());
+        this.manager.commandListener.setCommandType(context.getSource(), GIVE, player.getName());
     }
 
     @Alias(value = "ckey")

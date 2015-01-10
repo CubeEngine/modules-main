@@ -70,7 +70,7 @@ public class ManagementCommands extends CommandContainer
     public static World curWorldOfConsole = null;
 
     @Command(desc = "Sets or resets the current default world")
-    public void defaultworld(CommandContext context, @Optional @Label("world") World world)
+    public void defaultworld(CommandContext context, @Optional World world)
     {
         if (world == null)
         {

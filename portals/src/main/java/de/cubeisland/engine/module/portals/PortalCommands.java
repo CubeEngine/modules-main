@@ -60,7 +60,7 @@ public class PortalCommands extends CommandContainer
     @Alias(value = "mvpc")
     @Command(desc = "Creates a new Portal")
     @Restricted(value = User.class, msg = "You must be ingame to do this!")
-    public void create(CommandContext context, @Label("name") String name, @Optional @Label("destination") Destination destination)
+    public void create(CommandContext context, String name, @Optional Destination destination)
     {
         Selector selector = this.module.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
         User sender = (User)context.getSource();
@@ -100,7 +100,7 @@ public class PortalCommands extends CommandContainer
     @Alias(value = "mvps")
     @Command(desc = "Selects an existing portal")
     @Restricted(value = User.class, msg = "You must be ingame to do this!")
-    public void select(CommandContext context, @Label("portal") Portal portal)
+    public void select(CommandContext context, Portal portal)
     {
         ((User)context.getSource()).attachOrGet(PortalsAttachment.class, module).setPortal(portal);
         context.sendTranslated(POSITIVE, "Portal selected: {name}", context.get(0));
@@ -108,14 +108,14 @@ public class PortalCommands extends CommandContainer
 
     @Alias(value ="mvpi")
     @Command(desc = "Show info about a portal")
-    public void info(CommandContext context, @Default @Label("portal") Portal portal)
+    public void info(CommandContext context, @Default Portal portal)
     {
         portal.showInfo(context.getSource());
     }
 
     @Alias(value = "mvpr")
     @Command(desc = "Removes a portal permanently")
-    public void remove(CommandContext context, @Default @Label("portal") Portal portal)
+    public void remove(CommandContext context, @Default Portal portal)
     {
         portal.delete();
         context.sendTranslated(POSITIVE, "Portal {name} deleted", portal.getName());
@@ -161,7 +161,7 @@ public class PortalCommands extends CommandContainer
     }
 
     @Command(desc = "Lists the portals")
-    public void list(CommandContext context, @Label("world") World world)
+    public void list(CommandContext context, World world)
     {
         Set<Portal> portals = manager.getPortals(world);
         if (portals.isEmpty())

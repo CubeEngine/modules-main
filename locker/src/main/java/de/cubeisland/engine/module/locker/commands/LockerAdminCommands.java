@@ -61,7 +61,7 @@ public class LockerAdminCommands extends CommandContainer
 
     @Command(desc = "Opens a protected chest by protection id")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void view(CommandContext context, @Label("id") Integer id)
+    public void view(CommandContext context, Integer id)
     {
         Lock lock = this.getLockById(context, id);
         switch (lock.getProtectedType())
@@ -86,7 +86,7 @@ public class LockerAdminCommands extends CommandContainer
 
     @Command(desc = "Deletes a protection by its id")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void remove(CommandContext context, @Label("id") Integer id)
+    public void remove(CommandContext context, Integer id)
     {
         Lock lock = this.getLockById(context, id);
         if (lock == null) return;
@@ -95,7 +95,7 @@ public class LockerAdminCommands extends CommandContainer
 
     @Command(desc = "Teleport to a protection")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void tp(CommandContext context, @Label("id") Integer id)
+    public void tp(CommandContext context, Integer id)
     {
         Lock lock = this.getLockById(context, id);
         if (lock == null) return;
@@ -110,10 +110,10 @@ public class LockerAdminCommands extends CommandContainer
     }
 
     @Command(desc = "Deletes all locks of given player")
-    public void purge(CommandContext context, @Label("player") User user)
+    public void purge(CommandContext context, User player)
     {
-        this.manager.purgeLocksFrom(user);
-        context.sendTranslated(POSITIVE, "All locks for {user} are now deleted!", user);
+        this.manager.purgeLocksFrom(player);
+        context.sendTranslated(POSITIVE, "All locks for {user} are now deleted!", player);
     }
 
     // TODO admin cmds

@@ -80,7 +80,7 @@ public class InformationCommands
 
     @Command(desc = "Displays the biome type you are standing in.")
     public void biome(CommandContext context,
-                      @Label("world") @Optional World world,
+                      @Optional World world,
                       @Label("block-x") @Optional Integer x,
                       @Label("block-z") @Optional Integer z)
     {
@@ -102,7 +102,7 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the seed of a world.")
-    public void seed(CommandContext context, @Label("world") @Optional World world)
+    public void seed(CommandContext context, @Optional World world)
     {
         if (world == null)
         {
@@ -146,8 +146,8 @@ public class InformationCommands
 
     @Command(desc = "Displays near players(entities/mobs) to you.")
     public void near(CommandContext context,
-                     @Optional @Label("radius") Integer radius,
-                     @Default @Optional @Label("player") User user,
+                     @Optional Integer radius,
+                     @Default @Optional User player,
                      @Flag(longName = "entity", name = "e") boolean entityFlag,
                      @Flag(longName = "mob", name = "m") boolean mobFlag)
     {
@@ -157,7 +157,7 @@ public class InformationCommands
             radius = this.module.getConfiguration().commands.nearDefaultRadius; // TODO create defaultProvider for this
         }
         int squareRadius = radius * radius;
-        Location userLocation = user.getLocation();
+        Location userLocation = player.getLocation();
         List<Entity> list = userLocation.getWorld().getEntities();
         LinkedList<String> outputlist = new LinkedList<>();
         TreeMap<Double, List<Entity>> sortedMap = new TreeMap<>();
@@ -240,13 +240,13 @@ public class InformationCommands
             String result;
             result = StringUtils.implode(WHITE + ", ", outputlist);
             result += groupedOutput.toString();
-            if (context.getSource().equals(user))
+            if (context.getSource().equals(player))
             {
                 context.sendTranslated(NEUTRAL, "Found those nearby you:\n{}", result);
             }
             else
             {
-                context.sendTranslated(NEUTRAL, "Found those nearby {user}:\n{}", user, result);
+                context.sendTranslated(NEUTRAL, "Found those nearby {user}:\n{}", player, result);
             }
         }
     }

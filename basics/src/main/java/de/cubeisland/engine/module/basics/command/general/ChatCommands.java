@@ -61,7 +61,7 @@ public class ChatCommands
     }
 
     @Command(desc = "Sends a private message to someone", alias = {"tell", "message", "pm", "m", "t", "whisper", "w"})
-    public void msg(CommandContext context, @Label("player") User user, @Label("message") @Greed(INFINITE) String message)
+    public void msg(CommandContext context, User player, @Greed(INFINITE) String message)
     {
         // TODO allow console as "user" or make it work somehow
         if ("console".equalsIgnoreCase(context.getString(0)))
@@ -69,14 +69,14 @@ public class ChatCommands
             sendWhisperTo(NON_PLAYER_UUID, context.getStrings(1), context);
             return;
         }
-        if (!this.sendWhisperTo(user.getUniqueId(), message, context))
+        if (!this.sendWhisperTo(player.getUniqueId(), message, context))
         {
-            context.sendTranslated(NEGATIVE, "Could not find the player {user} to send the message to. Is the player offline?", user);
+            context.sendTranslated(NEGATIVE, "Could not find the player {user} to send the message to. Is the player offline?", player);
         }
     }
 
     @Command(alias = "r", desc = "Replies to the last person that whispered to you.")
-    public void reply(CommandContext context, @Label("message") @Greed(INFINITE) String message)
+    public void reply(CommandContext context, @Greed(INFINITE) String message)
     {
         UUID lastWhisper;
         if (context.getSource() instanceof User)
@@ -148,21 +148,19 @@ public class ChatCommands
     }
 
     @Command(desc = "Broadcasts a message")
-    public void broadcast(CommandContext context, @Label("message") @Greed(INFINITE) String message)
+    public void broadcast(CommandContext context, @Greed(INFINITE) String message)
     {
         this.um.broadcastMessage(NEUTRAL, "[{text:Broadcast}] {input}", message);
     }
 
     @Command(desc = "Mutes a player")
-    public void mute(CommandContext context,
-                     @Label("player") User user,
-                     @Label("duration") @Optional String duration)
+    public void mute(CommandContext context, User player, @Optional String duration)
     {
-        BasicsUserEntity bUser = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getEntity();
+        BasicsUserEntity bUser = player.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getEntity();
         Timestamp muted = bUser.getValue(TABLE_BASIC_USER.MUTED);
         if (muted != null && muted.getTime() < System.currentTimeMillis())
         {
-            context.sendTranslated(NEUTRAL, "{user} was already muted!", user);
+            context.sendTranslated(NEUTRAL, "{user} was already muted!", player);
         }
         Duration dura = module.getConfiguration().commands.defaultMuteTime;
         if (context.hasPositional(1))
@@ -177,22 +175,20 @@ public class ChatCommands
                 return;
             }
         }
-        bUser.setValue(TABLE_BASIC_USER.MUTED, new Timestamp(System.currentTimeMillis() +
-            (dura.getMillis() == 0 ? DAYS.toMillis(9001) : dura.getMillis())));
+        bUser.setValue(TABLE_BASIC_USER.MUTED, new Timestamp(System.currentTimeMillis() + (dura.getMillis() == 0 ? DAYS.toMillis(9001) : dura.getMillis())));
         bUser.updateAsync();
-        String timeString = dura.getMillis() == 0 ? user.getTranslation(NONE, "ever") : TimeUtil.format(
-            user.getLocale(), dura.getMillis());
-        user.sendTranslated(NEGATIVE, "You are now muted for {input#amount}!", timeString);
-        context.sendTranslated(NEUTRAL, "You muted {user} globally for {input#amount}!", user, timeString);
+        String timeString = dura.getMillis() == 0 ? player.getTranslation(NONE, "ever") : TimeUtil.format(player.getLocale(), dura.getMillis());
+        player.sendTranslated(NEGATIVE, "You are now muted for {input#amount}!", timeString);
+        context.sendTranslated(NEUTRAL, "You muted {user} globally for {input#amount}!", player, timeString);
     }
 
     @Command(desc = "Unmutes a player")
-    public void unmute(CommandContext context, @Label("player") User user)
+    public void unmute(CommandContext context, User player)
     {
-        BasicsUserEntity basicsUserEntity = user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getEntity();
+        BasicsUserEntity basicsUserEntity = player.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getEntity();
         basicsUserEntity.setValue(TABLE_BASIC_USER.MUTED, null);
         basicsUserEntity.updateAsync();
-        context.sendTranslated(POSITIVE, "{user} is no longer muted!", user);
+        context.sendTranslated(POSITIVE, "{user} is no longer muted!", player);
     }
 
     @Command(alias = "roll", desc = "Shows a random number from 0 to 100")

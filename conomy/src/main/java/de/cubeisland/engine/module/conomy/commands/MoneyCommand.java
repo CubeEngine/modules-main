@@ -69,10 +69,10 @@ public class MoneyCommand extends CommandContainer
 
     @Alias(value = {"balance", "moneybalance", "pmoney"})
     @Command(desc = "Shows your balance")
-    public void balance(CommandContext context, @Optional @Label("player") User user,
+    public void balance(CommandContext context, @Optional User player,
                         @Flag(longName = "showHidden", name = "f") boolean force)
     {
-        if (user == null)
+        if (player == null)
         {
             if (!(context.getSource() instanceof User))
             {
@@ -80,20 +80,20 @@ public class MoneyCommand extends CommandContainer
                                        "If you are out of money, better go work than typing silly commands in the console.");
                 return;
             }
-            user = (User)context.getSource();
+            player = (User)context.getSource();
         }
         boolean showHidden = force && module.perms().USER_SHOWHIDDEN.isAuthorized(context.getSource());
 
-        UserAccount account = this.getUserAccount(user);
+        UserAccount account = this.getUserAccount(player);
         if (account != null)
         {
-            if (!account.isHidden() || showHidden || account.getName().equalsIgnoreCase(user.getName()))
+            if (!account.isHidden() || showHidden || account.getName().equalsIgnoreCase(player.getName()))
             {
-                context.sendTranslated(POSITIVE, "{user}'s Balance: {currency}", user, account.balance());
+                context.sendTranslated(POSITIVE, "{user}'s Balance: {currency}", player, account.balance());
                 return;
             }
         }
-        context.sendTranslated(NEGATIVE, "No account found for {user}!", user);
+        context.sendTranslated(NEGATIVE, "No account found for {user}!", player);
     }
 
     @Alias(value = {"toplist", "balancetop", "topmoney"})
@@ -144,8 +144,8 @@ public class MoneyCommand extends CommandContainer
 
     @Alias(value = "pay")
     @Command(alias = "give", desc = "Transfer the given amount to another account.")
-    public void pay(CommandContext context, @Label("*|<players>") UserList users, @Label("amount") Double amount,
-                    @Named("as") @Label("player") User asUser, @Flag(longName = "force", name = "f") boolean force)
+    public void pay(CommandContext context, @Label("*|<players>") UserList users, Double amount,
+                    @Named("as") User player, @Flag(longName = "force", name = "f") boolean force)
     {
         if (amount < 0)
         {
@@ -153,7 +153,7 @@ public class MoneyCommand extends CommandContainer
             return;
         }
         boolean asSomeOneElse = false;
-        if (asUser != null)
+        if (player != null)
         {
             if (!module.perms().COMMAND_PAY_ASOTHER.isAuthorized(context.getSource()))
             {
@@ -169,14 +169,14 @@ public class MoneyCommand extends CommandContainer
                 context.sendTranslated(NEGATIVE, "Please specify a player to use their account.");
                 return;
             }
-            asUser = (User)context.getSource();
+            player = (User)context.getSource();
         }
-        Account source = this.manager.getUserAccount(asUser, false);
+        Account source = this.manager.getUserAccount(player, false);
         if (source == null)
         {
             if (asSomeOneElse)
             {
-                context.sendTranslated(NEGATIVE, "{user} does not have an account!", asUser);
+                context.sendTranslated(NEGATIVE, "{user} does not have an account!", player);
             }
             else
             {
@@ -205,7 +205,7 @@ public class MoneyCommand extends CommandContainer
             {
                 if (asSomeOneElse)
                 {
-                    context.sendTranslated(NEGATIVE, "{user} cannot afford {currency}!", asUser.getName(), amount);
+                    context.sendTranslated(NEGATIVE, "{user} cannot afford {currency}!", player.getName(), amount);
                 }
                 else
                 {
@@ -218,13 +218,13 @@ public class MoneyCommand extends CommandContainer
             {
                 if (asSomeOneElse)
                 {
-                    context.sendTranslated(POSITIVE, "{currency} transferred from {user}'s to {user}'s account!", amount, asUser, user);
+                    context.sendTranslated(POSITIVE, "{currency} transferred from {user}'s to {user}'s account!", amount, player, user);
                 }
                 else
                 {
                     context.sendTranslated(POSITIVE, "{currency} transferred to {user}'s account!", amount, user);
                 }
-                user.sendTranslated(POSITIVE, "{user} just paid you {currency}!", asUser, amount);
+                user.sendTranslated(POSITIVE, "{user} just paid you {currency}!", player, amount);
             }
             else
             {

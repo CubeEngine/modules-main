@@ -59,7 +59,7 @@ public class MailCommand extends CommandContainer
 
     @Alias(value = "readmail")
     @Command(desc = "Reads your mail.")
-    public void read(CommandContext context, @Optional @Label("player") User mailof)  // TODO staticValues = "console",
+    public void read(CommandContext context, @Optional User player)  // TODO staticValues = "console",
     {
         User sender = null;
         if (context.getSource() instanceof User)
@@ -68,13 +68,13 @@ public class MailCommand extends CommandContainer
         }
         if (sender == null)
         {
-            if (mailof == null)
+            if (player == null)
             {
                 context.sendTranslated(NEUTRAL, "Log into the game to check your mailbox!");
 
                 return;
             }
-            context.sendTranslated(NEUTRAL, "If you wanted to look into other players mail use: {text:/mail spy} {input#player}.", mailof);
+            context.sendTranslated(NEUTRAL, "If you wanted to look into other players mail use: {text:/mail spy} {input#player}.", player);
             context.sendTranslated(NEGATIVE, "Otherwise be quiet!");
             return;
         }
@@ -85,17 +85,17 @@ public class MailCommand extends CommandContainer
             return;
         }
         List<Mail> mails;
-        if (mailof == null) //get mails
+        if (player == null) //get mails
         {
             mails = bUser.getMails();
         }
         else //Search for mail of that user
         {
-            mails = bUser.getMailsFrom(mailof);
+            mails = bUser.getMailsFrom(player);
         }
         if (mails.isEmpty()) // Mailbox is not empty but no message from that player
         {
-            context.sendTranslated(NEUTRAL, "You do not have any mail from {user}.", mailof);
+            context.sendTranslated(NEUTRAL, "You do not have any mail from {user}.", player);
             return;
         }
         StringBuilder sb = new StringBuilder();
@@ -109,12 +109,12 @@ public class MailCommand extends CommandContainer
 
     @Alias(value = "spymail")
     @Command(desc = "Shows the mail of other players.")
-    public void spy(CommandContext context, @Label("player") User user)
+    public void spy(CommandContext context, User player)
     {
-        List<Mail> mails = user.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().getMails();
+        List<Mail> mails = player.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().getMails();
         if (mails.isEmpty()) // Mailbox is not empty but no message from that player
         {
-            context.sendTranslated(NEUTRAL, "{user} does not have any mail!", user);
+            context.sendTranslated(NEUTRAL, "{user} does not have any mail!", player);
             return;
         }
         StringBuilder sb = new StringBuilder();
@@ -124,20 +124,20 @@ public class MailCommand extends CommandContainer
             i++;
             sb.append("\n").append(ChatFormat.WHITE).append(i).append(": ").append(mail.getValue(TABLE_MAIL.MESSAGE));
         }
-        context.sendTranslated(NEUTRAL, "{user}'s mail: {input#mails}", user, ChatFormat.parseFormats(sb.toString()));
+        context.sendTranslated(NEUTRAL, "{user}'s mail: {input#mails}", player, ChatFormat.parseFormats(sb.toString()));
     }
 
     @Alias(value = "sendmail")
     @Command(desc = "Sends mails to other players.")
-    public void send(CommandContext context, @Label("player") User user, @Label("message") @Greed(INFINITE) String message)
+    public void send(CommandContext context, User player, @Greed(INFINITE) String message)
     {
-        this.mail(message, context.getSource(), user);
-        context.sendTranslated(POSITIVE, "Mail send to {user}!", user);
+        this.mail(message, context.getSource(), player);
+        context.sendTranslated(POSITIVE, "Mail send to {user}!", player);
     }
 
     @Alias(value = "sendallmail")
     @Command(desc = "Sends mails to all players.")
-    public void sendAll(CommandContext context, final @Label("message") @Greed(INFINITE) String message)
+    public void sendAll(CommandContext context, final @Greed(INFINITE) String message)
     {
         Set<User> users = this.module.getCore().getUserManager().getOnlineUsers();
         final Set<Long> alreadySend = new HashSet<>();
@@ -173,7 +173,7 @@ public class MailCommand extends CommandContainer
 
     @Command(desc = "Removes a single mail")
     @Restricted(value = User.class, msg = "The console has no mails!")
-    public void remove(CommandContext context, @Label("mailid") Integer mailId)
+    public void remove(CommandContext context, Integer mailId)
     {
         User user = (User)context.getSource();
         BasicsUser bUser = user.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser();
@@ -196,7 +196,7 @@ public class MailCommand extends CommandContainer
 
     @Command(desc = "Clears your mail.")
     @Restricted(value = User.class, msg = "You will never have mail here!")
-    public void clear(CommandContext context, @Optional @Label("player") User from)
+    public void clear(CommandContext context, @Optional User player)
     {
         User sender = (User)context.getSource();
         if (!context.hasPositional(0))
@@ -206,8 +206,8 @@ public class MailCommand extends CommandContainer
             return;
         }
         // TODO console User from = "console".equalsIgnoreCase(context.getString(0)) ? null : context.<User>get(0);
-        sender.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMailFrom(from);
-        context.sendTranslated(NEUTRAL, "Cleared all mail from {user}!", from == null ? "console" : from);
+        sender.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMailFrom(player);
+        context.sendTranslated(NEUTRAL, "Cleared all mail from {user}!", player == null ? "console" : player);
     }
 
     private void mail(String message, CommandSender from, User... users)

@@ -54,22 +54,18 @@ public class PortalModifyCommand extends CommandContainer
     }
 
     @Command(desc = "Changes the owner of a portal")
-    public void owner(CommandContext context, @Label("owner") User user, @Default @Label("portal") Portal portal)
+    public void owner(CommandContext context, User owner, @Default Portal portal)
     {
-        portal.config.owner = user.getOfflinePlayer();
+        portal.config.owner = owner.getOfflinePlayer();
         portal.config.save();
-        context.sendTranslated(POSITIVE, "{user} is now the owner of {name#portal}!", user, portal.getName());
+        context.sendTranslated(POSITIVE, "{user} is now the owner of {name#portal}!", owner, portal.getName());
     }
 
     @Alias(value = "mvpd")
     @Command(alias = "dest", desc = "changes the destination of the selected portal")
     public void destination(CommandContext context,
-        @Label("destination")
-        @Desc("A destination can be: here, <world> or p:<portal>")
-        Destination destination,
-        @Default
-        @Label("portal")
-        Portal portal)
+        @Desc("A destination can be: here, <world> or p:<portal>") Destination destination,
+        @Default Portal portal)
     {
         portal.config.destination = destination;
         portal.config.save();
@@ -78,14 +74,14 @@ public class PortalModifyCommand extends CommandContainer
 
     @Alias(value = "mvprd")
     @Command(alias = "randdest", desc = "Changes the destination of the selected portal to a random position each time")
-    public void randomDestination(CommandContext context, @Label("world") World world, @Default @Label("portal") Portal portal)
+    public void randomDestination(CommandContext context, World world, @Default Portal portal)
     {
         this.destination(context, new RandomDestination(world), portal);
     }
 
     @Command(desc = "Changes a portals location")
     @Restricted(value = User.class, msg = "You have to be ingame to do this!")
-    public void location(CommandContext context, @Default @Label("portal") Portal portal)
+    public void location(CommandContext context, @Default Portal portal)
     {
         User sender = (User)context.getSource();
         Selector selector = this.module.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
@@ -104,7 +100,7 @@ public class PortalModifyCommand extends CommandContainer
 
     @Command(desc = "Modifies the location where a player exits when teleporting a portal")
     @Restricted(value = User.class, msg = "You have to be ingame to do this!")
-    public void exit(CommandContext context, @Default @Label("portl") Portal portal)
+    public void exit(CommandContext context, @Default Portal portal)
     {
         User sender = (User)context.getSource();
         Location location = sender.getLocation();
@@ -120,7 +116,7 @@ public class PortalModifyCommand extends CommandContainer
     }
 
     @Command(desc = "Toggles safe teleportation for this portal")
-    public void togglesafe(CommandContext context, @Default @Label("portal") Portal portal)
+    public void togglesafe(CommandContext context, @Default Portal portal)
     {
         portal.config.safeTeleport = !portal.config.safeTeleport;
         portal.config.save();
@@ -133,7 +129,7 @@ public class PortalModifyCommand extends CommandContainer
     }
 
     @Command(desc = "Toggles whether entities can teleport with this portal")
-    public void entity(CommandContext context, @Default @Label("portal") Portal portal)
+    public void entity(CommandContext context, @Default Portal portal)
     {
         portal.config.teleportNonPlayers = !portal.config.teleportNonPlayers;
         portal.config.save();

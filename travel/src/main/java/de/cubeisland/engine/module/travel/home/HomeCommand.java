@@ -79,30 +79,30 @@ public class HomeCommand extends TpPointCommand
 
     @Restricted(User.class)
     @Command(desc = "Teleport to a home")
-    public void tp(CommandContext context, @Optional @Label("home") String name, @Default @Label("owner") User owner)
+    public void tp(CommandContext context, @Optional String home, @Default User owner)
     {
         User sender = (User)context.getSource();
-        name = name == null ? "home" : name;
-        Home home = this.manager.findOne(owner, name);
-        if (home == null)
+        home = home == null ? "home" : home;
+        Home h = this.manager.findOne(owner, home);
+        if (h == null)
         {
-            homeNotFoundMessage(context, owner, name);
+            homeNotFoundMessage(context, owner, home);
             context.sendTranslated(NEUTRAL, "Use {text:/sethome} to set your home");
             return;
         }
-        if (!home.canAccess(sender))
+        if (!h.canAccess(sender))
         {
             if (owner.equals(sender))
             {
-                homeNotFoundMessage(context, owner, name);
+                homeNotFoundMessage(context, owner, home);
                 return;
             }
             context.ensurePermission(module.getPermissions().HOME_TP_OTHER);
         }
-        Location location = home.getLocation();
+        Location location = h.getLocation();
         if (location == null)
         {
-            homeInDeletedWorldMessage(context, owner, home);
+            homeInDeletedWorldMessage(context, owner, h);
             return;
         }
         if (!sender.teleport(location, COMMAND))
@@ -110,23 +110,23 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(CRITICAL, "The teleportation got aborted!");
             return;
         }
-        if (home.getWelcomeMsg() != null)
+        if (h.getWelcomeMsg() != null)
         {
-            context.sendMessage(home.getWelcomeMsg());
+            context.sendMessage(h.getWelcomeMsg());
             return;
         }
-        if (home.isOwner(sender))
+        if (h.isOwner(sender))
         {
-            context.sendTranslated(POSITIVE, "You have been teleported to your home {name}!", home.getName());
+            context.sendTranslated(POSITIVE, "You have been teleported to your home {name}!", h.getName());
             return;
         }
-        context.sendTranslated(POSITIVE, "You have been teleported to the home {name} of {user}!", home.getName(), home.getOwnerName());
+        context.sendTranslated(POSITIVE, "You have been teleported to the home {name} of {user}!", h.getName(), h.getOwnerName());
     }
 
     @Alias("sethome")
     @Command(alias = {"create", "sethome", "createhome"}, desc = "Set your home")
     @Restricted(value = User.class, msg = "Ok so I'll need your new address then. No seriously this won't work!")
-    public void set(CommandContext context, @Optional @Label("name") String name, @ParameterPermission @Flag(longName = "public", name = "pub") boolean isPublic)
+    public void set(CommandContext context, @Optional String name, @ParameterPermission @Flag(longName = "public", name = "pub") boolean isPublic)
     {
         User sender = (User)context.getSource();
         if (this.manager.getCount(sender) >= this.module.getConfig().homes.max && !module.getPermissions().HOME_SET_MORE.isAuthorized(context.getSource()))
@@ -152,40 +152,40 @@ public class HomeCommand extends TpPointCommand
 
     @Command(desc = "Set the welcome message of homes", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
     public void greeting(CommandContext context,
-                         @Label("home") String name,
+                         String home,
                          @Optional @Label("welcome message") @Greed(INFINITE) String message,
-                         @Default @Named("owner") @Label("owner") User owner,
+                         @Default @Named("owner") User owner,
                          @Flag(longName = "append", name = "a") boolean append)
     {
-        Home home = this.manager.getExact(owner, name);
-        if (home == null)
+        Home h = this.manager.getExact(owner, home);
+        if (h == null)
         {
-            homeNotFoundMessage(context, owner, name);
+            homeNotFoundMessage(context, owner, home);
             return;
         }
         if (append)
         {
-            home.setWelcomeMsg(home.getWelcomeMsg() + message);
+            h.setWelcomeMsg(h.getWelcomeMsg() + message);
         }
         else
         {
-            home.setWelcomeMsg(message);
+            h.setWelcomeMsg(message);
         }
-        home.update();
-        if (home.isOwner(context.getSource()))
+        h.update();
+        if (h.isOwner(context.getSource()))
         {
-            context.sendTranslated(POSITIVE, "The welcome message for your home {name} is now set to:", home.getName());
+            context.sendTranslated(POSITIVE, "The welcome message for your home {name} is now set to:", h.getName());
         }
         else
         {
-            context.sendTranslated(POSITIVE, "The welcome message for the home {name} of {user} is now set to:", home.getName(), owner);
+            context.sendTranslated(POSITIVE, "The welcome message for the home {name} of {user} is now set to:", h.getName(), owner);
         }
-        context.sendMessage(home.getWelcomeMsg());
+        context.sendMessage(h.getWelcomeMsg());
     }
 
     @Restricted(value = User.class, msg = "I am calling the moving company right now!")
     @Command(alias = "replace", desc = "Move a home")
-    public void move(CommandContext context, @Label("name") @Optional String name, @Default @Label("owner") User owner)
+    public void move(CommandContext context, @Optional String name, @Default User owner)
     {
         name = name == null ? "home" : name;
         Home home = this.manager.getExact(owner, name);
@@ -212,7 +212,7 @@ public class HomeCommand extends TpPointCommand
 
     @Alias(value = {"remhome", "removehome", "delhome", "deletehome"})
     @Command(alias = {"delete", "rem", "del"}, desc = "Remove a home")
-    public void remove(CommandContext context, @Label("name") @Optional String name, @Default @Label("owner") @Optional User owner)
+    public void remove(CommandContext context, @Optional String name, @Default @Optional User owner)
     {
         Home home = this.manager.getExact(owner, name);
         if (home == null)
@@ -234,10 +234,7 @@ public class HomeCommand extends TpPointCommand
     }
 
     @Command(desc = "Rename a home")
-    public void rename(CommandContext context,
-                       @Label("name") String name,
-                       @Label("new name") String newName,
-                       @Default @Label("owner") @Optional User owner)
+    public void rename(CommandContext context, String name, @Label("new name") String newName, @Default @Optional User owner)
     {
         Home home = manager.getExact(owner, name);
         if (home == null)
@@ -270,35 +267,35 @@ public class HomeCommand extends TpPointCommand
 
     @Alias(value = {"listhomes", "homes"})
     @Command(alias = "listhomes", desc = "Lists homes a player can access")
-    public void list(CommandContext context, @Default @Label("owner") User user,
+    public void list(CommandContext context, @Default User owner,
                      @Flag(name = "pub", longName = "public") boolean isPublic,
                      @Flag(name = "o", longName = "owned") boolean owned,
                      @Flag(name = "i", longName = "invited") boolean invited) throws Exception
     {
-        if (!user.equals(context.getSource()))
+        if (!owner.equals(context.getSource()))
         {
             context.ensurePermission(module.getPermissions().HOME_LIST_OTHER);
         }
-        Set<Home> homes = this.manager.list(user, owned, isPublic, invited);
+        Set<Home> homes = this.manager.list(owner, owned, isPublic, invited);
         if (homes.isEmpty())
         {
-            if (user.equals(context.getSource()))
+            if (owner.equals(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "No homes are available to you!");
                 return;
             }
-            context.sendTranslated(NEGATIVE, "No homes are available to {user}!", user);
+            context.sendTranslated(NEGATIVE, "No homes are available to {user}!", owner);
             return;
         }
-        if (user.equals(context.getSource()))
+        if (owner.equals(context.getSource()))
         {
             context.sendTranslated(NEUTRAL, "The following homes are available to you:");
         }
         else
         {
-            context.sendTranslated(NEUTRAL, "The following homes are available to {user}:", user.getDisplayName());
+            context.sendTranslated(NEUTRAL, "The following homes are available to {user}:", owner.getDisplayName());
         }
-        showList(context, user, homes);
+        showList(context, owner, homes);
     }
 
     @Command(alias = "listhomes", desc = "Lists all homes")
@@ -315,14 +312,14 @@ public class HomeCommand extends TpPointCommand
     }
 
     @Command(alias = {"ilist", "invited"}, desc = "List all players invited to your homes")
-    public void invitedList(CommandContext context, @Default @Label("owner") User user)
+    public void invitedList(CommandContext context, @Default User owner)
     {
-        if (!user.equals(context.getSource()))
+        if (!owner.equals(context.getSource()))
         {
             context.ensurePermission(module.getPermissions().HOME_LIST_OTHER);// TODO permission "other"
         }
         Set<Home> homes = new HashSet<>();
-        for (Home home : this.manager.list(user, true, false, false))
+        for (Home home : this.manager.list(owner, true, false, false))
         {
             if (!home.getInvited().isEmpty())
             {
@@ -331,21 +328,21 @@ public class HomeCommand extends TpPointCommand
         }
         if (homes.isEmpty())
         {
-            if (user.equals(context.getSource()))
+            if (owner.equals(context.getSource()))
             {
                 context.sendTranslated(NEGATIVE, "You have no homes with players invited to them!");
                 return;
             }
-            context.sendTranslated(NEGATIVE, "{user} has no homes with players invited to them!", user);
+            context.sendTranslated(NEGATIVE, "{user} has no homes with players invited to them!", owner);
             return;
         }
-        if (user.equals(context.getSource()))
+        if (owner.equals(context.getSource()))
         {
             context.sendTranslated(NEUTRAL, "Your following homes have players invited to them:");
         }
         else
         {
-            context.sendTranslated(NEUTRAL, "The following homes of {user} have players invited to them:", user);
+            context.sendTranslated(NEUTRAL, "The following homes of {user} have players invited to them:", owner);
         }
         for (Home home : homes)
         {
@@ -363,133 +360,134 @@ public class HomeCommand extends TpPointCommand
 
     @Restricted(value = User.class, msg = "How about making a phone call to invite someone instead?")
     @Command(desc = "Invite a user to one of your homes")
-    public void invite(CommandContext context, @Label("player") User invited, @Label("home") @Optional String name)
+    public void invite(CommandContext context, User player, @Optional String home)
     {
         User sender = (User)context.getSource();
-        name = name == null ? "home" : name;
-        Home home = this.manager.getExact(sender, name);
-        if (home == null || !home.isOwner(sender))
+        home = home == null ? "home" : home;
+        Home h = this.manager.getExact(sender, home);
+        if (h == null || !h.isOwner(sender))
         {
-            context.sendTranslated(NEGATIVE, "You do not own a home named {name#home}!", name);
+            context.sendTranslated(NEGATIVE, "You do not own a home named {name#home}!", home);
             return;
         }
-        if (home.isPublic())
+        if (h.isPublic())
         {
             context.sendTranslated(NEGATIVE, "You can't invite a person to a public home.");
             return;
         }
-        if (invited.equals(sender))
+        if (player.equals(sender))
         {
             context.sendTranslated(NEGATIVE, "You cannot invite yourself to your own home!");
             return;
         }
-        if (home.isInvited(invited))
+        if (h.isInvited(player))
         {
-            context.sendTranslated(NEGATIVE, "{user} is already invited to your home!", invited);
+            context.sendTranslated(NEGATIVE, "{user} is already invited to your home!", player);
             return;
         }
-        home.invite(invited);
-        if (invited.isOnline())
+        h.invite(player);
+        if (player.isOnline())
         {
-            invited.sendTranslated(NEUTRAL, "{user} invited you to their home. To teleport to it use: /home {name#home} {name}", sender, home.getName(), sender.getName());
+            player.sendTranslated(NEUTRAL, "{user} invited you to their home. To teleport to it use: /home {name#home} {name}", sender, h.getName(), sender.getName());
         }
-        context.sendTranslated(POSITIVE, "{user} is now invited to your home {name}", invited, home.getName());
+        context.sendTranslated(POSITIVE, "{user} is now invited to your home {name}", player, h.getName());
     }
 
     @Restricted(User.class)
     @Command(desc = "Uninvite a player from one of your homes")
-    public void unInvite(CommandContext context, @Label("player") User invited, @Label("home") @Optional String name )
+    public void unInvite(CommandContext context, User player, @Optional String home )
     {
         User sender = (User)context.getSource();
-        name = name == null ? "home" : name;
-        Home home = this.manager.getExact(sender, name);
-        if (home == null || !home.isOwner(sender))
+        home = home == null ? "home" : home;
+        Home h = this.manager.getExact(sender, home);
+        if (h == null || !h.isOwner(sender))
         {
-            context.sendTranslated(NEGATIVE, "You do not own a home named {name#home}!", name);
+            context.sendTranslated(NEGATIVE, "You do not own a home named {name#home}!", home);
             return;
         }
-        if (home.isPublic())
+        if (h.isPublic())
         {
             context.sendTranslated(NEGATIVE, "This home is public. Make it private to disallow others to access it.");
             return;
         }
-        if (invited.equals(sender))
+        if (player.equals(sender))
         {
             context.sendTranslated(NEGATIVE, "You cannot uninvite yourself from your own home!");
             return;
         }
-        if (!home.isInvited(invited))
+        if (!h.isInvited(player))
         {
-            context.sendTranslated(NEGATIVE, "{user} is not invited to your home!", invited);
+            context.sendTranslated(NEGATIVE, "{user} is not invited to your home!", player);
             return;
         }
-        home.unInvite(invited);
-        if (invited.isOnline())
+        h.unInvite(player);
+        if (player.isOnline())
         {
-            invited.sendTranslated(NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, home.getName());
+            player.sendTranslated(NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.getName());
         }
-        context.sendTranslated(POSITIVE, "{user} is no longer invited to your home {name}", invited, home.getName());
+        context.sendTranslated(POSITIVE, "{user} is no longer invited to your home {name}", player, h.getName());
     }
 
     @Command(name = "private", alias = {"makeprivate", "setprivate"}, desc = "Make one of your homes private")
-    public void makePrivate(CommandContext context, @Optional @Label("home") String name, @Default @Label("owner") User user)
+    public void makePrivate(CommandContext context, @Optional String home, @Default User owner)
     {
-        if (!user.equals(context.getSource()))
+        if (!owner.equals(context.getSource()))
         {
             context.ensurePermission(module.getPermissions().HOME_PRIVATE_OTHER);
         }
-        name = name == null ? "home" : name;
-        Home home = this.manager.findOne(user, name);
-        if (home == null)
+        home = home == null ? "home" : home;
+        Home h = this.manager.findOne(owner, home);
+        if (h == null)
         {
-            homeNotFoundMessage(context, user, name);
+            homeNotFoundMessage(context, owner, home);
             return;
         }
-        if (!home.isPublic())
+        if (!h.isPublic())
         {
             context.sendTranslated(NEGATIVE, "This home is already private!");
             return;
         }
-        home.setVisibility(PRIVATE);
-        if (home.isOwner(context.getSource()))
+        h.setVisibility(PRIVATE);
+        if (h.isOwner(context.getSource()))
         {
-            context.sendTranslated(POSITIVE, "Your home {name} is now private", home.getName());
+            context.sendTranslated(POSITIVE, "Your home {name} is now private", h.getName());
             return;
         }
-        context.sendTranslated(POSITIVE, "The home {name} of {user} is now private", home.getOwnerName(), home.getName());
+        context.sendTranslated(POSITIVE, "The home {name} of {user} is now private", h.getOwnerName(),
+                               h.getName());
     }
 
     @Command(name = "public", alias = {"makepublic", "setpublic"}, desc = "Make one of your homes public")
-    public void makePublic(CommandContext context, @Optional @Label("home") String name, @Default @Label("owner") User user)
+    public void makePublic(CommandContext context, @Optional String home, @Default User owner)
     {
-        if (!user.equals(context.getSource()))
+        if (!owner.equals(context.getSource()))
         {
             context.ensurePermission(module.getPermissions().HOME_PUBLIC_OTHER);
         }
-        name = name == null ? "home" : name;
-        Home home = this.manager.findOne(user, name);
-        if (home == null)
+        home = home == null ? "home" : home;
+        Home h = this.manager.findOne(owner, home);
+        if (h == null)
         {
-            homeNotFoundMessage(context, user, name);
+            homeNotFoundMessage(context, owner, home);
             return;
         }
-        if (home.isPublic())
+        if (h.isPublic())
         {
             context.sendTranslated(NEGATIVE, "This home is already public!");
             return;
         }
-        home.setVisibility(PUBLIC);
-        if (home.isOwner(context.getSource()))
+        h.setVisibility(PUBLIC);
+        if (h.isOwner(context.getSource()))
         {
-            context.sendTranslated(POSITIVE, "Your home {name} is now public", home.getName());
+            context.sendTranslated(POSITIVE, "Your home {name} is now public", h.getName());
             return;
         }
-        context.sendTranslated(POSITIVE, "The home {name} of {user} is now public", home.getOwnerName(), home.getName());
+        context.sendTranslated(POSITIVE, "The home {name} of {user} is now public", h.getOwnerName(), h.getName());
     }
 
     @Alias(value = {"clearhomes"})
     @Command(desc = "Clear all homes (of an user)")
-    public CommandResult clear(final CommandContext context, final @Label("owner") User user,
+    public CommandResult clear(final CommandContext context, final User owner,
                                @Flag(name = "pub", longName = "public") final boolean isPublic,
                                @Flag(name = "priv", longName = "private") final boolean isPrivate,
                                @Flag(name = "sel", longName = "selection") final boolean isSelection)
@@ -535,7 +533,7 @@ public class HomeCommand extends TpPointCommand
             secondPoint = selector.getSecondPoint((User)context.getSource());
             if (context.hasPositional(0))
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes created by {user} in your current selection?", type, user);
+                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes created by {user} in your current selection?", type, owner);
             }
             else
             {
@@ -548,7 +546,7 @@ public class HomeCommand extends TpPointCommand
             secondPoint = null;
             if (context.hasPositional(0))
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes ever created by {user}?", type, user);
+                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes ever created by {user}?", type, owner);
             }
             else
             {
@@ -563,19 +561,19 @@ public class HomeCommand extends TpPointCommand
             {
                 if (isSelection)
                 {
-                    manager.massDelete(user, isPrivate, isPublic, firstPoint, secondPoint);
+                    manager.massDelete(owner, isPrivate, isPublic, firstPoint, secondPoint);
                     if (context.hasPositional(0))
                     {
-                        context.sendTranslated(POSITIVE, "The homes of {user} in the selection are now deleted", user);
+                        context.sendTranslated(POSITIVE, "The homes of {user} in the selection are now deleted", owner);
                         return;
                     }
                     context.sendTranslated(POSITIVE, "The homes in the selection are now deleted.");
                     return;
                 }
-                manager.massDelete(user, isPrivate, isPublic);
+                manager.massDelete(owner, isPrivate, isPublic);
                 if (context.hasPositional(0))
                 {
-                    context.sendTranslated(POSITIVE, "The homes of {user} are now deleted", user);
+                    context.sendTranslated(POSITIVE, "The homes of {user} are now deleted", owner);
                     return;
                 }
                 context.sendTranslated(POSITIVE, "The homes are now deleted.");

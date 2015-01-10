@@ -47,7 +47,7 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(alias = "grant", desc = "Gives money to one or all players.")
-    public void give(CommandContext context, @Label("*|<players>") UserList users, @Label("amount") Double amount,
+    public void give(CommandContext context, @Label("*|<players>") UserList users, Double amount,
                      @Flag(longName = "online", name = "0") boolean online)
     {
         if (users.isAll())
@@ -89,7 +89,7 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(alias = "remove", desc = "Takes money from given user")
-    public void take(CommandContext context, @Label("*|<players>") UserList users, @Label("amount") Double amount,
+    public void take(CommandContext context, @Label("*|<players>") UserList users, Double amount,
                      @Flag(longName = "online", name = "o") boolean online)
     {
         if (users.isAll())
@@ -125,8 +125,7 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(desc = "Reset the money from given user")
-    public void reset(CommandContext context, @Label("*|<players>") UserList users,
-                      @Flag(longName = "online", name = "o") boolean online)
+    public void reset(CommandContext context, @Label("*|<players>") UserList users, @Flag(longName = "online", name = "o") boolean online)
     {
         if (users.isAll())
         {
@@ -162,7 +161,7 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(desc = "Sets the money of a given player")
-    public void set(CommandContext context, @Label("*|<players>") UserList users, @Label("amount") Double amount,
+    public void set(CommandContext context, @Label("*|<players>") UserList users, Double amount,
                     @Flag(longName = "online", name = "o") boolean online)
     {
         if (users.isAll())
@@ -198,7 +197,7 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(desc = "Scales the money of a given player")
-    public void scale(CommandContext context, @Label("*|<players>") UserList users, @Label("factor") Float factor,
+    public void scale(CommandContext context, @Label("*|<players>") UserList users, Float factor,
                       @Flag(longName = "online", name = "o") boolean online)
     {
         if (users.isAll())
@@ -287,21 +286,21 @@ public class EcoCommands extends CommandContainer
     }
 
     @Command(desc = "Deletes a users account.")
-    public void delete(CommandContext context, @Label("player") User user)
+    public void delete(CommandContext context, User player)
     {
-        if (this.manager.deleteUserAccount(user))
+        if (this.manager.deleteUserAccount(player))
         {
-            context.sendTranslated(POSITIVE, "Deleted the account of {user}", user);
+            context.sendTranslated(POSITIVE, "Deleted the account of {user}", player);
             return;
         }
-        context.sendTranslated(NEUTRAL, "{user} did not have an account to delete!", user);
+        context.sendTranslated(NEUTRAL, "{user} did not have an account to delete!", player);
     }
 
     @Command(desc = "Creates a new account")
-    public void create(CommandContext context, @Optional @Label("player") OfflinePlayer oPlayer,
+    public void create(CommandContext context, @Optional OfflinePlayer player,
                        @Flag(longName = "force", name = "f") boolean force)
     {
-        if (oPlayer == null)
+        if (player == null)
         {
             if (context.getSource() instanceof User)
             {
@@ -323,9 +322,9 @@ public class EcoCommands extends CommandContainer
             context.sendTranslated(NEGATIVE, "You are not allowed to create account for other users!");
             return;
         }
-        if (!oPlayer.hasPlayedBefore() && !oPlayer.isOnline())
+        if (!player.hasPlayedBefore() && !player.isOnline())
         {
-            context.sendTranslated(NEUTRAL, "{user} has never played on this server!", oPlayer);
+            context.sendTranslated(NEUTRAL, "{user} has never played on this server!", player);
             if (!force)
             {
                 return;
@@ -336,13 +335,13 @@ public class EcoCommands extends CommandContainer
                 return;
             }
         }
-        User user = this.module.getCore().getUserManager().getExactUser(oPlayer.getName());
+        User user = this.module.getCore().getUserManager().getExactUser(player.getName());
         if (this.manager.getUserAccount(user, false) != null)
         {
-            context.sendTranslated(POSITIVE, "{user} already has an account!", oPlayer);
+            context.sendTranslated(POSITIVE, "{user} already has an account!", player);
             return;
         }
         this.manager.getUserAccount(user, true);
-        context.sendTranslated(POSITIVE, "Created account for {user}!", oPlayer);
+        context.sendTranslated(POSITIVE, "Created account for {user}!", player);
     }
 }

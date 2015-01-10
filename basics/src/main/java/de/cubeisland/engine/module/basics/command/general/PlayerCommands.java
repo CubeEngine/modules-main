@@ -82,9 +82,9 @@ public class PlayerCommands
     }
 
     @Command(desc = "Refills your hunger bar")
-    public void feed(CommandContext context, @Optional @Label("players") UserList users)
+    public void feed(CommandContext context, @Optional UserList players)
     {
-        if (users == null)
+        if (players == null)
         {
             if (!(context.getSource() instanceof User))
             {
@@ -103,8 +103,8 @@ public class PlayerCommands
             context.sendTranslated(NEGATIVE, "You are not allowed to feed other players!");
             return;
         }
-        List<User> userList = users.list();
-        if (users.isAll())
+        List<User> userList = players.list();
+        if (players.isAll())
         {
             if (userList.isEmpty())
             {
@@ -120,7 +120,7 @@ public class PlayerCommands
         }
         for (User user : userList)
         {
-            if (!users.isAll())
+            if (!players.isAll())
             {
                 user.sendTranslated(POSITIVE, "You got fed by {user}!", context.getSource());
             }
@@ -131,9 +131,9 @@ public class PlayerCommands
     }
 
     @Command(desc = "Empties the hunger bar")
-    public void starve(CommandContext context, @Optional @Label("players") UserList users)
+    public void starve(CommandContext context, @Optional UserList players)
     {
-        if (users == null)
+        if (players == null)
         {
             if (!(context.getSource() instanceof User))
             {
@@ -152,8 +152,8 @@ public class PlayerCommands
             context.sendTranslated(NEGATIVE, "You are not allowed to let other players starve!");
             return;
         }
-        List<User> userList = users.list();
-        if (users.isAll())
+        List<User> userList = players.list();
+        if (players.isAll())
         {
             if (userList.isEmpty())
             {
@@ -169,7 +169,7 @@ public class PlayerCommands
         }
         for (User user : userList)
         {
-            if (!users.isAll())
+            if (!players.isAll())
             {
                 user.sendTranslated(NEUTRAL, "You are suddenly starving!");
             }
@@ -180,9 +180,9 @@ public class PlayerCommands
     }
 
     @Command(desc = "Heals a player")
-    public void heal(CommandContext context, @Optional @Label("players") UserList users)
+    public void heal(CommandContext context, @Optional UserList players)
     {
-        if (users == null)
+        if (players == null)
         {
             if (!(context.getSource() instanceof User))
             {
@@ -199,8 +199,8 @@ public class PlayerCommands
             context.sendTranslated(NEGATIVE, "You are not allowed to heal other players!");
             return;
         }
-        List<User> userList = users.list();
-        if (users.isAll())
+        List<User> userList = players.list();
+        if (players.isAll())
         {
             if (userList.isEmpty())
             {
@@ -216,7 +216,7 @@ public class PlayerCommands
         }
         for (User user : userList)
         {
-            if (!users.isAll())
+            if (!players.isAll())
             {
                 user.sendTranslated(POSITIVE, "You got healed by {sender}!", context.getSource().getName());
             }
@@ -263,30 +263,30 @@ public class PlayerCommands
     }
 
     @Command(alias = "gm", desc = "Changes the gamemode")
-    public void gamemode(CommandContext context, @Optional @Label("gamemode") String gameModeString, @Default @Label("player") User target)
+    public void gamemode(CommandContext context, @Optional String gamemode, @Default User player)
     {
-        if (!context.getSource().equals(target) && !module.perms().COMMAND_GAMEMODE_OTHER.isAuthorized(context.getSource()))
+        if (!context.getSource().equals(player) && !module.perms().COMMAND_GAMEMODE_OTHER.isAuthorized(context.getSource()))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to change the game mode of an other player!");
             return;
         }
-        GameMode newMode = getGameMode(gameModeString);
+        GameMode newMode = getGameMode(gamemode);
         if (newMode == null)
         {
-            newMode = toggleGameMode(target.getGameMode());
+            newMode = toggleGameMode(player.getGameMode());
         }
-        target.setGameMode(newMode);
-        if (context.getSource().equals(target))
+        player.setGameMode(newMode);
+        if (context.getSource().equals(player))
         {
             context.sendTranslated(POSITIVE, "You changed your game mode to {input#gamemode}!", newMode.name());
             return;
         }
-        context.sendTranslated(POSITIVE, "You changed the game mode of {user} to {input#gamemode}!", target.getDisplayName(), newMode.name()); // TODO translate gamemode
-        target.sendTranslated(NEUTRAL, "Your game mode has been changed to {input#gamemode}!", newMode.name());
+        context.sendTranslated(POSITIVE, "You changed the game mode of {user} to {input#gamemode}!", player.getDisplayName(), newMode.name()); // TODO translate gamemode
+        player.sendTranslated(NEUTRAL, "Your game mode has been changed to {input#gamemode}!", newMode.name());
     }
 
     @Command(alias = "slay", desc = "Kills a player")
-    public void kill(CommandContext context, @Label("players") UserList users, // TODO default line of sight player
+    public void kill(CommandContext context, UserList players, // TODO default line of sight player
                      @Flag(longName = "force", name = "f") boolean force,
                      @Flag(longName = "quiet", name = "q") boolean quiet,
                      @Flag(longName = "lightning", name = "l") boolean lightning)
@@ -296,8 +296,8 @@ public class PlayerCommands
         quiet = quiet && module.perms().COMMAND_KILL_QUIET.isAuthorized(context.getSource());
         List<String> killed = new ArrayList<>();
         Object arg0 = context.get(0);
-        List<User> userList = users.list();
-        if (users.isAll())
+        List<User> userList = players.list();
+        if (players.isAll())
         {
             if (!module.perms().COMMAND_KILL_ALL.isAuthorized(context.getSource()))
             {
@@ -358,36 +358,36 @@ public class PlayerCommands
     private static final long SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
     @Command(desc = "Shows when given player was online the last time")
-    public void seen(CommandContext context, @Label("player") User user)
+    public void seen(CommandContext context, User player)
     {
-        if (user.isOnline())
+        if (player.isOnline())
         {
-            context.sendTranslated(NEUTRAL, "{user} is currently online!", user);
+            context.sendTranslated(NEUTRAL, "{user} is currently online!", player);
             return;
         }
-        long lastPlayed = user.getLastPlayed();
+        long lastPlayed = player.getLastPlayed();
         if (System.currentTimeMillis() - lastPlayed <= SEVEN_DAYS) // If less than 7 days show timeframe instead of date
         {
-            context.sendTranslated(NEUTRAL, "{user} was last seen {input#date}.", user, TimeUtil.format(context.getSource().getLocale(), new Date(lastPlayed)));
+            context.sendTranslated(NEUTRAL, "{user} was last seen {input#date}.", player, TimeUtil.format(context.getSource().getLocale(), new Date(lastPlayed)));
             return;
         }
         Date date = new Date(lastPlayed);
         DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getSource().getLocale());
-        context.sendTranslated(NEUTRAL, "{user} is offline since {input#time}", user, format.format(date));
+        context.sendTranslated(NEUTRAL, "{user} is offline since {input#time}", player, format.format(date));
     }
 
     @Command(desc = "Makes a player send a message (including commands)")
-    public void sudo(CommandContext context, @Label("player") User user, @Label("message") @Greed(INFINITE) String message)
+    public void sudo(CommandContext context, User player, @Greed(INFINITE) String message)
     {
         if (!message.startsWith("/"))
         {
-            user.chat(message);
-            context.sendTranslated(POSITIVE, "Forced {user} to chat: {input#message}", user, message);
+            player.chat(message);
+            context.sendTranslated(POSITIVE, "Forced {user} to chat: {input#message}", player, message);
             return;
         }
-        if (this.module.getCore().getCommandManager().runCommand(user, message.substring(1)))
+        if (this.module.getCore().getCommandManager().runCommand(player, message.substring(1)))
         {
-            context.sendTranslated(POSITIVE, "Command {input#command} executed as {user}", message, user);
+            context.sendTranslated(POSITIVE, "Command {input#command} executed as {user}", message, player);
             return;
         }
         context.sendTranslated(NEGATIVE, "Command was not executed successfully!");
@@ -404,88 +404,88 @@ public class PlayerCommands
     }
 
     @Command(desc = "Displays that you are afk")
-    public void afk(CommandContext context, @Label("player") @Default User user)
+    public void afk(CommandContext context, @Default User player)
     {
-        if (!context.getSource().equals(user))
+        if (!context.getSource().equals(player))
         {
             context.ensurePermission(module.perms().COMMAND_AFK_OTHER);
         }
-        if (!user.isOnline())
+        if (!player.isOnline())
         {
-            context.sendTranslated(NEGATIVE, "{user} is not online!", user);
+            context.sendTranslated(NEGATIVE, "{user} is not online!", player);
             return;
         }
-        if (user.get(BasicsAttachment.class).isAfk())
+        if (player.get(BasicsAttachment.class).isAfk())
         {
-            user.get(BasicsAttachment.class).updateLastAction();
+            player.get(BasicsAttachment.class).updateLastAction();
             this.afkListener.run();
             return;
         }
-        user.get(BasicsAttachment.class).setAfk(true);
-        user.get(BasicsAttachment.class).resetLastAction();
-        this.um.broadcastStatus("is now afk.", user);
+        player.get(BasicsAttachment.class).setAfk(true);
+        player.get(BasicsAttachment.class).resetLastAction();
+        this.um.broadcastStatus("is now afk.", player);
     }
 
     @Command(desc = "Displays informations from a player!")
-    public void whois(CommandContext context, @Label("player") User user)
+    public void whois(CommandContext context, User player)
     {
-        if (!user.isOnline())
+        if (!player.isOnline())
         {
-            context.sendTranslated(NEUTRAL, "Nickname: {user} ({text:offline})", user);
+            context.sendTranslated(NEUTRAL, "Nickname: {user} ({text:offline})", player);
         }
         else
         {
-            context.sendTranslated(NEUTRAL, "Nickname: {user}", user);
+            context.sendTranslated(NEUTRAL, "Nickname: {user}", player);
         }
-        if (user.hasPlayedBefore() || user.isOnline())
+        if (player.hasPlayedBefore() || player.isOnline())
         {
-            context.sendTranslated(NEUTRAL, "Life: {decimal:0}/{decimal#max:0}", user.getHealth(), user.getMaxHealth());
-            context.sendTranslated(NEUTRAL, "Hunger: {integer#foodlvl:0}/{text:20} ({integer#saturation}/{integer#foodlvl:0})", user.getFoodLevel(), (int)user.getSaturation(), user.getFoodLevel());
-            context.sendTranslated(NEUTRAL, "Level: {integer#level} + {integer#percent}%", user.getLevel(), (int)(user.getExp() * 100));
-            Location loc = user.getLocation();
+            context.sendTranslated(NEUTRAL, "Life: {decimal:0}/{decimal#max:0}", player.getHealth(), player.getMaxHealth());
+            context.sendTranslated(NEUTRAL, "Hunger: {integer#foodlvl:0}/{text:20} ({integer#saturation}/{integer#foodlvl:0})", player.getFoodLevel(), (int)player.getSaturation(), player.getFoodLevel());
+            context.sendTranslated(NEUTRAL, "Level: {integer#level} + {integer#percent}%", player.getLevel(), (int)(player.getExp() * 100));
+            Location loc = player.getLocation();
             if (loc != null)
             {
                 context.sendTranslated(NEUTRAL, "Position: {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getWorld());
             }
-            if (user.getAddress() != null)
+            if (player.getAddress() != null)
             {
-                context.sendTranslated(NEUTRAL, "IP: {input#ip}", user.getAddress().getAddress().getHostAddress());
+                context.sendTranslated(NEUTRAL, "IP: {input#ip}", player.getAddress().getAddress().getHostAddress());
             }
-            if (user.getGameMode() != null)
+            if (player.getGameMode() != null)
             {
-                context.sendTranslated(NEUTRAL, "Gamemode: {input#gamemode}", user.getGameMode().toString());
+                context.sendTranslated(NEUTRAL, "Gamemode: {input#gamemode}", player.getGameMode().toString());
             }
-            if (user.getAllowFlight())
+            if (player.getAllowFlight())
             {
-                context.sendTranslated(NEUTRAL, "Flymode: {text:true:color=BRIGHT_GREEN} {input#flying}", user.isFlying() ? "flying" : "not flying");
+                context.sendTranslated(NEUTRAL, "Flymode: {text:true:color=BRIGHT_GREEN} {input#flying}", player.isFlying() ? "flying" : "not flying");
             }
             else
             {
                 context.sendTranslated(NEUTRAL, "Flymode: {text:false:color=RED}");
             }
-            if (user.isOp())
+            if (player.isOp())
             {
                 context.sendTranslated(NEUTRAL, "OP: {text:true:color=BRIGHT_GREEN}");
             }
-            Timestamp muted = module.getBasicsUser(user).getEntity().getValue(TABLE_BASIC_USER.MUTED);
+            Timestamp muted = module.getBasicsUser(player).getEntity().getValue(TABLE_BASIC_USER.MUTED);
             if (muted != null && muted.getTime() > System.currentTimeMillis())
             {
                 context.sendTranslated(NEUTRAL, "Muted until {input#time}", DateFormat.getDateTimeInstance(SHORT, SHORT, context.getSource().getLocale()).format(muted));
             }
-            if (user.getGameMode() != GameMode.CREATIVE)
+            if (player.getGameMode() != GameMode.CREATIVE)
             {
-                context.sendTranslated(NEUTRAL, "GodMode: {input#godmode}", user.isInvulnerable() ? ChatFormat.BRIGHT_GREEN + "true" : ChatFormat.RED + "false");
+                context.sendTranslated(NEUTRAL, "GodMode: {input#godmode}", player.isInvulnerable() ? ChatFormat.BRIGHT_GREEN + "true" : ChatFormat.RED + "false");
             }
-            if (user.get(BasicsAttachment.class).isAfk())
+            if (player.get(BasicsAttachment.class).isAfk())
             {
                 context.sendTranslated(NEUTRAL, "AFK: {text:true:color=BRIGHT_GREEN}");
             }
             DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(SHORT, SHORT, Locale.ENGLISH);
-            context.sendTranslated(NEUTRAL, "First played: {input#date}", dateFormat.format(new Date(user.getFirstPlayed())));
+            context.sendTranslated(NEUTRAL, "First played: {input#date}", dateFormat.format(new Date(player.getFirstPlayed())));
         }
-        if (this.module.getCore().getBanManager().isUserBanned(user.getUniqueId()))
+        if (this.module.getCore().getBanManager().isUserBanned(player.getUniqueId()))
         {
-            UserBan ban = this.module.getCore().getBanManager().getUserBan(user.getUniqueId());
+            UserBan ban = this.module.getCore().getBanManager().getUserBan(player.getUniqueId());
             String expires;
             DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getSource().getLocale());
             if (ban.getExpires() != null)
@@ -501,10 +501,10 @@ public class PlayerCommands
     }
 
     @Command(desc = "Toggles the god-mode!")
-    public void god(CommandContext context, @Label("player") @Default User user)
+    public void god(CommandContext context, @Default User player)
     {
         boolean other = false;
-        if (!context.getSource().equals(user))
+        if (!context.getSource().equals(player))
         {
             if (!module.perms().COMMAND_GOD_OTHER.isAuthorized(context.getSource()))
             {
@@ -513,9 +513,9 @@ public class PlayerCommands
             }
             other = true;
         }
-        BasicsUserEntity bUser = module.getBasicsUser(user).getEntity();
+        BasicsUserEntity bUser = module.getBasicsUser(player).getEntity();
         bUser.setValue(TABLE_BASIC_USER.GODMODE, !bUser.getValue(TABLE_BASIC_USER.GODMODE));
-        BukkitUtils.setInvulnerable(user, bUser.getValue(TABLE_BASIC_USER.GODMODE));
+        BukkitUtils.setInvulnerable(player, bUser.getValue(TABLE_BASIC_USER.GODMODE));
         if (bUser.getValue(TABLE_BASIC_USER.GODMODE))
         {
             if (!other)
@@ -523,8 +523,8 @@ public class PlayerCommands
                 context.sendTranslated(POSITIVE, "You are now invincible!");
                 return;
             }
-            user.sendTranslated(POSITIVE, "You are now invincible!");
-            context.sendTranslated(POSITIVE, "{user} is now invincible!", user);
+            player.sendTranslated(POSITIVE, "You are now invincible!");
+            context.sendTranslated(POSITIVE, "{user} is now invincible!", player);
             return;
         }
         if (!other)
@@ -532,15 +532,15 @@ public class PlayerCommands
             context.sendTranslated(NEUTRAL, "You are no longer invincible!");
             return;
         }
-        user.sendTranslated(NEUTRAL, "You are no longer invincible!");
-        context.sendTranslated(NEUTRAL, "{user} is no longer invincible!", user);
+        player.sendTranslated(NEUTRAL, "You are no longer invincible!");
+        context.sendTranslated(NEUTRAL, "{user} is no longer invincible!", player);
     }
 
     @Command(desc = "Changes your walkspeed.")
-    public void walkspeed(CommandContext context, @Label("speed") Float speed, @Default @Label("player") User user)
+    public void walkspeed(CommandContext context, Float speed, @Default User player)
     {
         boolean other = false;
-        if (!context.getSource().equals(user))
+        if (!context.getSource().equals(player))
         {
             if (!module.perms().COMMAND_WALKSPEED_OTHER.isAuthorized(context.getSource()))
             {
@@ -549,77 +549,77 @@ public class PlayerCommands
             }
             other = true;
         }
-        if (!user.isOnline())
+        if (!player.isOnline())
         {
-            context.sendTranslated(NEGATIVE, "{user} is offline!", user.getName());
+            context.sendTranslated(NEGATIVE, "{user} is offline!", player.getName());
             return;
         }
         if (speed >= 0 && speed <= 10)
         {
-            user.setWalkSpeed(speed / 10f);
-            user.sendTranslated(POSITIVE, "You can now walk at {decimal:2}!", speed);
+            player.setWalkSpeed(speed / 10f);
+            player.sendTranslated(POSITIVE, "You can now walk at {decimal:2}!", speed);
             return;
         }
-        user.setWalkSpeed(0.2f);
+        player.setWalkSpeed(0.2f);
         if (speed != null && speed > 9000)
         {
-            user.sendTranslated(NEGATIVE, "It's over 9000!");
+            player.sendTranslated(NEGATIVE, "It's over 9000!");
         }
-        user.sendTranslated(NEUTRAL, "Walk speed has to be a Number between {text:0} and {text:10}!");
+        player.sendTranslated(NEUTRAL, "Walk speed has to be a Number between {text:0} and {text:10}!");
     }
 
     @Command(desc = "Lets you fly away")
-    public void fly(CommandContext context,@Optional @Label("flyspeed") Float speed, @Default @Named("player") @Label("player") User target)
+    public void fly(CommandContext context,@Optional Float flyspeed, @Default @Named("player") User player)
     {
         // new cmd system does not provide a way for defaultProvider to give custom messages
         //context.sendTranslated(NEUTRAL, "{text:ProTip}: If your server flies away it will go offline.");
         //context.sendTranslated(NEUTRAL, "So... Stopping the Server in {text:3..:color=RED}");
 
         // PermissionChecks
-        if (!context.getSource().equals(target) && !module.perms().COMMAND_FLY_OTHER.isAuthorized(context.getSource()))
+        if (!context.getSource().equals(player) && !module.perms().COMMAND_FLY_OTHER.isAuthorized(context.getSource()))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to change the fly mode of other player!");
             return;
         }
         //I Believe I Can Fly ...
-        if (speed != null)
+        if (flyspeed != null)
         {
-            if (speed >= 0 && speed <= 10)
+            if (flyspeed >= 0 && flyspeed <= 10)
             {
-                target.setFlySpeed(speed / 10f);
-                target.sendTranslated(POSITIVE, "You can now fly at {decimal#speed:2}!", speed);
-                if (!target.equals(context.getSource()))
+                player.setFlySpeed(flyspeed / 10f);
+                player.sendTranslated(POSITIVE, "You can now fly at {decimal#speed:2}!", flyspeed);
+                if (!player.equals(context.getSource()))
                 {
-                    context.sendTranslated(POSITIVE, "{player} can now fly at {decimal#speed:2}!", target, speed);
+                    context.sendTranslated(POSITIVE, "{player} can now fly at {decimal#speed:2}!", player, flyspeed);
                 }
             }
             else
             {
-                if (speed > 9000)
+                if (flyspeed > 9000)
                 {
                     context.sendTranslated(NEUTRAL, "It's over 9000!");
                 }
                 context.sendTranslated(NEGATIVE, "FlySpeed has to be a Number between {text:0} and {text:10}!");
             }
-            target.setAllowFlight(true);
-            target.setFlying(true);
+            player.setAllowFlight(true);
+            player.setFlying(true);
             return;
         }
-        target.setAllowFlight(!target.getAllowFlight());
-        if (target.getAllowFlight())
+        player.setAllowFlight(!player.getAllowFlight());
+        if (player.getAllowFlight())
         {
-            target.setFlySpeed(0.1f);
-            target.sendTranslated(POSITIVE, "You can now fly!");
-            if (!target.equals(context.getSource()))
+            player.setFlySpeed(0.1f);
+            player.sendTranslated(POSITIVE, "You can now fly!");
+            if (!player.equals(context.getSource()))
             {
-                context.sendTranslated(POSITIVE, "{player} can now fly!", target);
+                context.sendTranslated(POSITIVE, "{player} can now fly!", player);
             }
             return;
         }
-        target.sendTranslated(NEUTRAL, "You cannot fly anymore!");
-        if (!target.equals(context.getSource()))
+        player.sendTranslated(NEUTRAL, "You cannot fly anymore!");
+        if (!player.equals(context.getSource()))
         {
-            context.sendTranslated(POSITIVE, "{player} cannot fly anymore!", target);
+            context.sendTranslated(POSITIVE, "{player} cannot fly anymore!", player);
         }
     }
 }

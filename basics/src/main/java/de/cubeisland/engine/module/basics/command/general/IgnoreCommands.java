@@ -41,13 +41,11 @@ import static de.cubeisland.engine.module.basics.storage.TableIgnorelist.TABLE_I
 public class IgnoreCommands
 {
     private final Basics module;
-    private final UserManager um;
     private final DSLContext dsl;
 
     public IgnoreCommands(Basics basics)
     {
         this.module = basics;
-        this.um = basics.getCore().getUserManager();
         this.dsl = module.getCore().getDB().getDSL();
     }
 
@@ -84,13 +82,13 @@ public class IgnoreCommands
     }
 
     @Command(desc = "Ignores all messages from players")
-    public void ignore(CommandContext context, @Label("players") @Reader(User.class) List<User> users)
+    public void ignore(CommandContext context, @Reader(User.class) List<User> players)
     {
         if (context.getSource() instanceof User)
         {
             User sender = (User)context.getSource();
             List<String> added = new ArrayList<>();
-            for (User user : users)
+            for (User user : players)
             {
                 if (user == context.getSource())
                 {
@@ -122,11 +120,11 @@ public class IgnoreCommands
 
     @Command(desc = "Stops ignoring all messages from a player")
     @Restricted(value = User.class, msg = "Congratulations! You are now looking at this text!")
-    public void unignore(CommandContext context, @Label("players") @Reader(User.class) List<User> users)
+    public void unignore(CommandContext context, @Reader(User.class) List<User> players)
     {
         User sender = (User)context.getSource();
         List<String> added = new ArrayList<>();
-        for (User user : users)
+        for (User user : players)
         {
             if (!this.removeIgnore(sender, user))
             {
@@ -137,7 +135,6 @@ public class IgnoreCommands
                 added.add(user.getName());
             }
         }
-        context.sendTranslated(POSITIVE, "You removed {user#list} from your ignore list!",
-                               StringUtils.implode(WHITE + ", " + DARK_GREEN, added));
+        context.sendTranslated(POSITIVE, "You removed {user#list} from your ignore list!", StringUtils.implode(WHITE + ", " + DARK_GREEN, added));
     }
 }

@@ -51,7 +51,7 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "listroles")
     @Command(desc = "Lists all roles in a world or globally")
-    public void list(CommandContext context, @Named("in") @Label("world") World world, @Flag(longName = "global", name = "g") boolean global)
+    public void list(CommandContext context, @Named("in") World world, @Flag(longName = "global", name = "g") boolean global)
     {
         world = global ? null : this.getWorld(context, world);
         if (!global && world == null) return;
@@ -83,9 +83,7 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "checkrperm")
     @Command(alias = "checkpermission", desc = "Checks the permission in given role [in world]")
-    public void checkperm(CommandContext context, @Label("[g:]role") String roleName,
-                          @Label("permission") String permission,
-                          @Named("in") @Label("world") World world)
+    public void checkperm(CommandContext context, @Label("[g:]role") String roleName, String permission, @Named("in") World world)
     {
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
         world = global ? null : this.getWorld(context, world);
@@ -142,11 +140,8 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "listrperm")
     @Command(alias = "listpermission", desc = "Lists all permissions of given role [in world]")
-    @Params(positional = @Param(label = "[g:]role"),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    @Flags(@Flag(longName = "all", name = "a"))
     public void listperm(CommandContext context, @Label("[g:]role") String roleName,
-                         @Named("in") @Label("world") World world,
+                         @Named("in") World world,
                          @Flag(longName = "all", name = "a") boolean all)
     {
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -193,11 +188,8 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "listrdata")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists all metadata of given role [in world]")
-    @Params(positional = @Param(label = "[g:]role"),
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    @Flags(@Flag(longName = "all", name = "a"))
     public void listmetadata(CommandContext context, @Label("[g:]role") String roleName,
-                             @Named("in") @Label("world") World world,
+                             @Named("in") World world,
                              @Flag(longName = "all", name = "a") boolean all)
     {
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -237,7 +229,7 @@ public class RoleInformationCommands extends RoleCommandHelper
 
     @Alias(value = "listrparent")
     @Command(desc = "Lists all parents of given role [in world]")
-    public void listParent(CommandContext context, @Label("[g:]role") String roleName, @Named("in") @Label("world") World world)
+    public void listParent(CommandContext context, @Label("[g:]role") String roleName, @Named("in") World world)
     {
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
         world = global ? null : this.getWorld(context, world);
@@ -270,7 +262,7 @@ public class RoleInformationCommands extends RoleCommandHelper
     }
 
     @Command(alias = "prio", desc = "Show the priority of given role [in world]")
-    public void priority(CommandContext context, @Label("[g:]role") String roleName, @Named("in") @Label("world") World world)
+    public void priority(CommandContext context, @Label("[g:]role") String roleName, @Named("in") World world)
     {
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
         world = global ? null : this.getWorld(context, world);
@@ -287,7 +279,7 @@ public class RoleInformationCommands extends RoleCommandHelper
     }
 
     @Command(alias = {"default","defaultroles","listdefroles"}, desc = "Lists all default roles [in world]")
-    public void listDefaultRoles(CommandContext context, @Named("in") @Label("world") World world)
+    public void listDefaultRoles(CommandContext context, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null) return;

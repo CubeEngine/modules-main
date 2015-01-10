@@ -55,90 +55,85 @@ public class UserManagementCommands extends UserCommandHelper
     @Alias({"manuadd", "assignurole", "addurole", "giveurole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [in world] [-temp]")
     public void assign(CommandContext context,
-                       @Default @Label("player") User user,
-                       @Label("role") @Complete(RoleCompleter.class) String roleName,
-                       @Named("in") @Label("world") World world,
+                       @Default User player,
+                       @Complete(RoleCompleter.class) String role,
+                       @Named("in") World world,
                        @Flag(name = "t",longName = "temp") boolean temp)
     {
         world = this.getWorld(context, world);
         if (world == null) return;
-        Role role = this.manager.getProvider(world).getRole(roleName);
-        if (role == null)
+        Role r = this.manager.getProvider(world).getRole(role);
+        if (r == null)
         {
-            context.sendTranslated(NEUTRAL, "Could not find the role {name} in {world}.", roleName, world);
+            context.sendTranslated(NEUTRAL, "Could not find the role {name} in {world}.", role, world);
             return;
         }
-        if (!role.canAssignAndRemove(context.getSource()))
+        if (!r.canAssignAndRemove(context.getSource()))
         {
-            context.sendTranslated(NEGATIVE, "You are not allowed to assign the role {name} in {world}!", role.getName(), world);
+            context.sendTranslated(NEGATIVE, "You are not allowed to assign the role {name} in {world}!", r.getName(), world);
             return;
         }
-        RolesAttachment attachment = this.manager.getRolesAttachment(user);
+        RolesAttachment attachment = this.manager.getRolesAttachment(player);
         if (temp)
         {
-            if (!user.isOnline())
+            if (!player.isOnline())
             {
                 context.sendTranslated(NEGATIVE, "You cannot assign a temporary role to a offline player!");
                 return;
             }
-            if (attachment.getDataHolder(world).assignTempRole(role))
+            if (attachment.getDataHolder(world).assignTempRole(r))
             {
                 attachment.getCurrentDataHolder().apply();
-                context.sendTranslated(POSITIVE, "Added the role {name} temporarily to {user} in {world}.", roleName, user, world);
+                context.sendTranslated(POSITIVE, "Added the role {name} temporarily to {user} in {world}.", role, player, world);
                 return;
             }
-            context.sendTranslated(NEUTRAL, "{user} already had the role {name} in {world}.", user, roleName, world);
+            context.sendTranslated(NEUTRAL, "{user} already had the role {name} in {world}.", player, role, world);
             return;
         }
-        if (attachment.getDataHolder(world).assignRole(role))
+        if (attachment.getDataHolder(world).assignRole(r))
         {
             attachment.getCurrentDataHolder().apply();
-            context.sendTranslated(POSITIVE, "Added the role {name} to {user} in {world}.", roleName, user, world);
+            context.sendTranslated(POSITIVE, "Added the role {name} to {user} in {world}.", role, player, world);
             return;
         }
-        context.sendTranslated(NEUTRAL, "{user} already has the role {name} in {world}.", user, roleName, world);
+        context.sendTranslated(NEUTRAL, "{user} already has the role {name} in {world}.", player, role, world);
     }
 
     @Alias(value = {"remurole", "manudel"})
     @Command(desc = "Removes a role from the player [in world]")
-    public void remove(CommandContext context,
-                       @Default @Label("player") User user,
-                       @Label("role") @Complete(RoleCompleter.class) String roleName,
-                       @Named("in") @Label("world") World world)
+    public void remove(CommandContext context, @Default User player, @Complete(RoleCompleter.class) String role, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null) return;
-        Role role = this.manager.getProvider(world).getRole(roleName);
-        if (role == null)
+        Role r = this.manager.getProvider(world).getRole(role);
+        if (r == null)
         {
-            context.sendTranslated(NEUTRAL, "Could not find the role {name} in {world}.", roleName, world);
+            context.sendTranslated(NEUTRAL, "Could not find the role {name} in {world}.", role, world);
             return;
         }
-        if (!role.canAssignAndRemove(context.getSource()))
+        if (!r.canAssignAndRemove(context.getSource()))
         {
-            context.sendTranslated(NEGATIVE, "You are not allowed to remove the role {name} in {world}!", role.getName(), world);
+            context.sendTranslated(NEGATIVE, "You are not allowed to remove the role {name} in {world}!", r.getName(), world);
             return;
         }
-        RolesAttachment attachment = this.manager.getRolesAttachment(user);
-        if (attachment.getDataHolder(world).removeRole(role))
+        RolesAttachment attachment = this.manager.getRolesAttachment(player);
+        if (attachment.getDataHolder(world).removeRole(r))
         {
             attachment.reload();
             attachment.getCurrentDataHolder().apply();
-            context.sendTranslated(POSITIVE, "Removed the role {name} from {user} in {world}.", role.getName(), user, world);
+            context.sendTranslated(POSITIVE, "Removed the role {name} from {user} in {world}.", r.getName(), player, world);
             return;
         }
-        context.sendTranslated(NEUTRAL, "{user} did not have the role {name} in {world}.", user, role.getName(), world);
+        context.sendTranslated(NEUTRAL, "{user} did not have the role {name} in {world}.", player, r.getName(), world);
     }
 
     @Alias(value = {"clearurole", "manuclear"})
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in world]")
-    public void clear(CommandContext context,
-                      @Default @Label("player") User user,
-                      @Named("in") @Label("world") World world)
+    public void clear(CommandContext context, @Default User player, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null) return;
-        RolesAttachment attachment = this.manager.getRolesAttachment(user);
+        RolesAttachment attachment = this.manager.getRolesAttachment(player);
         UserDatabaseStore dataHolder = attachment.getDataHolder(world);
         dataHolder.clearRoles();
         Set<Role> defaultRoles = this.manager.getProvider(world).getDefaultRoles();
@@ -147,7 +142,7 @@ public class UserManagementCommands extends UserCommandHelper
             dataHolder.assignTempRole(role);
         }
         dataHolder.apply();
-        context.sendTranslated(NEUTRAL, "Cleared the roles of {user} in {world}.", user, world);
+        context.sendTranslated(NEUTRAL, "Cleared the roles of {user} in {world}.", player, world);
         if (!defaultRoles.isEmpty())
         {
             context.sendTranslated(NEUTRAL, "Default roles assigned:");
@@ -160,87 +155,71 @@ public class UserManagementCommands extends UserCommandHelper
 
     @Alias(value = "setuperm")
     @Command(alias = "setperm", desc = "Sets a permission for this user [in world]")
-    public void setpermission(CommandContext context,
-                              @Default @Label("player") User user,
-                              @Label("permission") String perm,
-                              @Default PermissionValue value,
-                              @Named("in") @Label("world") World world)
+    public void setpermission(CommandContext context, @Default User player, String permission, @Default PermissionValue value, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null) return;
-        RolesAttachment attachment = this.manager.getRolesAttachment(user);
-        attachment.getDataHolder(world).setPermission(perm, value);
+        RolesAttachment attachment = this.manager.getRolesAttachment(player);
+        attachment.getDataHolder(world).setPermission(permission, value);
         attachment.getCurrentDataHolder().apply();
         switch (value)
         {
             case RESET:
-                context.sendTranslated(NEUTRAL, "Permission {input} of {user} reset!", perm, user);
+                context.sendTranslated(NEUTRAL, "Permission {input} of {user} reset!", permission, player);
                 return;
             case TRUE:
-                context.sendTranslated(POSITIVE, "Permission {input} of {user} set to true!", perm, user);
+                context.sendTranslated(POSITIVE, "Permission {input} of {user} set to true!", permission, player);
                 return;
             case FALSE:
-                context.sendTranslated(NEGATIVE, "Permission {input} of {user} set to false!", perm, user);
+                context.sendTranslated(NEGATIVE, "Permission {input} of {user} set to false!", permission, player);
         }
     }
 
     @Alias(value = "resetuperm")
     @Command(alias = "resetperm", desc = "Resets a permission for this user [in world]")
-    public void resetpermission(CommandContext context,
-                                @Default @Label("player") User user,
-                                @Label("permission") String perm,
-                                @Named("in") @Label("world") World world)
+    public void resetpermission(CommandContext context, @Default User player, String perm, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null) return;
-        RolesAttachment attachment = this.manager.getRolesAttachment(user);
+        RolesAttachment attachment = this.manager.getRolesAttachment(player);
         attachment.getDataHolder(world).setPermission(perm, PermissionValue.RESET);
         attachment.getCurrentDataHolder().apply();
-        context.sendTranslated(NEUTRAL, "Permission {input} of {user} resetted!", perm, user);
+        context.sendTranslated(NEUTRAL, "Permission {input} of {user} resetted!", perm, player);
     }
 
     @Alias(value = {"setudata","setumeta","setumetadata"})
     @Command(alias = {"setdata", "setmeta"}, desc = "Sets metadata for this user [in world]")
-    public void setmetadata(CommandContext context,
-                            @Default @Label("player") User user,
-                            @Label("metaKey") String metaKey,
-                            @Label("metaValue") String metaVal,
-                            @Named("in") @Label("world") World world)
+    public void setmetadata(CommandContext context, @Default User player, String metaKey, String metaValue, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null) return;
-        RolesAttachment attachment = this.manager.getRolesAttachment(user);
-        attachment.getDataHolder(world).setMetadata(metaKey, metaVal);
+        RolesAttachment attachment = this.manager.getRolesAttachment(player);
+        attachment.getDataHolder(world).setMetadata(metaKey, metaValue);
         attachment.getCurrentDataHolder().apply();
-        context.sendTranslated(POSITIVE, "Metadata {input#key} of {user} set to {input#value} in {world}!", metaKey, user, metaVal, world);
+        context.sendTranslated(POSITIVE, "Metadata {input#key} of {user} set to {input#value} in {world}!", metaKey, player, metaValue, world);
     }
 
     @Alias(value = {"resetudata","resetumeta","resetumetadata"})
     @Command(alias = {"resetdata", "resetmeta", "deletedata", "deletemetadata", "deletemeta"}, desc = "Resets metadata for this user [in world]")
-    public void resetmetadata(CommandContext context,
-                              @Default @Label("player") User user,
-                              @Label("metaKey") String metaKey,
-                              @Named("in") @Label("world") World world)
+    public void resetmetadata(CommandContext context, @Default User player, String metaKey, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null) return;
-        RolesAttachment attachment = this.manager.getRolesAttachment(user);
+        RolesAttachment attachment = this.manager.getRolesAttachment(player);
         attachment.getDataHolder(world).removeMetadata(metaKey);
         attachment.getCurrentDataHolder().apply();
-        context.sendTranslated(NEUTRAL, "Metadata {input#key} of {user} removed in {world}!", metaKey, user, world);
+        context.sendTranslated(NEUTRAL, "Metadata {input#key} of {user} removed in {world}!", metaKey, player, world);
     }
 
     @Alias(value = {"clearudata","clearumeta","clearumetadata"})
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Resets metadata for this user [in world]")
-    public void clearMetaData(CommandContext context,
-                              @Default @Label("player") User user,
-                              @Named("in") @Label("world") World world)
+    public void clearMetaData(CommandContext context, @Default User player, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null) return;
-        RolesAttachment attachment = this.manager.getRolesAttachment(user);
+        RolesAttachment attachment = this.manager.getRolesAttachment(player);
         attachment.getDataHolder(world).clearMetadata();
         attachment.getCurrentDataHolder().apply();
-        context.sendTranslated(NEUTRAL, "Metadata of {user} cleared in {world}!", user, world);
+        context.sendTranslated(NEUTRAL, "Metadata of {user} cleared in {world}!", player, world);
     }
 }

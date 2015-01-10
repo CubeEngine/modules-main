@@ -52,18 +52,16 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(value = "listuroles")
     @Command(desc = "Lists roles of a user [in world]")
-    public void list(CommandContext context,
-                     @Default @Label("player") User user,
-                     @Named("in") @Label("world") World world)
+    public void list(CommandContext context, @Default User player, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null)
         {
             return;
         }
-        RolesAttachment rolesAttachment = this.manager.getRolesAttachment(user);
+        RolesAttachment rolesAttachment = this.manager.getRolesAttachment(player);
         // List all assigned roles
-        context.sendTranslated(NEUTRAL, "Roles of {user} in {world}:", user, world);
+        context.sendTranslated(NEUTRAL, "Roles of {user} in {world}:", player, world);
         for (Role pRole : rolesAttachment.getDataHolder(world).getRoles())
         {
             if (pRole.isGlobal())
@@ -77,26 +75,23 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(value = "checkuperm")
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in world]")
-    public void checkpermission(CommandContext context,
-                                @Default @Label("player") User user,
-                                @Label("permission") String permission,
-                                @Named("in") @Label("world") World world)
+    public void checkpermission(CommandContext context, @Default User player, String permission, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null)
         {
             return;
         }
-        RolesAttachment rolesAttachment = this.manager.getRolesAttachment(user);
+        RolesAttachment rolesAttachment = this.manager.getRolesAttachment(player);
         // Search for permission
         ResolvedPermission resolvedPermission = rolesAttachment.getDataHolder(world).getPermissions().get(permission);
-        if (user.isOp())
+        if (player.isOp())
         {
-            context.sendTranslated(POSITIVE, "{user} is op!", user);
+            context.sendTranslated(POSITIVE, "{user} is op!", player);
         }
-        if (user.isOnline()) // Can have superperm
+        if (player.isOnline()) // Can have superperm
         {
-            boolean superPerm = user.hasPermission(permission);
+            boolean superPerm = player.hasPermission(permission);
             context.sendTranslated(NEUTRAL, "SuperPerm Node: {bool}", superPerm);
         }
         if (resolvedPermission == null)
@@ -115,11 +110,11 @@ public class UserInformationCommands extends UserCommandHelper
         }
         if (resolvedPermission.isSet())
         {
-            context.sendTranslated(POSITIVE, "The player {user} does have access to {input#permission} in {world}", user, permission, world);
+            context.sendTranslated(POSITIVE, "The player {user} does have access to {input#permission} in {world}", player, permission, world);
         }
         else
         {
-            context.sendTranslated(NEGATIVE, "The player {user} does not have access to {input#permission} in {world}", user, permission, world);
+            context.sendTranslated(NEGATIVE, "The player {user} does not have access to {input#permission} in {world}", player, permission, world);
         }
         // Display origin
         TempDataStore store = resolvedPermission.getOrigin();
@@ -128,7 +123,7 @@ public class UserInformationCommands extends UserCommandHelper
             permission = resolvedPermission.getOriginPermission();
         }
         context.sendTranslated(NEUTRAL, "Permission inherited from:");
-        if (user.getName().equals(store.getName()))
+        if (player.getName().equals(store.getName()))
         {
             context.sendTranslated(NEUTRAL, "{input#permission} directly assigned to the user!", permission);
             return;
@@ -139,8 +134,8 @@ public class UserInformationCommands extends UserCommandHelper
     @Alias(value = "listuperm")
     @Command(alias = "listperm", desc = "List permission assigned to a user in a world")
     public void listpermission(CommandContext context,
-                               @Default @Label("player") User user,
-                               @Named("in") @Label("world") World world,
+                               @Default User player,
+                               @Named("in") World world,
                                @Flag(longName = "all", name = "a") boolean all)
     {
         world = this.getWorld(context, world);
@@ -148,20 +143,20 @@ public class UserInformationCommands extends UserCommandHelper
         {
             return;
         }
-        RolesAttachment rolesAttachment = this.manager.getRolesAttachment(user);
+        RolesAttachment rolesAttachment = this.manager.getRolesAttachment(player);
         UserDatabaseStore rawData = rolesAttachment.getDataHolder(world);
         Map<String, Boolean> perms = all ? rawData.getAllRawPermissions() : rawData.getRawPermissions();
         if (perms.isEmpty())
         {
             if (all)
             {
-                context.sendTranslated(NEUTRAL, "{user} has no permissions set in {world}.", user, world);
+                context.sendTranslated(NEUTRAL, "{user} has no permissions set in {world}.", player, world);
                 return;
             }
-            context.sendTranslated(NEUTRAL, "{user} has no permissions set directly in {world}.", user, world);
+            context.sendTranslated(NEUTRAL, "{user} has no permissions set directly in {world}.", player, world);
             return;
         }
-        context.sendTranslated(NEUTRAL, "Permissions of {user} in {world}.", user, world);
+        context.sendTranslated(NEUTRAL, "Permissions of {user} in {world}.", player, world);
         for (Map.Entry<String, Boolean> entry : perms.entrySet())
         {
             context.sendMessage(String.format(this.LISTELEM_VALUE, entry.getKey(), entry.getValue()));
@@ -170,29 +165,26 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(value = "checkumeta")
     @Command(alias = {"checkdata", "checkmeta"}, desc = "Checks for metadata of a user [in world]")
-    public void checkmetadata(CommandContext context,
-                              @Default @Label("player") User user,
-                              @Label("metadatakey") String metaKey,
-                              @Named("in") @Label("world") World world)
+    public void checkmetadata(CommandContext context, @Default User player, String metadatakey, @Named("in") World world)
     {
         world = this.getWorld(context, world);
         if (world == null)
         {
             return;
         }
-        RolesAttachment rolesAttachment = this.manager.getRolesAttachment(user);
+        RolesAttachment rolesAttachment = this.manager.getRolesAttachment(player);
         // Check metadata
         UserDatabaseStore dataHolder = rolesAttachment.getDataHolder(world);
         Map<String, ResolvedMetadata> metadata = dataHolder.getMetadata();
-        if (!metadata.containsKey(metaKey))
+        if (!metadata.containsKey(metadatakey))
         {
-            context.sendTranslated(NEUTRAL, "{input#key} is not set for {user} in {world}.", metaKey, user, world);
+            context.sendTranslated(NEUTRAL, "{input#key} is not set for {user} in {world}.", metadatakey, player, world);
             return;
         }
-        context.sendTranslated(NEUTRAL, "{input#key}: {input#value} is set for {user} in {world}.", metaKey, metadata.get(metaKey).getValue(), user, world);
-        if (metadata.get(metaKey).getOrigin() != dataHolder)
+        context.sendTranslated(NEUTRAL, "{input#key}: {input#value} is set for {user} in {world}.", metadatakey, metadata.get(metadatakey).getValue(), player, world);
+        if (metadata.get(metadatakey).getOrigin() != dataHolder)
         {
-            context.sendTranslated(NEUTRAL, "Origin: {name#role}", metadata.get(metaKey).getOrigin().getName());
+            context.sendTranslated(NEUTRAL, "Origin: {name#role}", metadata.get(metadatakey).getOrigin().getName());
             return;
         }
         context.sendTranslated(NEUTRAL, "Origin: {text:directly assigned}");
@@ -200,9 +192,7 @@ public class UserInformationCommands extends UserCommandHelper
 
     @Alias(value = "listumeta")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists assigned metadata from a user [in world]")
-    public void listmetadata(CommandContext context,
-                             @Default @Label("player") User user,
-                             @Named("in") @Label("world") World world,
+    public void listmetadata(CommandContext context, @Default User player, @Named("in") World world,
                              @Flag(longName = "all", name = "a") boolean all)
     {
         world = this.getWorld(context, world);
@@ -210,11 +200,11 @@ public class UserInformationCommands extends UserCommandHelper
         {
             return;
         }
-        RolesAttachment rolesAttachment = this.manager.getRolesAttachment(user);
+        RolesAttachment rolesAttachment = this.manager.getRolesAttachment(player);
         UserDatabaseStore rawData = rolesAttachment.getDataHolder(world);
         Map<String, String> metadata = all ? rawData.getAllRawMetadata() : rawData.getRawMetadata();
         // List all metadata
-        context.sendTranslated(NEUTRAL, "Metadata of {user} in {world}:", user, world);
+        context.sendTranslated(NEUTRAL, "Metadata of {user} in {world}:", player, world);
         for (Map.Entry<String, String> entry : metadata.entrySet())
         {
             context.sendMessage(String.format(this.LISTELEM_VALUE, entry.getKey(), entry.getValue()));

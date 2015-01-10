@@ -51,7 +51,7 @@ public class InventoryCommands
 
     @Command(desc = "Allows you to see into the inventory of someone else.")
     @Restricted(value = User.class, msg = "This command can only be used by a player!")
-    public void invsee(CommandContext context, @Label("player") User user,
+    public void invsee(CommandContext context, User player,
                        @Flag(longName = "force", name = "f") boolean force,
                        @Flag(longName = "quiet", name = "q") boolean quiet,
                        @Flag(longName = "ender", name = "e") boolean ender)
@@ -66,22 +66,22 @@ public class InventoryCommands
                 context.sendTranslated(NEGATIVE, "You are not allowed to look into enderchests!");
                 return;
             }
-            inv = user.getEnderChest();
+            inv = player.getEnderChest();
         }
         else
         {
-            inv = user.getInventory();
+            inv = player.getInventory();
         }
         if (module.perms().COMMAND_INVSEE_MODIFY.isAuthorized(sender))
         {
             denyModify = !(force && module.perms().COMMAND_INVSEE_MODIFY_FORCE.isAuthorized(sender))
-                && module.perms().COMMAND_INVSEE_MODIFY_PREVENT.isAuthorized(user);
+                && module.perms().COMMAND_INVSEE_MODIFY_PREVENT.isAuthorized(player);
         }
-        if (module.perms().COMMAND_INVSEE_NOTIFY.isAuthorized(user))
+        if (module.perms().COMMAND_INVSEE_NOTIFY.isAuthorized(player))
         {
             if (!(quiet && module.perms().COMMAND_INVSEE_QUIET.isAuthorized(context.getSource())))
             {
-                user.sendTranslated(NEUTRAL, "{sender} is looking into your inventory.", sender);
+                player.sendTranslated(NEUTRAL, "{sender} is looking into your inventory.", sender);
             }
         }
         InventoryGuardFactory guard = InventoryGuardFactory.prepareInventory(inv, sender);
@@ -131,44 +131,44 @@ public class InventoryCommands
 
     @Command(alias = {"ci", "clear"}, desc = "Clears the inventory")
     @SuppressWarnings("deprecation")
-    public void clearinventory(CommandContext context, @Default @Label("player") User target,
+    public void clearinventory(CommandContext context, @Default User player,
                                @Flag(longName = "removeArmor", name = "ra") boolean removeArmor,
                                @Flag(longName = "quiet", name = "q") boolean quiet,
                                @Flag(longName = "force", name = "f") boolean force)
     {
         //sender.sendTranslated(NEGATIVE, "That awkward moment when you realize you do not have an inventory!");
         CommandSender sender = context.getSource();
-        if (!sender.equals(target))
+        if (!sender.equals(player))
         {
             context.ensurePermission(module.perms().COMMAND_CLEARINVENTORY_OTHER);
-            if (module.perms().COMMAND_CLEARINVENTORY_PREVENT.isAuthorized(target)
+            if (module.perms().COMMAND_CLEARINVENTORY_PREVENT.isAuthorized(player)
                 && !(force && module.perms().COMMAND_CLEARINVENTORY_FORCE.isAuthorized(sender)))
             {
-                context.sendTranslated(NEGATIVE, "You are not allowed to clear the inventory of {user}", target);
+                context.sendTranslated(NEGATIVE, "You are not allowed to clear the inventory of {user}", player);
                 return;
             }
         }
-        target.getInventory().clear();
+        player.getInventory().clear();
         if (removeArmor)
         {
-            target.getInventory().setBoots(null);
-            target.getInventory().setLeggings(null);
-            target.getInventory().setChestplate(null);
-            target.getInventory().setHelmet(null);
+            player.getInventory().setBoots(null);
+            player.getInventory().setLeggings(null);
+            player.getInventory().setChestplate(null);
+            player.getInventory().setHelmet(null);
         }
-        target.updateInventory();
-        if (sender.equals(target))
+        player.updateInventory();
+        if (sender.equals(player))
         {
             sender.sendTranslated(POSITIVE, "Your inventory has been cleared!");
             return;
         }
-        if (module.perms().COMMAND_CLEARINVENTORY_NOTIFY.isAuthorized(target)) // notify
+        if (module.perms().COMMAND_CLEARINVENTORY_NOTIFY.isAuthorized(player)) // notify
         {
             if (!(module.perms().COMMAND_CLEARINVENTORY_QUIET.isAuthorized(sender) && quiet)) // quiet
             {
-                target.sendTranslated(NEUTRAL, "Your inventory has been cleared by {sender}!", sender);
+                player.sendTranslated(NEUTRAL, "Your inventory has been cleared by {sender}!", sender);
             }
         }
-        sender.sendTranslated(POSITIVE, "The inventory of {user} has been cleared!", target);
+        sender.sendTranslated(POSITIVE, "The inventory of {user} has been cleared!", player);
     }
 }
