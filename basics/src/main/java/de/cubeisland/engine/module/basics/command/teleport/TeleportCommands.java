@@ -95,7 +95,7 @@ public class TeleportCommands
         {
             if (module.perms().TELEPORT_PREVENT_TP.isAuthorized(player)) // teleport the user
             {
-                context.sendTranslated(NEGATIVE, "You are not allowed to teleport {user}!", user);
+                context.sendTranslated(NEGATIVE, "You are not allowed to teleport {user}!", player);
                 return;
             }
         } // else equals tp -> no need to check tp perm

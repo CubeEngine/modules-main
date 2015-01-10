@@ -222,7 +222,6 @@ public class MovementCommands
     {
         User sender = (User)context.getSource();
         boolean backPerm = module.perms().COMMAND_BACK_USE.isAuthorized(sender);
-        boolean safe = !unsafe
         if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(sender))
         {
             Location loc = sender.get(BasicsAttachment.class).getDeathLocation();
@@ -233,7 +232,7 @@ public class MovementCommands
             }
             if (loc != null)
             {
-                if (TeleportCommands.teleport(sender, loc, safe, true, true))
+                if (TeleportCommands.teleport(sender, loc, !unsafe, true, true))
                 {
                     sender.sendTranslated(POSITIVE, "Teleported to your death point!");
                 }
@@ -252,7 +251,7 @@ public class MovementCommands
                 context.sendTranslated(NEGATIVE, "You never teleported!");
                 return;
             }
-            if (TeleportCommands.teleport(sender, loc, safe, true, true))
+            if (TeleportCommands.teleport(sender, loc, !unsafe, true, true))
             {
                 sender.sendTranslated(POSITIVE, "Teleported to your last location!");
             }
