@@ -71,7 +71,7 @@ public class PortalCommands extends CommandContainer
         }
         if (this.manager.getPortal(name) != null)
         {
-            context.sendTranslated(NEGATIVE, "A portal named {input} already exists!", context.get(0));
+            context.sendTranslated(NEGATIVE, "A portal named {input} already exists!", name);
             return;
         }
         Location p1 = selector.getFirstPoint(sender);
@@ -85,9 +85,9 @@ public class PortalCommands extends CommandContainer
 
         config.destination = destination;
 
-        config.setFile(new File(manager.portalsDir, context.get(0) + ".yml"));
+        config.setFile(new File(manager.portalsDir, name + ".yml"));
         config.save();
-        Portal portal = new Portal(module, manager, context.getString(0), config);
+        Portal portal = new Portal(module, manager, name, config);
         this.manager.addPortal(portal);
         sender.attachOrGet(PortalsAttachment.class, module).setPortal(portal);
         context.sendTranslated(POSITIVE, "Portal {name} created!", portal.getName());
@@ -103,7 +103,7 @@ public class PortalCommands extends CommandContainer
     public void select(CommandContext context, Portal portal)
     {
         ((User)context.getSource()).attachOrGet(PortalsAttachment.class, module).setPortal(portal);
-        context.sendTranslated(POSITIVE, "Portal selected: {name}", context.get(0));
+        context.sendTranslated(POSITIVE, "Portal selected: {name}", portal.getName());
     }
 
     @Alias(value ="mvpi")
@@ -166,10 +166,10 @@ public class PortalCommands extends CommandContainer
         Set<Portal> portals = manager.getPortals(world);
         if (portals.isEmpty())
         {
-            context.sendTranslated(POSITIVE, "There are no portals in {world}", context.get(0));
+            context.sendTranslated(POSITIVE, "There are no portals in {world}", world);
             return;
         }
-        context.sendTranslated(POSITIVE, "The following portals are located in {world}", context.get(0));
+        context.sendTranslated(POSITIVE, "The following portals are located in {world}", world);
         for (Portal portal : portals)
         {
             context.sendMessage(" - " + portal.getName());
