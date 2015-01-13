@@ -109,7 +109,7 @@ public class ChatCommands
             }
             if (context.getSource() instanceof User)
             {
-                ConsoleCommandSender console = context.getCore().getCommandManager().getConsoleSender();
+                ConsoleCommandSender console = module.getCore().getCommandManager().getConsoleSender();
                 console.sendTranslated(NEUTRAL, "{sender} -> {text:You}: {message:color=WHITE}", context.getSource(), message);
                 context.sendTranslated(NEUTRAL, "{text:You} -> {user}: {message:color=WHITE}", console.getDisplayName(), message);
                 this.lastWhisperOfConsole = context.getSource().getUniqueId();

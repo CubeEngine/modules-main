@@ -43,11 +43,11 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 public class ListCommand
 {
     protected static final Comparator<User> USER_COMPARATOR = new UserComparator();
-    private final Basics basics;
+    private final Basics module;
 
-    public ListCommand(Basics basics)
+    public ListCommand(Basics module)
     {
-        this.basics = basics;
+        this.module = module;
     }
 
     protected SortedMap<String, Set<User>> groupUsers(Set<User> users)
@@ -64,7 +64,7 @@ public class ListCommand
         final CommandSender sender = context.getSource();
         final SortedSet<User> users = new TreeSet<>(USER_COMPARATOR);
 
-        for (User user : context.getCore().getUserManager().getOnlineUsers())
+        for (User user : module.getCore().getUserManager().getOnlineUsers())
         {
             if (sender instanceof User && !((User)sender).canSee(user))
             {
@@ -105,7 +105,7 @@ public class ListCommand
     private String formatUser(User user)
     {
         String entry = ChatFormat.DARK_GREEN + user.getDisplayName();
-        if (user.attachOrGet(BasicsAttachment.class, basics).isAfk())
+        if (user.attachOrGet(BasicsAttachment.class, module).isAfk())
         {
             entry += ChatFormat.WHITE + "(" + ChatFormat.GREY + "afk" + ChatFormat.WHITE + ")";
         }

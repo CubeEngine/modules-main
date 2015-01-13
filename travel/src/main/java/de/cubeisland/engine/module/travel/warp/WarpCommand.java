@@ -573,7 +573,7 @@ public class WarpCommand extends TpPointCommand
             }
         }
         context.sendTranslated(NEUTRAL, "Confirm with: {text:/confirm} before 30 seconds have passed to delete the warps");
-        return new ConfirmResult(new Runnable()
+        return new ConfirmResult(module, new Runnable()
         {
             @Override
             public void run()

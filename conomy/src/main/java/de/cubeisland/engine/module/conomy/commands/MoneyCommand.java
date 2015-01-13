@@ -186,7 +186,7 @@ public class MoneyCommand extends CommandContainer
         List<User> list = new ArrayList<>();
         if (users.isAll())
         {
-            list.addAll(context.getCore().getUserManager().getOnlineUsers());
+            list.addAll(module.getCore().getUserManager().getOnlineUsers());
         }
         else
         {

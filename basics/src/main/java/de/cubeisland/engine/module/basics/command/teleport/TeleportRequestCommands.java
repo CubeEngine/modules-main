@@ -40,11 +40,11 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.*;
  */
 public class TeleportRequestCommands
 {
-    private final Basics basics;
+    private final Basics module;
 
-    public TeleportRequestCommands(Basics basics)
+    public TeleportRequestCommands(Basics module)
     {
-        this.basics = basics;
+        this.module = module;
     }
 
     @Command(desc = "Requests to teleport to a player.")
@@ -73,11 +73,11 @@ public class TeleportRequestCommands
         user.get(BasicsAttachment.class).setPendingTpToRequest(sender.getUniqueId());
         user.get(BasicsAttachment.class).removePendingTpFromRequest();
         context.sendTranslated(POSITIVE, "Teleport request sent to {user}!", user);
-        int waitTime = this.basics.getConfiguration().commands.teleportRequestWait * 20;
+        int waitTime = this.module.getConfiguration().commands.teleportRequestWait * 20;
         if (waitTime > 0)
         {
             final User sendingUser = sender;
-            final int taskID = context.getCore().getTaskManager().runTaskDelayed(this.basics, new Runnable()
+            final int taskID = module.getCore().getTaskManager().runTaskDelayed(this.module, new Runnable()
             {
                 public void run()
                 {
@@ -90,7 +90,7 @@ public class TeleportRequestCommands
             Integer oldtaskID = user.get(BasicsAttachment.class).getTpRequestCancelTask();
             if (oldtaskID != null)
             {
-                context.getCore().getTaskManager().cancelTask(this.basics, oldtaskID);
+                module.getCore().getTaskManager().cancelTask(this.module, oldtaskID);
             }
             user.get(BasicsAttachment.class).setTpRequestCancelTask(taskID);
         }
@@ -115,11 +115,11 @@ public class TeleportRequestCommands
             user.get(BasicsAttachment.class).setPendingTpFromRequest(sender.getUniqueId());
             user.get(BasicsAttachment.class).removePendingTpToRequest();
             context.sendTranslated(POSITIVE, "Teleport request send to {user}!", user);
-            int waitTime = this.basics.getConfiguration().commands.teleportRequestWait * 20;
+            int waitTime = this.module.getConfiguration().commands.teleportRequestWait * 20;
             if (waitTime > 0)
             {
                 final User sendingUser = sender;
-                final int taskID = context.getCore().getTaskManager().runTaskDelayed(this.basics, new Runnable()
+                final int taskID = module.getCore().getTaskManager().runTaskDelayed(this.module, new Runnable()
                 {
                     public void run()
                     {
@@ -132,7 +132,7 @@ public class TeleportRequestCommands
                 Integer oldtaskID = user.get(BasicsAttachment.class).getTpRequestCancelTask();
                 if (oldtaskID != null)
                 {
-                    context.getCore().getTaskManager().cancelTask(this.basics, oldtaskID);
+                    module.getCore().getTaskManager().cancelTask(this.module, oldtaskID);
                 }
                 user.get(BasicsAttachment.class).setTpRequestCancelTask(taskID);
             }
@@ -157,7 +157,7 @@ public class TeleportRequestCommands
                     return;
                 }
                 sender.get(BasicsAttachment.class).removePendingTpFromRequest();
-                User user = this.basics.getCore().getUserManager().getExactUser(uuid);
+                User user = this.module.getCore().getUserManager().getExactUser(uuid);
                 if (user == null || !user.isOnline())
                 {
                     context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", user);
@@ -171,7 +171,7 @@ public class TeleportRequestCommands
             else
             {
                 sender.get(BasicsAttachment.class).removePendingTpToRequest();
-                User user = this.basics.getCore().getUserManager().getExactUser(uuid);
+                User user = this.module.getCore().getUserManager().getExactUser(uuid);
                 if (user == null || !user.isOnline())
                 {
                     context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", Bukkit.getPlayer(uuid).getName());
@@ -186,7 +186,7 @@ public class TeleportRequestCommands
             if (taskID != null)
             {
                 sender.get(BasicsAttachment.class).removeTpRequestCancelTask();
-                context.getCore().getTaskManager().cancelTask(this.basics, taskID);
+                module.getCore().getTaskManager().cancelTask(this.module, taskID);
             }
             return;
         }
@@ -211,7 +211,7 @@ public class TeleportRequestCommands
         if (tpa != null)
         {
             sender.get(BasicsAttachment.class).removePendingTpToRequest();
-            User user = this.basics.getCore().getUserManager().getExactUser(tpa);
+            User user = this.module.getCore().getUserManager().getExactUser(tpa);
             if (user == null)
             {
                 throw new IllegalStateException("Player saved in \"pendingTpToRequest\" was not found!");
@@ -222,7 +222,7 @@ public class TeleportRequestCommands
         else if (tpahere != null)
         {
             sender.get(BasicsAttachment.class).removePendingTpFromRequest();
-            User user = this.basics.getCore().getUserManager().getExactUser(tpahere);
+            User user = this.module.getCore().getUserManager().getExactUser(tpahere);
             if (user == null)
             {
                 throw new IllegalStateException("User saved in \"pendingTpFromRequest\" was not found!");
@@ -239,7 +239,7 @@ public class TeleportRequestCommands
         if (taskID != null)
         {
             sender.get(BasicsAttachment.class).removeTpRequestCancelTask();
-            context.getCore().getTaskManager().cancelTask(this.basics, taskID);
+            module.getCore().getTaskManager().cancelTask(this.module, taskID);
         }
     }
 }

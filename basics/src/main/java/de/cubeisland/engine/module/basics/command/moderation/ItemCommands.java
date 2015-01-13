@@ -24,6 +24,7 @@ import java.util.Map.Entry;
 import java.util.TreeSet;
 
 import de.cubeisland.engine.command.methodic.parametric.Default;
+import de.cubeisland.engine.command.methodic.parametric.Greed;
 import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Named;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
@@ -53,6 +54,7 @@ import de.cubeisland.engine.module.basics.BasicsAttachment;
 
 import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
+import static de.cubeisland.engine.command.parameter.property.Requirement.isRequired;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static org.bukkit.Material.AIR;
 import static org.bukkit.Material.SKULL_ITEM;
@@ -80,105 +82,95 @@ public class ItemCommands
     }
 
     @Command(desc = "Looks up an item for you!")
-    @Params(positional = @Param(req = OPTIONAL, label = "item"))
-    public PaginatedResult itemDB(CommandContext context)
+    @SuppressWarnings("deprecation")
+    public PaginatedResult itemDB(CommandContext context, @Optional String item)
     {
-        if (context.hasPositional(0))
+        if (item != null)
         {
-            TreeSet<Entry<ItemStack, Double>> itemSet = Match.material().itemStackList(context.getString(0));
-            if (itemSet != null && itemSet.size() > 0)
+            TreeSet<Entry<ItemStack, Double>> itemSet = Match.material().itemStackList(item);
+            if (itemSet == null || itemSet.size() <= 0)
             {
-                List<String> lines = new ArrayList<>();
-
-                lines.add(context.getSource().getTranslation(POSITIVE, "Best Matched {input#item} ({integer#id}:{short#data}) for {input}", Match.material().getNameFor(itemSet.first().getKey()), itemSet.first().getKey().getType().getId(), itemSet.first().getKey().getDurability(), context.get(
-                    0)));
-                itemSet.remove(itemSet.first());
-                for (Entry<ItemStack, Double> item : itemSet) {
-                    lines.add(context.getSource().getTranslation(POSITIVE, "Matched {input#item} ({integer#id}:{short#data}) for {input}",
-                                                                 Match.material().getNameFor(item.getKey()),
-                                                                 item.getKey().getType().getId(),
-                                                                 item.getKey().getDurability(), context.get(0)));
-                }
-                return new PaginatedResult(context, lines);
-            }
-            else
-            {
-                context.sendTranslated(NEGATIVE, "Could not find any item named {input}!", context.get(0));
-            }
-        }
-        else if (context.isSource(User.class))
-        {
-            User sender = (User)context.getSource();
-            if (sender.getItemInHand().getType() == AIR)
-            {
-                context.sendTranslated(NEUTRAL, "You hold nothing in your hands!");
+                context.sendTranslated(NEGATIVE, "Could not find any item named {input}!", item);
                 return null;
             }
-            ItemStack item = sender.getItemInHand();
-            String found = Match.material().getNameFor(item);
-            if (found == null)
-            {
-                context.sendTranslated(NEGATIVE, "Itemname unknown! Itemdata: {integer#id}:{short#data}", item.getType().getId(), item.getDurability());
+            List<String> lines = new ArrayList<>();
+            Entry<ItemStack, Double> first = itemSet.first();
+            ItemStack key = first.getKey();
+            lines.add(context.getSource().getTranslation(POSITIVE, "Best Matched {input#item} ({integer#id}:{short#data}) for {input}",
+                                                         Match.material().getNameFor(key),
+                                                         key.getType().getId(),
+                                                         key.getDurability(), item));
+            itemSet.remove(first);
+            for (Entry<ItemStack, Double> aItem : itemSet) {
+                lines.add(context.getSource().getTranslation(POSITIVE, "Matched {input#item} ({integer#id}:{short#data}) for {input}",
+                                                             Match.material().getNameFor(aItem.getKey()),
+                                                             aItem.getKey().getType().getId(),
+                                                             aItem.getKey().getDurability(), item));
             }
-            else
-            {
-                context.sendTranslated(POSITIVE, "The Item in your hand is: {input#item} ({integer#id}:{short#data})", found, item.getType().getId(), item.getDurability());
-            }
+            return new PaginatedResult(context, lines);
         }
-        else
+        if (!context.isSource(User.class))
         {
             throw new TooFewArgumentsException();
         }
+        User sender = (User)context.getSource();
+        if (sender.getItemInHand().getType() == AIR)
+        {
+            context.sendTranslated(NEUTRAL, "You hold nothing in your hands!");
+            return null;
+        }
+        ItemStack aItem = sender.getItemInHand();
+        String found = Match.material().getNameFor(aItem);
+        if (found == null)
+        {
+            context.sendTranslated(NEGATIVE, "Itemname unknown! Itemdata: {integer#id}:{short#data}",
+                                   aItem.getType().getId(), aItem.getDurability());
+            return null;
+        }
+        context.sendTranslated(POSITIVE, "The Item in your hand is: {input#item} ({integer#id}:{short#data})",
+                               found, aItem.getType().getId(), aItem.getDurability());
         return null;
     }
 
     @Command(desc = "Changes the display name of the item in your hand.")
-    @Params(positional = {@Param(label = "name"),
-              @Param(req = OPTIONAL, label = "lore...", greed = INFINITE)})
-    public void rename(CommandContext context)
+    @Restricted(value = User.class, msg = "Trying to give your {text:toys} a name?")
+    public void rename(CommandContext context, String name, @Optional @Greed(INFINITE) String... lore)
     {
-        if (context.getSource() instanceof User)
+        User sender = (User)context.getSource();
+        ItemStack item = sender.getItemInHand();
+        if (item == null || item.getType() == AIR)
         {
-            User sender = (User)context.getSource();
-            ItemStack item = sender.getItemInHand();
-            if (item == null || item.getType() == AIR)
-            {
-                context.sendTranslated(NEGATIVE, "You need to hold an item to rename in your hand!");
-                return;
-            }
-            ItemMeta meta = item.getItemMeta();
-            String name = ChatFormat.parseFormats(context.getString(0));
-            meta.setDisplayName(name);
-            ArrayList<String> list = new ArrayList<>();
-            for (int i = 1; i < context.getPositionalCount(); ++i)
-            {
-                list.add(ChatFormat.parseFormats(context.getString(i)));
-            }
-            meta.setLore(list);
-            item.setItemMeta(meta);
-            context.sendTranslated(POSITIVE, "You now hold {input#name} in your hands!", name);
+            context.sendTranslated(NEGATIVE, "You need to hold an item to rename in your hand!");
             return;
         }
-        context.sendTranslated(NEGATIVE, "Trying to give your {text:toys} a name?");
+        ItemMeta meta = item.getItemMeta();
+        meta.setDisplayName(ChatFormat.parseFormats(name));
+        ArrayList<String> list = new ArrayList<>();
+        for (String line : lore)
+        {
+            list.add(ChatFormat.parseFormats(line));
+        }
+        meta.setLore(list);
+        item.setItemMeta(meta);
+        context.sendTranslated(POSITIVE, "You now hold {input#name} in your hands!", name);
     }
 
     @Command(alias = "skullchange", desc = "Changes a skull to a players skin.")
-    @Params(positional = @Param(req = OPTIONAL, label = "name"))
     @Restricted(value = User.class, msg = "This will you only give headaches!")
-    public void headchange(CommandContext context)
+    public void headchange(CommandContext context, @Optional String name)
     {
         User sender = (User)context.getSource();
-        String name = context.get(0);
-        if (sender.getItemInHand().getType() == SKULL_ITEM)
+        ItemStack itemInHand = sender.getItemInHand();
+        if (itemInHand.getType() != SKULL_ITEM)
         {
-            sender.getItemInHand().setDurability((short)3);
-            SkullMeta meta = ((SkullMeta)sender.getItemInHand().getItemMeta());
-            meta.setOwner(name);
-            sender.getItemInHand().setItemMeta(meta);
-            context.sendTranslated(POSITIVE, "You now hold {user}'s head in your hands!", name);
+            context.sendTranslated(NEGATIVE, "You are not holding a head.");
             return;
         }
-        context.sendTranslated(NEGATIVE, "You are not holding a head.");
+        itemInHand.setDurability((short)3);
+        SkullMeta meta = ((SkullMeta)itemInHand.getItemMeta());
+        meta.setOwner(name);
+        itemInHand.setItemMeta(meta);
+        context.sendTranslated(POSITIVE, "You now hold {user}'s head in your hands!", name);
     }
 
     public enum OnOff implements FixedValues
@@ -199,7 +191,6 @@ public class ItemCommands
     }
 
     @Command(desc = "Grants unlimited items")
-    @Params(positional = @Param(req = OPTIONAL, names = {"on","off"}))
     @Restricted(User.class)
     public void unlimited(CommandContext context, @Optional OnOff unlimited)
     {
@@ -303,59 +294,54 @@ public class ItemCommands
     }
 
     @Command(alias = "i", desc = "Gives the specified Item to you")
+    @Restricted(value = User.class, msg = "Did you try to use {text:/give} on your new I-Tem?")
     @SuppressWarnings("deprecation")
     public void item(CommandContext context, @Label("material[:data]") ItemStack item,
                      @Optional Integer amount,
                      @Named("ench") @Label("enchantment[:level]") String enchantmentString,
                      @Flag boolean blacklist)
     {
-        if (context.getSource() instanceof User)
+        User sender = (User)context.getSource();
+        if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(sender) && this.module.getConfiguration().commands.containsBlackListed(item))
         {
-            User sender = (User)context.getSource();
-            if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(sender)
-                    && this.module.getConfiguration().commands.containsBlackListed(item))
-            {
-                context.sendTranslated(NEGATIVE, "This item is blacklisted!");
-                return;
-            }
-            amount = amount == null ? item.getMaxStackSize() : amount;
-            if (amount <= 0)
-            {
-                context.sendTranslated(NEGATIVE, "The amount has to be a number greater than 0!");
-                return;
-            }
+            context.sendTranslated(NEGATIVE, "This item is blacklisted!");
+            return;
+        }
+        amount = amount == null ? item.getMaxStackSize() : amount;
+        if (amount <= 0)
+        {
+            context.sendTranslated(NEGATIVE, "The amount has to be a number greater than 0!");
+            return;
+        }
 
-            if (enchantmentString != null)
+        if (enchantmentString != null)
+        {
+            String[] enchs = StringUtils.explode(",", enchantmentString);
+            for (String ench : enchs)
             {
-                String[] enchs = StringUtils.explode(",", enchantmentString);
-                for (String ench : enchs)
+                int enchLvl = 0;
+                if (ench.contains(":"))
                 {
-                    int enchLvl = 0;
-                    if (ench.contains(":"))
+                    enchLvl = Integer.parseInt(ench.substring(ench.indexOf(":") + 1, ench.length()));
+                    ench = ench.substring(0, ench.indexOf(":"));
+                }
+                if (module.perms().COMMAND_ITEM_ENCHANTMENTS.isAuthorized(sender))
+                {
+                    if (module.perms().COMMAND_ITEM_ENCHANTMENTS_UNSAFE.isAuthorized(sender))
                     {
-                        enchLvl = Integer.parseInt(ench.substring(ench.indexOf(":") + 1, ench.length()));
-                        ench = ench.substring(0, ench.indexOf(":"));
+                        Match.enchant().applyMatchedEnchantment(item, ench, enchLvl, true);
                     }
-                    if (module.perms().COMMAND_ITEM_ENCHANTMENTS.isAuthorized(sender))
+                    else
                     {
-                        if (module.perms().COMMAND_ITEM_ENCHANTMENTS_UNSAFE.isAuthorized(sender))
-                        {
-                            Match.enchant().applyMatchedEnchantment(item, ench, enchLvl, true);
-                        }
-                        else
-                        {
-                            Match.enchant().applyMatchedEnchantment(item, ench, enchLvl, false);
-                        }
+                        Match.enchant().applyMatchedEnchantment(item, ench, enchLvl, false);
                     }
                 }
             }
-            item.setAmount(amount);
-            sender.getInventory().addItem(item);
-            sender.updateInventory();
-            sender.sendTranslated(NEUTRAL, "Received: {amount} {input#item}", amount, Match.material().getNameFor(item));
-            return;
         }
-        context.sendTranslated(NEUTRAL, "Did you try to use {text:/give} on your new I-Tem?");
+        item.setAmount(amount);
+        sender.getInventory().addItem(item);
+        sender.updateInventory();
+        sender.sendTranslated(NEUTRAL, "Received: {amount} {input#item}", amount, Match.material().getNameFor(item));
     }
 
     @Command(desc = "Refills the stack in hand")

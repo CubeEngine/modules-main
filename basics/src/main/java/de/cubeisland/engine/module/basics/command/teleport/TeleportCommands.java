@@ -156,7 +156,7 @@ public class TeleportCommands
                 noTp.add(p.getName());
             }
         }
-        context.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleporting everyone to {user}", player);
+        module.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleporting everyone to {user}", player);
         if (!noTp.isEmpty())
         {
             context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
@@ -211,7 +211,7 @@ public class TeleportCommands
             }
         }
         context.sendTranslated(POSITIVE, "You teleported everyone to you!");
-        context.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleporting everyone to {sender}", sender);
+        module.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleporting everyone to {sender}", sender);
         if (!noTp.isEmpty())
         {
             context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));

@@ -500,19 +500,19 @@ public class HomeCommand extends TpPointCommand
         String type = "";
         if (isPublic)
         {
-            type = context.getCore().getI18n().translate(context.getSource().getLocale(), "public");
+            type = module.getCore().getI18n().translate(context.getSource().getLocale(), "public");
             type += " ";
         }
         else if (isPrivate)
         {
-            type = context.getCore().getI18n().translate(context.getSource().getLocale(), "private");
+            type = module.getCore().getI18n().translate(context.getSource().getLocale(), "private");
             type += " ";
         }
         final Location firstPoint;
         final Location secondPoint;
         if (selection)
         {
-            if (!context.getCore().getModuleManager().getServiceManager().isImplemented(Selector.class))
+            if (!module.getCore().getModuleManager().getServiceManager().isImplemented(Selector.class))
             {
                 context.sendTranslated(NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
                 return null;
@@ -522,7 +522,7 @@ public class HomeCommand extends TpPointCommand
                 context.sendTranslated(NEGATIVE, "You have to be in game to use the selection flag");
                 return null;
             }
-            Selector selector = context.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
+            Selector selector = module.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
             Shape shape = selector.getSelection((User)context.getSource());
             if (!(shape instanceof Cuboid))
             {
@@ -554,7 +554,7 @@ public class HomeCommand extends TpPointCommand
             }
         }
         context.sendTranslated(NEUTRAL, "Confirm with: {text:/confirm} before 30 seconds have passed to delete the homes");
-        return new ConfirmResult(new Runnable()
+        return new ConfirmResult(module, new Runnable()
         {
             @Override
             public void run()

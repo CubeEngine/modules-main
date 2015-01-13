@@ -153,7 +153,7 @@ public class SpawnCommands
                 return;
             }
             Location loc = world.getSpawnLocation().add(0.5, 0, 0.5);
-            for (User player : context.getCore().getUserManager().getOnlineUsers())
+            for (User player : module.getCore().getUserManager().getOnlineUsers())
             {
                 if (!force)
                 {
