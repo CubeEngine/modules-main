@@ -28,6 +28,7 @@ import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.sender.ConsoleCommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserManager;
@@ -41,6 +42,7 @@ import org.joda.time.Duration;
 
 import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.command.CommandSender.NON_PLAYER_UUID;
+import static de.cubeisland.engine.core.util.ChatFormat.RESET;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
@@ -66,22 +68,22 @@ public class ChatCommands
         // TODO allow console as "user" or make it work somehow
         if ("console".equalsIgnoreCase(context.getString(0)))
         {
-            sendWhisperTo(NON_PLAYER_UUID, context.getStrings(1), context);
+            sendWhisperTo(NON_PLAYER_UUID, message, context.getSource());
             return;
         }
-        if (!this.sendWhisperTo(player.getUniqueId(), message, context))
+        if (!this.sendWhisperTo(player.getUniqueId(), message, context.getSource()))
         {
             context.sendTranslated(NEGATIVE, "Could not find the player {user} to send the message to. Is the player offline?", player);
         }
     }
 
     @Command(alias = "r", desc = "Replies to the last person that whispered to you.")
-    public void reply(CommandContext context, @Greed(INFINITE) String message)
+    public void reply(CommandSender context, @Greed(INFINITE) String message)
     {
         UUID lastWhisper;
-        if (context.getSource() instanceof User)
+        if (context instanceof User)
         {
-            lastWhisper = ((User)context.getSource()).get(BasicsAttachment.class).getLastWhisper();
+            lastWhisper = ((User)context).get(BasicsAttachment.class).getLastWhisper();
         }
         else
         {
@@ -98,22 +100,22 @@ public class ChatCommands
         }
     }
 
-    private boolean sendWhisperTo(UUID whisperTarget, String message, CommandContext context)
+    private boolean sendWhisperTo(UUID whisperTarget, String message, CommandSender context)
     {
         if (NON_PLAYER_UUID.equals(whisperTarget))
         {
-            if (context.getSource() instanceof ConsoleCommandSender)
+            if (context instanceof ConsoleCommandSender)
             {
                 context.sendTranslated(NEUTRAL, "Talking to yourself?");
                 return true;
             }
-            if (context.getSource() instanceof User)
+            if (context instanceof User)
             {
                 ConsoleCommandSender console = module.getCore().getCommandManager().getConsoleSender();
-                console.sendTranslated(NEUTRAL, "{sender} -> {text:You}: {message:color=WHITE}", context.getSource(), message);
+                console.sendTranslated(NEUTRAL, "{sender} -> {text:You}: {message:color=WHITE}", context, message);
                 context.sendTranslated(NEUTRAL, "{text:You} -> {user}: {message:color=WHITE}", console.getDisplayName(), message);
-                this.lastWhisperOfConsole = context.getSource().getUniqueId();
-                ((User)context.getSource()).get(BasicsAttachment.class).setLastWhisper(NON_PLAYER_UUID);
+                this.lastWhisperOfConsole = context.getUniqueId();
+                ((User)context).get(BasicsAttachment.class).setLastWhisper(NON_PLAYER_UUID);
                 return true;
             }
             context.sendTranslated(NONE, "Who are you!?");
@@ -124,26 +126,26 @@ public class ChatCommands
         {
             return false;
         }
-        if (context.getSource().equals(user))
+        if (context.equals(user))
         {
             context.sendTranslated(NEUTRAL, "Talking to yourself?");
             return true;
         }
-        user.sendTranslated(NONE, "{sender} -> {text:You}: {message:color=WHITE}", context.getSource().getName(), message);
+        user.sendTranslated(NONE, "{sender} -> {text:You}: {message:color=WHITE}", context.getName(), message);
         if (user.get(BasicsAttachment.class).isAfk())
         {
             context.sendTranslated(NEUTRAL, "{user} is afk!", user);
         }
         context.sendTranslated(NEUTRAL, "{text:You} -> {user}: {message:color=WHITE}", user, message);
-        if (context.getSource() instanceof User)
+        if (context instanceof User)
         {
-            ((User)context.getSource()).get(BasicsAttachment.class).setLastWhisper(user.getUniqueId());
+            ((User)context).get(BasicsAttachment.class).setLastWhisper(user.getUniqueId());
         }
         else
         {
             this.lastWhisperOfConsole = user.getUniqueId();
         }
-        user.get(BasicsAttachment.class).setLastWhisper(context.getSource().getUniqueId());
+        user.get(BasicsAttachment.class).setLastWhisper(context.getUniqueId());
         return true;
     }
 
@@ -154,7 +156,7 @@ public class ChatCommands
     }
 
     @Command(desc = "Mutes a player")
-    public void mute(CommandContext context, User player, @Optional String duration)
+    public void mute(CommandSender context, User player, @Optional String duration)
     {
         BasicsUserEntity bUser = player.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getEntity();
         Timestamp muted = bUser.getValue(TABLE_BASIC_USER.MUTED);
@@ -163,7 +165,7 @@ public class ChatCommands
             context.sendTranslated(NEUTRAL, "{user} was already muted!", player);
         }
         Duration dura = module.getConfiguration().commands.defaultMuteTime;
-        if (context.hasPositional(1))
+        if (duration != null)
         {
             try
             {
@@ -183,7 +185,7 @@ public class ChatCommands
     }
 
     @Command(desc = "Unmutes a player")
-    public void unmute(CommandContext context, User player)
+    public void unmute(CommandSender context, User player)
     {
         BasicsUserEntity basicsUserEntity = player.attachOrGet(BasicsAttachment.class, module).getBasicsUser().getEntity();
         basicsUserEntity.setValue(TABLE_BASIC_USER.MUTED, null);
@@ -192,13 +194,13 @@ public class ChatCommands
     }
 
     @Command(alias = "roll", desc = "Shows a random number from 0 to 100")
-    public void rand(CommandContext context)
+    public void rand(CommandSender context)
     {
-        this.um.broadcastTranslatedStatus(YELLOW, "rolled a {integer}!", context.getSource(), new Random().nextInt(100));
+        this.um.broadcastTranslatedStatus(YELLOW, "rolled a {integer}!", context, new Random().nextInt(100));
     }
 
     @Command(desc = "Displays the colors")
-    public void chatcolors(CommandContext context)
+    public void chatcolors(CommandSender context)
     {
         context.sendTranslated(POSITIVE, "The following chat codes are available:");
         StringBuilder builder = new StringBuilder();
@@ -209,7 +211,7 @@ public class ChatCommands
             {
                 builder.append("\n");
             }
-            builder.append(" ").append(chatFormat.getChar()).append(" ").append(chatFormat.toString()).append(chatFormat.name()).append(ChatFormat.RESET);
+            builder.append(" ").append(chatFormat.getChar()).append(" ").append(chatFormat.toString()).append(chatFormat.name()).append(RESET);
         }
         context.sendMessage(builder.toString());
         context.sendTranslated(POSITIVE, "To use these type {text:&} followed by the code above");

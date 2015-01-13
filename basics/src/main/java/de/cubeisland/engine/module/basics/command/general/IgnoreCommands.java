@@ -26,6 +26,7 @@ import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Reader;
 import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserManager;
 import de.cubeisland.engine.core.util.StringUtils;
@@ -84,49 +85,47 @@ public class IgnoreCommands
     @Command(desc = "Ignores all messages from players")
     public void ignore(CommandContext context, @Reader(User.class) List<User> players)
     {
-        if (context.getSource() instanceof User)
+        if (!context.isSource(User.class))
         {
-            User sender = (User)context.getSource();
-            List<String> added = new ArrayList<>();
-            for (User user : players)
-            {
-                if (user == context.getSource())
-                {
-                    context.sendTranslated(NEGATIVE, "If you do not feel like talking to yourself just don't talk.");
-                }
-                else if (!this.addIgnore(sender, user))
-                {
-                    if (module.perms().COMMAND_IGNORE_PREVENT.isAuthorized(user))
-                    {
-                        context.sendTranslated(NEGATIVE, "You are not allowed to ignore {user}!", user);
-                        continue;
-                    }
-                    context.sendTranslated(NEGATIVE, "{user} is already on your ignore list!", user);
-                }
-                else
-                {
-                    added.add(user.getName());
-                }
-            }
-            context.sendTranslated(POSITIVE, "You added {user#list} to your ignore list!",
-                                   StringUtils.implode(WHITE + ", " + DARK_GREEN, added));
+            int rand1 = new Random().nextInt(6) + 1;
+            int rand2 = new Random().nextInt(6 - rand1 + 1) + 1;
+            context.sendTranslated(NEUTRAL, "Ignore ({text:8+:color=WHITE}): {integer#random} + {integer#random} = {integer#sum} -> {text:failed:color=RED}",
+                                   rand1, rand2, rand1 + rand2);
             return;
         }
-        int rand1 = new Random().nextInt(6)+1;
-        int rand2 = new Random().nextInt(6-rand1+1)+1;
-        context.sendTranslated(NEUTRAL, "Ignore ({text:8+:color=WHITE}): {integer#random} + {integer#random} = {integer#sum} -> {text:failed:color=RED}",
-                               rand1, rand2, rand1 + rand2);
-    }
-
-    @Command(desc = "Stops ignoring all messages from a player")
-    @Restricted(value = User.class, msg = "Congratulations! You are now looking at this text!")
-    public void unignore(CommandContext context, @Reader(User.class) List<User> players)
-    {
         User sender = (User)context.getSource();
         List<String> added = new ArrayList<>();
         for (User user : players)
         {
-            if (!this.removeIgnore(sender, user))
+            if (user == context.getSource())
+            {
+                context.sendTranslated(NEGATIVE, "If you do not feel like talking to yourself just don't talk.");
+            }
+            else if (!this.addIgnore(sender, user))
+            {
+                if (module.perms().COMMAND_IGNORE_PREVENT.isAuthorized(user))
+                {
+                    context.sendTranslated(NEGATIVE, "You are not allowed to ignore {user}!", user);
+                    continue;
+                }
+                context.sendTranslated(NEGATIVE, "{user} is already on your ignore list!", user);
+            }
+            else
+            {
+                added.add(user.getName());
+            }
+        }
+        context.sendTranslated(POSITIVE, "You added {user#list} to your ignore list!", StringUtils.implode(WHITE + ", " + DARK_GREEN, added));
+    }
+
+    @Command(desc = "Stops ignoring all messages from a player")
+    @Restricted(value = User.class, msg = "Congratulations! You are now looking at this text!")
+    public void unignore(User context, @Reader(User.class) List<User> players)
+    {
+        List<String> added = new ArrayList<>();
+        for (User user : players)
+        {
+            if (!this.removeIgnore(context, user))
             {
                 context.sendTranslated(NEGATIVE, "You haven't ignored {user}!", user);
             }

@@ -29,6 +29,7 @@ import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Named;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.command.parameter.FixedValues;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.readers.EnchantmentReader;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -134,10 +135,9 @@ public class ItemCommands
 
     @Command(desc = "Changes the display name of the item in your hand.")
     @Restricted(value = User.class, msg = "Trying to give your {text:toys} a name?")
-    public void rename(CommandContext context, String name, @Optional @Greed(INFINITE) String... lore)
+    public void rename(User context, String name, @Optional @Greed(INFINITE) String... lore)
     {
-        User sender = (User)context.getSource();
-        ItemStack item = sender.getItemInHand();
+        ItemStack item = context.getItemInHand();
         if (item == null || item.getType() == AIR)
         {
             context.sendTranslated(NEGATIVE, "You need to hold an item to rename in your hand!");
@@ -157,10 +157,9 @@ public class ItemCommands
 
     @Command(alias = "skullchange", desc = "Changes a skull to a players skin.")
     @Restricted(value = User.class, msg = "This will you only give headaches!")
-    public void headchange(CommandContext context, @Optional String name)
+    public void headchange(User context, @Optional String name)
     {
-        User sender = (User)context.getSource();
-        ItemStack itemInHand = sender.getItemInHand();
+        ItemStack itemInHand = context.getItemInHand();
         if (itemInHand.getType() != SKULL_ITEM)
         {
             context.sendTranslated(NEGATIVE, "You are not holding a head.");
@@ -192,10 +191,9 @@ public class ItemCommands
 
     @Command(desc = "Grants unlimited items")
     @Restricted(User.class)
-    public void unlimited(CommandContext context, @Optional OnOff unlimited)
+    public void unlimited(User context, @Optional OnOff unlimited)
     {
-        User sender = (User)context.getSource();
-        boolean setTo = unlimited != null ? unlimited.value : !sender.get(BasicsAttachment.class).hasUnlimitedItems();
+        boolean setTo = unlimited != null ? unlimited.value : !context.get(BasicsAttachment.class).hasUnlimitedItems();
         if (setTo)
         {
             context.sendTranslated(POSITIVE, "You now have unlimited items to build!");
@@ -204,15 +202,14 @@ public class ItemCommands
         {
             context.sendTranslated(NEUTRAL, "You no longer have unlimited items to build!");
         }
-        sender.get(BasicsAttachment.class).setUnlimitedItems(setTo);
+        context.get(BasicsAttachment.class).setUnlimitedItems(setTo);
     }
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
     @Restricted(value = User.class, msg = "Want to be Harry Potter?")
-    public void enchant(CommandContext context, @Default Enchantment enchantment, @Optional Integer level, @Flag boolean unsafe)
+    public void enchant(User context, @Default Enchantment enchantment, @Optional Integer level, @Flag boolean unsafe)
     {
-        User sender = (User)context.getSource();
-        ItemStack item = sender.getItemInHand();
+        ItemStack item = context.getItemInHand();
         if (item.getType() == AIR)
         {
             context.sendTranslated(NEUTRAL, "{text:ProTip}: You cannot enchant your fists!");
@@ -227,7 +224,7 @@ public class ItemCommands
         }
         if (unsafe)
         {
-            if (!module.perms().COMMAND_ENCHANT_UNSAFE.isAuthorized(sender))
+            if (!module.perms().COMMAND_ENCHANT_UNSAFE.isAuthorized(context))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to add unsafe enchantments!");
                 return;
@@ -271,9 +268,9 @@ public class ItemCommands
 
     @SuppressWarnings("deprecation")
     @Command(desc = "Gives the specified Item to a player")
-    public void give(CommandContext context, User player, @Label("material[:data]") ItemStack item, @Optional Integer amount, @Flag boolean blacklist)
+    public void give(CommandSender context, User player, @Label("material[:data]") ItemStack item, @Optional Integer amount, @Flag boolean blacklist)
     {
-        if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(context.getSource())
+        if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(context)
             && this.module.getConfiguration().commands.itemBlacklist.contains(item))
         {
             context.sendTranslated(NEGATIVE, "This item is blacklisted!");
@@ -290,19 +287,18 @@ public class ItemCommands
         player.updateInventory();
         String matname = Match.material().getNameFor(item);
         context.sendTranslated(POSITIVE, "You gave {user} {amount} {input#item}!", player, amount, matname);
-        player.sendTranslated(POSITIVE, "{user} just gave you {amount} {input#item}!", context.getSource().getName(), amount, matname);
+        player.sendTranslated(POSITIVE, "{user} just gave you {amount} {input#item}!", context.getName(), amount, matname);
     }
 
     @Command(alias = "i", desc = "Gives the specified Item to you")
     @Restricted(value = User.class, msg = "Did you try to use {text:/give} on your new I-Tem?")
     @SuppressWarnings("deprecation")
-    public void item(CommandContext context, @Label("material[:data]") ItemStack item,
+    public void item(User context, @Label("material[:data]") ItemStack item,
                      @Optional Integer amount,
                      @Named("ench") @Label("enchantment[:level]") String enchantmentString,
                      @Flag boolean blacklist)
     {
-        User sender = (User)context.getSource();
-        if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(sender) && this.module.getConfiguration().commands.containsBlackListed(item))
+        if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(context) && this.module.getConfiguration().commands.containsBlackListed(item))
         {
             context.sendTranslated(NEGATIVE, "This item is blacklisted!");
             return;
@@ -325,9 +321,9 @@ public class ItemCommands
                     enchLvl = Integer.parseInt(ench.substring(ench.indexOf(":") + 1, ench.length()));
                     ench = ench.substring(0, ench.indexOf(":"));
                 }
-                if (module.perms().COMMAND_ITEM_ENCHANTMENTS.isAuthorized(sender))
+                if (module.perms().COMMAND_ITEM_ENCHANTMENTS.isAuthorized(context))
                 {
-                    if (module.perms().COMMAND_ITEM_ENCHANTMENTS_UNSAFE.isAuthorized(sender))
+                    if (module.perms().COMMAND_ITEM_ENCHANTMENTS_UNSAFE.isAuthorized(context))
                     {
                         Match.enchant().applyMatchedEnchantment(item, ench, enchLvl, true);
                     }
@@ -339,30 +335,25 @@ public class ItemCommands
             }
         }
         item.setAmount(amount);
-        sender.getInventory().addItem(item);
-        sender.updateInventory();
-        sender.sendTranslated(NEUTRAL, "Received: {amount} {input#item}", amount, Match.material().getNameFor(item));
+        context.getInventory().addItem(item);
+        context.updateInventory();
+        context.sendTranslated(NEUTRAL, "Received: {amount} {input#item}", amount, Match.material().getNameFor(item));
     }
 
     @Command(desc = "Refills the stack in hand")
-    public void more(CommandContext context, @Optional Integer amount, @Flag boolean all) // TODO staticvalues staticValues = "*",
+    @Restricted(value = User.class, msg = "You can't get enough of it, can you?")
+    public void more(User context, @Optional Integer amount, @Flag boolean all) // TODO staticvalues staticValues = "*",
     {
-        if (!context.isSource(User.class))
-        {
-            context.sendTranslated(NEGATIVE, "You can't get enough of it, can you?");
-            return;
-        }
-        User sender = (User)context.getSource();
         if (all)
         {
-            for (ItemStack item : sender.getInventory().getContents())
+            for (ItemStack item : context.getInventory().getContents())
             {
                 if (item.getType() != AIR)
                 {
                     item.setAmount(64);
                 }
             }
-            sender.sendTranslated(POSITIVE, "Refilled all stacks!");
+            context.sendTranslated(POSITIVE, "Refilled all stacks!");
             return;
         }
         amount = amount == null ? 1 : amount;
@@ -371,34 +362,33 @@ public class ItemCommands
             context.sendTranslated(NEGATIVE, "Invalid amount {input#amount}", amount);
             return;
         }
-        if (sender.getItemInHand() == null || sender.getItemInHand().getType() == AIR)
+        if (context.getItemInHand() == null || context.getItemInHand().getType() == AIR)
         {
             context.sendTranslated(NEUTRAL, "More nothing is still nothing!");
             return;
         }
-        sender.getItemInHand().setAmount(64);
+        context.getItemInHand().setAmount(64);
         if (amount == 1)
         {
-            sender.sendTranslated(POSITIVE, "Refilled stack in hand!");
+            context.sendTranslated(POSITIVE, "Refilled stack in hand!");
             return;
         }
         for (int i = 1; i < amount; ++i)
         {
-            sender.getInventory().addItem(sender.getItemInHand());
+            context.getInventory().addItem(context.getItemInHand());
         }
-        sender.sendTranslated(POSITIVE, "Refilled {amount} stacks in hand!", amount);
+        context.sendTranslated(POSITIVE, "Refilled {amount} stacks in hand!", amount);
     }
 
     @Command(desc = "Repairs your items")
     @Restricted(value = User.class, msg = "If you do this you'll loose your warranty!")
-    public void repair(CommandContext context, @Flag boolean all)
+    public void repair(User context, @Flag boolean all)
     {
-        User sender = (User)context.getSource();
         if (all)
         {
             List<ItemStack> list = new ArrayList<>();
-            list.addAll(Arrays.asList(sender.getInventory().getArmorContents()));
-            list.addAll(Arrays.asList(sender.getInventory().getContents()));
+            list.addAll(Arrays.asList(context.getInventory().getArmorContents()));
+            list.addAll(Arrays.asList(context.getInventory().getContents()));
             int repaired = 0;
             for (ItemStack item : list)
             {
@@ -410,34 +400,33 @@ public class ItemCommands
             }
             if (repaired == 0)
             {
-                sender.sendTranslated(NEUTRAL, "No items to repair!");
+                context.sendTranslated(NEUTRAL, "No items to repair!");
                 return;
             }
-            sender.sendTranslated(POSITIVE, "Repaired {amount} items!", repaired);
+            context.sendTranslated(POSITIVE, "Repaired {amount} items!", repaired);
             return;
         }
-        ItemStack item = sender.getItemInHand();
+        ItemStack item = context.getItemInHand();
         if (Match.material().repairable(item))
         {
             if (item.getDurability() == 0)
             {
-                sender.sendTranslated(NEUTRAL, "No need to repair this!");
+                context.sendTranslated(NEUTRAL, "No need to repair this!");
                 return;
             }
             item.setDurability((short)0);
-            sender.sendTranslated(POSITIVE, "Item repaired!");
+            context.sendTranslated(POSITIVE, "Item repaired!");
             return;
         }
-        sender.sendTranslated(NEUTRAL, "Item cannot be repaired!");
+        context.sendTranslated(NEUTRAL, "Item cannot be repaired!");
     }
 
     @Command(desc = "Stacks your items up to 64")
     @Restricted(value = User.class, msg = "No stacking for you.")
-    public void stack(CommandContext context)
+    public void stack(User context)
     {
-        User user = (User)context.getSource();
-        boolean allow64 = module.perms().COMMAND_STACK_FULLSTACK.isAuthorized(user);
-        ItemStack[] items = user.getInventory().getContents();
+        boolean allow64 = module.perms().COMMAND_STACK_FULLSTACK.isAuthorized(context);
+        ItemStack[] items = context.getInventory().getContents();
         int size = items.length;
         boolean changed = false;
         for (int i = 0; i < size; i++)
@@ -482,10 +471,10 @@ public class ItemCommands
         }
         if (changed)
         {
-            user.getInventory().setContents(items);
-            user.sendTranslated(POSITIVE, "Items stacked together!");
+            context.getInventory().setContents(items);
+            context.sendTranslated(POSITIVE, "Items stacked together!");
             return;
         }
-        user.sendTranslated(NEUTRAL, "Nothing to stack!");
+        context.sendTranslated(NEUTRAL, "Nothing to stack!");
     }
 }

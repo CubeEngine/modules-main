@@ -59,14 +59,13 @@ public class ListCommand
     }
 
     @Command(desc = "Displays all the online players.")
-    public CommandResult list(CommandContext context)
+    public CommandResult list(CommandSender context)
     {
-        final CommandSender sender = context.getSource();
         final SortedSet<User> users = new TreeSet<>(USER_COMPARATOR);
 
         for (User user : module.getCore().getUserManager().getOnlineUsers())
         {
-            if (sender instanceof User && !((User)sender).canSee(user))
+            if (context instanceof User && !((User)context).canSee(user))
             {
                 continue;
             }
@@ -75,12 +74,13 @@ public class ListCommand
 
         if (users.isEmpty())
         {
-            sender.sendTranslated(NEGATIVE, "There are no players online at the moment!");
+            context.sendTranslated(NEGATIVE, "There are no players online at the moment!");
             return null;
         }
 
         SortedMap<String, Set<User>> grouped = this.groupUsers(users);
-        sender.sendTranslated(POSITIVE, "Players online: {amount#online}/{amount#max}", users.size(), Bukkit.getMaxPlayers());
+        context.sendTranslated(POSITIVE, "Players online: {amount#online}/{amount#max}", users.size(),
+                              Bukkit.getMaxPlayers());
 
         for (Entry<String, Set<User>> entry : grouped.entrySet())
         {
@@ -96,7 +96,7 @@ public class ListCommand
             {
                 group.append(ChatFormat.WHITE).append(", ").append(this.formatUser(it.next()));
             }
-            sender.sendMessage(group.toString());
+            context.sendMessage(group.toString());
         }
 
         return null;

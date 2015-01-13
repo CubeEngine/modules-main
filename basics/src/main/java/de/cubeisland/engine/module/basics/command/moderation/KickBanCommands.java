@@ -105,7 +105,7 @@ public class KickBanCommands
     }
 
     @Command(alias = "kickban", desc = "Bans a player permanently on your server.")
-    public void ban(CommandContext context, OfflinePlayer player, @Optional @Greed(INFINITE) String reason,
+    public void ban(CommandSender context, OfflinePlayer player, @Optional @Greed(INFINITE) String reason,
                     @Flag(longName = "ipban", name = "ip") boolean ipban, @Flag boolean force)
     {
         if (this.cannotBanUser(context)) return;
@@ -114,13 +114,13 @@ public class KickBanCommands
         {
             user = um.getExactUser(player.getUniqueId());
         }
-        else if (!context.hasFlag("f"))
+        else if (!force)
         {
             context.sendTranslated(NEGATIVE,"{user} has never played on this server before! Use the -force flag to ban him anyway.", player);
             return;
         }
-        reason = parseReason(reason, module.perms().COMMAND_BAN_NOREASON, context.getSource());
-        if (context.hasFlag("ip"))
+        reason = parseReason(reason, module.perms().COMMAND_BAN_NOREASON, context);
+        if (ipban)
         {
             if (user == null)
             {
@@ -135,7 +135,7 @@ public class KickBanCommands
                     context.sendTranslated(NEGATIVE, "{user} is already IP banned!", player);
                     return;
                 }
-                this.banManager.addBan(new IpBan(ipAdress,context.getSource().getName(), reason));
+                this.banManager.addBan(new IpBan(ipAdress, context.getName(), reason));
                 Set<String> bannedUsers = new HashSet<>();
                 for (User ipPlayer : um.getOnlineUsers())
                 {
@@ -147,7 +147,7 @@ public class KickBanCommands
                 }
                 context.sendTranslated(NEGATIVE, "You banned the IP: {input#ip}!", ipAdress.getHostAddress());
                 um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned from the server by {sender}!",
-                                               module.perms().BAN_RECEIVEMESSAGE, user, context.getSource());
+                                               module.perms().BAN_RECEIVEMESSAGE, user, context);
                 um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
                 um.broadcastTranslatedWithPerm(NEGATIVE, "And with it kicked: {user#list}!",
                                                module.perms().BAN_RECEIVEMESSAGE, StringUtils.implode(
@@ -166,7 +166,7 @@ public class KickBanCommands
                 context.sendTranslated(NEGATIVE, "{user} is already banned!", player);
                 return;
             }
-            this.banManager.addBan(new UserBan(player.getName(), context.getSource().getName(), reason));
+            this.banManager.addBan(new UserBan(player.getName(), context.getName(), reason));
             if (user != null && user.isOnline())
             {
                 user.kickPlayer(user.getTranslation(NEGATIVE, banMessage) + "\n\n" + RESET + reason);
@@ -174,7 +174,7 @@ public class KickBanCommands
         }
         context.sendTranslated(NEGATIVE, "You banned {user}!", player);
         um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned from the server by {sender}!",
-                                       module.perms().BAN_RECEIVEMESSAGE, player, context.getSource());
+                                       module.perms().BAN_RECEIVEMESSAGE, player, context);
         um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
     }
 
@@ -272,7 +272,7 @@ public class KickBanCommands
     }
 
     @Command(alias = "tban", desc = "Bans a player for a given time.")
-    public void tempban(CommandContext context, OfflinePlayer player, String time, @Optional @Greed(INFINITE) String reason, @Flag boolean force)
+    public void tempban(CommandSender context, OfflinePlayer player, String time, @Optional @Greed(INFINITE) String reason, @Flag boolean force)
     {
         if (this.cannotBanUser(context)) return;
         User user = null;
@@ -285,7 +285,7 @@ public class KickBanCommands
             context.sendTranslated(NEUTRAL, "{user} has never played on this server before! Use the -force flag to ban him anyways.", player);
             return;
         }
-        reason = parseReason(reason, module.perms().COMMAND_TEMPBAN_NOREASON, context.getSource());
+        reason = parseReason(reason, module.perms().COMMAND_TEMPBAN_NOREASON, context);
         if (this.banManager.isUserBanned(player.getUniqueId()))
         {
             context.sendTranslated(NEGATIVE, "{user} is already banned!", player);
@@ -295,7 +295,7 @@ public class KickBanCommands
         {
             long millis = StringUtils.convertTimeToMillis(time);
             Date toDate = new Date(System.currentTimeMillis() + millis);
-            this.banManager.addBan(new UserBan(player.getName(),context.getSource().getName(), reason, toDate));
+            this.banManager.addBan(new UserBan(player.getName(),context.getName(), reason, toDate));
             if (player.isOnline())
             {
                 if (user == null) throw new IllegalStateException();
@@ -303,7 +303,7 @@ public class KickBanCommands
             }
             context.sendTranslated(POSITIVE, "You banned {user} temporarily!", player);
             um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned temporarily from the server by {sender}!",
-                                           module.perms().BAN_RECEIVEMESSAGE, player, context.getSource());
+                                           module.perms().BAN_RECEIVEMESSAGE, player, context);
             um.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE);
         }
         catch (TimeConversionException ex)
@@ -312,7 +312,7 @@ public class KickBanCommands
         }
     }
 
-    private boolean cannotBanUser(CommandContext context)
+    private boolean cannotBanUser(CommandSender context)
     {
         if (!Bukkit.getOnlineMode())
         {

@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
 
+import de.cubeisland.engine.core.command.CommandSender;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -79,20 +80,19 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the biome type you are standing in.")
-    public void biome(CommandContext context,
+    public void biome(CommandSender context,
                       @Optional World world,
                       @Label("block-x") @Optional Integer x,
                       @Label("block-z") @Optional Integer z)
     {
-        if (!context.isSource(User.class) && (!context.hasPositional(2) || world == null))
+        if (!(context instanceof User) && (world == null || z == null))
         {
             context.sendTranslated(NEGATIVE, "Please provide a world and x and z coordinates!");
             return;
         }
-        if (!context.hasPositional(2) && context.isSource(User.class))
+        if (z == null)
         {
-            User user = (User)context.getSource();
-            Location loc = user.getLocation();
+            Location loc = ((User)context).getLocation();
             world = loc.getWorld();
             x = loc.getBlockX();
             z = loc.getBlockZ();
@@ -102,32 +102,32 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the seed of a world.")
-    public void seed(CommandContext context, @Optional World world)
+    public void seed(CommandSender context, @Optional World world)
     {
         if (world == null)
         {
-            if (!context.isSource(User.class))
+            if (!(context instanceof User))
             {
                 throw new TooFewArgumentsException();
             }
-            world = ((User)context.getSource()).getWorld();
+            world = ((User)context).getWorld();
         }
         context.sendTranslated(NEUTRAL, "Seed of {world} is {long#seed}", world, world.getSeed());
     }
 
     @Command(desc = "Displays the direction in which you are looking.")
     @Restricted(value = User.class, msg = "{text:ProTip}: I assume you are looking right at your screen, right?")
-    public void compass(CommandContext context)
+    public void compass(User context)
     {
-        int direction = Math.round(((User)context.getSource()).getLocation().getYaw() + 180f + 360f) % 360;
+        int direction = Math.round(context.getLocation().getYaw() + 180f + 360f) % 360;
         context.sendTranslated(NEUTRAL, "You are looking to {input#direction}!", Direction.matchDirection(direction).name()); // TODO translate direction
     }
 
     @Command(desc = "Displays your current depth.")
     @Restricted(value = User.class, msg = "You dug too deep!")
-    public void depth(CommandContext context)
+    public void depth(User context)
     {
-        final int height = ((User)context.getSource()).getLocation().getBlockY();
+        final int height = context.getLocation().getBlockY();
         if (height > 62)
         {
             context.sendTranslated(POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} above sealevel)", height, height - 62);
@@ -138,14 +138,14 @@ public class InformationCommands
 
     @Command(desc = "Displays your current location.")
     @Restricted(value = User.class, msg = "Your position: {text:Right in front of your screen!:color=RED}")
-    public void getPos(CommandContext context)
+    public void getPos(User context)
     {
-        final Location loc = ((User)context.getSource()).getLocation();
+        final Location loc = context.getLocation();
         context.sendTranslated(NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
     }
 
     @Command(desc = "Displays near players(entities/mobs) to you.")
-    public void near(CommandContext context, @Optional Integer radius, @Default User player, @Flag boolean entity, @Flag boolean mob)
+    public void near(CommandSender context, @Optional Integer radius, @Default User player, @Flag boolean entity, @Flag boolean mob)
     {
         //new cmd system showing default message via @Default context.sendTranslated(NEUTRAL, "I am right {text:behind:color=RED} you!");
         if (radius == null)
@@ -186,36 +186,34 @@ public class InformationCommands
                 if (i <= 10)
                 {
                     this.addNearInformation(outputlist, e, Math.sqrt(dist));
+                    continue;
+                }
+                String key;
+                if (e instanceof Player)
+                {
+                    key = DARK_GREEN + "player";
+                }
+                else if (e instanceof LivingEntity)
+                {
+                    key = ChatFormat.DARK_AQUA + Match.entity().getNameFor(e.getType());
+                }
+                else if (e instanceof Item)
+                {
+                    key = ChatFormat.GREY + Match.material().getNameFor(((Item)e).getItemStack());
                 }
                 else
                 {
-                    String key;
-                    if (e instanceof Player)
-                    {
-                        key = DARK_GREEN + "player";
-                    }
-                    else if (e instanceof LivingEntity)
-                    {
-                        key = ChatFormat.DARK_AQUA + Match.entity().getNameFor(e.getType());
-                    }
-                    else if (e instanceof Item)
-                    {
-                        key = ChatFormat.GREY + Match.material().getNameFor(((Item)e).getItemStack());
-                    }
-                    else
-                    {
-                        key = ChatFormat.GREY + Match.entity().getNameFor(e.getType());
-                    }
-                    Pair<Double, Integer> pair = groupedEntities.get(key);
-                    if (pair == null)
-                    {
-                        pair = new Pair<>(Math.sqrt(dist), 1);
-                        groupedEntities.put(key, pair);
-                    }
-                    else
-                    {
-                        pair.setRight(pair.getRight() + 1);
-                    }
+                    key = ChatFormat.GREY + Match.entity().getNameFor(e.getType());
+                }
+                Pair<Double, Integer> pair = groupedEntities.get(key);
+                if (pair == null)
+                {
+                    pair = new Pair<>(Math.sqrt(dist), 1);
+                    groupedEntities.put(key, pair);
+                }
+                else
+                {
+                    pair.setRight(pair.getRight() + 1);
                 }
             }
         }
@@ -230,21 +228,17 @@ public class InformationCommands
         if (outputlist.isEmpty())
         {
             context.sendTranslated(NEGATIVE, "Nothing detected nearby!");
+            return;
         }
-        else
+        String result;
+        result = StringUtils.implode(WHITE + ", ", outputlist);
+        result += groupedOutput.toString();
+        if (context.equals(player))
         {
-            String result;
-            result = StringUtils.implode(WHITE + ", ", outputlist);
-            result += groupedOutput.toString();
-            if (context.getSource().equals(player))
-            {
-                context.sendTranslated(NEUTRAL, "Found those nearby you:\n{}", result);
-            }
-            else
-            {
-                context.sendTranslated(NEUTRAL, "Found those nearby {user}:\n{}", player, result);
-            }
+            context.sendTranslated(NEUTRAL, "Found those nearby you:\n{}", result);
+            return;
         }
+        context.sendTranslated(NEUTRAL, "Found those nearby {user}:\n{}", player, result);
     }
 
     private void addNearInformation(List<String> list, Entity entity, double distance)
@@ -286,11 +280,11 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays chunk, memory and world information.")
-    public void lag(CommandContext context, @Flag boolean reset)
+    public void lag(CommandSender context, @Flag boolean reset)
     {
         if (reset)
         {
-            if (module.perms().COMMAND_LAG_RESET.isAuthorized(context.getSource()))
+            if (module.perms().COMMAND_LAG_RESET.isAuthorized(context))
             {
                 this.module.getLagTimer().resetLowestTPS();
                 context.sendTranslated(POSITIVE, "Reset lowest TPS!");
@@ -302,7 +296,7 @@ public class InformationCommands
         //Uptime:
         context.sendTranslated(POSITIVE, "[{text:CubeEngine-Basics:color=RED}]");
         DateFormat df = SimpleDateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT,
-                     context.getSource().getLocale());
+                                                             context.getLocale());
         Date start = new Date(ManagementFactory.getRuntimeMXBean().getStartTime());
         Duration dura = new Duration(start.getTime(), System.currentTimeMillis());
         context.sendTranslated(POSITIVE, "Server has been running since {input#uptime}", df.format(start));
@@ -366,7 +360,7 @@ public class InformationCommands
 
 
     @Command(desc = "Displays all loaded worlds", alias = {"worldlist","worlds"})
-    public void listWorlds(CommandContext context)
+    public void listWorlds(CommandSender context)
     {
         context.sendTranslated(POSITIVE, "Loaded worlds:");
         String format = " " + WHITE + "- " + GOLD + "%s" + WHITE + ":" + INDIGO + "%s";

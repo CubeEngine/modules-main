@@ -59,12 +59,12 @@ public class MailCommand extends CommandContainer
 
     @Alias(value = "readmail")
     @Command(desc = "Reads your mail.")
-    public void read(CommandContext context, @Optional User player)  // TODO staticValues = "console",
+    public void read(CommandSender context, @Optional User player)  // TODO staticValues = "console",
     {
         User sender = null;
-        if (context.getSource() instanceof User)
+        if (context instanceof User)
         {
-            sender = (User)context.getSource();
+            sender = (User)context;
         }
         if (sender == null)
         {
@@ -109,7 +109,7 @@ public class MailCommand extends CommandContainer
 
     @Alias(value = "spymail")
     @Command(desc = "Shows the mail of other players.")
-    public void spy(CommandContext context, User player)
+    public void spy(CommandSender context, User player)
     {
         List<Mail> mails = player.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().getMails();
         if (mails.isEmpty()) // Mailbox is not empty but no message from that player
@@ -129,22 +129,22 @@ public class MailCommand extends CommandContainer
 
     @Alias(value = "sendmail")
     @Command(desc = "Sends mails to other players.")
-    public void send(CommandContext context, User player, @Greed(INFINITE) String message)
+    public void send(CommandSender context, User player, @Greed(INFINITE) String message)
     {
-        this.mail(message, context.getSource(), player);
+        this.mail(message, context, player);
         context.sendTranslated(POSITIVE, "Mail send to {user}!", player);
     }
 
     @Alias(value = "sendallmail")
     @Command(desc = "Sends mails to all players.")
-    public void sendAll(CommandContext context, final @Greed(INFINITE) String message)
+    public void sendAll(CommandSender context, final @Greed(INFINITE) String message)
     {
         Set<User> users = this.module.getCore().getUserManager().getOnlineUsers();
         final Set<Long> alreadySend = new HashSet<>();
         User sender = null;
-        if (context.getSource() instanceof User)
+        if (context instanceof User)
         {
-            sender = (User)context.getSource();
+            sender = (User)context;
         }
         for (User user : users)
         {
@@ -173,10 +173,9 @@ public class MailCommand extends CommandContainer
 
     @Command(desc = "Removes a single mail")
     @Restricted(value = User.class, msg = "The console has no mails!")
-    public void remove(CommandContext context, Integer mailId)
+    public void remove(User context, Integer mailId)
     {
-        User user = (User)context.getSource();
-        BasicsUser bUser = user.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser();
+        BasicsUser bUser = context.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser();
         if (bUser.countMail() == 0)
         {
             context.sendTranslated(NEUTRAL, "You do not have any mail!");
@@ -196,17 +195,16 @@ public class MailCommand extends CommandContainer
 
     @Command(desc = "Clears your mail.")
     @Restricted(value = User.class, msg = "You will never have mail here!")
-    public void clear(CommandContext context, @Optional User player)
+    public void clear(User context, @Optional User player)
     {
-        User sender = (User)context.getSource();
-        if (!context.hasPositional(0))
+        if (player == null)
         {
-            sender.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMail();
+            context.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMail();
             context.sendTranslated(NEUTRAL, "Cleared all mails!");
             return;
         }
         // TODO console User from = "console".equalsIgnoreCase(context.getString(0)) ? null : context.<User>get(0);
-        sender.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMailFrom(player);
+        context.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMailFrom(player);
         context.sendTranslated(NEUTRAL, "Cleared all mail from {user}!", player == null ? "console" : player);
     }
 
