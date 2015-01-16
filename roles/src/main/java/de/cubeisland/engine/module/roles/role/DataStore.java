@@ -20,7 +20,6 @@ package de.cubeisland.engine.module.roles.role;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
 

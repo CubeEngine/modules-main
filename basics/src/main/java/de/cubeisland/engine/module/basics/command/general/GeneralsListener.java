@@ -17,6 +17,16 @@
  */
 package de.cubeisland.engine.module.basics.command.general;
 
+import de.cubeisland.engine.core.bukkit.AfterJoinEvent;
+import de.cubeisland.engine.core.bukkit.BukkitUtils;
+import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsAttachment;
+import de.cubeisland.engine.module.basics.BasicsUser;
+import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
+import de.cubeisland.engine.module.roles.RoleAppliedEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Tameable;
 import org.bukkit.event.EventHandler;
@@ -31,17 +41,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.inventory.AnvilInventory;
 import org.bukkit.inventory.BrewerInventory;
 import org.bukkit.inventory.ItemStack;
-
-import de.cubeisland.engine.core.bukkit.AfterJoinEvent;
-import de.cubeisland.engine.core.bukkit.BukkitUtils;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.matcher.Match;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.module.basics.BasicsUser;
-import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
-import de.cubeisland.engine.module.roles.RoleAppliedEvent;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;

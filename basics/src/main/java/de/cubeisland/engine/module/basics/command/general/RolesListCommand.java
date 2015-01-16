@@ -23,10 +23,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.result.CommandResult;
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;

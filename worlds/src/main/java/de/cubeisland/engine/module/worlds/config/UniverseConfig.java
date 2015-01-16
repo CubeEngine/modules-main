@@ -17,12 +17,11 @@
  */
 package de.cubeisland.engine.module.worlds.config;
 
-import org.bukkit.GameMode;
-
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.bukkit.GameMode;
 
 @SuppressWarnings("all")
 public class UniverseConfig extends ReflectedYaml

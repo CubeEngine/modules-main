@@ -19,7 +19,6 @@ package de.cubeisland.engine.module.locker;
 
 import java.util.Arrays;
 import java.util.List;
-
 import de.cubeisland.engine.module.locker.storage.LockType;
 import de.cubeisland.engine.module.locker.storage.ProtectedType;
 import de.cubeisland.engine.module.locker.storage.ProtectionFlag;

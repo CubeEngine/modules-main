@@ -29,10 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
-
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.Profiler;
 import de.cubeisland.engine.core.util.Triplet;
@@ -40,6 +36,8 @@ import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.RolesConfig;
 import de.cubeisland.engine.module.roles.config.MirrorConfig;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
 import org.jooq.DSLContext;
 
 public class RolesManager

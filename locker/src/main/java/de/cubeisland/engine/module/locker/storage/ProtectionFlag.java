@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.matcher.Match;
 

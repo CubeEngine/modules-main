@@ -19,13 +19,11 @@ package de.cubeisland.engine.module.basics.command.teleport;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.bukkit.World;
-
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.permission.PermissionContainer;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsPerm;
+import org.bukkit.World;
 
 /**
  * Dynamically registered Permissions for each world.

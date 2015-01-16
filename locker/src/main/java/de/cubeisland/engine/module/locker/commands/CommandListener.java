@@ -21,7 +21,14 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
+import de.cubeisland.engine.core.command.CommandSender;
+import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.core.util.Triplet;
+import de.cubeisland.engine.module.locker.Locker;
+import de.cubeisland.engine.module.locker.storage.Lock;
+import de.cubeisland.engine.module.locker.storage.LockManager;
+import de.cubeisland.engine.module.locker.storage.LockType;
+import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
 import org.bukkit.Location;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.event.Cancellable;
@@ -31,15 +38,6 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
-
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.Triplet;
-import de.cubeisland.engine.module.locker.Locker;
-import de.cubeisland.engine.module.locker.storage.Lock;
-import de.cubeisland.engine.module.locker.storage.LockManager;
-import de.cubeisland.engine.module.locker.storage.LockType;
-import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;

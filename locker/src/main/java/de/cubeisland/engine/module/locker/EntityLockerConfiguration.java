@@ -17,11 +17,10 @@
  */
 package de.cubeisland.engine.module.locker;
 
-import org.bukkit.entity.EntityType;
-
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.locker.storage.ProtectedType;
+import org.bukkit.entity.EntityType;
 
 public class EntityLockerConfiguration extends LockerSubConfig<EntityLockerConfiguration, EntityType>
 {

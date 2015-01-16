@@ -17,14 +17,13 @@
  */
 package de.cubeisland.engine.module.portals.config;
 
-import org.bukkit.OfflinePlayer;
-
 import de.cubeisland.engine.core.util.WorldLocation;
 import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.bukkit.OfflinePlayer;
 
 @SuppressWarnings("all")
 public class PortalConfig extends ReflectedYaml

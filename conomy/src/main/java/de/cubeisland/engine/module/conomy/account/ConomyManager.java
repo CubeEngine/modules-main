@@ -27,7 +27,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
-
 import de.cubeisland.engine.core.logging.LoggingUtil;
 import de.cubeisland.engine.core.module.service.Economy;
 import de.cubeisland.engine.core.user.User;

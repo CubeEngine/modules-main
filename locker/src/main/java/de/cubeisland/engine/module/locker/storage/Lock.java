@@ -24,7 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
+import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.core.util.InventoryGuardFactory;
+import de.cubeisland.engine.core.util.StringUtils;
+import de.cubeisland.engine.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.locker.Locker;
+import de.cubeisland.engine.module.locker.LockerAttachment;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -37,14 +43,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.material.Door;
-
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.InventoryGuardFactory;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.math.BlockVector3;
-import de.cubeisland.engine.module.locker.Locker;
-import de.cubeisland.engine.module.locker.LockerAttachment;
 import org.jooq.Result;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;

@@ -18,14 +18,6 @@
 package de.cubeisland.engine.module.portals.config;
 
 import java.util.Random;
-
-import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-
 import de.cubeisland.engine.command.CommandInvocation;
 import de.cubeisland.engine.command.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.command.parameter.reader.ReaderException;
@@ -38,6 +30,11 @@ import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.Portal;
 import de.cubeisland.engine.module.portals.PortalManager;
 import de.cubeisland.engine.module.portals.Portals;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
+import org.bukkit.entity.Entity;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 

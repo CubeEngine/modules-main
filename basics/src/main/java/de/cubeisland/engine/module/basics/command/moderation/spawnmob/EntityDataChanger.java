@@ -24,7 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-
+import de.cubeisland.engine.core.CubeEngine;
+import de.cubeisland.engine.core.bukkit.BukkitUtils;
+import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.core.util.matcher.Match;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Ageable;
@@ -51,12 +55,6 @@ import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Colorable;
-
-import de.cubeisland.engine.core.CubeEngine;
-import de.cubeisland.engine.core.bukkit.BukkitUtils;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.matcher.Match;
 
 import static org.bukkit.entity.Villager.Profession;
 

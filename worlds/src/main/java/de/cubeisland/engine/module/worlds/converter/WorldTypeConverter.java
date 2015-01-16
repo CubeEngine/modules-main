@@ -17,12 +17,11 @@
  */
 package de.cubeisland.engine.module.worlds.converter;
 
-import org.bukkit.WorldType;
-
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
+import org.bukkit.WorldType;
 
 public class WorldTypeConverter extends SimpleConverter<WorldType>
 {

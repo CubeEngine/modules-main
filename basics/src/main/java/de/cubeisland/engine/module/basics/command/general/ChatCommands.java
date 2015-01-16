@@ -20,10 +20,8 @@ package de.cubeisland.engine.module.basics.command.general;
 import java.sql.Timestamp;
 import java.util.Random;
 import java.util.UUID;
-
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.parametric.Greed;
-import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.node.StringNode;
@@ -65,7 +63,7 @@ public class ChatCommands
     @Command(desc = "Sends a private message to someone", alias = {"tell", "message", "pm", "m", "t", "whisper", "w"})
     public void msg(CommandContext context, User player, @Greed(INFINITE) String message)
     {
-        // TODO allow console as "user" or make it work somehow
+        // TODO CommandSender Reader
         if ("console".equalsIgnoreCase(context.getString(0)))
         {
             sendWhisperTo(NON_PLAYER_UUID, message, context.getSource());

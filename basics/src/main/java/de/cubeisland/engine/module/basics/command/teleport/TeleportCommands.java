@@ -18,28 +18,23 @@
 package de.cubeisland.engine.module.basics.command.teleport;
 
 import java.util.ArrayList;
-
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
-import de.cubeisland.engine.core.command.CommandSender;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-import org.bukkit.event.player.PlayerTeleportEvent;
-
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Default;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.basics.Basics;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerTeleportEvent;
 
-import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.WHITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;

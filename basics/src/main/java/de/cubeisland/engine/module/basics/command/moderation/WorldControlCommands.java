@@ -19,7 +19,24 @@ package de.cubeisland.engine.module.basics.command.moderation;
 
 import java.util.ArrayList;
 import java.util.List;
-
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
+import de.cubeisland.engine.command.methodic.Flags;
+import de.cubeisland.engine.command.methodic.Param;
+import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Default;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Named;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.command.parameter.IncorrectUsageException;
+import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
+import de.cubeisland.engine.core.command.completer.WorldCompleter;
+import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.core.util.StringUtils;
+import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsConfiguration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
@@ -30,31 +47,18 @@ import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.Flags;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.parameter.IncorrectUsageException;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.completer.WorldCompleter;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.matcher.Match;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsConfiguration;
-
 import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.ChatFormat.GOLD;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
-import static org.bukkit.entity.EntityType.DROPPED_ITEM;
+import static org.bukkit.entity.EntityType.*;
 
 /**
  * Commands controlling / affecting worlds. /weather /remove /butcher
  */
 public class WorldControlCommands
 {
+    public static final int RADIUS_INFINITE = -1;
     private final BasicsConfiguration config;
     private final Basics module;
     private final EntityRemovals entityRemovals;
@@ -66,65 +70,31 @@ public class WorldControlCommands
         this.entityRemovals = new EntityRemovals(module);
     }
 
-    @Command(desc = "Changes the weather")
-    @Params(positional = {@Param(names = {"sun","rain","storm"}),
-                        @Param(req = OPTIONAL, label = "duration", type = Integer.class)},
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void weather(CommandContext context)
+    public enum Weather
     {
-        World world;
-        if (context.hasNamed("in"))
-        {
-            world = context.get("in", null);
-            if (world == null)
-            {
-                context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.get(1));
-                return;
-            }
-        }
-        else if (context.isSource(User.class))
-        {
-            world = ((User)context.getSource()).getWorld();
-        }
-        else
-        {
-            context.sendTranslated(NEGATIVE, "You have to specify a world when using this command from the console!");
-            return;
-        }
+        SUN, RAIN, STORM
+    }
+
+    @Command(desc = "Changes the weather")
+    public void weather(CommandContext context, Weather weather, @Optional Integer duration, @Default @Named({"in", "world"}) World world)
+    {
         boolean sunny = true;
         boolean noThunder = true;
-        int duration = 10000000;
-        String weather = Match.string().matchString(context.getString(0), "sun", "rain", "storm");
-        if (weather == null)
-        {
-            context.sendTranslated(NEGATIVE, "Invalid weather! {input}", context.get(0));
-            context.sendTranslated(NEUTRAL, "Use {name#sun}, {name#rain} or {name#storm}!");
-            return;
-        }
+        duration = (duration == null ? 10000000 : duration) * 20;
         switch (weather)
         {
-            case "sun":
+            case SUN:
                 sunny = true;
                 noThunder = true;
                 break;
-            case "rain":
+            case RAIN:
                 sunny = false;
                 noThunder = true;
                 break;
-            case "storm":
+            case STORM:
                 sunny = false;
                 noThunder = false;
                 break;
-        }
-        if (context.hasPositional(1))
-        {
-            duration = context.get(1, 0);
-            if (duration == 0)
-            {
-                context.sendTranslated(NEGATIVE, "The given duration is invalid!");
-                return;
-            }
-            duration *= 20;
         }
 
         if (world.isThundering() != noThunder && world.hasStorm() != sunny) // weather is not changing
@@ -140,140 +110,91 @@ public class WorldControlCommands
         world.setWeatherDuration(duration);
     }
 
-    @Command(alias = "playerweather", desc = "Changes your weather")
-    @Params(positional = @Param(names=  {"clear","downfall","reset"}),
-            nonpositional = @Param(names = "player", label = "player", type = User.class))
-    public void pweather(CommandContext context)
+    public enum PlayerWeather
     {
-        User user;
-        if (context.hasNamed("player"))
+        CLEAR, DOWNFALL, RESET
+    }
+
+    @Command(alias = "playerweather", desc = "Changes your weather")
+    public void pweather(CommandContext context, PlayerWeather weather, @Default @Named("player") User player)
+    {
+        if (!player.isOnline())
         {
-            user = context.get("player");
-        }
-        else if (context.isSource(User.class))
-        {
-            user = (User)context.getSource();
-        }
-        else
-        {
-            context.sendTranslated(NEGATIVE, "You have to specify a player when using this command from the console!");
-            return;
-        }
-        if (!user.isOnline())
-        {
-            context.sendTranslated(NEGATIVE, "{user} is not online!", user);
-            return;
-        }
-        String weather = Match.string().matchString(context.getString(0), "clear", "downfall", "reset");
-        if (weather == null)
-        {
-            context.sendTranslated(NEGATIVE, "Invalid weather! {input}", context.get(0));
-            context.sendTranslated(NEUTRAL, "Use {name#clear}, {name#downfall} or {name#reset}!", "clear", "downfall", "reset");
+            context.sendTranslated(NEGATIVE, "{user} is not online!", player);
             return;
         }
         switch (weather)
         {
-            case "clear":
-                user.setPlayerWeather(WeatherType.CLEAR);
-                if (user == context.getSource())
+            case CLEAR:
+                player.setPlayerWeather(WeatherType.CLEAR);
+                if (context.getSource().equals(player))
                 {
                     context.sendTranslated(POSITIVE, "Your weather is now clear!");
                 }
                 else
                 {
-                    user.sendTranslated(POSITIVE, "Your weather is now clear!");
-                    context.sendTranslated(POSITIVE, "{user}s weather is now clear!", user);
+                    player.sendTranslated(POSITIVE, "Your weather is now clear!");
+                    context.sendTranslated(POSITIVE, "{user}s weather is now clear!", player);
                 }
                 return;
-            case "downfall":
-                user.setPlayerWeather(WeatherType.DOWNFALL);
-                if (user == context.getSource())
+            case DOWNFALL:
+                player.setPlayerWeather(WeatherType.DOWNFALL);
+                if (context.getSource().equals(player))
                 {
                     context.sendTranslated(POSITIVE, "Your weather is now not clear!");
                 }
                 else
                 {
-                    user.sendTranslated(POSITIVE, "Your weather is now not clear!");
-                    context.sendTranslated(POSITIVE, "{user}s weather is now not clear!", user);
+                    player.sendTranslated(POSITIVE, "Your weather is now not clear!");
+                    context.sendTranslated(POSITIVE, "{user}s weather is now not clear!", player);
                 }
                 return;
-            case "reset":
-                user.resetPlayerWeather();
-                if (user == context.getSource())
+            case RESET:
+                player.resetPlayerWeather();
+                if (context.getSource().equals(player))
                 {
                     context.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
                 }
                 else
                 {
-                    user.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
-                    context.sendTranslated(POSITIVE, "{user}s weather is now reset to server weather!", user);
+                    player.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
+                    context.sendTranslated(POSITIVE, "{user}s weather is now reset to server weather!", player);
                 }
                 return;
         }
         throw new IncorrectUsageException("You did something wrong!");
     }
 
-    @Command(desc = "Removes entity")
-    @Params(positional = {@Param(label = "entityType[:itemMaterial]"),
-                          @Param(req = OPTIONAL, label = "radius", type = Integer.class)}, // TODO staticValues = "*",
-            nonpositional = @Param(names = "in", label = "world", type = World.class))
-    public void remove(CommandContext context)
+    @Command(desc = "Removes entities in a world")
+    public void removeAll(CommandSender context, @Label("entityType[:itemMaterial]") String entityStrings, @Default @Named("in") World world)
     {
-        User sender = null;
-        if (context.getSource() instanceof User)
+        this.remove(context, entityStrings, RADIUS_INFINITE, world);
+    }
+
+    @Command(desc = "Removes entity in a radius")
+    public void remove(CommandSender context, @Label("entityType[:itemMaterial]") String entities,
+                       @Optional Integer radius, @Default @Named("in") World world)
+    {
+        radius = radius == null ? this.config.commands.removeDefaultRadius : radius;
+        if (radius <= 0 && radius != RADIUS_INFINITE)
         {
-            sender = (User)context.getSource();
+            context.sendTranslated(NEGATIVE, "The radius has to be a whole number greater than 0!");
+            return;
         }
-        World world;
-        if (context.hasNamed("in"))
+        Location loc = context instanceof User ? ((User)context).getLocation() : null;
+        if (loc != null && !loc.getWorld().equals(world))
         {
-            world = context.get("in");
-        }
-        else
-        {
-            if (sender == null)
-            {
-                context.sendTranslated(NEGATIVE, "The butcher will come for YOU tonight!");
-                return;
-            }
-            world = sender.getWorld();
-        }
-        int radius = this.config.commands.removeDefaultRadius;
-        if (context.hasPositional(1))
-        {
-            if ("*".equals(context.getString(1)))
-            {
-                radius = -1;
-            }
-            else if (sender == null)
-            {
-                context.sendTranslated(NEGATIVE, "If not used ingame you can only remove all!");
-                return;
-            }
-            else
-            {
-                radius = context.get(1, 0);
-            }
-            if (radius <= 0)
-            {
-                context.sendTranslated(NEGATIVE, "The radius has to be a whole number greater than 0!");
-                return;
-            }
-        }
-        Location loc = null;
-        if (sender != null)
-        {
-            loc = sender.getLocation();
+            loc = world.getSpawnLocation();
         }
         int entitiesRemoved;
-        if ("*".equals(context.getString(0)))
+        if ("*".equals(entities))
         {
             List<Entity> list = new ArrayList<>();
-            for (Entity entity : world.getEntities())
+            for (Entity e : world.getEntities())
             {
-                if (!(entity instanceof LivingEntity))
+                if (!(e instanceof LivingEntity))
                 {
-                    list.add(entity);
+                    list.add(e);
                 }
             }
             entitiesRemoved = this.removeEntities(list, loc, radius, false);
@@ -281,59 +202,65 @@ public class WorldControlCommands
         else
         {
             List<Entity> list = world.getEntities(); // All entites remaining in that list will not get deleted!
-            String[] s_entityTypes = StringUtils.explode(",", context.getString(0));
             List<EntityType> types = new ArrayList<>();
-            for (String s_entityType : s_entityTypes)
+            for (String entityString : StringUtils.explode(",", entities))
             {
-                if (s_entityType.contains(":"))
+                EntityType type;
+                if (entityString.contains(":"))
                 {
-                    EntityType type = Match.entity().any(s_entityType.substring(0, s_entityType.indexOf(":")));
+                    type = Match.entity().any(entityString.substring(0, entityString.indexOf(":")));
+                }
+                else
+                {
+                    type = Match.entity().any(entityString);
+                }
+                if (type == null)
+                {
+                    context.sendTranslated(NEGATIVE, "Invalid entity-type!");
+                    context.sendTranslated(NEUTRAL, "Use one of those instead:");
+                    context.sendMessage(DROPPED_ITEM.toString() + YELLOW + ", " +
+                                            GOLD + ARROW + YELLOW + ", " +
+                                            GOLD + BOAT + YELLOW + ", " +
+                                            GOLD + MINECART + YELLOW + ", " +
+                                            GOLD + PAINTING + YELLOW + ", " +
+                                            GOLD + ITEM_FRAME + YELLOW + " or " +
+                                            GOLD + EXPERIENCE_ORB);
+                    return;
+                }
+                if (type.isAlive())
+                {
+                    context.sendTranslated(NEGATIVE, "To kill living entities use the {text:/butcher} command!");
+                    return;
+                }
+                if (entityString.contains(":"))
+                {
                     if (!DROPPED_ITEM.equals(type))
                     {
                         context.sendTranslated(NEGATIVE, "You can only specify data for removing items!");
                         return;
                     }
-                    Material itemtype = Match.material().material(s_entityType.substring(s_entityType.indexOf(":") + 1));
-                    List<Entity> remList = new ArrayList<>();
+                    Material itemtype = Match.material().material(entityString.substring(entityString.indexOf(":") + 1));
+                    List<Entity> removeList = new ArrayList<>();
                     for (Entity entity : list)
                     {
                         if (entity.getType().equals(DROPPED_ITEM) && ((Item)entity).getItemStack().getType().equals(itemtype))
                         {
-                            remList.add(entity);
+                            removeList.add(entity);
                         }
                     }
-                    list.removeAll(remList);
+                    list.removeAll(removeList);
                 }
                 else
                 {
-                    EntityType type = Match.entity().any(s_entityType);
-                    if (type == null)
-                    {
-                        context.sendTranslated(NEGATIVE, "Invalid entity-type!");
-                        context.sendTranslated(NEUTRAL, "Use one of those instead:");
-                        context.sendMessage(DROPPED_ITEM.toString() + YELLOW + ", " +
-                                                GOLD + EntityType.ARROW + YELLOW + ", " +
-                                                GOLD + EntityType.BOAT + YELLOW + ", " +
-                                                GOLD + EntityType.MINECART + YELLOW + ", " +
-                                                GOLD + EntityType.PAINTING + YELLOW + ", " +
-                                                GOLD + EntityType.ITEM_FRAME + YELLOW + " or " +
-                                                GOLD + EntityType.EXPERIENCE_ORB);
-                        return;
-                    }
-                    if (type.isAlive())
-                    {
-                        context.sendTranslated(NEGATIVE, "To kill living entities use the {text:/butcher} command!");
-                        return;
-                    }
                     types.add(type);
                 }
             }
             List<Entity> remList = new ArrayList<>();
-            for (Entity entity : list)
+            for (Entity e : list)
             {
-                if (types.contains(entity.getType()))
+                if (types.contains(e.getType()))
                 {
-                    remList.add(entity);
+                    remList.add(e);
                 }
             }
             list.removeAll(remList);
@@ -344,25 +271,24 @@ public class WorldControlCommands
         if (entitiesRemoved == 0)
         {
             context.sendTranslated(NEUTRAL, "No entities to remove!");
+            return;
         }
-        else if ("*".equals(context.getString(0)))
+        if ("*".equals(entities))
         {
-            if (radius == -1)
+            if (radius == RADIUS_INFINITE)
             {
                 context.sendTranslated(POSITIVE, "Removed all entities in {world}! ({amount})", world, entitiesRemoved);
                 return;
             }
             context.sendTranslated(POSITIVE, "Removed all entities around you! ({amount})", entitiesRemoved);
+            return;
         }
-        else
+        if (radius == RADIUS_INFINITE)
         {
-            if (radius == -1)
-            {
-                context.sendTranslated(POSITIVE, "Removed {amount} entities in {world}!", entitiesRemoved, world);
-                return;
-            }
-            context.sendTranslated(POSITIVE, "Removed {amount} entities nearby!", entitiesRemoved); // TODO a non-plural version if there is only 1 entity
+            context.sendTranslated(POSITIVE, "Removed {amount} entities in {world}!", entitiesRemoved, world);
+            return;
         }
+        context.sendTranslated(POSITIVE, "Removed {amount} entities nearby!", entitiesRemoved); // TODO a non-plural version if there is only 1 entity
     }
 
     @Command(desc = "Gets rid of mobs close to you. Valid types are:\n" +

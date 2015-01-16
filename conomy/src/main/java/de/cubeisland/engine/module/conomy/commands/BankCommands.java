@@ -18,7 +18,6 @@
 package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.Set;
-
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;

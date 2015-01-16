@@ -26,7 +26,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-
+import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.core.util.LocationUtil;
+import de.cubeisland.engine.core.util.Pair;
+import de.cubeisland.engine.module.portals.config.PortalConfig;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -37,11 +40,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityTeleportEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.LocationUtil;
-import de.cubeisland.engine.core.util.Pair;
-import de.cubeisland.engine.module.portals.config.PortalConfig;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 

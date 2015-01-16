@@ -19,11 +19,6 @@ package de.cubeisland.engine.module.roles;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
-
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.module.service.Permission;
 import de.cubeisland.engine.core.permission.PermissionManager;
@@ -31,6 +26,9 @@ import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesManager;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 public class PermissionProvider implements Permission
 {

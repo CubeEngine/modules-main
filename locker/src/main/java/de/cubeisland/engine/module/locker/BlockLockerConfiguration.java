@@ -17,11 +17,10 @@
  */
 package de.cubeisland.engine.module.locker;
 
-import org.bukkit.Material;
-
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.locker.storage.ProtectedType;
+import org.bukkit.Material;
 
 /**
  * Example:

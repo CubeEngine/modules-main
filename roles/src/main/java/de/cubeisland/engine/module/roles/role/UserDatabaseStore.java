@@ -23,14 +23,12 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.RoleAppliedEvent;
 import de.cubeisland.engine.module.roles.storage.UserMetaData;
 import de.cubeisland.engine.module.roles.storage.UserPermission;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Result;

@@ -17,13 +17,12 @@
  */
 package de.cubeisland.engine.module.travel.warp;
 
-import org.bukkit.Location;
-
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.travel.InviteManager;
 import de.cubeisland.engine.module.travel.TelePointManager;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
+import org.bukkit.Location;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.TeleportType.WARP;

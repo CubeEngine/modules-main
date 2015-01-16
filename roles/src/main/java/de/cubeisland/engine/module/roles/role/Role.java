@@ -26,15 +26,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
-
-import org.bukkit.World;
-import org.bukkit.permissions.Permissible;
-
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.util.Triplet;
 import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.module.roles.exception.CircularRoleDependencyException;
+import org.bukkit.World;
+import org.bukkit.permissions.Permissible;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
 

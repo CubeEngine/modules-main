@@ -17,8 +17,6 @@
  */
 package de.cubeisland.engine.module.conomy.commands;
 
-import org.bukkit.OfflinePlayer;
-
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.parametric.Label;
@@ -30,6 +28,7 @@ import de.cubeisland.engine.core.user.UserList;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
+import org.bukkit.OfflinePlayer;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 

@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import de.cubeisland.engine.core.storage.database.Database;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.travel.storage.TeleportInvite;

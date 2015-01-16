@@ -19,14 +19,8 @@ package de.cubeisland.engine.module.worlds.converter;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
-
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.ConverterManager;
-import de.cubeisland.engine.converter.converter.ClassedConverter;
-import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.converter.SingleClassConverter;
 import de.cubeisland.engine.converter.node.ByteNode;
 import de.cubeisland.engine.converter.node.IntNode;
@@ -34,6 +28,8 @@ import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.NullNode;
 import de.cubeisland.engine.converter.node.StringNode;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 public class PotionEffectConverter extends SingleClassConverter<PotionEffect>
 {

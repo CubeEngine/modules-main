@@ -19,16 +19,14 @@ package de.cubeisland.engine.module.portals;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.Pair;
 import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.portals.config.PortalConfig;
+import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.entity.Entity;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;

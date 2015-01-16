@@ -19,7 +19,6 @@ package de.cubeisland.engine.module.basics;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.storage.database.Database;
 import de.cubeisland.engine.core.user.User;

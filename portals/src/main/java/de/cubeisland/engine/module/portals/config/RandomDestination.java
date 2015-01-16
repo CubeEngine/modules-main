@@ -18,21 +18,18 @@
 package de.cubeisland.engine.module.portals.config;
 
 import java.util.Random;
-
-import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
-
-import org.bukkit.Chunk;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Entity;
-
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.bukkit.BukkitUtils;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.Pair;
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.PortalManager;
+import org.bukkit.Chunk;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.craftbukkit.v1_8_R1.entity.CraftEntity;
+import org.bukkit.entity.Entity;
 
 public class RandomDestination extends Destination
 {

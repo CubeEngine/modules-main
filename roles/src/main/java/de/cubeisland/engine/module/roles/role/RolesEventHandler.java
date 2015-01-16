@@ -17,6 +17,9 @@
  */
 package de.cubeisland.engine.module.roles.role;
 
+import de.cubeisland.engine.core.permission.NotifyPermissionRegistrationCompletedEvent;
+import de.cubeisland.engine.core.user.UserAuthorizedEvent;
+import de.cubeisland.engine.module.roles.Roles;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,10 +27,6 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
-
-import de.cubeisland.engine.core.permission.NotifyPermissionRegistrationCompletedEvent;
-import de.cubeisland.engine.core.user.UserAuthorizedEvent;
-import de.cubeisland.engine.module.roles.Roles;
 
 public class RolesEventHandler implements Listener
 {

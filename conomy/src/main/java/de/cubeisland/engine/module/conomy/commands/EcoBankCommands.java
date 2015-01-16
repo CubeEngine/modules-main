@@ -18,7 +18,6 @@
 package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.List;
-
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;

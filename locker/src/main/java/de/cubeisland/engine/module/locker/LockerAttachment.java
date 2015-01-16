@@ -19,7 +19,6 @@ package de.cubeisland.engine.module.locker;
 
 import java.util.HashSet;
 import java.util.Set;
-
 import de.cubeisland.engine.core.user.UserAttachment;
 import de.cubeisland.engine.module.locker.storage.Lock;
 

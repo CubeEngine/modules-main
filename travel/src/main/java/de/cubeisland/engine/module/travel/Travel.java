@@ -18,7 +18,6 @@
 package de.cubeisland.engine.module.travel;
 
 import java.util.concurrent.TimeUnit;
-
 import de.cubeisland.engine.core.command.CommandManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.storage.database.Database;

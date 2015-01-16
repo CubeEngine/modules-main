@@ -18,16 +18,14 @@
 package de.cubeisland.engine.module.locker.storage;
 
 import java.util.Arrays;
-
+import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.locker.Locker;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.util.Vector;
-
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.module.locker.Locker;
 
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_RED;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;

@@ -17,22 +17,17 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
-import de.cubeisland.engine.command.methodic.parametric.Label;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
-import org.bukkit.World;
-
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
+import org.bukkit.World;
 
-import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 

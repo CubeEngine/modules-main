@@ -19,14 +19,6 @@ package de.cubeisland.engine.module.basics.command.moderation;
 
 import java.util.EnumSet;
 import java.util.Set;
-
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.material.Openable;
-
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
@@ -37,6 +29,12 @@ import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.math.Vector3;
 import de.cubeisland.engine.core.util.math.shape.Sphere;
 import de.cubeisland.engine.module.basics.Basics;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
+import org.bukkit.material.Openable;
 
 import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;

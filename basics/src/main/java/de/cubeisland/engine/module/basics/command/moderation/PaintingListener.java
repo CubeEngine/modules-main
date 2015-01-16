@@ -22,7 +22,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-
+import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.basics.Basics;
 import org.bukkit.Art;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Painting;
@@ -32,9 +33,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
-
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.module.basics.Basics;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;

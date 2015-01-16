@@ -17,10 +17,9 @@
  */
 package de.cubeisland.engine.module.basics.command.moderation;
 
+import de.cubeisland.engine.core.permission.Permission;
 import org.bukkit.entity.Entity;
 import org.bukkit.permissions.Permissible;
-
-import de.cubeisland.engine.core.permission.Permission;
 
 public class EntityRemoval
 {

@@ -17,18 +17,16 @@
  */
 package de.cubeisland.engine.module.locker.commands;
 
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.InventoryHolder;
-
 import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.storage.Lock;
 import de.cubeisland.engine.module.locker.storage.LockManager;
+import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
+import org.bukkit.inventory.InventoryHolder;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;

@@ -17,18 +17,13 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
+import de.cubeisland.engine.command.alias.Alias;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.parametric.Default;
 import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Named;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
-import org.bukkit.World;
-
-import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.Flags;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.node.StringNode;
@@ -41,8 +36,8 @@ import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RoleProvider;
 import de.cubeisland.engine.module.roles.role.WorldRoleProvider;
+import org.bukkit.World;
 
-import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 @Alias("manrole")

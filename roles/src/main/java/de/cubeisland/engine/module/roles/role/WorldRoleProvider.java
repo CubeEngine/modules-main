@@ -23,13 +23,11 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import org.bukkit.World;
-
 import de.cubeisland.engine.core.util.Triplet;
 import de.cubeisland.engine.module.roles.RolesConfig;
 import de.cubeisland.engine.module.roles.config.MirrorConfig;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
+import org.bukkit.World;
 
 import static de.cubeisland.engine.core.contract.Contract.expectNotNull;
 

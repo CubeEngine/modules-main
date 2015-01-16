@@ -20,12 +20,10 @@ package de.cubeisland.engine.module.roles.config;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.bukkit.World;
-
 import de.cubeisland.engine.core.util.Triplet;
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.module.roles.Roles;
+import org.bukkit.World;
 
 public class MirrorConfig
 {

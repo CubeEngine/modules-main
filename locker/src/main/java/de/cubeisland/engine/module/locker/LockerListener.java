@@ -19,7 +19,10 @@ package de.cubeisland.engine.module.locker;
 
 import java.util.HashSet;
 import java.util.Set;
-
+import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.core.util.BlockUtil;
+import de.cubeisland.engine.module.locker.storage.Lock;
+import de.cubeisland.engine.module.locker.storage.LockManager;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -63,11 +66,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.material.Door;
 import org.bukkit.material.Openable;
 import org.bukkit.projectiles.ProjectileSource;
-
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.BlockUtil;
-import de.cubeisland.engine.module.locker.storage.Lock;
-import de.cubeisland.engine.module.locker.storage.LockManager;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;

@@ -18,14 +18,12 @@
 package de.cubeisland.engine.module.travel;
 
 import java.util.Set;
-
-import org.bukkit.Location;
-
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
+import org.bukkit.Location;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;

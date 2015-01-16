@@ -17,15 +17,6 @@
  */
 package de.cubeisland.engine.module.worlds.converter;
 
-import net.minecraft.server.v1_8_R1.NBTTagCompound;
-import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
-
-import org.bukkit.Material;
-import org.bukkit.Server;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
-
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.IntNode;
@@ -35,6 +26,13 @@ import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.ShortNode;
 import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.core.bukkit.NBTUtils;
+import net.minecraft.server.v1_8_R1.NBTTagCompound;
+import org.bukkit.Material;
+import org.bukkit.Server;
+import org.bukkit.craftbukkit.v1_8_R1.inventory.CraftItemStack;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 
 public class InventoryConverter extends SimpleConverter<Inventory>
 {

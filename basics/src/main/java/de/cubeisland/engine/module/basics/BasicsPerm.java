@@ -18,7 +18,6 @@
 package de.cubeisland.engine.module.basics;
 
 import java.util.concurrent.TimeUnit;
-
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.permission.PermissionContainer;
 import de.cubeisland.engine.core.util.Profiler;
@@ -150,10 +149,6 @@ public class BasicsPerm extends PermissionContainer<Basics>
     public final Permission COMMAND_INVSEE_QUIET = COMMAND_INVSEE.child("quiet");
 
     private final Permission COMMAND_SPAWN = COMMAND.childWildcard("spawn");
-    /**
-     * Allows to teleport all online players to the spawn of the main world
-     */
-    public final Permission COMMAND_SPAWN_ALL = COMMAND_SPAWN.child("all");
     /**
      * Prevents from being teleported to spawn by someone else
      */

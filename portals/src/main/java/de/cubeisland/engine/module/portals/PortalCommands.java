@@ -19,15 +19,10 @@ package de.cubeisland.engine.module.portals;
 
 import java.io.File;
 import java.util.Set;
-
-import org.bukkit.Location;
-import org.bukkit.World;
-
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.command.parameter.FixedValues;
 import de.cubeisland.engine.core.command.CommandContainer;
@@ -40,6 +35,8 @@ import de.cubeisland.engine.core.util.math.shape.Cuboid;
 import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.config.Destination;
 import de.cubeisland.engine.module.portals.config.PortalConfig;
+import org.bukkit.Location;
+import org.bukkit.World;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;

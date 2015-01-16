@@ -24,23 +24,17 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-
-import de.cubeisland.engine.core.command.CommandSender;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.event.entity.EntityDamageEvent;
-
 import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.parametric.Default;
 import de.cubeisland.engine.command.methodic.parametric.Greed;
-import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Named;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.core.ban.UserBan;
 import de.cubeisland.engine.core.bukkit.BukkitUtils;
 import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserList;
 import de.cubeisland.engine.core.user.UserManager;
@@ -51,6 +45,9 @@ import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.event.entity.EntityDamageEvent;
 
 import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;

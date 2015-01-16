@@ -21,16 +21,14 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.inventory.ItemStack;
-
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.inventory.ItemStack;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 

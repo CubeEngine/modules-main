@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-
 import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 
 public class PermissionTree

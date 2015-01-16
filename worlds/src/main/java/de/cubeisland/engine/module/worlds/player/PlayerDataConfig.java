@@ -20,17 +20,15 @@ package de.cubeisland.engine.module.worlds.player;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-
+import de.cubeisland.engine.core.CubeEngine;
+import de.cubeisland.engine.core.config.codec.NBTCodec;
+import de.cubeisland.engine.reflect.ReflectedFile;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
-
-import de.cubeisland.engine.core.CubeEngine;
-import de.cubeisland.engine.core.config.codec.NBTCodec;
-import de.cubeisland.engine.reflect.ReflectedFile;
 
 public class PlayerDataConfig extends ReflectedFile<NBTCodec>
 {

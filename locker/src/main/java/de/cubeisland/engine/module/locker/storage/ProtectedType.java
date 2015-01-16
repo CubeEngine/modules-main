@@ -21,11 +21,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
+import de.cubeisland.engine.core.util.matcher.Match;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
-
-import de.cubeisland.engine.core.util.matcher.Match;
 
 import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;
 

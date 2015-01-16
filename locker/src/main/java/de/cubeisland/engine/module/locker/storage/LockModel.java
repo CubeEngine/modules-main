@@ -20,7 +20,6 @@ package de.cubeisland.engine.module.locker.storage;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.UUID;
-
 import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;

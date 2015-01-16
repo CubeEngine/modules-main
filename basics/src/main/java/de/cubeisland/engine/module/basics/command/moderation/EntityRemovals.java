@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.basics.command.moderation;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import de.cubeisland.engine.module.basics.Basics;
 import org.bukkit.entity.Ambient;
 import org.bukkit.entity.Animals;
 import org.bukkit.entity.Bat;
@@ -57,8 +57,6 @@ import org.bukkit.entity.Witch;
 import org.bukkit.entity.Wither;
 import org.bukkit.entity.Wolf;
 import org.bukkit.entity.Zombie;
-
-import de.cubeisland.engine.module.basics.Basics;
 
 public class EntityRemovals
 {

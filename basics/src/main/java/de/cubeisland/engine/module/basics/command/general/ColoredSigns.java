@@ -18,13 +18,11 @@
 package de.cubeisland.engine.module.basics.command.general;
 
 import java.util.regex.Pattern;
-
+import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.basics.Basics;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.SignChangeEvent;
-
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.module.basics.Basics;
 
 public class ColoredSigns implements Listener
 {

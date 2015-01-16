@@ -22,15 +22,12 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.parametric.Greed;
-import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.core.command.CommandContainer;
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;

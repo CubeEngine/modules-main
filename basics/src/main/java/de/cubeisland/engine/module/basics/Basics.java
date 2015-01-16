@@ -18,9 +18,6 @@
 package de.cubeisland.engine.module.basics;
 
 import java.util.concurrent.TimeUnit;
-
-import org.bukkit.entity.Player;
-
 import de.cubeisland.engine.core.bukkit.EventManager;
 import de.cubeisland.engine.core.command.CommandManager;
 import de.cubeisland.engine.core.module.Module;
@@ -55,6 +52,7 @@ import de.cubeisland.engine.module.basics.storage.TableBasicsUser;
 import de.cubeisland.engine.module.basics.storage.TableIgnorelist;
 import de.cubeisland.engine.module.basics.storage.TableMail;
 import de.cubeisland.engine.module.roles.Roles;
+import org.bukkit.entity.Player;
 
 public class Basics extends Module
 {

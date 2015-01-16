@@ -17,20 +17,18 @@
  */
 package de.cubeisland.engine.module.basics.command.moderation;
 
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-
 import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.InventoryGuardFactory;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 

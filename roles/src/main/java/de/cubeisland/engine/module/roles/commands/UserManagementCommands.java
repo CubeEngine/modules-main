@@ -18,19 +18,12 @@
 package de.cubeisland.engine.module.roles.commands;
 
 import java.util.Set;
-
-import de.cubeisland.engine.command.methodic.parametric.Complete;
-import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Label;
-import de.cubeisland.engine.command.methodic.parametric.Named;
-import org.bukkit.World;
-
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.Flags;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Complete;
+import de.cubeisland.engine.command.methodic.parametric.Default;
+import de.cubeisland.engine.command.methodic.parametric.Named;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.RoleCompleter;
@@ -39,8 +32,8 @@ import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 import de.cubeisland.engine.module.roles.role.UserDatabaseStore;
+import org.bukkit.World;
 
-import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 @Alias("manuser")

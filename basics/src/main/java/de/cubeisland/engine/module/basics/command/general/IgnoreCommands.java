@@ -20,15 +20,11 @@ package de.cubeisland.engine.module.basics.command.general;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
 import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Reader;
 import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserManager;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.storage.IgnoreList;

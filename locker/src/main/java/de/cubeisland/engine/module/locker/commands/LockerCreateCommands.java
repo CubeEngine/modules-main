@@ -24,6 +24,7 @@ import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
@@ -62,59 +63,49 @@ public class LockerCreateCommands extends CommandContainer
 
     @Alias(value = "cprivate")
     @Command(name = "private", desc = "creates a private protection")
-    @Params(positional = @Param(req = OPTIONAL, label = "password"))
-    @Flags(@Flag(name = "key", longName = "keybook"))
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void cPrivate(CommandContext context)
+    public void cPrivate(User context, @Optional String password, @Flag(name = "key", longName = "keybook") boolean keybook)
     {
-        this.setCreateProtection(context.getSource(), C_PRIVATE, context.getString(0), context.hasFlag("key"));
+        this.setCreateProtection(context, C_PRIVATE, password, keybook);
     }
 
     @Alias(value = "cpublic")
     @Command(name = "public", desc = "creates a public protection")
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void cPublic(CommandContext context)
+    public void cPublic(User context)
     {
-        this.setCreateProtection(context.getSource(), C_PUBLIC, null, false);
+        this.setCreateProtection(context, C_PUBLIC, null, false);
     }
 
     @Alias(value = "cdonation")
     @Command(name = "donation", desc = "creates a donation protection")
-    @Params(positional = @Param(req = OPTIONAL, label = "password"))
-    @Flags(@Flag(name = "key", longName = "keybook"))
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void cDonation(CommandContext context)
+    public void cDonation(User context, @Optional String password, @Flag(name = "key", longName = "keybook") boolean keybook)
     {
-        this.setCreateProtection(context.getSource(), C_DONATION, context.getString(0), context.hasFlag("key"));
+        this.setCreateProtection(context, C_DONATION, password, keybook);
     }
 
     @Alias(value = "cfree")
     @Command(name = "free", desc = "creates a free protection")
-    @Params(positional = @Param(req = OPTIONAL, label = "password"))
-    @Flags(@Flag(name = "key", longName = "keybook"))
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void cFree(CommandContext context)
+    public void cFree(User context, @Optional String password, @Flag(name = "key", longName = "keybook") boolean keybook)
     {
-        this.setCreateProtection(context.getSource(), C_FREE, context.getString(0), context.hasFlag("key"));
+        this.setCreateProtection(context, C_FREE, password, keybook);
     }
 
     @Alias(value = "cpassword")
     @Command(name = "password", desc = "creates a donation protection")
-    @Params(positional = @Param(label = "password"))
-    @Flags(@Flag(name = "key", longName = "keybook"))
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void cPassword(CommandContext context) // same as private but with pw
+    public void cPassword(User context, String password, @Flag(name = "key", longName = "keybook") boolean keybook) // same as private but with pw
     {
-        this.setCreateProtection(context.getSource(), C_PRIVATE, context.getString(0), context.hasFlag("key"));
+        this.setCreateProtection(context, C_PRIVATE, password, keybook);
     }
 
     @Alias(value = "cguarded")
     @Command(name = "guarded", desc = "creates a guarded protection")
-    @Params(positional = @Param(req = OPTIONAL, label = "password"))
-    @Flags(@Flag(name = "key", longName = "keybook"))
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void cguarded(CommandContext context) // same as private but with pw
+    public void cguarded(User context, @Optional String password, @Flag(name = "key", longName = "keybook") boolean keybook) // same as private but with pw
     {
-        this.setCreateProtection(context.getSource(), C_GUARDED, context.getString(0), context.hasFlag("key"));
+        this.setCreateProtection(context, C_GUARDED, password, keybook);
     }
 }

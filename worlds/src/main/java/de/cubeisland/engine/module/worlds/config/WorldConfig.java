@@ -23,15 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
-import org.bukkit.GameMode;
-import org.bukkit.World;
-import org.bukkit.World.Environment;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
-
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.util.WorldLocation;
 import de.cubeisland.engine.core.world.ConfigWorld;
@@ -39,6 +30,13 @@ import de.cubeisland.engine.module.worlds.Worlds;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.bukkit.Bukkit;
+import org.bukkit.Difficulty;
+import org.bukkit.GameMode;
+import org.bukkit.World;
+import org.bukkit.World.Environment;
+import org.bukkit.WorldCreator;
+import org.bukkit.WorldType;
 
 @SuppressWarnings("all")
 public class WorldConfig extends ReflectedYaml

@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
 import de.cubeisland.engine.module.conomy.account.storage.BankAccessModel;

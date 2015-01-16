@@ -18,7 +18,6 @@
 package de.cubeisland.engine.module.travel.home;
 
 import java.util.Locale;
-
 import de.cubeisland.engine.core.permission.PermDefault;
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.module.travel.TeleportPoint;

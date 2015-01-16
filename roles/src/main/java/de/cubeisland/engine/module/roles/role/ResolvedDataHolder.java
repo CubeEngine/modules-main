@@ -27,15 +27,13 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
-
-import org.bukkit.Bukkit;
-import org.bukkit.permissions.Permission;
-
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.exception.CircularRoleDependencyException;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
+import org.bukkit.Bukkit;
+import org.bukkit.permissions.Permission;
 
 public abstract class ResolvedDataHolder extends TempDataStore
 {

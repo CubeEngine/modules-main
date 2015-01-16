@@ -21,11 +21,7 @@ import java.util.Map;
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.Flags;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Label;
 import de.cubeisland.engine.command.methodic.parametric.Named;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.permission.PermDefault;
@@ -39,7 +35,6 @@ import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
 import org.bukkit.World;
 
-import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 @Command(name = "user", desc = "Manage users")

@@ -30,7 +30,8 @@ import de.cubeisland.engine.module.roles.role.RolesManager;
 import org.bukkit.World;
 
 import static de.cubeisland.engine.core.util.ChatFormat.*;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 
 public abstract class RoleCommandHelper extends CommandContainer
 {

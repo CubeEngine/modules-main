@@ -30,15 +30,6 @@ import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.TravelAgent;
-import org.bukkit.World;
-import org.bukkit.World.Environment;
-import org.bukkit.WorldCreator;
-import org.bukkit.entity.Player;
-
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.util.McUUID;
 import de.cubeisland.engine.core.util.Pair;
@@ -50,6 +41,13 @@ import de.cubeisland.engine.module.worlds.config.UniverseConfig;
 import de.cubeisland.engine.module.worlds.config.WorldConfig;
 import de.cubeisland.engine.module.worlds.player.PlayerDataConfig;
 import de.cubeisland.engine.reflect.Reflector;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.TravelAgent;
+import org.bukkit.World;
+import org.bukkit.World.Environment;
+import org.bukkit.WorldCreator;
+import org.bukkit.entity.Player;
 
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.DAT;
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;

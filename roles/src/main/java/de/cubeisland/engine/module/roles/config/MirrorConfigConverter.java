@@ -19,7 +19,6 @@ package de.cubeisland.engine.module.roles.config;
 
 import java.util.Map;
 import java.util.Map.Entry;
-
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.ListNode;

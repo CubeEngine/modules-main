@@ -19,7 +19,6 @@ package de.cubeisland.engine.module.basics.storage;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.core.user.User;

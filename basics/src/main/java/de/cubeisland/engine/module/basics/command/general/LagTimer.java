@@ -18,7 +18,6 @@
 package de.cubeisland.engine.module.basics.command.general;
 
 import java.util.LinkedList;
-
 import de.cubeisland.engine.core.util.Pair;
 import de.cubeisland.engine.module.basics.Basics;
 

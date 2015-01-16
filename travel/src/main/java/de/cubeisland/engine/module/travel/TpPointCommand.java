@@ -18,11 +18,11 @@
 package de.cubeisland.engine.module.travel;
 
 import java.util.Set;
-
 import de.cubeisland.engine.command.parameter.IncorrectUsageException;
 import de.cubeisland.engine.command.parameter.reader.ReaderException;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
@@ -80,7 +80,7 @@ public class TpPointCommand extends CommandContainer
         return user;
     }
 
-    protected void showList(CommandContext context, User user, Set<? extends TeleportPoint> points)
+    protected void showList(CommandSender context, User user, Set<? extends TeleportPoint> points)
     {
         for (TeleportPoint point : points)
         {

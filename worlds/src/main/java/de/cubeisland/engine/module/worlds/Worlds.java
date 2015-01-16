@@ -18,27 +18,17 @@
 package de.cubeisland.engine.module.worlds;
 
 import java.io.IOException;
-
-import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
-import org.bukkit.GameMode;
-import org.bukkit.World.Environment;
-import org.bukkit.WorldType;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.potion.PotionEffect;
-
 import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.core.config.codec.NBTCodec;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.module.exception.ModuleLoadError;
 import de.cubeisland.engine.module.worlds.commands.WorldsCommands;
 import de.cubeisland.engine.module.worlds.config.WorldsConfig;
-import de.cubeisland.engine.module.worlds.converter.DiffcultyConverter;
-import de.cubeisland.engine.module.worlds.converter.EnvironmentConverter;
-import de.cubeisland.engine.module.worlds.converter.GameModeConverter;
 import de.cubeisland.engine.module.worlds.converter.InventoryConverter;
 import de.cubeisland.engine.module.worlds.converter.PotionEffectConverter;
-import de.cubeisland.engine.module.worlds.converter.WorldTypeConverter;
+import org.bukkit.Bukkit;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.potion.PotionEffect;
 
 public class Worlds extends Module
 {

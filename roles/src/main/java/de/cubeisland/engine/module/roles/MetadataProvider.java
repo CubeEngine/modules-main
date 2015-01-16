@@ -17,8 +17,6 @@
  */
 package de.cubeisland.engine.module.roles;
 
-import org.bukkit.World;
-
 import de.cubeisland.engine.core.module.service.Metadata;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.roles.role.Role;
@@ -26,6 +24,7 @@ import de.cubeisland.engine.module.roles.role.RoleProvider;
 import de.cubeisland.engine.module.roles.role.RolesManager;
 import de.cubeisland.engine.module.roles.role.UserDatabaseStore;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
+import org.bukkit.World;
 
 public class MetadataProvider implements Metadata
 {

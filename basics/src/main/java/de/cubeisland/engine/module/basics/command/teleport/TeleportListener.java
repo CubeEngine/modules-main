@@ -17,6 +17,10 @@
  */
 package de.cubeisland.engine.module.basics.command.teleport;
 
+import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.core.util.LocationUtil;
+import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.basics.BasicsAttachment;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -24,11 +28,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
-
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.LocationUtil;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
 
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;

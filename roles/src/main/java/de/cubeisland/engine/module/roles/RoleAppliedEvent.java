@@ -17,11 +17,10 @@
  */
 package de.cubeisland.engine.module.roles;
 
-import org.bukkit.event.HandlerList;
-
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserEvent;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
+import org.bukkit.event.HandlerList;
 
 public class RoleAppliedEvent extends UserEvent
 {

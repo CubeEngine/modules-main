@@ -18,28 +18,22 @@
 package de.cubeisland.engine.module.basics.command.teleport;
 
 import de.cubeisland.engine.command.filter.Restricted;
+import de.cubeisland.engine.command.methodic.Command;
+import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.parametric.Default;
 import de.cubeisland.engine.command.methodic.parametric.Named;
 import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.command.parameter.TooFewArgumentsException;
 import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.UserList;
-import org.bukkit.Location;
-import org.bukkit.World;
-
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.Flags;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.core.world.WorldSetSpawnEvent;
 import de.cubeisland.engine.module.basics.Basics;
+import org.bukkit.Location;
+import org.bukkit.World;
 
-import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
 /**
  * Contains spawn-commands.
@@ -75,54 +69,34 @@ public class SpawnCommands
         context.sendTranslated(POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new BlockVector3(x, y, z));
     }
 
-    @Command(desc = "Teleport directly to the worlds spawn.")
-    public void spawn(CommandSender context, @Optional User player, @Named({"world", "w"}) World world,
-                      @Flag boolean force, @Flag boolean all)
+    @Command(desc = "Teleports all players to spawn")
+    public void spawnAll(CommandSender context, World world, @Flag boolean force)
+    {
+        Location loc = world.getSpawnLocation().add(0.5, 0, 0.5);
+        for (User aPlayer : module.getCore().getUserManager().getOnlineUsers())
+        {
+            if (!force && module.perms().COMMAND_SPAWN_PREVENT.isAuthorized(aPlayer))
+            {
+                continue;
+            }
+            if (!TeleportCommands.teleport(aPlayer, loc, true, force, true))
+            {
+                context.sendTranslated(NEGATIVE, "Teleport failed!");
+                return;
+            }
+        }
+        this.module.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleported everyone to the spawn of {world}!", world);
+    }
+
+    @Command(desc = "Teleports a player to spawn")
+    public void spawn(CommandSender context, @Default User player, @Optional World world, @Flag boolean force)
     {
         world = world == null ? module.getConfiguration().mainWorld : world;
-        if (world == null && context instanceof User)
-        {
-            world = ((User)context).getWorld();
-        }
         if (world == null)
         {
-            throw new TooFewArgumentsException();
+            world = player.getWorld();
         }
         force = force && module.perms().COMMAND_SPAWN_FORCE.isAuthorized(context);
-        if (all)
-        {
-            if (!module.perms().COMMAND_SPAWN_ALL.isAuthorized(context))
-            {
-                context.sendTranslated(NEGATIVE, "You are not allowed to spawn everyone!");
-                return;
-            }
-            Location loc = world.getSpawnLocation().add(0.5, 0, 0.5);
-            for (User aPlayer : module.getCore().getUserManager().getOnlineUsers())
-            {
-                if (!force)
-                {
-                    if (module.perms().COMMAND_SPAWN_PREVENT.isAuthorized(aPlayer))
-                    {
-                        continue;
-                    }
-                }
-                if (!TeleportCommands.teleport(aPlayer, loc, true, force, true))
-                {
-                    return;
-                }
-            }
-            this.module.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleported everyone to the spawn of {world}!", world);
-            return;
-        }
-        if (player == null)
-        {
-            if (!(context instanceof User))
-            {
-                context.sendTranslated(NEGATIVE, "{text:Pro Tip}: Teleport does not work IRL!");
-                return;
-            }
-            player = (User)context;
-        }
         if (!player.isOnline())
         {
             context.sendTranslated(NEGATIVE, "You cannot teleport an offline player to spawn!");
@@ -140,7 +114,9 @@ public class SpawnCommands
         if (!TeleportCommands.teleport(player, spawnLocation, true, force, true))
         {
             context.sendTranslated(NEGATIVE, "Teleport failed!");
+            return;
         }
+        context.sendTranslated(POSITIVE, "You are now standing at the spawn in {world}!", world);
     }
 
     @Command(desc = "Teleports you to the spawn of given world")

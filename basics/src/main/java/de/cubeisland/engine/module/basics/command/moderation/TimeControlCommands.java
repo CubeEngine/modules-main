@@ -22,10 +22,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
-
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
@@ -36,6 +32,8 @@ import de.cubeisland.engine.core.task.TaskManager;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
+import org.bukkit.Bukkit;
+import org.bukkit.World;
 
 import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;

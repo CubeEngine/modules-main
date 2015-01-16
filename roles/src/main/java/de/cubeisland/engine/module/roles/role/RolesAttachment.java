@@ -20,12 +20,10 @@ package de.cubeisland.engine.module.roles.role;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
-
-import org.bukkit.World;
-
 import de.cubeisland.engine.core.user.UserAttachment;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
+import org.bukkit.World;
 
 public class RolesAttachment extends UserAttachment
 {

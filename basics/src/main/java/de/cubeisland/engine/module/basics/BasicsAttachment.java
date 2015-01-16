@@ -18,11 +18,9 @@
 package de.cubeisland.engine.module.basics;
 
 import java.util.UUID;
-
+import de.cubeisland.engine.core.user.UserAttachment;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
-
-import de.cubeisland.engine.core.user.UserAttachment;
 
 public class BasicsAttachment extends UserAttachment
 {
