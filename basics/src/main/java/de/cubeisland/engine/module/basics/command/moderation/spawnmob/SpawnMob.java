@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import de.cubeisland.engine.command.parameter.IncorrectUsageException;
 import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.matcher.Match;
 import org.bukkit.Location;
@@ -38,7 +39,7 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 
 public class SpawnMob
 {
-    static Entity[] spawnMobs(CommandContext context, String mobString, Location loc, int amount)
+    static Entity[] spawnMobs(CommandSender context, String mobString, Location loc, int amount)
     {
         String[] mobStrings = StringUtils.explode(",", mobString);
         Entity[] mobs = spawnMob(context, mobStrings[0], loc, amount, null); // base mobs
@@ -58,7 +59,7 @@ public class SpawnMob
         }
     }
 
-    static Entity[] spawnMob(CommandContext context, String mobString, Location loc, int amount, Entity[] ridingOn)
+    static Entity[] spawnMob(CommandSender context, String mobString, Location loc, int amount, Entity[] ridingOn)
     {
         String entityName = mobString;
         EntityType entityType;

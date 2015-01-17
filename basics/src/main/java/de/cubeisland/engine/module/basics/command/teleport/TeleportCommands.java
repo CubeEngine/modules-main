@@ -25,7 +25,9 @@ import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.methodic.parametric.Default;
+import de.cubeisland.engine.command.methodic.parametric.Named;
 import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.math.BlockVector3;
@@ -212,65 +214,16 @@ public class TeleportCommands
             context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
         }
     }
+
     @Command(desc = "Direct teleport to a coordinate.")
-    @Params(positional = {@Param(label = "x", type = Integer.class),
-                         @Param(label = "y", type = Integer.class), // TODO optional y coord
-                         @Param(label = "z", type = Integer.class)},
-            nonpositional = {@Param(names = {"world", "w"}, type = World.class),
-                             @Param(names = {"player", "p"}, type = User.class)})
-    @Flags(@Flag(longName = "safe", name = "s"))
-    public void tppos(CommandContext context)
+    public void tppos(CommandSender context, Integer x, Integer y, Integer z, // TODO optional y coord
+                      @Default @Named({"world", "w"}) World world,
+                      @Default @Named({"player", "p"}) User player,
+                      @Flag boolean safe)
     {
-        User user;
-        if (context.hasNamed("player"))
-        {
-            user = context.get("player");
-        }
-        else if (context.isSource(User.class))
-        {
-            user = (User)context.getSource();
-        }
-        else
-        {
-            context.sendTranslated(NEGATIVE, "{text:Pro Tip}: Teleport does not work IRL!");
-            return;
-        }
-        Integer x = context.get(0);
-        Integer y;
-        Integer z;
-        World world = user.getWorld();
-        if (context.hasNamed("world"))
-        {
-            world = context.get("world");
-            if (world == null)
-            {
-                context.sendTranslated(NEGATIVE, "World not found!");
-                return;
-            }
-        }
-        if (context.hasPositional(2))
-        {
-            y = context.get(1, null);
-            z = context.get(2, null);
-        }
-        else
-        {
-            z = context.get(1, null);
-            if (x == null || z == null)
-            {
-                context.sendTranslated(NEGATIVE, "Coordinates have to be numbers!");
-                return;
-            }
-            y = user.getWorld().getHighestBlockAt(x, z).getY() + 1;
-        }
-        if (x == null || y == null || z == null)
-        {
-            context.sendTranslated(NEGATIVE, "Coordinates have to be numbers!");
-            return;
-        }
         Location loc = new Location(world, x, y, z).add(0.5, 0, 0.5);
-        if (TeleportCommands.teleport(user, loc, context.hasFlag("s")
-            && module.perms().COMMAND_TPPOS_SAFE.isAuthorized(context.getSource()), false, true))
+        safe = safe && module.perms().COMMAND_TPPOS_SAFE.isAuthorized(context);
+        if (TeleportCommands.teleport(player, loc, safe, false, true))
         {
             context.sendTranslated(POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new BlockVector3(x, y, z), world);
         }

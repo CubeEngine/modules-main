@@ -191,21 +191,18 @@ public class KickBanCommands
 
 
     @Command(alias = "pardon", desc = "Unbans a previously banned player.")
-    @Params(positional = @Param(label = "player"))
-    public void unban(CommandContext context)
+    public void unban(CommandContext context, OfflinePlayer player)
     {
-        String userName = context.get(0);
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(userName);
-        if (offlinePlayer.getUniqueId().version() == 3)
+        if (player.getUniqueId().version() == 3)
         {
-            offlinePlayer = Bukkit.getOfflinePlayer(McUUID.getUUIDForName(userName));
+            player = Bukkit.getOfflinePlayer(McUUID.getUUIDForName(player.getName()));
         }
-        if (this.banManager.removeUserBan(offlinePlayer.getUniqueId()))
+        if (this.banManager.removeUserBan(player.getUniqueId()))
         {
-            context.sendTranslated(POSITIVE, "You unbanned {user}({name#uuid})!", userName, offlinePlayer.getUniqueId().toString());
+            context.sendTranslated(POSITIVE, "You unbanned {user}({name#uuid})!", player, player.getUniqueId().toString());
             return;
         }
-        context.sendTranslated(NEGATIVE, "{user} is not banned, maybe you misspelled his name?", userName);
+        context.sendTranslated(NEGATIVE, "{user} is not banned, maybe you misspelled his name?", player);
     }
 
     @Command(alias = "banip", desc = "Bans the IP from this server.")
@@ -333,9 +330,13 @@ public class KickBanCommands
         context.sendTranslated(POSITIVE, "Reloadhe ban lists successfully!");
     }
 
+    public enum BanListType
+    {
+        IPS, PLAYERS
+    }
+
     @Command(desc = "View all players banned from this server")
-    @Params(positional = @Param(req = OPTIONAL, names = {"ips","players"}))
-    public void banlist(CommandContext context)
+    public void banlist(CommandSender context, BanListType type)
     {
         if (true == true)
         {
@@ -343,23 +344,7 @@ public class KickBanCommands
             return;
         }
         // TODO paging
-        boolean players = true;
-        if (context.hasPositional(0))
-        {
-            if ("players".equalsIgnoreCase(context.getString(0)))
-            {
-                players = true;
-            }
-            else if ("ips".equalsIgnoreCase(context.getString(0)))
-            {
-                players = false;
-            }
-            else
-            {
-                return;
-            }
-        }
-        if (players)
+        if (type == BanListType.PLAYERS)
         {
             Set<UserBan> userBans = this.banManager.getUserBans();
             if (userBans.isEmpty())

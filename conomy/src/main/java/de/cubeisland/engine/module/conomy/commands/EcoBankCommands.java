@@ -22,8 +22,10 @@ import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
 import de.cubeisland.engine.command.parameter.reader.SimpleListReader;
+import de.cubeisland.engine.converter.converter.DoubleConverter;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
@@ -45,180 +47,148 @@ public class EcoBankCommands extends CommandContainer
     }
 
     @Command(alias = "grant", desc = "Gives money to a bank or all banks")
-    @Params(positional = {@Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class), // TODO static values "*"
-                          @Param(label = "amount", type = Double.class)})
-    public void give(CommandContext context)
+    public void give(CommandSender context, BankAccount bank, Double amount)
     {
-        Double amount = context.get(1);
-        String format = manager.format(amount);
+        /* TODO give all
         if ("*".equals(context.get(0)))
         {
             this.manager.transactionAll(false, true, amount);
             context.sendTranslated(POSITIVE, "You gave {input#amount} to every bank!", format);
             return;
-        }
-        for (BankAccount target : context.<List<BankAccount>>get(0))
+        } */
+        String format = manager.format(amount);
+        this.manager.transaction(null, bank, amount, true);
+        context.sendTranslated(POSITIVE, "You gave {input#amount} to the bank {input#bank}!", format, bank.getName());
+        for (User user : this.module.getCore().getUserManager().getOnlineUsers())
         {
-            this.manager.transaction(null, target, amount, true);
-            context.sendTranslated(POSITIVE, "You gave {input#amount} to the bank {input#bank}!", format, target.getName());
-            for (User user : this.module.getCore().getUserManager().getOnlineUsers())
+            if (bank.isOwner(user))
             {
-                if (target.isOwner(user))
-                {
-                    user.sendTranslated(POSITIVE, "{user} granted {input#amount} to your bank {input#bank}!", context.getSource(), format, target.getName());
-                }
+                user.sendTranslated(POSITIVE, "{user} granted {input#amount} to your bank {input#bank}!", context, format, bank.getName());
             }
         }
     }
 
     @Command(alias = "remove", desc = "Takes money from given bank or all banks")
-    @Params(positional = {@Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class),// TODO static values "*"
-                          @Param(label = "amount", type = Double.class)})
-    public void take(CommandContext context)
+    public void take(CommandContext context, BankAccount bank, Double amount)
     {
-        Double amount = context.get(1);
-        String format = manager.format(amount);
+        /* TODO take all
         if ("*".equals(context.get(0)))
         {
             this.manager.transactionAll(false, true, -amount);
             context.sendTranslated(POSITIVE, "You took {input#amount} from every bank!", format);
             return;
-        }
-        for (BankAccount target : context.<List<BankAccount>>get(0))
+        } */
+        String format = manager.format(amount);
+        this.manager.transaction(bank, null, amount, true);
+        context.sendTranslated(POSITIVE, "You took {input#amount} from the bank {input#bank}!", format, bank.getName());
+        for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
         {
-            this.manager.transaction(target, null, amount, true);
-            context.sendTranslated(POSITIVE, "You took {input#amount} from the bank {input#bank}!", format, target.getName());
-            for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
+            if (bank.isOwner(onlineUser))
             {
-                if (target.isOwner(onlineUser))
-                {
-                    onlineUser.sendTranslated(POSITIVE, "{user} charged your bank {input#bank} for {input#amount}!", context.getSource(), target.getName(), format);
-                }
+                onlineUser.sendTranslated(POSITIVE, "{user} charged your bank {input#bank} for {input#amount}!", context.getSource(), bank.getName(), format);
             }
         }
     }
 
     @Command(desc = "Reset the money from given banks")
-    @Params(positional = @Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class)) // TODO static values "*"
-    public void reset(CommandContext context)
+    public void reset(CommandContext context, BankAccount bank)
     {
+        /* TODO reset all
         if ("*".equals(context.get(0)))
         {
             this.manager.setAll(false, true, this.manager.getDefaultBankBalance());
             context.sendTranslated(POSITIVE, "You reset every bank account!");
             return;
-        }
-        for (BankAccount target : context.<List<BankAccount>>get(0))
+        } */
+        bank.reset();
+        String format = this.manager.format(this.manager.getDefaultBalance());
+        context.sendTranslated(POSITIVE, "The account of the bank {input#bank} got reset to {input#balance}!", bank.getName(), format);
+        for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
         {
-            target.reset();
-            String format = this.manager.format(this.manager.getDefaultBalance());
-            context.sendTranslated(POSITIVE, "The account of the bank {input#bank} got reset to {input#balance}!", target.getName(), format);
-            for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
+            if (bank.isOwner(onlineUser))
             {
-                if (target.isOwner(onlineUser))
-                {
-                    onlineUser.sendTranslated(POSITIVE, "{user} reset the money of your bank {input#bank} to {input#balance}!", context.getSource(), target.getName(), format);
-                }
+                onlineUser.sendTranslated(POSITIVE, "{user} reset the money of your bank {input#bank} to {input#balance}!", context.getSource(), bank.getName(), format);
             }
         }
     }
 
     @Command(desc = "Sets the money from given banks")
-    @Params(positional = {@Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class), // TODO static values "*"
-                          @Param(label = "amount", type = Double.class)})
-    public void set(CommandContext context)
+    public void set(CommandContext context, BankAccount bank, Double amount)
     {
-        Double amount = context.get(1);
-        String format = this.manager.format(amount);
+        /* TODO set all
         if ("*".equals(context.get(0)))
         {
             this.manager.setAll(false, true, amount);
             context.sendTranslated(POSITIVE, "You have set every bank account to {input#balance}!", format);
             return;
         }
-        for (BankAccount target : context.<List<BankAccount>>get(0))
+        */
+        String format = this.manager.format(amount);
+        bank.set(amount);
+        context.sendTranslated(POSITIVE, "The money of bank account {input#bank} got set to {input#balance}!", bank.getName(), format);
+        for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
         {
-            target.set(amount);
-            context.sendTranslated(POSITIVE, "The money of bank account {input#bank} got set to {input#balance}!", target.getName(), format);
-            for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
+            if (bank.isOwner(onlineUser))
             {
-                if (target.isOwner(onlineUser))
-                {
-                    onlineUser.sendTranslated(POSITIVE, "{user} set the money of your bank {input#bank} to {input#balance}!", context.getSource(), target.getName(), format);
-                }
+                onlineUser.sendTranslated(POSITIVE, "{user} set the money of your bank {input#bank} to {input#balance}!", context.getSource(), bank.getName(), format);
             }
         }
     }
 
     @Command(desc = "Scales the money from given banks")
-    @Params(positional = {@Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class), // TODO static values "*"
-                          @Param(label = "factor", type = Float.class)})
-    public void scale(CommandContext context)
+    public void scale(CommandContext context, BankAccount bank, Float factor)
     {
-        Float factor = context.get(1);
+        /* TODO scale all
         if ("*".equals(context.get(0)))
         {
             this.manager.scaleAll(false, true, factor);
             context.sendTranslated(POSITIVE, "Scaled the balance of every bank by {decimal#factor}!", factor);
             return;
-        }
-        for (BankAccount target : context.<List<BankAccount>>get(0))
+        } */
+        bank.scale(factor);
+        context.sendTranslated(POSITIVE, "Scaled the balance of the bank {input#bank} by {decimal#factor}!", bank.getName(), factor);
+        for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
         {
-            target.scale(factor);
-            context.sendTranslated(POSITIVE, "Scaled the balance of the bank {input#bank} by {decimal#factor}!", target.getName(), factor);
-            for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
+            if (bank.isOwner(onlineUser))
             {
-                if (target.isOwner(onlineUser))
-                {
-                    onlineUser.sendTranslated(POSITIVE, "{user} scaled the money of your bank {input#bank} by {decimal#factor}", context.getSource().getName(), target.getName(), factor);
-                }
+                onlineUser.sendTranslated(POSITIVE, "{user} scaled the money of your bank {input#bank} by {decimal#factor}", context.getSource().getName(), bank.getName(), factor);
             }
         }
     }
 
     @Command(desc = "Hides the account of given bank")
-    @Params(positional = @Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class)) // TODO static values "*"
-    public void hide(CommandContext context)
+    public void hide(CommandContext context, BankAccount bank)
     {
+        /* TODO hide all
         if ("*".equals(context.get(0)))
         {
             this.manager.hideAll(false, true);
             return;
-        }
-        for (BankAccount target : context.<List<BankAccount>>get(0))
+        } */
+        if (bank.isHidden())
         {
-            if (target.isHidden())
-            {
-                context.sendTranslated(POSITIVE, "The bank {input#bank} is already hidden!", target.getName());
-            }
-            else
-            {
-                target.setHidden(true);
-                context.sendTranslated(POSITIVE, "The bank {input#bank} is now hidden!", target.getName());
-            }
+            context.sendTranslated(POSITIVE, "The bank {input#bank} is already hidden!", bank.getName());
+            return;
         }
+        bank.setHidden(true);
+        context.sendTranslated(POSITIVE, "The bank {input#bank} is now hidden!", bank.getName());
     }
 
     @Command(desc = "Unhides the account of given banks")
-    @Params(positional = @Param(label = "bank", type = BankAccount.class, reader = SimpleListReader.class)) // TODO static values "*"
-    public void unhide(CommandContext context)
+    public void unhide(CommandContext context, BankAccount bank)
     {
+        /* TODO uhide all
         if ("*".equals(context.get(0)))
         {
             this.manager.unhideAll(false, true);
             return;
-        }
-        for (BankAccount target : context.<List<BankAccount>>get(0))
+        } */
+        if (!bank.isHidden())
         {
-            if (target.isHidden())
-            {
-                target.setHidden(false);
-                context.sendTranslated(POSITIVE, "The bank {input#bank} is no longer hidden!", target.getName());
-            }
-            else
-            {
-                context.sendTranslated(POSITIVE, "The bank {input#bank} was not hidden!", target.getName());
-            }
+            context.sendTranslated(POSITIVE, "The bank {input#bank} was not hidden!", bank.getName());
+            return;
         }
+        bank.setHidden(false);
+        context.sendTranslated(POSITIVE, "The bank {input#bank} is no longer hidden!", bank.getName());
     }
 }

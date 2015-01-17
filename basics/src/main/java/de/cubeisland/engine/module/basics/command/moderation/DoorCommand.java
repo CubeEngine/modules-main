@@ -24,7 +24,9 @@ import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.math.Vector3;
 import de.cubeisland.engine.core.util.math.shape.Sphere;
@@ -48,40 +50,19 @@ public class DoorCommand
         this.basics = basics;
     }
 
-    @Command(desc = "Opens or closes doors around the player.")
-    @Params(positional = {@Param(names = {"open","close"}),
-                          @Param(label = "radius", type = Integer.class),
-                          @Param(req = OPTIONAL, label = "world", type = World.class),
-                          @Param(req = OPTIONAL, label = "x", type = Integer.class),
-                          @Param(req = OPTIONAL, label = "y", type = Integer.class),
-                          @Param(req = OPTIONAL, label = "z", type = Integer.class)})
-    @Flags({@Flag(longName = "all", name = "a"),
-            @Flag(longName = "woodenDoor", name = "w"),
-            @Flag(longName = "ironDoor", name = "i"),
-            @Flag(longName = "trapDoor", name = "t"),
-            @Flag(longName = "fenceGate", name = "f")})
-    public void doors(CommandContext context)
+    public enum DoorState
     {
-        boolean open;
-        int radius = context.get(1, 0);
-        Vector3 vector;
-        World world;
-        Set<Material> openMaterials = EnumSet.noneOf(Material.class);
+        OPEN, CLOSE
+    }
 
-        String task = context.get(0);
-        if("open".equalsIgnoreCase(task))
-        {
-            open = true;
-        }
-        else if("close".equalsIgnoreCase(task))
-        {
-            open = false;
-        }
-        else
-        {
-            context.sendTranslated(NEGATIVE, "Do not know whether I should close or open the doors");
-            return;
-        }
+    @Command(desc = "Opens or closes doors around the player.")
+    public void doors(CommandSender context, DoorState state, Integer radius,
+                      @Optional World world, @Optional Integer x, @Optional Integer y, @Optional Integer z,
+                      @Flag boolean all, @Flag boolean woodenDoor, @Flag boolean ironDoor, @Flag boolean trapDoor, @Flag boolean fenceGate)
+    {
+        radius = radius == null ? 0 : radius;
+        Vector3 vector;
+        Set<Material> openMaterials = EnumSet.noneOf(Material.class);
 
         if(radius > this.basics.getConfiguration().commands.maxDoorRadius)
         {
@@ -89,59 +70,35 @@ public class DoorCommand
             return;
         }
 
-        if(!context.hasPositional(5) && !(context.getSource() instanceof User))
+        if(z == null)
         {
-            context.sendTranslated(NEGATIVE, "You has to specify a location!");
-            return;
-        }
-        else if(!context.hasPositional(5))
-        {
-            Location location = ((User) context.getSource()).getLocation();
+            if (!(context instanceof User))
+            {
+                context.sendTranslated(NEGATIVE, "You has to specify a location!");
+                return;
+            }
+            Location location = ((User) context).getLocation();
             world = location.getWorld();
             vector = new Vector3(location.getX(), location.getY(), location.getZ());
         }
         else
         {
-            world = context.get(2, null);
-            if(world == null)
-            {
-                context.sendTranslated(NEGATIVE, "World {input#world} not found!", context.get(2));
-                return;
-            }
-            Integer x = context.get(3, null);
-            if(x == null)
-            {
-                context.sendTranslated(NEGATIVE, "Invalid x-value {input}!", context.get(3));
-                return;
-            }
-            Integer y = context.get(4, null);
-            if(y == null)
-            {
-                context.sendTranslated(NEGATIVE, "Invalid y-value {input}!", context.get(4));
-                return;
-            }
-            Integer z = context.get(5, null);
-            if(z == null)
-            {
-                context.sendTranslated(NEGATIVE, "Invalid z-value {input}!", context.get(5));
-                return;
-            }
             vector = new Vector3(x, y, z);
         }
         
-        if(context.hasFlag("f"))
+        if(fenceGate)
         {
             openMaterials.add(Material.FENCE_GATE);
         }
-        if(context.hasFlag("t"))
+        if(trapDoor)
         {
             openMaterials.add(Material.TRAP_DOOR);
         }
-        if(context.hasFlag("i"))
+        if(ironDoor)
         {
             openMaterials.add(Material.IRON_DOOR_BLOCK);
         }
-        if(context.hasFlag("w") || (openMaterials.isEmpty() && !context.hasFlag("a")))
+        if(woodenDoor || (openMaterials.isEmpty() && !all))
         {
             openMaterials.add(Material.WOODEN_DOOR);
         }
@@ -150,9 +107,9 @@ public class DoorCommand
         for(Vector3 point : sphere)
         {
             Block block = world.getBlockAt((int) point.x, (int) point.y, (int) point.z);
-            if(context.hasFlag("a") || openMaterials.contains(block.getType()))
+            if(all || openMaterials.contains(block.getType()))
             {
-                this.setOpen(block, open);
+                this.setOpen(block, state == DoorState.OPEN);
             }
         }
     }

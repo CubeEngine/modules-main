@@ -20,7 +20,10 @@ package de.cubeisland.engine.module.basics.command.moderation.spawnmob;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
@@ -46,26 +49,18 @@ public class SpawnMobCommand
     }
 
     @Command(desc = "Spawns the specified Mob")
-    @Params(positional = {@Param(label = "<mob>[:data][,<ridingmob>[:data]]"),
-              @Param(label = "amount", type = Integer.class, req = OPTIONAL),
-              @Param(label = "player", type = User.class, req = OPTIONAL)})
-    public void spawnMob(CommandContext context)
+    public void spawnMob(CommandSender context, @Label("<mob>[:data][,<ridingmob>[:data]]") String data,
+                         @Optional Integer amount, @Optional User player)
     {
         User sender = null;
-        if (context.getSource() instanceof User)
+        if (context instanceof User)
         {
-            sender = (User)context.getSource();
+            sender = (User)context;
         }
         Location loc;
-        if (context.hasPositional(2))
+        if (player != null)
         {
-            User user = context.get(2);
-            if (user == null)
-            {
-                context.sendTranslated(NEGATIVE, "User {user} not found!", context.get(2));
-                return;
-            }
-            loc = user.getLocation();
+            loc = player.getLocation();
         }
         else if (sender == null)
         {
@@ -76,15 +71,12 @@ public class SpawnMobCommand
         {
             loc = sender.getTargetBlock(null, 200).getLocation().add(new Vector(0, 1, 0));
         }
-        Integer amount = 1;
-        if (context.hasPositional(1))
+        amount = amount == null ? 1 : amount;
+
+        if (amount <= 0)
         {
-            amount = context.get(1);
-            if (amount <= 0)
-            {
-                context.sendTranslated(NEUTRAL, "And how am i supposed to know which mobs to despawn?");
-                return;
-            }
+            context.sendTranslated(NEUTRAL, "And how am i supposed to know which mobs to despawn?");
+            return;
         }
         if (amount > config.commands.spawnmobLimit)
         {
@@ -92,7 +84,7 @@ public class SpawnMobCommand
             return;
         }
         loc.add(0.5, 0, 0.5);
-        Entity[] entitiesSpawned = spawnMobs(context, context.getString(0), loc, amount);
+        Entity[] entitiesSpawned = spawnMobs(context, data, loc, amount);
         if (entitiesSpawned == null)
         {
             return;
@@ -108,9 +100,9 @@ public class SpawnMobCommand
             while (entitySpawned.getPassenger() != null)
             {
                 entitySpawned = entitySpawned.getPassenger();
-                message = context.getSource().getTranslation(NONE, "{input#entity} riding {input}", Match.entity().getNameFor(entitySpawned.getType()), message);
+                message = context.getTranslation(NONE, "{input#entity} riding {input}", Match.entity().getNameFor(entitySpawned.getType()), message);
             }
-            message = context.getSource().getTranslation(POSITIVE, "Spawned {amount} {input#message}!", amount, message);
+            message = context.getTranslation(POSITIVE, "Spawned {amount} {input#message}!", amount, message);
             context.sendMessage(message);
         }
     }

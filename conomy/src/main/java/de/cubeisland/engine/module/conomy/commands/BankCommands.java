@@ -19,14 +19,19 @@ package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.Set;
 import de.cubeisland.engine.command.alias.Alias;
+import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.methodic.Command;
 import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Default;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Optional;
 import de.cubeisland.engine.command.parameter.reader.ReaderException;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
 import de.cubeisland.engine.module.conomy.Conomy;
@@ -35,7 +40,6 @@ import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.UserAccount;
 
-import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 @Command(name = "bank", desc = "Manages your money in banks.")
@@ -53,19 +57,17 @@ public class BankCommands extends CommandContainer
 
     @Alias(value = "bbalance")
     @Command(desc = "Shows the balance of the specified bank")
-    @Params(positional = @Param(req = OPTIONAL, label = "bank", type = BankAccount.class))
-    public void balance(CommandContext context)
+    public void balance(CommandSender context, @Optional BankAccount bank)
     {
-        if (context.hasPositional(0))
+        if (bank != null)
         {
-            BankAccount bankAccount = context.get(0);
-            ensureIsVisible(context, bankAccount);
-            context.sendTranslated(POSITIVE, "Bank {name#bank} Balance: {input#balance}", bankAccount.getName(), this.manager.format(bankAccount.balance()));
+            ensureIsVisible(context, bank);
+            context.sendTranslated(POSITIVE, "Bank {name#bank} Balance: {input#balance}", bank.getName(), this.manager.format(bank.balance()));
             return;
         }
-        if (context.getSource() instanceof User)
+        if (context instanceof User)
         {
-            Set<BankAccount> bankAccounts = this.manager.getBankAccounts((User)context.getSource());
+            Set<BankAccount> bankAccounts = this.manager.getBankAccounts((User)context);
             if (bankAccounts.size() == 1)
             {
                 BankAccount bankAccount = bankAccounts.iterator().next();
@@ -78,20 +80,18 @@ public class BankCommands extends CommandContainer
     }
 
     @Command(desc = "Lists all banks")
-    @Params(positional = @Param(req = OPTIONAL, label = "owner", type = User.class))
-    public void list(CommandContext context) //Lists all banks [of given player]
+    public void list(CommandSender context, @Optional User owner) //Lists all banks [of given player]
     {
         String format = " - " + ChatFormat.YELLOW;
-        if (context.hasPositional(0))
+        if (owner != null)
         {
-            User user = context.get(1);
-            Set<BankAccount> bankAccounts = this.manager.getBankAccounts(user);
+            Set<BankAccount> bankAccounts = this.manager.getBankAccounts(owner);
             if (bankAccounts.isEmpty())
             {
-                context.sendTranslated(POSITIVE, "{user} is not owner of any bank!", user);
+                context.sendTranslated(POSITIVE, "{user} is not owner of any bank!", owner);
                 return;
             }
-            context.sendTranslated(POSITIVE, "{user} is the owner of the following banks:", user);
+            context.sendTranslated(POSITIVE, "{user} is the owner of the following banks:", owner);
 
             for (BankAccount bankAccount : bankAccounts)
             {
@@ -99,7 +99,7 @@ public class BankCommands extends CommandContainer
             }
             return;
         }
-        Set<String> allBanks = this.manager.getBankNames(module.perms().BANK_SHOWHIDDEN.isAuthorized(context.getSource()));
+        Set<String> allBanks = this.manager.getBankNames(module.perms().BANK_SHOWHIDDEN.isAuthorized(context));
         if (allBanks.isEmpty())
         {
             context.sendTranslated(NEUTRAL, "There are no banks currently!");
@@ -113,33 +113,28 @@ public class BankCommands extends CommandContainer
     }
 
     @Command(desc = "Invites a user to a bank")
-    @Params(positional = {@Param(label = "player", type = User.class),
-                          @Param(req = OPTIONAL, label = "bank", type = BankAccount.class)})
-    @Flags(@Flag(longName = "force", name = "f"))
-    public void invite(CommandContext context)
+    public void invite(CommandSender context, User player, @Optional BankAccount bank, @Flag boolean force)
     {
-        User user = context.get(0);
-        boolean force = context.hasFlag("f") && module.perms().COMMAND_BANK_INVITE_FORCE.isAuthorized(context.getSource());
-        if (context.hasPositional(1))
+        force = force && module.perms().COMMAND_BANK_INVITE_FORCE.isAuthorized(context);
+        if (bank != null)
         {
-            BankAccount account = context.get(1);
-            if (!account.needsInvite())
+            if (!bank.needsInvite())
             {
                 context.sendTranslated(NEUTRAL, "This bank does not need an invite to be able to join!");
                 return;
             }
-            if (force || !(context.getSource() instanceof User) || account.hasAccess((User)context.getSource()))
+            if (force || !(context instanceof User) || bank.hasAccess((User)context))
             {
-                account.invite(user);
-                context.sendTranslated(POSITIVE, "You invited {user} to the bank {name#bank}!", user, account.getName());
+                bank.invite(player);
+                context.sendTranslated(POSITIVE, "You invited {user} to the bank {name#bank}!", player, bank.getName());
                 return;
             }
             context.sendTranslated(NEGATIVE, "You are not allowed to invite a player to this bank.");
             return;
         }
-        if (context.getSource() instanceof User)
+        if (context instanceof User)
         {
-            Set<BankAccount> bankAccounts = this.manager.getBankAccounts((User)context.getSource());
+            Set<BankAccount> bankAccounts = this.manager.getBankAccounts((User)context);
             if (bankAccounts.size() == 1)
             {
                 BankAccount account = bankAccounts.iterator().next();
@@ -148,10 +143,10 @@ public class BankCommands extends CommandContainer
                     context.sendTranslated(NEUTRAL, "This bank does not need an invite to be able to join!");
                     return;
                 }
-                if (force || account.hasAccess((User)context.getSource()))
+                if (force || account.hasAccess((User)context))
                 {
-                    account.invite(user);
-                    context.sendTranslated(POSITIVE, "You invited {user} to the bank {name#bank}!", user, account.getName());
+                    account.invite(player);
+                    context.sendTranslated(POSITIVE, "You invited {user} to the bank {name#bank}!", player, account.getName());
                     return;
                 }
                 context.sendTranslated(NEGATIVE, "You are not allowed to invite a player to this bank.");
@@ -162,205 +157,139 @@ public class BankCommands extends CommandContainer
     }
 
     @Command(desc = "Joins a bank")
-    @Params(positional = {@Param(label = "bank", type = BankAccount.class),
-                         @Param(req = OPTIONAL, label = "player", type = User.class)})
-    @Flags(@Flag(longName = "force", name = "f"))
-    public void join(CommandContext context)
+    public void join(CommandSender context, BankAccount bank, @Default User player, @Flag boolean force)
     {
-        User user;
-        boolean other = false;
-        if (context.hasPositional(1))
+        if (!context.equals(player) && !module.perms().COMMAND_BANK_JOIN_OTHER.isAuthorized(context))
         {
-            if (!module.perms().COMMAND_BANK_JOIN_OTHER.isAuthorized(context.getSource()))
-            {
-                context.sendTranslated(NEGATIVE, "You are not allowed to let someone else join a bank!");
-                return;
-            }
-            user = context.get(1);
-            other = true;
-        }
-        else if (context.getSource() instanceof User)
-        {
-            user = (User)context.getSource();
-        }
-        else
-        {
-            context.sendTranslated(NEGATIVE, "Please specify a player to join!");
+            context.sendTranslated(NEGATIVE, "You are not allowed to let someone else join a bank!");
             return;
         }
-        BankAccount account = context.get(0);
-        if (account.isOwner(user))
+        if (bank.isOwner(player))
         {
-            if (other)
+            if (context.equals(player))
             {
-                context.sendTranslated(NEGATIVE, "{user} is already owner of this bank!", user);
+                context.sendTranslated(NEGATIVE, "You are already owner of this bank!");
                 return;
             }
-            context.sendTranslated(NEGATIVE, "You are already owner of this bank!");
+            context.sendTranslated(NEGATIVE, "{user} is already owner of this bank!", player);
             return;
         }
-        if (account.isMember(user))
+        if (bank.isMember(player))
         {
-            if (other)
+            if (context.equals(player))
             {
-                context.sendTranslated(NEGATIVE, "{user} is already member of this bank!", user);
+                context.sendTranslated(NEGATIVE, "You are already member of this bank!");
                 return;
             }
-            context.sendTranslated(NEGATIVE, "You are already member of this bank!");
+            context.sendTranslated(NEGATIVE, "{user} is already member of this bank!", player);
             return;
         }
-        boolean force = context.hasFlag("f") && module.perms().COMMAND_BANK_JOIN_FORCE.isAuthorized(context.getSource());
-        if (!force || (account.needsInvite() && !account.isInvited(user)))
+        force = force && module.perms().COMMAND_BANK_JOIN_FORCE.isAuthorized(context);
+        if (!force || (bank.needsInvite() && !bank.isInvited(player)))
         {
-            if (other)
+            if (context.equals(player))
             {
-                context.sendTranslated(NEGATIVE, "{user} needs to be invited to join this bank!", user);
+                context.sendTranslated(NEGATIVE, "You need to be invited to join this bank!");
                 return;
             }
-            context.sendTranslated(NEGATIVE, "You need to be invited to join this bank!");
+            context.sendTranslated(NEGATIVE, "{user} needs to be invited to join this bank!", player);
             return;
         }
-        account.promoteToMember(user);
-        context.sendTranslated(POSITIVE, "{user} is now a member of the {name#bank} bank!", user, account.getName());
+        bank.promoteToMember(player);
+        context.sendTranslated(POSITIVE, "{user} is now a member of the {name#bank} bank!", player, bank.getName());
     }
 
     @Command(desc = "Leaves a bank")
-    @Params(positional = {@Param(req = OPTIONAL, label = "bank", type = BankAccount.class),
-                          @Param(req = OPTIONAL, label = "player", type = User.class)})
-    public void leave(CommandContext context)
+    public void leave(CommandSender context, @Optional BankAccount bank, @Default User player)
     {
-        if (context.hasPositional(0))
+        if (bank == null)
         {
-            User user;
-            boolean other = false;
-            if (context.hasPositional(1))
+            Set<BankAccount> bankAccounts = this.manager.getBankAccounts(player);
+            if (bankAccounts.size() != 1)
             {
-                if (!module.perms().COMMAND_BANK_LEAVE_OTHER.isAuthorized(context.getSource()))
-                {
-                    context.sendTranslated(NEGATIVE, "You are not allowed to let someone else leave a bank!");
-                    return;
-                }
-                user = context.get(1);
-                other = true;
-            }
-            else if (context.getSource() instanceof User)
-            {
-                user = (User)context.getSource();
-            }
-            else
-            {
-                context.sendTranslated(NEGATIVE, "Please specify a player to leave!");
+                context.sendTranslated(NEGATIVE, "Please do specify a bank account to leave");
                 return;
             }
-            BankAccount account;
-            if (context.hasPositional(0))
-            {
-                account = context.get(0);
-            }
-            else
-            {
-                Set<BankAccount> bankAccounts = this.manager.getBankAccounts(user);
-                if (bankAccounts.size() == 1)
-                {
-                    account = bankAccounts.iterator().next();
-                }
-                else
-                {
-                    context.sendTranslated(NEGATIVE, "Please do specify a bank account to leave");
-                    return;
-                }
-            }
-            if (account.hasAccess(user))
-            {
-                account.kickUser(user);
-                if (other)
-                {
-                    context.sendTranslated(POSITIVE, "{user} is no longer a member of the bank {name#bank}!", user, account.getName());
-                    return;
-                }
-                context.sendTranslated(POSITIVE, "You are no longer a member of the bank {name#bank}!", account.getName());
-                return;
-            }
-            if (other)
-            {
-                context.sendTranslated(NEGATIVE, "{user} is not a member of that bank!", user);
-                return;
-            }
-            context.sendTranslated(NEGATIVE, "You are not a member if that bank!");
+            bank = bankAccounts.iterator().next();
         }
-        context.sendTranslated(NEUTRAL, "You have to specify a bank to leave!");
+        if (!context.equals(player) && !module.perms().COMMAND_BANK_LEAVE_OTHER.isAuthorized(context))
+        {
+            context.sendTranslated(NEGATIVE, "You are not allowed to let someone else leave a bank!");
+            return;
+        }
+
+        if (bank.hasAccess(player))
+        {
+            bank.kickUser(player);
+            if (context.equals(player))
+            {
+                context.sendTranslated(POSITIVE, "You are no longer a member of the bank {name#bank}!", bank.getName());
+                return;
+            }
+            context.sendTranslated(POSITIVE, "{user} is no longer a member of the bank {name#bank}!", player, bank.getName());
+            return;
+        }
+        if (context.equals(player))
+        {
+            context.sendTranslated(NEGATIVE, "You are not a member if that bank!");
+            return;
+        }
+        context.sendTranslated(NEGATIVE, "{user} is not a member of that bank!", player);
     }
 
     @Command(desc = "Removes a player from the invite-list")
-    @Params(positional = {@Param(label = "player", type = User.class),
-                          @Param(label = "bank", type = BankAccount.class)})
-    public void uninvite(CommandContext context)
+    public void uninvite(CommandSender context, User player, BankAccount bank)
     {
-        User user = context.get(0);
-        BankAccount bankAccount = context.get(1);
-        if (bankAccount.isOwner(user) || module.perms().COMMAND_BANK_UNINVITE_FORCE.isAuthorized(context.getSource()))
+        if (bank.isOwner(player) || module.perms().COMMAND_BANK_UNINVITE_FORCE.isAuthorized(context))
         {
-            if (!bankAccount.isInvited(user))
+            if (!bank.isInvited(player))
             {
-                context.sendTranslated(NEGATIVE, "{user} is not invited to the bank {name#bank}!", user, bankAccount.getName());
+                context.sendTranslated(NEGATIVE, "{user} is not invited to the bank {name#bank}!", player, bank.getName());
                 return;
             }
-            bankAccount.uninvite(user);
-            context.sendTranslated(NEGATIVE, "{user} is no longer invited to the bank {name#bank}!", user, bankAccount.getName());
+            bank.uninvite(player);
+            context.sendTranslated(NEGATIVE, "{user} is no longer invited to the bank {name#bank}!", player, bank.getName());
             return;
         }
         context.sendTranslated(NEGATIVE, "You are not allowed to uninvite someone from this bank!");
     }
 
     @Command(desc = "Rejects an invite from a bank")
-    @Params(positional = @Param(label = "bank", type = BankAccount.class))
-    public void rejectinvite(CommandContext context)
+    @Restricted(value = User.class, msg = "How did you manage to get invited in the first place?")
+    public void rejectinvite(User context, BankAccount bank)
     {
-        if (context.getSource() instanceof User)
+        if (bank.isInvited(context))
         {
-            User user = (User)context.getSource();
-            BankAccount bankAccount = context.get(0);
-            if (bankAccount.isInvited(user))
-            {
-                context.sendTranslated(NEGATIVE, "You are not invited to the bank {name#bank}!", bankAccount.getName());
-                return;
-            }
-            bankAccount.uninvite(user);
+            context.sendTranslated(NEGATIVE, "You are not invited to the bank {name#bank}!", bank.getName());
             return;
         }
-        context.sendTranslated(NEGATIVE, "How did you manage to get invited in the first place?");
+        bank.uninvite(context);
     }
 
     @Command(desc = "Creates a new bank")
-    @Params(positional = @Param(label = "name"))
-    @Flags(@Flag(longName = "nojoin", name = "nj"))
-    public void create(CommandContext context)
+    public void create(CommandSender context, String name, @Flag(longName = "nojoin", name = "nj") boolean noJoin)
     {
-        if (this.manager.bankAccountExists(context.getString(0)))
+        if (this.manager.bankAccountExists(name))
         {
-            context.sendTranslated(NEGATIVE, "There is already a bank names {input#bank}!", context.get(0));
+            context.sendTranslated(NEGATIVE, "There is already a bank names {input#bank}!", name);
+            return;
         }
-        else
+        BankAccount bankAccount = this.manager.getBankAccount(name, true);
+        if (context instanceof User && !noJoin)
         {
-            BankAccount bankAccount = this.manager.getBankAccount(context.getString(0), true);
-            if (context.getSource() instanceof User && !context.hasFlag("nj"))
-            {
-                bankAccount.promoteToOwner((User)context.getSource());
-            }
-            context.sendTranslated(POSITIVE, "Created new Bank {name#bank}!", bankAccount.getName());
+            bankAccount.promoteToOwner((User)context);
         }
+        context.sendTranslated(POSITIVE, "Created new Bank {name#bank}!", bankAccount.getName());
     }
 
     @Command(desc = "Deletes a bank")
-    @Params(positional = @Param(label = "bank", type = BankAccount.class))
-    public void delete(CommandContext context)
+    public void delete(CommandSender context, BankAccount bank)
     {
-        BankAccount account = context.get(0);
-        if (context.getSource() instanceof User)
+        if (context instanceof User)
         {
-            if (account.isOwner((User)context.getSource()))
+            if (bank.isOwner((User)context))
             {
-                if (!module.perms().COMMAND_BANK_DELETE_OWN.isAuthorized(context.getSource()))
+                if (!module.perms().COMMAND_BANK_DELETE_OWN.isAuthorized(context))
                 {
                     context.sendTranslated(NEGATIVE, "You are not allowed to delete your bank!");
                     return;
@@ -368,79 +297,62 @@ public class BankCommands extends CommandContainer
             }
             else
             {
-                if (!module.perms().COMMAND_BANK_DELETE_OTHER.isAuthorized(context.getSource()))
+                if (!module.perms().COMMAND_BANK_DELETE_OTHER.isAuthorized(context))
                 {
                     context.sendTranslated(NEGATIVE, "You are not owner of this bank!");
                     return;
                 }
             }
         } // else ignore perms
-        account.delete();
-        context.sendTranslated(POSITIVE, "You deleted the bank {name#bank}!", account.getName());
+        bank.delete();
+        context.sendTranslated(POSITIVE, "You deleted the bank {name#bank}!", bank.getName());
     }
 
     @Command(desc = "Renames a bank")
-    @Params(positional = {@Param(label = "name",type = BankAccount.class),
-                          @Param(label = "new name")})
-    @Flags(@Flag(longName = "force", name = "f"))
-    public void rename(CommandContext context)
+    public void rename(CommandSender context, BankAccount bank, String newName, @Flag boolean force)
     {
-        BankAccount account = context.get(0);
-        boolean force = context.hasFlag("f") && module.perms().COMMAND_BANK_RENAME_FORCE.isAuthorized(context.getSource());
-        if (!force && context.getSource() instanceof User)
+        force = force && module.perms().COMMAND_BANK_RENAME_FORCE.isAuthorized(context);
+        if (!force && context instanceof User && !bank.isOwner((User)context))
         {
-            if (!account.isOwner((User)context.getSource()))
-            {
-                context.sendTranslated(NEGATIVE, "You need to be owner of a bank to rename it!");
-                return;
-            }
+            context.sendTranslated(NEGATIVE, "You need to be owner of a bank to rename it!");
+            return;
         }
-        if (account.rename(context.getString(1)))
+        if (bank.rename(newName))
         {
             context.sendTranslated(POSITIVE, "Bank renamed!");
             return;
         }
-        context.sendTranslated(NEGATIVE, "Bank name {input#bank} has already been taken!", context.get(1));
+        context.sendTranslated(NEGATIVE, "Bank name {input#bank} has already been taken!", newName);
     }
 
     @Command(desc = "Sets given user as owner for a bank")
-    @Params(positional = {@Param(label = "bank", type = BankAccount.class),
-                          @Param(label = "player", type = User.class)})
-    @Flags(@Flag(longName = "force", name = "f"))
-    public void setOwner(CommandContext context)
+    public void setOwner(CommandSender context, BankAccount bank, User player, @Flag boolean force)
     {
-        User user = context.get(1);
-        BankAccount account = context.get(0);
-        boolean force = context.hasFlag("f") && module.perms().COMMAND_BANK_SETOWNER_FORCE.isAuthorized(context.getSource());
-        if (force || context.getSource() instanceof User)
+        force = force && module.perms().COMMAND_BANK_SETOWNER_FORCE.isAuthorized(context);
+        if ((force || context instanceof User) && !bank.isOwner((User)context))
         {
-            if (!account.isOwner((User)context.getSource()))
-            {
-                context.sendTranslated(NEGATIVE, "You are not allowed to set an owner for this bank!");
-                return;
-            }
+            context.sendTranslated(NEGATIVE, "You are not allowed to set an owner for this bank!");
+            return;
         }
-        account.promoteToOwner(user);
-        context.sendTranslated(POSITIVE, "{user} is now owner of the bank {name#bank}!", user, account.getName());
+        bank.promoteToOwner(player);
+        context.sendTranslated(POSITIVE, "{user} is now owner of the bank {name#bank}!", player, bank.getName());
     }
 
     @Command(desc = "Lists the current invites of a bank")
-    @Params(positional = @Param(label = "bank", type = BankAccount.class))
-    public void listinvites(CommandContext context)
+    public void listinvites(CommandSender context, BankAccount bank)
     {
-        BankAccount account = context.get(0);
-        ensureIsVisible(context, account);
-        if (account.needsInvite())
+        ensureIsVisible(context, bank);
+        if (bank.needsInvite())
         {
-            if (context.getSource() instanceof User && !account.hasAccess((User)context.getSource()))
+            if (context instanceof User && !bank.hasAccess((User)context))
             {
-                if (!module.perms().COMMAND_BANK_LISTINVITES_OTHER.isAuthorized(context.getSource()))
+                if (!module.perms().COMMAND_BANK_LISTINVITES_OTHER.isAuthorized(context))
                 {
                     context.sendTranslated(NEGATIVE, "You are not allowed to see the invites of this bank!");
                     return;
                 }
             }
-            Set<String> invites = account.getInvites();
+            Set<String> invites = bank.getInvites();
             if (invites.isEmpty())
             {
                 String format = " - " + ChatFormat.DARK_GREEN;
@@ -458,13 +370,11 @@ public class BankCommands extends CommandContainer
     }
 
     @Command(desc = "Lists the members of a bank")
-    @Params(positional = @Param(label = "bank", type = BankAccount.class))
-    public void listmembers(CommandContext context)
+    public void listmembers(CommandSender context, BankAccount bank)
     {
-        BankAccount account = context.get(0);
-        ensureIsVisible(context, account);
-        Set<String> owners = account.getOwners();
-        Set<String> members = account.getMembers();
+        ensureIsVisible(context, bank);
+        Set<String> owners = bank.getOwners();
+        Set<String> members = bank.getMembers();
         String format = " - " + ChatFormat.DARK_GREEN;
         if (owners.isEmpty())
         {
@@ -494,129 +404,105 @@ public class BankCommands extends CommandContainer
 
     // Owners Members Invites Balance Hidden
     @Command(desc = "Shows bank information")
-    @Params(positional = @Param(label = "bank", type = BankAccount.class))
-    public void info(CommandContext context) //list all members with their rank
+    public void info(CommandSender context, BankAccount bank) //list all members with their rank
     {
-        BankAccount account = context.get(0);
-        ensureIsVisible(context, account);
-        context.sendTranslated(POSITIVE, "Bank Information for {name}:", context.getString(0));
+        ensureIsVisible(context, bank);
+        context.sendTranslated(POSITIVE, "Bank Information for {name}:", bank.getName());
         context.sendTranslated(POSITIVE, "Owner:");
-        for (String owner : account.getOwners())
+        for (String owner : bank.getOwners())
         {
             context.sendMessage(" - " + owner);
         }
         context.sendTranslated(POSITIVE, "Member:");
-        for (String member : account.getMembers())
+        for (String member : bank.getMembers())
         {
             context.sendMessage(" - " + member);
         }
-        if (!context.isSource(User.class) || account.isMember((User)context.getSource()))
+        if (!(context instanceof User) || bank.isMember((User)context))
         {
             context.sendTranslated(POSITIVE, "Invited:");
-            for (String invite : account.getInvites())
+            for (String invite : bank.getInvites())
             {
                 context.sendMessage(" - " + invite);
             }
-            context.sendTranslated(POSITIVE, "Current Balance: {input}", manager.format(context.getSource().getLocale(), account.balance()));
+            context.sendTranslated(POSITIVE, "Current Balance: {input}", manager.format(context.getLocale(),
+                                                                                        bank.balance()));
         }
-        if (account.isHidden())
+        if (bank.isHidden())
         {
             context.sendTranslated(POSITIVE, "This bank is hidden for other players!");
         }
     }
 
-    private void ensureIsVisible(CommandContext context, BankAccount account)
+    private void ensureIsVisible(CommandSender context, BankAccount account)
     {
-        if (!account.isHidden() || module.perms().BANK_SHOWHIDDEN.isAuthorized(context.getSource())
-            || !context.isSource(User.class))
+        if (!account.isHidden() || module.perms().BANK_SHOWHIDDEN.isAuthorized(context)
+            || !(context instanceof User))
         {
             return;
         }
-        if (account.hasAccess((User)context.getSource()))
+        if (account.hasAccess((User)context))
         {
-            throw new ReaderException(context.getSource().getTranslation(NEGATIVE, "There is no bank account named {input#name}!", account.getName()));
+            throw new ReaderException(context.getTranslation(NEGATIVE, "There is no bank account named {input#name}!", account.getName()));
         }
     }
 
     @Command(desc = "Deposits given amount of money into the bank")
-    @Params(positional = {@Param(label = "bank", type = BankAccount.class),
-                          @Param(label = "amount", type = Double.class)})
-    @Flags(@Flag(longName = "force", name = "f"))
-    public void deposit(CommandContext context)
+    @Restricted(value = User.class, msg =  "You cannot deposit into a bank as console!")
+    public void deposit(User context, BankAccount bank, Double amount, @Flag boolean force)
     {
-        if (context.getSource() instanceof User)
+        UserAccount userAccount = this.manager.getUserAccount(context, this.manager.getAutoCreateUserAccount());
+        if (userAccount == null)
         {
-            BankAccount account = context.get(0);
-            Double amount = context.get(1);
-            UserAccount userAccount = this.manager.getUserAccount((User)context.getSource(), this.manager.getAutoCreateUserAccount());
-            if (userAccount == null)
-            {
-                context.sendTranslated(NEGATIVE, "You do not have an account!");
-                return;
-            }
-            boolean force = context.hasFlag("f") && module.perms().COMMAND_BANK_DEPOSIT_FORCE.isAuthorized(context.getSource());
-            if (userAccount.transactionTo(account, amount, force))
-            {
-                context.sendTranslated(POSITIVE, "Deposited {input#amount} into {name#bank}! New Balance: {input#balance}", this.manager.format(amount), account.getName(), this.manager.format(account.balance()));
-                return;
-            }
-            context.sendTranslated(NEGATIVE, "You cannot afford to spend that much!");
+            context.sendTranslated(NEGATIVE, "You do not have an account!");
             return;
         }
-        context.sendTranslated(NEGATIVE, "You cannot deposit into a bank as console!");
+        force = force && module.perms().COMMAND_BANK_DEPOSIT_FORCE.isAuthorized(context);
+        if (userAccount.transactionTo(bank, amount, force))
+        {
+            context.sendTranslated(POSITIVE, "Deposited {input#amount} into {name#bank}! New Balance: {input#balance}", this.manager.format(amount), bank.getName(), this.manager.format( bank.balance()));
+            return;
+        }
+        context.sendTranslated(NEGATIVE, "You cannot afford to spend that much!");
     }
 
     @Command(desc = "Withdraws given amount of money from the bank")
-    @Params(positional = {@Param(label = "bank", type = BankAccount.class),
-                          @Param(label = "amount", type = Double.class)})
-    @Flags(@Flag(longName = "force", name = "f"))
-    public void withdraw(CommandContext context)//takes money from the bank
+    @Restricted(value = User.class, msg = "You cannot withdraw from a bank as console!")
+    public void withdraw(User context, BankAccount bank, Double amount, @Flag boolean force)//takes money from the bank
     {
-        if (context.getSource() instanceof User)
+        if (!bank.isOwner(context) && !module.perms().COMMAND_BANK_WITHDRAW_OTHER.isAuthorized(context))
         {
-            BankAccount account = context.get(0);
-            if (!account.isOwner((User)context.getSource()) && !module.perms().COMMAND_BANK_WITHDRAW_OTHER.isAuthorized(context.getSource()))
-            {
-                context.sendTranslated(NEGATIVE, "Only owners of the bank are allowed to withdraw from it!");
-                return;
-            }
-            Double amount = context.get(1);
-            UserAccount userAccount = this.manager.getUserAccount((User)context.getSource(), this.manager.getAutoCreateUserAccount());
-            if (userAccount == null)
-            {
-                context.sendTranslated(NEGATIVE, "You do not have an account!");
-                return;
-            }
-            boolean force = context.hasFlag("f") && module.perms().COMMAND_BANK_WITHDRAW_FORCE.isAuthorized(context.getSource());
-            if (account.transactionTo(userAccount, amount, force))
-            {
-                context.sendTranslated(POSITIVE, "Withdrawn {input#amount} from {name#bank}! New Balance: {input#balance}", this.manager.format(amount), account.getName(), this.manager.format(account.balance()));
-                return;
-            }
-            context.sendTranslated(NEGATIVE, "The bank does not hold enough money to spend that much!");
+            context.sendTranslated(NEGATIVE, "Only owners of the bank are allowed to withdraw from it!");
             return;
         }
-        context.sendTranslated(NEGATIVE, "You cannot withdraw from a bank as console!");
+        UserAccount userAccount = this.manager.getUserAccount(context, this.manager.getAutoCreateUserAccount());
+        if (userAccount == null)
+        {
+            context.sendTranslated(NEGATIVE, "You do not have an account!");
+            return;
+        }
+        force = force && module.perms().COMMAND_BANK_WITHDRAW_FORCE.isAuthorized(context);
+        if (bank.transactionTo(userAccount, amount, force))
+        {
+            context.sendTranslated(POSITIVE, "Withdrawn {input#amount} from {name#bank}! New Balance: {input#balance}", this.manager.format(amount), bank.getName(), this.manager.format(bank.balance()));
+            return;
+        }
+        context.sendTranslated(NEGATIVE, "The bank does not hold enough money to spend that much!");
     }
 
     @Command(desc = "Pays given amount of money as bank to another account")
-    @Params(positional = {@Param(label = "bank", type = BankAccount.class),
-                          @Param(label = "target-account"),
-                          @Param(label = "amount", type = Double.class)})
-    @Flags({@Flag(longName = "force", name = "f"),
-            @Flag(longName = "bank", name = "b")})
-    public void pay(CommandContext context)//pay AS bank to a player or other bank <name> [-bank]
+    public void pay(CommandSender context, @Label("bank")BankAccount bankAccount, String targetAccount, Double amount,
+                    @Flag boolean force, @Flag boolean bank)//pay AS bank to a player or other bank <name> [-bank]
     {
-        BankAccount account = context.get(0);
-        if (!account.isOwner((User)context.getSource()))
+        if (!bankAccount.isOwner((User)context))
         {
             context.sendTranslated(NEGATIVE, "Only owners of the bank are allowed to spend the money from it!");
             return;
         }
         Account target;
-        if (context.hasFlag("b"))
+        if (!bank)
         {
-            User user = this.module.getCore().getUserManager().findUser(context.getString(1));
+            User user = this.module.getCore().getUserManager().findUser(targetAccount);
             target = this.manager.getUserAccount(user, this.manager.getAutoCreateUserAccount());
             if (target == null)
             {
@@ -626,29 +512,28 @@ public class BankCommands extends CommandContainer
         }
         else
         {
-            target = this.manager.getBankAccount(context.getString(1), false);
+            target = this.manager.getBankAccount(targetAccount, false);
             if (target == null)
             {
-                context.sendTranslated(NEGATIVE, "There is no bank account named {input#bank}!", context.get(1));
+                context.sendTranslated(NEGATIVE, "There is no bank account named {input#bank}!", targetAccount);
                 return;
             }
         }
-        Double amount = context.get(2);
         if (amount < 0)
         {
             context.sendTranslated(NEGATIVE, "Sorry but robbing a bank is not allowed!");
             return;
         }
-        boolean force = context.hasFlag("f") && module.perms().COMMAND_BANK_PAY_FORCE.isAuthorized(context.getSource());
-        if (account.transactionTo(target, amount, force))
+        force = force && module.perms().COMMAND_BANK_PAY_FORCE.isAuthorized(context);
+        if (bankAccount.transactionTo(target, amount, force))
         {
-            if (context.hasFlag("b"))
+            if (bank)
             {
-                context.sendTranslated(POSITIVE, "Transferred {input#amount} from {name#bank} to {user}! New Balance: {input#balance}", this.manager.format(amount), account.getName(), target.getName(), this.manager.format(account.balance()));
+                context.sendTranslated(POSITIVE, "Transferred {input#amount} from {name#bank} to {user}! New Balance: {input#balance}", this.manager.format(amount), bankAccount.getName(), target.getName(), this.manager.format(bankAccount.balance()));
             }
             else
             {
-                context.sendTranslated(POSITIVE, "Transferred {input#amount} from {name#bank} to {name#bank} New Balance: {input#balance}", this.manager.format(amount), account.getName(), target.getName(), this.manager.format(account.balance()));
+                context.sendTranslated(POSITIVE, "Transferred {input#amount} from {name#bank} to {name#bank} New Balance: {input#balance}", this.manager.format(amount), bankAccount.getName(), target.getName(), this.manager.format(bankAccount.balance()));
             }
             return;
         }

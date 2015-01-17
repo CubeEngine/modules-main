@@ -46,7 +46,6 @@ public class TeleportRequestCommands
     }
 
     @Command(desc = "Requests to teleport to a player.")
-    @Params(positional = @Param(label = "player", type = User.class))
     @Restricted(value = User.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
     public void tpa(User context, User player)
     {
