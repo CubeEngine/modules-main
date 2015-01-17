@@ -99,11 +99,11 @@ public class WorldControlCommands
 
         if (world.isThundering() != noThunder && world.hasStorm() != sunny) // weather is not changing
         {
-            context.sendTranslated(POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather);
+            context.sendTranslated(POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather.name());
         }
         else
         {
-            context.sendTranslated(POSITIVE, "Changed weather in {world} to {input#weather}!", world, weather);
+            context.sendTranslated(POSITIVE, "Changed weather in {world} to {input#weather}!", world, weather.name());
         }
         world.setStorm(!sunny);
         world.setThundering(!noThunder);
@@ -293,20 +293,24 @@ public class WorldControlCommands
 
     @Command(desc = "Gets rid of mobs close to you. Valid types are:\n" +
         "monster, animal, pet, golem, boss, other, creeper, skeleton, spider etc.")
-    @Params(positional = {@Param(label = "types...", req = OPTIONAL),
-              @Param(label = "radius", type = Integer.class, req = OPTIONAL)},
-            nonpositional =@Param(names = "in", type = World.class, completer = WorldCompleter.class))
-    @Flags({@Flag(longName = "lightning", name = "l"), // die with style
-            @Flag(longName = "all", name = "a")})// infinite radius
-    public void butcher(CommandContext context)
+    public void butcher(CommandSender context, @Label("types...") @Optional String types,
+                        @Optional Integer radius,
+                        @Named("in") World world,
+                        @Flag boolean lightning, // die with style
+                        @Flag boolean all) // infinite radius
     {
         User sender = null;
-        if (context.getSource() instanceof User)
+        if (context instanceof User)
         {
-            sender = (User)context.getSource();
+            sender = (User)context;
         }
         Location loc;
-        int radius = this.config.commands.butcherDefaultRadius;
+        radius = radius == null ? this.config.commands.butcherDefaultRadius : radius;
+        if (radius < 0 && !(radius == -1 && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context)))
+        {
+            context.sendTranslated(NEGATIVE, "The radius has to be a number greater than 0!");
+            return;
+        }
         int removed;
         if (sender == null)
         {
@@ -317,29 +321,15 @@ public class WorldControlCommands
         {
             loc = sender.getLocation();
         }
-        if (context.hasPositional(1))
-        {
-            radius = context.get(1, 0);
-            if (radius < 0 && !(radius == -1 && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context
-                                                                                                         .getSource())))
-            {
-                context.sendTranslated(NEGATIVE, "The radius has to be a number greater than 0!");
-                return;
-            }
-        }
-        if (context.hasFlag("a") && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context.getSource()))
+        if (all && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context))
         {
             radius = -1;
         }
-        boolean lightning = false;
-        if (context.hasFlag("l") && module.perms().COMMAND_BUTCHER_FLAG_LIGHTNING.isAuthorized(context.getSource()))
-        {
-            lightning = true;
-        }
+        lightning = lightning && module.perms().COMMAND_BUTCHER_FLAG_LIGHTNING.isAuthorized(context);
         List<Entity> list;
-        if (context.getSource() instanceof User && !(radius == -1))
+        if (context instanceof User && !(radius == -1))
         {
-            list = ((User)context.getSource()).getNearbyEntities(radius, radius, radius);
+            list = ((User)context).getNearbyEntities(radius, radius, radius);
         }
         else
         {
@@ -347,12 +337,12 @@ public class WorldControlCommands
         }
         String[] s_types = { "monster" };
         boolean allTypes = false;
-        if (context.hasPositional(0))
+        if (types != null)
         {
-            if ("*".equals(context.getString(0)))
+            if ("*".equals(types))
             {
                 allTypes = true;
-                if (!module.perms().COMMAND_BUTCHER_FLAG_ALLTYPE.isAuthorized(context.getSource()))
+                if (!module.perms().COMMAND_BUTCHER_FLAG_ALLTYPE.isAuthorized(context))
                 {
                     context.sendTranslated(NEGATIVE, "You are not allowed to butcher all types of living entities at once!");
                     return;
@@ -360,7 +350,7 @@ public class WorldControlCommands
             }
             else
             {
-                s_types = StringUtils.explode(",", context.getString(0));
+                s_types = StringUtils.explode(",", types);
             }
         }
         List<Entity> remList = new ArrayList<>();
@@ -391,7 +381,7 @@ public class WorldControlCommands
                 }
                 for (Entity entity : list)
                 {
-                    if (entityRemoval.doesMatch(entity) && entityRemoval.isAllowed(context.getSource()))
+                    if (entityRemoval.doesMatch(entity) && entityRemoval.isAllowed(context))
                     {
                         remList.add(entity);
                     }

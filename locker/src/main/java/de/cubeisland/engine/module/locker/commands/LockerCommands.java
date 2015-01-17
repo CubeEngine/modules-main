@@ -27,6 +27,9 @@ import de.cubeisland.engine.command.methodic.Flag;
 import de.cubeisland.engine.command.methodic.Flags;
 import de.cubeisland.engine.command.methodic.Param;
 import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.methodic.parametric.Complete;
+import de.cubeisland.engine.command.methodic.parametric.Label;
+import de.cubeisland.engine.command.methodic.parametric.Named;
 import de.cubeisland.engine.core.command.CommandContainer;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
@@ -220,13 +223,13 @@ public class LockerCommands extends CommandContainer
 
     @Alias(value = "cflag")
     @Command(desc = "Sets or unsets flags")
-    @Params(nonpositional = {@Param(names = "set", label = "flags...", completer = FlagCompleter.class),
-                             @Param(names = "unset", label = "flags...", completer = FlagCompleter.class)})
-    @Flags(@Flag(longName = "persist", name = "p"))
     @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void flag(CommandContext context) // TODO use parameterized cmd
+    public void flag(User context,
+                     @Named("set") @Complete(FlagCompleter.class) @Label("flags...") String setFlags,
+                     @Named("unset") @Complete(FlagCompleter.class) @Label("flags...") String unsetFlags,
+                     @Flag boolean persist)
     {
-        if (context.hasNamed())
+        if (setFlags == null && unsetFlags == null)
         {
             context.sendTranslated(NEUTRAL, "You need to define which flags to {text:set} or {text:unset}!");
             context.sendTranslated(NEUTRAL, "The following flags are available:");
@@ -238,22 +241,22 @@ public class LockerCommands extends CommandContainer
             context.sendTranslated(NEUTRAL, "You can also unset {text:all}");
             return;
         }
-        if (context.hasFlag("p"))
+        if (persist)
         {
-            this.persist((User)context.getSource());
+            this.persist(context);
         }
-        if (context.hasNamed("set") && context.hasNamed("unSet"))
+        if (setFlags != null && unsetFlags != null)
         {
             context.sendTranslated(NEGATIVE, "You have cannot set and unset flags at the same time!");
             return;
         }
-        if (context.hasNamed("set"))
+        if (setFlags != null)
         {
-            this.manager.commandListener.setCommandType(context.getSource(), CommandType.FLAGS_SET, context.getString("set"));
+            this.manager.commandListener.setCommandType(context, CommandType.FLAGS_SET, setFlags);
         }
         else
         {
-            this.manager.commandListener.setCommandType(context.getSource(), CommandType.FLAGS_UNSET, context.getString("unset"));
+            this.manager.commandListener.setCommandType(context, CommandType.FLAGS_UNSET, unsetFlags);
         }
         context.sendTranslated(POSITIVE, "Right click a protection to change its flags!");
     }
