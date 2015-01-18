@@ -22,25 +22,19 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.Flags;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Named;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Default;
+import de.cubeisland.engine.command.parametric.Named;
+import de.cubeisland.engine.command.parametric.Optional;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.task.TaskManager;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.reflect.annotations.Name;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
-import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 /**

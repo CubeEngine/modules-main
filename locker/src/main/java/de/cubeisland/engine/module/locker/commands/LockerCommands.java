@@ -22,16 +22,12 @@ import de.cubeisland.engine.command.CommandInvocation;
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.completer.Completer;
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.Flags;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.methodic.parametric.Complete;
-import de.cubeisland.engine.command.methodic.parametric.Label;
-import de.cubeisland.engine.command.methodic.parametric.Named;
-import de.cubeisland.engine.core.command.CommandContainer;
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Complete;
+import de.cubeisland.engine.command.parametric.Label;
+import de.cubeisland.engine.command.parametric.Named;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.core.util.math.BlockVector3;
@@ -50,7 +46,7 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
 
 @Command(name = "locker", desc = "Locker commands", alias = "l")
-public class LockerCommands extends CommandContainer
+public class LockerCommands extends ContainerCommand
 {
     private final Locker module;
     final LockManager manager;

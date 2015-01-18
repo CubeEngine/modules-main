@@ -18,8 +18,8 @@
 package de.cubeisland.engine.module.locker.commands;
 
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.locker.Locker;
@@ -32,7 +32,7 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
 @Command(name = "admin", desc = "Administrate the protections")
-public class LockerAdminCommands extends CommandContainer
+public class LockerAdminCommands extends ContainerCommand
 {
     private final LockManager manager;
 

@@ -18,9 +18,9 @@
 package de.cubeisland.engine.module.roles.commands;
 
 import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Optional;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -32,7 +32,7 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
 @Command(name = "admin", desc = "Manages the module", alias = "manadmin")
-public class ManagementCommands extends CommandContainer
+public class ManagementCommands extends ContainerCommand
 {
     private Roles module;
 

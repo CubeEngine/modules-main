@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -33,7 +33,7 @@ import static de.cubeisland.engine.core.util.ChatFormat.*;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 
-public abstract class RoleCommandHelper extends CommandContainer
+public abstract class RoleCommandHelper extends ContainerCommand
 {
     protected static final String GLOBAL_PREFIX = "g:";
     protected final RolesManager manager;

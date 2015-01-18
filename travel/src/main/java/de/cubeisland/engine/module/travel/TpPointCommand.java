@@ -20,7 +20,7 @@ package de.cubeisland.engine.module.travel;
 import java.util.Set;
 import de.cubeisland.engine.command.parameter.IncorrectUsageException;
 import de.cubeisland.engine.command.parameter.reader.ReaderException;
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -28,7 +28,7 @@ import de.cubeisland.engine.core.user.User;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 
-public class TpPointCommand extends CommandContainer
+public class TpPointCommand extends ContainerCommand
 {
     protected InviteManager iManager;
 

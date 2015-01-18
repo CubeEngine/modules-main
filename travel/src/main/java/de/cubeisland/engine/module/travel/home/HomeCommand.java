@@ -22,13 +22,13 @@ import java.util.Set;
 import de.cubeisland.engine.command.CommandInvocation;
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Greed;
-import de.cubeisland.engine.command.methodic.parametric.Label;
-import de.cubeisland.engine.command.methodic.parametric.Named;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Default;
+import de.cubeisland.engine.command.parametric.Greed;
+import de.cubeisland.engine.command.parametric.Label;
+import de.cubeisland.engine.command.parametric.Named;
+import de.cubeisland.engine.command.parametric.Optional;
 import de.cubeisland.engine.command.result.CommandResult;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
@@ -315,7 +315,7 @@ public class HomeCommand extends TpPointCommand
         this.showList(context, null, this.manager.list(true, true));
     }
 
-    @Command(alias = {"ilist", "invited"}, desc = "List all players invited to your homes")
+    @Command(name = "ilist", alias = "invited", desc = "List all players invited to your homes")
     public void invitedList(CommandSender context, @Default User owner)
     {
         if (!owner.equals(context) && !module.getPermissions().HOME_LIST_OTHER.isAuthorized(context))

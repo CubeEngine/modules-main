@@ -17,11 +17,11 @@
  */
 package de.cubeisland.engine.module.conomy.commands;
 
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.parametric.Label;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Label;
+import de.cubeisland.engine.command.parametric.Optional;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserList;
@@ -33,7 +33,7 @@ import org.bukkit.OfflinePlayer;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 @Command(name = "eco", desc = "Administrative commands for Conomy")
-public class EcoCommands extends CommandContainer
+public class EcoCommands extends ContainerCommand
 {
     private final Conomy module;
     private final ConomyManager manager;

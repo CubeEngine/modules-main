@@ -20,17 +20,13 @@ package de.cubeisland.engine.module.conomy.commands;
 import java.util.Set;
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.Flags;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Label;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Default;
+import de.cubeisland.engine.command.parametric.Label;
+import de.cubeisland.engine.command.parametric.Optional;
 import de.cubeisland.engine.command.parameter.reader.ReaderException;
-import de.cubeisland.engine.core.command.CommandContainer;
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.ChatFormat;
@@ -43,7 +39,7 @@ import de.cubeisland.engine.module.conomy.account.UserAccount;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 
 @Command(name = "bank", desc = "Manages your money in banks.")
-public class BankCommands extends CommandContainer
+public class BankCommands extends ContainerCommand
 {
     private final ConomyManager manager;
     private final Conomy module;

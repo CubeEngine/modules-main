@@ -17,13 +17,8 @@
  */
 package de.cubeisland.engine.module.conomy.commands;
 
-import java.util.List;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.parameter.reader.SimpleListReader;
-import de.cubeisland.engine.converter.converter.DoubleConverter;
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -34,7 +29,7 @@ import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
 @Command(name = "bank", desc = "Administrative commands for Conomy Banks.")
-public class EcoBankCommands extends CommandContainer
+public class EcoBankCommands extends ContainerCommand
 {
     private final Conomy module;
     private final ConomyManager manager;

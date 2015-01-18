@@ -18,12 +18,12 @@
 package de.cubeisland.engine.module.roles.commands;
 
 import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Label;
-import de.cubeisland.engine.command.methodic.parametric.Named;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Default;
+import de.cubeisland.engine.command.parametric.Label;
+import de.cubeisland.engine.command.parametric.Named;
+import de.cubeisland.engine.command.parametric.Optional;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.node.StringNode;

@@ -25,12 +25,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.parametric.Named;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Named;
+import de.cubeisland.engine.command.parametric.Optional;
 import de.cubeisland.engine.command.parameter.IncorrectUsageException;
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -57,7 +57,7 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @Command(name = "worlds", desc = "Worlds commands")
-public class WorldsCommands extends CommandContainer
+public class WorldsCommands extends ContainerCommand
 {
     private Worlds module;
     private final Multiverse multiverse;

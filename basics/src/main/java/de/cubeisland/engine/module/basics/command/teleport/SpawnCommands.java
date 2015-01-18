@@ -18,11 +18,10 @@
 package de.cubeisland.engine.module.basics.command.teleport;
 
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Named;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Default;
+import de.cubeisland.engine.command.parametric.Optional;
 import de.cubeisland.engine.command.parameter.TooFewArgumentsException;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;

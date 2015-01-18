@@ -30,34 +30,34 @@ public class TravelPerm extends PermissionContainer<Travel>
     public TravelPerm(Travel module, HomeCommand homeCmd, WarpCommand warpCmd)
     {
         super(module);
-        HOME_TP_OTHER = homeCmd.getCommand("tp").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        HOME_SET_MORE = homeCmd.getCommand("set").getDescriptor().valueFor(PermissionProvider.class).child("more");
-        HOME_MOVE_OTHER = homeCmd.getCommand("move").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        HOME_REMOVE_OTHER = homeCmd.getCommand("remove").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        HOME_RENAME_OTHER = homeCmd.getCommand("rename").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        HOME_LIST_OTHER = homeCmd.getCommand("list").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        HOME_PRIVATE_OTHER = homeCmd.getCommand("private").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        HOME_PUBLIC_OTHER = homeCmd.getCommand("public").getDescriptor().valueFor(PermissionProvider.class).child("other");
+        HOME_TP_OTHER = homeCmd.getPermission("tp").child("other");
+        HOME_SET_MORE = homeCmd.getPermission("set").child("more");
+        HOME_MOVE_OTHER = homeCmd.getPermission("move").child("other");
+        HOME_REMOVE_OTHER = homeCmd.getPermission("remove").child("other");
+        HOME_RENAME_OTHER = homeCmd.getPermission("rename").child("other");
+        HOME_LIST_OTHER = homeCmd.getPermission("list").child("other");
+        HOME_PRIVATE_OTHER = homeCmd.getPermission("private").child("other");
+        HOME_PUBLIC_OTHER = homeCmd.getPermission("public").child("other");
 
-        WARP_TP_OTHER = warpCmd.getCommand("tp").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        WARP_MOVE_OTHER = warpCmd.getCommand("move").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        WARP_REMOVE_OTHER = warpCmd.getCommand("remove").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        WARP_RENAME_OTHER = warpCmd.getCommand("rename").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        WARP_LIST_OTHER = warpCmd.getCommand("list").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        WARP_PRIVATE_OTHER = warpCmd.getCommand("private").getDescriptor().valueFor(PermissionProvider.class).child("other");
-        WARP_PUBLIC_OTHER = warpCmd.getCommand("public").getDescriptor().valueFor(PermissionProvider.class).child("other");
+        WARP_TP_OTHER = warpCmd.getPermission("tp").child("other");
+        WARP_MOVE_OTHER = warpCmd.getPermission("move").child("other");
+        WARP_REMOVE_OTHER = warpCmd.getPermission("remove").child("other");
+        WARP_RENAME_OTHER = warpCmd.getPermission("rename").child("other");
+        WARP_LIST_OTHER = warpCmd.getPermission("list").child("other");
+        WARP_PRIVATE_OTHER = warpCmd.getPermission("private").child("other");
+        WARP_PUBLIC_OTHER = warpCmd.getPermission("public").child("other");
 
-        HOME_USER.attach(homeCmd.getCommand("tp").getDescriptor().valueFor(PermissionProvider.class),
-                         homeCmd.getCommand("set").getDescriptor().valueFor(PermissionProvider.class),
-                         homeCmd.getCommand("move").getDescriptor().valueFor(PermissionProvider.class),
-                         homeCmd.getCommand("remove").getDescriptor().valueFor(PermissionProvider.class),
-                         homeCmd.getCommand("rename").getDescriptor().valueFor(PermissionProvider.class),
-                         homeCmd.getCommand("list").getDescriptor().valueFor(PermissionProvider.class),
-                         homeCmd.getCommand("private").getDescriptor().valueFor(PermissionProvider.class),
-                         homeCmd.getCommand("greeting").getDescriptor().valueFor(PermissionProvider.class),
-                         homeCmd.getCommand("ilist").getDescriptor().valueFor(PermissionProvider.class),
-                         homeCmd.getCommand("invite").getDescriptor().valueFor(PermissionProvider.class),
-                         homeCmd.getCommand("uninvite").getDescriptor().valueFor(PermissionProvider.class));
+        HOME_USER.attach(homeCmd.getPermission("tp"),
+                         homeCmd.getPermission("set"),
+                         homeCmd.getPermission("move"),
+                         homeCmd.getPermission("remove"),
+                         homeCmd.getPermission("rename"),
+                         homeCmd.getPermission("list"),
+                         homeCmd.getPermission("private"),
+                         homeCmd.getPermission("greeting"),
+                         homeCmd.getPermission("ilist"),
+                         homeCmd.getPermission("invite"),
+                         homeCmd.getPermission("uninvite"));
 
         this.registerAllPermissions();
     }

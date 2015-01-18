@@ -22,12 +22,12 @@ import java.util.Collection;
 import java.util.List;
 import de.cubeisland.engine.command.CommandInvocation;
 import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.parametric.Label;
-import de.cubeisland.engine.command.methodic.parametric.Named;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Label;
+import de.cubeisland.engine.command.parametric.Named;
+import de.cubeisland.engine.command.parametric.Optional;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.user.UserList;
@@ -43,7 +43,7 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 
 @Command(name = "money", desc = "Manage your money")
-public class MoneyCommand extends CommandContainer
+public class MoneyCommand extends ContainerCommand
 {
     private final Conomy module;
     private final ConomyManager manager;

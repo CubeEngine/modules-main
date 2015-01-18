@@ -19,10 +19,10 @@ package de.cubeisland.engine.module.roles.commands;
 
 import java.util.Map;
 import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Named;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Default;
+import de.cubeisland.engine.command.parametric.Named;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.permission.PermDefault;
 import de.cubeisland.engine.core.user.User;

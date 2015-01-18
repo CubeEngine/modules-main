@@ -19,10 +19,10 @@ package de.cubeisland.engine.module.portals;
 
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Desc;
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Default;
+import de.cubeisland.engine.command.parametric.Desc;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.module.service.Selector;
 import de.cubeisland.engine.core.user.User;
@@ -39,7 +39,7 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
 @Alias("mvpm")
 @Command(name = "modify", desc = "modifies a portal")
-public class PortalModifyCommand extends CommandContainer
+public class PortalModifyCommand extends ContainerCommand
 {
     private Portals module;
     private final PortalManager manager;

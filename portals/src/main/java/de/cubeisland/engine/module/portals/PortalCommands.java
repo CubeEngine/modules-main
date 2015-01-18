@@ -21,11 +21,11 @@ import java.io.File;
 import java.util.Set;
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.parametric.Default;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Default;
+import de.cubeisland.engine.command.parametric.Optional;
 import de.cubeisland.engine.command.parameter.FixedValues;
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.module.service.Selector;
 import de.cubeisland.engine.core.user.User;
@@ -42,7 +42,7 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
 @Command(name = "portals", desc = "The portal commands", alias = "mvp")
-public class PortalCommands extends CommandContainer
+public class PortalCommands extends ContainerCommand
 {
     private final Portals module;
     private final PortalManager manager;

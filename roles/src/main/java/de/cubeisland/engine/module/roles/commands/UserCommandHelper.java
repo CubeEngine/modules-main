@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
-import de.cubeisland.engine.core.command.CommandContainer;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -31,7 +31,7 @@ import org.bukkit.World;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 
-public class UserCommandHelper extends CommandContainer
+public class UserCommandHelper extends ContainerCommand
 {
     protected final RolesManager manager;
     protected final WorldManager worldManager;

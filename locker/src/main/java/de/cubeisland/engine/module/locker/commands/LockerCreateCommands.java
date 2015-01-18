@@ -19,26 +19,21 @@ package de.cubeisland.engine.module.locker.commands;
 
 import de.cubeisland.engine.command.alias.Alias;
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Flag;
-import de.cubeisland.engine.command.methodic.Flags;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
-import de.cubeisland.engine.command.methodic.parametric.Optional;
-import de.cubeisland.engine.core.command.CommandContainer;
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.command.parametric.Flag;
+import de.cubeisland.engine.command.parametric.Optional;
+import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.commands.CommandListener.CommandType;
 import de.cubeisland.engine.module.locker.storage.LockManager;
 
-import static de.cubeisland.engine.command.parameter.property.Requirement.OPTIONAL;
 import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
 
 @Command(name = "create", desc = "Creates various protections")
-public class LockerCreateCommands extends CommandContainer
+public class LockerCreateCommands extends ContainerCommand
 {
     private final LockManager manager;
 

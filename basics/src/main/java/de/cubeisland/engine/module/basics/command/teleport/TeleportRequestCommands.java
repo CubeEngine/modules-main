@@ -19,9 +19,7 @@ package de.cubeisland.engine.module.basics.command.teleport;
 
 import java.util.UUID;
 import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.methodic.Command;
-import de.cubeisland.engine.command.methodic.Param;
-import de.cubeisland.engine.command.methodic.Params;
+import de.cubeisland.engine.command.parametric.Command;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
