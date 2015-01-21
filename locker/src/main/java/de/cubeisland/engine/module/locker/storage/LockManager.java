@@ -437,6 +437,18 @@ public class LockManager implements Listener
     public CompletableFuture<Lock> createLock(Material material, Location location, User user, LockType lockType, String password, boolean createKeyBook)
     {
         LockModel model = this.dsl.newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
+        for (BlockLockerConfiguration blockProtection : this.module.getConfig().blockprotections)
+        {
+            if (blockProtection.isType(material))
+            {
+                short flags = blockProtection.getFlags();
+                if (flags != 0)
+                {
+                    model.setValue(TABLE_LOCK.FLAGS, (short)(model.getValue(TABLE_LOCK.FLAGS) | flags));
+                }
+                break;
+            }
+        }
         return model.createPassword(this, password).insertAsync().thenCompose(m -> {
             List<Location> locations = new ArrayList<>();
             Block block = location.getBlock();
@@ -494,26 +506,12 @@ public class LockManager implements Listener
             {
                 locations.add(location);
             }
-            return allOf(locations.parallelStream().map(loc -> dsl.newRecord(TABLE_LOCK_LOCATION).newLocation(model,
-                                                                                                              loc)).map(
+            return allOf(locations.parallelStream().map(loc -> dsl.newRecord(TABLE_LOCK_LOCATION).newLocation(model, loc)).map(
                 AsyncRecord::insertAsync).toArray(CompletableFuture[]::new)).thenApply((v) -> {
                 Lock lock = new Lock(this, model, locations);
                 this.addLoadedLocationLock(lock);
                 lock.showCreatedMessage(user);
                 lock.attemptCreatingKeyBook(user, createKeyBook);
-                for (BlockLockerConfiguration blockProtection : this.module.getConfig().blockprotections)
-                {
-                    if (blockProtection.isType(material))
-                    {
-                        short flags = blockProtection.getFlags();
-                        if (flags != 0)
-                        {
-                            lock.setFlags((short)(lock.getFlags() | flags));
-                            lock.model.updateAsync();
-                        }
-                        break;
-                    }
-                }
                 return lock;
             });
         });
