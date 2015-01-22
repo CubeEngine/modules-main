@@ -220,7 +220,7 @@ public class InformationCommands
         {
             groupedOutput.append("\n").append(GOLD).append(groupedEntities.get(key).getRight()).append("x ")
                          .append(key).append(WHITE).append(" (").append(GOLD)
-                         .append(MathHelper.round(groupedEntities.get(key).getLeft())).append("m")
+                         .append(Math.round(groupedEntities.get(key).getLeft())).append("m")
                          .append(WHITE).append(")");
         }
         if (outputlist.isEmpty())
