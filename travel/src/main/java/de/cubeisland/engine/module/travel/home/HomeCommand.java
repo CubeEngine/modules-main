@@ -218,7 +218,7 @@ public class HomeCommand extends TpPointCommand
     @Command(alias = {"delete", "rem", "del"}, desc = "Remove a home")
     public void remove(CommandSender context, @Optional String name, @Default @Optional User owner)
     {
-        Home home = this.manager.getExact(owner, name);
+        Home home = this.manager.getExact(owner, name == null ? "home" : name);
         if (home == null)
         {
             homeNotFoundMessage(context, owner, name);
