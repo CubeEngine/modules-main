@@ -138,12 +138,15 @@ public class ItemCommands
         }
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(ChatFormat.parseFormats(name));
-        ArrayList<String> list = new ArrayList<>();
-        for (String line : lore)
+        if (lore != null)
         {
-            list.add(ChatFormat.parseFormats(line));
+            ArrayList<String> list = new ArrayList<>();
+            for (String line : lore)
+            {
+                list.add(ChatFormat.parseFormats(line));
+            }
+            meta.setLore(list);
         }
-        meta.setLore(list);
         item.setItemMeta(meta);
         context.sendTranslated(POSITIVE, "You now hold {input#name} in your hands!", name);
     }
