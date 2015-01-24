@@ -157,6 +157,7 @@ public class PortalCommands extends ContainerCommand
         context.sendTranslated(POSITIVE, "Portal debug mode OFF!");
     }
 
+    @Alias("mvpl")
     @Command(desc = "Lists the portals")
     public void list(CommandContext context, @Default World world)
     {
