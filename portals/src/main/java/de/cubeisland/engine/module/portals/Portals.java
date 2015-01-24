@@ -38,7 +38,7 @@ public class Portals extends Module
         this.getCore().getConfigFactory().getDefaultConverterManager().registerConverter(new DestinationConverter(getCore()), Destination.class);
         ReaderManager rManager = this.getCore().getCommandManager().getReaderManager();
         rManager.registerReader(new PortalReader(this), Portal.class);
-        rManager.registerReader(new DestinationReader(this), Portal.class);
+        rManager.registerReader(new DestinationReader(this), Destination.class);
         this.portalManager = new PortalManager(this);
     }
 }

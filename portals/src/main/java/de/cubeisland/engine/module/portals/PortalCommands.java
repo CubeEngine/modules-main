@@ -158,7 +158,7 @@ public class PortalCommands extends ContainerCommand
     }
 
     @Command(desc = "Lists the portals")
-    public void list(CommandContext context, World world)
+    public void list(CommandContext context, @Default World world)
     {
         Set<Portal> portals = manager.getPortals(world);
         if (portals.isEmpty())
