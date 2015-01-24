@@ -23,6 +23,7 @@ import de.cubeisland.engine.command.parametric.Command;
 import de.cubeisland.engine.command.parametric.Flag;
 import de.cubeisland.engine.command.parametric.Default;
 import de.cubeisland.engine.command.parametric.Named;
+import de.cubeisland.engine.command.parametric.Optional;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -71,21 +72,31 @@ public class TeleportCommands
     }
 
     @Command(desc = "Teleport directly to a player.")
-    public void tp(CommandContext context, @Default User player, User target, @Flag boolean force, @Flag boolean unsafe)
+    public void tp(CommandSender context, User player, @Optional User target, @Flag boolean force, @Flag boolean unsafe)
     {
+        if (target == null)
+        {
+            target = player;
+            if (!(context instanceof User))
+            {
+                context.sendTranslated(NEGATIVE, "You have to provide both players");
+                return;
+            }
+            player = (User)context;
+        }
         if (!target.isOnline())
         {
             context.sendTranslated(NEGATIVE, "Teleportation only works with online players!");
             return;
         }
-        force = force && module.perms().COMMAND_TP_FORCE.isAuthorized(context.getSource());
-        if (!context.getSource().equals(player) && !module.perms().COMMAND_TP_OTHER.isAuthorized(context.getSource())) // teleport other persons
+        force = force && module.perms().COMMAND_TP_FORCE.isAuthorized(context);
+        if (!context.equals(player) && !module.perms().COMMAND_TP_OTHER.isAuthorized(context)) // teleport other persons
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to teleport other people!");
             return;
         }
 
-        if (!context.getSource().equals(player))
+        if (!context.equals(player))
         {
             if (module.perms().TELEPORT_PREVENT_TP.isAuthorized(player)) // teleport the user
             {
@@ -93,11 +104,11 @@ public class TeleportCommands
                 return;
             }
         } // else equals tp -> no need to check tp perm
-        if (!context.getSource().equals(target))
+        if (!context.equals(target))
         {
             if (module.perms().TELEPORT_PREVENT_TPTO.isAuthorized(target)) // teleport to the target
             {
-                if (module.perms().COMMAND_TP_FORCE.isAuthorized(context.getSource()))
+                if (module.perms().COMMAND_TP_FORCE.isAuthorized(context))
                 {
                     context.sendTranslated(POSITIVE, "Use the {text:-force (-f)} flag to teleport to this player."); //Show force flag if has permission
                 }
@@ -108,7 +119,7 @@ public class TeleportCommands
 
         if (player.equals(target))
         {
-            if (context.getSource().equals(player))
+            if (context.equals(player))
             {
                 context.sendTranslated(NEUTRAL, "You found yourself!");
                 return;
