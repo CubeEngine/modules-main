@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.BlockUtil;
+import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.module.locker.storage.Lock;
 import de.cubeisland.engine.module.locker.storage.LockManager;
 import org.bukkit.Chunk;
@@ -258,6 +259,7 @@ public class LockerListener implements Listener
         if (!event.canBuild()) return;
         Block placed = event.getBlockPlaced();
         User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
+        Location location = placed.getLocation();
         if (placed.getType() == Material.CHEST || placed.getType() == Material.TRAPPED_CHEST)
         {
             Location relativeLoc = new Location(null,0,0,0);
@@ -291,7 +293,7 @@ public class LockerListener implements Listener
         }
         else if (placed.getType() == Material.WOODEN_DOOR || placed.getType() == Material.IRON_DOOR_BLOCK)
         {
-            Location loc = placed.getLocation();
+            Location loc = location;
             Location relativeLoc = new Location(null,0,0,0);
             for (BlockFace blockFace : BlockUtil.CARDINAL_DIRECTIONS)
             {
@@ -338,12 +340,19 @@ public class LockerListener implements Listener
                 }
             }
         }
+        for (ConfigWorld world : module.getConfig().disableAutoProtect)
+        {
+            if (location.getWorld().equals(world.getWorld()))
+            {
+                return ;
+            }
+        }
         for (BlockLockerConfiguration blockprotection : this.module.getConfig().blockprotections)
         {
             if (blockprotection.isType(placed.getType()))
             {
                 if (!blockprotection.autoProtect) return;
-                this.manager.createLock(placed.getType(), placed.getLocation(), user, blockprotection.autoProtectType, null, false);
+                this.manager.createLock(placed.getType(), location, user, blockprotection.autoProtectType, null, false);
                 return;
             }
         }
@@ -562,6 +571,13 @@ public class LockerListener implements Listener
     {
         if (event.getOwner() instanceof Player)
         {
+            for (ConfigWorld world : module.getConfig().disableAutoProtect)
+            {
+                if (event.getEntity().getWorld().equals(world.getWorld()))
+                {
+                    return;
+                }
+            }
             for (EntityLockerConfiguration entityProtection : this.module.getConfig().entityProtections)
             {
                 if (entityProtection.isType(event.getEntityType()) && entityProtection.autoProtect)

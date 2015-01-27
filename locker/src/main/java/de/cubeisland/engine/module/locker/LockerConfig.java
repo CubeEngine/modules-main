@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Transient;
 import de.cubeisland.engine.core.CubeEngine;
+import de.cubeisland.engine.core.world.ConfigWorld;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
@@ -110,6 +111,9 @@ public class LockerConfig extends ReflectedYaml
                  "auto-protect only applies onto entities that can be tamed")
     @Name("protections.entities")
     public List<EntityLockerConfiguration> entityProtections;
+
+    @Comment("Worlds to disable auto-protect in")
+    public List<ConfigWorld> disableAutoProtect = new ArrayList<>();
 
     // limit protection count#
 
