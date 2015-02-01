@@ -17,11 +17,11 @@
  */
 package de.cubeisland.engine.module.worlds;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -51,6 +51,7 @@ import org.bukkit.entity.Player;
 
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.DAT;
 import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Represents multiple worlds in a universe
@@ -173,14 +174,10 @@ public class Universe
                 this.universeConfig.mainWorld = new ConfigWorld(this.wm, world);
                 this.universeConfig.save();
             }
-            for (WorldConfig worldConfig : this.worldConfigs.values())
-            {
-                if (worldConfig.spawn.respawnWorld == null)
-                {
-                    worldConfig.spawn.respawnWorld = new ConfigWorld(this.wm, this.universeConfig.mainWorld.getName());
-                    worldConfig.save();
-                }
-            }
+            this.worldConfigs.values().stream().filter(c -> c.spawn.respawnWorld == null).forEach(c -> {
+                c.spawn.respawnWorld = new ConfigWorld(this.wm, this.universeConfig.mainWorld.getName());
+                c.save();
+            });
             World mainWorld = this.universeConfig.mainWorld.getWorld();
             if (mainWorld == null)
             {
@@ -314,16 +311,11 @@ public class Universe
             this.module.getCore().getPermissionManager().registerPermission(module, this.universeAccessPerm);
         }
         Permission worldAccess = this.multiverse.getUniverseRootPerm().childWildcard("world-access");
-        for (Entry<String, WorldConfig> entry : this.worldConfigs.entrySet())
-        {
-            if (!entry.getValue().access.free)
-            {
-                Permission perm = worldAccess.child(entry.getKey());
-                this.module.getCore().getPermissionManager().registerPermission(module, perm);
-                this.worldPerms.put(entry.getKey(), perm);
-            }
-
-        }
+        this.worldConfigs.entrySet().stream().filter(e -> !e.getValue().access.free).forEach(e -> {
+            Permission perm = worldAccess.child(e.getKey());
+            this.module.getCore().getPermissionManager().registerPermission(module, perm);
+            this.worldPerms.put(e.getKey(), perm);
+        });
     }
 
     private WorldConfig createWorldConfigFromExisting(World world)
@@ -375,14 +367,9 @@ public class Universe
         final PlayerDataConfig config = this.module.getCore().getConfigFactory().create(PlayerDataConfig.class);
         config.applyFromPlayer(player);
 
-        this.module.getCore().getTaskManager().runAsynchronousTask(this.module, new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                config.setFile(dirPlayers.resolve(player.getUniqueId() + DAT.getExtention()).toFile());
-                config.save();
-            }
+        this.module.getCore().getTaskManager().runAsynchronousTask(this.module, () -> {
+            config.setFile(dirPlayers.resolve(player.getUniqueId() + DAT.getExtention()).toFile());
+            config.save();
         });
         this.module.getLog().debug("PlayerData for {} in {} ({}) saved", player.getDisplayName(), world.getName(), this.getName());
     }
@@ -539,18 +526,18 @@ public class Universe
 
     public List<Pair<String, WorldConfig>> getAllWorlds()
     {
-        ArrayList<Pair<String, WorldConfig>> list = new ArrayList<>();
-        for (Entry<String, WorldConfig> entry : this.worldConfigs.entrySet())
-        {
-            list.add(new Pair<>(entry.getKey(), entry.getValue()));
-        }
-        return list;
+        return this.worldConfigs.entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue())).collect(toList());
     }
 
     public void removeWorld(String name)
     {
-        WorldConfig config = this.worldConfigs.remove(name);
-        config.getFile().delete();
+        final WorldConfig config = this.worldConfigs.remove(name);
+        final File file = config.getFile();
+        if (!file.delete())
+        {
+            module.getLog().warn("Failed to remove the world configuration {}. Deleting on exit...", file);
+            file.deleteOnExit();
+        }
     }
 
     public Path getDirectory()
