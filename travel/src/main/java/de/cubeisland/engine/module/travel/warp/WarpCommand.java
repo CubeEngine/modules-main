@@ -17,7 +17,6 @@
  */
 package de.cubeisland.engine.module.travel.warp;
 
-import java.util.HashSet;
 import java.util.Set;
 import de.cubeisland.engine.command.CommandInvocation;
 import de.cubeisland.engine.command.alias.Alias;
@@ -47,6 +46,7 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PRIVATE;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
+import static java.util.stream.Collectors.toSet;
 import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @Command(name = "warp", desc = "Teleport to a warp")
@@ -74,81 +74,85 @@ public class WarpCommand extends TpPointCommand
 
     @Restricted(User.class)
     @Command(desc = "Teleport to a warp")
-    public void tp(User context, String warp, @Default User owner)
+    public void tp(User sender, String warp, @Default User owner)
     {
         Warp w = manager.findOne(owner, warp);
         if (w == null)
         {
-            warpNotFoundMessage(context, owner, warp);
+            warpNotFoundMessage(sender, owner, warp);
             return;
         }
-        if (!w.canAccess(context) && !module.getPermissions().WARP_TP_OTHER.isAuthorized(context))
+        if (!w.canAccess(sender) && !module.getPermissions().WARP_TP_OTHER.isAuthorized(sender))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_TP_OTHER);
         }
         Location location = w.getLocation();
         if (location == null)
         {
-            warpInDeletedWorldMessage(context, owner, w);
+            warpInDeletedWorldMessage(sender, w);
             return;
         }
-        if (!context.teleport(location, COMMAND))
+        if (!sender.teleport(location, COMMAND))
         {
-            context.sendTranslated(CRITICAL, "The teleportation got aborted!");
+            sender.sendTranslated(CRITICAL, "The teleportation got aborted!");
             return;
         }
         if (w.getWelcomeMsg() != null)
         {
-            context.sendMessage(w.getWelcomeMsg());
+            sender.sendMessage(w.getWelcomeMsg());
             return;
         }
-        if (w.isOwner(context))
+        if (w.isOwnedBy(sender))
         {
-            context.sendTranslated(POSITIVE, "You have been teleported to your warp {name}!", w.getName());
+            sender.sendTranslated(POSITIVE, "You have been teleported to your warp {name}!", w.getName());
             return;
         }
-        context.sendTranslated(POSITIVE, "You have been teleported to the warp {name} of {user}!", w.getName(), w.getOwnerName());
+        sender.sendTranslated(POSITIVE, "You have been teleported to the warp {name} of {user}!", w.getName(),
+                               w.getOwnerName());
     }
 
     @Restricted(User.class)
     @Alias(value = {"createwarp", "mkwarp", "makewarp"})
     @Command(alias = "make", desc = "Create a warp")
-    public void create(User context, String name, @Flag(name = "priv", longName = "private") boolean priv) // TODO flag permission "private"
+    public void create(User sender, String name, @Flag(name = "priv", longName = "private") boolean priv) // TODO flag permission "private"
     {
         if (this.manager.getCount() >= this.module.getConfig().warps.max)
         {
-            context.sendTranslated(CRITICAL, "The server have reached its maximum number of warps!");
-            context.sendTranslated(NEGATIVE, "Some warps must be deleted for new ones to be made");
+            sender.sendTranslated(CRITICAL, "The server have reached its maximum number of warps!");
+            sender.sendTranslated(NEGATIVE, "Some warps must be deleted for new ones to be made");
             return;
         }
-        if (manager.has(context, name))
+        if (manager.has(sender, name))
         {
-            context.sendTranslated(NEGATIVE, "A warp by that name already exist!");
+            sender.sendTranslated(NEGATIVE, "A warp by that name already exist!");
             return;
         }
         if (name.contains(":") || name.length() >= 32)
         {
-            context.sendTranslated(NEGATIVE, "Warps may not have names that are longer than 32 characters nor contain colon(:)'s!");
+            sender.sendTranslated(NEGATIVE,
+                                   "Warps may not have names that are longer than 32 characters nor contain colon(:)'s!");
             return;
         }
-        if (this.manager.has(context, name))
+        if (this.manager.has(sender, name))
         {
-            context.sendTranslated(NEGATIVE, "The warp already exists! You can move it with {text:/warp move}");
+            sender.sendTranslated(NEGATIVE, "The warp already exists! You can move it with {text:/warp move}");
             return;
         }
-        Warp warp = manager.create(context, name, context.getLocation(), !priv);
-        context.sendTranslated(POSITIVE, "Your warp {name} has been created!", warp.getName());
+        Warp warp = manager.create(sender, name, sender.getLocation(), !priv);
+        sender.sendTranslated(POSITIVE, "Your warp {name} has been created!", warp.getName());
     }
 
     @Command(desc = "Set the welcome message of warps", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
-    public void greeting(CommandSender context, String warp, @Label("welcome message") @Greed(INFINITE) @Optional String message,
-                         @Default @Named("owner") User owner, @Flag boolean append)
+    public void greeting(CommandSender sender, String warp,
+                         @Label("welcome message") @Greed(INFINITE) @Optional String message,
+                         @Default @Named("owner") User owner,
+                         @Flag boolean append)
     {
         // TODO permission other
         Warp w = this.manager.getExact(owner, warp);
         if (w == null)
         {
-            warpNotFoundMessage(context, owner, warp);
+            warpNotFoundMessage(sender, owner, warp);
             return;
         }
         if (append)
@@ -160,93 +164,97 @@ public class WarpCommand extends TpPointCommand
             w.setWelcomeMsg(message);
         }
         w.update();
-        if (w.isOwner(context))
+        if (w.isOwnedBy(sender))
         {
-            context.sendTranslated(POSITIVE, "The welcome message for your warp {name} is now set to:", w.getName());
+            sender.sendTranslated(POSITIVE, "The welcome message for your warp {name} is now set to:", w.getName());
         }
         else
         {
-            context.sendTranslated(POSITIVE, "The welcome message for the warp {name} of {user} is now set to:", w.getName(), owner);
+            sender.sendTranslated(POSITIVE, "The welcome message for the warp {name} of {user} is now set to:",
+                                   w.getName(), owner);
         }
-        context.sendMessage(w.getWelcomeMsg());
+        sender.sendMessage(w.getWelcomeMsg());
     }
 
     @Restricted(User.class)
     @Command(desc = "Move a warp")
-    public void move(User context, String warp, @Default User owner)
+    public void move(User sender, String warp, @Default User owner)
     {
         Warp w = manager.getExact(owner, warp);
         if (w == null)
         {
-            warpNotFoundMessage(context, owner, warp);
+            warpNotFoundMessage(sender, owner, warp);
             return;
         }
-        if (!w.isOwner(context) && !module.getPermissions().WARP_MOVE_OTHER.isAuthorized(context))
+        if (!w.isOwnedBy(sender) && !module.getPermissions().WARP_MOVE_OTHER.isAuthorized(sender))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_MOVE_OTHER);
         }
-        w.setLocation(context.getLocation());
+        w.setLocation(sender.getLocation());
         w.update();
-        if (w.isOwner(context))
+        if (w.isOwnedBy(sender))
         {
-            context.sendTranslated(POSITIVE, "Your warp {name} has been moved to your current location!", w.getName());
+            sender.sendTranslated(POSITIVE, "Your warp {name} has been moved to your current location!", w.getName());
             return;
         }
-        context.sendTranslated(POSITIVE, "The warp {name} of {user} has been moved to your current location", w.getName(), owner);
+        sender.sendTranslated(POSITIVE, "The warp {name} of {user} has been moved to your current location",
+                               w.getName(), owner);
     }
 
     @Alias(value = {"removewarp", "deletewarp", "delwarp", "remwarp"})
     @Command(alias = "delete", desc = "Remove a warp")
-    public void remove(CommandSender context, String warp, @Default User owner)
+    public void remove(CommandSender sender, String warp, @Default User owner)
     {
         Warp w = manager.getExact(owner, warp);
         if (w == null)
         {
-            warpNotFoundMessage(context, owner, warp);
+            warpNotFoundMessage(sender, owner, warp);
             return;
         }
-        if (!w.isOwner(context) && !module.getPermissions().WARP_REMOVE_OTHER.isAuthorized(context))
+        if (!w.isOwnedBy(sender) && !module.getPermissions().WARP_REMOVE_OTHER.isAuthorized(sender))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_REMOVE_OTHER);
         }
         manager.delete(w);
-        if (w.isOwner(context))
+        if (w.isOwnedBy(sender))
         {
-            context.sendTranslated(POSITIVE, "Your warp {name} has been removed", warp);
+            sender.sendTranslated(POSITIVE, "Your warp {name} has been removed", warp);
             return;
         }
-        context.sendTranslated(POSITIVE, "The warp {name} of {user} has been removed", warp, owner);
+        sender.sendTranslated(POSITIVE, "The warp {name} of {user} has been removed", warp, owner);
     }
 
     @Command(desc = "Rename a warp")
-    public void rename(CommandSender context, String warp, @Label("new name") String newName, @Default @Named("owner") User owner)
+    public void rename(CommandSender sender, String warp, @Label("new name") String newName, @Default @Named("owner") User owner)
     {
         Warp w = manager.getExact(owner, warp);
         if (w == null)
         {
-            warpNotFoundMessage(context, owner, warp);
+            warpNotFoundMessage(sender, owner, warp);
             return;
         }
-        if (!w.isOwner(context) && !module.getPermissions().WARP_RENAME_OTHER.isAuthorized(context))
+        if (!w.isOwnedBy(sender) && !module.getPermissions().WARP_RENAME_OTHER.isAuthorized(sender))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_RENAME_OTHER);
         }
         if (warp.contains(":") || warp.length() >= 32)
         {
-            context.sendTranslated(NEGATIVE, "Warps may not have names that are longer than 32 characters or contain colon(:)'s!");
+            sender.sendTranslated(NEGATIVE,
+                                   "Warps may not have names that are longer than 32 characters or contain colon(:)'s!");
             return;
         }
         if (manager.rename(w, newName))
         {
-            if (w.isOwner(context))
+            if (w.isOwnedBy(sender))
             {
-                context.sendTranslated(POSITIVE, "Your warp {name} has been renamed to {name}", w.getName(), newName);
+                sender.sendTranslated(POSITIVE, "Your warp {name} has been renamed to {name}", w.getName(), newName);
                 return;
             }
-            context.sendTranslated(POSITIVE, "The warp {name} of {user} has been renamed to {name}", w.getName(), owner, newName);
+            sender.sendTranslated(POSITIVE, "The warp {name} of {user} has been renamed to {name}", w.getName(), owner,
+                                   newName);
             return;
         }
-        context.sendTranslated(POSITIVE, "Could not rename the warp to {name}", newName);
+        sender.sendTranslated(POSITIVE, "Could not rename the warp to {name}", newName);
     }
 
     @Command(desc = "List warps of a player")
@@ -269,7 +277,7 @@ public class WarpCommand extends TpPointCommand
         {
             if (warp.isPublic())
             {
-                if (warp.isOwner(owner))
+                if (warp.isOwnedBy(owner))
                 {
                     context.sendTranslated(NEUTRAL, "  {name#warp} ({text:public})", warp.getName());
                 }
@@ -279,7 +287,7 @@ public class WarpCommand extends TpPointCommand
                 }
                 continue;
             }
-            if (warp.isOwner(owner))
+            if (warp.isOwnedBy(owner))
             {
                 context.sendTranslated(NEUTRAL, "  {name#warp} ({text:private})", warp.getName());
             }
@@ -291,46 +299,41 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(desc = "List all available warps")
-    public void listAll(CommandSender context)
+    public void listAll(CommandSender sender)
     {
         int count = this.manager.getCount();
         if (count == 0)
         {
-            context.sendTranslated(POSITIVE, "There are no warps set.");
+            sender.sendTranslated(POSITIVE, "There are no warps set.");
             return;
         }
-        context.sendTranslatedN(POSITIVE, count, "There is one warp set:", "There are {amount} warps set:", count);
-        this.showList(context, null, this.manager.list(true, true));
+        sender.sendTranslatedN(POSITIVE, count, "There is one warp set:", "There are {amount} warps set:", count);
+        this.showList(sender, null, this.manager.list(true, true));
     }
 
     @Command(alias = {"ilist", "invited"}, desc = "List all players invited to your warps")
-    public void invitedList(CommandContext context, @Default User owner) // TODO named permission "other"
+    public void invitedList(CommandContext sender, @Default User owner) // TODO named permission "other"
     {
-        Set<Warp> warps = new HashSet<>();
-        for (Warp w : this.manager.list(owner, true, false, false))
-        {
-            if (!w.getInvited().isEmpty())
-            {
-                warps.add(w);
-            }
-        }
+        Set<Warp> warps = this.manager.list(owner, true, false, false).stream()
+                                      .filter(w -> !w.getInvited().isEmpty())
+                                      .collect(toSet());
         if (warps.isEmpty())
         {
-            if (owner.equals(context.getSource()))
+            if (owner.equals(sender.getSource()))
             {
-                context.sendTranslated(NEGATIVE, "You have no warps with players invited to them!");
+                sender.sendTranslated(NEGATIVE, "You have no warps with players invited to them!");
                 return;
             }
-            context.sendTranslated(NEGATIVE, "{user} has no warps with players invited to them!", owner);
+            sender.sendTranslated(NEGATIVE, "{user} has no warps with players invited to them!", owner);
             return;
         }
-        if (owner.equals(context.getSource()))
+        if (owner.equals(sender.getSource()))
         {
-            context.sendTranslated(NEUTRAL, "Your following warps have players invited to them:");
+            sender.sendTranslated(NEUTRAL, "Your following warps have players invited to them:");
         }
         else
         {
-            context.sendTranslated(NEUTRAL, "The following warps of {user} have players invited to them:", owner);
+            sender.sendTranslated(NEUTRAL, "The following warps of {user} have players invited to them:", owner);
         }
         // TODO do async db access here
         for (Warp w : warps)
@@ -338,10 +341,11 @@ public class WarpCommand extends TpPointCommand
             Set<TeleportInvite> invites = this.iManager.getInvites(w.getModel());
             if (!invites.isEmpty())
             {
-                context.sendMessage(YELLOW + "  " + w.getName() + ":");
+                sender.sendMessage(YELLOW + "  " + w.getName() + ":");
                 for (TeleportInvite invite : invites)
                 {
-                    context.sendMessage("    " + DARK_GREEN + this.module.getCore().getUserManager().getUser(invite.getValue(TABLE_INVITE.USERKEY)).getDisplayName());
+                    sender.sendMessage("    " + DARK_GREEN + this.module.getCore().getUserManager().getUser(
+                        invite.getValue(TABLE_INVITE.USERKEY)).getDisplayName());
                 }
             }
         }
@@ -349,122 +353,122 @@ public class WarpCommand extends TpPointCommand
 
     @Restricted(User.class)
     @Command(desc = "Invite a user to one of your warps")
-    public void invite(User context, String warp, User player)
+    public void invite(User sender, String warp, User player)
     {
-        Warp w = this.manager.findOne(context, warp);
-        if (w == null || !w.isOwner(context))
+        Warp w = this.manager.findOne(sender, warp);
+        if (w == null || !w.isOwnedBy(sender))
         {
-            context.sendTranslated(NEGATIVE, "You do not own a warp named {name#warp}!", warp);
+            sender.sendTranslated(NEGATIVE, "You do not own a warp named {name#warp}!", warp);
             return;
         }
         if (w.isPublic())
         {
-            context.sendTranslated(NEGATIVE, "You can't invite a person to a public warp.");
+            sender.sendTranslated(NEGATIVE, "You can't invite a person to a public warp.");
             return;
         }
-        if (player.equals(context))
+        if (player.equals(sender))
         {
-            context.sendTranslated(NEGATIVE, "You cannot invite yourself to your own warp!");
+            sender.sendTranslated(NEGATIVE, "You cannot invite yourself to your own warp!");
             return;
         }
         if (w.isInvited(player))
         {
-            context.sendTranslated(NEGATIVE, "{user} is already invited to your warp!", player);
+            sender.sendTranslated(NEGATIVE, "{user} is already invited to your warp!", player);
             return;
         }
         w.invite(player);
         if (player.isOnline())
         {
-            player.sendTranslated(NEUTRAL, "{user} invited you to their private warp. To teleport to it use: /warp {name#warp} {user}", context, w.getName(), context);
+            player.sendTranslated(NEUTRAL, "{user} invited you to their private warp. To teleport to it use: /warp {name#warp} {user}", sender, w.getName(), sender);
         }
-        context.sendTranslated(POSITIVE, "{user} is now invited to your warp {name}", player, w.getName());
+        sender.sendTranslated(POSITIVE, "{user} is now invited to your warp {name}", player, w.getName());
     }
 
     @Restricted(User.class)
     @Command(desc = "Uninvite a player from one of your warps")
-    public void unInvite(User context, String warp, User player)
+    public void unInvite(User sender, String warp, User player)
     {
-        Warp w = this.manager.getExact(context, warp);
-        if (w == null || !w.isOwner(context))
+        Warp w = this.manager.getExact(sender, warp);
+        if (w == null || !w.isOwnedBy(sender))
         {
-            context.sendTranslated(NEGATIVE, "You do not own a warp named {name#warp}!", warp);
+            sender.sendTranslated(NEGATIVE, "You do not own a warp named {name#warp}!", warp);
             return;
         }
         if (w.isPublic())
         {
-            context.sendTranslated(NEGATIVE, "This warp is public. Make it private to disallow others to access it.");
+            sender.sendTranslated(NEGATIVE, "This warp is public. Make it private to disallow others to access it.");
             return;
         }
-        if (player.equals(context))
+        if (player.equals(sender))
         {
-            context.sendTranslated(NEGATIVE, "You cannot uninvite yourself from your own warp!");
+            sender.sendTranslated(NEGATIVE, "You cannot uninvite yourself from your own warp!");
             return;
         }
         if (!w.isInvited(player))
         {
-            context.sendTranslated(NEGATIVE, "{user} is not invited to your warp!", player);
+            sender.sendTranslated(NEGATIVE, "{user} is not invited to your warp!", player);
             return;
         }
         w.unInvite(player);
         if (player.isOnline())
         {
-            player.sendTranslated(NEUTRAL, "You are no longer invited to {user}'s warp {name#warp}", context, w.getName());
+            player.sendTranslated(NEUTRAL, "You are no longer invited to {user}'s warp {name#warp}", sender, w.getName());
         }
-        context.sendTranslated(POSITIVE, "{user} is no longer invited to your warp {name}", player, w.getName());
+        sender.sendTranslated(POSITIVE, "{user} is no longer invited to your warp {name}", player, w.getName());
     }
 
     @Command(name = "private", alias = "makeprivate", desc = "Make a players warp private")
-    public void makePrivate(CommandSender context, @Optional String warp, @Default User owner)
+    public void makePrivate(CommandSender sender, @Optional String warp, @Default User owner)
     {
-        if (!owner.equals(context) && !module.getPermissions().WARP_PUBLIC_OTHER.isAuthorized(context))
+        if (!owner.equals(sender) && !module.getPermissions().WARP_PUBLIC_OTHER.isAuthorized(sender))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_PUBLIC_OTHER);
         }
         Warp w = this.manager.findOne(owner, warp);
         if (w == null)
         {
-            warpNotFoundMessage(context, owner, warp);
+            warpNotFoundMessage(sender, owner, warp);
             return;
         }
         if (!w.isPublic())
         {
-            context.sendTranslated(NEGATIVE, "This warp is already private!");
+            sender.sendTranslated(NEGATIVE, "This warp is already private!");
             return;
         }
         w.setVisibility(PRIVATE);
-        if (w.isOwner(context))
+        if (w.isOwnedBy(sender))
         {
-            context.sendTranslated(POSITIVE, "Your warp {name} is now private", w.getName());
+            sender.sendTranslated(POSITIVE, "Your warp {name} is now private", w.getName());
             return;
         }
-        context.sendTranslated(POSITIVE, "The warp {name} of {user} is now private", w.getOwnerName(), w.getName());
+        sender.sendTranslated(POSITIVE, "The warp {name} of {user} is now private", w.getOwnerName(), w.getName());
     }
 
     @Command(name = "public", desc = "Make a users warp public")
-    public void makePublic(CommandSender context, @Optional String warp, @Default User owner)
+    public void makePublic(CommandSender sender, @Optional String warp, @Default User owner)
     {
-        if (!owner.equals(context) && !module.getPermissions().WARP_PUBLIC_OTHER.isAuthorized(context))
+        if (!owner.equals(sender) && !module.getPermissions().WARP_PUBLIC_OTHER.isAuthorized(sender))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_PUBLIC_OTHER);
         }
         Warp w = this.manager.findOne(owner, warp);
         if (w == null)
         {
-            warpNotFoundMessage(context, owner, warp);
+            warpNotFoundMessage(sender, owner, warp);
             return;
         }
         if (w.isPublic())
         {
-            context.sendTranslated(NEGATIVE, "This warp is already public!");
+            sender.sendTranslated(NEGATIVE, "This warp is already public!");
             return;
         }
         w.setVisibility(PUBLIC);
-        if (w.isOwner(context))
+        if (w.isOwnedBy(sender))
         {
-            context.sendTranslated(POSITIVE, "Your warp {name} is now public", w.getName());
+            sender.sendTranslated(POSITIVE, "Your warp {name} is now public", w.getName());
             return;
         }
-        context.sendTranslated(POSITIVE, "The warp {name} of {user} is now public", w.getOwnerName(), w.getName());
+        sender.sendTranslated(POSITIVE, "The warp {name} of {user} is now public", w.getOwnerName(), w.getName());
     }
 
     @Alias(value = {"clearwarps"})
@@ -509,43 +513,42 @@ public class WarpCommand extends TpPointCommand
             }
         }
         context.sendTranslated(NEUTRAL, "Confirm with: {text:/confirm} before 30 seconds have passed to delete the warps");
-        return new ConfirmResult(module, new Runnable()
-        {
-            @Override
-            public void run()
+        return new ConfirmResult(module, () -> {
+            if (player != null)
             {
-                if (player != null)
-                {
-                    manager.massDelete(player, priv, pub);
-                    context.sendTranslated(POSITIVE, "Deleted warps.");
-                }
-                else
-                {
-                    manager.massDelete(priv, pub);
-                    context.sendTranslated(POSITIVE, "The warps are now deleted");
-                }
+                manager.massDelete(player, priv, pub);
+                context.sendTranslated(POSITIVE, "Deleted warps.");
+            }
+            else
+            {
+                manager.massDelete(priv, pub);
+                context.sendTranslated(POSITIVE, "The warps are now deleted");
             }
         }, context);
     }
 
 
-    private void warpInDeletedWorldMessage(CommandSender context, User user, Warp warp)
+    private void warpInDeletedWorldMessage(CommandSender sender, Warp warp)
     {
-        if (warp.isOwner(user))
+        if (warp.isOwnedBy(sender))
         {
-            context.sendTranslated(NEGATIVE, "Your warp {name} is in a world that no longer exists!", warp.getName());
-            return;
+            sender.sendTranslated(NEGATIVE, "Your warp {name} is in a world that no longer exists!", warp.getName());
         }
-        context.sendTranslated(NEGATIVE, "The warp {name} of {user} is in a world that no longer exists!",warp.getName(), warp.getOwnerName());
+        else
+        {
+            sender.sendTranslated(NEGATIVE, "The warp {name} of {user} is in a world that no longer exists!", warp.getName(), warp.getOwnerName());
+        }
     }
 
-    private void warpNotFoundMessage(CommandSender context, User user, String name)
+    private void warpNotFoundMessage(CommandSender sender, User user, String name)
     {
-        if (context.equals(user))
+        if (sender.equals(user))
         {
-            context.sendTranslated(NEGATIVE, "You have no warp named {name#warp}!", name);
-            return;
+            sender.sendTranslated(NEGATIVE, "You have no warp named {name#warp}!", name);
         }
-        context.sendTranslated(NEGATIVE, "{user} has no warp named {name#warp}!", user, name);
+        else
+        {
+            sender.sendTranslated(NEGATIVE, "{user} has no warp named {name#warp}!", user, name);
+        }
     }
 }

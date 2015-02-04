@@ -90,7 +90,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
         }
         for (T point : map.values())
         {
-            if (point.isOwner(user))
+            if (point.isOwnedBy(user))
             {
                 return point;
             }
@@ -127,7 +127,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
         {
             for (T value : map.values())
             {
-                if (value.isOwner(user))
+                if (value.isOwnedBy(user))
                 {
                     return true;
                 }
@@ -141,7 +141,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
         return this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.OWNER.eq(user.getEntity().getKey())).fetchCount();
     }
 
-    public abstract T create(User owner, String name, Location location, boolean publicVisiblity);
+    public abstract T create(User owner, String name, Location location, boolean publicVisibility);
 
     public void delete(T point)
     {
@@ -216,11 +216,11 @@ public abstract class TelePointManager<T extends TeleportPoint>
         Set<T> set = new LinkedHashSet<>();
         for (T value : map.values())
         {
-            if (owned && value.isOwner(user))
+            if (owned && value.isOwnedBy(user))
             {
                 set.add(value);
             }
-            if (publics && value.isPublic() && !value.isOwner(user))
+            if (publics && value.isPublic() && !value.isOwnedBy(user))
             {
                 set.add(value);
             }

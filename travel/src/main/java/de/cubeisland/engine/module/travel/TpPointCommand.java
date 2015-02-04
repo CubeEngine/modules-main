@@ -18,14 +18,10 @@
 package de.cubeisland.engine.module.travel;
 
 import java.util.Set;
-import de.cubeisland.engine.command.parameter.IncorrectUsageException;
-import de.cubeisland.engine.command.parameter.reader.ReaderException;
 import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
 
 public class TpPointCommand extends ContainerCommand
@@ -38,55 +34,13 @@ public class TpPointCommand extends ContainerCommand
         iManager = module.getInviteManager();
     }
 
-    protected User getUser(CommandContext context, int i)
-    {
-        User user;
-        if (context.hasPositional(i))
-        {
-            user = context.get(i);
-        }
-        else if (context.isSource(User.class))
-        {
-            user = (User)context.getSource();
-        }
-        else
-        {
-            throw new IncorrectUsageException(context.getSource().getTranslation(NEGATIVE, "You need to provide a owner"));
-        }
-        return user;
-    }
-
-    protected User getUser(CommandContext context, String owner)
-    {
-        User user;
-        if (context.hasNamed(owner))
-        {
-            user = context.get(owner);
-            if (user == null)
-            {
-                throw new ReaderException(context.getSource().getTranslation(NEGATIVE,
-                                                                                      "Player {user} not found!",
-                                                                                      context.getString(owner)));
-            }
-        }
-        else if (context.isSource(User.class))
-        {
-            user = (User)context.getSource();
-        }
-        else
-        {
-            throw new IncorrectUsageException(context.getSource().getTranslation(NEGATIVE, "You need to provide a owner"));
-        }
-        return user;
-    }
-
     protected void showList(CommandSender context, User user, Set<? extends TeleportPoint> points)
     {
         for (TeleportPoint point : points)
         {
             if (point.isPublic())
             {
-                if (user != null && point.isOwner(user))
+                if (user != null && point.isOwnedBy(user))
                 {
                     context.sendTranslated(NEUTRAL, "  {name#tppoint} ({text:public})", point.getName());
                 }
@@ -97,7 +51,7 @@ public class TpPointCommand extends ContainerCommand
             }
             else
             {
-                if (user != null && point.isOwner(user))
+                if (user != null && point.isOwnedBy(user))
                 {
                     context.sendTranslated(NEUTRAL, "  {name#tppoint} ({text:private})", point.getName());
                 }

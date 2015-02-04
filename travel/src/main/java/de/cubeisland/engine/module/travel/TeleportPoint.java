@@ -78,7 +78,7 @@ public abstract class TeleportPoint
         this.model.setValue(TABLE_TP_POINT.OWNER, owner.getEntity().getKey());
     }
 
-    public boolean isOwner(CommandSender user)
+    public boolean isOwnedBy(CommandSender user)
     {
         if (user instanceof User)
         {
@@ -177,7 +177,7 @@ public abstract class TeleportPoint
 
     public boolean canAccess(User user)
     {
-        return this.isPublic() ? this.permission.isAuthorized(user) : (this.isInvited(user) || this.isOwner(user));
+        return this.isPublic() ? this.permission.isAuthorized(user) : (this.isInvited(user) || this.isOwnedBy(user));
     }
 
     protected abstract Permission generatePublicPerm();
