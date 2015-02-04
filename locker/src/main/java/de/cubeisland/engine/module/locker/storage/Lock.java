@@ -166,6 +166,7 @@ public class Lock
                 ItemStack itemStack = new ItemStack(Material.ENCHANTED_BOOK, 1);
                 ItemMeta itemMeta = itemStack.getItemMeta();
                 itemMeta.setDisplayName(this.getColorPass() + KeyBook.TITLE + this.getId());
+                // TODO remove chatcolors in translated text
                 itemMeta.setLore(Arrays.asList(user.getTranslation(NEUTRAL, ChatFormat.YELLOW + "This book can"), user
                     .getTranslation(NEUTRAL, ChatFormat.YELLOW + "unlock a magically"), user
                                                    .getTranslation(NEUTRAL, ChatFormat.YELLOW + "locked protection")));
