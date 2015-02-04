@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de.cubeisland.engine.module:basics:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2015-02-04 23:39:54+0100\n"
+"POT-Creation-Date: 2015-02-04 23:53:17+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1062,10 +1062,12 @@ msgid "You are not allowed to teleport to this world!"
 msgstr ""
 
 #: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:115
+#: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:147
 msgid "You are not allowed to teleport to {user}!"
 msgstr ""
 
 #: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:103
+#: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:189
 msgid "You are not allowed to teleport {user}!"
 msgstr ""
 
@@ -1229,6 +1231,7 @@ msgid "You ended your life. Why? {text:\\:(:color=DARK_RED}"
 msgstr ""
 
 #: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:124
+#: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:184
 msgid "You found yourself!"
 msgstr ""
 
@@ -1512,6 +1515,8 @@ msgstr ""
 msgid "{user} is no longer muted!"
 msgstr ""
 
+#: de/cubeisland/engine/module/basics/command/general/PlayerCommands.java:406
+#: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:118
 #: de/cubeisland/engine/module/basics/command/teleport/TeleportRequestCommands.java:53
 #: de/cubeisland/engine/module/basics/command/teleport/TeleportRequestCommands.java:91
 msgid "{user} is not online!"
@@ -1657,14 +1662,17 @@ msgstr ""
 msgid "The IP {input#ip} was banned from the server by {sender}!"
 msgstr ""
 
+#: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:127
 #: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:131
 msgid "Your weather is now clear!"
 msgstr ""
 
+#: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:139
 #: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:143
 msgid "Your weather is now not clear!"
 msgstr ""
 
+#: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:151
 #: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:155
 msgid "Your weather is now reset to server weather!"
 msgstr ""
@@ -1820,4 +1828,151 @@ msgstr ""
 
 #: de/cubeisland/engine/module/basics/command/general/InformationCommands.java:117
 msgid "{text:ProTip}: I assume you are looking right at your screen, right?"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:101
+msgid "Changed weather in {world} to {input#weather}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/PlayerCommands.java:385
+msgid "Command was not executed successfully!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/PlayerCommands.java:382
+msgid "Command {input#command} executed as {user}"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/ItemCommands.java:87
+msgid "Could not find any item named {input}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/ChatCommands.java:74
+msgid ""
+"Could not find the player {user} to send the message to. Is the player "
+"offline?"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/PlayerCommands.java:377
+msgid "Forced {user} to chat: {input#message}"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/IgnoreCommands.java:98
+msgid "If you do not feel like talking to yourself just don't talk."
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/IgnoreCommands.java:88
+msgid ""
+"Ignore ({text:8+:color=WHITE}): {integer#random} + {integer#random} = "
+"{integer#sum} -> {text:failed:color=RED}"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/ItemCommands.java:120
+msgid "Itemname unknown! Itemdata: {integer#id}:{short#data}"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/KickBanCommands.java:327
+msgid "Reloadhe ban lists successfully!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/KickBanCommands.java:213
+msgid "The IP {input#ip} is already banned!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/KickBanCommands.java:256
+msgid "The IP {input#ip} was not banned!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/ItemCommands.java:124
+msgid "The Item in your hand is: {input#item} ({integer#id}:{short#data})"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:167
+#: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:222
+msgid "The following players were not teleported: \n"
+"{user#list}"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:97
+msgid "Weather in {world} is already set to {input#weather}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/IgnoreCommands.java:114
+msgid "You added {user#list} to your ignore list!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/InventoryCommands.java:145
+msgid "You are not allowed to clear the inventory of {user}"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/IgnoreCommands.java:104
+msgid "You are not allowed to ignore {user}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/InventoryCommands.java:64
+msgid "You are not allowed to look into enderchests!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/KickBanCommands.java:218
+msgid "You banned the IP {input#ip} from your server!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:178
+msgid "You cannot teleport an offline player to you!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:141
+msgid "You cannot teleport to an offline player!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/ItemCommands.java:113
+msgid "You hold nothing in your hands!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:218
+msgid "You teleported everyone to you!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/teleport/TeleportCommands.java:194
+msgid "You teleported {user} to you!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/KickBanCommands.java:252
+msgid "You unbanned the IP {input#ip}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/KickBanCommands.java:199
+msgid "You unbanned {user}({name#uuid})!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/InformationCommands.java:274
+msgid "ping! Your latency: {integer#ping}"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/InformationCommands.java:274
+msgid "pong! Your latency: {integer#ping}"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/KickBanCommands.java:240
+#: de/cubeisland/engine/module/basics/command/moderation/KickBanCommands.java:261
+msgid "{input#ip} is not a valid IP address!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/general/IgnoreCommands.java:107
+msgid "{user} is already on your ignore list!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/KickBanCommands.java:202
+msgid "{user} is not banned, maybe you misspelled his name?"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:132
+msgid "{user}s weather is now clear!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:144
+msgid "{user}s weather is now not clear!"
+msgstr ""
+
+#: de/cubeisland/engine/module/basics/command/moderation/WorldControlCommands.java:156
+msgid "{user}s weather is now reset to server weather!"
 msgstr ""
