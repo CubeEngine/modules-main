@@ -21,8 +21,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CubeEngine\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2015-02-04 23:39:56+0100\n"
-"PO-Revision-Date: 2015-02-04 22:40+0000\n"
+"POT-Creation-Date: 2015-02-04 23:53:19+0100\n"
+"PO-Revision-Date: 2015-02-04 22:53+0000\n"
 "Last-Translator: Cube Island Development <development@cubeisland.de>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/cubeengine/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -119,10 +119,12 @@ msgstr ""
 msgid "You cannot invite yourself to your own home!"
 msgstr ""
 
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:137
 #: de/cubeisland/engine/module/travel/home/HomeListener.java:72
 msgid "You have reached your maximum number of homes!"
 msgstr ""
 
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:138
 #: de/cubeisland/engine/module/travel/home/HomeListener.java:73
 msgid "You have to delete a home to make a new one"
 msgstr ""
@@ -548,4 +550,158 @@ msgstr ""
 msgid ""
 "{user} invited you to their home. To teleport to it use: /home {name#home} "
 "{name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:292
+msgid "  {name#warp} ({text:private})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:282
+msgid "  {name#warp} ({text:public})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:296
+msgid "  {user}:{name#warp} ({text:private})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:286
+msgid "  {user}:{name#warp} ({text:public})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:493
+msgid ""
+"Are you sure you want to delete all private warps ever created by {user}?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:508
+msgid ""
+"Are you sure you want to delete all private warps ever created on this "
+"server?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:489
+msgid ""
+"Are you sure you want to delete all public warps ever created by {user}?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:504
+msgid ""
+"Are you sure you want to delete all public warps ever created on this "
+"server!?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:497
+msgid "Are you sure you want to delete all warps ever created by {user}?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:512
+msgid ""
+"Are you sure you want to delete all warps ever created on this server!?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:540
+msgid ""
+"Are you sure you want to delete all {input#public|private}homes created by "
+"{user} in your current selection?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:544
+msgid ""
+"Are you sure you want to delete all {input#public|private}homes created in "
+"your current selection?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:553
+msgid ""
+"Are you sure you want to delete all {input#public|private}homes ever created"
+" by {user}?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:557
+msgid ""
+"Are you sure you want to delete all {input#public|private}homes ever created"
+" on this server?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:560
+msgid ""
+"Confirm with: {text:/confirm} before 30 seconds have passed to delete the "
+"homes"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:515
+msgid ""
+"Confirm with: {text:/confirm} before 30 seconds have passed to delete the "
+"warps"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:144
+msgid ""
+"Homes may not have names that are longer then 32 characters nor contain "
+"colon(:)'s!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:533
+msgid "Invalid selection!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:293
+msgid "No homes are available to you!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:296
+msgid "No homes are available to {user}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:272
+msgid "No warps are available to you!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:301
+msgid "The following homes are available to you:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:305
+msgid "The following homes are available to {user}:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:275
+msgid "The following warps are available to you:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:336
+msgid "The following warps of {user} have players invited to them:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:149
+msgid "The home already exists! You can move it with {text:/home move}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:501
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:482
+msgid "This command has been disabled for ingame use via the configuration"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:324
+msgid "You have no warps with players invited to them!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:526
+msgid "You have to be in game to use the selection flag"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:521
+msgid "You need to use the Selector module to delete homes in a selection!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:332
+msgid "Your following warps have players invited to them:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:153
+msgid "Your home {name} has been created!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:327
+msgid "{user} has no warps with players invited to them!"
 msgstr ""

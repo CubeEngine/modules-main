@@ -20,8 +20,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CubeEngine\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2015-02-04 23:39:58+0100\n"
-"PO-Revision-Date: 2015-02-04 22:40+0000\n"
+"POT-Creation-Date: 2015-02-04 23:53:20+0100\n"
+"PO-Revision-Date: 2015-02-04 22:53+0000\n"
 "Last-Translator: Cube Island Development <development@cubeisland.de>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/cubeengine/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -651,4 +651,30 @@ msgstr ""
 #: de/cubeisland/engine/module/locker/storage/KeyBook.java:111
 #| msgid "looks old and"
 msgid "won't let you"
+msgstr ""
+
+#: de/cubeisland/engine/module/locker/commands/LockerAdminCommands.java:114
+msgid "All locks for {user} are now deleted!"
+msgstr ""
+
+#: de/cubeisland/engine/module/locker/commands/LockerAdminCommands.java:77
+msgid ""
+"The protection with the id {integer} is an entity and cannot be accessed "
+"from far away!"
+msgstr ""
+
+#: de/cubeisland/engine/module/locker/commands/LockerAdminCommands.java:81
+msgid "The protection with the id {integer} is not a container!"
+msgstr ""
+
+#: de/cubeisland/engine/module/locker/commands/LockerAdminCommands.java:55
+msgid "There is no protection with the id {integer}"
+msgstr ""
+
+#: de/cubeisland/engine/module/locker/commands/LockerAdminCommands.java:106
+msgid "You cannot teleport to an entity protection!"
+msgstr ""
+
+#: de/cubeisland/engine/module/locker/commands/LockerAdminCommands.java:49
+msgid "{input} is not a valid id!"
 msgstr ""

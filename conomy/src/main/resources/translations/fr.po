@@ -18,8 +18,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CubeEngine\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2015-02-04 23:39:43+0100\n"
-"PO-Revision-Date: 2015-02-04 22:40+0000\n"
+"POT-Creation-Date: 2015-02-04 23:53:06+0100\n"
+"PO-Revision-Date: 2015-02-04 22:53+0000\n"
 "Last-Translator: Cube Island Development <development@cubeisland.de>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/cubeengine/language/fr/)\n"
 "MIME-Version: 1.0\n"
@@ -360,6 +360,7 @@ msgstr ""
 
 #: de/cubeisland/engine/module/conomy/commands/BankCommands.java:453
 #: de/cubeisland/engine/module/conomy/commands/BankCommands.java:477
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:181
 msgid "You do not have an account!"
 msgstr ""
 
@@ -536,4 +537,226 @@ msgstr ""
 
 #: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:225
 msgid "{user} just paid you {currency}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:75
+msgid "Could not give the money to {user}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:338
+msgid "Created account for {user}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:287
+msgid "Deleted the account of {user}"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:77
+msgid ""
+"If you are out of money, better go work than typing silly commands in the "
+"console."
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:118
+msgid "Invalid rank!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:94
+msgid "No account found for {user}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:167
+msgid "Please specify a player to use their account."
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:203
+msgid "Scaled the balance of every online player by {decimal#factor}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:207
+msgid "Scaled the balance of every player by {decimal#factor}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoBankCommands.java:144
+msgid "Scaled the balance of the bank {input#bank} by {decimal#factor}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:221
+msgid "Scaled the balance of {user} by {decimal#factor}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:229
+msgid "The Transaction was not successful!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoBankCommands.java:100
+msgid "The account of the bank {input#bank} got reset to {input#balance}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoBankCommands.java:165
+msgid "The bank {input#bank} is already hidden!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoBankCommands.java:187
+msgid "The bank {input#bank} is no longer hidden!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoBankCommands.java:169
+msgid "The bank {input#bank} is now hidden!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoBankCommands.java:183
+msgid "The bank {input#bank} was not hidden!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoBankCommands.java:123
+msgid "The money of bank account {input#bank} got set to {input#balance}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:126
+msgid "Top Balance ({amount})"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:130
+msgid "Top Balance from {integer} to {integer}"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:327
+msgid "Use the -force flag to create the account anyway."
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:150
+msgid "What are you trying to do?"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:303
+msgid "You already have an account!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:315
+msgid "You are not allowed to create account for other users!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:158
+msgid "You are not allowed to pay money as someone else!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:210
+msgid "You cannot afford {currency}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:56
+msgid "You gave {currency} to every online player!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:60
+msgid "You gave {currency} to every player!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:79
+msgid "You gave {currency} to {user}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:168
+msgid "You have set every online player account to {currency}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:172
+msgid "You have set every player account to {currency}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:310
+msgid "You have to provide a player!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:132
+msgid "You reset every online players' account!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:136
+msgid "You reset every players' account!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:97
+msgid "You took {currency} from every online player!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:101
+msgid "You took {currency} from every player!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:115
+msgid "You took {currency} from {user}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoBankCommands.java:78
+msgid "You took {input#amount} from the bank {input#bank}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:307
+msgid "Your account has now been created!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:219
+msgid "{currency} transferred from {user}'s to {user}'s account!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:223
+msgid "{currency} transferred to {user}'s account!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:151
+msgid "{user} account reset to {input#balance}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:186
+msgid "{user} account set to {currency}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:334
+msgid "{user} already has an account!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:206
+msgid "{user} cannot afford {currency}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:290
+msgid "{user} did not have an account to delete!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:69
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:110
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:145
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:181
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:216
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:240
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:268
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:177
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:199
+msgid "{user} does not have an account!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:320
+msgid "{user} has never played on this server!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/MoneyCommand.java:90
+msgid "{user}'s Balance: {currency}"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:244
+msgid "{user}'s account is already hidden!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:273
+msgid "{user}'s account is no longer hidden!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:249
+msgid "{user}'s account is now hidden!"
+msgstr ""
+
+#: de/cubeisland/engine/module/conomy/commands/EcoCommands.java:277
+msgid "{user}'s account was not hidden!"
 msgstr ""
