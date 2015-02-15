@@ -50,7 +50,7 @@ public class TeleportRequestCommands
         context.get(BasicsAttachment.class).removeTpRequestCancelTask();
         if (!player.isOnline())
         {
-            context.sendTranslated(NEGATIVE, "{user} is not online!");
+            context.sendTranslated(NEGATIVE, "{user} is not online!", player);
             return;
         }
         player.sendTranslated(POSITIVE, "{sender} wants to teleport to you!", context);
