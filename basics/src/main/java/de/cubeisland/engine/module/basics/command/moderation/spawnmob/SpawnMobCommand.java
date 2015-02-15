@@ -17,6 +17,7 @@
  */
 package de.cubeisland.engine.module.basics.command.moderation.spawnmob;
 
+import java.util.Collections;
 import de.cubeisland.engine.command.parametric.Command;
 import de.cubeisland.engine.command.parametric.Label;
 import de.cubeisland.engine.command.parametric.Optional;
@@ -26,6 +27,7 @@ import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsConfiguration;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 
@@ -65,7 +67,7 @@ public class SpawnMobCommand
         }
         else
         {
-            loc = sender.getTargetBlock(null, 200).getLocation().add(new Vector(0, 1, 0));
+            loc = sender.getTargetBlock(Collections.<Material>emptySet(), 200).getLocation().add(new Vector(0, 1, 0));
         }
         amount = amount == null ? 1 : amount;
 

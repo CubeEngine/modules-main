@@ -17,6 +17,7 @@
  */
 package de.cubeisland.engine.module.basics.command.teleport;
 
+import java.util.Collections;
 import de.cubeisland.engine.command.filter.Restricted;
 import de.cubeisland.engine.command.parametric.Command;
 import de.cubeisland.engine.command.parametric.Flag;
@@ -30,6 +31,7 @@ import de.cubeisland.engine.core.util.LocationUtil;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 
@@ -257,7 +259,7 @@ public class MovementCommands
             context.sendTranslated(NEGATIVE, "You cannot move an offline player!");
             return;
         }
-        Location loc = context.getTargetBlock(null, 350).getLocation();
+        Location loc = context.getTargetBlock(Collections.<Material>emptySet(), 350).getLocation();
         if (loc.getBlock().getType() == AIR)
         {
             context.sendTranslated(NEGATIVE, "No block in sight!");
