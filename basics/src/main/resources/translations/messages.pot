@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de.cubeisland.engine.module:basics:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2015-02-04 23:53:17+0100\n"
+"POT-Creation-Date: 2015-02-18 22:18:05+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -142,8 +142,8 @@ msgstr ""
 msgid "Ignores all messages from players"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:173
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:190
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:175
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:192
 msgid "Jumps to the position you are looking at."
 msgstr ""
 
@@ -235,7 +235,7 @@ msgstr ""
 msgid "Shows when given player was online the last time"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:47
+#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:49
 msgid "Spawns the specified Mob"
 msgstr ""
 
@@ -267,15 +267,15 @@ msgstr ""
 msgid "Teleports everyone directly to a player."
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:88
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:90
 msgid "Teleports to the highest point at your position."
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:142
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:144
 msgid "Teleports you to the next safe spot downwards."
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:101
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:103
 msgid "Teleports you to the next safe spot upwards."
 msgstr ""
 
@@ -283,7 +283,7 @@ msgstr ""
 msgid "Teleports you to the spawn of given world"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:207
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:209
 msgid "Teleports you to your last location"
 msgstr ""
 
@@ -335,11 +335,11 @@ msgstr ""
 msgid "Shows the mail of other players."
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:274
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:276
 msgid "Swaps you and another players position"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:56
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:58
 msgid ""
 "Teleports you X amount of blocks into the air and puts a glass block beneath "
 "you."
@@ -375,11 +375,11 @@ msgid ""
 "Added unsafe enchantment: {input#enchantment} {integer#level} to your item!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:74
+#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:76
 msgid "And how am i supposed to know which mobs to despawn?"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:138
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:140
 msgid "Ascended a level!"
 msgstr ""
 
@@ -411,7 +411,7 @@ msgstr ""
 msgid "Could not match all worlds! {input#worlds}"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:307
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:309
 msgid "Could not teleport both players!"
 msgstr ""
 
@@ -423,7 +423,7 @@ msgstr ""
 msgid "Deleted Mail #{integer#mailid}"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:169
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:171
 msgid "Descended a level!"
 msgstr ""
 
@@ -509,7 +509,7 @@ msgstr ""
 msgid "Invalid entity-type!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:61
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:63
 msgid "Invalid height. The height has to be a whole number greater than 0!"
 msgstr ""
 
@@ -582,12 +582,12 @@ msgstr ""
 msgid "Nickname: {user} ({text:offline})"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:180
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:263
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:182
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:265
 msgid "No block in sight!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:218
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:220
 msgid "No death point found!"
 msgstr ""
 
@@ -620,7 +620,7 @@ msgstr ""
 msgid "Nothing to butcher!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:198
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:200
 #: de/cubeisland/engine/module/basics/command/teleport/TeleportListener.java:115
 msgid "Nothing to pass through!"
 msgstr ""
@@ -666,9 +666,9 @@ msgstr ""
 msgid "Position: {vector} in {world}"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:89
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:102
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:143
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:91
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:104
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:145
 #: de/cubeisland/engine/module/basics/command/teleport/SpawnCommands.java:122
 msgid "Pro Tip: Teleport does not work IRL!"
 msgstr ""
@@ -729,11 +729,11 @@ msgstr ""
 msgid "Server has been running since {input#uptime}"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:91
+#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:93
 msgid "Spawned {amount} {input#entity}!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:101
+#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:103
 msgid "Spawned {amount} {input#message}!"
 msgstr ""
 
@@ -741,15 +741,15 @@ msgstr ""
 msgid "Starved {amount} players!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:63
+#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:65
 msgid "Succesfully spawned some {text:bugs:color=RED} inside your server!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:299
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:301
 msgid "Swapped position of {user} and {user}!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:302
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:304
 msgid "Swapped position with {user}!"
 msgstr ""
 
@@ -757,7 +757,7 @@ msgstr ""
 msgid "Swapped stashed Inventory!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:286
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:288
 msgid "Swapping positions with yourself!? Are you kidding me?"
 msgstr ""
 
@@ -796,11 +796,11 @@ msgstr ""
 msgid "Teleported to the spawn of world {world}!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:225
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:227
 msgid "Teleported to your death point!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:244
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:246
 msgid "Teleported to your last location!"
 msgstr ""
 
@@ -926,7 +926,7 @@ msgstr ""
 msgid "To use these type {text:&} followed by the code above"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:289
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:291
 msgid "Truly a hero! Trying to swap a users position with himself..."
 msgstr ""
 
@@ -1049,7 +1049,7 @@ msgstr ""
 msgid "You are not allowed to spawn {user}!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:248
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:250
 msgid "You are not allowed to teleport back!"
 msgstr ""
 
@@ -1092,7 +1092,7 @@ msgstr ""
 msgid "You are now muted for {input#amount}!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:97
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:99
 msgid "You are now on top!"
 msgstr ""
 
@@ -1170,12 +1170,12 @@ msgstr ""
 msgid "You cannot IP ban a player that has never played on the server before!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:114
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:132
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:116
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:134
 msgid "You cannot ascend here"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:163
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:165
 msgid "You cannot descend here"
 msgstr ""
 
@@ -1187,8 +1187,8 @@ msgstr ""
 msgid "You cannot kill {user}!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:257
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:279
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:259
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:281
 msgid "You cannot move an offline player!"
 msgstr ""
 
@@ -1251,7 +1251,7 @@ msgstr ""
 msgid "You has to specify a location!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:84
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:86
 msgid "You have just been lifted!"
 msgstr ""
 
@@ -1271,15 +1271,15 @@ msgstr ""
 msgid "You just got a mail from {user}!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:186
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:188
 msgid "You just jumped!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:203
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:205
 msgid "You just passed the wall!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:269
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:271
 msgid "You just placed {user} where you were looking!"
 msgstr ""
 
@@ -1319,7 +1319,7 @@ msgstr ""
 msgid "You need to specify a reason!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:239
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:241
 msgid "You never teleported!"
 msgstr ""
 
@@ -1359,7 +1359,7 @@ msgstr ""
 msgid "You were killed by {user}"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:270
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:272
 msgid "You were placed somewhere!"
 msgstr ""
 
@@ -1371,7 +1371,7 @@ msgstr ""
 msgid "You will never have mail here!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:73
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:75
 msgid "Your destination seems to be obstructed!"
 msgstr ""
 
@@ -1415,7 +1415,7 @@ msgstr ""
 msgid "for ever"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:99
+#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:101
 msgid "{input#entity} riding {input}"
 msgstr ""
 
@@ -1607,7 +1607,7 @@ msgid_plural "You have {amount} of mail!"
 msgstr[0] ""
 msgstr[1] ""
 
-#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:79
+#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:81
 msgid ""
 "The serverlimit is set to {amount}, you cannot spawn more mobs at once!"
 msgstr ""
@@ -1642,7 +1642,7 @@ msgstr ""
 msgid "Manages your server mail."
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:251
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:253
 msgid "Places a player to the position you are looking at."
 msgstr ""
 
@@ -1681,7 +1681,7 @@ msgstr ""
 msgid "enchantment[:level]"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:275
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:277
 msgid "player"
 msgstr ""
 
@@ -1702,7 +1702,7 @@ msgstr ""
 msgid "{user} was kicked from the server by {user}!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:48
+#: de/cubeisland/engine/module/basics/command/moderation/spawnmob/SpawnMobCommand.java:50
 msgid "<mob>[:data][,<ridingmob>[:data]]"
 msgstr ""
 
@@ -1714,7 +1714,7 @@ msgstr ""
 msgid "If you do this you'll loose your warranty!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:174
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:176
 msgid "Jumping in the console is not allowed! Go play outside!"
 msgstr ""
 
@@ -1726,7 +1726,7 @@ msgstr ""
 msgid "No stacking for you."
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:191
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:193
 msgid ""
 "Passing through firewalls in the console is not allowed! Go play outside!"
 msgstr ""
@@ -1755,7 +1755,7 @@ msgstr ""
 msgid "This will you only give headaches!"
 msgstr ""
 
-#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:209
+#: de/cubeisland/engine/module/basics/command/teleport/MovementCommands.java:211
 #| msgid "Nothing to pass through!"
 msgid ""
 "Unfortunately teleporting is still not implemented in the game {text:"
