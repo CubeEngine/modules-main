@@ -224,7 +224,7 @@ public class HomeCommand extends TpPointCommand
         Home home = this.manager.getExact(owner, name == null ? "home" : name);
         if (home == null)
         {
-            homeNotFoundMessage(sender, owner, name);
+            homeNotFoundMessage(sender, owner, name == null ? "home" : name);
             return;
         }
         if (!home.isOwnedBy(sender) && !module.getPermissions().HOME_REMOVE_OTHER.isAuthorized(sender))
