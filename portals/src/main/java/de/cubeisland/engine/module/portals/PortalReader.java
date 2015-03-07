@@ -19,12 +19,12 @@ package de.cubeisland.engine.module.portals;
 
 import de.cubeisland.engine.command.CommandInvocation;
 import de.cubeisland.engine.command.parameter.reader.ArgumentReader;
-import de.cubeisland.engine.command.parameter.reader.DefaultProvider;
+import de.cubeisland.engine.command.parameter.reader.DefaultValue;
 import de.cubeisland.engine.command.parameter.reader.ReaderException;
-import de.cubeisland.engine.command.parameter.reader.ReaderManager;
+import de.cubeisland.engine.command.ProviderManager;
 import de.cubeisland.engine.core.user.User;
 
-public class PortalReader implements ArgumentReader<Portal>, DefaultProvider<Portal>
+public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal>
 {
     private Portals module;
 
@@ -34,7 +34,7 @@ public class PortalReader implements ArgumentReader<Portal>, DefaultProvider<Por
     }
 
     @Override
-    public Portal read(ReaderManager manager, Class type, CommandInvocation invocation) throws ReaderException
+    public Portal read(ProviderManager manager, Class type, CommandInvocation invocation) throws ReaderException
     {
         String portalName = invocation.consume(1);
         Portal portal = this.module.getPortalManager().getPortal(portalName);

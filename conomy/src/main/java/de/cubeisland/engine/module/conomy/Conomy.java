@@ -55,7 +55,7 @@ public class Conomy extends Module
         EcoCommands ecoCommands = new EcoCommands(this);
         cm.addCommand(ecoCommands);
 
-        cm.getReaderManager().registerReader(new BankReader(this.manager), BankAccount.class);
+        cm.getProviderManager().register(new BankReader(this.manager), BankAccount.class);
         cm.addCommand(new BankCommands(this));
         ecoCommands.addCommand(new EcoBankCommands(this));
         this.getCore().getModuleManager().getServiceManager().registerService(this, Economy.class, manager.getInterface());

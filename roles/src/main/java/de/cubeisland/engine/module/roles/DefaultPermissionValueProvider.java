@@ -18,10 +18,10 @@
 package de.cubeisland.engine.module.roles;
 
 import de.cubeisland.engine.command.CommandInvocation;
-import de.cubeisland.engine.command.parameter.reader.DefaultProvider;
+import de.cubeisland.engine.command.parameter.reader.DefaultValue;
 import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 
-public class DefaultPermissionValueProvider implements DefaultProvider<PermissionValue>
+public class DefaultPermissionValueProvider implements DefaultValue<PermissionValue>
 {
     @Override
     public PermissionValue getDefault(CommandInvocation invocation)

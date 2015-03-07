@@ -65,7 +65,7 @@ public class Roles extends Module
         this.getCore().getUserManager().addDefaultAttachment(RolesAttachment.class, this);
 
         final CommandManager cm = this.getCore().getCommandManager();
-        cm.getReaderManager().registerDefaultProvider(new DefaultPermissionValueProvider());
+        cm.getProviderManager().register(this, new DefaultPermissionValueProvider());
         RoleCommands cmdRoles = new RoleCommands(this);
         cm.addCommand(cmdRoles);
         RoleManagementCommands cmdRole = new RoleManagementCommands(this);
@@ -80,14 +80,9 @@ public class Roles extends Module
         this.getCore().getEventManager().registerListener(this, new RolesEventHandler(this));
 
         this.config = loadConfig(RolesConfig.class);
-        this.getCore().getTaskManager().runTask(this, new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                rolesManager.initRoleProviders();
-                rolesManager.recalculateAllRoles();
-            }
+        this.getCore().getTaskManager().runTask(this, () -> {
+            rolesManager.initRoleProviders();
+            rolesManager.recalculateAllRoles();
         });
 
         this.getCore().getModuleManager().getServiceManager().registerService(this, Metadata.class, new MetadataProvider(this.rolesManager));

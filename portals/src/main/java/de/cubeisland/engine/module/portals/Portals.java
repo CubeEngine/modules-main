@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.portals;
 
-import de.cubeisland.engine.command.parameter.reader.ReaderManager;
+import de.cubeisland.engine.command.ProviderManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.module.portals.config.Destination;
 import de.cubeisland.engine.module.portals.config.Destination.DestinationReader;
@@ -36,9 +36,9 @@ public class Portals extends Module
     public void onEnable()
     {
         this.getCore().getConfigFactory().getDefaultConverterManager().registerConverter(new DestinationConverter(getCore()), Destination.class);
-        ReaderManager rManager = this.getCore().getCommandManager().getReaderManager();
-        rManager.registerReader(new PortalReader(this), Portal.class);
-        rManager.registerReader(new DestinationReader(this), Destination.class);
+        ProviderManager rManager = this.getCore().getCommandManager().getProviderManager();
+        rManager.register(new PortalReader(this), Portal.class);
+        rManager.register(new DestinationReader(this), Destination.class);
         this.portalManager = new PortalManager(this);
     }
 }
