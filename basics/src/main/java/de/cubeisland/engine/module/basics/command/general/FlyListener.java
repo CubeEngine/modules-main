@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.basics.command.general;
 
 import de.cubeisland.engine.module.basics.Basics;
 import org.bukkit.GameMode;
-import org.bukkit.craftbukkit.v1_8_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_8_R2.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
