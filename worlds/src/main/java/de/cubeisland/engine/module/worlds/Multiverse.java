@@ -492,14 +492,7 @@ public class Multiverse implements Listener
         {
             // Wait until spawn is set & reset it
             final Location spawnLocation = event.getPlayer().getBedSpawnLocation();
-            this.module.getCore().getTaskManager().runTaskDelayed(module, new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                      event.getPlayer().setBedSpawnLocation(spawnLocation, true);
-                }
-            }, 1);
+            this.module.getCore().getTaskManager().runTaskDelayed(module, () -> event.getPlayer().setBedSpawnLocation(spawnLocation, true), 1);
         }
     }
 

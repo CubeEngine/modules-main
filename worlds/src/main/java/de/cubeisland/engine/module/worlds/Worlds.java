@@ -45,11 +45,6 @@ public class Worlds extends Module
     public void onLoad()
     {
         ConverterManager manager = this.getCore().getConfigFactory().getDefaultConverterManager();
-        // TODO those should be covered by enumConverter already
-        //manager.registerConverter(new DiffcultyConverter(), Difficulty.class);
-        //manager.registerConverter(new EnvironmentConverter(), Environment.class);
-        //manager.registerConverter(new GameModeConverter(), GameMode.class);
-        //manager.registerConverter(new WorldTypeConverter(), WorldType.class);
 ///*TODO remove saving into yml too
         manager.registerConverter(new InventoryConverter(Bukkit.getServer()), Inventory.class);
         manager.registerConverter(new PotionEffectConverter(), PotionEffect.class);
