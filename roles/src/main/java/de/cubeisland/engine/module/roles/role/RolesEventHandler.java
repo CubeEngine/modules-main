@@ -55,6 +55,7 @@ public class RolesEventHandler implements Listener
             }
         }
         */
+
         RolesAttachment attachment = this.rolesManager.getRolesAttachment(event.getPlayer());
         attachment.flushData(event.getFrom());
         attachment.getCurrentDataHolder().apply();

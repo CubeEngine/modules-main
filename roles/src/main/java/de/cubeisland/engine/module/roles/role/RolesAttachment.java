@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Stack;
 import de.cubeisland.engine.core.user.UserAttachment;
+import de.cubeisland.engine.logscribe.target.syslog.SyslogLevelFilter;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
 import org.bukkit.World;

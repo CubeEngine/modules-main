@@ -69,8 +69,12 @@ public class UserDatabaseStore extends ResolvedDataHolder
     protected void loadFromDatabase()
     {
         UInteger assignedRolesMirror = getDBWorldId(this.manager.assignedRolesMirrors.get(this.world));
+        long start = System.currentTimeMillis();
+
         Result<Record1<String>> roleFetch = manager.dsl.select(TABLE_ROLE.ROLENAME).
-            from(TABLE_ROLE).where(TABLE_ROLE.USERID.eq(this.getUserID()), TABLE_ROLE.WORLDID.eq(assignedRolesMirror)).fetch();
+            from(TABLE_ROLE).where(TABLE_ROLE.USERID.eq(this.getUserID()), TABLE_ROLE.WORLDID.eq(assignedRolesMirror)).fetch(); // This is sometimes VERY slow
+        long point = System.currentTimeMillis();
+        System.out.println("fetch " + (point - start));
         this.roles = new HashSet<>(roleFetch.getValues(TABLE_ROLE.ROLENAME, String.class));
         UInteger userDataMirror = getDBWorldId(this.manager.assignedUserDataMirrors.get(this.world));
         Result<Record2<String,Boolean>> permFetch = manager.dsl.select(TABLE_PERM.PERM, TABLE_PERM.ISSET).

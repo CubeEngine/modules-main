@@ -25,9 +25,14 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import de.cubeisland.engine.core.storage.database.AsyncRecord;
 import de.cubeisland.engine.core.storage.database.Database;
 import de.cubeisland.engine.core.user.User;
@@ -94,8 +99,13 @@ public class LockManager implements Listener
 
     public final MessageDigest messageDigest;
 
+    private final Queue<Chunk> queuedChunks = new ConcurrentLinkedQueue<>();
+    private final ExecutorService executor;
+    private Future<?> future = null;
+
     public LockManager(Locker module)
     {
+        executor = Executors.newSingleThreadExecutor(module.getCore().getTaskManager().getThreadFactory());
         try
         {
             messageDigest = MessageDigest.getInstance("SHA-1");
@@ -112,49 +122,60 @@ public class LockManager implements Listener
         this.module.getCore().getEventManager().registerListener(module, this);
         this.dsl = module.getCore().getDB().getDSL();
         this.database = module.getCore().getDB();
-        CompletableFuture future = null;
         for (World world : module.getCore().getWorldManager().getWorlds())
         {
             for (Chunk chunk : world.getLoadedChunks())
             {
-                future = this.loadFromChunk(chunk);
+                this.queueChunk(chunk);
             }
         }
-        if (future != null)
-        {
-            future.thenRun(() -> LockManager.this.module.getLog().info("Finished loading locks"));
-        }
+        this.loadLocksInChunks();
+        this.module.getLog().info("Finished loading locks");
+
+        module.getCore().getTaskManager().runTimer(module, () -> {
+            if (!queuedChunks.isEmpty() && (future == null || future.isDone()))
+            {
+                System.out.println("Loading " + queuedChunks.size() + " Chunks worth of Locks");
+                future = executor.submit(this::loadLocksInChunks);
+            }
+        }, 5, 5);
     }
 
     @EventHandler
     private void onChunkLoad(ChunkLoadEvent event)
     {
-        this.loadFromChunk(event.getChunk());
+        queueChunk(event.getChunk());
     }
 
-    private CompletableFuture<Result<LockModel>> loadFromChunk(Chunk chunk)
+    private boolean queueChunk(Chunk chunk)
     {
+        return this.queuedChunks.add(chunk);
+    }
+
+    private void loadLocksInChunks()
+    {
+        if (queuedChunks.isEmpty())
+        {
+            return;
+        }
+        Chunk chunk = queuedChunks.poll();
         UInteger world_id = this.wm.getWorldId(chunk.getWorld());
-        CompletableFuture<Result<LockModel>> future = this.database.query(this.database.getDSL().selectFrom(
-            TABLE_LOCK).where(TABLE_LOCK.ID.in(this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID).from(
-                                  TABLE_LOCK_LOCATION).where(TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id),
-                                                             TABLE_LOCK_LOCATION.CHUNKX.eq(chunk.getX()),
-                                                             TABLE_LOCK_LOCATION.CHUNKZ.eq(chunk.getZ())))));
-        future.thenAccept(models -> {
-            Map<UInteger, Result<LockLocationModel>> locations = LockManager.
-                this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION).where(TABLE_LOCK_LOCATION.LOCK_ID.in(
-                models.getValues(TABLE_LOCK.ID))).fetch().intoGroups(TABLE_LOCK_LOCATION.LOCK_ID);
-            for (LockModel model : models)
-            {
-                Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
-                addLoadedLocationLock(new Lock(LockManager.this, model, lockLoc));
-            }
-        });
-        future.exceptionally(e -> {
-            module.getLog().error("Error while getting locks from database", e);
-            return null;
-        });
-        return future;
+        Result<LockModel> models = this.database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.in(
+            this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID).from(TABLE_LOCK_LOCATION).where(
+                TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id), TABLE_LOCK_LOCATION.CHUNKX.eq(chunk.getX()),
+                TABLE_LOCK_LOCATION.CHUNKZ.eq(chunk.getZ())))).fetch();
+        Map<UInteger, Result<LockLocationModel>> locations = LockManager.
+            this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION).where(TABLE_LOCK_LOCATION.LOCK_ID.in(
+            models.getValues(TABLE_LOCK.ID))).fetch().intoGroups(TABLE_LOCK_LOCATION.LOCK_ID);
+        for (LockModel model : models)
+        {
+            Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
+            addLoadedLocationLock(new Lock(LockManager.this, model, lockLoc));
+        }
+        if (!queuedChunks.isEmpty())
+        {
+            future = executor.submit(this::loadLocksInChunks);
+        }
     }
 
     private void addLoadedLocationLock(Lock lock)
@@ -205,6 +226,7 @@ public class LockManager implements Listener
     @EventHandler
     private void onChunkUnload(ChunkUnloadEvent event)
     {
+        queuedChunks.remove(event.getChunk());
         UInteger worldId = module.getCore().getWorldManager().getWorldId(event.getWorld());
         Set<Lock> remove = this.getChunkLocksMap(worldId).remove(getChunkKey(event.getChunk().getX(), event.getChunk().getZ()));
         if (remove == null) return; // nothing to remove
