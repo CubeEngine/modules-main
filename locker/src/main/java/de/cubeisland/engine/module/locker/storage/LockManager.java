@@ -135,7 +135,6 @@ public class LockManager implements Listener
         module.getCore().getTaskManager().runTimer(module, () -> {
             if (!queuedChunks.isEmpty() && (future == null || future.isDone()))
             {
-                System.out.println("Loading " + queuedChunks.size() + " Chunks worth of Locks");
                 future = executor.submit(this::loadLocksInChunks);
             }
         }, 5, 5);
