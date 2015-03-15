@@ -21,8 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import de.cubeisland.engine.core.CubeEngine;
-import de.cubeisland.engine.core.config.codec.NBTCodec;
-import de.cubeisland.engine.reflect.ReflectedFile;
+import de.cubeisland.engine.reflect.codec.nbt.ReflectedNBT;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -30,7 +29,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 
-public class PlayerDataConfig extends ReflectedFile<NBTCodec>
+public class PlayerDataConfig extends ReflectedNBT
 {
     public String lastName;
     public int heldItemSlot = 0;

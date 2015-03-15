@@ -19,13 +19,13 @@ package de.cubeisland.engine.module.worlds;
 
 import java.io.IOException;
 import de.cubeisland.engine.converter.ConverterManager;
-import de.cubeisland.engine.core.config.codec.NBTCodec;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.core.module.exception.ModuleLoadError;
 import de.cubeisland.engine.module.worlds.commands.WorldsCommands;
 import de.cubeisland.engine.module.worlds.config.WorldsConfig;
 import de.cubeisland.engine.module.worlds.converter.InventoryConverter;
 import de.cubeisland.engine.module.worlds.converter.PotionEffectConverter;
+import de.cubeisland.engine.reflect.codec.nbt.NBTCodec;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.potion.PotionEffect;
