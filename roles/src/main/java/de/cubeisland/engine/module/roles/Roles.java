@@ -35,6 +35,7 @@ import de.cubeisland.engine.module.roles.config.PermissionTree;
 import de.cubeisland.engine.module.roles.config.PermissionTreeConverter;
 import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.PriorityConverter;
+import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 import de.cubeisland.engine.module.roles.role.RolesEventHandler;
 import de.cubeisland.engine.module.roles.role.RolesManager;
@@ -65,7 +66,7 @@ public class Roles extends Module
         this.getCore().getUserManager().addDefaultAttachment(RolesAttachment.class, this);
 
         final CommandManager cm = this.getCore().getCommandManager();
-        cm.getProviderManager().register(this, new DefaultPermissionValueProvider());
+        cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), PermissionValue.class);
         RoleCommands cmdRoles = new RoleCommands(this);
         cm.addCommand(cmdRoles);
         RoleManagementCommands cmdRole = new RoleManagementCommands(this);

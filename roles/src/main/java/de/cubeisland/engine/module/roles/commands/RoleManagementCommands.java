@@ -53,7 +53,7 @@ public class RoleManagementCommands extends RoleCommandHelper
     @Command(alias = "setperm",  desc = "Sets the permission for given role [in world]")
     public void setpermission(CommandContext context, @Label("[g:]role") String roleName,
                               String permission,
-                              @Optional PermissionValue type,
+                              @Default PermissionValue type,
                               @Named("in") World world)
     {
         boolean global = roleName.startsWith(GLOBAL_PREFIX);
@@ -62,10 +62,6 @@ public class RoleManagementCommands extends RoleCommandHelper
         RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
         Role role = this.getRole(context, provider, roleName, world);
         if (role == null) return;
-        if (type == null)
-        {
-            type = PermissionValue.TRUE;
-        }
         switch (type)
         {
             case RESET:
