@@ -293,6 +293,10 @@ public class UserDatabaseStore extends ResolvedDataHolder
             {
                 this.module.getLog().debug("Role for {} calculated in {} ({})", this.attachment.getHolder().getDisplayName(), this.world.getName(), this.provider.getMainWorld().getName());
             }
+            if (this.attachment.getHolder().getWorld() == world)
+            {
+                apply();
+            }
             return true;
         }
         return false;
