@@ -20,7 +20,7 @@ msgstr ""
 "Project-Id-Version: CubeEngine\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
 "POT-Creation-Date: 2015-03-15 23:03:36+0100\n"
-"PO-Revision-Date: 2015-02-11 13:24+0000\n"
+"PO-Revision-Date: 2015-03-15 22:53+0000\n"
 "Last-Translator: Faithcaio <Faithcaio@cubeisland.de>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/cubeengine/language/de/)\n"
 "MIME-Version: 1.0\n"
@@ -171,7 +171,7 @@ msgid ""
 "The server is currently running in offline mode. Permissions will not be "
 "applied until logging in! Contact an Administrator if you think this is an "
 "error."
-msgstr ""
+msgstr "Der Server läuft derzeit im Offline Modus. Rechte werden nicht zugewiesen solange der Spieler nicht eingeloggt ist. Benachrichtige einen Administrator falls das ein Fehler ist."
 
 #: de/cubeisland/engine/module/roles/role/UserDatabaseStore.java:312
 #: de/cubeisland/engine/module/roles/role/UserDatabaseStore.java:317
@@ -707,7 +707,7 @@ msgstr ""
 
 #: de/cubeisland/engine/module/roles/commands/ManagementCommands.java:62
 msgid "{text:Roles} all configurations saved!"
-msgstr ""
+msgstr "{text:Roles} alle Konfigurationen gespeichert!"
 
 #: de/cubeisland/engine/module/roles/commands/ManagementCommands.java:52
 msgid "{text:Roles} reload complete!"
