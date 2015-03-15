@@ -14,15 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
 # Translators:
-# Faithcaio <Faithcaio@cubeisland.de>, 2014
+# Faithcaio <Faithcaio@cubeisland.de>, 2014-2015
 # jeti83 <jeti83@hotmail.de>, 2014
 msgid ""
 msgstr ""
 "Project-Id-Version: CubeEngine\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
 "POT-Creation-Date: 2015-02-04 23:39:59+0100\n"
-"PO-Revision-Date: 2015-02-04 22:40+0000\n"
-"Last-Translator: Cube Island Development <development@cubeisland.de>\n"
+"PO-Revision-Date: 2015-02-18 12:13+0000\n"
+"Last-Translator: Faithcaio <Faithcaio@cubeisland.de>\n"
 "Language-Team: German (http://www.transifex.com/projects/p/cubeengine/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -202,7 +202,7 @@ msgstr "Welt {world} wird geschlossen!"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:343
 msgid "World information for {input#world}:"
-msgstr ""
+msgstr "Weltinformationen für {input#world}:"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:461
 msgid "World successfully moved!"
@@ -274,15 +274,15 @@ msgstr "{world} ist nun die Hauptwelt des Universums {name}"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:312
 msgid "Lists all worlds"
-msgstr ""
+msgstr "Listet alle Welten"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:500
 msgid "Loads a player's state for their current world"
-msgstr ""
+msgstr "Load Spielerstatus für die aktuelle Welt"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:508
 msgid "Save a player's state for their current world"
-msgstr ""
+msgstr "Speichert Spielerstatus für aktuelle Welt"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:274
 msgid "There is still one player on that map!"
@@ -292,43 +292,43 @@ msgstr[1] ""
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:388
 msgid "End portals lead to {input#world}"
-msgstr ""
+msgstr "End-Portale führen zu {input#world}"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:345
 msgid "Environment: {input}"
-msgstr ""
+msgstr "Umgebung: {input}"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:344
 msgid "Gamemode: {input}"
-msgstr ""
+msgstr "Spielmodus: {input}"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:384
 msgid "Nether portals lead to {input#world}"
-msgstr ""
+msgstr "Nether-Portale führen zu {input#world}"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:375
 msgid "Players need a permission to enter this world"
-msgstr ""
+msgstr "Spieler benötigen eine Berechtigung um diese Welt zu betreten"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:365
 msgid "The respawnworld is {world} and beds are allowed"
-msgstr ""
+msgstr "Die Respawnwelt ist {world} und Betten sind erlaubt"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:369
 msgid "The respawnworld is {world} and beds do not set spawn"
-msgstr ""
+msgstr "Die Respawnwelt ist {world} und Betten setzten nicht den Spawnpunkt"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:360
 msgid "This world will not load automatically!"
-msgstr ""
+msgstr "Diese Welt lädt nicht automatisch bei Serverstart!"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:372
 msgid "This worlds spawn is at {vector}"
-msgstr ""
+msgstr "Der Spawn der Welt ist bei {vector}"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:356
 msgid "Using custom Generator: {input}"
-msgstr ""
+msgstr "Benutzerdefinierter Terraingenerator: {input}"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:362
 msgid "World scale: {}"
@@ -336,11 +336,11 @@ msgstr ""
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:352
 msgid "WorldType: {input}"
-msgstr ""
+msgstr "Welttyp: {input}"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:348
 msgid "WorldType: {input} with structures"
-msgstr ""
+msgstr "Welttyp: {input} mit Strukturen"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:59
 msgid "Worlds commands"
@@ -349,8 +349,8 @@ msgstr ""
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:475
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:493
 msgid "Teleport failed!"
-msgstr ""
+msgstr "Teleport fehlgeschlagen!"
 
 #: de/cubeisland/engine/module/worlds/commands/WorldsCommands.java:478
 msgid "Teleports to the spawn of the mainworld of a universe"
-msgstr ""
+msgstr "Teleportiert zum Spawn der Hauptwelt in einem Universum"

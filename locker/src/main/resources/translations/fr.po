@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: CubeEngine\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2015-02-04 23:53:20+0100\n"
+"POT-Creation-Date: 2015-03-15 23:03:40+0100\n"
 "PO-Revision-Date: 2015-02-04 22:53+0000\n"
 "Last-Translator: Cube Island Development <development@cubeisland.de>\n"
 "Language-Team: French (http://www.transifex.com/projects/p/cubeengine/language/fr/)\n"
@@ -134,7 +134,7 @@ msgid ""
 " interact"
 msgstr ""
 
-#: de/cubeisland/engine/module/locker/storage/LockManager.java:289
+#: de/cubeisland/engine/module/locker/storage/LockManager.java:310
 msgid "Broken protection detected! Try /cremove on nearby blocks!"
 msgstr ""
 
@@ -148,7 +148,7 @@ msgid ""
 "do this!"
 msgstr ""
 
-#: de/cubeisland/engine/module/locker/storage/LockManager.java:307
+#: de/cubeisland/engine/module/locker/storage/LockManager.java:328
 msgid "Deleted invalid BlockProtection!"
 msgstr ""
 
@@ -168,7 +168,7 @@ msgstr ""
 msgid "Free Lock created!"
 msgstr ""
 
-#: de/cubeisland/engine/module/locker/storage/LockManager.java:694
+#: de/cubeisland/engine/module/locker/storage/LockManager.java:715
 msgid "Global access for {user} set!"
 msgstr ""
 
@@ -192,7 +192,7 @@ msgstr ""
 msgid "Has a password and is currently {text:unlocked:color=YELLOW}"
 msgstr ""
 
-#: de/cubeisland/engine/module/locker/storage/LockManager.java:291
+#: de/cubeisland/engine/module/locker/storage/LockManager.java:312
 msgid "If this message keeps coming please contact an administrator!"
 msgstr ""
 
@@ -256,7 +256,7 @@ msgstr ""
 msgid "Protection expanded!"
 msgstr ""
 
-#: de/cubeisland/engine/module/locker/storage/LockManager.java:282
+#: de/cubeisland/engine/module/locker/storage/LockManager.java:303
 msgid "Protection repaired & expanded!"
 msgstr ""
 
@@ -276,11 +276,11 @@ msgstr ""
 msgid "Public Lock created!"
 msgstr ""
 
-#: de/cubeisland/engine/module/locker/storage/LockManager.java:419
+#: de/cubeisland/engine/module/locker/storage/LockManager.java:440
 msgid "Removed Lock!"
 msgstr ""
 
-#: de/cubeisland/engine/module/locker/storage/LockManager.java:712
+#: de/cubeisland/engine/module/locker/storage/LockManager.java:733
 msgid "Removed global access from {user}"
 msgstr ""
 
@@ -419,7 +419,7 @@ msgstr ""
 msgid "This is not your protection!"
 msgstr ""
 
-#: de/cubeisland/engine/module/locker/storage/LockManager.java:423
+#: de/cubeisland/engine/module/locker/storage/LockManager.java:444
 msgid "This protection is not yours!"
 msgstr ""
 
@@ -435,7 +435,7 @@ msgstr ""
 msgid "This protections covers {amount} blocks!"
 msgstr ""
 
-#: de/cubeisland/engine/module/locker/storage/LockManager.java:700
+#: de/cubeisland/engine/module/locker/storage/LockManager.java:721
 msgid "Updated global access level for {user}!"
 msgstr ""
 
@@ -570,7 +570,7 @@ msgstr ""
 msgid "{user} had no access to this protection!"
 msgstr ""
 
-#: de/cubeisland/engine/module/locker/storage/LockManager.java:707
+#: de/cubeisland/engine/module/locker/storage/LockManager.java:728
 msgid "{user} had no global access!"
 msgstr ""
 
