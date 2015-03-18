@@ -233,10 +233,12 @@ public class InformationCommands
         result += groupedOutput.toString();
         if (context.equals(player))
         {
-            context.sendTranslated(NEUTRAL, "Found those nearby you:\n{}", result);
+            context.sendTranslated(NEUTRAL, "Found those nearby you:");
+            context.sendMessage(result);
             return;
         }
-        context.sendTranslated(NEUTRAL, "Found those nearby {user}:\n{}", player, result);
+        context.sendTranslated(NEUTRAL, "Found those nearby {user}:", player);
+        context.sendMessage(result);
     }
 
     private void addNearInformation(List<String> list, Entity entity, double distance)

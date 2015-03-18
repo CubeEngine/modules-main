@@ -136,7 +136,8 @@ public class PlayerCommands
         {
             if (!(context instanceof User))
             {
-                context.sendTranslated(NEGATIVE, "\n\n\n\n\n\n\n\n\n\n\n\n\nI'll give you only one line to eat!");
+                context.sendMessage("\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                context.sendTranslated(NEGATIVE, "I'll give you only one line to eat!");
                 return;
             }
             User sender = (User)context;
