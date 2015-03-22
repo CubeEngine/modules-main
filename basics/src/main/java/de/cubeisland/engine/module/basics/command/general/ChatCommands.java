@@ -61,10 +61,9 @@ public class ChatCommands
     }
 
     @Command(desc = "Sends a private message to someone", alias = {"tell", "message", "pm", "m", "t", "whisper", "w"})
-    public void msg(CommandContext context, User player, @Greed(INFINITE) String message)
+    public void msg(CommandContext context, CommandSender player, @Greed(INFINITE) String message)
     {
-        // TODO CommandSender Reader
-        if ("console".equalsIgnoreCase(context.getString(0)))
+        if (player instanceof ConsoleCommandSender)
         {
             sendWhisperTo(NON_PLAYER_UUID, message, context.getSource());
             return;
