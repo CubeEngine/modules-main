@@ -20,7 +20,6 @@ package de.cubeisland.engine.module.conomy.commands;
 import de.cubeisland.engine.command.CommandInvocation;
 import de.cubeisland.engine.command.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.command.parameter.reader.ReaderException;
-import de.cubeisland.engine.command.ProviderManager;
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
@@ -37,7 +36,7 @@ public class BankReader implements ArgumentReader<BankAccount>
     }
 
     @Override
-    public BankAccount read(ProviderManager manager, Class type, CommandInvocation invocation) throws ReaderException
+    public BankAccount read(Class type, CommandInvocation invocation) throws ReaderException
     {
         String arg = invocation.consume(1);
         BankAccount target = this.manager.getBankAccount(arg, false);

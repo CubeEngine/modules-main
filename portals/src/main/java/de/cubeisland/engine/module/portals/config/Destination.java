@@ -21,7 +21,6 @@ import java.util.Random;
 import de.cubeisland.engine.command.CommandInvocation;
 import de.cubeisland.engine.command.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.command.parameter.reader.ReaderException;
-import de.cubeisland.engine.command.ProviderManager;
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.bukkit.BukkitUtils;
 import de.cubeisland.engine.core.user.User;
@@ -137,7 +136,7 @@ public class Destination
         }
 
         @Override
-        public Destination read(ProviderManager manager, Class type, CommandInvocation invocation) throws ReaderException
+        public Destination read(Class type, CommandInvocation invocation) throws ReaderException
         {
             String token = invocation.consume(1);
             if ("here".equalsIgnoreCase(token))

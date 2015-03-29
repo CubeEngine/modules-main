@@ -56,7 +56,7 @@ public class MailCommand extends ContainerCommand
 
     @Alias(value = "readmail")
     @Command(desc = "Reads your mail.")
-    public void read(CommandSender context, @Optional User player)  // TODO staticValues = "console",
+    public void read(CommandSender context, @Optional CommandSender player)
     {
         User sender = null;
         if (context instanceof User)

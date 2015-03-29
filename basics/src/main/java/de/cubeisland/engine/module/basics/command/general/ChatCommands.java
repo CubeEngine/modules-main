@@ -128,7 +128,7 @@ public class ChatCommands
             context.sendTranslated(NEUTRAL, "Talking to yourself?");
             return true;
         }
-        user.sendTranslated(NONE, "{sender} -> {text:You}: {message:color=WHITE}", context.getName(), message); // TODO null messages are somehow possible
+        user.sendTranslated(NONE, "{sender} -> {text:You}: {message:color=WHITE}", context.getName(), message);
         if (user.get(BasicsAttachment.class).isAfk())
         {
             context.sendTranslated(NEUTRAL, "{user} is afk!", user);

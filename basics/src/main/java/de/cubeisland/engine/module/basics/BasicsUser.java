@@ -46,8 +46,7 @@ public class BasicsUser
     public BasicsUser(Database database, User user)
     {
         this.dsl = database.getDSL();
-        this.bUEntity = dsl.selectFrom(TABLE_BASIC_USER).where(TABLE_BASIC_USER.KEY.eq(user.getEntity().getValue(
-            TABLE_USER.KEY))).fetchOneInto(TABLE_BASIC_USER);
+        this.bUEntity = dsl.selectFrom(TABLE_BASIC_USER).where(TABLE_BASIC_USER.KEY.eq(user.getEntity().getValue(TABLE_USER.KEY))).fetchOneInto(TABLE_BASIC_USER);
         if (bUEntity == null)
         {
             this.bUEntity = this.dsl.newRecord(TABLE_BASIC_USER).newBasicUser(user);
@@ -69,12 +68,17 @@ public class BasicsUser
         return this.mailbox;
     }
 
-    public List<Mail> getMailsFrom(User sender)
+    public List<Mail> getMailsFrom(CommandSender sender)
     {
         List<Mail> mails = new ArrayList<>();
         for (Mail mail : this.getMails())
         {
-            if (mail.getValue(TABLE_MAIL.SENDERID).longValue() == sender.getId())
+            long senderId = 0;
+            if (sender instanceof User)
+            {
+                senderId = ((User)sender).getId();
+            }
+            if (mail.getValue(TABLE_MAIL.SENDERID).longValue() == senderId)
             {
                 mails.add(mail);
             }

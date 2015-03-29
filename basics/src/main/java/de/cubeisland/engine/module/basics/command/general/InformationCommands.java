@@ -59,6 +59,7 @@ import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
 import static de.cubeisland.engine.core.util.ChatFormat.*;
+import static de.cubeisland.engine.core.util.Direction.matchDirection;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static java.util.Locale.ENGLISH;
 
@@ -118,7 +119,7 @@ public class InformationCommands
     public void compass(User context)
     {
         int direction = Math.round(context.getLocation().getYaw() + 180f + 360f) % 360;
-        context.sendTranslated(NEUTRAL, "You are looking to {input#direction}!", Direction.matchDirection(direction).name()); // TODO translate direction
+        context.sendTranslated(NEUTRAL, "You are looking to {input#direction}!", matchDirection(direction).translated(context));
     }
 
     @Command(desc = "Displays your current depth.")
@@ -145,10 +146,9 @@ public class InformationCommands
     @Command(desc = "Displays near players(entities/mobs) to you.")
     public void near(CommandSender context, @Optional Integer radius, @Default User player, @Flag boolean entity, @Flag boolean mob)
     {
-        //new cmd system showing default message via @Default context.sendTranslated(NEUTRAL, "I am right {text:behind:color=RED} you!");
         if (radius == null)
         {
-            radius = this.module.getConfiguration().commands.nearDefaultRadius; // TODO create defaultProvider for this
+            radius = this.module.getConfiguration().commands.nearDefaultRadius;
         }
         int squareRadius = radius * radius;
         Location userLocation = player.getLocation();
