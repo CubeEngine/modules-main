@@ -192,7 +192,7 @@ public class MailCommand extends ContainerCommand
 
     @Command(desc = "Clears your mail.")
     @Restricted(value = User.class, msg = "You will never have mail here!")
-    public void clear(User context, @Optional User player)
+    public void clear(User context, @Optional CommandSender player)
     {
         if (player == null)
         {
@@ -200,9 +200,8 @@ public class MailCommand extends ContainerCommand
             context.sendTranslated(NEUTRAL, "Cleared all mails!");
             return;
         }
-        // TODO console User from = "console".equalsIgnoreCase(context.getString(0)) ? null : context.<User>get(0);
         context.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMailFrom(player);
-        context.sendTranslated(NEUTRAL, "Cleared all mail from {user}!", player == null ? "console" : player);
+        context.sendTranslated(NEUTRAL, "Cleared all mail from {user}!", player instanceof User ? player : "console");
     }
 
     private void mail(String message, CommandSender from, User... users)

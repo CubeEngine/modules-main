@@ -113,11 +113,11 @@ public class BasicsUser
         this.mailbox = new ArrayList<>();
     }
 
-    public void clearMailFrom(User sender)
+    public void clearMailFrom(CommandSender sender)
     {
         final List<Mail> mailsFrom = this.getMailsFrom(sender);
         this.mailbox.removeAll(mailsFrom);
-        UInteger senderId = sender == null ? null : sender.getEntity().getKey();
+        UInteger senderId = sender instanceof User ? ((User)sender).getEntity().getKey() : UInteger.valueOf(0);
         this.dsl.delete(TABLE_MAIL).where(
             TABLE_MAIL.USERID.eq(this.bUEntity.getValue(TABLE_BASIC_USER.KEY)),
             TABLE_MAIL.SENDERID.eq(senderId)).execute();
