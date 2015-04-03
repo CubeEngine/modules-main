@@ -283,7 +283,8 @@ public class WorldControlCommands
             context.sendTranslated(POSITIVE, "Removed {amount} entities in {world}!", entitiesRemoved, world);
             return;
         }
-        context.sendTranslated(POSITIVE, "Removed {amount} entities nearby!", entitiesRemoved); // TODO a non-plural version if there is only 1 entity
+        context.sendTranslatedN(POSITIVE, entitiesRemoved, "Removed one entity nearby!",
+                                "Removed {amount} entities nearby!", entitiesRemoved);
     }
 
     @Command(desc = "Gets rid of mobs close to you. Valid types are:\n" +
