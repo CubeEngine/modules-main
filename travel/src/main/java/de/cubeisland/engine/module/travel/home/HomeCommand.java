@@ -491,7 +491,7 @@ public class HomeCommand extends TpPointCommand
 
     @Alias(value = {"clearhomes"})
     @Command(desc = "Clear all homes (of an user)")
-    public CommandResult clear(final CommandContext sender, final User owner,
+    public CommandResult clear(final CommandContext sender, @Optional final User owner,
                                @Flag(name = "pub", longName = "public") final boolean isPublic,
                                @Flag(name = "priv", longName = "private") final boolean isPrivate,
                                @Flag(name = "sel", longName = "selection") final boolean selection)
@@ -535,7 +535,7 @@ public class HomeCommand extends TpPointCommand
             }
             firstPoint = selector.getFirstPoint((User)sender.getSource());
             secondPoint = selector.getSecondPoint((User)sender.getSource());
-            if (sender.hasPositional(0))
+            if (owner != null)
             {
                 sender.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes created by {user} in your current selection?", type, owner);
             }
@@ -548,7 +548,7 @@ public class HomeCommand extends TpPointCommand
         {
             firstPoint = null;
             secondPoint = null;
-            if (sender.hasPositional(0))
+            if (owner != null)
             {
                 sender.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes ever created by {user}?", type, owner);
             }
@@ -557,8 +557,7 @@ public class HomeCommand extends TpPointCommand
                 sender.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes ever created on this server?", type);
             }
         }
-        sender.sendTranslated(NEUTRAL,
-                               "Confirm with: {text:/confirm} before 30 seconds have passed to delete the homes");
+        sender.sendTranslated(NEUTRAL, "Confirm with: {text:/confirm} before 30 seconds have passed to delete the homes");
         return new ConfirmResult(module, () -> {
             if (selection)
             {

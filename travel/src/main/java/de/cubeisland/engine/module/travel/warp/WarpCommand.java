@@ -471,9 +471,9 @@ public class WarpCommand extends TpPointCommand
         sender.sendTranslated(POSITIVE, "The warp {name} of {user} is now public", w.getOwnerName(), w.getName());
     }
 
-    @Alias(value = {"clearwarps"})
+    @Alias(value = "clearwarps")
     @Command(desc = "Clear all warps (of a player)")
-    public ConfirmResult clear(final CommandContext context, @Optional User player,
+    public ConfirmResult clear(final CommandContext context, @Optional User owner,
                                @Flag(name = "pub", longName = "public") boolean pub,
                                @Flag(name = "priv", longName = "private") boolean priv)
     {
@@ -482,19 +482,19 @@ public class WarpCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return null;
         }
-        if (player != null)
+        if (owner != null)
         {
             if (pub)
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all public warps ever created by {user}?", player);
+                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all public warps ever created by {user}?", owner);
             }
             else if (priv)
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all private warps ever created by {user}?", player);
+                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all private warps ever created by {user}?", owner);
             }
             else
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all warps ever created by {user}?", player);
+                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all warps ever created by {user}?", owner);
             }
         }
         else
@@ -514,9 +514,9 @@ public class WarpCommand extends TpPointCommand
         }
         context.sendTranslated(NEUTRAL, "Confirm with: {text:/confirm} before 30 seconds have passed to delete the warps");
         return new ConfirmResult(module, () -> {
-            if (player != null)
+            if (owner != null)
             {
-                manager.massDelete(player, priv, pub);
+                manager.massDelete(owner, priv, pub);
                 context.sendTranslated(POSITIVE, "Deleted warps.");
             }
             else
