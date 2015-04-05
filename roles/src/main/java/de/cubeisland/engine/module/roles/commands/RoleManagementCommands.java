@@ -17,13 +17,13 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
-import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.parametric.Command;
-import de.cubeisland.engine.command.parametric.Flag;
-import de.cubeisland.engine.command.parametric.Default;
-import de.cubeisland.engine.command.parametric.Label;
-import de.cubeisland.engine.command.parametric.Named;
-import de.cubeisland.engine.command.parametric.Optional;
+import de.cubeisland.engine.butler.alias.Alias;
+import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Flag;
+import de.cubeisland.engine.butler.parametric.Default;
+import de.cubeisland.engine.butler.parametric.Label;
+import de.cubeisland.engine.butler.parametric.Named;
+import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.node.StringNode;

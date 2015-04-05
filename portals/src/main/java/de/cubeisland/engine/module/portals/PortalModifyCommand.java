@@ -17,11 +17,11 @@
  */
 package de.cubeisland.engine.module.portals;
 
-import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.parametric.Command;
-import de.cubeisland.engine.command.parametric.Default;
-import de.cubeisland.engine.command.parametric.Desc;
+import de.cubeisland.engine.butler.alias.Alias;
+import de.cubeisland.engine.butler.filter.Restricted;
+import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Default;
+import de.cubeisland.engine.butler.parametric.Desc;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.module.service.Selector;

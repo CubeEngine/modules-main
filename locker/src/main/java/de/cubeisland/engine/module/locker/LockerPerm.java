@@ -17,8 +17,6 @@
  */
 package de.cubeisland.engine.module.locker;
 
-import de.cubeisland.engine.command.Dispatcher;
-import de.cubeisland.engine.core.command.property.PermissionProvider;
 import de.cubeisland.engine.core.permission.PermDefault;
 import de.cubeisland.engine.core.permission.Permission;
 import de.cubeisland.engine.core.permission.PermissionContainer;

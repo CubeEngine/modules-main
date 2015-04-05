@@ -22,11 +22,11 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.parametric.Command;
-import de.cubeisland.engine.command.parametric.Greed;
-import de.cubeisland.engine.command.parametric.Optional;
+import de.cubeisland.engine.butler.alias.Alias;
+import de.cubeisland.engine.butler.filter.Restricted;
+import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Greed;
+import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
@@ -39,7 +39,7 @@ import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
+import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
 

@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.conomy.commands;
 
-import de.cubeisland.engine.command.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;

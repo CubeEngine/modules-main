@@ -18,9 +18,9 @@
 package de.cubeisland.engine.module.basics.command.moderation.spawnmob;
 
 import java.util.Collections;
-import de.cubeisland.engine.command.parametric.Command;
-import de.cubeisland.engine.command.parametric.Label;
-import de.cubeisland.engine.command.parametric.Optional;
+import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Label;
+import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.matcher.Match;

@@ -17,8 +17,8 @@
  */
 package de.cubeisland.engine.module.roles;
 
-import de.cubeisland.engine.command.CommandInvocation;
-import de.cubeisland.engine.command.parameter.reader.DefaultValue;
+import de.cubeisland.engine.butler.CommandInvocation;
+import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
 import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 
 public class DefaultPermissionValueProvider implements DefaultValue<PermissionValue>

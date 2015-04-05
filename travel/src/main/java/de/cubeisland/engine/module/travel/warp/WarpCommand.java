@@ -18,16 +18,16 @@
 package de.cubeisland.engine.module.travel.warp;
 
 import java.util.Set;
-import de.cubeisland.engine.command.CommandInvocation;
-import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.parametric.Command;
-import de.cubeisland.engine.command.parametric.Flag;
-import de.cubeisland.engine.command.parametric.Default;
-import de.cubeisland.engine.command.parametric.Greed;
-import de.cubeisland.engine.command.parametric.Label;
-import de.cubeisland.engine.command.parametric.Named;
-import de.cubeisland.engine.command.parametric.Optional;
+import de.cubeisland.engine.butler.CommandInvocation;
+import de.cubeisland.engine.butler.alias.Alias;
+import de.cubeisland.engine.butler.filter.Restricted;
+import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Flag;
+import de.cubeisland.engine.butler.parametric.Default;
+import de.cubeisland.engine.butler.parametric.Greed;
+import de.cubeisland.engine.butler.parametric.Label;
+import de.cubeisland.engine.butler.parametric.Named;
+import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.core.command.CommandContext;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.command.exception.PermissionDeniedException;
@@ -39,7 +39,7 @@ import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportInvite;
 import org.bukkit.Location;
 
-import static de.cubeisland.engine.command.parameter.Parameter.INFINITE;
+import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.core.util.formatter.MessageType.*;

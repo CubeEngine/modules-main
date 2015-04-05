@@ -18,14 +18,14 @@
 package de.cubeisland.engine.module.conomy.commands;
 
 import java.util.Set;
-import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.parametric.Command;
-import de.cubeisland.engine.command.parametric.Flag;
-import de.cubeisland.engine.command.parametric.Default;
-import de.cubeisland.engine.command.parametric.Label;
-import de.cubeisland.engine.command.parametric.Optional;
-import de.cubeisland.engine.command.parameter.reader.ReaderException;
+import de.cubeisland.engine.butler.alias.Alias;
+import de.cubeisland.engine.butler.filter.Restricted;
+import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Flag;
+import de.cubeisland.engine.butler.parametric.Default;
+import de.cubeisland.engine.butler.parametric.Label;
+import de.cubeisland.engine.butler.parametric.Optional;
+import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.command.CommandSender;
 import de.cubeisland.engine.core.user.User;

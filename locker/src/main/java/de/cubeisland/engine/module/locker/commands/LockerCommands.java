@@ -18,15 +18,15 @@
 package de.cubeisland.engine.module.locker.commands;
 
 import java.util.List;
-import de.cubeisland.engine.command.CommandInvocation;
-import de.cubeisland.engine.command.alias.Alias;
-import de.cubeisland.engine.command.completer.Completer;
-import de.cubeisland.engine.command.filter.Restricted;
-import de.cubeisland.engine.command.parametric.Command;
-import de.cubeisland.engine.command.parametric.Flag;
-import de.cubeisland.engine.command.parametric.Complete;
-import de.cubeisland.engine.command.parametric.Label;
-import de.cubeisland.engine.command.parametric.Named;
+import de.cubeisland.engine.butler.CommandInvocation;
+import de.cubeisland.engine.butler.alias.Alias;
+import de.cubeisland.engine.butler.completer.Completer;
+import de.cubeisland.engine.butler.filter.Restricted;
+import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Flag;
+import de.cubeisland.engine.butler.parametric.Complete;
+import de.cubeisland.engine.butler.parametric.Label;
+import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.core.command.ContainerCommand;
 import de.cubeisland.engine.core.user.User;
 import de.cubeisland.engine.core.util.StringUtils;

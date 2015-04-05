@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.portals;
 
-import de.cubeisland.engine.command.ProviderManager;
+import de.cubeisland.engine.butler.ProviderManager;
 import de.cubeisland.engine.core.module.Module;
 import de.cubeisland.engine.module.portals.config.Destination;
 import de.cubeisland.engine.module.portals.config.Destination.DestinationReader;

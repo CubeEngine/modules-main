@@ -18,9 +18,9 @@
 package de.cubeisland.engine.module.portals.config;
 
 import java.util.Random;
-import de.cubeisland.engine.command.CommandInvocation;
-import de.cubeisland.engine.command.parameter.reader.ArgumentReader;
-import de.cubeisland.engine.command.parameter.reader.ReaderException;
+import de.cubeisland.engine.butler.CommandInvocation;
+import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
+import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.core.bukkit.BukkitUtils;
 import de.cubeisland.engine.core.user.User;

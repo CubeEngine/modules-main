@@ -17,10 +17,10 @@
  */
 package de.cubeisland.engine.module.portals;
 
-import de.cubeisland.engine.command.CommandInvocation;
-import de.cubeisland.engine.command.parameter.reader.ArgumentReader;
-import de.cubeisland.engine.command.parameter.reader.DefaultValue;
-import de.cubeisland.engine.command.parameter.reader.ReaderException;
+import de.cubeisland.engine.butler.CommandInvocation;
+import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
+import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
+import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import de.cubeisland.engine.core.user.User;
 
 public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal>
