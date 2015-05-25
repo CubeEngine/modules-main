@@ -17,22 +17,23 @@
  */
 package de.cubeisland.engine.module.conomy.account.storage;
 
-import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
-import de.cubeisland.engine.core.util.Version;
+import de.cubeisland.engine.module.core.util.Version;
+import de.cubeisland.engine.module.service.database.AutoIncrementTable;
+import de.cubeisland.engine.module.service.database.Database;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
+import static de.cubeisland.engine.module.service.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 
 public class TableBankAccess extends AutoIncrementTable<BankAccessModel, UInteger>
 {
     public static TableBankAccess TABLE_BANK_ACCESS;
 
-    public TableBankAccess(String prefix)
+    public TableBankAccess(String prefix, Database database)
     {
-        super(prefix + "account_access", new Version(1));
+        super(prefix + "account_access", new Version(1), database);
         this.setAIKey(ID);
         this.addUniqueKey(USERID, ACCOUNTID);
         this.addForeignKey(TABLE_USER.getPrimaryKey(), USERID);

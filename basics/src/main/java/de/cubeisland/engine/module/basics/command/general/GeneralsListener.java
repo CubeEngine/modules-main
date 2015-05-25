@@ -17,104 +17,113 @@
  */
 package de.cubeisland.engine.module.basics.command.general;
 
-import de.cubeisland.engine.core.bukkit.AfterJoinEvent;
-import de.cubeisland.engine.core.bukkit.BukkitUtils;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.matcher.Match;
+import com.google.common.base.Optional;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.BasicsUser;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
+import de.cubeisland.engine.module.core.sponge.BukkitUtils;
+import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.roles.RoleAppliedEvent;
-import org.bukkit.Bukkit;
-import org.bukkit.entity.Tameable;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.inventory.AnvilInventory;
-import org.bukkit.inventory.BrewerInventory;
-import org.bukkit.inventory.ItemStack;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
+import org.spongepowered.api.data.manipulator.entity.GameModeData;
+import org.spongepowered.api.data.manipulator.entity.InvulnerabilityData;
+import org.spongepowered.api.data.manipulator.entity.TameableData;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.player.PlayerChangeWorldEvent;
+import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
+import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
+import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
+import org.spongepowered.api.event.entity.player.PlayerQuitEvent;
+import org.spongepowered.api.event.inventory.InventoryClickEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.Texts;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import static java.lang.Integer.MAX_VALUE;
+import static org.spongepowered.api.event.Order.POST;
 
-public class GeneralsListener implements Listener
+public class GeneralsListener
 {
     private final Basics module;
+    private UserManager um;
 
-    public GeneralsListener(Basics basics)
+    public GeneralsListener(Basics basics, UserManager um)
     {
         this.module = basics;
+        this.um = um;
     }
 
-    @EventHandler
-    public void blockplace(final BlockPlaceEvent event)
+    @Subscribe
+    public void blockplace(final PlayerPlaceBlockEvent event)
     {
-        User user = module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
+        User user = um.getExactUser(event.getUser().getUniqueId());
         if (user.get(BasicsAttachment.class).hasUnlimitedItems())
         {
-            ItemStack itemInHand = event.getPlayer().getItemInHand();
-            itemInHand.setAmount(itemInHand.getAmount() + 1);
+            Optional<ItemStack> itemInHand = event.getUser().getItemInHand();
+            if (itemInHand.isPresent())
+            {
+                itemInHand.get().setQuantity(itemInHand.get().getQuantity() + 1);
+            }
         }
     }
 
-    @EventHandler
+    @Subscribe
     public void onLeave(PlayerQuitEvent event)
     {
-        BasicsUserEntity bUser = this.module.getBasicsUser(event.getPlayer()).getEntity();
-        if (!module.perms().COMMAND_GOD_KEEP.isAuthorized(event.getPlayer()))
+        BasicsUserEntity bUser = this.module.getBasicsUser(event.getUser()).getEntity();
+        if (!module.perms().COMMAND_GOD_KEEP.isAuthorized(event.getUser()))
         {
             bUser.setValue(TABLE_BASIC_USER.GODMODE, false);
         }
         bUser.updateAsync();
-        if (!module.perms().COMMAND_GAMEMODE_KEEP.isAuthorized(event.getPlayer()))
+        if (!module.perms().COMMAND_GAMEMODE_KEEP.isAuthorized(event.getUser()))
         {
-            event.getPlayer().setGameMode(Bukkit.getServer().getDefaultGameMode()); // reset gamemode to default on the server
+            GameModeData mode = event.getUser().getOrCreate(GameModeData.class).get();
+            mode.setGameMode(event.getUser().getWorld().getProperties().getGameMode());
+            event.getUser().offer(mode); // reset gamemode to default on the server
         }
     }
 
-    @EventHandler
-    public void onWorldChange(PlayerChangedWorldEvent event)
+    @Subscribe
+    public void onWorldChange(PlayerChangeWorldEvent event)
     {
-        BasicsUserEntity bUser = this.module.getBasicsUser(event.getPlayer()).getEntity();
-        if (!module.perms().COMMAND_GOD_KEEP.isAuthorized(event.getPlayer()))
+        BasicsUserEntity bUser = this.module.getBasicsUser(event.getUser()).getEntity();
+        if (!module.perms().COMMAND_GOD_KEEP.isAuthorized(event.getUser()))
         {
             bUser.setValue(TABLE_BASIC_USER.GODMODE, false);
-            BukkitUtils.setInvulnerable(event.getPlayer(), false);
+            event.getUser().offer(event.getUser().getOrCreate(InvulnerabilityData.class).get().setInvulnerableTicks(MAX_VALUE));
         }
         bUser.updateAsync();
-        if (!module.perms().COMMAND_GAMEMODE_KEEP.isAuthorized(event.getPlayer()))
+        if (!module.perms().COMMAND_GAMEMODE_KEEP.isAuthorized(event.getUser()))
         {
-            event.getPlayer().setGameMode(Bukkit.getServer().getDefaultGameMode()); // reset gamemode to default on the server
+            GameModeData mode = event.getUser().getOrCreate(GameModeData.class).get();
+            mode.setGameMode(event.getUser().getWorld().getProperties().getGameMode());
+            event.getUser().offer(mode); // reset gamemode to default on the server
         }
     }
 
-    @EventHandler
-    public void onAfterJoin(AfterJoinEvent event)
+    @Subscribe(order = POST)
+    public void onAfterJoin(PlayerJoinEvent event)
     {
-        User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
-        BasicsUser bUser = this.module.getBasicsUser(user);
+        BasicsUser bUser = this.module.getBasicsUser(event.getUser());
         int amount = bUser.countMail();
         if (amount > 0)
         {
+            User user = um.getExactUser(event.getUser().getUniqueId());
             user.sendTranslatedN(POSITIVE, amount, "You have a new mail!", "You have {amount} of mail!", amount);
             user.sendTranslated(NEUTRAL, "Use {text:/mail read} to display them.");
         }
     }
 
-    @EventHandler
+    @Subscribe
     public void onPlayerJoin(PlayerJoinEvent event)
     {
-        User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
-        BasicsUser bUser = this.module.getBasicsUser(user);
+        User user = um.getExactUser(event.getUser().getUniqueId());
+        BasicsUser bUser = this.module.getBasicsUser(event.getUser());
         if (bUser.getEntity().getValue(TABLE_BASIC_USER.GODMODE))
         {
             if (module.perms().COMMAND_GOD_KEEP.isAuthorized(user))
@@ -129,21 +138,22 @@ public class GeneralsListener implements Listener
         }
     }
 
-    @EventHandler
+    @Subscribe
     public void onInteractWithTamed(PlayerInteractEntityEvent event)
     {
-        if (event.getRightClicked() != null && event.getRightClicked() instanceof Tameable)
+        Optional<TameableData> tameable = event.getTargetEntity().getData(TameableData.class);
+        if (tameable.isPresent())
         {
-            Tameable tamed = (Tameable) event.getRightClicked();
-            if (tamed.getOwner() != null && !event.getPlayer().equals(tamed.getOwner()))
+            if (!event.getUser().equals(tameable.get().getOwner()))
             {
-                User clicker = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
-                clicker.sendTranslated(POSITIVE, "This {name#entity} belongs to {tamer}!", Match.entity().getNameFor(event.getRightClicked().getType()), tamed.getOwner());
+                User clicker = um.getExactUser(event.getUser().getUniqueId());
+                clicker.sendTranslated(POSITIVE, "This {name#entity} belongs to {tamer}!",
+                                       event.getEntity().getType().getName(), tameable.get().getOwner());
             }
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @Subscribe(order = POST)
     public void onPlayerJoin(RoleAppliedEvent event)
     {
         String meta = event.getAttachment().getCurrentMetadataString("tablist-prefix");
@@ -154,38 +164,7 @@ public class GeneralsListener implements Listener
             {
                 colored = colored.substring(0,16);
             }
-            event.getUser().setPlayerListName(colored);
-        }
-    }
-
-    @EventHandler
-    public void onPlayerInventoryClick(InventoryClickEvent event)
-    {
-        if (this.module.getConfiguration().preventOverstackedItems && !module.perms().OVERSTACKED_ANVIL_AND_BREWING.isAuthorized(event.getWhoClicked()))
-        {
-
-            if (event.getView().getTopInventory() instanceof AnvilInventory
-                || event.getView().getTopInventory() instanceof BrewerInventory)
-            {
-                boolean topClick = event.getRawSlot() < event.getView().getTopInventory().getSize();
-                switch (event.getAction())
-                {
-                case PLACE_ALL:
-                case PLACE_SOME:
-                    if (!topClick) return;
-                    if (event.getCursor().getAmount() > event.getCursor().getMaxStackSize())
-                    {
-                        event.setCancelled(true);
-                    }
-                    break;
-                case MOVE_TO_OTHER_INVENTORY:
-                    if (topClick) return;
-                    if (event.getCurrentItem().getAmount() > event.getCurrentItem().getMaxStackSize())
-                    {
-                        event.setCancelled(true);
-                    }
-                }
-            }
+            event.getUser().getPlayer().get().getTabList().getPlayer(event.getUser().getUniqueId()).get().setDisplayName(Texts.of(colored));
         }
     }
 }

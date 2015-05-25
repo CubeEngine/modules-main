@@ -27,31 +27,41 @@ import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.task.TaskManager;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.BasicsUser;
 import de.cubeisland.engine.module.basics.storage.Mail;
+import de.cubeisland.engine.module.service.user.UserManager;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 @Command(name = "mail", desc = "Manages your server mail.")
 public class MailCommand extends ContainerCommand
 {
     private final Basics module;
+    private final UserManager um;
+    private final TaskManager taskManager;
+    private final Database db;
 
-    public MailCommand(Basics module)
+    public MailCommand(Basics module, UserManager um, TaskManager taskManager, Database db)
     {
         super(module);
         this.module = module;
+        this.um = um;
+        this.taskManager = taskManager;
+        this.db = db;
     }
 
     @Alias(value = "readmail")
@@ -99,7 +109,7 @@ public class MailCommand extends ContainerCommand
         for (int i = 0; i < mails.size(); i++)
         {
             Mail mail = mails.get(i);
-            sb.append("\n").append(ChatFormat.WHITE).append(i+1).append(": ").append(mail.readMail());
+            sb.append("\n").append(ChatFormat.WHITE).append(i+1).append(": ").append(mail.readMail(um));
         }
         context.sendTranslated(POSITIVE, "Your mail: {input#mails}", ChatFormat.parseFormats(sb.toString()));
     }
@@ -136,7 +146,7 @@ public class MailCommand extends ContainerCommand
     @Command(desc = "Sends mails to all players.")
     public void sendAll(CommandSender context, final @Greed(INFINITE) String message)
     {
-        Set<User> users = this.module.getCore().getUserManager().getOnlineUsers();
+        Set<User> users = um.getOnlineUsers();
         final Set<Long> alreadySend = new HashSet<>();
         User sender = null;
         if (context instanceof User)
@@ -149,22 +159,18 @@ public class MailCommand extends ContainerCommand
             alreadySend.add(user.getId());
         }
         final UInteger senderId = sender == null ? null : sender.getEntity().getKey();
-        this.module.getCore().getTaskManager().runAsynchronousTaskDelayed(this.module,new Runnable()
-        {
-            public void run() // Async sending to all Users ever
+        taskManager.runAsynchronousTaskDelayed(this.module, (Runnable)() -> {
+            DSLContext dsl = db.getDSL();
+            Collection<Query> queries = new ArrayList<>();
+            for (Long userId : um.getAllIds())
             {
-                DSLContext dsl = module.getCore().getDB().getDSL();
-                Collection<Query> queries = new ArrayList<>();
-                for (Long userId : module.getCore().getUserManager().getAllIds())
+                if (!alreadySend.contains(userId))
                 {
-                    if (!alreadySend.contains(userId))
-                    {
-                        queries.add(dsl.insertInto(TABLE_MAIL, TABLE_MAIL.MESSAGE, TABLE_MAIL.USERID, TABLE_MAIL.SENDERID).values(message, UInteger.valueOf(userId), senderId));
-                    }
+                    queries.add(dsl.insertInto(TABLE_MAIL, TABLE_MAIL.MESSAGE, TABLE_MAIL.USERID, TABLE_MAIL.SENDERID).values(message, UInteger.valueOf(userId), senderId));
                 }
-                dsl.batch(queries).execute();
             }
-        },0);
+            dsl.batch(queries).execute();
+        }, 0);
         context.sendTranslated(POSITIVE, "Sent mail to everyone!");
     }
 
@@ -181,7 +187,7 @@ public class MailCommand extends ContainerCommand
         try
         {
             Mail mail = bUser.getMails().get(mailId);
-            module.getCore().getDB().getDSL().delete(TABLE_MAIL).where(TABLE_MAIL.KEY.eq(mail.getValue(TABLE_MAIL.KEY))).execute();
+            db.getDSL().delete(TABLE_MAIL).where(TABLE_MAIL.KEY.eq(mail.getValue(TABLE_MAIL.KEY))).execute();
             context.sendTranslated(POSITIVE, "Deleted Mail #{integer#mailid}", mailId);
         }
         catch (IndexOutOfBoundsException e)

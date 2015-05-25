@@ -17,19 +17,20 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.world.WorldManager;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 import de.cubeisland.engine.module.roles.role.RolesManager;
-import org.bukkit.World;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 public class UserCommandHelper extends ContainerCommand
 {
@@ -40,11 +41,11 @@ public class UserCommandHelper extends ContainerCommand
     protected final String LISTELEM = "- " + ChatFormat.YELLOW + "%s";
     protected final String LISTELEM_VALUE = "- " + ChatFormat.YELLOW + "%s" + ChatFormat.WHITE + ": " + ChatFormat.GOLD + "%s";
 
-    public UserCommandHelper(Roles module)
+    public UserCommandHelper(Roles module, WorldManager wm)
     {
         super(module);
         this.manager = module.getRolesManager();
-        this.worldManager = module.getCore().getWorldManager();
+        this.worldManager = wm;
         this.module = module;
     }
 

@@ -17,10 +17,11 @@
  */
 package de.cubeisland.engine.module.conomy;
 
-import de.cubeisland.engine.core.command.CommandManager;
-import de.cubeisland.engine.core.module.Module;
-import de.cubeisland.engine.core.module.service.Economy;
-import de.cubeisland.engine.core.storage.database.Database;
+import java.util.concurrent.ThreadFactory;
+import javax.inject.Inject;
+import de.cubeisland.engine.logscribe.LogFactory;
+import de.cubeisland.engine.modularity.asm.marker.Enable;
+import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.storage.TableAccount;
@@ -30,6 +31,12 @@ import de.cubeisland.engine.module.conomy.commands.BankReader;
 import de.cubeisland.engine.module.conomy.commands.EcoBankCommands;
 import de.cubeisland.engine.module.conomy.commands.EcoCommands;
 import de.cubeisland.engine.module.conomy.commands.MoneyCommand;
+import de.cubeisland.engine.module.core.filesystem.FileManager;
+import de.cubeisland.engine.module.core.i18n.I18n;
+import de.cubeisland.engine.module.service.command.CommandManager;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.reflect.Reflector;
 
 public class Conomy extends Module
 {
@@ -37,28 +44,33 @@ public class Conomy extends Module
     private ConomyManager manager;
     private ConomyPermissions perms;
 
-    @Override
+    @Inject private Database db;
+    @Inject private I18n i18n;
+    @Inject private CommandManager cm;
+    @Inject private ThreadFactory tf;
+    @Inject private LogFactory lf;
+    @Inject private FileManager fm;
+    @Inject private UserManager um;
+
+    @Enable
     public void onEnable()
     {
-        Database db = this.getCore().getDB();
         db.registerTable(TableAccount.class);
         db.registerTable(TableBankAccess.class);
 
-        this.config = this.loadConfig(ConomyConfiguration.class);
-        this.manager = new ConomyManager(this);
+        this.config = fm.loadConfig(this, ConomyConfiguration.class);
+        this.manager = new ConomyManager(this, tf, db, lf, fm, um);
         perms = new ConomyPermissions(this);
 
-        this.getCore().getI18n().getCompositor().registerMacro(new CurrencyFormatter(this));
+        i18n.getCompositor().registerMacro(new CurrencyFormatter(manager));
 
-        final CommandManager cm = this.getCore().getCommandManager();
-        cm.addCommand(new MoneyCommand(this));
-        EcoCommands ecoCommands = new EcoCommands(this);
+        cm.addCommand(new MoneyCommand(this, um));
+        EcoCommands ecoCommands = new EcoCommands(this, um);
         cm.addCommand(ecoCommands);
 
-        cm.getProviderManager().register(this, new BankReader(this.manager), BankAccount.class);
-        cm.addCommand(new BankCommands(this));
-        ecoCommands.addCommand(new EcoBankCommands(this));
-        this.getCore().getModuleManager().getServiceManager().registerService(this, Economy.class, manager.getInterface());
+        cm.getProviderManager().register(this, new BankReader(this.manager, i18n), BankAccount.class);
+        cm.addCommand(new BankCommands(this, um));
+        ecoCommands.addCommand(new EcoBankCommands(this, um));
     }
 
     public ConomyConfiguration getConfig()

@@ -18,26 +18,29 @@
 package de.cubeisland.engine.module.conomy.commands;
 
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
+import de.cubeisland.engine.module.service.user.UserManager;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 @Command(name = "bank", desc = "Administrative commands for Conomy Banks.")
 public class EcoBankCommands extends ContainerCommand
 {
     private final Conomy module;
+    private final UserManager um;
     private final ConomyManager manager;
 
-    public EcoBankCommands(Conomy module)
+    public EcoBankCommands(Conomy module, UserManager um)
     {
         super(module);
         this.module = module;
+        this.um = um;
         this.manager = module.getManager();
     }
 
@@ -54,7 +57,7 @@ public class EcoBankCommands extends ContainerCommand
         String format = manager.format(amount);
         this.manager.transaction(null, bank, amount, true);
         context.sendTranslated(POSITIVE, "You gave {input#amount} to the bank {input#bank}!", format, bank.getName());
-        for (User user : this.module.getCore().getUserManager().getOnlineUsers())
+        for (User user : um.getOnlineUsers())
         {
             if (bank.isOwner(user))
             {
@@ -76,7 +79,7 @@ public class EcoBankCommands extends ContainerCommand
         String format = manager.format(amount);
         this.manager.transaction(bank, null, amount, true);
         context.sendTranslated(POSITIVE, "You took {input#amount} from the bank {input#bank}!", format, bank.getName());
-        for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
+        for (User onlineUser : um.getOnlineUsers())
         {
             if (bank.isOwner(onlineUser))
             {
@@ -98,7 +101,7 @@ public class EcoBankCommands extends ContainerCommand
         bank.reset();
         String format = this.manager.format(this.manager.getDefaultBalance());
         context.sendTranslated(POSITIVE, "The account of the bank {input#bank} got reset to {input#balance}!", bank.getName(), format);
-        for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
+        for (User onlineUser : um.getOnlineUsers())
         {
             if (bank.isOwner(onlineUser))
             {
@@ -121,7 +124,7 @@ public class EcoBankCommands extends ContainerCommand
         String format = this.manager.format(amount);
         bank.set(amount);
         context.sendTranslated(POSITIVE, "The money of bank account {input#bank} got set to {input#balance}!", bank.getName(), format);
-        for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
+        for (User onlineUser : um.getOnlineUsers())
         {
             if (bank.isOwner(onlineUser))
             {
@@ -142,7 +145,7 @@ public class EcoBankCommands extends ContainerCommand
         } */
         bank.scale(factor);
         context.sendTranslated(POSITIVE, "Scaled the balance of the bank {input#bank} by {decimal#factor}!", bank.getName(), factor);
-        for (User onlineUser : this.module.getCore().getUserManager().getOnlineUsers())
+        for (User onlineUser : um.getOnlineUsers())
         {
             if (bank.isOwner(onlineUser))
             {

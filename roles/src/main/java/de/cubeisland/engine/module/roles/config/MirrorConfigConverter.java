@@ -26,8 +26,8 @@ import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.NullNode;
 import de.cubeisland.engine.converter.node.StringNode;
-import de.cubeisland.engine.core.util.Triplet;
-import de.cubeisland.engine.core.world.ConfigWorld;
+import de.cubeisland.engine.module.core.util.Triplet;
+import de.cubeisland.engine.module.service.world.ConfigWorld;
 import de.cubeisland.engine.module.roles.Roles;
 
 public class MirrorConfigConverter extends SimpleConverter<MirrorConfig>
@@ -77,7 +77,7 @@ public class MirrorConfigConverter extends SimpleConverter<MirrorConfig>
             return null;
         }
 
-        MirrorConfig mirror = new MirrorConfig(module, new ConfigWorld(module.getCore().getWorldManager(),
+        MirrorConfig mirror = new MirrorConfig(module, wm, new ConfigWorld(module.getCore().getWorldManager(),
                                        readMap.getValue().keySet().iterator().next()));
         for (Map.Entry<String, Node> worlds : readMap.getValue().entrySet())
         {

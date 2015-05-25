@@ -27,22 +27,25 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Complete;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.commands.CommandListener.CommandType;
 import de.cubeisland.engine.module.locker.storage.KeyBook;
 import de.cubeisland.engine.module.locker.storage.Lock;
 import de.cubeisland.engine.module.locker.storage.LockManager;
 import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
-import org.bukkit.Location;
-import org.bukkit.entity.Entity;
+import de.cubeisland.engine.module.service.user.UserManager;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.Location;
 
-import static de.cubeisland.engine.core.util.ChatFormat.GOLD;
-import static de.cubeisland.engine.core.util.ChatFormat.GREY;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
 
 @Command(name = "locker", desc = "Locker commands", alias = "l")
@@ -50,12 +53,14 @@ public class LockerCommands extends ContainerCommand
 {
     private final Locker module;
     final LockManager manager;
+    private UserManager um;
 
-    public LockerCommands(Locker module, LockManager manager)
+    public LockerCommands(Locker module, LockManager manager, UserManager um)
     {
         super(module);
         this.module = module;
         this.manager = manager;
+        this.um = um;
     }
 
     @Alias(value = "cinfo")
@@ -67,7 +72,7 @@ public class LockerCommands extends ContainerCommand
         {
             this.persist(context);
         }
-        KeyBook keyBook = KeyBook.getKeyBook((context).getItemInHand(), context, this.module);
+        KeyBook keyBook = KeyBook.getKeyBook((context).getItemInHand().orNull(), context, this.module);
         if (keyBook != null)
         {
             Lock lock = this.manager.getLockById(keyBook.lockID);
@@ -77,7 +82,7 @@ public class LockerCommands extends ContainerCommand
                 if (lock.isBlockLock())
                 {
                     Location loc = lock.getFirstLocation();
-                    context.sendTranslated(POSITIVE, "The protection corresponding to this book is located at {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getWorld());
+                    context.sendTranslated(POSITIVE, "The protection corresponding to this book is located at {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
                 }
                 else
                 {
@@ -86,7 +91,7 @@ public class LockerCommands extends ContainerCommand
                         if (entity.getUniqueId().equals(lock.getEntityUID()))
                         {
                             Location loc = entity.getLocation();
-                            context.sendTranslated(POSITIVE, "The entity protection corresponding to this book is located at {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getWorld());
+                            context.sendTranslated(POSITIVE, "The entity protection corresponding to this book is located at {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
                             return;
                         }
                     }
@@ -163,7 +168,7 @@ public class LockerCommands extends ContainerCommand
             {
                 name = name.substring(1);
             }
-            User user = this.module.getCore().getUserManager().findExactUser(name);
+            User user = um.findExactUser(name);
             if (user == null)
             {
                 context.sendTranslated(NEGATIVE, "Player {user} not found!", name);
@@ -229,7 +234,7 @@ public class LockerCommands extends ContainerCommand
         {
             context.sendTranslated(NEUTRAL, "You need to define which flags to {text:set} or {text:unset}!");
             context.sendTranslated(NEUTRAL, "The following flags are available:");
-            String format = "  " + GREY + "-" + GOLD;
+            String format = "  " + ChatFormat.GREY + "-" + ChatFormat.GOLD;
             for (String flag : ProtectionFlag.getNames())
             {
                 context.sendMessage(format + flag);

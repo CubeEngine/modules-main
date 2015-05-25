@@ -17,12 +17,13 @@
  */
 package de.cubeisland.engine.module.basics.storage;
 
-import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
-import de.cubeisland.engine.core.util.Version;
+import de.cubeisland.engine.module.core.util.Version;
+import de.cubeisland.engine.module.service.database.AutoIncrementTable;
+import de.cubeisland.engine.module.service.database.Database;
 import org.jooq.TableField;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
+import static de.cubeisland.engine.module.service.user.TableUser.TABLE_USER;
 import static org.jooq.impl.SQLDataType.VARCHAR;
 
 public class TableMail extends AutoIncrementTable<Mail, UInteger>
@@ -33,9 +34,9 @@ public class TableMail extends AutoIncrementTable<Mail, UInteger>
     public final TableField<Mail, UInteger> USERID = createField("userId", U_INTEGER.nullable(false), this);
     public final TableField<Mail, UInteger> SENDERID = createField("senderId", U_INTEGER, this);
 
-    public TableMail(String prefix)
+    public TableMail(String prefix, Database db)
     {
-        super(prefix + "mail", new Version(1));
+        super(prefix + "mail", new Version(1), db);
         setAIKey(KEY);
         addForeignKey(TABLE_USER.getPrimaryKey(), USERID);
         addForeignKey(TABLE_USER.getPrimaryKey(), SENDERID);

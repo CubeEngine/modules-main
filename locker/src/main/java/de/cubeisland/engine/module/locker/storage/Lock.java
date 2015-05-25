@@ -24,37 +24,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.InventoryGuardFactory;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.LockerAttachment;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.Sound;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.entity.Entity;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.Door;
 import org.jooq.Result;
+import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.world.Location;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 import static de.cubeisland.engine.module.locker.storage.AccessListModel.*;
 import static de.cubeisland.engine.module.locker.storage.LockType.PUBLIC;
 import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
 import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
-import static org.bukkit.Material.IRON_DOOR_BLOCK;
-import static org.bukkit.Sound.DOOR_CLOSE;
-import static org.bukkit.Sound.DOOR_OPEN;
-import static org.bukkit.block.BlockFace.DOWN;
 
 public class Lock
 {
@@ -160,10 +152,14 @@ public class Lock
         }
         if (third)
         {
-            if (user.getItemInHand().getType() == Material.BOOK)
+            if (user.getItemInHand().isPresent() && user.getItemInHand().get().getItem() == ItemTypes.BOOK)
             {
-                int amount = user.getItemInHand().getAmount() -1;
-                ItemStack itemStack = new ItemStack(Material.ENCHANTED_BOOK, 1);
+                ItemStack itemStack = user.getItemInHand().get();
+                itemStack.setQuantity(itemStack.getQuantity() - 1);
+            }
+            if (user.getItemInHand().transform(ItemStack::getItem).orNull() == ItemTypes.BOOK)
+            {
+                ItemStack itemStack = new ItemStack(ItemTypes.ENCHANTED_BOOK, 1);
                 ItemMeta itemMeta = itemStack.getItemMeta();
                 itemMeta.setDisplayName(this.getColorPass() + KeyBook.TITLE + this.getId());
                 // TODO remove chatcolors in translated text
@@ -311,7 +307,7 @@ public class Lock
      */
     public Boolean checkForKeyBook(User user, Location effectLocation)
     {
-        KeyBook keyBook = KeyBook.getKeyBook(user.getItemInHand(), user, this.manager.module);
+        KeyBook keyBook = KeyBook.getKeyBook(user.getItemInHand().orNull(), user, this.manager.module);
         if (keyBook != null)
         {
             return keyBook.check(this, effectLocation);

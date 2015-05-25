@@ -17,60 +17,65 @@
  */
 package de.cubeisland.engine.module.basics.command.teleport;
 
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.LocationUtil;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.LocationUtil;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
-import org.bukkit.Location;
-import org.bukkit.block.Block;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import de.cubeisland.engine.module.service.user.UserManager;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
-import static org.bukkit.Material.AIR;
-import static org.bukkit.Material.COMPASS;
-import static org.bukkit.event.Event.Result.DENY;
-import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.PLUGIN;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.EntityTeleportEvent;
+import org.spongepowered.api.event.entity.player.PlayerDeathEvent;
+import org.spongepowered.api.event.entity.player.PlayerInteractEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.world.Location;
 
-public class TeleportListener implements Listener
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static org.spongepowered.api.item.ItemTypes.COMPASS;
+
+public class TeleportListener
 {
     private final Basics module;
+    private UserManager um;
 
-    public TeleportListener(Basics basics)
+    public TeleportListener(Basics basics, UserManager um)
     {
         this.module = basics;
+        this.um = um;
     }
 
-    @EventHandler
-    public void onTeleport(PlayerTeleportEvent event)
+    @Subscribe
+    public void onTeleport(EntityTeleportEvent event)
     {
-        User user = module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
-        switch (event.getCause())
+        if (event.getEntity() instanceof Player)
         {
-            case COMMAND:
-            case PLUGIN:
-                user.get(BasicsAttachment.class).setLastLocation(event.getFrom());
+            User user = um.getExactUser(event.getEntity().getUniqueId());
+            event.getCause().get().getReason()
+            switch (event.getCause())
+            {
+                case COMMAND:
+                case PLUGIN:
+                    user.get(BasicsAttachment.class).setLastLocation(event.getOldLocation());
+            }
         }
     }
 
-    @EventHandler
+    @Subscribe
     public void onDeath(PlayerDeathEvent event)
     {
-        User user = this.module.getCore().getUserManager().getExactUser(event.getEntity().getUniqueId());
+        User user = um.getExactUser(event.getEntity().getUniqueId());
         if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(user))
         {
             user.get(BasicsAttachment.class).setDeathLocation(user.getLocation());
         }
     }
 
-    @EventHandler
+    @Subscribe
     public void onClick(PlayerInteractEvent event)
     {
-        if (event.getPlayer().getItemInHand().getType() == COMPASS)
+        if (event.getUser().getItemInHand().transform(ItemStack::getItem).orNull() == COMPASS)
         {
             if (event.useItemInHand().equals(DENY))
             {
@@ -83,7 +88,7 @@ public class TeleportListener implements Listener
                 case LEFT_CLICK_BLOCK:
                     if (module.perms().COMPASS_JUMPTO_LEFT.isAuthorized(event.getPlayer()))
                     {
-                        User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
+                        User user = um.getExactUser(event.getPlayer().getUniqueId());
                         Location loc;
                         if (event.getClickedBlock() != null && event.getClickedBlock().getType().isSolid())
                         {
@@ -105,9 +110,9 @@ public class TeleportListener implements Listener
                     return;
                 case RIGHT_CLICK_AIR:
                 case RIGHT_CLICK_BLOCK:
-                    if (module.perms().COMPASS_JUMPTO_RIGHT.isAuthorized(event.getPlayer()))
+                    if (module.perms().COMPASS_JUMPTO_RIGHT.isAuthorized(event.getUser()))
                     {
-                        User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
+                        User user = um.getExactUser(event.getUser().getUniqueId());
                         Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfiguration().navigation.thru.maxRange,
                                 this.module.getConfiguration().navigation.thru.maxWallThickness);
                         if (loc == null)

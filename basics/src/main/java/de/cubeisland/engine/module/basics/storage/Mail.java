@@ -19,10 +19,10 @@ package de.cubeisland.engine.module.basics.storage;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import de.cubeisland.engine.core.CubeEngine;
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.service.database.AsyncRecord;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
@@ -45,14 +45,14 @@ public class Mail extends AsyncRecord<Mail>
         return this;
     }
 
-    public String readMail()
+    public String readMail(UserManager um)
     {
         UInteger value = this.getValue(TABLE_MAIL.SENDERID);
         if (value == null || value.longValue() == 0)
         {
             return ChatFormat.RED + "CONSOLE" + ChatFormat.WHITE + ": " + this.getValue(TABLE_MAIL.MESSAGE);
         }
-        User user = CubeEngine.getUserManager().getUser(this.getValue(TABLE_MAIL.SENDERID));
+        User user = um.getUser(this.getValue(TABLE_MAIL.SENDERID));
         return ChatFormat.DARK_GREEN + user.getDisplayName() + ChatFormat.WHITE + ": " + this.getValue(TABLE_MAIL.MESSAGE);
     }
 }

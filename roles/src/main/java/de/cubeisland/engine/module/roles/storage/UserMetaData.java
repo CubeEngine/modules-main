@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.roles.storage;
 
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
+import de.cubeisland.engine.module.service.database.AsyncRecord;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.roles.storage.TableData.TABLE_META;

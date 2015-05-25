@@ -17,8 +17,8 @@
  */
 package de.cubeisland.engine.module.basics.storage;
 
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.database.AsyncRecord;
+import de.cubeisland.engine.module.service.user.User;
 
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 

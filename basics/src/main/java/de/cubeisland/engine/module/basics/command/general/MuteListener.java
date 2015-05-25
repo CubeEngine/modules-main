@@ -19,56 +19,55 @@ package de.cubeisland.engine.module.basics.command.general;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
+import de.cubeisland.engine.module.service.user.UserManager;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.player.PlayerChatEvent;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 
-public class MuteListener implements Listener
+public class MuteListener
 {
     private final Basics basics;
     private final IgnoreCommands ignore;
+    private UserManager um;
 
-    public MuteListener(Basics basics, IgnoreCommands ignore)
+    public MuteListener(Basics basics, IgnoreCommands ignore, UserManager um)
     {
         this.basics = basics;
         this.ignore = ignore;
+        this.um = um;
     }
 
-    @EventHandler
-    public void onChat(AsyncPlayerChatEvent event)
+    @Subscribe
+    public void onChat(PlayerChatEvent event)
     {
-        if (!event.getMessage().startsWith("/"))
+        // muted?
+        User sender = um.getExactUser(event.getUser().getUniqueId());
+        if (sender != null)
         {
-            // muted?
-            User sender = this.basics.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
-            if (sender != null)
+            BasicsUserEntity bUser = basics.getBasicsUser(event.getUser()).getEntity();
+            Timestamp muted = bUser.getValue(TABLE_BASIC_USER.MUTED);
+            if (muted != null && System.currentTimeMillis() < muted.getTime())
             {
-                BasicsUserEntity bUser = basics.getBasicsUser(sender).getEntity();
-                Timestamp muted = bUser.getValue(TABLE_BASIC_USER.MUTED);
-                if (muted != null && System.currentTimeMillis() < muted.getTime())
-                {
-                    event.setCancelled(true);
-                    sender.sendTranslated(NEGATIVE, "You try to speak but nothing happens!");
-                }
+                event.setCancelled(true);
+                sender.sendTranslated(NEGATIVE, "You try to speak but nothing happens!");
             }
-            // ignored?
-            ArrayList<Player> ignore = new ArrayList<>();
-            for (Player player : event.getRecipients())
-            {
-                User user = this.basics.getCore().getUserManager().getExactUser(player.getUniqueId());
-                if (this.ignore.checkIgnored(user, sender))
-                {
-                    ignore.add(player);
-                }
-            }
-            event.getRecipients().removeAll(ignore);
         }
+        // ignored?
+        ArrayList<Player> ignore = new ArrayList<>();
+        for (Player player : event.getRecipients())
+        {
+            User user = um.getExactUser(player.getUniqueId());
+            if (this.ignore.checkIgnored(user, sender))
+            {
+                ignore.add(player);
+            }
+        }
+        event.getRecipients().removeAll(ignore);
     }
 }

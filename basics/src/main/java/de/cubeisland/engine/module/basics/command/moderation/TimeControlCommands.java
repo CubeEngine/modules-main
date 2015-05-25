@@ -18,39 +18,49 @@
 package de.cubeisland.engine.module.basics.command.moderation;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.task.TaskManager;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.task.TaskManager;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 /**
  * Commands changing time. /time /ptime
  */
 public class TimeControlCommands
 {
-
     private final Basics module;
     private final TaskManager taskmgr;
+    private WorldManager wm;
     private final LockTask lockTask;
 
-    public TimeControlCommands(Basics module)
+    public TimeControlCommands(Basics module, TaskManager taskmgr, WorldManager wm)
     {
         this.module = module;
-        this.taskmgr = module.getCore().getTaskManager();
+        this.taskmgr = taskmgr;
+        this.wm = wm;
         this.lockTask = new LockTask();
     }
 
@@ -59,16 +69,16 @@ public class TimeControlCommands
                      @Named({ "w", "worlds", "in"}) String worlds, // TODO worldlist reader // TODO NParams static label reader
                      @Flag boolean lock)
     {
-        List<World> worldList;
+        Collection<World> worldList;
         if (worlds != null)
         {
             if ("*".equals(worlds))
             {
-                worldList = Bukkit.getWorlds();
+                worldList = wm.getWorlds();
             }
             else
             {
-                worldList = Match.worlds().matchWorlds(worlds);
+                worldList = worldMatcher.matchWorlds(worlds);
                 for (World world : worldList)
                 {
                     if (world == null)
@@ -86,11 +96,11 @@ public class TimeControlCommands
                 context.sendTranslated(NEGATIVE, "You have to specify a world when using this command from the console!");
                 return;
             }
-            worldList = Arrays.asList(((User)context).getWorld());
+            worldList = Collections.singletonList(((User)context).getWorld());
         }
         if (time != null)
         {
-            final Long lTime = Match.time().matchTimeValue(time);
+            final Long lTime = timeMatcher.matchTimeValue(time);
             if (lTime == null)
             {
                 context.sendTranslated(NEGATIVE, "The time you entered is not valid!");
@@ -98,15 +108,17 @@ public class TimeControlCommands
             }
             if (worldList.size() == 1)
             {
-                context.sendTranslated(POSITIVE, "The time of {world} have been set to {input#time} ({input#neartime})!", worldList.get(0), Match.time().format(lTime), Match.time().getNearTimeName(lTime));
+                context.sendTranslated(POSITIVE, "The time of {world} have been set to {input#time} ({input#neartime})!", worldList.get(0), timeMatcher.format(
+                    lTime), timeMatcher.getNearTimeName(lTime));
             }
             else if ("*".equals(worlds))
             {
-                context.sendTranslated(POSITIVE, "The time of all worlds have been set to {input#time} ({input#neartime})!", Match.time().format(lTime), Match.time().getNearTimeName(lTime));
-            }
+                context.sendTranslated(POSITIVE, "The time of all worlds have been set to {input#time} ({input#neartime})!", timeMatcher.format(lTime), timeMatcher.getNearTimeName(
+                    lTime));            }
             else
             {
-                context.sendTranslated(POSITIVE, "The time of {amount} worlds have been set to {input#time} ({input#neartime})!", worldList.size(), Match.time().format(lTime), Match.time().getNearTimeName(lTime));
+                context.sendTranslated(POSITIVE, "The time of {amount} worlds have been set to {input#time} ({input#neartime})!", worldList.size(), timeMatcher.format(
+                    lTime), timeMatcher.getNearTimeName(lTime));
             }
             for (World world : worldList)
             {
@@ -147,7 +159,8 @@ public class TimeControlCommands
         context.sendTranslated(POSITIVE, "The current time is:");
         for (World world : worldList)
         {
-            context.sendTranslated(NEUTRAL, "{input#time} ({input#neartime}) in {world}.", Match.time().format(world.getTime()), Match.time().getNearTimeName(world.getTime()), world);
+            context.sendTranslated(NEUTRAL, "{input#time} ({input#neartime}) in {world}.", timeMatcher.format(
+                world.getTime()), timeMatcher.getNearTimeName(world.getTime()), world);
         }
     }
 
@@ -162,7 +175,7 @@ public class TimeControlCommands
         }
         else
         {
-            lTime = Match.time().matchTimeValue(time);
+            lTime = timeMatcher.matchTimeValue(time);
             if (lTime == null)
             {
                 context.sendTranslated(NEGATIVE, "Invalid time format!");
@@ -185,8 +198,8 @@ public class TimeControlCommands
             }
             return;
         }
-        String format = Match.time().format(lTime);
-        String nearTime = Match.time().getNearTimeName(lTime);
+        String format = timeMatcher.format(lTime);
+        String nearTime = timeMatcher.getNearTimeName(lTime);
         if (lock)
         {
             player.resetPlayerTime();
@@ -214,24 +227,24 @@ public class TimeControlCommands
     {
 
         private final Map<String, Long> worlds = new HashMap<>();
-        private int taskid = -1;
+        private UUID taskid = null;
 
         public void add(World world)
         {
             this.worlds.put(world.getName(), world.getTime());
-            if (this.taskid == -1)
+            if (this.taskid == null)
             {
-                this.taskid = taskmgr.runTimer(module, this, 10, 10);
+                this.taskid = taskmgr.runTimer(module, this, 10, 10).get();
             }
         }
 
         public void remove(World world)
         {
             this.worlds.remove(world.getName());
-            if (this.taskid != -1 && this.worlds.isEmpty())
+            if (this.taskid != null && this.worlds.isEmpty())
             {
                 taskmgr.cancelTask(module, this.taskid);
-                this.taskid = -1;
+                this.taskid = null;
             }
         }
 
@@ -255,10 +268,10 @@ public class TimeControlCommands
                     iter.remove();
                 }
             }
-            if (this.taskid != -1 && this.worlds.isEmpty())
+            if (this.taskid != null && this.worlds.isEmpty())
             {
                 taskmgr.cancelTask(module, this.taskid);
-                this.taskid = -1;
+                this.taskid = null;
             }
         }
     }

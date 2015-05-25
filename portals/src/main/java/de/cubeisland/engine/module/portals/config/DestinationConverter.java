@@ -24,18 +24,18 @@ import de.cubeisland.engine.converter.converter.SingleClassConverter;
 import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
-import de.cubeisland.engine.core.Core;
-import de.cubeisland.engine.core.util.WorldLocation;
-import de.cubeisland.engine.core.world.ConfigWorld;
+import de.cubeisland.engine.module.core.util.WorldLocation;
+import de.cubeisland.engine.module.service.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.config.Destination.Type;
+import de.cubeisland.engine.module.service.world.WorldManager;
 
 public class DestinationConverter extends SingleClassConverter<Destination>
 {
-    private final Core core;
+    private WorldManager wm;
 
-    public DestinationConverter(Core core)
+    public DestinationConverter(WorldManager wm)
     {
-        this.core = core;
+        this.wm = wm;
     }
 
     @Override
@@ -86,10 +86,10 @@ public class DestinationConverter extends SingleClassConverter<Destination>
                         break;
                     case RANDOM:
                     case WORLD:
-                        destination.world = new ConfigWorld(core.getWorldManager(), mappedNodes.get("world").asText());
+                        destination.world = new ConfigWorld(wm, mappedNodes.get("world").asText());
                         break;
                     case LOCATION:
-                        destination.world = new ConfigWorld(core.getWorldManager(), mappedNodes.get("world").asText());
+                        destination.world = new ConfigWorld(wm, mappedNodes.get("world").asText());
                         destination.location = converterManager.convertFromNode(mappedNodes.get("location"),
                                                                                 WorldLocation.class);
                         break;

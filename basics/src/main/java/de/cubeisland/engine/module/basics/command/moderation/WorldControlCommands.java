@@ -18,6 +18,7 @@
 package de.cubeisland.engine.module.basics.command.moderation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
@@ -26,11 +27,13 @@ import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsConfiguration;
 import org.bukkit.Location;
@@ -42,11 +45,30 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
 
-import static de.cubeisland.engine.core.util.ChatFormat.GOLD;
-import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import de.cubeisland.engine.module.core.util.ChatFormat.GOLD;
+import de.cubeisland.engine.module.core.util.ChatFormat.YELLOW;
+import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.Item;
+import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.world.weather.Weather;
+import org.spongepowered.api.world.weather.Weathers;
+
+import static de.cubeisland.engine.module.core.util.ChatFormat.GOLD;
+import static de.cubeisland.engine.module.core.util.ChatFormat.YELLOW;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 import static org.bukkit.entity.EntityType.*;
+import static org.spongepowered.api.entity.EntityTypes.*;
+import static org.spongepowered.api.world.weather.Weathers.THUNDER_STORM;
 
 /**
  * Commands controlling / affecting worlds. /weather /remove /butcher
@@ -92,7 +114,8 @@ public class WorldControlCommands
                 break;
         }
 
-        if (world.isThundering() != noThunder && world.hasStorm() != sunny) // weather is not changing
+        WorldProperties worldProp = world.getProperties();
+        if (worldProp.isThundering() != noThunder && worldProp.isRaining() != sunny) // weather is not changing
         {
             context.sendTranslated(POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather.name());
         }
@@ -100,9 +123,9 @@ public class WorldControlCommands
         {
             context.sendTranslated(POSITIVE, "Changed weather in {world} to {input#weather}!", world, weather.name());
         }
-        world.setStorm(!sunny);
-        world.setThundering(!noThunder);
-        world.setWeatherDuration(duration);
+        worldProp.setRaining(!sunny);
+        worldProp.setThundering(!noThunder);
+        worldProp.setRainTime(duration);
     }
 
     public enum PlayerWeather
@@ -121,7 +144,7 @@ public class WorldControlCommands
         switch (weather)
         {
             case CLEAR:
-                player.setPlayerWeather(WeatherType.CLEAR);
+                player.setPlayerWeather(Weathers.CLEAR);
                 if (context.getSource().equals(player))
                 {
                     context.sendTranslated(POSITIVE, "Your weather is now clear!");
@@ -133,7 +156,7 @@ public class WorldControlCommands
                 }
                 return;
             case DOWNFALL:
-                player.setPlayerWeather(WeatherType.DOWNFALL);
+                player.setPlayerWeather(Weathers.RAIN);
                 if (context.getSource().equals(player))
                 {
                     context.sendTranslated(POSITIVE, "Your weather is now not clear!");
@@ -177,7 +200,7 @@ public class WorldControlCommands
             return;
         }
         Location loc = context instanceof User ? ((User)context).getLocation() : null;
-        if (loc != null && !loc.getWorld().equals(world))
+        if (loc != null && !loc.getExtent().equals(world))
         {
             loc = world.getSpawnLocation();
         }
@@ -187,7 +210,7 @@ public class WorldControlCommands
             List<Entity> list = new ArrayList<>();
             for (Entity e : world.getEntities())
             {
-                if (!(e instanceof LivingEntity))
+                if (!(e instanceof Living))
                 {
                     list.add(e);
                 }
@@ -196,30 +219,30 @@ public class WorldControlCommands
         }
         else
         {
-            List<Entity> list = world.getEntities(); // All entites remaining in that list will not get deleted!
+            Collection<Entity> list = world.getEntities(); // All entites remaining in that list will not get deleted!
             List<EntityType> types = new ArrayList<>();
             for (String entityString : StringUtils.explode(",", entities))
             {
                 EntityType type;
                 if (entityString.contains(":"))
                 {
-                    type = Match.entity().any(entityString.substring(0, entityString.indexOf(":")));
+                    type = entityMatcher.any(entityString.substring(0, entityString.indexOf(":")));
                 }
                 else
                 {
-                    type = Match.entity().any(entityString);
+                    type = entityMatcher.any(entityString);
                 }
                 if (type == null)
                 {
                     context.sendTranslated(NEGATIVE, "Invalid entity-type!");
                     context.sendTranslated(NEUTRAL, "Use one of those instead:");
                     context.sendMessage(DROPPED_ITEM.toString() + YELLOW + ", " +
-                                            GOLD + ARROW + YELLOW + ", " +
-                                            GOLD + BOAT + YELLOW + ", " +
-                                            GOLD + MINECART + YELLOW + ", " +
-                                            GOLD + PAINTING + YELLOW + ", " +
-                                            GOLD + ITEM_FRAME + YELLOW + " or " +
-                                            GOLD + EXPERIENCE_ORB);
+                                            GOLD + ARROW.getName() + YELLOW + ", " +
+                                            GOLD + BOAT.getName() + YELLOW + ", " +
+                                            GOLD + RIDEABLE_MINECART.getName() + YELLOW + ", " +
+                                            GOLD + PAINTING.getName() + YELLOW + ", " +
+                                            GOLD + ITEM_FRAME.getName() + YELLOW + " or " +
+                                            GOLD + EXPERIENCE_ORB.getName());
                     return;
                 }
                 if (type.isAlive())
@@ -234,11 +257,11 @@ public class WorldControlCommands
                         context.sendTranslated(NEGATIVE, "You can only specify data for removing items!");
                         return;
                     }
-                    Material itemtype = Match.material().material(entityString.substring(entityString.indexOf(":") + 1));
+                    ItemType itemtype = materialMatcher.material(entityString.substring(entityString.indexOf(":") + 1));
                     List<Entity> removeList = new ArrayList<>();
                     for (Entity entity : list)
                     {
-                        if (entity.getType().equals(DROPPED_ITEM) && ((Item)entity).getItemStack().getType().equals(itemtype))
+                        if (entity.getType().equals(DROPPED_ITEM) && ((Item)entity).getItemData().getValue().getItem().equals(itemtype))
                         {
                             removeList.add(entity);
                         }
@@ -250,7 +273,7 @@ public class WorldControlCommands
                     types.add(type);
                 }
             }
-            List<Entity> remList = new ArrayList<>();
+            Collection<Entity> remList = new ArrayList<>();
             for (Entity e : list)
             {
                 if (types.contains(e.getType()))
@@ -311,7 +334,7 @@ public class WorldControlCommands
         if (sender == null)
         {
             radius = -1;
-            loc = this.config.mainWorld.getSpawnLocation();
+            loc = this.config.mainWorld.getWorld().getSpawnLocation();
         }
         else
         {
@@ -322,14 +345,14 @@ public class WorldControlCommands
             radius = -1;
         }
         lightning = lightning && module.perms().COMMAND_BUTCHER_FLAG_LIGHTNING.isAuthorized(context);
-        List<Entity> list;
+        Collection<Entity> list;
         if (context instanceof User && !(radius == -1))
         {
-            list = ((User)context).getNearbyEntities(radius, radius, radius);
+            list = ((User)context).getNearbyEntities(radius);
         }
         else
         {
-            list = loc.getWorld().getEntities();
+            list = loc.getExtent().getEntities();
         }
         String[] s_types = { "monster" };
         boolean allTypes = false;
@@ -354,11 +377,11 @@ public class WorldControlCommands
         {
             for (String s_type : s_types)
             {
-                String match = Match.string().matchString(s_type, this.entityRemovals.GROUPED_ENTITY_REMOVAL.keySet());
+                String match = stringMatcher.matchString(s_type, this.entityRemovals.GROUPED_ENTITY_REMOVAL.keySet());
                 EntityType directEntityMatch = null;
                 if (match == null)
                 {
-                    directEntityMatch = Match.entity().living(s_type);
+                    directEntityMatch = entityMatcher.mob(s_type);
                     if (directEntityMatch == null)
                     {
                         context.sendTranslated(NEGATIVE, "Unknown entity {input#entity}", s_type);
@@ -408,7 +431,7 @@ public class WorldControlCommands
 
     }
 
-    private int removeEntities(List<Entity> remList, Location loc, int radius, boolean lightning)
+    private int removeEntities(Collection<Entity> remList, Location loc, int radius, boolean lightning)
     {
         int removed = 0;
 
@@ -418,18 +441,17 @@ public class WorldControlCommands
         }
         boolean all = radius == -1;
         int radiusSquared = radius * radius;
-        final Location entityLocation = new Location(null, 0, 0, 0);
         for (Entity entity : remList)
         {
             if (entity instanceof Player)
             {
                 continue;
             }
-            entity.getLocation(entityLocation);
+            Location eLoc = entity.getLocation();
             if (!all)
             {
 
-                int distance = (int)(entityLocation.subtract(loc)).lengthSquared();
+                int distance = (int)(eLoc.subtract(loc)).lengthSquared();
                 if (radiusSquared < distance)
                 {
                     continue;
@@ -437,7 +459,7 @@ public class WorldControlCommands
             }
             if (lightning)
             {
-                entityLocation.getWorld().strikeLightningEffect(entityLocation);
+                ((World)eLoc.getExtent()).strikeLightningEffect(eLoc);
             }
             entity.remove();
             removed++;

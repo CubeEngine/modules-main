@@ -17,12 +17,13 @@
  */
 package de.cubeisland.engine.module.locker.storage;
 
-import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
-import de.cubeisland.engine.core.util.Version;
+import de.cubeisland.engine.module.core.util.Version;
+import de.cubeisland.engine.module.service.database.AutoIncrementTable;
+import de.cubeisland.engine.module.service.database.Database;
 import org.jooq.TableField;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
+import static de.cubeisland.engine.module.service.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static org.jooq.impl.SQLDataType.SMALLINT;
 
@@ -36,9 +37,9 @@ public class TableAccessList extends AutoIncrementTable<AccessListModel, UIntege
     public final TableField<AccessListModel, Short> LEVEL = createField("level", SMALLINT.nullable(false),this);
     public final TableField<AccessListModel, UInteger> OWNER_ID = createField("owner_id", U_INTEGER, this);
 
-    public TableAccessList(String prefix)
+    public TableAccessList(String prefix, Database db)
     {
-        super(prefix + "lockaccesslist", new Version(1));
+        super(prefix + "lockaccesslist", new Version(1), db);
         this.setAIKey(ID);
         this.addUniqueKey(USER_ID, LOCK_ID);
         this.addUniqueKey(USER_ID, OWNER_ID);

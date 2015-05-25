@@ -27,7 +27,8 @@ import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.node.StringNode;
-import de.cubeisland.engine.core.command.CommandContext;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.PriorityConverter;
@@ -36,17 +37,18 @@ import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RoleProvider;
 import de.cubeisland.engine.module.roles.role.WorldRoleProvider;
-import org.bukkit.World;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 @Alias("manrole")
 @Command(name = "role", desc = "Manage roles")
 public class RoleManagementCommands extends RoleCommandHelper
 {
-    public RoleManagementCommands(Roles module)
+    public RoleManagementCommands(Roles module, WorldManager wm)
     {
-        super(module);
+        super(module, wm);
     }
 
     @Alias("setrperm")

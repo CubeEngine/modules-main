@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.basics.command.moderation;
 
-import de.cubeisland.engine.core.permission.Permission;
-import org.bukkit.entity.Entity;
-import org.bukkit.permissions.Permissible;
+import de.cubeisland.engine.module.service.permission.Permission;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.service.permission.Subject;
 
 public class EntityRemoval
 {
@@ -48,7 +48,7 @@ public class EntityRemoval
         return false;
     }
 
-    public boolean isAllowed(Permissible permissible)
+    public boolean isAllowed(Subject permissible)
     {
         return this.perm.isAuthorized(permissible);
     }

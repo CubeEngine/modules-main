@@ -24,9 +24,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.matcher.Match;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -34,7 +35,15 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Skeleton;
 import org.bukkit.inventory.ItemStack;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
+import de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.monster.Skeleton;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.world.Location;
+
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 
 public class SpawnMob
 {
@@ -88,14 +97,14 @@ public class SpawnMob
         for (int i = 0; i < amount; ++i)
         {
             //CreatureSpawnEvent
-            spawnedMobs[i] = loc.getWorld().spawnEntity(loc, entityType);
+            spawnedMobs[i] = loc.getExtent().spawnEntity(loc, entityType);
             if (ridingOn != null)
             {
                 ridingOn[i].setPassenger(spawnedMobs[i]);
             }
             if (spawnedMobs[i] instanceof Skeleton)
             {
-                ((Skeleton)spawnedMobs[i]).getEquipment().setItemInHand(new ItemStack(Material.BOW));
+                ((Skeleton)spawnedMobs[i]).getEquipment().setItemInHand(new ItemStack(ItemTypes.BOW));
             }
         }
         applyDataToMob(entityData, spawnedMobs);

@@ -19,17 +19,17 @@ package de.cubeisland.engine.module.basics;
 
 import java.util.ArrayList;
 import java.util.List;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.storage.database.Database;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
 import de.cubeisland.engine.module.basics.storage.Mail;
 import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
+import static de.cubeisland.engine.module.service.user.TableUser.TABLE_USER;
 
 public class BasicsUser
 {

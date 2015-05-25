@@ -27,31 +27,34 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserList;
-import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserList;
+import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.UserAccount;
 import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
+import de.cubeisland.engine.module.service.user.UserManager;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 
 @Command(name = "money", desc = "Manage your money")
 public class MoneyCommand extends ContainerCommand
 {
     private final Conomy module;
+    private UserManager um;
     private final ConomyManager manager;
 
-    public MoneyCommand(Conomy module)
+    public MoneyCommand(Conomy module, UserManager um)
     {
         super(module);
         this.module = module;
+        this.um = um;
         this.manager = module.getManager();
     }
 
@@ -133,8 +136,7 @@ public class MoneyCommand extends ContainerCommand
         for (AccountModel account : models)
         {
             context.sendMessage("" + i++ + ChatFormat.WHITE + "- " + ChatFormat.DARK_GREEN +
-                                    this.module.getCore().getUserManager().getUser(account.getValue(
-                                        TABLE_ACCOUNT.USER_ID)).getName() +
+                                    um.getUser(account.getValue(TABLE_ACCOUNT.USER_ID)).getName() +
                                     ChatFormat.WHITE + ": " + ChatFormat.GOLD + (manager.format(
                 (double)account.getValue(TABLE_ACCOUNT.VALUE) / manager.fractionalDigitsFactor())));
         }
@@ -185,7 +187,7 @@ public class MoneyCommand extends ContainerCommand
         List<User> list = new ArrayList<>();
         if (users.isAll())
         {
-            list.addAll(module.getCore().getUserManager().getOnlineUsers());
+            list.addAll(um.getOnlineUsers());
         }
         else
         {

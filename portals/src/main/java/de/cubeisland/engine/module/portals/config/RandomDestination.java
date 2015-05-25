@@ -18,27 +18,30 @@
 package de.cubeisland.engine.module.portals.config;
 
 import java.util.Random;
-import de.cubeisland.engine.core.CubeEngine;
-import de.cubeisland.engine.core.bukkit.BukkitUtils;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.Pair;
-import de.cubeisland.engine.core.world.ConfigWorld;
+import de.cubeisland.engine.module.core.CubeEngine;
+import de.cubeisland.engine.module.core.sponge.BukkitUtils;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.Pair;
+import de.cubeisland.engine.module.service.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.PortalManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.World;
 
 public class RandomDestination extends Destination
 {
     private final Random random = new Random();
 
-    public RandomDestination(World world)
+    public RandomDestination(WorldManager wm, World world)
     {
         this.type = Type.RANDOM;
-        this.world = new ConfigWorld(CubeEngine.getCore().getWorldManager(), world);
+        this.world = new ConfigWorld(wm, world);
     }
 
     protected RandomDestination()

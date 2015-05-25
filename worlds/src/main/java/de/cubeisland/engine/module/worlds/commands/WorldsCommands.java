@@ -30,31 +30,27 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.Pair;
-import de.cubeisland.engine.core.util.WorldLocation;
-import de.cubeisland.engine.core.util.math.BlockVector3;
-import de.cubeisland.engine.core.world.ConfigWorld;
-import de.cubeisland.engine.core.world.WorldManager;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.Pair;
+import de.cubeisland.engine.module.core.util.WorldLocation;
+
+import de.cubeisland.engine.module.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.service.world.ConfigWorld;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.worlds.Multiverse;
 import de.cubeisland.engine.module.worlds.Universe;
 import de.cubeisland.engine.module.worlds.Worlds;
 import de.cubeisland.engine.module.worlds.config.WorldConfig;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.World.Environment;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
-import org.bukkit.entity.Player;
+import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
-import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
+import static de.cubeisland.engine.module.core.filesystem.FileExtensionFilter.YAML;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 @Command(name = "worlds", desc = "Worlds commands")
 public class WorldsCommands extends ContainerCommand
@@ -63,12 +59,12 @@ public class WorldsCommands extends ContainerCommand
     private final Multiverse multiverse;
     private final WorldManager wm;
 
-    public WorldsCommands(Worlds module, Multiverse multiverse)
+    public WorldsCommands(Worlds module, Multiverse multiverse, WorldManager wm)
     {
         super(module);
         this.module = module;
         this.multiverse = multiverse;
-        this.wm = module.getCore().getWorldManager();
+        this.wm = wm;
     }
 
     @Command(desc = "Creates a new universe")
@@ -80,23 +76,23 @@ public class WorldsCommands extends ContainerCommand
 
     @Command(desc = "Creates a new world")
     public void create(CommandSender context, String name, @Optional String universeName,
-                       @Named({"environment","env"}) Environment environment,
+                       @Named({"environment","env"}) DimensionType environment,
                        @Named("seed") String seed,
-                       @Named({"worldtype","type"}) WorldType type,
+                       @Named({"worldtype","type"}) GeneratorType type,
                        @Named({"structure","struct"}) Boolean generateStructures,
                        @Named({"generator", "gen"}) String generator,
                        @Flag boolean recreate,
                        @Flag boolean noload)
     {
-        World world = this.wm.getWorld(name);
-        if (world != null)
+        com.google.common.base.Optional<World> world = this.wm.getWorld(name);
+        if (world.isPresent())
         {
             if (recreate)
             {
                 context.sendTranslated(NEGATIVE, "You have to unload a world before recreating it!");
                 return;
             }
-            context.sendTranslated(NEGATIVE, "A world named {world} already exists and is loaded!", world);
+            context.sendTranslated(NEGATIVE, "A world named {world} already exists and is loaded!", world.get());
             return;
         }
         Path path = Bukkit.getServer().getWorldContainer().toPath().resolve(name);
@@ -262,7 +258,7 @@ public class WorldsCommands extends ContainerCommand
             }
             context.sendTranslated(POSITIVE, "Teleported all players out of {world}", world);
         }
-        if (this.wm.unloadWorld(world, true))
+        if (this.wm.unloadWorld(world))
         {
             context.sendTranslated(POSITIVE, "Unloaded the world {world}!", world);
             return;
@@ -467,7 +463,7 @@ public class WorldsCommands extends ContainerCommand
     public void spawn(User context, World world)
     {
         WorldConfig worldConfig = this.multiverse.getUniverseFrom(world).getWorldConfig(world);
-        if (context.safeTeleport(worldConfig.spawn.spawnLocation.getLocationIn(world), COMMAND, false))
+        if (context.safeTeleport(worldConfig.spawn.spawnLocation.getLocationIn(world), COMMAND, false)) // TODO rotation
         {
             context.sendTranslated(POSITIVE, "You are now at the spawn of {world}!", world);
             return;
@@ -485,7 +481,7 @@ public class WorldsCommands extends ContainerCommand
             {
                 World world = u.getMainWorld();
                 WorldConfig worldConfig = u.getWorldConfig(world);
-                if (context.safeTeleport(worldConfig.spawn.spawnLocation.getLocationIn(world), COMMAND, false))
+                if (context.safeTeleport(worldConfig.spawn.spawnLocation.getLocationIn(world), COMMAND, false)) // TODO rotation
                 {
                     context.sendTranslated(POSITIVE, "You are now at the spawn of {world} (main world of the universe {name})", world, universe);
                     return;

@@ -22,20 +22,21 @@ import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Desc;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.module.service.Selector;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.WorldLocation;
-import de.cubeisland.engine.core.util.math.BlockVector3;
-import de.cubeisland.engine.core.util.math.shape.Cuboid;
+import de.cubeisland.engine.module.core.util.WorldLocation;
+import de.cubeisland.engine.module.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.core.util.math.shape.Cuboid;
 import de.cubeisland.engine.module.portals.config.Destination;
 import de.cubeisland.engine.module.portals.config.RandomDestination;
-import org.bukkit.Location;
-import org.bukkit.World;
+import de.cubeisland.engine.module.service.Selector;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 @Alias("mvpm")
 @Command(name = "modify", desc = "modifies a portal")
@@ -43,12 +44,16 @@ public class PortalModifyCommand extends ContainerCommand
 {
     private Portals module;
     private final PortalManager manager;
+    private Selector selector;
+    private WorldManager wm;
 
-    public PortalModifyCommand(Portals module, PortalManager manager)
+    public PortalModifyCommand(Portals module, PortalManager manager, Selector selector, WorldManager wm)
     {
         super(module);
         this.module = module;
         this.manager = manager;
+        this.selector = selector;
+        this.wm = wm;
     }
 
     @Command(desc = "Changes the owner of a portal")
@@ -74,7 +79,7 @@ public class PortalModifyCommand extends ContainerCommand
     @Command(alias = "randdest", desc = "Changes the destination of the selected portal to a random position each time")
     public void randomDestination(CommandContext context, World world, @Default Portal portal)
     {
-        this.destination(context, new RandomDestination(world), portal);
+        this.destination(context, new RandomDestination(wm, world), portal);
     }
 
     @Command(desc = "Changes a portals location")
@@ -82,7 +87,6 @@ public class PortalModifyCommand extends ContainerCommand
     public void location(CommandContext context, @Default Portal portal)
     {
         User sender = (User)context.getSource();
-        Selector selector = this.module.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
         if (!(selector.getSelection(sender) instanceof Cuboid))
         {
             context.sendTranslated(NEGATIVE, "Please select a cuboid first!");
@@ -102,13 +106,13 @@ public class PortalModifyCommand extends ContainerCommand
     {
         User sender = (User)context.getSource();
         Location location = sender.getLocation();
-        if (portal.config.world.getWorld() != location.getWorld())
+        if (portal.config.world.getWorld() != location.getExtent())
         {
             // TODO range check? range in config
             context.sendTranslated(NEGATIVE, "A portals exit cannot be in an other world than its location!");
             return;
         }
-        portal.config.location.destination = new WorldLocation(location);
+        portal.config.location.destination = new WorldLocation(location, sender.getRotation());
         portal.config.save();
         context.sendTranslated(POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
     }

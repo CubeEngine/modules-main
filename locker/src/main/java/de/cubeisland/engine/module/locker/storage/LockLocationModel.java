@@ -17,10 +17,9 @@
  */
 package de.cubeisland.engine.module.locker.storage;
 
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
-import org.bukkit.Location;
+import de.cubeisland.engine.module.service.database.AsyncRecord;
+import org.spongepowered.api.world.Location;
 
-import static de.cubeisland.engine.core.CubeEngine.getCore;
 import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 

@@ -17,13 +17,13 @@
  */
 package de.cubeisland.engine.module.basics;
 
-import java.util.concurrent.TimeUnit;
-import de.cubeisland.engine.core.permission.Permission;
-import de.cubeisland.engine.core.permission.PermissionContainer;
-import de.cubeisland.engine.core.util.Profiler;
 import de.cubeisland.engine.module.basics.command.teleport.TpWorldPermissions;
+import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.service.permission.PermissionContainer;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 
-import static de.cubeisland.engine.core.permission.PermDefault.FALSE;
+import static de.cubeisland.engine.module.service.permission.PermDefault.FALSE;
 
 @SuppressWarnings("all")
 public class BasicsPerm extends PermissionContainer<Basics>
@@ -35,19 +35,11 @@ public class BasicsPerm extends PermissionContainer<Basics>
 
     private final TpWorldPermissions tpWorld;
 
-    public BasicsPerm(Basics module)
+    public BasicsPerm(Basics module, WorldManager wm, PermissionManager pm)
     {
         super(module);
-        module.getLog().trace("{} ms - Basics.Permission-register", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
-        SIGN_COLORED.attach(SIGN_COLORED_BLACK, SIGN_COLORED_DARK_BLUE, SIGN_COLORED_DARK_GREEN,
-                            SIGN_COLORED_DARK_AQUA, SIGN_COLORED_DARK_RED, SIGN_COLORED_DARK_PURPLE,
-                            SIGN_COLORED_GOLD, SIGN_COLORED_GRAY, SIGN_COLORED_DARK_GRAY,
-                            SIGN_COLORED_BLUE, SIGN_COLORED_GREEN, SIGN_COLORED_AQUA,
-                            SIGN_COLORED_RED, SIGN_COLORED_LIGHT_PURPLE, SIGN_COLORED_YELLOW,
-                            SIGN_COLORED_WHITE, SIGN_COLORED_OBFUSCATED, SIGN_COLORED_BOLD,
-                            SIGN_COLORED_STRIKE, SIGN_COLORED_UNDERLINE, SIGN_COLORED_ITALIC, SIGN_COLORED_RESET);
         this.registerAllPermissions();
-        tpWorld = new TpWorldPermissions(module, this); // per world permissions
+        tpWorld = new TpWorldPermissions(module, this, wm, pm); // per world permissions
     }
 
     public final Permission COMMAND = getBasePerm().childWildcard("command");
@@ -276,7 +268,7 @@ public class BasicsPerm extends PermissionContainer<Basics>
     public final Permission COMMAND_STACK_FULLSTACK = COMMAND.childWildcard("stack").child("fullstack");
 
     public final Permission COMMAND_BAN_NOREASON = COMMAND.childWildcard("ban").child("noreason");
-    public final Permission COMMAND_IPBAN_NOREASON = COMMAND.childWildcard("ipban").child("noreason",FALSE);
+    public final Permission COMMAND_IPBAN_NOREASON = COMMAND.childWildcard("ipban").child("noreason", FALSE);
     public final Permission COMMAND_TEMPBAN_NOREASON = COMMAND.childWildcard("tempban").child("noreason",FALSE);
     
     /**
@@ -288,29 +280,7 @@ public class BasicsPerm extends PermissionContainer<Basics>
      * Allows writing colored signs
      */
     public final Permission SIGN_COLORED = getBasePerm().childWildcard("sign").child("colored");
-    public final Permission SIGN_COLORED_BLACK = SIGN_COLORED.newPerm("black");
-    public final Permission SIGN_COLORED_DARK_BLUE = SIGN_COLORED.newPerm("dark-blue");
-    public final Permission SIGN_COLORED_DARK_GREEN = SIGN_COLORED.newPerm("dark-green");
-    public final Permission SIGN_COLORED_DARK_AQUA = SIGN_COLORED.newPerm("dark-aqua");
-    public final Permission SIGN_COLORED_DARK_RED = SIGN_COLORED.newPerm("dark-red");
-    public final Permission SIGN_COLORED_DARK_PURPLE = SIGN_COLORED.newPerm("dark-purple");
-    public final Permission SIGN_COLORED_GOLD = SIGN_COLORED.newPerm("gold");
-    public final Permission SIGN_COLORED_GRAY = SIGN_COLORED.newPerm("gray");
-    public final Permission SIGN_COLORED_DARK_GRAY = SIGN_COLORED.newPerm("dark-gray");
-    public final Permission SIGN_COLORED_BLUE = SIGN_COLORED.newPerm("blue");
-    public final Permission SIGN_COLORED_GREEN = SIGN_COLORED.newPerm("green");
-    public final Permission SIGN_COLORED_AQUA = SIGN_COLORED.newPerm("aqua");
-    public final Permission SIGN_COLORED_RED = SIGN_COLORED.newPerm("red");
-    public final Permission SIGN_COLORED_LIGHT_PURPLE = SIGN_COLORED.newPerm("light-purple");
-    public final Permission SIGN_COLORED_YELLOW = SIGN_COLORED.newPerm("yellow");
-    public final Permission SIGN_COLORED_WHITE = SIGN_COLORED.newPerm("white");
-
-    public final Permission SIGN_COLORED_OBFUSCATED = SIGN_COLORED.newPerm("obfuscated");
-    public final Permission SIGN_COLORED_BOLD = SIGN_COLORED.newPerm("bold");
-    public final Permission SIGN_COLORED_STRIKE = SIGN_COLORED.newPerm("strike");
-    public final Permission SIGN_COLORED_UNDERLINE = SIGN_COLORED.newPerm("underline");
-    public final Permission SIGN_COLORED_ITALIC = SIGN_COLORED.newPerm("italic");
-    public final Permission SIGN_COLORED_RESET = SIGN_COLORED.newPerm("reset");
+    // TODO maybe permissions for obfuscated format?
 
     public final Permission CHANGEPAINTING = getBasePerm().child("changepainting");
     public final Permission KICK_RECEIVEMESSAGE = getBasePerm().childWildcard("kick").child("receivemessage");

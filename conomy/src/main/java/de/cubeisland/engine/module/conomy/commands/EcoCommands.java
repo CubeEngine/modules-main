@@ -21,27 +21,30 @@ import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserList;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import org.bukkit.OfflinePlayer;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserList;
+import de.cubeisland.engine.module.service.user.UserManager;
+import org.spongepowered.api.data.manipulator.entity.JoinData;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 @Command(name = "eco", desc = "Administrative commands for Conomy")
 public class EcoCommands extends ContainerCommand
 {
     private final Conomy module;
+    private UserManager um;
     private final ConomyManager manager;
 
-    public EcoCommands(Conomy module)
+    public EcoCommands(Conomy module, UserManager um)
     {
         super(module);
         this.module = module;
+        this.um = um;
         this.manager = module.getManager();
     }
 
@@ -291,7 +294,7 @@ public class EcoCommands extends ContainerCommand
     }
 
     @Command(desc = "Creates a new account")
-    public void create(CommandContext context, @Optional OfflinePlayer player, @Flag boolean force)
+    public void create(CommandContext context, @Optional org.spongepowered.api.entity.player.User player, @Flag boolean force)
     {
         if (player == null)
         {
@@ -315,7 +318,7 @@ public class EcoCommands extends ContainerCommand
             context.sendTranslated(NEGATIVE, "You are not allowed to create account for other users!");
             return;
         }
-        if (!player.hasPlayedBefore() && !player.isOnline())
+        if (!player.getData(JoinData.class).isPresent() && !player.isOnline())
         {
             context.sendTranslated(NEUTRAL, "{user} has never played on this server!", player);
             if (!force)
@@ -328,7 +331,7 @@ public class EcoCommands extends ContainerCommand
                 return;
             }
         }
-        User user = this.module.getCore().getUserManager().getExactUser(player.getName());
+        User user = um.getExactUser(player.getName());
         if (this.manager.getUserAccount(user, false) != null)
         {
             context.sendTranslated(POSITIVE, "{user} already has an account!", player);

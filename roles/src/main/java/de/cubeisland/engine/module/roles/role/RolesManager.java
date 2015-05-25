@@ -29,20 +29,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.Profiler;
-import de.cubeisland.engine.core.util.Triplet;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.Profiler;
+import de.cubeisland.engine.module.core.util.Triplet;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.RolesConfig;
 import de.cubeisland.engine.module.roles.config.MirrorConfig;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
 import org.jooq.DSLContext;
+import org.spongepowered.api.world.World;
 
 public class RolesManager
 {
     protected final Roles module;
+    private Log logger;
     private final Path rolesFolder;
     protected final DSLContext dsl;
 
@@ -54,10 +56,11 @@ public class RolesManager
     protected Map<World, World> assignedUserDataMirrors = new HashMap<>();
     protected Map<World, World> assignedRolesMirrors = new HashMap<>();
 
-    public RolesManager(Roles module)
+    public RolesManager(Roles module, Log logger, Database db)
     {
         this.module = module;
-        this.dsl = module.getCore().getDB().getDSL();
+        this.logger = logger;
+        this.dsl = db.getDSL();
         this.rolesFolder = module.getFolder().resolve("roles");
     }
 
@@ -82,7 +85,7 @@ public class RolesManager
         }
         catch (IOException ex)
         {
-            this.module.getLog().error(ex, "Failed to initialize the role providers!");
+            logger.error(ex, "Failed to initialize the role providers!");
         }
     }
 
@@ -111,25 +114,25 @@ public class RolesManager
     private void registerWorldRoleProvider(WorldRoleProvider provider)
     {
         Map<World, Triplet<Boolean, Boolean, Boolean>> worldMirrors = provider.getWorldMirrors();
-        this.module.getLog().debug("Loading role-provider for {}", provider.getMainWorld().getName());
+        logger.debug("Loading role-provider for {}", provider.getMainWorld().getName());
         for (World world : worldMirrors.keySet())
         {
             if (this.worldRoleProviders.containsKey(world))
             {
-                this.module.getLog().error("The world {} is mirrored multiple times! Check your configuration under mirrors.{}",
-                                           world.getName(), provider.getMainWorld().getName());
+                logger.error("The world {} is mirrored multiple times! Check your configuration under mirrors.{}",
+                             world.getName(), provider.getMainWorld().getName());
                 continue;
             }
-            this.module.getLog().debug("  {}:", world.getName());
+            logger.debug("  {}:", world.getName());
             if (worldMirrors.get(world).getFirst()) // Roles are mirrored add to provider...
             {
-                this.module.getLog().debug("   - roles are mirrored");
+                logger.debug("   - roles are mirrored");
                 this.worldRoleProviders.put(world, provider);
                 this.providerSet.add(provider);
             }
             if (worldMirrors.get(world).getSecond())
             {
-                this.module.getLog().debug("   - assigned roles are mirrored");
+                logger.debug("   - assigned roles are mirrored");
                 this.assignedRolesMirrors.put(world, provider.getMainWorld());
             }
             else
@@ -138,7 +141,7 @@ public class RolesManager
             }
             if (worldMirrors.get(world).getThird()) // specific user perm/metadata is mirrored
             {
-                this.module.getLog().debug("   - assigned user-data is mirrored");
+                logger.debug("   - assigned user-data is mirrored");
                 this.assignedUserDataMirrors.put(world, provider.getMainWorld());
             }
             else
@@ -150,7 +153,7 @@ public class RolesManager
 
     private void createMissingWorldRoleProviders()
     {
-        for (World world : this.module.getCore().getWorldManager().getWorlds())
+        for (World world : wm.getWorlds())
         {
             if (this.worldRoleProviders.get(world) == null)
             {
@@ -165,7 +168,7 @@ public class RolesManager
                 {
                     this.assignedUserDataMirrors.put(world, world);
                 }
-                this.module.getLog().debug("Loading role-provider without mirror: {}", world.getName());
+                logger.debug("Loading role-provider without mirror: {}", world.getName());
             }
         }
     }
@@ -176,7 +179,7 @@ public class RolesManager
         WorldRoleProvider worldRoleProvider = this.worldRoleProviders.get(world);
         if (worldRoleProvider == null)
         {
-            this.module.getLog().warn("No RoleProvider for {}! Reloading...", world.getName());
+            logger.warn("No RoleProvider for {}! Reloading...", world.getName());
             this.module.getConfiguration().reload();
             this.module.getRolesManager().initRoleProviders();
             this.module.getRolesManager().recalculateAllRoles();
@@ -207,12 +210,12 @@ public class RolesManager
 
     public void recalculateAllRoles()
     {
-        this.module.getLog().debug("Calculating all roles...");
+        logger.debug("Calculating all roles...");
         Profiler.startProfiling("calculateAllRoles");
         try
         {
             List<RolesAttachment> attachments = new ArrayList<>();
-            for (User user : this.module.getCore().getUserManager().getLoadedUsers())
+            for (User user : um.getLoadedUsers())
             {
                 RolesAttachment rolesAttachment = user.get(RolesAttachment.class);
                 if (rolesAttachment == null)
@@ -226,10 +229,7 @@ public class RolesManager
                 rolesAttachment.reload();
                 attachments.add(rolesAttachment);
             }
-            for (RoleProvider roleProvider : providerSet)
-            {
-                roleProvider.recalculateRoles();
-            }
+            providerSet.forEach(de.cubeisland.engine.module.roles.role.RoleProvider::recalculateRoles);
             for (RolesAttachment attachment : attachments)
             {
                 if (attachment.getHolder().isOnline())
@@ -240,11 +240,12 @@ public class RolesManager
         }
         finally
         {
-            this.module.getLog().debug("All roles are now calculated! ({} ms)", Profiler.endProfiling("calculateAllRoles", TimeUnit.MILLISECONDS));
+            logger.debug("All roles are now calculated! ({} ms)", Profiler.endProfiling("calculateAllRoles",
+                                                                                        TimeUnit.MILLISECONDS));
         }
     }
 
-    public RolesAttachment getRolesAttachment(OfflinePlayer player)
+    public RolesAttachment getRolesAttachment(User player)
     {
         User user;
         if (player instanceof User)
@@ -253,7 +254,7 @@ public class RolesManager
         }
         else
         {
-            user = this.module.getCore().getUserManager().getExactUser(player.getUniqueId());
+            user = um.getExactUser(player.getUniqueId());
         }
         return user.attachOrGet(RolesAttachment.class, this.module);
     }
@@ -292,7 +293,7 @@ public class RolesManager
                 this.worldRoleProviders.remove(m);
             }
         }
-        MirrorConfig roleMirror = new MirrorConfig(module, world);
+        MirrorConfig roleMirror = new MirrorConfig(module, wm, world);
         for (World mWorld : worlds)
         {
             // Remove all providers of related worlds

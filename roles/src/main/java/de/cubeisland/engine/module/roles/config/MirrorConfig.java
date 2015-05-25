@@ -20,27 +20,30 @@ package de.cubeisland.engine.module.roles.config;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import de.cubeisland.engine.core.util.Triplet;
-import de.cubeisland.engine.core.world.ConfigWorld;
-import de.cubeisland.engine.module.roles.Roles;
-import org.bukkit.World;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.module.core.util.Triplet;
+import de.cubeisland.engine.module.service.world.ConfigWorld;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.world.World;
 
 public class MirrorConfig
 {
     public final ConfigWorld mainWorld;
-    private final Roles module;
+    private Log logger;
     //mirror roles / assigned / users
     protected final Map<ConfigWorld, Triplet<Boolean, Boolean, Boolean>> mirrors = new HashMap<>();
+    private WorldManager wm;
 
-    public MirrorConfig(Roles module, World world)
+    public MirrorConfig(WorldManager wm, World world, Log logger)
     {
-        this(module, new ConfigWorld(module.getCore().getWorldManager(), world));
+        this(wm, new ConfigWorld(wm, world), logger);
     }
 
-    protected MirrorConfig(Roles module, ConfigWorld mainWorld)
+    protected MirrorConfig(WorldManager wm, ConfigWorld mainWorld, Log logger)
     {
-        this.module = module;
+        this.wm = wm;
         this.mainWorld = mainWorld;
+        this.logger = logger;
         this.mirrors.put(mainWorld, new Triplet<>(true, true, true));
     }
 
@@ -58,7 +61,8 @@ public class MirrorConfig
             World world = entry.getKey().getWorld();
             if (world == null)
             {
-                module.getLog().warn("Configured world for mirror of {} does not exist! {}", mainWorld.getName(), entry.getKey().getName());
+                logger.warn("Configured world for mirror of {} does not exist! {}", mainWorld.getName(),
+                            entry.getKey().getName());
                 continue;
             }
             result.put(world, entry.getValue());
@@ -68,7 +72,7 @@ public class MirrorConfig
 
     public void setWorld(World world, boolean roles, boolean assigned, boolean users)
     {
-        this.setWorld(new ConfigWorld(module.getCore().getWorldManager(), world), new Triplet<>(roles, assigned, users));
+        this.setWorld(new ConfigWorld(wm, world), new Triplet<>(roles, assigned, users));
     }
 
     protected void setWorld(ConfigWorld world, Triplet<Boolean, Boolean, Boolean> t)
@@ -80,7 +84,7 @@ public class MirrorConfig
     {
         if (this.mainWorld.getWorld() == null)
         {
-            module.getLog().warn("Configured main world for mirror does not exist! {}", this.mainWorld.getName());
+            logger.warn("Configured main world for mirror does not exist! {}", this.mainWorld.getName());
             return null;
         }
         return this.mainWorld.getWorld();

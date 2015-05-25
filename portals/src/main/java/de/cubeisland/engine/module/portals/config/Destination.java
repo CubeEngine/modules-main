@@ -18,24 +18,32 @@
 package de.cubeisland.engine.module.portals.config;
 
 import java.util.Random;
+import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
-import de.cubeisland.engine.core.CubeEngine;
-import de.cubeisland.engine.core.bukkit.BukkitUtils;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.WorldLocation;
-import de.cubeisland.engine.core.world.ConfigWorld;
+import de.cubeisland.engine.module.core.CubeEngine;
+import de.cubeisland.engine.module.core.sponge.BukkitUtils;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.WorldLocation;
+import de.cubeisland.engine.module.service.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.Portal;
 import de.cubeisland.engine.module.portals.PortalManager;
 import de.cubeisland.engine.module.portals.Portals;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.craftbukkit.v1_8_R2.entity.CraftEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
+import de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 
 public class Destination
 {
@@ -44,16 +52,16 @@ public class Destination
     public WorldLocation location;
     public String portal;
 
-    public Destination(Location location)
+    public Destination(WorldManager wm, Location location, Vector3d direction)
     {
-        this.location = new WorldLocation(location);
-        this.world = new ConfigWorld(CubeEngine.getCore().getWorldManager(), location.getWorld());
+        this.location = new WorldLocation(location, direction);
+        this.world = new ConfigWorld(wm, (World)location.getExtent());
         this.type = Type.LOCATION;
     }
 
-    public Destination(World world)
+    public Destination(WorldManager wm, World world)
     {
-        this.world = new ConfigWorld(CubeEngine.getCore().getWorldManager(), world);
+        this.world = new ConfigWorld(wm, world);
         this.type = Type.WORLD;
     }
 
@@ -89,7 +97,7 @@ public class Destination
             loc.setZ(loc.getBlockZ() + 0.5);
             break;
         case LOCATION:
-            loc = location.getLocationIn(world.getWorld());
+            loc = location.getLocationIn(world.getWorld()); // TODO rotation
             break;
         }
         if (entity.isInsideVehicle())

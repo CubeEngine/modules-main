@@ -24,25 +24,26 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Complete;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Named;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.roles.RoleCompleter;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 import de.cubeisland.engine.module.roles.role.UserDatabaseStore;
-import org.bukkit.World;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 @Alias("manuser")
 @Command(name = "user", desc = "Manage users")
 public class UserManagementCommands extends UserCommandHelper
 {
-    public UserManagementCommands(Roles module)
+    public UserManagementCommands(Roles module, WorldManager wm)
     {
-        super(module);
+        super(module, wm);
     }
 
     @Alias({"manuadd", "assignurole", "addurole", "giveurole"})

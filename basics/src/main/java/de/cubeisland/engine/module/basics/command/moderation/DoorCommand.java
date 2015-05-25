@@ -17,24 +17,23 @@
  */
 package de.cubeisland.engine.module.basics.command.moderation;
 
-import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.math.Vector3;
-import de.cubeisland.engine.core.util.math.shape.Sphere;
 import de.cubeisland.engine.module.basics.Basics;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.material.Openable;
+import de.cubeisland.engine.module.core.util.math.Vector3;
+import de.cubeisland.engine.module.core.util.math.shape.Sphere;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.manipulator.block.OpenData;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 
 public class DoorCommand
 {
@@ -57,7 +56,7 @@ public class DoorCommand
     {
         radius = radius == null ? 0 : radius;
         Vector3 vector;
-        Set<Material> openMaterials = EnumSet.noneOf(Material.class);
+        Set<BlockType> openMaterials = new HashSet<>();
 
         if(radius > this.basics.getConfiguration().commands.maxDoorRadius)
         {
@@ -73,7 +72,7 @@ public class DoorCommand
                 return;
             }
             Location location = ((User) context).getLocation();
-            world = location.getWorld();
+            world = (World)location.getExtent();
             vector = new Vector3(location.getX(), location.getY(), location.getZ());
         }
         else
@@ -83,25 +82,26 @@ public class DoorCommand
         
         if(fenceGate)
         {
-            openMaterials.add(Material.FENCE_GATE);
+            openMaterials.add(BlockTypes.FENCE_GATE);
         }
         if(trapDoor)
         {
-            openMaterials.add(Material.TRAP_DOOR);
+            openMaterials.add(BlockTypes.TRAPDOOR);
+            openMaterials.add(BlockTypes.IRON_TRAPDOOR);
         }
         if(ironDoor)
         {
-            openMaterials.add(Material.IRON_DOOR_BLOCK);
+            openMaterials.add(BlockTypes.IRON_DOOR);
         }
         if(woodenDoor || (openMaterials.isEmpty() && !all))
         {
-            openMaterials.add(Material.WOODEN_DOOR);
+            openMaterials.add(BlockTypes.WOODEN_DOOR); // TODO other wood doors
         }
 
         Sphere sphere = new Sphere(vector, radius);
         for(Vector3 point : sphere)
         {
-            Block block = world.getBlockAt((int) point.x, (int) point.y, (int) point.z);
+            Location block = new Location(world, point.x, point.y, point.z);
             if(all || openMaterials.contains(block.getType()))
             {
                 this.setOpen(block, state == DoorState.OPEN);
@@ -116,32 +116,22 @@ public class DoorCommand
      * @param open  - true to set open, false to set closed
      * @return returns whether the block could set or not
      */
-    public boolean setOpen(Block block, boolean open)
+    public boolean setOpen(Location block, boolean open)
     {
-        Material type = block.getType();
-        BlockState state = block.getState();
-
-        if(!(state.getData() instanceof Openable))
+        if (block.isCompatible(OpenData.class))
         {
             return false;
         }
 
-        byte rawData = state.getRawData();
-
-        if((type == Material.WOODEN_DOOR || type == Material.IRON_DOOR_BLOCK) && (rawData & 0x8) == 0x8)
+        boolean isOpen = block.getData(OpenData.class).isPresent();
+        if (!open && isOpen)
         {
-            return false;
+            block.remove(OpenData.class);
         }
-
-        if(open)
+        else if (open && !isOpen)
         {
-            state.setRawData((byte) (rawData | 0x4));   // open door
+            block.offer(block.getOrCreate(OpenData.class).get());
         }
-        else
-        {
-            state.setRawData((byte) (rawData & 0xB));    //close door
-        }
-        state.update();
         return true;
     }
 }

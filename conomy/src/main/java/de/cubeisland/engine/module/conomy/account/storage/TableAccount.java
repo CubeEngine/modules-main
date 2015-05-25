@@ -17,13 +17,14 @@
  */
 package de.cubeisland.engine.module.conomy.account.storage;
 
-import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
-import de.cubeisland.engine.core.util.Version;
+import de.cubeisland.engine.module.core.util.Version;
+import de.cubeisland.engine.module.service.database.AutoIncrementTable;
+import de.cubeisland.engine.module.service.database.Database;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
+import static de.cubeisland.engine.module.service.user.TableUser.TABLE_USER;
 
 public class TableAccount extends AutoIncrementTable<AccountModel, UInteger>
 {
@@ -34,9 +35,9 @@ public class TableAccount extends AutoIncrementTable<AccountModel, UInteger>
     public final TableField<AccountModel, Long> VALUE = createField("value", SQLDataType.BIGINT.nullable(false), this);
     public final TableField<AccountModel, Byte> MASK = createField("mask", SQLDataType.TINYINT, this);
 
-    public TableAccount(String prefix)
+    public TableAccount(String prefix, Database database)
     {
-        super(prefix + "accounts", new Version(1));
+        super(prefix + "accounts", new Version(1), database);
         this.setAIKey(KEY);
         this.addUniqueKey(USER_ID, NAME);
         this.addForeignKey(TABLE_USER.getPrimaryKey(), USER_ID);

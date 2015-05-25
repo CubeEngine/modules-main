@@ -27,7 +27,6 @@ import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.NullNode;
 import de.cubeisland.engine.converter.node.StringNode;
-import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.module.locker.storage.LockType;
 import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
 
@@ -103,7 +102,7 @@ public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> 
                         }
                         else
                         {
-                            CubeEngine.getCore().getLog().warn("[Locker] Unsupported flag for protectedType! {}: {}", configuration.protectedType.name(), flag.name());
+                            logger.warn("[Locker] Unsupported flag for protectedType! {}: {}", configuration.protectedType.name(), flag.name());
                         }
                     }
                 }

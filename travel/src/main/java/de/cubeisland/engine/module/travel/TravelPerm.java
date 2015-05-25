@@ -17,13 +17,12 @@
  */
 package de.cubeisland.engine.module.travel;
 
-import de.cubeisland.engine.core.command.property.PermissionProvider;
-import de.cubeisland.engine.core.permission.Permission;
-import de.cubeisland.engine.core.permission.PermissionContainer;
+import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.service.permission.PermissionContainer;
 import de.cubeisland.engine.module.travel.home.HomeCommand;
 import de.cubeisland.engine.module.travel.warp.WarpCommand;
 
-import static de.cubeisland.engine.core.permission.PermDefault.TRUE;
+import de.cubeisland.engine.module.service.permission.PermDefault.TRUE;
 
 public class TravelPerm extends PermissionContainer<Travel>
 {

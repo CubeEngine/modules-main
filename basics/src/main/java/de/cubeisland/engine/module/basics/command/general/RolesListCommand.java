@@ -25,20 +25,22 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.result.CommandResult;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
+import de.cubeisland.engine.module.service.user.UserManager;
+import org.spongepowered.api.Game;
 
 public class RolesListCommand extends ListCommand
 {
     private static final Comparator<Role> ROLE_COMPARATOR = new RoleComparator();
 
-    public RolesListCommand(Basics basics)
+    public RolesListCommand(Basics basics, UserManager um, Game game)
     {
-        super(basics);
+        super(basics, um, game);
     }
 
     @Override

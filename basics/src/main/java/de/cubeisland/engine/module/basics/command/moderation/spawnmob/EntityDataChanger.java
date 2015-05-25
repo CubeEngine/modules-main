@@ -24,39 +24,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import de.cubeisland.engine.core.CubeEngine;
-import de.cubeisland.engine.core.bukkit.BukkitUtils;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.matcher.Match;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
-import org.bukkit.entity.Ageable;
-import org.bukkit.entity.AnimalTamer;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.Enderman;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.Horse.Style;
-import org.bukkit.entity.Horse.Variant;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Ocelot;
-import org.bukkit.entity.Ocelot.Type;
-import org.bukkit.entity.Pig;
-import org.bukkit.entity.PigZombie;
-import org.bukkit.entity.Sheep;
-import org.bukkit.entity.Skeleton;
-import org.bukkit.entity.Skeleton.SkeletonType;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.Wolf;
-import org.bukkit.entity.Zombie;
-import org.bukkit.inventory.EntityEquipment;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Colorable;
+import de.cubeisland.engine.module.core.sponge.BukkitUtils;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.service.user.User;
 
-import static org.bukkit.entity.Villager.Profession;
+import org.spongepowered.api.data.type.DyeColor;
+import org.spongepowered.api.data.type.Profession;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.Ageable;
+import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.Villager;
+import org.spongepowered.api.entity.living.animal.*;
+import org.spongepowered.api.entity.living.monster.Creeper;
+import org.spongepowered.api.entity.living.monster.Enderman;
+import org.spongepowered.api.entity.living.monster.Skeleton;
+import org.spongepowered.api.entity.living.monster.Slime;
+import org.spongepowered.api.entity.living.monster.Zombie;
+import org.spongepowered.api.entity.living.monster.ZombiePigman;
+import org.spongepowered.api.item.inventory.ItemStack;
+
 
 public class EntityDataChanger<EntityInterface>
 {
@@ -125,11 +111,11 @@ public class EntityDataChanger<EntityInterface>
                         }
                     });
 
-    public static final EntityDataChanger<PigZombie> PIGZOMBIE_ANGRY =
-        new EntityDataChanger<>(PigZombie.class,
-                          new BoolEntityChanger<PigZombie>("angry") {
+    public static final EntityDataChanger<ZombiePigman> PIGZOMBIE_ANGRY =
+        new EntityDataChanger<>(ZombiePigman.class,
+                          new BoolEntityChanger<ZombiePigman>("angry") {
                               @Override
-                              public void applyEntity(PigZombie entity, Boolean input) {
+                              public void applyEntity(ZombiePigman entity, Boolean input) {
                                   entity.setAngry(input);
                               }
                           });
@@ -315,11 +301,11 @@ public class EntityDataChanger<EntityInterface>
                                                  }
                                              });
 
-    public static final EntityDataChanger<LivingEntity> HP =
-            new EntityDataChanger<>(LivingEntity.class,
-                    new EntityChanger<LivingEntity, Integer>() {
+    public static final EntityDataChanger<Living> HP =
+            new EntityDataChanger<>(Living.class,
+                    new EntityChanger<Living, Integer>() {
                         @Override
-                        public void applyEntity(LivingEntity entity, Integer input)
+                        public void applyEntity(Living entity, Integer input)
                         {
                             entity.setMaxHealth(input);
                             entity.setHealth(input);
@@ -372,11 +358,11 @@ public class EntityDataChanger<EntityInterface>
                                 });
 
     // TODO EntitySpeed using Bukkit-API #WaitForBukkit
-    public static final EntityDataChanger<LivingEntity> ENTITY_SPEED =
-        new EntityDataChanger<>(LivingEntity.class,
-                                new EntityChanger<LivingEntity, Double>() {
+    public static final EntityDataChanger<Living> ENTITY_SPEED =
+        new EntityDataChanger<>(Living.class,
+                                new EntityChanger<Living, Double>() {
                                     @Override
-                                    public void applyEntity(LivingEntity entity, Double input)
+                                    public void applyEntity(Living entity, Double input)
                                     {
                                         BukkitUtils.setEntitySpeed(entity, input);
                                     }
@@ -411,11 +397,11 @@ public class EntityDataChanger<EntityInterface>
                                             * 0.25D;
      */
 
-    public static final EntityDataChanger<LivingEntity> ENTITY_NAME =
-        new EntityDataChanger<>(LivingEntity.class,
-                                new EntityChanger<LivingEntity, String>() {
+    public static final EntityDataChanger<Living> ENTITY_NAME =
+        new EntityDataChanger<>(Living.class,
+                                new EntityChanger<Living, String>() {
                                     @Override
-                                    public void applyEntity(LivingEntity entity, String input)
+                                    public void applyEntity(Living entity, String input)
                                     {
                                         entity.setCustomName(ChatFormat.parseFormats(input));
                                     }
@@ -461,11 +447,11 @@ public class EntityDataChanger<EntityInterface>
                                     }
                                 });
 
-    public static final EntityDataChanger<LivingEntity> ARMOR_CHESTPLATE =
-        new EntityDataChanger<>(LivingEntity.class,
-                                new EntityChanger<LivingEntity, ItemStack>() {
+    public static final EntityDataChanger<Living> ARMOR_CHESTPLATE =
+        new EntityDataChanger<>(Living.class,
+                                new EntityChanger<Living, ItemStack>() {
                                     @Override
-                                    public void applyEntity(LivingEntity entity, ItemStack value) {
+                                    public void applyEntity(Living entity, ItemStack value) {
                                         entity.getEquipment().setChestplate(value);
                                     }
 
@@ -480,11 +466,11 @@ public class EntityDataChanger<EntityInterface>
                                     }
                                 });
 
-    public static final EntityDataChanger<LivingEntity> ARMOR_LEG =
-        new EntityDataChanger<>(LivingEntity.class,
-                                new EntityChanger<LivingEntity, ItemStack>() {
+    public static final EntityDataChanger<Living> ARMOR_LEG =
+        new EntityDataChanger<>(Living.class,
+                                new EntityChanger<Living, ItemStack>() {
                                     @Override
-                                    public void applyEntity(LivingEntity entity, ItemStack value) {
+                                    public void applyEntity(Living entity, ItemStack value) {
                                         entity.getEquipment().setLeggings(value);
                                     }
 
@@ -499,11 +485,11 @@ public class EntityDataChanger<EntityInterface>
                                     }
                                 });
 
-    public static final EntityDataChanger<LivingEntity> ARMOR_BOOT =
-        new EntityDataChanger<>(LivingEntity.class,
-                                new EntityChanger<LivingEntity, ItemStack>() {
+    public static final EntityDataChanger<Living> ARMOR_BOOT =
+        new EntityDataChanger<>(Living.class,
+                                new EntityChanger<Living, ItemStack>() {
                                     @Override
-                                    public void applyEntity(LivingEntity entity, ItemStack value) {
+                                    public void applyEntity(Living entity, ItemStack value) {
                                         entity.getEquipment().setBoots(value);
                                     }
 
@@ -518,11 +504,11 @@ public class EntityDataChanger<EntityInterface>
                                     }
                                 });
 
-    public static final EntityDataChanger<LivingEntity> ARMOR_HELMET =
-        new EntityDataChanger<>(LivingEntity.class,
-                                new EntityChanger<LivingEntity, ItemStack>() {
+    public static final EntityDataChanger<Living> ARMOR_HELMET =
+        new EntityDataChanger<>(Living.class,
+                                new EntityChanger<Living, ItemStack>() {
                                     @Override
-                                    public void applyEntity(LivingEntity entity, ItemStack value) {
+                                    public void applyEntity(Living entity, ItemStack value) {
                                         entity.getEquipment().setHelmet(value);
                                     }
 
@@ -537,11 +523,11 @@ public class EntityDataChanger<EntityInterface>
                                     }
                                 });
 
-    public static final EntityDataChanger<LivingEntity> EQUIP_HAND =
-        new EntityDataChanger<>(LivingEntity.class,
-                                new EntityChanger<LivingEntity, ItemStack>() {
+    public static final EntityDataChanger<Living> EQUIP_HAND =
+        new EntityDataChanger<>(Living.class,
+                                new EntityChanger<Living, ItemStack>() {
                                     @Override
-                                    public void applyEntity(LivingEntity entity, ItemStack value) {
+                                    public void applyEntity(Living entity, ItemStack value) {
                                         entity.getEquipment().setItemInHand(value);
                                     }
 
@@ -556,11 +542,11 @@ public class EntityDataChanger<EntityInterface>
                                     }
                                 });
 
-    public static final EntityDataChanger<LivingEntity> DO_DROP_EQUIP =
-        new EntityDataChanger<>(LivingEntity.class,
-                                new BoolEntityChanger<LivingEntity>("dropEquip") {
+    public static final EntityDataChanger<Living> DO_DROP_EQUIP =
+        new EntityDataChanger<>(Living.class,
+                                new BoolEntityChanger<Living>("dropEquip") {
                                     @Override
-                                    public void applyEntity(LivingEntity entity, Boolean value) {
+                                    public void applyEntity(Living entity, Boolean value) {
                                         if (value)
                                         {
                                             EntityEquipment equipment = entity.getEquipment();
@@ -573,11 +559,11 @@ public class EntityDataChanger<EntityInterface>
                                     }
                                 });
 
-    public static final EntityDataChanger<LivingEntity> DO_NOT_DROP_EQUIP =
-        new EntityDataChanger<>(LivingEntity.class,
-                                new BoolEntityChanger<LivingEntity>("dropNoEquip") {
+    public static final EntityDataChanger<Living> DO_NOT_DROP_EQUIP =
+        new EntityDataChanger<>(Living.class,
+                                new BoolEntityChanger<Living>("dropNoEquip") {
                                     @Override
-                                    public void applyEntity(LivingEntity entity, Boolean value) {
+                                    public void applyEntity(Living entity, Boolean value) {
                                         if (value)
                                         {
                                             EntityEquipment equipment = entity.getEquipment();

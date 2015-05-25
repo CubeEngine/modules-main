@@ -21,54 +21,64 @@ import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.concurrent.TimeUnit;
+import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.butler.filter.Restricted;
+import de.cubeisland.engine.butler.parameter.TooFewArgumentsException;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Default;
+import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.butler.parameter.TooFewArgumentsException;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.Pair;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.matcher.Match;
-import de.cubeisland.engine.core.util.math.BlockVector2;
-import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.basics.Basics;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.block.Biome;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.Direction;
+import de.cubeisland.engine.module.core.util.Pair;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
+import de.cubeisland.engine.module.core.util.math.BlockVector2;
+import de.cubeisland.engine.module.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.Item;
+import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.biome.BiomeType;
 
-import static de.cubeisland.engine.core.util.ChatFormat.*;
-import static de.cubeisland.engine.core.util.Direction.matchDirection;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.ChatFormat.*;
+import static de.cubeisland.engine.module.core.util.Direction.matchDirection;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 import static java.util.Locale.ENGLISH;
+import static org.spongepowered.api.util.Direction.*;
 
 public class InformationCommands
 {
     private final PeriodFormatter formatter;
     private final Basics module;
+    private WorldManager wm;
+    private MaterialMatcher materialMatcher;
 
-    public InformationCommands(Basics module)
+    public InformationCommands(Basics module, WorldManager wm, MaterialMatcher materialMatcher)
     {
         this.module = module;
+        this.wm = wm;
+        this.materialMatcher = materialMatcher;
         this.formatter = new PeriodFormatterBuilder().appendWeeks().appendSuffix(" week"," weeks").appendSeparator(" ")
                                                      .appendDays().appendSuffix(" day", " days").appendSeparator(" ")
                                                      .appendHours().appendSuffix(" hour"," hours").appendSeparator(" ")
@@ -90,11 +100,11 @@ public class InformationCommands
         if (z == null)
         {
             Location loc = ((User)context).getLocation();
-            world = loc.getWorld();
+            world = (World)loc.getExtent();
             x = loc.getBlockX();
             z = loc.getBlockZ();
         }
-        Biome biome = world.getBiome(x, z);
+        BiomeType biome = world.getBiome(x, z);
         context.sendTranslated(NEUTRAL, "Biome at {vector:x\\=:z\\=}: {biome}", new BlockVector2(x, z), biome);
     }
 
@@ -109,15 +119,14 @@ public class InformationCommands
             }
             world = ((User)context).getWorld();
         }
-        context.sendTranslated(NEUTRAL, "Seed of {world} is {long#seed}", world, world.getSeed());
+        context.sendTranslated(NEUTRAL, "Seed of {world} is {long#seed}", world, world.getWorldStorage().getWorldProperties().getSeed());
     }
 
     @Command(desc = "Displays the direction in which you are looking.")
     @Restricted(value = User.class, msg = "{text:ProTip}: I assume you are looking right at your screen, right?")
     public void compass(User context)
     {
-        int direction = Math.round(context.getLocation().getYaw() + 180f + 360f) % 360;
-        context.sendTranslated(NEUTRAL, "You are looking to {input#direction}!", matchDirection(direction).translated(context));
+        context.sendTranslated(NEUTRAL, "You are looking to {input#direction}!", getClosest(context.getPlayer().get().getRotation()).name()); // TODO translation of direction
     }
 
     @Command(desc = "Displays your current depth.")
@@ -150,17 +159,16 @@ public class InformationCommands
         }
         int squareRadius = radius * radius;
         Location userLocation = player.getLocation();
-        List<Entity> list = userLocation.getWorld().getEntities();
+        Collection<Entity> list = ((World)userLocation.getExtent()).getEntities();
         LinkedList<String> outputlist = new LinkedList<>();
         TreeMap<Double, List<Entity>> sortedMap = new TreeMap<>();
-        final Location entityLocation = new Location(null, 0, 0, 0);
         for (Entity e : list)
         {
-            e.getLocation(entityLocation);
-            double distance = entityLocation.distanceSquared(userLocation);
+            Location entityLocation = e.getLocation();
+            double distance = entityLocation.getPosition().distanceSquared(userLocation.getPosition());
             if (!entityLocation.equals(userLocation) && distance < squareRadius)
             {
-                if (entity || (mob && e instanceof LivingEntity) || e instanceof Player)
+                if (entity || (mob && e instanceof Living) || e instanceof Player)
                 {
                     List<Entity> sublist = sortedMap.get(distance);
                     if (sublist == null)
@@ -189,17 +197,17 @@ public class InformationCommands
                 {
                     key = DARK_GREEN + "player";
                 }
-                else if (e instanceof LivingEntity)
+                else if (e instanceof Living)
                 {
-                    key = ChatFormat.DARK_AQUA + Match.entity().getNameFor(e.getType());
+                    key = ChatFormat.DARK_AQUA + e.getType().getName();
                 }
                 else if (e instanceof Item)
                 {
-                    key = ChatFormat.GREY + Match.material().getNameFor(((Item)e).getItemStack());
+                    key = ChatFormat.GREY + materialMatcher.getNameFor(((Item)e).getItemData().getValue());
                 }
                 else
                 {
-                    key = ChatFormat.GREY + Match.entity().getNameFor(e.getType());
+                    key = ChatFormat.GREY + e.getType().getName();
                 }
                 Pair<Double, Integer> pair = groupedEntities.get(key);
                 if (pair == null)
@@ -246,19 +254,19 @@ public class InformationCommands
         {
             s = DARK_GREEN + ((Player)entity).getName();
         }
-        else if (entity instanceof LivingEntity)
+        else if (entity instanceof Living)
         {
-            s = ChatFormat.DARK_AQUA + Match.entity().getNameFor(entity.getType());
+            s = ChatFormat.DARK_AQUA + entity.getType().getName();
         }
         else
         {
             if (entity instanceof Item)
             {
-                s = ChatFormat.GREY + Match.material().getNameFor(((Item)entity).getItemStack());
+                s = ChatFormat.GREY + materialMatcher.getNameFor(((Item)entity).getItemData().getValue());
             }
             else
             {
-                s = ChatFormat.GREY + Match.entity().getNameFor(entity.getType());
+                s = ChatFormat.GREY + entity.getType().getName();
             }
         }
         s += WHITE + " (" + GOLD + distance + "m" + WHITE + ")";
@@ -271,7 +279,7 @@ public class InformationCommands
         final String label = context.getInvocation().getLabels().get(0).toLowerCase(ENGLISH);
         if (context.isSource(User.class))
         {
-            context.sendTranslated(NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}", ((User)context.getSource()).getPing());
+            context.sendTranslated(MessageType.NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}", ((User)context.getSource()).getPing());
             return;
         }
         context.sendTranslated(NEUTRAL, label + " in the console?");
@@ -347,10 +355,22 @@ public class InformationCommands
         memused += memUse;
         context.sendTranslated(POSITIVE, "Memory Usage: {input#memused}/{integer#memcom}/{integer#memMax} MB", memused, memCom, memMax);
         //Worlds with loaded Chunks / Entities
-        for (World world : Bukkit.getServer().getWorlds())
+        for (World world : wm.getWorlds())
         {
-            String type = world.getEnvironment().name();
-            int loadedChunks = world.getLoadedChunks().length;
+            String type = world.getWorldStorage().getWorldProperties().getDimensionType().getName();
+            int loadedChunks;
+            if (world.getLoadedChunks() instanceof Collection)
+            {
+                loadedChunks = ((Collection)world.getLoadedChunks()).size();
+            }
+            else
+            {
+                loadedChunks = 0;
+                for (Chunk chunk : world.getLoadedChunks())
+                {
+                    loadedChunks++;
+                }
+            }
             int entities = world.getEntities().size();
             context.sendTranslated(POSITIVE, "{world} ({input#environment}): {amount} chunks {amount} entities", world, type, loadedChunks, entities);
         }
@@ -362,9 +382,9 @@ public class InformationCommands
     {
         context.sendTranslated(POSITIVE, "Loaded worlds:");
         String format = " " + WHITE + "- " + GOLD + "%s" + WHITE + ":" + INDIGO + "%s";
-        for (World world : Bukkit.getServer().getWorlds())
+        for (World world : wm.getWorlds())
         {
-            context.sendMessage(String.format(format, world.getName(), world.getEnvironment().name()));
+            context.sendMessage(String.format(format, world.getName(), world.getWorldStorage().getWorldProperties().getDimensionType().getName()));
         }
     }
 }

@@ -17,12 +17,13 @@
  */
 package de.cubeisland.engine.module.locker.storage;
 
-import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
-import de.cubeisland.engine.core.util.Version;
+import de.cubeisland.engine.module.service.database.AutoIncrementTable;
+import de.cubeisland.engine.module.core.util.Version;
+import de.cubeisland.engine.module.service.database.Database;
 import org.jooq.TableField;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.core.world.TableWorld.TABLE_WORLD;
+import static de.cubeisland.engine.module.service.world.TableWorld.TABLE_WORLD;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static org.jooq.impl.SQLDataType.INTEGER;
 
@@ -38,9 +39,9 @@ public class TableLockLocations extends AutoIncrementTable<LockLocationModel, UI
     public final TableField<LockLocationModel, Integer> CHUNKZ = createField("chunkZ", INTEGER.nullable(false), this);
     public final TableField<LockLocationModel, UInteger> LOCK_ID = createField("lock_id", U_INTEGER.nullable(false),this);
 
-    public TableLockLocations(String prefix)
+    public TableLockLocations(String prefix, Database db)
     {
-        super(prefix + "locklocation", new Version(1));
+        super(prefix + "locklocation", new Version(1), db);
         this.setAIKey(ID);
         this.addIndex(CHUNKX, CHUNKZ);
         this.addUniqueKey(WORLD_ID, X, Y, Z);

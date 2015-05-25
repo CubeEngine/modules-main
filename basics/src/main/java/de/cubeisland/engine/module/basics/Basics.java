@@ -18,14 +18,15 @@
 package de.cubeisland.engine.module.basics;
 
 import java.util.concurrent.TimeUnit;
-import de.cubeisland.engine.core.bukkit.EventManager;
-import de.cubeisland.engine.core.command.CommandManager;
-import de.cubeisland.engine.core.module.Module;
-import de.cubeisland.engine.core.storage.database.Database;
-import de.cubeisland.engine.core.util.Profiler;
+import javax.inject.Inject;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.modularity.asm.marker.Enable;
+import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
+import de.cubeisland.engine.modularity.core.Maybe;
+import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.module.basics.command.general.ChatCommands;
 import de.cubeisland.engine.module.basics.command.general.ColoredSigns;
-import de.cubeisland.engine.module.basics.command.general.FlyListener;
+import de.cubeisland.engine.module.fixes.FixListener;
 import de.cubeisland.engine.module.basics.command.general.GeneralsListener;
 import de.cubeisland.engine.module.basics.command.general.IgnoreCommands;
 import de.cubeisland.engine.module.basics.command.general.InformationCommands;
@@ -51,13 +52,28 @@ import de.cubeisland.engine.module.basics.command.teleport.TeleportRequestComman
 import de.cubeisland.engine.module.basics.storage.TableBasicsUser;
 import de.cubeisland.engine.module.basics.storage.TableIgnorelist;
 import de.cubeisland.engine.module.basics.storage.TableMail;
+import de.cubeisland.engine.module.core.filesystem.FileManager;
+import de.cubeisland.engine.module.core.sponge.EventManager;
+import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
+import de.cubeisland.engine.module.core.util.Profiler;
+import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
 import de.cubeisland.engine.module.roles.Roles;
-import org.bukkit.entity.Player;
+import de.cubeisland.engine.module.service.ban.BanManager;
+import de.cubeisland.engine.module.service.command.CommandManager;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
+import de.cubeisland.engine.module.service.task.TaskManager;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.player.Player;
 
+@ModuleInfo(name = "Basics", description = "Basic Functionality")
 public class Basics extends Module
 {
     private BasicsConfiguration config;
     private LagTimer lagTimer;
+
 
     public BasicsPerm perms()
     {
@@ -65,73 +81,83 @@ public class Basics extends Module
     }
 
     private BasicsPerm perms;
+    @Inject private Database db;
+    @Inject private EventManager em;
+    @Inject private CommandManager cm;
+    @Inject private Log logger;
+    @Inject private UserManager um;
+    @Inject private FileManager fm;
+    @Inject private Maybe<Roles> roles;
+    @Inject private WorldManager wm;
+    @Inject private TaskManager taskManager;
+    @Inject private BanManager banManager;
+    @Inject private PermissionManager pm;
+    @Inject private InventoryGuardFactory invGuard;
+    @Inject private MaterialMatcher materialMatcher;
+    @Inject private Game game;
 
-    @Override
+    @Enable
     public void onEnable()
     {
         Profiler.startProfiling("basicsEnable");
 
-        this.config = this.loadConfig(BasicsConfiguration.class);
-		final Database db = this.getCore().getDB();
+        this.config = fm.loadConfig(this, BasicsConfiguration.class);
         db.registerTable(TableBasicsUser.class);
         db.registerTable(TableIgnorelist.class);
         db.registerTable(TableMail.class);
-        final CommandManager cm = this.getCore().getCommandManager();
-        final EventManager em = this.getCore().getEventManager();
-        this.getLog().trace("{} ms - Basics.Permission", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
-        perms = new BasicsPerm(this);
-        this.getCore().getUserManager().addDefaultAttachment(BasicsAttachment.class, this);
+        logger.trace("{} ms - Basics.Permission", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
+        perms = new BasicsPerm(this, wm, pm);
+        um.addDefaultAttachment(BasicsAttachment.class, this);
 
         em.registerListener(this, new ColoredSigns(this));
 
-        this.getLog().trace("{} ms - General-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
+        logger.trace("{} ms - General-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         //General:
-        IgnoreCommands ignoreCommands = new IgnoreCommands(this);
+        IgnoreCommands ignoreCommands = new IgnoreCommands(this, db);
         cm.addCommands(cm, this, ignoreCommands);
-        cm.addCommands(cm, this, new ChatCommands(this));
-        cm.addCommands(cm, this, new InformationCommands(this));
-        cm.addCommand(new MailCommand(this));
-        cm.addCommands(cm, this, new PlayerCommands(this));
-        this.getLog().trace("{} ms - General-Listener", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
-        em.registerListener(this, new GeneralsListener(this));
-        em.registerListener(this, new MuteListener(this, ignoreCommands));
-        this.getLog().trace("{} ms - Moderation-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
+        cm.addCommands(cm, this, new ChatCommands(this, um, cm));
+        cm.addCommands(cm, this, new InformationCommands(this, wm, materialMatcher));
+        cm.addCommand(new MailCommand(this, um, taskManager, db));
+        cm.addCommands(cm, this, new PlayerCommands(this, um, em, taskManager, cm, banManager));
+        logger.trace("{} ms - General-Listener", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
+        em.registerListener(this, new GeneralsListener(this, um));
+        em.registerListener(this, new MuteListener(this, ignoreCommands, um));
+        logger.trace("{} ms - Moderation-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         //Moderation:
-        cm.addCommands(cm, this, new InventoryCommands(this));
+        cm.addCommands(cm, this, new InventoryCommands(this, invGuard));
         cm.addCommands(cm, this, new ItemCommands(this));
-        cm.addCommands(cm, this, new KickBanCommands(this));
+        cm.addCommands(cm, this, new KickBanCommands(this, banManager, um, game));
         cm.addCommands(cm, this, new SpawnMobCommand(this));
-        cm.addCommands(cm, this, new TimeControlCommands(this));
+        cm.addCommands(cm, this, new TimeControlCommands(this, taskManager, wm));
         cm.addCommands(cm, this, new WorldControlCommands(this));
 
-        Module roles = getCore().getModuleManager().getModule("roles");
-        if (roles != null && roles instanceof Roles)
+        if (roles.isAvailable())
         {
-            cm.addCommands(cm, this, new RolesListCommand(this));
+            cm.addCommands(cm, this, new RolesListCommand(this, um, game));
         }
         else
         {
-            this.getLog().info("No Roles-Module found!");
-            cm.addCommands(cm, this, new ListCommand(this));
+            logger.info("No Roles-Module found!");
+            cm.addCommands(cm, this, new ListCommand(this, um, game));
         }
-        
-        em.registerListener(this, new PaintingListener(this));
 
-        this.getLog().trace("{} ms - Teleport-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
+        em.registerListener(this, new PaintingListener(this, um));
+
+        logger.trace("{} ms - Teleport-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         //Teleport:
         cm.addCommands(cm, this, new MovementCommands(this));
-        cm.addCommands(cm, this, new SpawnCommands(this));
-        cm.addCommands(cm, this, new TeleportCommands(this));
-        cm.addCommands(cm, this, new TeleportRequestCommands(this));
-        this.getLog().trace("{} ms - Teleport/Fly-Listener", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
-        em.registerListener(this, new TeleportListener(this));
-        em.registerListener(this, new FlyListener(this));
+        cm.addCommands(cm, this, new SpawnCommands(this, em, um));
+        cm.addCommands(cm, this, new TeleportCommands(this, um));
+        cm.addCommands(cm, this, new TeleportRequestCommands(this, taskManager, um));
+        logger.trace("{} ms - Teleport/Fly-Listener", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
+        em.registerListener(this, new TeleportListener(this, um));
+        em.registerListener(this, new FixListener(this));
 
         this.lagTimer = new LagTimer(this);
 
         cm.addCommands(cm, this, new DoorCommand(this));
 
-        this.getLog().trace("{} ms - done", Profiler.endProfiling("basicsEnable", TimeUnit.MILLISECONDS));
+        logger.trace("{} ms - done", Profiler.endProfiling("basicsEnable", TimeUnit.MILLISECONDS));
     }
 
     public BasicsConfiguration getConfiguration()
@@ -139,12 +165,13 @@ public class Basics extends Module
         return this.config;
     }
 
-    public LagTimer getLagTimer() {
+    public LagTimer getLagTimer()
+    {
         return this.lagTimer;
     }
 
     public BasicsUser getBasicsUser(Player player)
     {
-        return this.getCore().getUserManager().getExactUser(player.getUniqueId()).attachOrGet(BasicsAttachment.class, this).getBasicsUser();
+        return um.getExactUser(player.getUniqueId()).attachOrGet(BasicsAttachment.class, this).getBasicsUser();
     }
 }

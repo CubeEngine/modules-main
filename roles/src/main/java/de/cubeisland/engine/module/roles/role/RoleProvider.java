@@ -25,14 +25,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Stack;
-import de.cubeisland.engine.core.permission.Permission;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.reflect.exception.InvalidReflectedObjectException;
-import org.bukkit.World;
 
-import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;
+import org.spongepowered.api.world.World;
+
+import static de.cubeisland.engine.module.core.filesystem.FileExtensionFilter.YAML;
 
 public abstract class RoleProvider
 {
@@ -85,7 +86,7 @@ public abstract class RoleProvider
     {
         this.configs = new HashMap<>();
         this.roles = new HashMap<>();
-        for (User user : this.module.getCore().getUserManager().getLoadedUsers())
+        for (User user : um.getLoadedUsers())
         {
             RolesAttachment rolesAttachment = user.get(RolesAttachment.class);
             if (rolesAttachment != null)
@@ -104,16 +105,16 @@ public abstract class RoleProvider
                 for (Path configFile : directory)
                 {
                     ++i;
-                    RoleConfig config = module.getCore().getConfigFactory().load(RoleConfig.class, configFile.toFile());
+                    RoleConfig config = reflector.load(RoleConfig.class, configFile.toFile());
                     this.configs.put(config.roleName.toLowerCase(), config);
                 }
             }
         }
         catch (IOException | InvalidReflectedObjectException e)
         {
-            this.module.getLog().warn(e, "Failed to load a configuration");
+            logger.warn(e, "Failed to load a configuration");
         }
-        this.module.getLog().debug("provider {}: {} role-configs read!", this.getFolder().getFileName(), i);
+        logger.debug("provider {}: {} role-configs read!", this.getFolder().getFileName(), i);
     }
 
     /**
@@ -134,10 +135,7 @@ public abstract class RoleProvider
     public void recalculateRoles()
     {
         Stack<String> roleStack = new Stack<>(); // stack for detecting circular dependencies
-        for (Role role : this.roles.values())
-        {
-            role.resetTempData();
-        }
+        this.roles.values().forEach(Role::resetTempData);
         for (Role role : this.roles.values())
         {
             role.calculate(roleStack);
@@ -161,7 +159,7 @@ public abstract class RoleProvider
         {
             return null;
         }
-        RoleConfig config = this.module.getCore().getConfigFactory().create(RoleConfig.class);
+        RoleConfig config = reflector.create(RoleConfig.class);
         config.roleName = roleName;
         this.configs.put(roleName,config);
         config.onLoaded(null);
@@ -169,7 +167,7 @@ public abstract class RoleProvider
         config.save();
         Role role = new Role(manager, this, config);
         this.roles.put(roleName, role);
-        role.calculate(new Stack<String>());
+        role.calculate(new Stack<>());
         return role;
     }
 

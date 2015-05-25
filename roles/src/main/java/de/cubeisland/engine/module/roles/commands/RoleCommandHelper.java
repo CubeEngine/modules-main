@@ -17,21 +17,21 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.world.WorldManager;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RoleProvider;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 import de.cubeisland.engine.module.roles.role.RolesManager;
-import org.bukkit.World;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.ChatFormat.*;
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.ChatFormat.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
 
 public abstract class RoleCommandHelper extends ContainerCommand
 {
@@ -43,12 +43,12 @@ public abstract class RoleCommandHelper extends ContainerCommand
     protected final String LISTELEM = "- " + YELLOW + "%s";
     protected final String LISTELEM_VALUE = "- " + YELLOW + "%s" + WHITE + ": " + GOLD + "%s";
 
-    public RoleCommandHelper(Roles module)
+    public RoleCommandHelper(Roles module, WorldManager wm)
     {
         super(module);
         this.manager = module.getRolesManager();
         this.module = module;
-        this.worldManager = module.getCore().getWorldManager();
+        this.worldManager = wm;
     }
 
     protected World getWorld(CommandContext context, World world)

@@ -26,28 +26,31 @@ import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.UserAccount;
+import de.cubeisland.engine.module.service.user.UserManager;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 @Command(name = "bank", desc = "Manages your money in banks.")
 public class BankCommands extends ContainerCommand
 {
     private final ConomyManager manager;
     private final Conomy module;
+    private UserManager um;
 
-    public BankCommands(Conomy module)
+    public BankCommands(Conomy module, UserManager um)
     {
         super(module);
         this.module = module;
+        this.um = um;
         this.manager = module.getManager();
     }
 
@@ -439,7 +442,7 @@ public class BankCommands extends ContainerCommand
         }
         if (account.hasAccess((User)context))
         {
-            throw new ReaderException(context.getTranslation(NEGATIVE, "There is no bank account named {input#name}!", account.getName()));
+            throw new ReaderException(context.getTranslation(NEGATIVE, "There is no bank account named {input#name}!", account.getName()).get(context.getLocale()));
         }
     }
 
@@ -498,7 +501,7 @@ public class BankCommands extends ContainerCommand
         Account target;
         if (!bank)
         {
-            User user = this.module.getCore().getUserManager().findUser(targetAccount);
+            User user = um.findUser(targetAccount);
             target = this.manager.getUserAccount(user, this.manager.getAutoCreateUserAccount());
             if (target == null)
             {

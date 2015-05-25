@@ -21,9 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.Triplet;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.Triplet;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.storage.Lock;
 import de.cubeisland.engine.module.locker.storage.LockManager;
@@ -38,12 +39,14 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.InventoryHolder;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.player.PlayerInteractEvent;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
 import static de.cubeisland.engine.module.locker.storage.LockType.*;
 
-public class CommandListener implements Listener
+public class CommandListener
 {
     private final Map<UUID, Triplet<CommandType, String, Boolean>> map = new HashMap<>();
     private final Map<UUID,Long> persist = new HashMap<>();
@@ -100,7 +103,7 @@ public class CommandListener implements Listener
         return true;
     }
 
-    @EventHandler
+    @Subscribe
     public void onRightClickBlock(PlayerInteractEvent event)
     {
         if (event.getAction() == Action.PHYSICAL

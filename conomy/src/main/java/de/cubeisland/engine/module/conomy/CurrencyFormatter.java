@@ -19,20 +19,21 @@ package de.cubeisland.engine.module.conomy;
 
 import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
 import de.cubeisland.engine.messagecompositor.macro.MacroContext;
+import de.cubeisland.engine.module.conomy.account.ConomyManager;
 
 public class CurrencyFormatter extends AbstractFormatter<Double>
 {
-    private Conomy module;
+    private ConomyManager manager;
 
-    public CurrencyFormatter(Conomy module)
+    public CurrencyFormatter(ConomyManager manager)
     {
-        this.module = module;
+        this.manager = manager;
         this.names.add("currency");
     }
 
     @Override
     public String process(Double object, MacroContext context)
     {
-        return module.getManager().format(object);
+        return manager.format(object);
     }
 }

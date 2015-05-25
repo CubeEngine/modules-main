@@ -17,12 +17,17 @@
  */
 package de.cubeisland.engine.module.roles;
 
+import javax.inject.Inject;
 import de.cubeisland.engine.converter.ConverterManager;
-import de.cubeisland.engine.core.command.CommandManager;
-import de.cubeisland.engine.core.module.Module;
-import de.cubeisland.engine.core.module.service.Metadata;
-import de.cubeisland.engine.core.module.service.Permission;
-import de.cubeisland.engine.core.storage.database.Database;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.modularity.asm.marker.Disable;
+import de.cubeisland.engine.modularity.asm.marker.Enable;
+import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
+import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.module.core.sponge.EventManager;
+import de.cubeisland.engine.module.service.command.CommandManager;
+import de.cubeisland.engine.module.service.Metadata;
+import de.cubeisland.engine.module.service.Permission;
 import de.cubeisland.engine.module.roles.commands.ManagementCommands;
 import de.cubeisland.engine.module.roles.commands.RoleCommands;
 import de.cubeisland.engine.module.roles.commands.RoleInformationCommands;
@@ -42,30 +47,41 @@ import de.cubeisland.engine.module.roles.role.RolesManager;
 import de.cubeisland.engine.module.roles.storage.TableData;
 import de.cubeisland.engine.module.roles.storage.TablePerm;
 import de.cubeisland.engine.module.roles.storage.TableRole;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.task.TaskManager;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.reflect.Reflector;
 
+@ModuleInfo(name = "Roles", description = "Manages permissions of players and roles")
 public class Roles extends Module
 {
     private RolesConfig config;
     private RolesManager rolesManager;
 
-    @Override
+    @Inject private Reflector reflector;
+    @Inject private Database db;
+    @Inject private Log logger;
+    @Inject private UserManager um;
+    @Inject private CommandManager cm;
+    @Inject private EventManager em;
+    @Inject private TaskManager tm;
+
+    @Enable
     public void onEnable()
     {
-        ConverterManager cManager = this.getCore().getConfigFactory().getDefaultConverterManager();
+        ConverterManager cManager = reflector.getDefaultConverterManager();
         cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);
         cManager.registerConverter(new PriorityConverter(), Priority.class);
         cManager.registerConverter(new MirrorConfigConverter(this), MirrorConfig.class);
 
-        Database db = this.getCore().getDB();
         db.registerTable(TableRole.class);
         db.registerTable(TablePerm.class);
         db.registerTable(TableData.class);
 
-        this.rolesManager = new RolesManager(this);
+        this.rolesManager = new RolesManager(this, logger, db);
 
-        this.getCore().getUserManager().addDefaultAttachment(RolesAttachment.class, this);
+        um.addDefaultAttachment(RolesAttachment.class, this);
 
-        final CommandManager cm = this.getCore().getCommandManager();
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), PermissionValue.class);
         RoleCommands cmdRoles = new RoleCommands(this);
         cm.addCommand(cmdRoles);
@@ -78,22 +94,21 @@ public class Roles extends Module
         cm.addCommands(cmdUsers, this, new UserInformationCommands(this));
         cmdRoles.addCommand(new ManagementCommands(this));
 
-        this.getCore().getEventManager().registerListener(this, new RolesEventHandler(this));
+        em.registerListener(this, new RolesEventHandler(this));
 
         this.config = loadConfig(RolesConfig.class);
-        this.getCore().getTaskManager().runTask(this, () -> {
+        tm.runTask(this, () -> {
             rolesManager.initRoleProviders();
             rolesManager.recalculateAllRoles();
         });
 
-        this.getCore().getModuleManager().getServiceManager().registerService(this, Metadata.class, new MetadataProvider(this.rolesManager));
-        this.getCore().getModuleManager().getServiceManager().registerService(this, Permission.class, new PermissionProvider(this, this.rolesManager, this.getCore().getPermissionManager()));
+        getModularity().getModuleManager().getServiceManager().registerService(this, Permission.class, new PermissionProvider(this, this.rolesManager, this.getCore().getPermissionManager()));
     }
 
-    @Override
+    @Disable
     public void onDisable()
     {
-        this.getCore().getEventManager().removeListeners(this);
+        em.removeListeners(this);
     }
 
     public RolesConfig getConfiguration()

@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.travel.warp;
 
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.travel.InviteManager;
 import de.cubeisland.engine.module.travel.TelePointManager;
 import de.cubeisland.engine.module.travel.Travel;

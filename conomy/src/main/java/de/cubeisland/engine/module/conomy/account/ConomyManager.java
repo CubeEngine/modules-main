@@ -27,10 +27,14 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ThreadFactory;
-import de.cubeisland.engine.core.logging.LoggingUtil;
-import de.cubeisland.engine.core.module.service.Economy;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserManager;
+import de.cubeisland.engine.logscribe.LogFactory;
+import de.cubeisland.engine.module.core.filesystem.FileManager;
+import de.cubeisland.engine.module.core.logging.LoggingUtil;
+import de.cubeisland.engine.module.service.Economy;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.task.TaskManager;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.logscribe.LogLevel;
 import de.cubeisland.engine.logscribe.target.file.AsyncFileTarget;
@@ -53,31 +57,26 @@ public class ConomyManager
     protected final ConomyConfiguration config;
     protected final DSLContext dsl;
     protected final UserManager um;
-    private final ThreadFactory threadFactory;
     private final Map<String, BankAccount> bankaccounts = new HashMap<>();
     private final Map<Long, BankAccount> bankaccountsID = new HashMap<>();
-    private final Economy conomyInterface;
-    private Thread thread = null;
 
-    public ConomyManager(Conomy module)
+    public ConomyManager(Conomy module, ThreadFactory tf, Database db, LogFactory lf, FileManager fm, UserManager um)
     {
         this.module = module;
-        this.threadFactory = module.getCore().getTaskManager().getThreadFactory(module);
         this.config = module.getConfig();
 
-        this.dsl = this.module.getCore().getDB().getDSL();
+        this.dsl = db.getDSL();
 
-        this.logger = module.getCore().getLogFactory().getLog(Conomy.class, "Conomy-Transactions");
-        this.logger.addTarget(new AsyncFileTarget(LoggingUtil.getLogFile(module.getCore(), "Conomy-Transactions"),
+        this.logger = lf.getLog(Conomy.class, "Conomy-Transactions");
+        this.logger.addTarget(new AsyncFileTarget(LoggingUtil.getLogFile(fm, "Conomy-Transactions"),
                                                   LoggingUtil.getFileFormat(true, false), true, LoggingUtil.getCycler(),
-                                                  module.getCore().getTaskManager().getThreadFactory()));
+                                                  tf));
         if (!this.module.getConfig().enableLogging)
         {
             logger.setLevel(LogLevel.NONE);
         }
 
-        this.um = this.module.getCore().getUserManager();
-        this.conomyInterface = new ConomyInterface(this);
+        this.um = um;
     }
 
     public BankAccount getBankAccount(String name, boolean create)
@@ -137,7 +136,7 @@ public class ConomyManager
 
     public void setAllOnline(final double value)
     {
-        for (User user : this.module.getCore().getUserManager().getOnlineUsers())
+        for (User user : um.getOnlineUsers())
         {
             UserAccount userAccount = ConomyManager.this.getUserAccount(user, true);
             userAccount.set(value);
@@ -455,11 +454,6 @@ public class ConomyManager
         bankAccount.model.updateAsync();
         this.bankaccounts.put(newName, bankAccount);
         return true;
-    }
-
-    public Economy getInterface()
-    {
-        return this.conomyInterface;
     }
 
     /**

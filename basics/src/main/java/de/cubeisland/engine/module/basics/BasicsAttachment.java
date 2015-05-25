@@ -18,9 +18,10 @@
 package de.cubeisland.engine.module.basics;
 
 import java.util.UUID;
-import de.cubeisland.engine.core.user.UserAttachment;
-import org.bukkit.Location;
-import org.bukkit.inventory.ItemStack;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.user.UserAttachment;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.world.Location;
 
 public class BasicsAttachment extends UserAttachment
 {
@@ -28,7 +29,7 @@ public class BasicsAttachment extends UserAttachment
     private BasicsUser basicUser = null;
     private boolean afk;
     private Location lastLocation = null;
-    private Integer tpRequestCancelTask;
+    private UUID tpRequestCancelTask;
     private UUID pendingTpToRequest;
     private UUID pendingTpFromRequest;
     private ItemStack[] stashedArmor;
@@ -58,7 +59,8 @@ public class BasicsAttachment extends UserAttachment
 
     private boolean unlimitedItems = false;
 
-    public boolean hasUnlimitedItems() {
+    public boolean hasUnlimitedItems()
+    {
         return unlimitedItems;
     }
 
@@ -67,83 +69,102 @@ public class BasicsAttachment extends UserAttachment
         this.unlimitedItems = b;
     }
 
-    public BasicsUser getBasicsUser() {
+    public BasicsUser getBasicsUser()
+    {
         if (basicUser == null)
         {
-            this.basicUser = new BasicsUser(this.getModule().getCore().getDB(), this.getHolder());
+            this.basicUser = new BasicsUser((Database)this.getModule().getModularity().start(Database.class), this.getHolder());
         }
         return basicUser;
     }
 
-    public Location getLastLocation() {
+    public Location getLastLocation()
+    {
         return lastLocation;
     }
 
-    public void setLastLocation(Location lastLocation) {
+    public void setLastLocation(Location lastLocation)
+    {
         this.lastLocation = lastLocation;
     }
 
-    public void setTpRequestCancelTask(Integer tpRequestCancelTask) {
+    public void setTpRequestCancelTask(UUID tpRequestCancelTask)
+    {
         this.tpRequestCancelTask = tpRequestCancelTask;
     }
 
-    public Integer getTpRequestCancelTask() {
+    public UUID getTpRequestCancelTask()
+    {
         return tpRequestCancelTask;
     }
 
-    public void removeTpRequestCancelTask() {
+    public void removeTpRequestCancelTask()
+    {
         this.tpRequestCancelTask = null;
     }
 
-    public void setPendingTpToRequest(UUID pendingTpToRequest) {
+    public void setPendingTpToRequest(UUID pendingTpToRequest)
+    {
         this.pendingTpToRequest = pendingTpToRequest;
     }
 
-    public UUID getPendingTpToRequest() {
+    public UUID getPendingTpToRequest()
+    {
         return pendingTpToRequest;
     }
 
-    public void removePendingTpToRequest() {
+    public void removePendingTpToRequest()
+    {
         pendingTpToRequest = null;
     }
 
-    public void setPendingTpFromRequest(UUID pendingTpFromRequest) {
+    public void setPendingTpFromRequest(UUID pendingTpFromRequest)
+    {
         this.pendingTpFromRequest = pendingTpFromRequest;
     }
 
-    public UUID getPendingTpFromRequest() {
+    public UUID getPendingTpFromRequest()
+    {
         return pendingTpFromRequest;
     }
 
-    public void removePendingTpFromRequest() {
+    public void removePendingTpFromRequest()
+    {
         pendingTpFromRequest = null;
     }
 
-    public void setStashedArmor(ItemStack[] stashedArmor) {
+    public void setStashedArmor(ItemStack[] stashedArmor)
+    {
         this.stashedArmor = stashedArmor;
     }
 
-    public ItemStack[] getStashedArmor() {
+    public ItemStack[] getStashedArmor()
+    {
         return stashedArmor;
     }
 
-    public void setStashedInventory(ItemStack[] stashedInventory) {
+    public void setStashedInventory(ItemStack[] stashedInventory)
+    {
         this.stashedInventory = stashedInventory;
     }
 
-    public ItemStack[] getStashedInventory() {
+    public ItemStack[] getStashedInventory()
+    {
         return stashedInventory;
     }
 
-    public void setLastWhisper(UUID lastWhisper) {
+    public void setLastWhisper(UUID lastWhisper)
+    {
         this.lastWhisper = lastWhisper;
     }
 
-    public UUID getLastWhisper() {
+    public UUID getLastWhisper()
+    {
         return lastWhisper;
     }
 
-    public void resetLastAction() {
+    public void resetLastAction()
+    {
         this.lastAction = 0;
     }
 

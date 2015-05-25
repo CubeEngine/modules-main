@@ -21,19 +21,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
-import de.cubeisland.engine.core.module.service.Economy;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserManager;
+import javax.inject.Inject;
+import de.cubeisland.engine.module.conomy.Conomy;
+import de.cubeisland.engine.module.service.Economy;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
 
 public class ConomyInterface implements Economy
 {
     private final ConomyManager manager;
     private final UserManager um;
 
-    public ConomyInterface(ConomyManager manager)
+    @Inject
+    public ConomyInterface(Conomy conomy, UserManager um)
     {
-        this.manager = manager;
-        this.um = manager.module.getCore().getUserManager();
+        this.manager = conomy.getManager();
+        this.um = um;
     }
 
     @Override
@@ -137,7 +140,7 @@ public class ConomyInterface implements Economy
         BankAccount bankAccount = manager.getBankAccount(name, true);
         if (owner != null)
         {
-            User user = this.manager.module.getCore().getUserManager().getExactUser(owner);
+            User user = um.getExactUser(owner);
             if (user == null)
             {
                 throw new IllegalArgumentException("Unknown User: " + owner);
@@ -207,7 +210,7 @@ public class ConomyInterface implements Economy
         {
             throw new IllegalArgumentException("There is no bankaccount named: " + name);
         }
-        User user = this.manager.module.getCore().getUserManager().getExactUser(player);
+        User user = um.getExactUser(player);
         if (user == null)
         {
             throw new IllegalArgumentException("Unknown User: " + player);
@@ -223,7 +226,7 @@ public class ConomyInterface implements Economy
         {
             throw new IllegalArgumentException("There is no bankaccount named: " + name);
         }
-        User user = this.manager.module.getCore().getUserManager().getExactUser(player);
+        User user = um.getExactUser(player);
         if (user == null)
         {
             throw new IllegalArgumentException("Unknown User: " + player);

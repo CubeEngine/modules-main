@@ -20,19 +20,21 @@ package de.cubeisland.engine.module.conomy.commands;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
-import de.cubeisland.engine.core.CubeEngine;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
+import de.cubeisland.engine.module.core.i18n.I18n;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 
 public class BankReader implements ArgumentReader<BankAccount>
 {
     private final ConomyManager manager;
+    private final I18n i18n;
 
-    public BankReader(ConomyManager manager)
+    public BankReader(ConomyManager manager, I18n i18n)
     {
         this.manager = manager;
+        this.i18n = i18n;
     }
 
     @Override
@@ -42,7 +44,7 @@ public class BankReader implements ArgumentReader<BankAccount>
         BankAccount target = this.manager.getBankAccount(arg, false);
         if (target == null)
         {
-            throw new ReaderException(CubeEngine.getI18n().translate(invocation.getLocale(), NEGATIVE, "There is no bank account named {input#name}!", arg));
+            throw new ReaderException(i18n.translate(invocation.getLocale(), NEGATIVE, "There is no bank account named {input#name}!", arg));
         }
         return target;
     }

@@ -18,12 +18,13 @@
 package de.cubeisland.engine.module.locker.storage;
 
 import java.sql.Timestamp;
-import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
-import de.cubeisland.engine.core.util.Version;
+import de.cubeisland.engine.module.core.util.Version;
+import de.cubeisland.engine.module.service.database.AutoIncrementTable;
+import de.cubeisland.engine.module.service.database.Database;
 import org.jooq.TableField;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
+import static de.cubeisland.engine.module.service.user.TableUser.TABLE_USER;
 import static org.jooq.impl.SQLDataType.*;
 import static org.jooq.util.mysql.MySQLDataType.DATETIME;
 
@@ -52,9 +53,9 @@ public class TableLocks extends AutoIncrementTable<LockModel, UInteger>
     public final TableField<LockModel, Timestamp> LAST_ACCESS = createField("last_access", DATETIME.nullable(false), this);
     public final TableField<LockModel, Timestamp> CREATED = createField("created", DATETIME.nullable(false), this);
 
-    public TableLocks(String prefix)
+    public TableLocks(String prefix, Database db)
     {
-        super(prefix + "locks", new Version(1));
+        super(prefix + "locks", new Version(1), db);
         this.setAIKey(ID);
         this.addUniqueKey(ENTITY_UID_LEAST, ENTITY_UID_MOST);
         this.addForeignKey(TABLE_USER.getPrimaryKey(), OWNER_ID);

@@ -21,37 +21,45 @@ import java.io.File;
 import java.util.Set;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.filter.Restricted;
+import de.cubeisland.engine.butler.parameter.FixedValues;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.butler.parameter.FixedValues;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.module.service.Selector;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.WorldLocation;
-import de.cubeisland.engine.core.util.math.BlockVector3;
-import de.cubeisland.engine.core.util.math.shape.Cuboid;
-import de.cubeisland.engine.core.world.ConfigWorld;
+import de.cubeisland.engine.module.core.util.WorldLocation;
+import de.cubeisland.engine.module.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.core.util.math.shape.Cuboid;
 import de.cubeisland.engine.module.portals.config.Destination;
 import de.cubeisland.engine.module.portals.config.PortalConfig;
-import org.bukkit.Location;
-import org.bukkit.World;
+import de.cubeisland.engine.module.service.Selector;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.world.ConfigWorld;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.reflect.Reflector;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 @Command(name = "portals", desc = "The portal commands", alias = "mvp")
 public class PortalCommands extends ContainerCommand
 {
     private final Portals module;
     private final PortalManager manager;
+    private Selector selector;
+    private Reflector reflector;
+    private WorldManager wm;
 
-    public PortalCommands(Portals module, PortalManager manager)
+    public PortalCommands(Portals module, PortalManager manager, Selector selector, Reflector reflector, WorldManager wm)
     {
         super(module);
         this.module = module;
         this.manager = manager;
+        this.selector = selector;
+        this.reflector = reflector;
+        this.wm = wm;
     }
 
     @Alias(value = "mvpc")
@@ -59,7 +67,6 @@ public class PortalCommands extends ContainerCommand
     @Restricted(value = User.class, msg = "You must be ingame to do this!")
     public void create(CommandContext context, String name, @Optional Destination destination)
     {
-        Selector selector = this.module.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
         User sender = (User)context.getSource();
         if (!(selector.getSelection(sender) instanceof Cuboid))
         {
@@ -73,12 +80,12 @@ public class PortalCommands extends ContainerCommand
         }
         Location p1 = selector.getFirstPoint(sender);
         Location p2 = selector.getSecondPoint(sender);
-        PortalConfig config = this.module.getCore().getConfigFactory().create(PortalConfig.class);
+        PortalConfig config = reflector.create(PortalConfig.class);
         config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
         config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
-        config.location.destination = new WorldLocation(sender.getLocation());
+        config.location.destination = new WorldLocation(sender.getLocation(), sender.getRotation());
         config.owner = sender.getOfflinePlayer();
-        config.world = new ConfigWorld(module.getCore().getWorldManager(), p1.getWorld());
+        config.world = new ConfigWorld(wm, (World)p1.getExtent());
 
         config.destination = destination;
 

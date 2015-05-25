@@ -19,17 +19,21 @@ package de.cubeisland.engine.module.locker.commands;
 
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.storage.Lock;
 import de.cubeisland.engine.module.locker.storage.LockManager;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.InventoryHolder;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 @Command(name = "admin", desc = "Administrate the protections")
 public class LockerAdminCommands extends ContainerCommand

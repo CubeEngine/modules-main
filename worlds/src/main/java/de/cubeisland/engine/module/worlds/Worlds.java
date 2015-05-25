@@ -18,56 +18,57 @@
 package de.cubeisland.engine.module.worlds;
 
 import java.io.IOException;
+import javax.inject.Inject;
 import de.cubeisland.engine.converter.ConverterManager;
-import de.cubeisland.engine.core.module.Module;
-import de.cubeisland.engine.core.module.exception.ModuleLoadError;
+import de.cubeisland.engine.modularity.asm.marker.Enable;
+import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.module.service.command.CommandManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.worlds.commands.WorldsCommands;
 import de.cubeisland.engine.module.worlds.config.WorldsConfig;
 import de.cubeisland.engine.module.worlds.converter.InventoryConverter;
 import de.cubeisland.engine.module.worlds.converter.PotionEffectConverter;
+import de.cubeisland.engine.reflect.Reflector;
 import de.cubeisland.engine.reflect.codec.nbt.NBTCodec;
-import org.bukkit.Bukkit;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.potion.PotionEffect;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.potion.PotionEffect;
 
 public class Worlds extends Module
 {
     private WorldsPermissions perms;
-
-    public Multiverse getMultiverse()
-    {
-        return multiverse;
-    }
-
     private Multiverse multiverse;
+    @Inject private Reflector reflector;
+    @Inject private CommandManager cm;
+    @Inject private WorldManager wm;
 
-    @Override
+    @Enable
     public void onLoad()
     {
-        ConverterManager manager = this.getCore().getConfigFactory().getDefaultConverterManager();
+        ConverterManager manager = reflector.getDefaultConverterManager();
 ///*TODO remove saving into yml too
         manager.registerConverter(new InventoryConverter(Bukkit.getServer()), Inventory.class);
         manager.registerConverter(new PotionEffectConverter(), PotionEffect.class);
 //*/
-        NBTCodec codec = this.getCore().getConfigFactory().getCodecManager().getCodec(NBTCodec.class);
+        NBTCodec codec = reflector.getCodecManager().getCodec(NBTCodec.class);
         manager = codec.getConverterManager();
         manager.registerConverter(new InventoryConverter(Bukkit.getServer()), Inventory.class);
         manager.registerConverter(new PotionEffectConverter(), PotionEffect.class);
-    }
 
-    @Override
-    public void onEnable()
-    {
         try
         {
-            multiverse = new Multiverse(this, this.loadConfig(WorldsConfig.class));
+            multiverse = new Multiverse(this, this.loadConfig(WorldsConfig.class), wm);
         }
         catch (IOException e)
         {
             throw new ModuleLoadError(e);
         }
-        this.getCore().getCommandManager().addCommand(new WorldsCommands(this, multiverse));
+        this.cm.addCommand(new WorldsCommands(this, multiverse, wm));
         this.perms = new WorldsPermissions(this);
+    }
+
+    public Multiverse getMultiverse()
+    {
+        return multiverse;
     }
 
     public WorldsPermissions perms()

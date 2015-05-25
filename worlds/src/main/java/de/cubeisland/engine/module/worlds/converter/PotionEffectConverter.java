@@ -28,8 +28,8 @@ import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.NullNode;
 import de.cubeisland.engine.converter.node.StringNode;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
+import org.spongepowered.api.potion.PotionEffect;
+import org.spongepowered.api.potion.PotionEffectType;
 
 public class PotionEffectConverter extends SingleClassConverter<PotionEffect>
 {

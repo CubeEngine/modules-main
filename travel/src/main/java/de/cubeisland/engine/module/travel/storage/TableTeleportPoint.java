@@ -17,22 +17,23 @@
  */
 package de.cubeisland.engine.module.travel.storage;
 
-import de.cubeisland.engine.core.storage.database.AutoIncrementTable;
-import de.cubeisland.engine.core.util.Version;
+import de.cubeisland.engine.module.service.database.AutoIncrementTable;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.core.util.Version;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
-import static de.cubeisland.engine.core.world.TableWorld.TABLE_WORLD;
+import static de.cubeisland.engine.module.service.user.TableUser.TABLE_USER;
+import static de.cubeisland.engine.module.service.world.TableWorld.TABLE_WORLD;
 
 public class TableTeleportPoint extends AutoIncrementTable<TeleportPointModel, UInteger>
 {
     public static TableTeleportPoint TABLE_TP_POINT;
 
-    public TableTeleportPoint(String prefix)
+    public TableTeleportPoint(String prefix, Database database)
     {
-        super(prefix + "teleportpoints", new Version(1));
+        super(prefix + "teleportpoints", new Version(1), database);
         this.setAIKey(KEY);
         this.addUniqueKey(OWNER, NAME, TYPE);
         this.addForeignKey(TABLE_USER.getPrimaryKey(), OWNER);

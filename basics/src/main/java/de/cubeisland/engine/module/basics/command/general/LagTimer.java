@@ -18,11 +18,14 @@
 package de.cubeisland.engine.module.basics.command.general;
 
 import java.util.LinkedList;
-import de.cubeisland.engine.core.util.Pair;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.module.core.util.Pair;
 import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.service.task.TaskManager;
 
 public class LagTimer implements Runnable
 {
+    private final Log logger;
     private long lastTick = 0;
     private final LinkedList<Float> tpsHistory = new LinkedList<>();
 
@@ -30,12 +33,11 @@ public class LagTimer implements Runnable
     private long lowestTPSTime = 0;
 
     private long lastLowTps = 0;
-    private final Basics module;
 
     public LagTimer(Basics module)
     {
-        this.module = module;
-        module.getCore().getTaskManager().runTimer(module, this, 200, 20); //start timer after 10 sec
+        this.logger = module.getProvided(Log.class);
+        module.getModularity().start(TaskManager.class).runTimer(module, this, 200, 20); //start timer after 10 sec
     }
 
     @Override
@@ -69,7 +71,7 @@ public class LagTimer implements Runnable
                 }
                 if (tps < 1)
                 {
-                    module.getLog().warn("Server is running slowly! Less then 1 tick per Second!");
+                    logger.warn("Server is running slowly! Less then 1 tick per Second!");
                 }
                 this.lastLowTps = currentTick;
             }

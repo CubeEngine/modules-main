@@ -17,10 +17,9 @@
  */
 package de.cubeisland.engine.module.roles;
 
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserEvent;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserEvent;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
-import org.bukkit.event.HandlerList;
 
 public class RoleAppliedEvent extends UserEvent
 {
@@ -29,7 +28,7 @@ public class RoleAppliedEvent extends UserEvent
 
     public RoleAppliedEvent(Roles roles, User user, RolesAttachment attachment)
     {
-        super(roles.getCore(), user);
+        super(roles, user);
         this.roles = roles;
         this.attachment = attachment;
     }
@@ -42,18 +41,5 @@ public class RoleAppliedEvent extends UserEvent
     public Roles getRoles()
     {
         return roles;
-    }
-
-    private static final HandlerList handlers = new HandlerList();
-
-    @Override
-    public HandlerList getHandlers()
-    {
-        return handlers;
-    }
-
-    public static HandlerList getHandlerList()
-    {
-        return handlers;
     }
 }

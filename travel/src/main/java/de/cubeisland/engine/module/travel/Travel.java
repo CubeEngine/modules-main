@@ -18,10 +18,10 @@
 package de.cubeisland.engine.module.travel;
 
 import java.util.concurrent.TimeUnit;
-import de.cubeisland.engine.core.command.CommandManager;
-import de.cubeisland.engine.core.module.Module;
-import de.cubeisland.engine.core.storage.database.Database;
-import de.cubeisland.engine.core.util.Profiler;
+import de.cubeisland.engine.module.service.command.CommandManager;
+import de.cubeisland.engine.module.core.module.Module;
+import de.cubeisland.engine.module.core.storage.database.Database;
+import de.cubeisland.engine.module.core.util.Profiler;
 import de.cubeisland.engine.module.travel.home.HomeCommand;
 import de.cubeisland.engine.module.travel.home.HomeListener;
 import de.cubeisland.engine.module.travel.home.HomeManager;

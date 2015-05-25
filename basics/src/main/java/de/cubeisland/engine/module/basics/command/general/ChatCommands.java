@@ -25,39 +25,40 @@ import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.node.StringNode;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.command.sender.ConsoleCommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserManager;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.TimeUtil;
-import de.cubeisland.engine.core.util.converter.DurationConverter;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.TimeUtil;
+import de.cubeisland.engine.module.core.util.converter.DurationConverter;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandManager;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.command.sender.ConsoleCommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
 import org.joda.time.Duration;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.core.command.CommandSender.NON_PLAYER_UUID;
-import static de.cubeisland.engine.core.util.ChatFormat.RESET;
-import static de.cubeisland.engine.core.util.ChatFormat.YELLOW;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.service.command.CommandSender.NON_PLAYER_UUID;
 import static java.util.concurrent.TimeUnit.DAYS;
 
 public class ChatCommands
 {
     private final DurationConverter converter = new DurationConverter();
     private final UserManager um;
+    private CommandManager cm;
     private final Basics module;
 
     private UUID lastWhisperOfConsole = null;
 
-    public ChatCommands(Basics basics)
+    public ChatCommands(Basics basics, UserManager um, CommandManager cm)
     {
         this.module = basics;
-        this.um = basics.getCore().getUserManager();
+        this.um = um;
+        this.cm = cm;
     }
 
     @Command(desc = "Sends a private message to someone", alias = {"tell", "message", "pm", "m", "t", "whisper", "w"})
@@ -108,7 +109,7 @@ public class ChatCommands
             }
             if (context instanceof User)
             {
-                ConsoleCommandSender console = module.getCore().getCommandManager().getConsoleSender();
+                ConsoleCommandSender console = cm.getConsoleSender();
                 console.sendTranslated(NEUTRAL, "{sender} -> {text:You}: {message:color=WHITE}", context, message);
                 context.sendTranslated(NEUTRAL, "{text:You} -> {user}: {message:color=WHITE}", console.getDisplayName(), message);
                 this.lastWhisperOfConsole = context.getUniqueId();
@@ -176,7 +177,7 @@ public class ChatCommands
         }
         bUser.setValue(TABLE_BASIC_USER.MUTED, new Timestamp(System.currentTimeMillis() + (dura.getMillis() == 0 ? DAYS.toMillis(9001) : dura.getMillis())));
         bUser.updateAsync();
-        String timeString = dura.getMillis() == 0 ? player.getTranslation(NONE, "ever") : TimeUtil.format(player.getLocale(), dura.getMillis());
+        String timeString = dura.getMillis() == 0 ? player.getTranslation(NONE, "ever").get(player.getLocale()) : TimeUtil.format(player.getLocale(), dura.getMillis());
         player.sendTranslated(NEGATIVE, "You are now muted for {input#amount}!", timeString);
         context.sendTranslated(NEUTRAL, "You muted {user} globally for {input#amount}!", player, timeString);
     }
@@ -193,7 +194,7 @@ public class ChatCommands
     @Command(alias = "roll", desc = "Shows a random number from 0 to 100")
     public void rand(CommandSender context)
     {
-        this.um.broadcastTranslatedStatus(YELLOW, "rolled a {integer}!", context, new Random().nextInt(100));
+        this.um.broadcastTranslatedStatus(NEUTRAL, "rolled a {integer}!", context, new Random().nextInt(100));
     }
 
     @Command(desc = "Displays the colors")
@@ -208,7 +209,7 @@ public class ChatCommands
             {
                 builder.append("\n");
             }
-            builder.append(" ").append(chatFormat.getChar()).append(" ").append(chatFormat.toString()).append(chatFormat.name()).append(RESET);
+            builder.append(" ").append(chatFormat.getChar()).append(" ").append(chatFormat.toString()).append(chatFormat.name()).append(ChatFormat.RESET);
         }
         context.sendMessage(builder.toString());
         context.sendTranslated(POSITIVE, "To use these type {text:&} followed by the code above");

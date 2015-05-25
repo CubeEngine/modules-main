@@ -17,12 +17,23 @@
  */
 package de.cubeisland.engine.module.portals;
 
+import javax.inject.Inject;
 import de.cubeisland.engine.butler.ProviderManager;
-import de.cubeisland.engine.core.module.Module;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.modularity.asm.marker.Enable;
+import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
+import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.portals.config.Destination;
 import de.cubeisland.engine.module.portals.config.Destination.DestinationReader;
 import de.cubeisland.engine.module.portals.config.DestinationConverter;
+import de.cubeisland.engine.module.service.Selector;
+import de.cubeisland.engine.module.service.command.CommandManager;
+import de.cubeisland.engine.module.service.task.TaskManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.reflect.Reflector;
 
+@ModuleInfo(name = "Portals", description = "Create and use portals")
 public class Portals extends Module
 {
     private PortalManager portalManager;
@@ -32,13 +43,21 @@ public class Portals extends Module
         return portalManager;
     }
 
-    @Override
+    @Inject private Reflector reflector;
+    @Inject private CommandManager cm;
+    @Inject private WorldManager wm;
+    @Inject private Selector selector;
+    @Inject private EventManager em;
+    @Inject private TaskManager tm;
+    @Inject private Log logger;
+
+    @Enable
     public void onEnable()
     {
-        this.getCore().getConfigFactory().getDefaultConverterManager().registerConverter(new DestinationConverter(getCore()), Destination.class);
-        ProviderManager rManager = this.getCore().getCommandManager().getProviderManager();
+        reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(wm), Destination.class);
+        ProviderManager rManager = cm.getProviderManager();
         rManager.register(this, new PortalReader(this), Portal.class);
         rManager.register(this, new DestinationReader(this), Destination.class);
-        this.portalManager = new PortalManager(this);
+        this.portalManager = new PortalManager(this, selector, reflector, wm, em, tm, cm, logger);
     }
 }

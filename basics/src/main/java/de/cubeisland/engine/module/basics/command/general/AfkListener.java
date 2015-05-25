@@ -17,86 +17,88 @@
  */
 package de.cubeisland.engine.module.basics.command.general;
 
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserManager;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityShootBowEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerChatTabCompleteEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.ProjectileLaunchEvent;
+import org.spongepowered.api.event.entity.player.PlayerChatEvent;
+import org.spongepowered.api.event.entity.player.PlayerInteractEvent;
+import org.spongepowered.api.event.entity.player.PlayerMoveEvent;
+import org.spongepowered.api.event.entity.player.PlayerQuitEvent;
+import org.spongepowered.api.event.inventory.InventoryClickEvent;
+import org.spongepowered.api.event.message.CommandEvent;
 
-public class AfkListener implements Listener, Runnable
+import static org.spongepowered.api.event.Order.POST;
+
+public class AfkListener implements Runnable
 {
     private final Basics module;
     private final UserManager um;
     private final long autoAfk;
     private final long afkCheck;
 
-    public AfkListener(Basics module, long autoAfk, long afkCheck)
+    public AfkListener(Basics module, UserManager um, long autoAfk, long afkCheck)
     {
         this.module = module;
-        this.um = module.getCore().getUserManager();
+        this.um = um;
         this.autoAfk = autoAfk;
         this.afkCheck = afkCheck;
     }
-
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @Subscribe(order = POST)
     public void onMove(PlayerMoveEvent event)
     {
-        if (event.getFrom().getBlockX() == event.getTo().getBlockX() && event.getFrom().getBlockZ() == event.getTo().getBlockZ())
+        if (event.getOldLocation().getBlockX() == event.getNewLocation().getBlockX() && event.getOldLocation().getBlockZ() == event.getNewLocation().getBlockZ())
         {
             return;
         }
-        this.updateLastAction(event.getPlayer());
+        this.updateLastAction(event.getUser());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @Subscribe(order = POST)
     public void onInventoryClick(InventoryClickEvent event)
     {
-        if (event.getWhoClicked() instanceof Player)
+        if (event.getViewer() instanceof Player)
         {
-            this.updateLastAction((Player)event.getWhoClicked());
+            this.updateLastAction((Player)event.getViewer());
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @Subscribe(order = POST)
     public void playerInteract(PlayerInteractEvent event)
     {
-        this.updateLastAction(event.getPlayer());
+        this.updateLastAction(event.getUser());
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onChat(AsyncPlayerChatEvent event)
+    @Subscribe(order = POST)
+    public void onChat(PlayerChatEvent event)
     {
-        this.updateLastAction(event.getPlayer());
+        this.updateLastAction(event.getUser());
         this.run();
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onCommand(PlayerCommandPreprocessEvent event)
+    @Subscribe(order = POST)
+    public void onCommand(CommandEvent event)
     {
-        this.updateLastAction(event.getPlayer());
+        if (event.getSource() instanceof Player)
+        {
+            this.updateLastAction((Player)event.getSource());
+        }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    /* TODO @Subscribe(order = POST)
     public void onChatTabComplete(PlayerChatTabCompleteEvent event)
     {
-        this.updateLastAction(event.getPlayer());
+        this.updateLastAction(event.getUser());
     }
+    */
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @Subscribe(order = POST)
     public void onLeave(PlayerQuitEvent event)
     {
-        BasicsAttachment basicsAttachment = this.um.getExactUser(event.getPlayer().getUniqueId()).get(BasicsAttachment.class);
+        BasicsAttachment basicsAttachment = this.um.getExactUser(event.getUser().getUniqueId()).get(BasicsAttachment.class);
         if (basicsAttachment != null)
         {
             basicsAttachment.setAfk(false);
@@ -104,10 +106,10 @@ public class AfkListener implements Listener, Runnable
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
-    public void onBowShot(EntityShootBowEvent event)
+    @Subscribe(order = POST)
+    public void onBowShot(ProjectileLaunchEvent event)
     {
-        if (event.getEntity() instanceof Player)
+        if (event.getSource().isPresent() && event.getSource() instanceof Player)
         {
             this.updateLastAction((Player)event.getEntity());
         }
@@ -130,7 +132,7 @@ public class AfkListener implements Listener, Runnable
     public void run()
     {
         BasicsAttachment basicsAttachment;
-        for (User user : this.module.getCore().getUserManager().getLoadedUsers())
+        for (User user : um.getLoadedUsers())
         {
             if (user.isOnline())
             {

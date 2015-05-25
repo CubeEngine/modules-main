@@ -23,20 +23,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import de.cubeisland.engine.core.CubeEngine;
-import de.cubeisland.engine.core.util.WorldLocation;
-import de.cubeisland.engine.core.world.ConfigWorld;
+import de.cubeisland.engine.module.core.util.WorldLocation;
+import de.cubeisland.engine.module.service.world.ConfigWorld;
 import de.cubeisland.engine.module.worlds.Worlds;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.bukkit.Bukkit;
-import org.bukkit.Difficulty;
-import org.bukkit.GameMode;
-import org.bukkit.World;
-import org.bukkit.World.Environment;
-import org.bukkit.WorldCreator;
-import org.bukkit.WorldType;
+import org.spongepowered.api.entity.player.gamemode.GameMode;
+import org.spongepowered.api.entity.player.gamemode.GameModes;
+import org.spongepowered.api.world.DimensionType;
+import org.spongepowered.api.world.GeneratorType;
+import org.spongepowered.api.world.GeneratorTypes;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.difficulty.Difficulties;
+import org.spongepowered.api.world.difficulty.Difficulty;
 
 @SuppressWarnings("all")
 public class WorldConfig extends ReflectedYaml
@@ -51,10 +51,10 @@ public class WorldConfig extends ReflectedYaml
     public class Generation implements Section
     {
         @Comment("NORMAL, NETHER or THE_END")
-        public Environment environment;
+        public DimensionType environment;
         public String seed = "";
-        @Comment("NORMAL, FLAT, DEFAULT_1_1, LARGEBIOMES or AMPLIFIED")
-        public WorldType worldType = WorldType.NORMAL;
+        @Comment("FLAT, NETHER, OVERWORLD or END")
+        public GeneratorType worldType = GeneratorTypes.OVERWORLD;
         @Comment("Whether to generate structures or not")
         public boolean generateStructures = true;
         @Comment("Custom Generator Class ID (consists of Plugin:generatorID)")
@@ -121,9 +121,9 @@ public class WorldConfig extends ReflectedYaml
     public boolean autosave = true;
 
     @Comment("This worlds gamemode")
-    public GameMode gameMode = GameMode.SURVIVAL;
+    public GameMode gameMode = GameModes.SURVIVAL;
     @Comment("This worlds difficulty")
-    public Difficulty difficulty = Difficulty.NORMAL;
+    public Difficulty difficulty = Difficulties.NORMAL;
 
     @Comment("The world where NetherPortals will lead to. (This won't work in an end world)")
     public String netherTarget;

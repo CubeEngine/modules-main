@@ -17,19 +17,26 @@
  */
 package de.cubeisland.engine.module.roles;
 
-import de.cubeisland.engine.core.module.service.Metadata;
-import de.cubeisland.engine.core.user.User;
+import javax.inject.Inject;
+import de.cubeisland.engine.modularity.asm.marker.ServiceImpl;
+import de.cubeisland.engine.modularity.asm.marker.Version;
+import de.cubeisland.engine.module.service.Metadata;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RoleProvider;
 import de.cubeisland.engine.module.roles.role.RolesManager;
 import de.cubeisland.engine.module.roles.role.UserDatabaseStore;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
 import org.bukkit.World;
+import org.spongepowered.api.world.World;
 
+@ServiceImpl(Metadata.class)
+@Version(1)
 public class MetadataProvider implements Metadata
 {
     private RolesManager rolesManager;
 
+    @Inject
     public MetadataProvider(RolesManager rolesManager)
     {
         this.rolesManager = rolesManager;

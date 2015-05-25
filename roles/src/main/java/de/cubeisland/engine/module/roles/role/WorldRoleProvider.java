@@ -23,13 +23,12 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import de.cubeisland.engine.core.util.Triplet;
+import de.cubeisland.engine.module.core.util.Triplet;
 import de.cubeisland.engine.module.roles.RolesConfig;
 import de.cubeisland.engine.module.roles.config.MirrorConfig;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
-import org.bukkit.World;
 
-import static de.cubeisland.engine.core.contract.Contract.expectNotNull;
+import org.spongepowered.api.world.World;
 
 public class WorldRoleProvider extends RoleProvider
 {
@@ -46,7 +45,7 @@ public class WorldRoleProvider extends RoleProvider
 
     public WorldRoleProvider(RolesManager manager, World world)
     {
-        this(manager, new MirrorConfig(manager.module, world));
+        this(manager, new MirrorConfig(manager.module, wm, world));
     }
 
     public void reloadRoles()

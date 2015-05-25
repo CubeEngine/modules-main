@@ -21,9 +21,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import de.cubeisland.engine.core.util.matcher.Match;
-import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.entity.EntityType;
 
 import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;
 
@@ -52,7 +51,7 @@ public enum ProtectedType
         }
     }
 
-    private ProtectedType(int id, ProtectionFlag... supportedFlags)
+    ProtectedType(int id, ProtectionFlag... supportedFlags)
     {
         this.supportedFlags = Arrays.asList(supportedFlags);
         this.id = (byte)id;
@@ -64,7 +63,7 @@ public enum ProtectedType
     }
 
 
-    public static ProtectedType getProtectedType(Material material)
+    public static ProtectedType getProtectedType(BlockType material)
     {
         switch (material)
         {

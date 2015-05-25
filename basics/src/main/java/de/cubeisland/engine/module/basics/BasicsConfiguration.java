@@ -21,16 +21,17 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
+import de.cubeisland.engine.module.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.inventory.ItemStack;
 import org.joda.time.Duration;
 import org.joda.time.Period;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.item.ItemType;
+
+import static org.spongepowered.api.block.BlockTypes.*;
 
 @SuppressWarnings("all")
 public class BasicsConfiguration extends ReflectedYaml
@@ -54,42 +55,42 @@ public class BasicsConfiguration extends ReflectedYaml
         @Name("mute.default-mute-time")
         public Duration defaultMuteTime = new Duration(0);
 
-        public Collection<ItemStack> itemBlacklist = new LinkedList<ItemStack>()
+        public Collection<BlockType> itemBlacklist = new LinkedList<BlockType>()
         {
             {
-                this.add(new ItemStack(Material.BEDROCK));
-                this.add(new ItemStack(Material.WATER));
-                this.add(new ItemStack(Material.STATIONARY_WATER));
-                this.add(new ItemStack(Material.LAVA));
-                this.add(new ItemStack(Material.STATIONARY_LAVA));
-                this.add(new ItemStack(Material.BED_BLOCK));
-                this.add(new ItemStack(Material.PISTON_EXTENSION));
-                this.add(new ItemStack(Material.PISTON_MOVING_PIECE));
-                this.add(new ItemStack(Material.REDSTONE_WIRE));
-                this.add(new ItemStack(Material.CROPS));
-                this.add(new ItemStack(Material.SIGN_POST));
-                this.add(new ItemStack(Material.WOODEN_DOOR));
-                this.add(new ItemStack(Material.WALL_SIGN));
-                this.add(new ItemStack(Material.IRON_DOOR_BLOCK));
-                this.add(new ItemStack(Material.REDSTONE_TORCH_OFF));
-                this.add(new ItemStack(Material.PORTAL));
-                this.add(new ItemStack(Material.CAKE_BLOCK));
-                this.add(new ItemStack(Material.DIODE_BLOCK_OFF));
-                this.add(new ItemStack(Material.DIODE_BLOCK_ON));
-                this.add(new ItemStack(Material.PUMPKIN_STEM));
-                this.add(new ItemStack(Material.MELON_STEM));
-                this.add(new ItemStack(Material.NETHER_WARTS));
-                this.add(new ItemStack(Material.BREWING_STAND));
-                this.add(new ItemStack(Material.CAULDRON));
-                this.add(new ItemStack(Material.ENDER_PORTAL));
-                this.add(new ItemStack(Material.REDSTONE_LAMP_ON));
-                this.add(new ItemStack(Material.COCOA));
-                this.add(new ItemStack(Material.TRIPWIRE));
-                this.add(new ItemStack(Material.COMMAND));
-                this.add(new ItemStack(Material.FLOWER_POT));
-                this.add(new ItemStack(Material.CARROT));
-                this.add(new ItemStack(Material.POTATO));
-                this.add(new ItemStack(Material.SKULL));
+                this.add(BEDROCK);
+                this.add(WATER);
+                this.add(FLOWING_WATER);
+                this.add(LAVA);
+                this.add(FLOWING_LAVA);
+                this.add(BED);
+                this.add(PISTON_EXTENSION);
+                this.add(PISTON_HEAD);
+                this.add(REDSTONE_WIRE);
+                this.add(WHEAT);
+                this.add(STANDING_SIGN);
+                this.add(WOODEN_DOOR);
+                this.add(WALL_SIGN);
+                this.add(IRON_DOOR);
+                this.add(UNLIT_REDSTONE_TORCH);
+                this.add(PORTAL);
+                this.add(CAKE);
+                this.add(POWERED_REPEATER);
+                this.add(UNPOWERED_REPEATER);
+                this.add(PUMPKIN_STEM);
+                this.add(MELON_STEM);
+                this.add(NETHER_WART);
+                this.add(BREWING_STAND);
+                this.add(CAULDRON);
+                this.add(END_PORTAL);
+                this.add(LIT_REDSTONE_LAMP);
+                this.add(COCOA);
+                this.add(TRIPWIRE);
+                this.add(COMMAND_BLOCK);
+                this.add(FLOWER_POT);
+                this.add(CARROTS);
+                this.add(POTATOES);
+                this.add(SKULL);
             }
         };
 
@@ -99,13 +100,16 @@ public class BasicsConfiguration extends ReflectedYaml
         @Name("door.max.radius")
         public int maxDoorRadius = 10;
 
-        public boolean containsBlackListed(ItemStack item)
+        public boolean containsBlackListed(ItemType item)
         {
-            for (ItemStack blItem : itemBlacklist)
+            for (BlockType blItem : itemBlacklist)
             {
-                if (blItem.getType() == item.getType() && blItem.getDurability() == item.getDurability())
+                if (blItem.getHeldItem().isPresent())
                 {
-                    return true;
+                    if (blItem.getHeldItem().equals(item))
+                    {
+                        return true;
+                    }
                 }
             }
             return false;
@@ -114,7 +118,7 @@ public class BasicsConfiguration extends ReflectedYaml
 
     @Comment({"The world to teleport to when using /spawn",
               "Use {} if you want to use the spawn of the world the player is in."})
-    public World mainWorld = Bukkit.getServer().getWorld("world");
+    public ConfigWorld mainWorld;
 
     public AfkSection autoAfk;
 
@@ -154,7 +158,7 @@ public class BasicsConfiguration extends ReflectedYaml
     @Override
     public void onLoaded(File loadedFrom)
     {
-        for (Iterator<ItemStack> it = this.commands.itemBlacklist.iterator(); it.hasNext(); )
+        for (Iterator<BlockType> it = this.commands.itemBlacklist.iterator(); it.hasNext(); )
         {
             if (it.next() == null)
             {

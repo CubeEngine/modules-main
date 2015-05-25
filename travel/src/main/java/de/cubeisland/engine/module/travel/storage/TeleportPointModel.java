@@ -18,12 +18,13 @@
 package de.cubeisland.engine.module.travel.storage;
 
 import javax.persistence.Transient;
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.database.AsyncRecord;
+import de.cubeisland.engine.module.core.storage.database.AsyncRecord;
+import de.cubeisland.engine.module.service.user.User;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Location;
 
-import static de.cubeisland.engine.core.CubeEngine.getCore;
+import de.cubeisland.engine.module.core.CubeEngine.getCore;
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
 public class TeleportPointModel extends AsyncRecord<TeleportPointModel>

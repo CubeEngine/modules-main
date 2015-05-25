@@ -20,43 +20,21 @@ package de.cubeisland.engine.module.basics.command.moderation;
 import java.util.HashMap;
 import java.util.Map;
 import de.cubeisland.engine.module.basics.Basics;
-import org.bukkit.entity.Ambient;
-import org.bukkit.entity.Animals;
-import org.bukkit.entity.Bat;
-import org.bukkit.entity.Blaze;
-import org.bukkit.entity.CaveSpider;
-import org.bukkit.entity.Chicken;
-import org.bukkit.entity.Cow;
-import org.bukkit.entity.Creeper;
-import org.bukkit.entity.EnderDragon;
-import org.bukkit.entity.Enderman;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Ghast;
-import org.bukkit.entity.Giant;
-import org.bukkit.entity.Golem;
-import org.bukkit.entity.Horse;
-import org.bukkit.entity.IronGolem;
-import org.bukkit.entity.MagmaCube;
-import org.bukkit.entity.Monster;
-import org.bukkit.entity.MushroomCow;
-import org.bukkit.entity.Ocelot;
-import org.bukkit.entity.Pig;
-import org.bukkit.entity.PigZombie;
-import org.bukkit.entity.Sheep;
-import org.bukkit.entity.Silverfish;
-import org.bukkit.entity.Skeleton;
-import org.bukkit.entity.Slime;
-import org.bukkit.entity.Snowman;
-import org.bukkit.entity.Spider;
-import org.bukkit.entity.Squid;
-import org.bukkit.entity.Tameable;
-import org.bukkit.entity.Villager;
-import org.bukkit.entity.WaterMob;
-import org.bukkit.entity.Witch;
-import org.bukkit.entity.Wither;
-import org.bukkit.entity.Wolf;
-import org.bukkit.entity.Zombie;
+
+import org.spongepowered.api.data.manipulator.entity.TameableData;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.Ambient;
+import org.spongepowered.api.entity.living.Bat;
+import org.spongepowered.api.entity.living.Squid;
+import org.spongepowered.api.entity.living.Villager;
+import org.spongepowered.api.entity.living.animal.*;
+import org.spongepowered.api.entity.living.complex.EnderDragon;
+import org.spongepowered.api.entity.living.golem.Golem;
+import org.spongepowered.api.entity.living.golem.IronGolem;
+import org.spongepowered.api.entity.living.golem.SnowGolem;
+import org.spongepowered.api.entity.living.monster.*;
 
 public class EntityRemovals
 {
@@ -67,73 +45,73 @@ public class EntityRemovals
             @Override
             public boolean extra(Entity entity)
             {
-                return ((Tameable)entity).isTamed();
+                return entity.getData(TameableData.class).isPresent();
             }
         });
         GROUPED_ENTITY_REMOVAL.put("golem", new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_GOLEM, Golem.class));
-        GROUPED_ENTITY_REMOVAL.put("animal", new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Animals.class)
+        GROUPED_ENTITY_REMOVAL.put("animal", new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Animal.class)
         {
             @Override
             public boolean extra(Entity entity)
             {
-                return !(entity instanceof Tameable && ((Tameable)entity).isTamed());
+                return entity.getData(TameableData.class).isPresent();
             }
         });
-        GROUPED_ENTITY_REMOVAL.put("other", new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_OTHER, Ambient.class, WaterMob.class));
+        GROUPED_ENTITY_REMOVAL.put("other", new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_OTHER, Ambient.class, Squid.class));
         GROUPED_ENTITY_REMOVAL.put("boss", new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_BOSS, EnderDragon.class, Wither.class));
         GROUPED_ENTITY_REMOVAL.put("monster", new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Monster.class, Slime.class, Ghast.class));
 
 
-        DIRECT_ENTITY_REMOVAL.put(EntityType.CREEPER, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Creeper.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.SKELETON, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Skeleton.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.SPIDER, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Spider.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.GIANT, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_BOSS, Giant.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.ZOMBIE, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Zombie.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.SLIME, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Slime.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.GHAST, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Ghast.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.PIG_ZOMBIE, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, PigZombie.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.ENDERMAN, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Enderman.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.CAVE_SPIDER, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, CaveSpider.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.SILVERFISH, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Silverfish.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.BLAZE, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Blaze.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.MAGMA_CUBE, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, MagmaCube.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.ENDER_DRAGON, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_BOSS, EnderDragon.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.WITHER, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_BOSS, Wither.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.BAT, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_OTHER, Bat.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.WITCH, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Witch.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.PIG, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Pig.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.SHEEP, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Sheep.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.COW, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Cow.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.CHICKEN, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Chicken.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.SQUID, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_OTHER, Squid.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.WOLF, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Wolf.class)
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.CREEPER, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Creeper.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.SPIDER, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Spider.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.GIANT, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_BOSS, Giant.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.ZOMBIE, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Zombie.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.SLIME, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Slime.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.GHAST, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Ghast.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.PIG_ZOMBIE, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, ZombiePigman.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.ENDERMAN, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Enderman.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.CAVE_SPIDER, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, CaveSpider.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.SILVERFISH, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Silverfish.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.BLAZE, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Blaze.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.MAGMA_CUBE, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, MagmaCube.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.ENDER_DRAGON, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_BOSS, EnderDragon.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.WITHER, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_BOSS, Wither.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.BAT, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_OTHER, Bat.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.WITCH, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Witch.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.PIG, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Pig.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.SHEEP, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Sheep.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.COW, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Cow.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.CHICKEN, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Chicken.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.SKELETON, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_MONSTER, Skeleton.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.SQUID, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_OTHER, Squid.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.WOLF, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Wolf.class)
         {
             @Override
             public boolean extra(Entity entity)
             {
-                return !((Wolf)entity).isTamed();
+                return !entity.getData(TameableData.class).isPresent();
             }
         });
-        DIRECT_ENTITY_REMOVAL.put(EntityType.MUSHROOM_COW, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, MushroomCow.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.SNOWMAN, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_GOLEM, Snowman.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.OCELOT, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Ocelot.class)
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.MUSHROOM_COW, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Mooshroom.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.SNOWMAN, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_GOLEM, SnowGolem.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.OCELOT, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Ocelot.class)
         {
             @Override
             public boolean extra(Entity entity)
             {
-                return !((Ocelot)entity).isTamed();
+                return !entity.getData(TameableData.class).isPresent();
             }
         });
-        DIRECT_ENTITY_REMOVAL.put(EntityType.IRON_GOLEM, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_GOLEM, IronGolem.class));
-        DIRECT_ENTITY_REMOVAL.put(EntityType.HORSE, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Horse.class)
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.IRON_GOLEM, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_GOLEM, IronGolem.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.HORSE, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_ANIMAL, Horse.class)
         {
             @Override
             public boolean extra(Entity entity)
             {
-                return !((Horse)entity).isTamed();
+                return !entity.getData(TameableData.class).isPresent();
             }
         });
-        DIRECT_ENTITY_REMOVAL.put(EntityType.VILLAGER, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_NPC, Villager.class));
+        DIRECT_ENTITY_REMOVAL.put(EntityTypes.VILLAGER, new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_NPC, Villager.class));
     }
 
     final Map<String, EntityRemoval> GROUPED_ENTITY_REMOVAL = new HashMap<>();

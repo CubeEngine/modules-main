@@ -29,48 +29,31 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.permission.Permission;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.McUUID;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.WorldLocation;
-import de.cubeisland.engine.core.world.ConfigWorld;
-import de.cubeisland.engine.core.world.WorldManager;
-import de.cubeisland.engine.core.world.WorldSetSpawnEvent;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.McUUID;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.WorldLocation;
+import de.cubeisland.engine.module.service.world.ConfigWorld;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.module.service.world.WorldSetSpawnEvent;
 import de.cubeisland.engine.module.worlds.config.WorldConfig;
 import de.cubeisland.engine.module.worlds.config.WorldsConfig;
 import de.cubeisland.engine.module.worlds.player.PlayerConfig;
 import de.cubeisland.engine.module.worlds.player.PlayerDataConfig;
 import de.cubeisland.engine.reflect.Reflector;
-import org.bukkit.Location;
-import org.bukkit.TravelAgent;
-import org.bukkit.World;
-import org.bukkit.World.Environment;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityPortalEvent;
-import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerBedLeaveEvent;
-import org.bukkit.event.player.PlayerChangedWorldEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerPortalEvent;
-import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.player.PlayerRespawnEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
-import org.bukkit.event.world.WorldLoadEvent;
-import org.bukkit.inventory.InventoryHolder;
 
-import static de.cubeisland.engine.core.filesystem.FileExtensionFilter.YAML;
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.filesystem.FileExtensionFilter.YAML;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.world.World;
 
 /**
  * Holds multiple parallel universes
  */
-public class Multiverse implements Listener
+public class Multiverse
 {
     private final Worlds module;
     private final WorldManager wm;
@@ -87,10 +70,10 @@ public class Multiverse implements Listener
 
     private final Permission universeRootPerm;
 
-    public Multiverse(Worlds module, WorldsConfig config) throws IOException
+    public Multiverse(Worlds module, WorldsConfig config, WorldManager wm) throws IOException
     {
         this.module = module;
-        this.wm = module.getCore().getWorldManager();
+        this.wm = wm;
         this.config = config;
         this.universeRootPerm = this.module.getBasePermission().childWildcard("universe");
 
@@ -379,7 +362,7 @@ public class Multiverse implements Listener
         }
     }
 
-    @EventHandler
+    @Subscribe
     public void onEntityPortal(EntityPortalEvent event)
     {
         World world = event.getEntity().getWorld();
@@ -452,7 +435,7 @@ public class Multiverse implements Listener
             Universe universe = this.universes.get(this.config.mainUniverse);
             World world = universe.getMainWorld();
             WorldConfig worldConfig = universe.getWorldConfig(world);
-            event.getPlayer().teleport(worldConfig.spawn.spawnLocation.getLocationIn(world));
+            event.getPlayer().teleport(worldConfig.spawn.spawnLocation.getLocationIn(world)); // TODO rotation
         }
         this.checkForExpectedWorld(event.getPlayer());
     }

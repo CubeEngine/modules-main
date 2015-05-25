@@ -22,8 +22,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.service.user.UserManager;
 import org.bukkit.Art;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Painting;
@@ -34,33 +36,44 @@ import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerItemHeldEvent;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import org.spongepowered.api.data.type.Art;
+import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.hanging.Painting;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 
-public class PaintingListener implements Listener
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+
+public class PaintingListener
 {
     private final Basics module;
+    private UserManager um;
     private final Map<UUID, Painting> paintingChange;
 
-    public PaintingListener(Basics module)
+    public PaintingListener(Basics module, UserManager um)
     {
         this.module = module;
+        this.um = um;
         this.paintingChange = new HashMap<>();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @Subscribe(order = Order.EARLY)
     public void onPlayerInteractEntity(PlayerInteractEntityEvent event)
     {
-        if (event.getRightClicked().getType() == EntityType.PAINTING)
+        if (event.getTargetEntity().getType() == EntityTypes.PAINTING)
         {
-            User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
+            User user = um.getExactUser(event.getUser().getUniqueId());
 
             if (!module.perms().CHANGEPAINTING.isAuthorized(user))
             {
                 user.sendTranslated(NEGATIVE, "You are not allowed to change this painting.");
                 return;
             }
-            Painting painting = (Painting)event.getRightClicked();
+            Painting painting = (Painting)event.getTargetEntity();
 
             Painting playerPainting = this.paintingChange.get(user.getUniqueId());
             if(playerPainting == null && this.paintingChange.containsValue(painting))
@@ -93,16 +106,16 @@ public class PaintingListener implements Listener
         return Integer.compare(previousSlot, newSlot);
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @Subscribe(order = Order.EARLY)
     public void onItemHeldChange(PlayerItemHeldEvent event)
     {
         if (!this.paintingChange.isEmpty())
         {
-            Painting painting = this.paintingChange.get(event.getPlayer().getUniqueId());
+            Painting painting = this.paintingChange.get(event.getUser().getUniqueId());
 
             if (painting != null)
             {
-                User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
+                User user = um.getExactUser(event.getUser().getUniqueId());
                 final int maxDistanceSquared = this.module.getConfiguration().maxChangePaintingDistance * this.module
                     .getConfiguration().maxChangePaintingDistance;
 
@@ -115,7 +128,8 @@ public class PaintingListener implements Listener
                 }
 
                 Art[] arts = Art.values();
-                int artNumber = painting.getArt().ordinal();
+
+                int artNumber = painting.getArtData().getArt().ordinal();
                 int change = this.compareSlots(event.getPreviousSlot(), event.getNewSlot());
                 artNumber += change;
                 if (artNumber >= arts.length)
@@ -146,7 +160,7 @@ public class PaintingListener implements Listener
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    @Subscribe(order = Order.EARLY)
     public void onPaintingBreakEvent(HangingBreakEvent event)
     {
         if (!(event.getEntity() instanceof Painting))
@@ -162,7 +176,7 @@ public class PaintingListener implements Listener
             Entry<UUID, Painting> entry = paintingIterator.next();
             if(entry.getValue().equals(painting))
             {
-                this.module.getCore().getUserManager().getExactUser(entry.getKey()).sendTranslated(NEGATIVE, "The painting broke");
+                um.getExactUser(entry.getKey()).sendTranslated(NEGATIVE, "The painting broke");
                 paintingIterator.remove();
             }
         }

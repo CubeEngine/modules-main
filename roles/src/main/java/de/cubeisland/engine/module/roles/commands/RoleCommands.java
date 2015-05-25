@@ -18,7 +18,7 @@
 package de.cubeisland.engine.module.roles.commands;
 
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.core.command.ContainerCommand;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.roles.Roles;
 
 @Command(name = "roles", desc = "Manages the roles")

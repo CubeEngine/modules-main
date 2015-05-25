@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.roles.storage;
 
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
+import de.cubeisland.engine.module.service.database.AsyncRecord;
 import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import org.jooq.types.UInteger;
 

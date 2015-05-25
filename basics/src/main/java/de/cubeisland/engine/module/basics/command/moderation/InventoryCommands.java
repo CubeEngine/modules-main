@@ -21,16 +21,18 @@ import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.InventoryGuardFactory;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 /**
  * Contains commands that allow to modify an inventory.
@@ -41,10 +43,12 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 public class InventoryCommands
 {
     private final Basics module;
+    private InventoryGuardFactory invGuard;
 
-    public InventoryCommands(Basics module)
+    public InventoryCommands(Basics module, InventoryGuardFactory invGuard)
     {
         this.module = module;
+        this.invGuard = invGuard;
     }
 
     @Command(desc = "Allows you to see into the inventory of someone else.")
@@ -82,7 +86,7 @@ public class InventoryCommands
                 player.sendTranslated(NEUTRAL, "{sender} is looking into your inventory.", sender);
             }
         }
-        InventoryGuardFactory guard = InventoryGuardFactory.prepareInventory(inv, sender);
+        InventoryGuardFactory guard = invGuard.prepareInventory(inv, sender);
         if (denyModify)
         {
             guard.blockPutInAll().blockTakeOutAll();

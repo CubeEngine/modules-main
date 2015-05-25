@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.portals;
 
-import de.cubeisland.engine.core.user.UserAttachment;
+import de.cubeisland.engine.module.service.user.UserAttachment;
 
 public class PortalsAttachment extends UserAttachment
 {

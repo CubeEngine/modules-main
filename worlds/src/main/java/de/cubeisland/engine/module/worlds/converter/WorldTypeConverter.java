@@ -22,17 +22,18 @@ import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
 import org.bukkit.WorldType;
+import org.spongepowered.api.world.GeneratorType;
 
-public class WorldTypeConverter extends SimpleConverter<WorldType>
+public class WorldTypeConverter extends SimpleConverter<GeneratorType>
 {
     @Override
-    public Node toNode(WorldType object) throws ConversionException
+    public Node toNode(GeneratorType object) throws ConversionException
     {
-        return new StringNode(object.name());
+        return new StringNode(object.getName());
     }
 
     @Override
-    public WorldType fromNode(Node node) throws ConversionException
+    public GeneratorType fromNode(Node node) throws ConversionException
     {
         try
         {

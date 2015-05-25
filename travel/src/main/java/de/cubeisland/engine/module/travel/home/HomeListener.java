@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.travel.home;
 
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.travel.Travel;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -25,7 +25,6 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static org.bukkit.Material.BED;
 import static org.bukkit.Material.BED_BLOCK;
 import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK;

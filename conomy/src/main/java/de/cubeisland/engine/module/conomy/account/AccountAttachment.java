@@ -17,7 +17,8 @@
  */
 package de.cubeisland.engine.module.conomy.account;
 
-import de.cubeisland.engine.core.user.UserAttachment;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.user.UserAttachment;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
 
@@ -65,8 +66,8 @@ public class AccountAttachment extends UserAttachment
     public UserAccount createAccount()
     {
         if (this.userAccount != null) return this.getAccount();
-        AccountModel model = this.getModule().getCore().getDB().getDSL().newRecord(TABLE_ACCOUNT).
-            newAccount(this.getHolder(), null,(long) (this.manager.config.defaultBalance * this.manager.config.fractionalDigitsFactor()), false);
+        AccountModel model = getModule().getModularity().start(Database.class).getDSL().newRecord(TABLE_ACCOUNT).
+            newAccount(getHolder(), null,(long) (this.manager.config.defaultBalance * this.manager.config.fractionalDigitsFactor()), false);
         model.insertAsync();
         this.userAccount = new UserAccount(this, this.manager, model);
         this.manager.logger.debug("NEW User: {} :: {}", this.getHolder().getName(), userAccount.balance());

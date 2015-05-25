@@ -20,16 +20,21 @@ package de.cubeisland.engine.module.roles.commands;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.core.command.ContainerCommand;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
 import org.bukkit.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import org.spongepowered.api.world.World;
+
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 @Command(name = "admin", desc = "Manages the module", alias = "manadmin")
 public class ManagementCommands extends ContainerCommand

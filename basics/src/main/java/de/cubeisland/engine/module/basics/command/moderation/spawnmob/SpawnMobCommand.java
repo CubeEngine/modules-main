@@ -21,18 +21,22 @@ import java.util.Collections;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.matcher.Match;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsConfiguration;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.Location;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.command.moderation.spawnmob.SpawnMob.spawnMobs;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 /**
  * The /spawnmob command.
@@ -67,7 +71,7 @@ public class SpawnMobCommand
         }
         else
         {
-            loc = sender.getTargetBlock(Collections.<Material>emptySet(), 200).getLocation().add(new Vector(0, 1, 0));
+            loc = sender.getTargetBlock(Collections.<BlockType>emptySet(), 200).getLocation().add(new Vector(0, 1, 0));
         }
         amount = amount == null ? 1 : amount;
 
@@ -90,17 +94,17 @@ public class SpawnMobCommand
         Entity entitySpawned = entitiesSpawned[0];
         if (entitySpawned.getPassenger() == null)
         {
-            context.sendTranslated(POSITIVE, "Spawned {amount} {input#entity}!", amount, Match.entity().getNameFor(entitySpawned.getType()));
+            context.sendTranslated(POSITIVE, "Spawned {amount} {input#entity}!", amount, entitySpawned.getType().getName());
         }
         else
         {
-            String message = Match.entity().getNameFor(entitySpawned.getType());
+            String message = entitySpawned.getType().getName();
             while (entitySpawned.getPassenger() != null)
             {
                 entitySpawned = entitySpawned.getPassenger();
-                message = context.getTranslation(NONE, "{input#entity} riding {input}", Match.entity().getNameFor(entitySpawned.getType()), message);
+                message = context.getTranslation(NONE, "{input#entity} riding {input}", entitySpawned.getType().getName(), message).get(context.getLocale());
             }
-            message = context.getTranslation(POSITIVE, "Spawned {amount} {input#message}!", amount, message);
+            message = context.getTranslation(POSITIVE, "Spawned {amount} {input#message}!", amount, message).get(context.getLocale());
             context.sendMessage(message);
         }
     }

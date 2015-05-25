@@ -19,11 +19,13 @@ package de.cubeisland.engine.module.basics.command.teleport;
 
 import java.util.HashMap;
 import java.util.Map;
-import de.cubeisland.engine.core.permission.Permission;
-import de.cubeisland.engine.core.permission.PermissionContainer;
+import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.service.permission.PermissionContainer;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsPerm;
-import org.bukkit.World;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.world.World;
 
 /**
  * Dynamically registered Permissions for each world.
@@ -33,12 +35,14 @@ public class TpWorldPermissions extends PermissionContainer<Basics>
 {
     private final Permission COMMAND_TPWORLD;
     private final Map<String, Permission> permissions = new HashMap<>();
+    private PermissionManager pm;
 
-    public TpWorldPermissions(Basics module, BasicsPerm perm)
+    public TpWorldPermissions(Basics module, BasicsPerm perm, WorldManager wm, PermissionManager pm)
     {
         super(module);
+        this.pm = pm;
         COMMAND_TPWORLD = perm.COMMAND.childWildcard("tpworld");
-        for (final World world : module.getCore().getWorldManager().getWorlds())
+        for (final World world : wm.getWorlds())
         {
             initWorldPermission(world.getName());
         }
@@ -48,7 +52,7 @@ public class TpWorldPermissions extends PermissionContainer<Basics>
     {
         Permission perm = COMMAND_TPWORLD.child(world);
         permissions.put(world, perm);
-        module.getCore().getPermissionManager().registerPermission(module,perm);
+        pm.registerPermission(module, perm);
         return perm;
     }
 
@@ -58,7 +62,7 @@ public class TpWorldPermissions extends PermissionContainer<Basics>
         if (perm == null)
         {
             perm = initWorldPermission(world);
-            this.module.getCore().getPermissionManager().notifyPermissionRegistrationCompleted(this.module, perm);
+            pm.notifyPermissionRegistrationCompleted(this.module, perm);
         }
         return perm;
     }

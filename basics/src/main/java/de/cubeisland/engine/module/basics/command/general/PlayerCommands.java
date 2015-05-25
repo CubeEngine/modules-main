@@ -26,56 +26,66 @@ import java.util.List;
 import java.util.Locale;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Default;
+import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.core.ban.UserBan;
-import de.cubeisland.engine.core.bukkit.BukkitUtils;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserList;
-import de.cubeisland.engine.core.user.UserManager;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.TimeUtil;
-import de.cubeisland.engine.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.event.entity.EntityDamageEvent;
+import de.cubeisland.engine.module.core.sponge.EventManager;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.TimeUtil;
+import de.cubeisland.engine.module.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.service.ban.BanManager;
+import de.cubeisland.engine.module.service.ban.UserBan;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandManager;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.task.TaskManager;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserList;
+import de.cubeisland.engine.module.service.user.UserManager;
+import org.spongepowered.api.entity.player.gamemode.GameMode;
+import org.spongepowered.api.entity.player.gamemode.GameModes;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 import static java.text.DateFormat.SHORT;
-import static org.bukkit.event.entity.EntityDamageEvent.DamageCause.CUSTOM;
+import static org.spongepowered.api.entity.player.gamemode.GameModes.CREATIVE;
+import static org.spongepowered.api.entity.player.gamemode.GameModes.SURVIVAL;
 
 public class PlayerCommands
 {
     private final UserManager um;
+    private CommandManager cm;
+    private BanManager banManager;
     private final Basics module;
     private AfkListener afkListener;
 
-    public PlayerCommands(Basics basics)
+    public PlayerCommands(Basics basics, UserManager um, EventManager em, TaskManager taskManager, CommandManager cm, BanManager banManager)
     {
         this.module = basics;
-        this.um = basics.getCore().getUserManager();
+        this.um = um;
+        this.cm = cm;
+        this.banManager = banManager;
         final long autoAfk;
         final long afkCheck;
         afkCheck = basics.getConfiguration().autoAfk.check.getMillis();
         if (afkCheck > 0)
         {
             autoAfk = basics.getConfiguration().autoAfk.after.getMillis();
-            this.afkListener = new AfkListener(basics, autoAfk, afkCheck);
-            basics.getCore().getEventManager().registerListener(basics, this.afkListener);
+            this.afkListener = new AfkListener(basics, um, autoAfk, afkCheck);
+            em.registerListener(basics, this.afkListener);
             if (autoAfk > 0)
             {
-                basics.getCore().getTaskManager().runTimer(basics, this.afkListener, 20, afkCheck / 50); // this is in ticks so /50
+                taskManager.runTimer(basics, this.afkListener, 20, afkCheck / 50); // this is in ticks so /50
             }
         }
     }
@@ -136,7 +146,7 @@ public class PlayerCommands
         {
             if (!(context instanceof User))
             {
-                context.sendMessage("\n\n\n\n\n\n\n\n\n\n\n\n\n");
+                context.sendMessage(Texts.of("\n\n\n\n\n\n\n\n\n\n\n\n\n"));
                 context.sendTranslated(NEGATIVE, "I'll give you only one line to eat!");
                 return;
             }
@@ -235,15 +245,15 @@ public class PlayerCommands
             case "survival":
             case "s":
             case "0":
-                return GameMode.SURVIVAL;
+                return GameModes.SURVIVAL;
             case "creative":
             case "c":
             case "1":
-                return GameMode.CREATIVE;
+                return GameModes.CREATIVE;
             case "adventure":
             case "a":
             case "2":
-                return GameMode.ADVENTURE;
+                return GameModes.ADVENTURE;
             default:
                 return null;
         }
@@ -251,15 +261,12 @@ public class PlayerCommands
 
     private GameMode toggleGameMode(GameMode mode)
     {
-        switch (mode)
+        if (mode == SURVIVAL)
         {
-            case SURVIVAL:
-                return GameMode.CREATIVE;
-            case ADVENTURE:
-            case CREATIVE:
-            default:
-                return GameMode.SURVIVAL;
+            return CREATIVE;
         }
+        //if (mode == ADVENTURE || mode == CREATIVE)
+        return SURVIVAL;
     }
 
     @Command(alias = "gm", desc = "Changes the gamemode")
@@ -278,11 +285,11 @@ public class PlayerCommands
         player.setGameMode(newMode);
         if (context.equals(player))
         {
-            context.sendTranslated(POSITIVE, "You changed your game mode to {input#gamemode}!", newMode.name());
+            context.sendTranslated(POSITIVE, "You changed your game mode to {input#gamemode}!", newMode.getName());
             return;
         }
-        context.sendTranslated(POSITIVE, "You changed the game mode of {user} to {input#gamemode}!", player.getDisplayName(), newMode.name()); // TODO translate gamemode
-        player.sendTranslated(NEUTRAL, "Your game mode has been changed to {input#gamemode}!", newMode.name());
+        context.sendTranslated(POSITIVE, "You changed the game mode of {user} to {input#gamemode}!", player.getDisplayName(), newMode.getName()); // TODO translate gamemode
+        player.sendTranslated(NEUTRAL, "Your game mode has been changed to {input#gamemode}!", newMode.getName());
     }
 
     @Command(alias = "slay", desc = "Kills a player")
@@ -292,7 +299,7 @@ public class PlayerCommands
         lightning = lightning && module.perms().COMMAND_KILL_LIGHTNING.isAuthorized(context);
         force = force && module.perms().COMMAND_KILL_FORCE.isAuthorized(context);
         quiet = quiet && module.perms().COMMAND_KILL_QUIET.isAuthorized(context);
-        List<String> killed = new ArrayList<>();
+        List<Text> killed = new ArrayList<>();
         List<User> userList = players.list();
         if (players.isAll())
         {
@@ -325,7 +332,7 @@ public class PlayerCommands
     {
         if (!force)
         {
-            if (module.perms().COMMAND_KILL_PREVENT.isAuthorized(user) || this.module.getBasicsUser(user).getEntity().getValue(TABLE_BASIC_USER.GODMODE))
+            if (module.perms().COMMAND_KILL_PREVENT.isAuthorized(user) || this.module.getBasicsUser(user.getPlayer().get()).getEntity().getValue(TABLE_BASIC_USER.GODMODE))
             {
                 context.sendTranslated(NEGATIVE, "You cannot kill {user}!", user);
                 return false;
@@ -357,14 +364,15 @@ public class PlayerCommands
             context.sendTranslated(NEUTRAL, "{user} is currently online!", player);
             return;
         }
-        long lastPlayed = player.getLastPlayed();
-        if (System.currentTimeMillis() - lastPlayed <= SEVEN_DAYS) // If less than 7 days show timeframe instead of date
+
+        Date lastPlayed = player.getLastPlayed();
+        if (System.currentTimeMillis() - lastPlayed.getTime() <= SEVEN_DAYS) // If less than 7 days show timeframe instead of date
         {
             context.sendTranslated(NEUTRAL, "{user} was last seen {input#date}.", player, TimeUtil.format(
-                context.getLocale(), new Date(lastPlayed)));
+                context.getLocale(), new Date(lastPlayed.getTime())));
             return;
         }
-        Date date = new Date(lastPlayed);
+        Date date = new Date(lastPlayed.getTime());
         DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale());
         context.sendTranslated(NEUTRAL, "{user} is offline since {input#time}", player, format.format(date));
     }
@@ -378,7 +386,7 @@ public class PlayerCommands
             context.sendTranslated(POSITIVE, "Forced {user} to chat: {input#message}", player, message);
             return;
         }
-        if (this.module.getCore().getCommandManager().runCommand(player, message.substring(1)))
+        if (cm.runCommand(player, message.substring(1)))
         {
             context.sendTranslated(POSITIVE, "Command {input#command} executed as {user}", message, player);
             return;
@@ -391,7 +399,9 @@ public class PlayerCommands
     public void suicide(User context)
     {
         context.setHealth(0);
-        context.setLastDamageCause(new EntityDamageEvent(context, CUSTOM, context.getMaxHealth()));
+
+        // TODO context.setLastDamageCause(new EntityDamageEvent(context, CUSTOM, context.getMaxHealth()));
+        // maybe DamageableData
         context.sendTranslated(NEGATIVE, "You ended your life. Why? {text:\\:(:color=DARK_RED}");
     }
 
@@ -433,11 +443,11 @@ public class PlayerCommands
         {
             context.sendTranslated(NEUTRAL, "Life: {decimal:0}/{decimal#max:0}", player.getHealth(), player.getMaxHealth());
             context.sendTranslated(NEUTRAL, "Hunger: {integer#foodlvl:0}/{text:20} ({integer#saturation}/{integer#foodlvl:0})", player.getFoodLevel(), (int)player.getSaturation(), player.getFoodLevel());
-            context.sendTranslated(NEUTRAL, "Level: {integer#level} + {integer#percent}%", player.getLevel(), (int)(player.getExp() * 100));
+            context.sendTranslated(NEUTRAL, "Level: {integer#level} + {integer#percent}%", player.getLevel(), (int)(player.getExpPerecent() * 100));
             Location loc = player.getLocation();
             if (loc != null)
             {
-                context.sendTranslated(NEUTRAL, "Position: {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getWorld());
+                context.sendTranslated(NEUTRAL, "Position: {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
             }
             if (player.getAddress() != null)
             {
@@ -459,12 +469,12 @@ public class PlayerCommands
             {
                 context.sendTranslated(NEUTRAL, "OP: {text:true:color=BRIGHT_GREEN}");
             }
-            Timestamp muted = module.getBasicsUser(player).getEntity().getValue(TABLE_BASIC_USER.MUTED);
+            Timestamp muted = module.getBasicsUser(player.getPlayer().get()).getEntity().getValue(TABLE_BASIC_USER.MUTED);
             if (muted != null && muted.getTime() > System.currentTimeMillis())
             {
                 context.sendTranslated(NEUTRAL, "Muted until {input#time}", DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale()).format(muted));
             }
-            if (player.getGameMode() != GameMode.CREATIVE)
+            if (player.getGameMode() != CREATIVE)
             {
                 context.sendTranslated(NEUTRAL, "GodMode: {input#godmode}", player.isInvulnerable() ? ChatFormat.BRIGHT_GREEN + "true" : ChatFormat.RED + "false");
             }
@@ -473,11 +483,11 @@ public class PlayerCommands
                 context.sendTranslated(NEUTRAL, "AFK: {text:true:color=BRIGHT_GREEN}");
             }
             DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(SHORT, SHORT, Locale.ENGLISH);
-            context.sendTranslated(NEUTRAL, "First played: {input#date}", dateFormat.format(new Date(player.getFirstPlayed())));
+            context.sendTranslated(NEUTRAL, "First played: {input#date}", dateFormat.format(player.getFirstPlayed()));
         }
-        if (this.module.getCore().getBanManager().isUserBanned(player.getUniqueId()))
+        if (banManager.isUserBanned(player.getUniqueId()))
         {
-            UserBan ban = this.module.getCore().getBanManager().getUserBan(player.getUniqueId());
+            UserBan ban = banManager.getUserBan(player.getUniqueId());
             String expires;
             DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale());
             if (ban.getExpires() != null)
@@ -486,7 +496,7 @@ public class PlayerCommands
             }
             else
             {
-                expires = context.getTranslation(NONE, "for ever");
+                expires = context.getTranslation(NONE, "for ever").toString();
             }
             context.sendTranslated(NEUTRAL, "Banned by {user} on {input#date}: {input#reason} ({input#expire})", ban.getSource(), format.format(ban.getCreated()), ban.getReason(), expires);
         }
@@ -505,9 +515,9 @@ public class PlayerCommands
             }
             other = true;
         }
-        BasicsUserEntity bUser = module.getBasicsUser(player).getEntity();
+        BasicsUserEntity bUser = module.getBasicsUser(player.getPlayer().get()).getEntity();
         bUser.setValue(TABLE_BASIC_USER.GODMODE, !bUser.getValue(TABLE_BASIC_USER.GODMODE));
-        BukkitUtils.setInvulnerable(player, bUser.getValue(TABLE_BASIC_USER.GODMODE));
+        player.setInvulnerable(bUser.getValue(TABLE_BASIC_USER.GODMODE));
         if (bUser.getValue(TABLE_BASIC_USER.GODMODE))
         {
             if (!other)

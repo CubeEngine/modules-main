@@ -17,14 +17,16 @@
  */
 package de.cubeisland.engine.module.basics.command.general;
 
-import java.util.regex.Pattern;
-import de.cubeisland.engine.core.util.ChatFormat;
+import java.util.List;
 import de.cubeisland.engine.module.basics.Basics;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.SignChangeEvent;
+import org.spongepowered.api.data.manipulator.tileentity.SignData;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.block.tileentity.SignChangeEvent;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Texts;
 
-public class ColoredSigns implements Listener
+public class ColoredSigns
 {
     private final Basics module;
 
@@ -33,127 +35,23 @@ public class ColoredSigns implements Listener
         this.module = module;
     }
 
-    @EventHandler
+    @Subscribe
     public void onSignChange(SignChangeEvent event)
     {
-        if (module.perms().SIGN_COLORED.isAuthorized(event.getPlayer())) // ALL colors
+        if (!(event.getCause().orNull() instanceof Subject))
         {
-            this.formatColors(event, event.getLines());
+            return;
         }
-        else
+        if (module.perms().SIGN_COLORED.isAuthorized((Subject)event.getCause().get())) // ALL colors
         {
-            String toStrip = "";
-            if( module.perms().SIGN_COLORED_BLACK.isAuthorized(event.getPlayer()))
+            SignData newData = event.getNewData();
+            List<Text> lines = newData.getLines();
+            for (int i = 0; i < lines.size(); i++)
             {
-                toStrip += "0";
+                final Text text = lines.get(i);
+                newData.setLine(i, Texts.fromLegacy(Texts.toPlain(text)));
             }
-            if( module.perms().SIGN_COLORED_DARK_BLUE.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "1";
-            }
-            if( module.perms().SIGN_COLORED_DARK_GREEN.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "2";
-            }
-            if( module.perms().SIGN_COLORED_DARK_AQUA.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "3";
-            }
-            if( module.perms().SIGN_COLORED_DARK_RED.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "4";
-            }
-            if( module.perms().SIGN_COLORED_DARK_PURPLE.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "5";
-            }
-            if( module.perms().SIGN_COLORED_GOLD.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "6";
-            }
-            if( module.perms().SIGN_COLORED_GRAY.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "7";
-            }
-            if( module.perms().SIGN_COLORED_DARK_GRAY.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "8";
-            }
-            if( module.perms().SIGN_COLORED_BLUE.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "9";
-            }
-            if( module.perms().SIGN_COLORED_GREEN.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "aA";
-            }
-            if( module.perms().SIGN_COLORED_AQUA.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "bB";
-            }
-            if( module.perms().SIGN_COLORED_RED.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "cC";
-            }
-            if( module.perms().SIGN_COLORED_LIGHT_PURPLE.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "dD";
-            }
-            if( module.perms().SIGN_COLORED_YELLOW.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "eE";
-            }
-            if( module.perms().SIGN_COLORED_WHITE.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "fF";
-            }
-            if( module.perms().SIGN_COLORED_OBFUSCATED.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "kK";
-            }
-            if( module.perms().SIGN_COLORED_BOLD.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "lL";
-            }
-            if( module.perms().SIGN_COLORED_STRIKE.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "mM";
-            }
-            if( module.perms().SIGN_COLORED_UNDERLINE.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "nN";
-            }
-            if( module.perms().SIGN_COLORED_ITALIC.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "oO";
-            }
-            if( module.perms().SIGN_COLORED_RESET.isAuthorized(event.getPlayer()))
-            {
-                toStrip += "rR";
-            }
-            if (toStrip.isEmpty())
-            {
-                return;
-            }
-            Pattern stripFormats = Pattern.compile("&[" + toStrip + "]");
-            String[] lines = event.getLines();
-            for (int i = 0; i < 4; ++i)
-            {
-                lines[i] = stripFormats.matcher(lines[i]).replaceAll("");
-            }
-            this.formatColors(event, lines);
-        }
-    }
-
-    private void formatColors(SignChangeEvent event, String[] lines)
-    {
-        for (int i = 0; i < 4; ++i)
-        {
-            lines[i] = ChatFormat.parseFormats(lines[i]);
-        }
-        for (int i = 0; i < 4; ++i)
-        {
-            event.setLine(i, lines[i]);
+            event.setNewData(newData);
         }
     }
 }

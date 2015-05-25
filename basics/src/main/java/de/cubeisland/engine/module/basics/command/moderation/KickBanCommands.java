@@ -22,32 +22,35 @@ import java.net.UnknownHostException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import de.cubeisland.engine.butler.parameter.TooFewArgumentsException;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.butler.parameter.TooFewArgumentsException;
-import de.cubeisland.engine.core.ban.BanManager;
-import de.cubeisland.engine.core.ban.IpBan;
-import de.cubeisland.engine.core.ban.UserBan;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.permission.Permission;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserList;
-import de.cubeisland.engine.core.user.UserManager;
-import de.cubeisland.engine.core.util.ChatFormat;
-import de.cubeisland.engine.core.util.McUUID;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.TimeConversionException;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.ban.BanManager;
+import de.cubeisland.engine.module.service.ban.IpBan;
+import de.cubeisland.engine.module.service.ban.UserBan;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserList;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.TimeConversionException;
 import de.cubeisland.engine.module.basics.Basics;
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.data.manipulator.entity.JoinData;
+import org.spongepowered.api.text.Texts;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.core.util.ChatFormat.*;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.ChatFormat.DARK_GREEN;
+import static de.cubeisland.engine.module.core.util.ChatFormat.GREY;
+import static de.cubeisland.engine.module.core.util.ChatFormat.RED;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 /**
  * Contains commands to manage kicks/bans.
@@ -62,15 +65,17 @@ public class KickBanCommands
     private final Basics module;
     private final BanManager banManager;
     private final UserManager um;
+    private Game game;
 
     private static final String kickMessage = "You have been kicked from the server!";
     private static final String banMessage = "You have been banned from this server!";
 
-    public KickBanCommands(Basics module)
+    public KickBanCommands(Basics module, BanManager banManager, UserManager um, Game game)
     {
         this.module = module;
-        this.banManager = this.module.getCore().getBanManager();
-        this.um = this.module.getCore().getUserManager();
+        this.banManager = banManager;
+        this.um = um;
+        this.game = game;
     }
 
     @Command(desc = "Kicks a player from the server")
@@ -84,14 +89,14 @@ public class KickBanCommands
             {
                 if (!context.getSource().equals(toKick))
                 {
-                    toKick.kickPlayer(toKick.getTranslation(NEGATIVE, kickMessage) + "\n\n" + RESET + reason);
+                    toKick.kick(Texts.of(toKick.getTranslation(NEGATIVE, kickMessage) + "\n\n" + reason));
                 }
             }
             return;
         }
         for (User user : players.list())
         {
-            user.kickPlayer(user.getTranslation(NEGATIVE, kickMessage) + "\n\n" + RESET + reason);
+            user.kick(Texts.of(user.getTranslation(NEGATIVE, kickMessage) + "\n\n" + reason));
             this.um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was kicked from the server by {user}!",
                                                 module.perms().KICK_RECEIVEMESSAGE, user, context.getSource());
         }
@@ -99,12 +104,13 @@ public class KickBanCommands
     }
 
     @Command(alias = "kickban", desc = "Bans a player permanently on your server.")
-    public void ban(CommandSender context, OfflinePlayer player, @Optional @Greed(INFINITE) String reason,
+    public void ban(CommandSender context, org.spongepowered.api.entity.player.User player, @Optional @Greed(INFINITE) String reason,
                     @Flag(longName = "ipban", name = "ip") boolean ipban, @Flag boolean force)
     {
         if (this.cannotBanUser(context)) return;
         User user = null;
-        if (player.hasPlayedBefore() || player.isOnline())
+        com.google.common.base.Optional<JoinData> data = player.getData(JoinData.class);
+        if (player.isOnline() || (data.isPresent()))
         {
             user = um.getExactUser(player.getUniqueId());
         }
@@ -129,13 +135,13 @@ public class KickBanCommands
                     context.sendTranslated(NEGATIVE, "{user} is already IP banned!", player);
                     return;
                 }
-                this.banManager.addBan(new IpBan(ipAdress, context.getName(), reason));
+                this.banManager.addBan(new IpBan(ipAdress, context, Texts.of(reason)));
                 Set<String> bannedUsers = new HashSet<>();
                 for (User ipPlayer : um.getOnlineUsers())
                 {
                     if (ipPlayer.getAddress() != null && ipPlayer.getAddress().getAddress().equals(ipAdress))
                     {
-                        ipPlayer.kickPlayer(ipPlayer.getTranslation(NEGATIVE, banMessage) + "\n\n" + RESET + reason);
+                        ipPlayer.kick(Texts.of(ipPlayer.getTranslation(NEGATIVE, banMessage) + "\n\n" + reason));
                         bannedUsers.add(ipPlayer.getName());
                     }
                 }
@@ -160,10 +166,10 @@ public class KickBanCommands
                 context.sendTranslated(NEGATIVE, "{user} is already banned!", player);
                 return;
             }
-            this.banManager.addBan(new UserBan(player.getName(), context.getName(), reason));
+            this.banManager.addBan(new UserBan(player, context, Texts.of(reason)));
             if (user != null && user.isOnline())
             {
-                user.kickPlayer(user.getTranslation(NEGATIVE, banMessage) + "\n\n" + RESET + reason);
+                user.kick(Texts.of(user.getTranslation(NEGATIVE, banMessage) + "\n\n" + reason));
             }
         }
         context.sendTranslated(NEGATIVE, "You banned {user}!", player);
@@ -188,12 +194,8 @@ public class KickBanCommands
 
 
     @Command(alias = "pardon", desc = "Unbans a previously banned player.")
-    public void unban(CommandContext context, OfflinePlayer player)
+    public void unban(CommandContext context, org.spongepowered.api.entity.player.User player)
     {
-        if (player.getUniqueId().version() == 3)
-        {
-            player = Bukkit.getOfflinePlayer(McUUID.getUUIDForName(player.getName()));
-        }
         if (this.banManager.removeUserBan(player.getUniqueId()))
         {
             context.sendTranslated(POSITIVE, "You unbanned {user}({name#uuid})!", player, player.getUniqueId().toString());
@@ -214,14 +216,14 @@ public class KickBanCommands
                 return;
             }
             reason = parseReason(reason, module.perms().COMMAND_IPBAN_NOREASON, context.getSource());
-            this.banManager.addBan(new IpBan(address,context.getSource().getName(), reason));
+            this.banManager.addBan(new IpBan(address,context.getSource(), Texts.of(reason)));
             context.sendTranslated(NEGATIVE, "You banned the IP {input#ip} from your server!", address.getHostAddress());
             Set<String> bannedUsers = new HashSet<>();
             for (User user : um.getOnlineUsers())
             {
                 if (user.getAddress() != null && user.getAddress().getAddress().getHostAddress().equals(ipaddress))
                 {
-                    user.kickPlayer(user.getTranslation(NEGATIVE, banMessage) + "\n\n" + RESET + reason);
+                    user.kick(Texts.of(user.getTranslation(NEGATIVE, banMessage) + "\n\n" + reason));
                     bannedUsers.add(user.getName());
                 }
             }
@@ -263,11 +265,13 @@ public class KickBanCommands
     }
 
     @Command(alias = "tban", desc = "Bans a player for a given time.")
-    public void tempban(CommandSender context, OfflinePlayer player, String time, @Optional @Greed(INFINITE) String reason, @Flag boolean force)
+    public void tempban(CommandSender context, org.spongepowered.api.entity.player.User player, String time, @Optional @Greed(INFINITE) String reason, @Flag boolean force)
     {
         if (this.cannotBanUser(context)) return;
         User user = null;
-        if (player.hasPlayedBefore() || player.isOnline())
+
+        com.google.common.base.Optional<JoinData> data = player.getData(JoinData.class);
+        if (player.isOnline() || (data.isPresent()))
         {
             user = um.getExactUser(player.getName());
         }
@@ -286,11 +290,11 @@ public class KickBanCommands
         {
             long millis = StringUtils.convertTimeToMillis(time);
             Date toDate = new Date(System.currentTimeMillis() + millis);
-            this.banManager.addBan(new UserBan(player.getName(),context.getName(), reason, toDate));
+            this.banManager.addBan(new UserBan(player,context, Texts.of(reason), toDate));
             if (player.isOnline())
             {
                 if (user == null) throw new IllegalStateException();
-                user.kickPlayer(user.getTranslation(NEGATIVE, banMessage) + "\n\n" + RESET + reason);
+                user.kick(Texts.of(user.getTranslation(NEGATIVE, banMessage) + "\n\n" + reason));
             }
             context.sendTranslated(POSITIVE, "You banned {user} temporarily!", player);
             um.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned temporarily from the server by {sender}!",
@@ -305,7 +309,7 @@ public class KickBanCommands
 
     private boolean cannotBanUser(CommandSender context)
     {
-        if (!Bukkit.getOnlineMode())
+        if (!game.getServer().getOnlineMode())
         {
             if (this.module.getConfiguration().commands.disallowBanIfOfflineMode)
             {
@@ -335,11 +339,6 @@ public class KickBanCommands
     @Command(desc = "View all players banned from this server")
     public void banlist(CommandSender context, BanListType type)
     {
-        if (true == true)
-        {
-            context.sendMessage("CURRENTLY NOT SAFE TO USE!!!"); // TODO Get Name from banlist not from Bukkit / querying mojang
-            return;
-        }
         // TODO paging
         if (type == BanListType.PLAYERS)
         {
@@ -352,11 +351,12 @@ public class KickBanCommands
             if (userBans.size() == 1)
             {
                 UserBan next = userBans.iterator().next();
-                context.sendTranslated(POSITIVE, "Only {user}({name#uuid}) is banned on this server", um.getExactUser(next.getTarget()).getDisplayName(), next.getTarget());
+                context.sendTranslated(POSITIVE, "Only {user}({name#uuid}) is banned on this server",
+                                       um.getExactUser(next.getTarget().getName()).getDisplayName(), next.getTarget());
                 return;
             }
             context.sendTranslated(POSITIVE, "The following {amount} players are banned from this server", userBans.size());
-            context.sendMessage(StringUtils.implode(GREY + ", ", userBans));
+            context.sendMessage(Texts.of(StringUtils.implode(GREY + ", ", userBans)));
             return;
         }
         Set<IpBan> ipbans = this.banManager.getIpBans();
@@ -372,6 +372,6 @@ public class KickBanCommands
             return;
         }
         context.sendTranslated(POSITIVE, "The following {amount} IPs are banned from this server", ipbans.size());
-        context.sendMessage(StringUtils.implode(GREY + ", ", ipbans));
+        context.sendMessage(Texts.of(StringUtils.implode(GREY + ", ", ipbans)));
     }
 }

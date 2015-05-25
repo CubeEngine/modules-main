@@ -18,9 +18,8 @@
 package de.cubeisland.engine.module.locker;
 
 import de.cubeisland.engine.converter.ConversionException;
-import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.locker.storage.ProtectedType;
-import org.bukkit.entity.EntityType;
+import org.spongepowered.api.entity.EntityType;
 
 public class EntityLockerConfiguration extends LockerSubConfig<EntityLockerConfiguration, EntityType>
 {
@@ -32,7 +31,7 @@ public class EntityLockerConfiguration extends LockerSubConfig<EntityLockerConfi
 
     public String getTitle()
     {
-        return type.name();
+        return type.getName();
     }
 
     public static class EntityLockerConfigConverter extends LockerSubConfigConverter<EntityLockerConfiguration>

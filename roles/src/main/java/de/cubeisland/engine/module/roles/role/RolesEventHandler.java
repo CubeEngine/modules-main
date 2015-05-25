@@ -17,8 +17,8 @@
  */
 package de.cubeisland.engine.module.roles.role;
 
-import de.cubeisland.engine.core.permission.NotifyPermissionRegistrationCompletedEvent;
-import de.cubeisland.engine.core.user.UserAuthorizedEvent;
+import de.cubeisland.engine.module.service.permission.NotifyPermissionRegistrationCompletedEvent;
+import de.cubeisland.engine.module.service.user.UserAuthorizedEvent;
 import de.cubeisland.engine.module.roles.Roles;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;

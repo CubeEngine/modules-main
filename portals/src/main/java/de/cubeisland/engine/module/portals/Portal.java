@@ -19,17 +19,17 @@ package de.cubeisland.engine.module.portals;
 
 import java.util.ArrayList;
 import java.util.List;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.Pair;
-import de.cubeisland.engine.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.core.util.Pair;
+import de.cubeisland.engine.module.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.portals.config.PortalConfig;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 public class Portal
 {
@@ -53,7 +53,7 @@ public class Portal
 
     public boolean has(Location location)
     {
-        return location.getWorld().getName().equals(config.world.getName()) &&
+        return ((World)location.getExtent()).getName().equals(config.world.getName()) &&
             isBetween(config.location.from.x, config.location.to.x, location.getBlockX()) &&
             isBetween(config.location.from.y, config.location.to.y, location.getBlockY()) &&
             isBetween(config.location.from.z, config.location.to.z, location.getBlockZ());
@@ -87,7 +87,7 @@ public class Portal
             BlockVector3 midpoint = this.config.location.to.midpoint(this.config.location.from);
             return new Location(this.config.world.getWorld(), midpoint.x + 0.5, midpoint.y, midpoint.z + 0.5);
         }
-        return this.config.location.destination.getLocationIn(this.config.world.getWorld());
+        return this.config.location.destination.getLocationIn(this.config.world.getWorld()); // TODO rotation
     }
 
     public void delete()

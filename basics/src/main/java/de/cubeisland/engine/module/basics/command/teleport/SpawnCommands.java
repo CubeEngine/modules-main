@@ -17,22 +17,26 @@
  */
 package de.cubeisland.engine.module.basics.command.teleport;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.parameter.TooFewArgumentsException;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.math.BlockVector3;
-import de.cubeisland.engine.core.world.WorldSetSpawnEvent;
+import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Default;
+import de.cubeisland.engine.butler.parametric.Flag;
+import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.basics.Basics;
-import org.bukkit.Location;
-import org.bukkit.World;
+import de.cubeisland.engine.module.core.sponge.EventManager;
+import de.cubeisland.engine.module.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.service.world.WorldSetSpawnEvent;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 /**
  * Contains spawn-commands.
@@ -43,10 +47,14 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
 public class SpawnCommands
 {
     private final Basics module;
+    private EventManager em;
+    private UserManager um;
 
-    public SpawnCommands(Basics basics)
+    public SpawnCommands(Basics basics, EventManager em, UserManager um)
     {
         this.module = basics;
+        this.em = em;
+        this.um = um;
     }
 
     @Command(desc = "Changes the global respawnpoint")
@@ -63,8 +71,8 @@ public class SpawnCommands
             y = loc.getBlockY();
             z = loc.getBlockZ();
         }
-        this.module.getCore().getEventManager().fireEvent(new WorldSetSpawnEvent(this.module.getCore(), world, new Location(world, x,y,z)));
-        world.setSpawnLocation(x, y, z);
+        em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location(world, x, y, z)));
+        world.getWorldStorage().getWorldProperties().setSpawnPosition(new Vector3i(x, y, z));
         context.sendTranslated(POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new BlockVector3(x, y, z));
     }
 
@@ -72,7 +80,7 @@ public class SpawnCommands
     public void spawnAll(CommandSender context, World world, @Flag boolean force)
     {
         Location loc = world.getSpawnLocation().add(0.5, 0, 0.5);
-        for (User aPlayer : module.getCore().getUserManager().getOnlineUsers())
+        for (User aPlayer : um.getOnlineUsers())
         {
             if (!force && module.perms().COMMAND_SPAWN_PREVENT.isAuthorized(aPlayer))
             {
@@ -84,13 +92,13 @@ public class SpawnCommands
                 return;
             }
         }
-        this.module.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleported everyone to the spawn of {world}!", world);
+        um.broadcastTranslated(POSITIVE, "Teleported everyone to the spawn of {world}!", world);
     }
 
     @Command(desc = "Teleports a player to spawn")
     public void spawn(CommandSender context, @Default User player, @Optional World world, @Flag boolean force)
     {
-        world = world == null ? module.getConfiguration().mainWorld : world;
+        world = world == null ? module.getConfiguration().mainWorld.getWorld() : world;
         if (world == null)
         {
             world = player.getWorld();
@@ -107,14 +115,13 @@ public class SpawnCommands
             return;
         }
         final Location spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
-        final Location userLocation = player.getLocation();
-        spawnLocation.setPitch(userLocation.getPitch());
-        spawnLocation.setYaw(userLocation.getYaw());
+        Vector3d rotation = player.getRotation();
         if (!TeleportCommands.teleport(player, spawnLocation, true, force, true))
         {
             context.sendTranslated(NEGATIVE, "Teleport failed!");
             return;
         }
+        player.setRotation(rotation);
         context.sendTranslated(POSITIVE, "You are now standing at the spawn in {world}!", world);
     }
 
@@ -123,17 +130,16 @@ public class SpawnCommands
     public void tpworld(User context, World world)
     {
         final Location spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
-        final Location userLocation = context.getLocation();
-        spawnLocation.setPitch(userLocation.getPitch());
-        spawnLocation.setYaw(userLocation.getYaw());
         if (!module.perms().tpWorld().getPermission(world.getName()).isAuthorized(context))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to teleport to this world!");
             return;
         }
+        Vector3d rotation = context.getRotation();
         if (TeleportCommands.teleport(context, spawnLocation, true, false, true))
         {
             context.sendTranslated(POSITIVE, "Teleported to the spawn of world {world}!", world);
         }
+        context.setRotation(rotation);
     }
 }

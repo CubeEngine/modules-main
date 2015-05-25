@@ -17,10 +17,13 @@
  */
 package de.cubeisland.engine.module.locker;
 
+import javax.inject.Inject;
 import de.cubeisland.engine.converter.ConverterManager;
-import de.cubeisland.engine.core.module.Module;
-import de.cubeisland.engine.core.module.Reloadable;
-import de.cubeisland.engine.core.storage.database.Database;
+import de.cubeisland.engine.modularity.asm.marker.Disable;
+import de.cubeisland.engine.modularity.asm.marker.Enable;
+import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.module.core.filesystem.FileManager;
+import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.locker.BlockLockerConfiguration.BlockLockerConfigConverter;
 import de.cubeisland.engine.module.locker.EntityLockerConfiguration.EntityLockerConfigConverter;
 import de.cubeisland.engine.module.locker.commands.LockerAdminCommands;
@@ -30,8 +33,12 @@ import de.cubeisland.engine.module.locker.storage.LockManager;
 import de.cubeisland.engine.module.locker.storage.TableAccessList;
 import de.cubeisland.engine.module.locker.storage.TableLockLocations;
 import de.cubeisland.engine.module.locker.storage.TableLocks;
+import de.cubeisland.engine.module.service.command.CommandManager;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.reflect.Reflector;
 
-public class Locker extends Module implements Reloadable
+public class Locker extends Module
 {
     private LockerConfig config;
     private LockManager manager;
@@ -44,31 +51,38 @@ public class Locker extends Module implements Reloadable
 
     private LockerPerm perms;
 
-    @Override
+    @Inject private Reflector reflector;
+    @Inject private FileManager fm;
+    @Inject private Database db;
+    @Inject private CommandManager cm;
+    @Inject private EventManager em;
+    @Inject private UserManager um;
+
+    @Enable
     public void onEnable()
     {
-        ConverterManager cManager = this.getCore().getConfigFactory().getDefaultConverterManager();
+        ConverterManager cManager = reflector.getDefaultConverterManager();
         cManager.registerConverter(new BlockLockerConfigConverter(), BlockLockerConfiguration.class);
         cManager.registerConverter(new EntityLockerConfigConverter(), EntityLockerConfiguration.class);
-        this.config = this.loadConfig(LockerConfig.class);
-        Database db = this.getCore().getDB();
+        this.config = fm.loadConfig(this, LockerConfig.class);
         db.registerTable(TableLocks.class);
         db.registerTable(TableLockLocations.class);
         db.registerTable(TableAccessList.class);
         manager = new LockManager(this);
-        LockerCommands lockerCmd = new LockerCommands(this, manager);
-        this.getCore().getCommandManager().addCommand(lockerCmd);
+        LockerCommands lockerCmd = new LockerCommands(this, manager, um);
+        cm.addCommand(lockerCmd);
         lockerCmd.addCommand(new LockerCreateCommands(this, manager));
         lockerCmd.addCommand(new LockerAdminCommands(this, manager));
         perms = new LockerPerm(this, lockerCmd);
         listener = new LockerListener(this, manager);
+        em.registerListener(this, listener);
     }
 
-    @Override
+    @Disable
     public void onDisable()
     {
-        this.getCore().getEventManager().removeListeners(this);
-        this.getCore().getCommandManager().removeCommands(this);
+        em.removeListeners(this);
+        cm.removeCommands(this);
         this.manager.saveAll();
     }
 

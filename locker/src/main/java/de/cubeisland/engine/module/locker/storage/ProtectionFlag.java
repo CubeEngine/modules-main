@@ -24,10 +24,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.matcher.Match;
+import java.util.stream.Collectors;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.matcher.Match;
 
-import static de.cubeisland.engine.core.util.StringUtils.startsWithIgnoreCase;
+import de.cubeisland.engine.module.core.util.StringUtils.startsWithIgnoreCase;
+
+import static de.cubeisland.engine.module.core.util.StringUtils.startsWithIgnoreCase;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Flags that can be given to a protection.
@@ -101,12 +105,7 @@ public enum ProtectionFlag
             }
         }
         matchedFlags.removeAll(previousTokens); // do not duplicate!
-        List<String> result = new ArrayList<>();
-        for (String flag : matchedFlags)
-        {
-            result.add(token + flag.replaceFirst(subToken, ""));
-        }
-        return result;
+        return matchedFlags.stream().map(flag -> token + flag.replaceFirst(subToken, "")).collect(toList());
     }
 
     public static ProtectionFlag match(String toMatch)

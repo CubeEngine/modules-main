@@ -18,9 +18,9 @@
 package de.cubeisland.engine.module.travel;
 
 import java.util.Set;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.permission.Permission;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
 import org.bukkit.Location;

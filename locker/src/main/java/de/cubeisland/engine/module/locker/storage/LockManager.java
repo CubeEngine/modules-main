@@ -33,44 +33,42 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import de.cubeisland.engine.core.storage.database.AsyncRecord;
-import de.cubeisland.engine.core.storage.database.Database;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.user.UserManager;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.world.WorldManager;
+import java.util.concurrent.ThreadFactory;
+import javax.inject.Inject;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.modularity.asm.marker.Enable;
+import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
+import de.cubeisland.engine.module.core.sponge.EventManager;
+import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.locker.BlockLockerConfiguration;
 import de.cubeisland.engine.module.locker.EntityLockerConfiguration;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.commands.CommandListener;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
-import org.bukkit.block.Chest;
-import org.bukkit.block.DoubleChest;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.world.ChunkLoadEvent;
-import org.bukkit.event.world.ChunkUnloadEvent;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
-import org.bukkit.material.Door;
-import org.jooq.DSLContext;
+import de.cubeisland.engine.module.service.database.AsyncRecord;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.task.TaskManager;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import org.jooq.Result;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.world.ChunkLoadEvent;
+import org.spongepowered.api.event.world.ChunkUnloadEvent;
+import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.contract.Contract.expect;
-import static de.cubeisland.engine.core.contract.Contract.expectNotNull;
-import static de.cubeisland.engine.core.util.BlockUtil.CARDINAL_DIRECTIONS;
-import static de.cubeisland.engine.core.util.LocationUtil.getChunkKey;
-import static de.cubeisland.engine.core.util.LocationUtil.getLocationKey;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.BlockUtil.CARDINAL_DIRECTIONS;
+import static de.cubeisland.engine.module.core.util.LocationUtil.getChunkKey;
+import static de.cubeisland.engine.module.core.util.LocationUtil.getLocationKey;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.storage.AccessListModel.ACCESS_ALL;
 import static de.cubeisland.engine.module.locker.storage.AccessListModel.ACCESS_FULL;
 import static de.cubeisland.engine.module.locker.storage.ProtectedType.getProtectedType;
@@ -78,17 +76,19 @@ import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_A
 import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static java.util.concurrent.CompletableFuture.allOf;
-import static org.bukkit.Material.CHEST;
-import static org.bukkit.Material.TRAPPED_CHEST;
+import static org.spongepowered.api.block.BlockTypes.CHEST;
+import static org.spongepowered.api.block.BlockTypes.TRAPPED_CHEST;
 
-public class LockManager implements Listener
+@ServiceProvider(LockManager.class)
+public class LockManager
 {
-    protected final DSLContext dsl;
     protected final Locker module;
 
-    private final Database database;
-    protected WorldManager wm;
-    protected UserManager um;
+    @Inject private Database database;
+    @Inject protected WorldManager wm;
+    @Inject protected UserManager um;
+    @Inject protected TaskManager tm;
+    protected Log logger;
 
     public final CommandListener commandListener;
 
@@ -103,9 +103,12 @@ public class LockManager implements Listener
     private final ExecutorService executor;
     private Future<?> future = null;
 
-    public LockManager(Locker module)
+    @Inject
+    public LockManager(Locker module, EventManager em)
     {
-        executor = Executors.newSingleThreadExecutor(module.getCore().getTaskManager().getThreadFactory());
+        logger = module.getProvided(Log.class);
+        this.module = module;
+        executor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));
         try
         {
             messageDigest = MessageDigest.getInstance("SHA-1");
@@ -115,14 +118,15 @@ public class LockManager implements Listener
             throw new RuntimeException("SHA-1 hash algorithm not available!");
         }
         this.commandListener = new CommandListener(module, this);
-        this.module = module;
-        this.wm = module.getCore().getWorldManager();
-        this.um = module.getCore().getUserManager();
-        this.module.getCore().getEventManager().registerListener(module, this.commandListener);
-        this.module.getCore().getEventManager().registerListener(module, this);
-        this.dsl = module.getCore().getDB().getDSL();
-        this.database = module.getCore().getDB();
-        for (World world : module.getCore().getWorldManager().getWorlds())
+        em.registerListener(module, this.commandListener);
+        em.registerListener(module, this);
+    }
+
+
+    @Enable
+    public void onEnable()
+    {
+        for (World world : wm.getWorlds())
         {
             for (Chunk chunk : world.getLoadedChunks())
             {
@@ -130,9 +134,9 @@ public class LockManager implements Listener
             }
         }
         this.loadLocksInChunks();
-        this.module.getLog().info("Finished loading locks");
+        logger.info("Finished loading locks");
 
-        module.getCore().getTaskManager().runTimer(module, () -> {
+        tm.runTimer(module, () -> {
             if (!queuedChunks.isEmpty() && (future == null || future.isDone()))
             {
                 future = executor.submit(this::loadLocksInChunks);
@@ -140,7 +144,7 @@ public class LockManager implements Listener
         }, 5, 5);
     }
 
-    @EventHandler
+    @Subscribe
     private void onChunkLoad(ChunkLoadEvent event)
     {
         queueChunk(event.getChunk());
@@ -161,8 +165,8 @@ public class LockManager implements Listener
         UInteger world_id = this.wm.getWorldId(chunk.getWorld());
         Result<LockModel> models = this.database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.in(
             this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID).from(TABLE_LOCK_LOCATION).where(
-                TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id), TABLE_LOCK_LOCATION.CHUNKX.eq(chunk.getX()),
-                TABLE_LOCK_LOCATION.CHUNKZ.eq(chunk.getZ())))).fetch();
+                TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id), TABLE_LOCK_LOCATION.CHUNKX.eq(chunk.getPosition().getX()),
+                TABLE_LOCK_LOCATION.CHUNKZ.eq(chunk.getPosition().getZ())))).fetch();
         Map<UInteger, Result<LockLocationModel>> locations = LockManager.
             this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION).where(TABLE_LOCK_LOCATION.LOCK_ID.in(
             models.getValues(TABLE_LOCK.ID))).fetch().intoGroups(TABLE_LOCK_LOCATION.LOCK_ID);
@@ -185,7 +189,7 @@ public class LockManager implements Listener
         {
             if (worldId == null)
             {
-                worldId = module.getCore().getWorldManager().getWorldId(loc.getWorld());
+                worldId = wm.getWorldId((World)loc.getExtent());
             }
             Map<Long, Set<Lock>> locksInChunkMap = this.getChunkLocksMap(worldId);
             long chunkKey = getChunkKey(loc);
@@ -222,12 +226,12 @@ public class LockManager implements Listener
         return locksAtLocMap;
     }
 
-    @EventHandler
+    @Subscribe
     private void onChunkUnload(ChunkUnloadEvent event)
     {
         queuedChunks.remove(event.getChunk());
-        UInteger worldId = module.getCore().getWorldManager().getWorldId(event.getWorld());
-        Set<Lock> remove = this.getChunkLocksMap(worldId).remove(getChunkKey(event.getChunk().getX(), event.getChunk().getZ()));
+        UInteger worldId = wm.getWorldId(event.getChunk().getWorld());
+        Set<Lock> remove = this.getChunkLocksMap(worldId).remove(getChunkKey(event.getChunk().getPosition().getX(), event.getChunk().getPosition().getZ()));
         if (remove == null) return; // nothing to remove
         Map<Long, Lock> locLockMap = this.getLocLockMap(worldId);
         for (Lock lock : remove) // remove from chunks
@@ -283,21 +287,21 @@ public class LockManager implements Listener
      */
     public Lock getLockAtLocation(Location location, User user, boolean access, boolean repairExpand)
     {
-        UInteger worldId = module.getCore().getWorldManager().getWorldId(location.getWorld());
+        UInteger worldId = wm.getWorldId((World)location.getExtent());
         Lock lock = this.getLocLockMap(worldId).get(getLocationKey(location));
         if (repairExpand && lock != null && lock.isSingleBlockLock())
         {
-            Block block = lock.getFirstLocation().getBlock();
+            Location block = lock.getFirstLocation();
             if (block.getType() == CHEST || block.getType() == TRAPPED_CHEST)
             {
-                for (BlockFace cardinalDirection : CARDINAL_DIRECTIONS)
+                for (Direction cardinalDirection : CARDINAL_DIRECTIONS)
                 {
-                    Block relative = block.getRelative(cardinalDirection);
+                    Location relative = block.getRelative(cardinalDirection);
                     if (relative.getType() == block.getType())
                     {
-                        if (this.getLockAtLocation(relative.getLocation(),null, false,false)== null)
+                        if (this.getLockAtLocation(relative,null, false,false)== null)
                         {
-                            this.extendLock(lock, relative.getLocation());
+                            this.extendLock(lock, relative);
                             if (user != null)
                             {
                                 user.sendTranslated(POSITIVE, "Protection repaired & expanded!");
@@ -361,7 +365,7 @@ public class LockManager implements Listener
         Lock lock = this.loadedEntityLocks.get(uniqueId);
         if (lock == null)
         {
-            LockModel model = this.dsl.selectFrom(TABLE_LOCK).where(TABLE_LOCK.ENTITY_UID_LEAST.eq(uniqueId.getLeastSignificantBits()),
+            LockModel model = database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ENTITY_UID_LEAST.eq(uniqueId.getLeastSignificantBits()),
                                                                       TABLE_LOCK.ENTITY_UID_MOST.eq(uniqueId.getMostSignificantBits())).fetchOne();
             if (model != null)
             {
@@ -395,11 +399,11 @@ public class LockManager implements Listener
     public void extendLock(Lock lock, Location location)
     {
         expectNotNull(lock, "The lock must not be null!");
-        expect(this.getLockAtLocation(location, null, false, false) == null , "Cannot extend Lock onto another!");
+        expect(this.getLockAtLocation(location, null, false, false) == null, "Cannot extend Lock onto another!");
         lock.locations.add(location);
-        LockLocationModel model = this.dsl.newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location);
+        LockLocationModel model = database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location);
         model.insertAsync();
-        UInteger worldId = module.getCore().getWorldManager().getWorldId(location.getWorld());
+        UInteger worldId = wm.getWorldId(((World)location.getExtent()));
         this.getLocLockMap(worldId).put(getLocationKey(location), lock);
     }
 
@@ -422,7 +426,7 @@ public class LockManager implements Listener
                 for (Location location : lock.getLocations())
                 {
                     long chunkKey = getChunkKey(location);
-                    UInteger worldId = module.getCore().getWorldManager().getWorldId(location.getWorld());
+                    UInteger worldId = wm.getWorldId(((World)location.getExtent()));
                     this.getLocLockMap(worldId).remove(getLocationKey(location));
                     Set<Lock> locks = this.getChunkLocksMap(worldId).get(chunkKey);
                     if (locks != null)
@@ -455,9 +459,9 @@ public class LockManager implements Listener
      * @param createKeyBook whether to attempt to create a keyBook
      * @return the created Lock
      */
-    public CompletableFuture<Lock> createLock(Material material, Location location, User user, LockType lockType, String password, boolean createKeyBook)
+    public CompletableFuture<Lock> createLock(BlockType material, Location location, User user, LockType lockType, String password, boolean createKeyBook)
     {
-        LockModel model = this.dsl.newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
+        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
         for (BlockLockerConfiguration blockProtection : this.module.getConfig().blockprotections)
         {
             if (blockProtection.isType(material))
@@ -484,7 +488,7 @@ public class LockManager implements Listener
                     locations.add(((BlockState)dc.getRightSide()).getLocation());
                 }
             }
-            else if (material == Material.WOODEN_DOOR || material == Material.IRON_DOOR_BLOCK)
+            else if (material == BlockTypes.WOODEN_DOOR || material == BlockTypes.IRON_DOOR)
             {
                 locations.add(location);
                 if (block.getState().getData() instanceof Door)
@@ -500,7 +504,7 @@ public class LockManager implements Listener
                         botBlock = location.getBlock();
                         locations.add(location.clone().add(0, 1, 0));
                     }
-                    for (BlockFace blockFace : CARDINAL_DIRECTIONS)
+                    for (Direction blockFace : CARDINAL_DIRECTIONS)
                     {
                         if (botBlock.getRelative(blockFace).getType() == block.getType()) // same door type
                         {
@@ -527,7 +531,7 @@ public class LockManager implements Listener
             {
                 locations.add(location);
             }
-            return allOf(locations.parallelStream().map(loc -> dsl.newRecord(TABLE_LOCK_LOCATION).newLocation(model, loc)).map(
+            return allOf(locations.parallelStream().map(loc -> database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(model, loc)).map(
                 AsyncRecord::insertAsync).toArray(CompletableFuture[]::new)).thenApply((v) -> {
                 Lock lock = new Lock(this, model, locations);
                 this.addLoadedLocationLock(lock);
@@ -550,7 +554,7 @@ public class LockManager implements Listener
      */
     public CompletableFuture<Lock> createLock(Entity entity, User user, LockType lockType, String password, boolean createKeyBook)
     {
-        LockModel model = this.dsl.newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(entity.getType()), entity.getUniqueId());
+        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(entity.getType()), entity.getUniqueId());
         model.createPassword(this, password);
         return model.insertAsync().thenApply(m -> {
             Lock lock = new Lock(this, model);
@@ -575,7 +579,7 @@ public class LockManager implements Listener
         });
     }
 
-    public boolean canProtect(Material type)
+    public boolean canProtect(BlockType type)
     {
         for (BlockLockerConfiguration blockprotection : this.module.getConfig().blockprotections)
         {
@@ -664,10 +668,10 @@ public class LockManager implements Listener
         {
             return lock;
         }
-        LockModel lockModel = this.dsl.selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.eq(UInteger.valueOf(lockID))).fetchOne();
+        LockModel lockModel = database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.eq(UInteger.valueOf(lockID))).fetchOne();
         if (lockModel != null)
         {
-            Result<LockLocationModel> fetch = this.dsl.selectFrom(TABLE_LOCK_LOCATION)
+            Result<LockLocationModel> fetch = database.getDSL().selectFrom(TABLE_LOCK_LOCATION)
                                                       .where(TABLE_LOCK_LOCATION.LOCK_ID.eq(lockModel.getValue(TABLE_LOCK.ID)))
                                                       .fetch();
             if (fetch.isEmpty())
@@ -703,14 +707,14 @@ public class LockManager implements Listener
             {
                 accessType = ACCESS_ALL; // with AdminAccess
             }
-            AccessListModel accessListModel = this.dsl.selectFrom(TABLE_ACCESS_LIST).where(
+            AccessListModel accessListModel = database.getDSL().selectFrom(TABLE_ACCESS_LIST).where(
                 TABLE_ACCESS_LIST.USER_ID.eq(modifyUser.getEntity().getKey()),
                 TABLE_ACCESS_LIST.OWNER_ID.eq(sender.getEntity().getKey())).fetchOne();
             if (add)
             {
                 if (accessListModel == null)
                 {
-                    accessListModel = this.dsl.newRecord(TABLE_ACCESS_LIST).newGlobalAccess(sender, modifyUser, accessType);
+                    accessListModel = database.getDSL().newRecord(TABLE_ACCESS_LIST).newGlobalAccess(sender, modifyUser, accessType);
                     accessListModel.insertAsync();
                     sender.sendTranslated(POSITIVE, "Global access for {user} set!", modifyUser);
                 }
@@ -738,7 +742,7 @@ public class LockManager implements Listener
 
     public CompletableFuture<Integer> purgeLocksFrom(User user)
     {
-        return module.getCore().getDB().execute(this.dsl.delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(user.getEntity().getKey())));
+        return database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(user.getEntity().getKey())));
     }
 
 }

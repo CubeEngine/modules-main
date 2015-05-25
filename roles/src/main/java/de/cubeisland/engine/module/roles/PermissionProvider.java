@@ -19,28 +19,35 @@ package de.cubeisland.engine.module.roles;
 
 import java.util.ArrayList;
 import java.util.List;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.module.service.Permission;
-import de.cubeisland.engine.core.permission.PermissionManager;
+import javax.inject.Inject;
+import de.cubeisland.engine.modularity.asm.marker.ServiceImpl;
+import de.cubeisland.engine.modularity.asm.marker.Version;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.Permission;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
 import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesManager;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.World;
-import org.bukkit.entity.Player;
+import de.cubeisland.engine.module.service.user.UserManager;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.entity.player.User;
+import org.spongepowered.api.world.World;
 
+@ServiceImpl(Permission.class)
+@Version(1)
 public class PermissionProvider implements Permission
 {
-    private Roles roles;
     private RolesManager manager;
     private PermissionManager permMananger;
+    private UserManager um;
 
-    public PermissionProvider(Roles roles, RolesManager manager, PermissionManager permMananger)
+    @Inject
+    public PermissionProvider(RolesManager manager, PermissionManager permMananger, UserManager um)
     {
-        this.roles = roles;
         this.manager = manager;
         this.permMananger = permMananger;
+        this.um = um;
     }
 
     @Override
@@ -56,17 +63,11 @@ public class PermissionProvider implements Permission
     }
 
     @Override
-    public boolean hasSuperPermsCompat()
-    {
-        return true;
-    }
-
-    @Override
-    public boolean has(World world, OfflinePlayer player, String permission)
+    public boolean has(World world, User player, String permission)
     {
         if (player.isOnline() && player.getPlayer().getWorld().equals(world))
         {
-            return this.has(roles.getCore().getUserManager().getExactUser(player.getUniqueId()), permission);
+            return this.has(um.getExactUser(player.getUniqueId()), permission);
         }
         ResolvedPermission rPerm = this.manager.getRolesAttachment(player).getDataHolder(world).getPermissions().get(permission);
         return rPerm == null ? getDefaultPerm(permission, (CommandSender)player) : rPerm.isSet();
@@ -79,7 +80,7 @@ public class PermissionProvider implements Permission
     }
 
     @Override
-    public boolean add(World world, OfflinePlayer player, String permission)
+    public boolean add(World world, User player, String permission)
     {
         this.manager.getRolesAttachment(player).getDataHolder(world).setPermission(permission, PermissionValue.TRUE);
         return true;
@@ -93,14 +94,14 @@ public class PermissionProvider implements Permission
     }
 
     @Override
-    public boolean remove(World world, OfflinePlayer player, String permission)
+    public boolean remove(World world, User player, String permission)
     {
         this.manager.getRolesAttachment(player).getDataHolder(world).setPermission(permission, PermissionValue.RESET);
         return true;
     }
 
     @Override
-    public boolean removeTemporary(World world, OfflinePlayer player, String permission)
+    public boolean removeTemporary(World world, User player, String permission)
     {
         this.manager.getRolesAttachment(player).getDataHolder(world).setTempPermission(permission, PermissionValue.RESET);
         return true;
@@ -160,27 +161,27 @@ public class PermissionProvider implements Permission
     }
 
     @Override
-    public boolean hasRole(World world, OfflinePlayer player, String role)
+    public boolean hasRole(World world, User player, String role)
     {
         return this.manager.getRolesAttachment(player).getDataHolder(world).getRawRoles().contains(role);
     }
 
     @Override
-    public boolean addRole(World world, OfflinePlayer player, String roleName)
+    public boolean addRole(World world, User player, String roleName)
     {
         Role role = this.manager.getProvider(world).getRole(roleName);
         return role != null && this.manager.getRolesAttachment(player).getDataHolder(world).assignRole(role);
     }
 
     @Override
-    public boolean removeRole(World world, OfflinePlayer player, String roleName)
+    public boolean removeRole(World world, User player, String roleName)
     {
         Role role = this.manager.getProvider(world).getRole(roleName);
         return role != null && this.manager.getRolesAttachment(player).getDataHolder(world).removeRole(role);
     }
 
     @Override
-    public String[] getRoles(World world, OfflinePlayer player)
+    public String[] getRoles(World world, User player)
     {
         List<String> list = new ArrayList<>();
         for (Role role : this.manager.getRolesAttachment(player).getDataHolder(world).getRoles())
@@ -191,7 +192,7 @@ public class PermissionProvider implements Permission
     }
 
     @Override
-    public String getDominantRole(World world, OfflinePlayer player)
+    public String getDominantRole(World world, User player)
     {
         return this.manager.getRolesAttachment(player).getDominantRole(world).getName();
     }

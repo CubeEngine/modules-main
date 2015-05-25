@@ -23,9 +23,10 @@ import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Named;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.permission.PermDefault;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.permission.PermDefault;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RolesAttachment;
@@ -33,16 +34,22 @@ import de.cubeisland.engine.module.roles.role.TempDataStore;
 import de.cubeisland.engine.module.roles.role.UserDatabaseStore;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedMetadata;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
-import org.bukkit.World;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 @Command(name = "user", desc = "Manage users")
 public class UserInformationCommands extends UserCommandHelper
 {
-    public UserInformationCommands(Roles module)
+    private PermissionManager pm;
+
+    public UserInformationCommands(Roles module, PermissionManager pm, WorldManager wm)
     {
-        super(module);
+        super(module, wm);
+        this.pm = pm;
     }
 
     @Alias(value = "listuroles")
@@ -92,7 +99,7 @@ public class UserInformationCommands extends UserCommandHelper
         if (resolvedPermission == null)
         {
 
-            PermDefault defaultFor = this.module.getCore().getPermissionManager().getDefaultFor(permission);
+            PermDefault defaultFor = pm.getDefaultFor(permission);
             if (defaultFor == null)
             {
                 context.sendTranslated(NEGATIVE, "Permission {input} neither set nor registered!", permission);

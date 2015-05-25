@@ -18,9 +18,8 @@
 package de.cubeisland.engine.module.locker;
 
 import de.cubeisland.engine.converter.ConversionException;
-import de.cubeisland.engine.core.util.matcher.Match;
 import de.cubeisland.engine.module.locker.storage.ProtectedType;
-import org.bukkit.Material;
+import org.spongepowered.api.block.BlockType;
 
 /**
  * Example:
@@ -30,9 +29,9 @@ import org.bukkit.Material;
  *      - BLOCK_REDSTONE
  *      - AUTOCLOSE
  */
-public class BlockLockerConfiguration extends LockerSubConfig<BlockLockerConfiguration, Material>
+public class BlockLockerConfiguration extends LockerSubConfig<BlockLockerConfiguration, BlockType>
 {
-    public BlockLockerConfiguration(Material material)
+    public BlockLockerConfiguration(BlockType material)
     {
         super(ProtectedType.getProtectedType(material));
         this.type = material;
@@ -40,14 +39,14 @@ public class BlockLockerConfiguration extends LockerSubConfig<BlockLockerConfigu
 
     public String getTitle()
     {
-        return type.name();
+        return type.getName();
     }
 
     public static class BlockLockerConfigConverter extends LockerSubConfigConverter<BlockLockerConfiguration>
     {
         protected BlockLockerConfiguration fromString(String s) throws ConversionException
         {
-            Material material;
+            BlockType material;
             try
             {
                 material = Material.valueOf(s);

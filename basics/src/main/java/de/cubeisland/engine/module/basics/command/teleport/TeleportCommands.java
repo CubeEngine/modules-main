@@ -24,20 +24,31 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.command.CommandSender;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.StringUtils;
-import de.cubeisland.engine.core.util.math.BlockVector3;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.basics.Basics;
+import de.cubeisland.engine.module.service.user.UserManager;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent;
 
-import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
-import static de.cubeisland.engine.core.util.ChatFormat.WHITE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import de.cubeisland.engine.module.core.util.ChatFormat.DARK_GREEN;
+import de.cubeisland.engine.module.core.util.ChatFormat.WHITE;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+import static de.cubeisland.engine.module.core.util.ChatFormat.DARK_GREEN;
+import static de.cubeisland.engine.module.core.util.ChatFormat.WHITE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
 /**
  * Contains commands to teleport to players/worlds/position.
@@ -50,10 +61,12 @@ import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 public class TeleportCommands
 {
     private final Basics module;
+    private UserManager um;
 
-    public TeleportCommands(Basics module)
+    public TeleportCommands(Basics module, UserManager um)
     {
         this.module = module;
+        this.um = um;
     }
 
     public static boolean teleport(User user, Location loc, boolean safe, boolean force, boolean keepDirection)
@@ -148,20 +161,20 @@ public class TeleportCommands
             return;
         }
         ArrayList<String> noTp = new ArrayList<>();
-        for (Player p : context.getSource().getServer().getOnlinePlayers())
+        for (User p : um.getOnlineUsers())
         {
             if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(p))
             {
                 noTp.add(p.getName());
                 continue;
             }
-            if (!teleport(player.getCore().getUserManager().getExactUser(p.getUniqueId()), player.getLocation(), !unsafe,
+            if (!teleport(um.getExactUser(p.getUniqueId()), player.getLocation(), !unsafe,
                           force, true))
             {
                 noTp.add(p.getName());
             }
         }
-        module.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleporting everyone to {user}", player);
+        um.broadcastTranslated(POSITIVE, "Teleporting everyone to {user}", player);
         if (!noTp.isEmpty())
         {
             context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
@@ -203,23 +216,24 @@ public class TeleportCommands
         User sender = (User)context.getSource();
         force = force && module.perms().COMMAND_TPHEREALL_FORCE.isAuthorized(context.getSource());
         ArrayList<String> noTp = new ArrayList<>();
-        for (Player player : context.getSource().getServer().getOnlinePlayers())
+        for (User player : um.getOnlineUsers())
         {
             if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(player))
             {
                 noTp.add(player.getName());
                 continue;
             }
-            if (!teleport(sender.getCore().getUserManager().getExactUser(player.getUniqueId()), sender.getLocation(), !unsafe, force, true))
+            if (!teleport(player, sender.getLocation(), !unsafe, force, true))
             {
                 noTp.add(player.getName());
             }
         }
         context.sendTranslated(POSITIVE, "You teleported everyone to you!");
-        module.getCore().getUserManager().broadcastTranslated(POSITIVE, "Teleporting everyone to {sender}", sender);
+        um.broadcastTranslated(POSITIVE, "Teleporting everyone to {sender}", sender);
         if (!noTp.isEmpty())
         {
-            context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
+            context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(
+                WHITE + "," + DARK_GREEN, noTp));
         }
     }
 

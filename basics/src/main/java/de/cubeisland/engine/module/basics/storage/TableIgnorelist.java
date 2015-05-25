@@ -17,12 +17,13 @@
  */
 package de.cubeisland.engine.module.basics.storage;
 
-import de.cubeisland.engine.core.storage.database.Table;
-import de.cubeisland.engine.core.util.Version;
+import de.cubeisland.engine.module.core.util.Version;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.database.Table;
 import org.jooq.TableField;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.core.user.TableUser.TABLE_USER;
+import static de.cubeisland.engine.module.service.user.TableUser.TABLE_USER;
 
 public class TableIgnorelist extends Table<IgnoreList>
 {
@@ -30,9 +31,9 @@ public class TableIgnorelist extends Table<IgnoreList>
     public final TableField<IgnoreList, UInteger> KEY = createField("key", U_INTEGER.nullable(false), this);
     public final TableField<IgnoreList, UInteger> IGNORE = createField("ignore", U_INTEGER.nullable(false), this);
 
-    public TableIgnorelist(String prefix)
+    public TableIgnorelist(String prefix, Database db)
     {
-        super(prefix + "ignorelist", new Version(1));
+        super(prefix + "ignorelist", new Version(1), db);
         this.addForeignKey(TABLE_USER.getPrimaryKey(), KEY);
         this.addForeignKey(TABLE_USER.getPrimaryKey(), IGNORE);
         this.setPrimaryKey(KEY, IGNORE);

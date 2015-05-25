@@ -23,27 +23,27 @@ import java.util.Random;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Reader;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.StringUtils;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.storage.IgnoreList;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.user.User;
 import org.jooq.DSLContext;
 
-import static de.cubeisland.engine.core.util.ChatFormat.DARK_GREEN;
-import static de.cubeisland.engine.core.util.ChatFormat.WHITE;
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.basics.storage.TableIgnorelist.TABLE_IGNORE_LIST;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 public class IgnoreCommands
 {
     private final Basics module;
     private final DSLContext dsl;
 
-    public IgnoreCommands(Basics basics)
+    public IgnoreCommands(Basics basics, Database db)
     {
         this.module = basics;
-        this.dsl = module.getCore().getDB().getDSL();
+        this.dsl = db.getDSL();
     }
 
     private boolean addIgnore(User user, User ignored)
@@ -111,7 +111,7 @@ public class IgnoreCommands
                 added.add(user.getName());
             }
         }
-        context.sendTranslated(POSITIVE, "You added {user#list} to your ignore list!", StringUtils.implode(WHITE + ", " + DARK_GREEN, added));
+        context.sendTranslated(POSITIVE, "You added {user#list} to your ignore list!", StringUtils.implode(ChatFormat.WHITE + ", " + ChatFormat.DARK_GREEN, added));
     }
 
     @Command(desc = "Stops ignoring all messages from a player")
@@ -130,6 +130,6 @@ public class IgnoreCommands
                 added.add(user.getName());
             }
         }
-        context.sendTranslated(POSITIVE, "You removed {user#list} from your ignore list!", StringUtils.implode(WHITE + ", " + DARK_GREEN, added));
+        context.sendTranslated(POSITIVE, "You removed {user#list} from your ignore list!", StringUtils.implode(ChatFormat.WHITE + ", " + ChatFormat.DARK_GREEN, added));
     }
 }

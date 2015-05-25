@@ -26,26 +26,32 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
-import de.cubeisland.engine.core.user.User;
-import de.cubeisland.engine.core.util.LocationUtil;
-import de.cubeisland.engine.core.util.Pair;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.module.core.sponge.EventManager;
+import de.cubeisland.engine.module.core.util.LocationUtil;
+import de.cubeisland.engine.module.core.util.Pair;
 import de.cubeisland.engine.module.portals.config.PortalConfig;
-import org.bukkit.Chunk;
-import org.bukkit.Location;
-import org.bukkit.World;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityTeleportEvent;
-import org.bukkit.event.player.PlayerMoveEvent;
-import org.bukkit.event.player.PlayerTeleportEvent;
+import de.cubeisland.engine.module.service.Selector;
+import de.cubeisland.engine.module.service.command.CommandManager;
+import de.cubeisland.engine.module.service.task.TaskManager;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.reflect.Reflector;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.EntityTeleportEvent;
+import org.spongepowered.api.event.entity.player.PlayerMoveEvent;
+import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
-public class PortalManager implements Listener
+public class PortalManager
 {
     public final Portals module;
+    private Reflector reflector;
+    private Log logger;
     protected final File portalsDir;
 
     private final Map<String, Portal> portals = new HashMap<>();
@@ -68,25 +74,20 @@ public class PortalManager implements Listener
         return setting;
     }
 
-    public PortalManager(Portals module)
+    public PortalManager(Portals module, Selector selector, Reflector reflector, WorldManager wm, EventManager em, TaskManager tm, CommandManager cm, Log logger)
     {
         this.module = module;
+        this.reflector = reflector;
+        this.logger = logger;
         this.portalsDir = this.module.getFolder().resolve("portals").toFile();
         this.portalsDir.mkdir();
-        PortalCommands portals = new PortalCommands(this.module, this);
-        this.module.getCore().getCommandManager().addCommand(portals);
+        PortalCommands portals = new PortalCommands(this.module, this, selector, reflector, wm);
+        cm.addCommand(portals);
         portals.addCommand(new PortalModifyCommand(this.module, this));
 
-        this.module.getCore().getEventManager().registerListener(this.module, this);
+        em.registerListener(this.module, this);
         this.loadPortals();
-        this.module.getCore().getTaskManager().runTimer(module, new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                checkForEntitiesInPortals();
-            }
-        }, 5, 5);
+        tm.runTimer(module, this::checkForEntitiesInPortals, 5, 5);
     }
 
     private void loadPortals()
@@ -95,28 +96,28 @@ public class PortalManager implements Listener
         {
             if (!file.isDirectory() && file.getName().endsWith(".yml"))
             {
-                PortalConfig load = this.module.getCore().getConfigFactory().load(PortalConfig.class, file);
+                PortalConfig load = reflector.load(PortalConfig.class, file);
                 Portal portal = new Portal(module, this, file.getName().substring(0, file.getName().lastIndexOf(".yml")), load);
                 this.addPortal(portal);
             }
         }
-        this.module.getLog().info("{} portals loaded!", this.portals.size());
-        this.module.getLog().debug("in {} chunks", this.chunksWithPortals.size());
+        logger.info("{} portals loaded!", this.portals.size());
+        logger.debug("in {} chunks", this.chunksWithPortals.size());
     }
 
-    @EventHandler
+    @Subscribe
     public void onTeleport(PlayerTeleportEvent event)
     {
-        List<Portal> portals = this.chunksWithPortals.get(LocationUtil.getChunkKey(event.getTo()));
+        List<Portal> portals = this.chunksWithPortals.get(LocationUtil.getChunkKey(event.getNewLocation()));
         if (portals == null)
         {
             return;
         }
         for (Portal portal : portals)
         {
-            if (portal.has(event.getTo()))
+            if (portal.has(event.getNewLocation()))
             {
-                User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
+                User user = um.getExactUser(event.getUser().getUniqueId());
                 PortalsAttachment attachment = user.attachOrGet(PortalsAttachment.class, module);
                 attachment.setInPortal(true);
                 if (attachment.isDebug())
@@ -141,13 +142,12 @@ public class PortalManager implements Listener
                 {
                     if (portal.getWorld().isChunkLoaded(chunk.getLeft(), chunk.getRight()))
                     {
-                        Location helperLoc = new Location(null, 0,0,0);
                         for (Entity entity : portal.getWorld().getChunkAt(chunk.getLeft(), chunk.getRight()).getEntities())
                         {
                             if (!(entity instanceof Player))
                             {
                                 List<Entity> entities = entitesInPortals.get(portal);
-                                if (portal.has(entity.getLocation(helperLoc)))
+                                if (portal.has(entity.getLocation()))
                                 {
                                     if (entities == null || entities.isEmpty() || !entities.contains(entity))
                                     {
@@ -166,10 +166,10 @@ public class PortalManager implements Listener
         }
     }
 
-    @EventHandler
+    @Subscribe
     public void onEntityTeleport(EntityTeleportEvent event)
     {
-        List<Portal> portals = this.chunksWithPortals.get(LocationUtil.getChunkKey(event.getFrom()));
+        List<Portal> portals = this.chunksWithPortals.get(LocationUtil.getChunkKey(event.getOldLocation()));
         if (portals == null)
         {
             return;
@@ -177,7 +177,7 @@ public class PortalManager implements Listener
         for (Portal portal : portals)
         {
             List<Entity> entities = this.entitesInPortals.get(portal);
-            if (portal.has(event.getTo()))
+            if (portal.has(event.getNewLocation()))
             {
                 if (entities == null)
                 {
@@ -194,25 +194,25 @@ public class PortalManager implements Listener
         }
     }
 
-    @EventHandler
+    @Subscribe
     public void onMove(PlayerMoveEvent event)
     {
-        if (event.getFrom().getWorld() != event.getTo().getWorld())
+        if (event.getOldLocation().getExtent() != event.getNewLocation().getExtent())
         {
             return;
         }
-        if (event.getFrom().getBlockX() != event.getTo().getBlockX()
-         || event.getFrom().getBlockY() != event.getTo().getBlockY()
-         || event.getFrom().getBlockZ() != event.getTo().getBlockZ())
+        if (event.getOldLocation().getBlockX() != event.getNewLocation().getBlockX()
+         || event.getOldLocation().getBlockY() != event.getNewLocation().getBlockY()
+         || event.getOldLocation().getBlockZ() != event.getNewLocation().getBlockZ())
         {
-            List<Portal> portals = this.chunksWithPortals.get(LocationUtil.getChunkKey(event.getTo()));
-            User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
+            List<Portal> portals = this.chunksWithPortals.get(LocationUtil.getChunkKey(event.getNewLocation()));
+            User user = um.getExactUser(event.getUser().getUniqueId());
             PortalsAttachment attachment = user.attachOrGet(PortalsAttachment.class, module);
             if (portals != null)
             {
                 for (Portal portal : portals)
                 {
-                    if (portal.has(event.getTo()))
+                    if (portal.has(event.getNewLocation()))
                     {
                         if (attachment.isDebug())
                         {

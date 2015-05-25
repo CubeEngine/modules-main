@@ -25,23 +25,25 @@ import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
-import de.cubeisland.engine.core.command.CommandContext;
-import de.cubeisland.engine.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.role.Role;
 import de.cubeisland.engine.module.roles.role.RoleProvider;
 import de.cubeisland.engine.module.roles.role.WorldRoleProvider;
 import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
-import org.bukkit.World;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 @Command(name = "role", desc = "Manage roles")
 public class RoleInformationCommands extends RoleCommandHelper
 {
-    public RoleInformationCommands(Roles module)
+    public RoleInformationCommands(Roles module, WorldManager wm)
     {
-        super(module);
+        super(module, wm);
     }
 
     @Alias(value = "listroles")

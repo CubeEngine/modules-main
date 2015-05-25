@@ -26,31 +26,38 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
-import de.cubeisland.engine.core.permission.Permission;
-import de.cubeisland.engine.core.util.Triplet;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.core.util.Triplet;
 import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.module.roles.exception.CircularRoleDependencyException;
-import org.bukkit.World;
-import org.bukkit.permissions.Permissible;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import org.jooq.impl.DSL;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.world.World;
 
 import static de.cubeisland.engine.module.roles.storage.TableRole.TABLE_ROLE;
 
 public class Role extends ResolvedDataHolder implements Comparable<Role>
 {
     protected final RoleConfig config;
+    private WorldManager wm;
+    private Log logger;
     protected final Permission rolePermission;
 
     private boolean isDefaultRole = false;
 
-    public Role(RolesManager manager, RoleProvider provider, RoleConfig config)
+    public Role(RolesManager manager, RoleProvider provider, RoleConfig config, PermissionManager pm, WorldManager wm, Log logger)
     {
         super(manager, provider);
         this.config = config;
+        this.wm = wm;
+        this.logger = logger;
         this.rolePermission = provider.basePerm.child(config.roleName);
-        this.module.getCore().getPermissionManager().registerPermission(this.module, this.rolePermission);
+        pm.registerPermission(this.module, this.rolePermission);
     }
 
     @Override
@@ -58,10 +65,10 @@ public class Role extends ResolvedDataHolder implements Comparable<Role>
     {
         if (super.calculate(roleStack))
         {
-            this.module.getLog().debug("   - {} calculated!", this.getName());
+            logger.debug("   - {} calculated!", this.getName());
             for (ResolvedDataHolder role : this.dependentRoles)
             {
-                role.calculate(new Stack<String>());
+                role.calculate(new Stack<>());
             }
             return true;
         }
@@ -87,7 +94,7 @@ public class Role extends ResolvedDataHolder implements Comparable<Role>
             {
                 if (entry.getValue().getSecond())
                 {
-                    worldMirrors.add(this.module.getCore().getWorldManager().getWorldId(entry.getKey()));
+                    worldMirrors.add(wm.getWorldId(entry.getKey()));
                 }
             }
             this.manager.dsl.update(TABLE_ROLE).set(TABLE_ROLE.ROLENAME, newName).
@@ -130,7 +137,7 @@ public class Role extends ResolvedDataHolder implements Comparable<Role>
             {
                 if (entry.getValue().getSecond())
                 {
-                    worldMirrors.add(this.module.getCore().getWorldManager().getWorldId(entry.getKey()));
+                    worldMirrors.add(wm.getWorldId(entry.getKey()));
                 }
             }
             this.manager.dsl.delete(TABLE_ROLE).where(TABLE_ROLE.ROLENAME.eq(this.getName()),
@@ -143,7 +150,7 @@ public class Role extends ResolvedDataHolder implements Comparable<Role>
         }
         catch (IOException e)
         {
-            this.module.getLog().error(e, "Could not delete role {}!", this.config.getTarget().getName());
+            logger.error(e, "Could not delete role {}!", this.config.getTarget().getName());
         }
     }
 
@@ -293,7 +300,7 @@ public class Role extends ResolvedDataHolder implements Comparable<Role>
         return false;
     }
 
-    public boolean canAssignAndRemove(Permissible permissible)
+    public boolean canAssignAndRemove(Subject permissible)
     {
         return this.rolePermission.isAuthorized(permissible);
     }

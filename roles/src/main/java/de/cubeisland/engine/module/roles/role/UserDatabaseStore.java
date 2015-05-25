@@ -23,19 +23,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
-import de.cubeisland.engine.core.user.User;
+import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.module.roles.RoleAppliedEvent;
 import de.cubeisland.engine.module.roles.storage.UserMetaData;
 import de.cubeisland.engine.module.roles.storage.UserPermission;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import org.jooq.Record1;
 import org.jooq.Record2;
 import org.jooq.Result;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.core.util.formatter.MessageType.CRITICAL;
-import static de.cubeisland.engine.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.CRITICAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.module.roles.storage.TableData.TABLE_META;
 import static de.cubeisland.engine.module.roles.storage.TablePerm.TABLE_PERM;
 import static de.cubeisland.engine.module.roles.storage.TableRole.TABLE_ROLE;
@@ -43,15 +44,19 @@ import static de.cubeisland.engine.module.roles.storage.TableRole.TABLE_ROLE;
 public class UserDatabaseStore extends ResolvedDataHolder
 {
     private final World world;
+    private WorldManager wm;
+    private Log logger;
     private final RolesManager manager;
     private final RolesAttachment attachment;
 
-    public UserDatabaseStore(RolesAttachment attachment, WorldRoleProvider provider, RolesManager manager, World world)
+    public UserDatabaseStore(RolesAttachment attachment, WorldRoleProvider provider, RolesManager manager, World world, WorldManager wm, Log logger)
     {
         super(manager, provider);
         this.attachment = attachment;
         this.manager = manager;
         this.world = world;
+        this.wm = wm;
+        this.logger = logger;
 
         this.loadFromDatabase();
     }
@@ -243,7 +248,7 @@ public class UserDatabaseStore extends ResolvedDataHolder
 
     private UInteger getDBWorldId(World world)
     {
-        return this.module.getCore().getWorldManager().getWorldId(world);
+        return wm.getWorldId(world);
     }
 
     /**
@@ -262,16 +267,16 @@ public class UserDatabaseStore extends ResolvedDataHolder
                     user.sendTranslated(NEGATIVE, "The server is currently running in offline mode. Permissions will not be applied until logging in! Contact an Administrator if you think this is an error.");
                     attachment.setOfflineMsgReceived(true);
                 }
-                this.module.getLog().warn("Role permissions not applied! Server is running in unsecured offline mode!");
+                logger.warn("Role permissions not applied! Server is running in unsecured offline mode!");
                 return;
             }
             user.setPermission(this.getResolvedPermissions());
             for (Role assignedRole : this.getRoles())
             {
-                this.module.getLog().debug(" - assigned {} to {}", assignedRole.getName(), this.getName());
+                logger.debug(" - assigned {} to {}", assignedRole.getName(), this.getName());
             }
         }
-        this.module.getCore().getEventManager().fireEvent(new RoleAppliedEvent(module, user, this.attachment));
+        em.fireEvent(new RoleAppliedEvent(module, user, this.attachment));
         // else user is offline ignore
     }
 
@@ -282,7 +287,7 @@ public class UserDatabaseStore extends ResolvedDataHolder
         {
             if (this.getRawRoles().isEmpty() && this.getRawTempRoles().isEmpty())
             {
-                this.module.getLog().debug("{} had no roles applying default roles", this.attachment.getHolder().getDisplayName());
+                logger.debug("{} had no roles applying default roles", this.attachment.getHolder().getDisplayName());
 
                 for (Role role : ((WorldRoleProvider)this.provider).getDefaultRoles())
                 {
@@ -291,7 +296,8 @@ public class UserDatabaseStore extends ResolvedDataHolder
             }
             if (super.calculate(roleStack))
             {
-                this.module.getLog().debug("Role for {} calculated in {} ({})", this.attachment.getHolder().getDisplayName(), this.world.getName(), this.provider.getMainWorld().getName());
+                logger.debug("Role for {} calculated in {} ({})", this.attachment.getHolder().getDisplayName(),
+                             this.world.getName(), this.provider.getMainWorld().getName());
             }
             if (this.attachment.getHolder().getWorld() == world)
             {
