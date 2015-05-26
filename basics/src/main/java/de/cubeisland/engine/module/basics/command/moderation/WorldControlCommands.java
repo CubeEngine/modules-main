@@ -20,6 +20,7 @@ package de.cubeisland.engine.module.basics.command.moderation;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Default;
@@ -29,6 +30,9 @@ import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.core.util.matcher.EntityMatcher;
+import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
+import de.cubeisland.engine.module.core.util.matcher.StringMatcher;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.user.User;
@@ -66,6 +70,8 @@ import static de.cubeisland.engine.module.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import static java.util.stream.Collectors.*;
+import static java.util.stream.Collectors.toList;
 import static org.bukkit.entity.EntityType.*;
 import static org.spongepowered.api.entity.EntityTypes.*;
 import static org.spongepowered.api.world.weather.Weathers.THUNDER_STORM;
@@ -78,11 +84,17 @@ public class WorldControlCommands
     public static final int RADIUS_INFINITE = -1;
     private final BasicsConfiguration config;
     private final Basics module;
+    private EntityMatcher entityMatcher;
+    private MaterialMatcher materialMatcher;
+    private StringMatcher stringMatcher;
     private final EntityRemovals entityRemovals;
 
-    public WorldControlCommands(Basics module)
+    public WorldControlCommands(Basics module, EntityMatcher entityMatcher, MaterialMatcher materialMatcher, StringMatcher stringMatcher)
     {
         this.module = module;
+        this.entityMatcher = entityMatcher;
+        this.materialMatcher = materialMatcher;
+        this.stringMatcher = stringMatcher;
         this.config = module.getConfiguration();
         this.entityRemovals = new EntityRemovals(module);
     }
@@ -207,14 +219,7 @@ public class WorldControlCommands
         int entitiesRemoved;
         if ("*".equals(entities))
         {
-            List<Entity> list = new ArrayList<>();
-            for (Entity e : world.getEntities())
-            {
-                if (!(e instanceof Living))
-                {
-                    list.add(e);
-                }
-            }
+            List<Entity> list = world.getEntities().stream().filter(e -> !(e instanceof Living)).collect(toList());
             entitiesRemoved = this.removeEntities(list, loc, radius, false);
         }
         else
@@ -398,13 +403,8 @@ public class WorldControlCommands
                 {
                     entityRemoval = this.entityRemovals.GROUPED_ENTITY_REMOVAL.get(match);
                 }
-                for (Entity entity : list)
-                {
-                    if (entityRemoval.doesMatch(entity) && entityRemoval.isAllowed(context))
-                    {
-                        remList.add(entity);
-                    }
-                }
+                remList.addAll(list.stream().filter(entity -> entityRemoval.doesMatch(entity)
+                    && entityRemoval.isAllowed(context)).collect(toList()));
             }
         }
         else
@@ -414,7 +414,7 @@ public class WorldControlCommands
         list = new ArrayList<>();
         for (Entity entity : remList)
         {
-            if (entity.getType().isAlive())
+            if (entity instanceof Living)
             {
                 list.add(entity);
             }
@@ -451,7 +451,7 @@ public class WorldControlCommands
             if (!all)
             {
 
-                int distance = (int)(eLoc.subtract(loc)).lengthSquared();
+                int distance = (int)(eLoc.getPosition().sub(loc.getPosition())).lengthSquared();
                 if (radiusSquared < distance)
                 {
                     continue;

@@ -154,7 +154,7 @@ public class TeleportRequestCommands
             User user = um.getExactUser(uuid);
             if (user == null || !user.isOnline())
             {
-                context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", Bukkit.getPlayer(uuid).getName());
+                context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", um.getExactUser(uuid).getName());
                 return;
             }
             if (!TeleportCommands.teleport(user, context.getLocation(), true, false, true))

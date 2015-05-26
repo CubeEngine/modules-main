@@ -32,6 +32,8 @@ import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.core.util.matcher.TimeMatcher;
+import de.cubeisland.engine.module.core.util.matcher.WorldMatcher;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.User;
@@ -54,13 +56,17 @@ public class TimeControlCommands
     private final Basics module;
     private final TaskManager taskmgr;
     private WorldManager wm;
+    private WorldMatcher worldMatcher;
+    private TimeMatcher timeMatcher;
     private final LockTask lockTask;
 
-    public TimeControlCommands(Basics module, TaskManager taskmgr, WorldManager wm)
+    public TimeControlCommands(Basics module, TaskManager taskmgr, WorldManager wm, WorldMatcher worldMatcher, TimeMatcher timeMatcher)
     {
         this.module = module;
         this.taskmgr = taskmgr;
         this.wm = wm;
+        this.worldMatcher = worldMatcher;
+        this.timeMatcher = timeMatcher;
         this.lockTask = new LockTask();
     }
 
@@ -258,7 +264,7 @@ public class TimeControlCommands
             while (iter.hasNext())
             {
                 entry = iter.next();
-                world = Bukkit.getWorld(entry.getKey());
+                world = wm.getWorld(entry.getKey()).orNull();
                 if (world != null)
                 {
                     world.setTime(entry.getValue());

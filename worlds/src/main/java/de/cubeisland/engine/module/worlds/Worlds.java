@@ -18,10 +18,13 @@
 package de.cubeisland.engine.module.worlds;
 
 import java.io.IOException;
+import java.nio.file.Path;
 import javax.inject.Inject;
 import de.cubeisland.engine.converter.ConverterManager;
+import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.module.core.filesystem.FileManager;
 import de.cubeisland.engine.module.service.command.CommandManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.worlds.commands.WorldsCommands;
@@ -30,6 +33,7 @@ import de.cubeisland.engine.module.worlds.converter.InventoryConverter;
 import de.cubeisland.engine.module.worlds.converter.PotionEffectConverter;
 import de.cubeisland.engine.reflect.Reflector;
 import de.cubeisland.engine.reflect.codec.nbt.NBTCodec;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.potion.PotionEffect;
 
@@ -40,28 +44,33 @@ public class Worlds extends Module
     @Inject private Reflector reflector;
     @Inject private CommandManager cm;
     @Inject private WorldManager wm;
+    @Inject private Game game;
+    @Inject private FileManager fm;
+    @Inject private Path modulePath;
+    @Inject private Log logger;
 
     @Enable
     public void onLoad()
     {
         ConverterManager manager = reflector.getDefaultConverterManager();
 ///*TODO remove saving into yml too
-        manager.registerConverter(new InventoryConverter(Bukkit.getServer()), Inventory.class);
+        manager.registerConverter(new InventoryConverter(game), Inventory.class);
         manager.registerConverter(new PotionEffectConverter(), PotionEffect.class);
 //*/
         NBTCodec codec = reflector.getCodecManager().getCodec(NBTCodec.class);
         manager = codec.getConverterManager();
-        manager.registerConverter(new InventoryConverter(Bukkit.getServer()), Inventory.class);
+        manager.registerConverter(new InventoryConverter(game), Inventory.class);
         manager.registerConverter(new PotionEffectConverter(), PotionEffect.class);
 
         try
         {
-            multiverse = new Multiverse(this, this.loadConfig(WorldsConfig.class), wm);
+            multiverse = new Multiverse(this, fm.loadConfig(this, WorldsConfig.class), wm, modulePath, cm, logger);
         }
         catch (IOException e)
         {
-            throw new ModuleLoadError(e);
+            throw new IllegalStateException(e); // TODO
         }
+
         this.cm.addCommand(new WorldsCommands(this, multiverse, wm));
         this.perms = new WorldsPermissions(this);
     }

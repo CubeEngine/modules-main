@@ -158,7 +158,6 @@ public class InventoryCommands
             player.getInventory().setChestplate(null);
             player.getInventory().setHelmet(null);
         }
-        player.updateInventory();
         if (sender.equals(player))
         {
             sender.sendTranslated(POSITIVE, "Your inventory has been cleared!");

@@ -48,6 +48,8 @@ import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.user.UserList;
 import de.cubeisland.engine.module.service.user.UserManager;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.player.gamemode.GameMode;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
 import org.spongepowered.api.text.Text;
@@ -66,15 +68,17 @@ public class PlayerCommands
     private final UserManager um;
     private CommandManager cm;
     private BanManager banManager;
+    private Game game;
     private final Basics module;
     private AfkListener afkListener;
 
-    public PlayerCommands(Basics basics, UserManager um, EventManager em, TaskManager taskManager, CommandManager cm, BanManager banManager)
+    public PlayerCommands(Basics basics, UserManager um, EventManager em, TaskManager taskManager, CommandManager cm, BanManager banManager, Game game)
     {
         this.module = basics;
         this.um = um;
         this.cm = cm;
         this.banManager = banManager;
+        this.game = game;
         final long autoAfk;
         final long afkCheck;
         afkCheck = basics.getConfiguration().autoAfk.check.getMillis();

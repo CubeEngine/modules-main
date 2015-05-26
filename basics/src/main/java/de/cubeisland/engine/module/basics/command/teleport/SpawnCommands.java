@@ -60,6 +60,7 @@ public class SpawnCommands
     @Command(desc = "Changes the global respawnpoint")
     public void setSpawn(CommandSender context, @Default World world, @Optional Integer x, @Optional Integer y, @Optional Integer z)
     {
+        Vector3d direction = null;
         if (z == null)
         {
             if (!(context instanceof User))
@@ -70,8 +71,9 @@ public class SpawnCommands
             x = loc.getBlockX();
             y = loc.getBlockY();
             z = loc.getBlockZ();
+            direction = ((User)context).getRotation();
         }
-        em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location(world, x, y, z)));
+        em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location(world, x, y, z), direction));
         world.getWorldStorage().getWorldProperties().setSpawnPosition(new Vector3i(x, y, z));
         context.sendTranslated(POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new BlockVector3(x, y, z));
     }

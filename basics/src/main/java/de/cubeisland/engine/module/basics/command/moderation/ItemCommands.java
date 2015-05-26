@@ -33,6 +33,7 @@ import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.parameter.FixedValues;
 import de.cubeisland.engine.butler.parameter.TooFewArgumentsException;
 import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.core.util.matcher.EnchantMatcher;
 import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.CommandSender;
@@ -50,14 +51,20 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.DisplayNameData;
 import org.spongepowered.api.data.manipulator.SkullData;
 import org.spongepowered.api.data.manipulator.entity.SkinData;
+import org.spongepowered.api.data.manipulator.item.DurabilityData;
 import org.spongepowered.api.data.manipulator.item.LoreData;
+import org.spongepowered.api.data.property.UseLimitProperty;
 import org.spongepowered.api.data.type.SkullTypes;
 import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackComparators;
+import org.spongepowered.api.item.inventory.entity.HumanInventory;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Text.Literal;
 import org.spongepowered.api.text.Texts;
@@ -66,9 +73,12 @@ import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.service.command.readers.EnchantmentReader.getPossibleEnchantments;
 import static org.bukkit.Material.AIR;
 import static org.bukkit.Material.SKULL_ITEM;
 import static org.spongepowered.api.item.ItemTypes.SKULL;
+import static org.spongepowered.api.item.inventory.ItemStackComparators.ITEM_DATA;
+import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
 
 /**
  * item-related commands
@@ -87,11 +97,15 @@ public class ItemCommands
 {
     private final Basics module;
     private MaterialMatcher materialMatcher;
+    private EnchantMatcher enchantMatcher;
+    private Game game;
 
-    public ItemCommands(Basics module, MaterialMatcher materialMatcher)
+    public ItemCommands(Basics module, MaterialMatcher materialMatcher, EnchantMatcher enchantMatcher, Game game)
     {
         this.module = module;
         this.materialMatcher = materialMatcher;
+        this.enchantMatcher = enchantMatcher;
+        this.game = game;
     }
 
     @Command(desc = "Looks up an item for you!")
@@ -275,7 +289,7 @@ public class ItemCommands
             context.sendTranslated(NEGATIVE, "This enchantment level is not allowed!");
             return;
         }
-        String possibleEnchs = EnchantmentReader.getPossibleEnchantments(item);
+        String possibleEnchs = getPossibleEnchantments(game.getRegistry(), item);
         if (possibleEnchs != null)
         {
             context.sendTranslated(NEGATIVE, "This enchantment is not allowed for this item!", possibleEnchs);
@@ -296,18 +310,21 @@ public class ItemCommands
             context.sendTranslated(NEGATIVE, "This item is blacklisted!");
             return;
         }
-        amount = amount == null ? item.getMaxStackSize() : amount;
+        amount = amount == null ? item.getMaxStackQuantity() : amount;
         if (amount <= 0)
         {
             context.sendTranslated(NEGATIVE, "The amount has to be a number greater than 0!");
             return;
         }
-        item.setAmount(amount);
-        player.getInventory().addItem(item);
-        player.updateInventory();
-        String matname = materialMatcher.getNameFor(item);
-        context.sendTranslated(POSITIVE, "You gave {user} {amount} {input#item}!", player, amount, matname);
-        player.sendTranslated(POSITIVE, "{user} just gave you {amount} {input#item}!", context.getName(), amount, matname);
+        item.setQuantity(amount);
+        if (player.getInventory().offer(item))
+        {
+            String matname = materialMatcher.getNameFor(item);
+            context.sendTranslated(POSITIVE, "You gave {user} {amount} {input#item}!", player, amount, matname);
+            player.sendTranslated(POSITIVE, "{user} just gave you {amount} {input#item}!", context.getName(), amount, matname);
+            return;
+        }
+        player.sendTranslated(NEGATIVE, "{user} had no place for the item.");
     }
 
     @Command(alias = "i", desc = "Gives the specified Item to you")
@@ -318,12 +335,12 @@ public class ItemCommands
                      @Named("ench") @Label("enchantment[:level]") String enchantmentString,
                      @Flag boolean blacklist)
     {
-        if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(context) && this.module.getConfiguration().commands.containsBlackListed(item))
+        if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(context) && this.module.getConfiguration().commands.containsBlackListed(item.getItem()))
         {
             context.sendTranslated(NEGATIVE, "This item is blacklisted!");
             return;
         }
-        amount = amount == null ? item.getMaxStackSize() : amount;
+        amount = amount == null ? item.getMaxStackQuantity() : amount;
         if (amount <= 0)
         {
             context.sendTranslated(NEGATIVE, "The amount has to be a number greater than 0!");
@@ -345,18 +362,17 @@ public class ItemCommands
                 {
                     if (module.perms().COMMAND_ITEM_ENCHANTMENTS_UNSAFE.isAuthorized(context))
                     {
-                        Match.enchant().applyMatchedEnchantment(item, ench, enchLvl, true);
+                        enchantMatcher.applyMatchedEnchantment(item, ench, enchLvl, true);
                     }
                     else
                     {
-                        Match.enchant().applyMatchedEnchantment(item, ench, enchLvl, false);
+                        enchantMatcher.applyMatchedEnchantment(item, ench, enchLvl, false);
                     }
                 }
             }
         }
-        item.setAmount(amount);
-        context.getInventory().addItem(item);
-        context.updateInventory();
+        item.setQuantity(amount);
+        context.getInventory().offer(item);
         context.sendTranslated(NEUTRAL, "Received: {amount} {input#item}", amount, materialMatcher.getNameFor(item));
     }
 
@@ -366,11 +382,12 @@ public class ItemCommands
     {
         if (all)
         {
-            for (ItemStack item : context.getInventory().getContents())
+            for (Inventory slot : context.getInventory().slots())
             {
-                if (item.getType() != AIR)
+                if (slot.peek().isPresent())
                 {
-                    item.setAmount(64);
+                    ItemStack item = slot.peek().get();
+                    item.setQuantity(64);
                 }
             }
             context.sendTranslated(POSITIVE, "Refilled all stacks!");
@@ -382,12 +399,13 @@ public class ItemCommands
             context.sendTranslated(NEGATIVE, "Invalid amount {input#amount}", amount);
             return;
         }
-        if (context.getItemInHand() == null || context.getItemInHand().getType() == AIR)
+
+        if (!context.getItemInHand().isPresent())
         {
             context.sendTranslated(NEUTRAL, "More nothing is still nothing!");
             return;
         }
-        context.getItemInHand().setAmount(64);
+        context.getItemInHand().get().setQuantity(64);
         if (amount == 1)
         {
             context.sendTranslated(POSITIVE, "Refilled stack in hand!");
@@ -395,7 +413,7 @@ public class ItemCommands
         }
         for (int i = 1; i < amount; ++i)
         {
-            context.getInventory().addItem(context.getItemInHand());
+            context.getInventory().offer(context.getItemInHand().get());
         }
         context.sendTranslated(POSITIVE, "Refilled {amount} stacks in hand!", amount);
     }
@@ -406,16 +424,18 @@ public class ItemCommands
     {
         if (all)
         {
-            List<ItemStack> list = new ArrayList<>();
-            list.addAll(Arrays.asList(context.getInventory().getArmorContents()));
-            list.addAll(Arrays.asList(context.getInventory().getContents()));
             int repaired = 0;
-            for (ItemStack item : list)
+            for (Inventory slot : context.getInventory().slots())
             {
-                if (materialMatcher.repairable(item))
+                if (slot.peek().isPresent())
                 {
-                    item.setDurability((short)0);
-                    repaired++;
+                    ItemStack item = slot.peek().get();
+                    if (item.isCompatible(DurabilityData.class))
+                    {
+                        Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
+                        item.offer(item.getOrCreate(DurabilityData.class).get().setDurability(max));
+                        repaired++;
+                    }
                 }
             }
             if (repaired == 0)
@@ -426,15 +446,16 @@ public class ItemCommands
             context.sendTranslated(POSITIVE, "Repaired {amount} items!", repaired);
             return;
         }
-        ItemStack item = context.getItemInHand();
-        if (materialMatcher.repairable(item))
+        ItemStack item = context.getItemInHand().get();
+        if (item.isCompatible(DurabilityData.class))
         {
-            if (item.getDurability() == 0)
+            Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
+            if (item.getOrCreate(DurabilityData.class).get().getDurability() == max)
             {
                 context.sendTranslated(NEUTRAL, "No need to repair this!");
                 return;
             }
-            item.setDurability((short)0);
+            item.offer(item.getOrCreate(DurabilityData.class).get().setDurability(max));
             context.sendTranslated(POSITIVE, "Item repaired!");
             return;
         }
@@ -446,43 +467,49 @@ public class ItemCommands
     public void stack(User context)
     {
         boolean allow64 = module.perms().COMMAND_STACK_FULLSTACK.isAuthorized(context);
-        ItemStack[] items = context.getInventory().getContents();
+        ItemStack[] items = new ItemStack[context.getInventory().capacity()];
+        int slotIndex = 0;
+        for (Inventory slot : context.getInventory().slots())
+        {
+            items[slotIndex] = slot.peek().orNull();
+        }
+
         int size = items.length;
         boolean changed = false;
         for (int i = 0; i < size; i++)
         {
             ItemStack item = items[i];
             // no null / infinite or unstackable items (if not allowed)
-            if (item == null || item.getAmount() <= 0 || (!allow64 && item.getMaxStackSize() == 1))
+            if (item == null || item.getQuantity() <= 0 || (!allow64 && item.getMaxStackQuantity() == 1))
             {
                 continue;
             }
-            int max = allow64 ? 64 : item.getMaxStackSize();
-            if (item.getAmount() < max)
+            int max = allow64 ? 64 : item.getMaxStackQuantity();
+            if (item.getQuantity() < max)
             {
-                int needed = max - item.getAmount();
+                int needed = max - item.getQuantity();
                 for (int j = i + 1; j < size; j++) // search for same item
                 {
                     ItemStack item2 = items[j];
                     // no null / infinite or unstackable items (if not allowed)
-                    if (item2 == null || item2.getAmount() <= 0 || (!allow64 && item.getMaxStackSize() == 1))
+                    if (item2 == null || item2.getQuantity() <= 0 || (!allow64 && item.getMaxStackQuantity() == 1))
                     {
                         continue;
                     }
                     // compare
-                    if (item.isSimilar(item2))
+                    if (TYPE.compare(item, item2) == 0 && ITEM_DATA.compare(item, item2) == 0)
                     {
-                        if (item2.getAmount() > needed) // not enough place -> fill up stack
+                        if (item2.getQuantity() > needed) // not enough place -> fill up stack
                         {
-                            item.setAmount(max);
-                            item2.setAmount(item2.getAmount() - needed);
+                            item.setQuantity(max);
+                            item2.setQuantity(item2.getQuantity() - needed);
                             break;
                         }
                         // enough place -> add to stack
                         {
                             items[j] = null;
-                            item.setAmount(item.getAmount() + item2.getAmount());
-                            needed = max - item.getAmount();
+                            item.setQuantity(item.getQuantity() + item2.getQuantity());
+                            needed = max - item.getQuantity();
                         }
                         changed = true;
                     }
@@ -491,7 +518,11 @@ public class ItemCommands
         }
         if (changed)
         {
-            context.getInventory().setContents(items);
+            int i = 0;
+            for (Inventory slot : context.getInventory().slots())
+            {
+                slot.set(items[i++]);
+            }
             context.sendTranslated(POSITIVE, "Items stacked together!");
             return;
         }

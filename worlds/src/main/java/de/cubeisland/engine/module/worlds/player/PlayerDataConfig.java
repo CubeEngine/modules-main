@@ -28,6 +28,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
+import org.spongepowered.api.entity.player.Player;
 
 public class PlayerDataConfig extends ReflectedNBT
 {

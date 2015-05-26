@@ -32,16 +32,17 @@ import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 public class InventoryConverter extends SimpleConverter<Inventory>
 {
-    private final Server server;
+    private final Game game;
 
-    public InventoryConverter(Server server)
+    public InventoryConverter(Game game)
     {
-        this.server = server;
+        this.game = game;
     }
 
     @Override
@@ -95,7 +96,7 @@ public class InventoryConverter extends SimpleConverter<Inventory>
             Node size = ((MapNode)node).get("Size");
             if (size instanceof IntNode)
             {
-                Inventory inventory = server.createInventory(null, ((IntNode)size).getValue());
+                Inventory inventory = game.createInventory(null, ((IntNode)size).getValue());
                 Node contents = ((MapNode)node).get("Contents");
                 if (contents instanceof ListNode)
                 {

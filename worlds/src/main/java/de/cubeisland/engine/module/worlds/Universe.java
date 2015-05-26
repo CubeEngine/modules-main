@@ -44,6 +44,9 @@ import de.cubeisland.engine.reflect.Reflector;
 
 import static de.cubeisland.engine.module.core.filesystem.FileExtensionFilter.DAT;
 import static de.cubeisland.engine.module.core.filesystem.FileExtensionFilter.YAML;
+
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static java.util.stream.Collectors.toList;

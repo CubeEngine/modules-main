@@ -22,22 +22,10 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.service.user.UserManager;
-import org.bukkit.Art;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Painting;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.hanging.HangingBreakEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerItemHeldEvent;
 
-import de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
-import de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.hanging.Painting;
@@ -119,8 +107,8 @@ public class PaintingListener
                 final int maxDistanceSquared = this.module.getConfiguration().maxChangePaintingDistance * this.module
                     .getConfiguration().maxChangePaintingDistance;
 
-                if (painting.getLocation().toVector()
-                            .distanceSquared(user.getLocation().toVector()) > maxDistanceSquared)
+                if (painting.getLocation().getPosition()
+                            .distanceSquared(user.getLocation().getPosition()) > maxDistanceSquared)
                 {
                     this.paintingChange.remove(user.getUniqueId());
                     user.sendTranslated(POSITIVE, "Painting locked");

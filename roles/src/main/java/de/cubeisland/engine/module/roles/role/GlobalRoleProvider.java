@@ -18,9 +18,6 @@
 package de.cubeisland.engine.module.roles.role;
 
 import java.nio.file.Path;
-import org.bukkit.World;
-
-import de.cubeisland.engine.module.core.contract.Contract.expectNotNull;
 
 public class GlobalRoleProvider extends RoleProvider
 {
