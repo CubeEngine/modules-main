@@ -20,17 +20,13 @@ package de.cubeisland.engine.module.roles.commands;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
-import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.roles.Roles;
-import de.cubeisland.engine.module.roles.role.RolesAttachment;
-import org.bukkit.World;
-
-import de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
-import de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.world.World;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
@@ -52,6 +48,7 @@ public class ManagementCommands extends ContainerCommand
     public void reload(CommandContext context)
     {
         module.getConfiguration().reload();
+
         module.getRolesManager().initRoleProviders();
         module.getRolesManager().recalculateAllRoles();
         context.sendTranslated(POSITIVE, "{text:Roles} reload complete!");
@@ -81,9 +78,14 @@ public class ManagementCommands extends ContainerCommand
             context.sendTranslated(POSITIVE, "All your roles commands will now have {world} as default world!", world);
         }
         CommandSender sender = context.getSource();
+
         if (sender instanceof User)
         {
-            ((User)sender).get(RolesAttachment.class).setWorkingWorld(world);
+            SubjectData data = ((User)sender).getPlayer().get().getTransientSubjectData();
+            if (data instanceof OptionSubjectData)
+            {
+                ((OptionSubjectData)data).setOption(((User)sender).getPlayer().get().getActiveContexts(), "CubeEngine:roles:active-world", world.getName());
+            }
             return;
         }
         curWorldOfConsole = world;

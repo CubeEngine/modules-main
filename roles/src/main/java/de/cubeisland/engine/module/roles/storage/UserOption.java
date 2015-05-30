@@ -15,38 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.roles.role.resolved;
+package de.cubeisland.engine.module.roles.storage;
 
-import de.cubeisland.engine.module.roles.role.ResolvedDataHolder;
-import de.cubeisland.engine.module.roles.role.Role;
+import java.util.UUID;
+import de.cubeisland.engine.module.service.database.AsyncRecord;
 
-public class ResolvedData
+import static de.cubeisland.engine.module.roles.storage.TableOption.TABLE_META;
+
+public class UserOption extends AsyncRecord<UserOption>
 {
-    private final ResolvedDataHolder origin;
-    private final String key;
-
-    public ResolvedData(ResolvedDataHolder origin, String key)
+    public UserOption()
     {
-        this.origin = origin;
-        this.key = key;
+        super(TABLE_META);
     }
 
-    public ResolvedDataHolder getOrigin()
+    public UserOption newMeta(UUID uuid, String context, String key, String value)
     {
-        return origin;
-    }
-
-    public String getKey()
-    {
-        return key;
-    }
-
-    public int getPriorityValue()
-    {
-        if (origin instanceof Role)
-        {
-            return ((Role)origin).getPriorityValue();
-        }
-        return Integer.MAX_VALUE;
+        this.setValue(TABLE_META.USER, uuid);
+        this.setValue(TABLE_META.CONTEXT, context);
+        this.setValue(TABLE_META.KEY, key);
+        this.setValue(TABLE_META.VALUE, value);
+        return this;
     }
 }

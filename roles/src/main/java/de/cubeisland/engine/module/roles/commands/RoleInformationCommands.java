@@ -17,6 +17,8 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -25,15 +27,14 @@ import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
-import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.roles.Roles;
-import de.cubeisland.engine.module.roles.role.Role;
-import de.cubeisland.engine.module.roles.role.RoleProvider;
-import de.cubeisland.engine.module.roles.role.WorldRoleProvider;
-import de.cubeisland.engine.module.roles.role.resolved.ResolvedPermission;
+import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
+import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
+import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.world.World;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
@@ -41,40 +42,39 @@ import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 @Command(name = "role", desc = "Manage roles")
 public class RoleInformationCommands extends RoleCommandHelper
 {
-    public RoleInformationCommands(Roles module, WorldManager wm)
+    private RolesPermissionService service;
+
+    public RoleInformationCommands(Roles module, WorldManager wm, RolesPermissionService service)
     {
         super(module, wm);
+        this.service = service;
     }
 
     @Alias(value = "listroles")
     @Command(desc = "Lists all roles in a world or globally")
-    public void list(CommandContext context, @Named("in") World world, @Flag boolean global)
+    public void list(CommandContext cContext, Context context, @Flag boolean global)
     {
-        world = global ? null : this.getWorld(context, world);
-        if (!global && world == null) return;
-        RoleProvider provider = world == null ? this.manager.getGlobalProvider() : this.manager.getProvider(world);
-        if (provider.getRoles().isEmpty())
+        ContextualRole role = new ContextualRole();
+        role.contextName = context.getName();
+        role.contextType = context.getType();
+        role.roleName = "";
+        List<Subject> roles = new ArrayList<>();
+        for (Subject subject : service.getGroupSubjects().getAllSubjects())
         {
-
-            if (global)
+            if (subject.getIdentifier().startsWith(role.getIdentifier()))
             {
-                context.sendTranslated(NEGATIVE, "There are no global roles!");
-                return;
+                roles.add(subject);
             }
-            context.sendTranslated(NEGATIVE, "There are no roles in {world}!", world);
+        }
+        if (roles.isEmpty())
+        {
+            cContext.sendTranslated(NEGATIVE, "There are no roles in {context}!", context);
             return;
         }
-        if (global)
+        cContext.sendTranslated(POSITIVE, "The following roles are available in {context}:", context);
+        for (Subject r : roles)
         {
-            context.sendTranslated(POSITIVE, "The following global roles are available:");
-        }
-        else
-        {
-            context.sendTranslated(POSITIVE, "The following roles are available in {world}:", world);
-        }
-        for (Role role : provider.getRoles())
-        {
-            context.sendMessage(String.format(this.LISTELEM, role.getName()));
+            cContext.sendMessage(String.format(this.LISTELEM, r instanceof RoleSubject ? ((RoleSubject)r).getName() : r.getIdentifier()));
         }
     }
 

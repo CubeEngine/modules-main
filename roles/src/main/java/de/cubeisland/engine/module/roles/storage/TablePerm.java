@@ -17,31 +17,28 @@
  */
 package de.cubeisland.engine.module.roles.storage;
 
+import java.util.UUID;
 import de.cubeisland.engine.module.core.util.Version;
 import de.cubeisland.engine.module.service.database.Database;
 import de.cubeisland.engine.module.service.database.Table;
 import org.jooq.TableField;
-import org.jooq.types.UInteger;
+import org.jooq.impl.SQLDataType;
 
-import static de.cubeisland.engine.module.service.user.TableUser.TABLE_USER;
-import static de.cubeisland.engine.module.service.world.TableWorld.TABLE_WORLD;
 import static org.jooq.impl.SQLDataType.VARCHAR;
 
 public class TablePerm extends Table<UserPermission>
 {
     public static TablePerm TABLE_PERM;
-    public final TableField<UserPermission, UInteger> USERID = createField("userId", U_INTEGER.nullable(false), this);
-    public final TableField<UserPermission, UInteger> WORLDID = createField("worldId", U_INTEGER.nullable(false), this);
+    public final TableField<UserPermission, UUID> USER = createField("user", SQLDataType.UUID.length(255).nullable(false), this);
+    public final TableField<UserPermission, String> CONTEXT = createField("world", VARCHAR.length(255).nullable(false), this);
     public final TableField<UserPermission, String> PERM = createField("perm", VARCHAR.length(255).nullable(false), this);
     public final TableField<UserPermission, Boolean> ISSET = createField("isSet", BOOLEAN.nullable(false), this);
 
     public TablePerm(String prefix, Database database)
     {
-        super(prefix + "userperms", new Version(1), database);
-        this.setPrimaryKey(USERID, WORLDID, PERM);
-        this.addForeignKey(TABLE_USER.getPrimaryKey(), USERID);
-        this.addForeignKey(TABLE_WORLD.getPrimaryKey(), WORLDID);
-        this.addFields(USERID, WORLDID, PERM, ISSET);
+        super(prefix + "permission", new Version(1), database);
+        this.setPrimaryKey(USER, CONTEXT, PERM);
+        this.addFields(USER, CONTEXT, PERM, ISSET);
         TABLE_PERM = this;
     }
 

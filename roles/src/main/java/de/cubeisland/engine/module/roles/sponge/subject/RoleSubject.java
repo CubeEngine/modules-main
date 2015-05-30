@@ -4,7 +4,7 @@ import java.util.Set;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
-import de.cubeisland.engine.module.roles.sponge.data.RolesSubjectData;
+import de.cubeisland.engine.module.roles.sponge.data.RoleSubjectData;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.command.CommandSource;
@@ -16,7 +16,7 @@ import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEX
 public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
 {
     public static final String SEPARATOR = "|";
-    private final RolesSubjectData data;
+    private final RoleSubjectData data;
     private final String roleName;
     private final Set<Context> contexts;
 
@@ -24,7 +24,7 @@ public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
     {
         super(service.getGroupSubjects());
         this.contexts = context == null ? GLOBAL_CONTEXT : singleton(context);
-        this.data = new RolesSubjectData(service, config, context);
+        this.data = new RoleSubjectData(service, config, context);
         this.roleName = "role:" + (context == null ? "global" + SEPARATOR : context.getKey() + SEPARATOR + context.getValue() + SEPARATOR) + config.roleName;
     }
 
@@ -57,5 +57,10 @@ public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
     {
         // Higher priority first
         return -Integer.compare(data.getConfig().priority.value, o.data.getConfig().priority.value);
+    }
+
+    public String getName()
+    {
+        return roleName.substring(roleName.lastIndexOf("|" + 1));
     }
 }

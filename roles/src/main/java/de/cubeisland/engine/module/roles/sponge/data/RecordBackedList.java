@@ -8,14 +8,11 @@ import java.util.ListIterator;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import de.cubeisland.engine.module.roles.sponge.collection.RoleCollection;
-import de.cubeisland.engine.module.roles.storage.AssignedRole;
-import de.cubeisland.engine.module.roles.storage.TableRole;
 import de.cubeisland.engine.module.service.database.AsyncRecord;
 import de.cubeisland.engine.module.service.database.Database;
 import de.cubeisland.engine.module.service.database.Table;
 import org.jooq.Result;
 import org.jooq.TableField;
-import org.jooq.types.UInteger;
 import org.spongepowered.api.service.permission.Subject;
 
 import static java.util.stream.Collectors.toList;

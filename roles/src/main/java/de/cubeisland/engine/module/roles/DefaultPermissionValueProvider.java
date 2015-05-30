@@ -19,13 +19,13 @@ package de.cubeisland.engine.module.roles;
 
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
-import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
+import org.spongepowered.api.util.Tristate;
 
-public class DefaultPermissionValueProvider implements DefaultValue<PermissionValue>
+public class DefaultPermissionValueProvider implements DefaultValue<Tristate>
 {
     @Override
-    public PermissionValue getDefault(CommandInvocation invocation)
+    public Tristate getDefault(CommandInvocation invocation)
     {
-        return PermissionValue.TRUE;
+        return Tristate.TRUE;
     }
 }

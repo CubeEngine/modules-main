@@ -26,24 +26,27 @@ import org.jooq.impl.SQLDataType;
 
 import static org.jooq.impl.SQLDataType.VARCHAR;
 
-public class TableRole extends Table<UserRole>
+public class TableOption extends Table<UserOption>
 {
-    public static TableRole TABLE_ROLE;
-    public final TableField<UserRole, UUID> USER = createField("user", SQLDataType.UUID.length(255).nullable(false), this);
-    public final TableField<UserRole, String> CONTEXT = createField("context", VARCHAR.length(255).nullable(false), this);
-    public final TableField<UserRole, String> ROLE = createField("role", VARCHAR.length(255).nullable(false), this);
+    public static TableOption TABLE_META;
+    public final TableField<UserOption, UUID> USER = createField("userId", SQLDataType.UUID.length(255).nullable(false),
+                                                                 this);
+    public final TableField<UserOption, String> CONTEXT = createField("worldId", VARCHAR.length(255).nullable(false),
+                                                                      this);
+    public final TableField<UserOption, String> KEY = createField("key", VARCHAR.length(255).nullable(false), this);
+    public final TableField<UserOption, String> VALUE = createField("value", VARCHAR.length(255).nullable(false), this);
 
-    public TableRole(String prefix, Database database)
+    public TableOption(String prefix, Database database)
     {
-        super(prefix + "role", new Version(1), database);
-        this.setPrimaryKey(USER, CONTEXT, ROLE);
-        this.addFields(USER, CONTEXT, ROLE);
-        TABLE_ROLE = this;
+        super(prefix + "option", new Version(1), database);
+        this.setPrimaryKey(USER, CONTEXT, KEY);
+        this.addFields(USER, CONTEXT, KEY, VALUE);
+        TABLE_META = this;
     }
 
     @Override
-    public Class<UserRole> getRecordType()
+    public Class<UserOption> getRecordType()
     {
-        return UserRole.class;
+        return UserOption.class;
     }
 }

@@ -17,11 +17,10 @@
  */
 package de.cubeisland.engine.module.roles.storage;
 
+import java.util.UUID;
 import de.cubeisland.engine.module.service.database.AsyncRecord;
-import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
-import org.jooq.types.UInteger;
+import org.spongepowered.api.util.Tristate;
 
-import static de.cubeisland.engine.module.roles.role.DataStore.PermissionValue.TRUE;
 import static de.cubeisland.engine.module.roles.storage.TablePerm.TABLE_PERM;
 
 public class UserPermission extends AsyncRecord<UserPermission>
@@ -31,12 +30,12 @@ public class UserPermission extends AsyncRecord<UserPermission>
         super(TABLE_PERM);
     }
 
-    public UserPermission newPerm(UInteger userId, UInteger worldId, String perm, PermissionValue set)
+    public UserPermission newPerm(UUID uuid, String context, String perm, Tristate set)
     {
-        this.setValue(TABLE_PERM.USERID, userId);
-        this.setValue(TABLE_PERM.WORLDID, worldId);
+        this.setValue(TABLE_PERM.USER, uuid);
+        this.setValue(TABLE_PERM.CONTEXT, context);
         this.setValue(TABLE_PERM.PERM, perm);
-        this.setValue(TABLE_PERM.ISSET, set == TRUE);
+        this.setValue(TABLE_PERM.ISSET, set.asBoolean());
         return this;
     }
 }

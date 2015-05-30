@@ -27,20 +27,20 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerLoginEvent.Result;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.player.PlayerChangeWorldEvent;
 
-public class RolesEventHandler implements Listener
+public class RolesEventHandler
 {
     private final Roles module;
-    private final RolesManager rolesManager;
 
     public RolesEventHandler(Roles module)
     {
         this.module = module;
-        this.rolesManager = module.getRolesManager();
     }
 
-    @EventHandler
-    public void onPlayerChangedWorld(PlayerChangedWorldEvent event)
+    @Subscribe
+    public void onPlayerChangedWorld(PlayerChangeWorldEvent event)
     {
         /*
         // TODO this wasn't completly right (we can only not recalculate if all data is shared)
@@ -61,7 +61,7 @@ public class RolesEventHandler implements Listener
         attachment.getCurrentDataHolder().apply();
     }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @Subscribe(priority = EventPriority.MONITOR)
     public void onLogin(PlayerLoginEvent event)
     {
         if (event.getResult().equals(Result.ALLOWED)) // only if allowed to join
@@ -70,13 +70,13 @@ public class RolesEventHandler implements Listener
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @Subscribe(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent event)
     {
         this.rolesManager.getRolesAttachment(event.getPlayer()).getCurrentDataHolder().apply(); // Pre-calculate + apply
     }
 
-    @EventHandler
+    @Subscribe
     public void onAuthorized(UserAuthorizedEvent event)
     {
         RolesAttachment rolesAttachment = this.rolesManager.getRolesAttachment(event.getUser());
@@ -84,7 +84,7 @@ public class RolesEventHandler implements Listener
         rolesAttachment.getCurrentDataHolder().apply(); // Pre-Calculate + apply
     }
 
-    @EventHandler
+    @Subscribe
     public void onPermissionRegister(NotifyPermissionRegistrationCompletedEvent event)
     {
         this.module.getLog().debug("{} registered new Permissions. Reloading Roles...", event.getModule().getName());

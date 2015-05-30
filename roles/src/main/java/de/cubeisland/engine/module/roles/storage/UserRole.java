@@ -17,23 +17,23 @@
  */
 package de.cubeisland.engine.module.roles.storage;
 
+import java.util.UUID;
 import de.cubeisland.engine.module.service.database.AsyncRecord;
-import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.roles.storage.TableRole.TABLE_ROLE;
 
-public class AssignedRole extends AsyncRecord<AssignedRole>
+public class UserRole extends AsyncRecord<UserRole>
 {
-    public AssignedRole()
+    public UserRole()
     {
         super(TABLE_ROLE);
     }
 
-    public AssignedRole newAssignedRole(UInteger userId, UInteger worldId, String roleName)
+    public UserRole newAssignedRole(UUID uuid, String context, String roleName)
     {
-        this.setValue(TABLE_ROLE.USERID, userId);
-        this.setValue(TABLE_ROLE.WORLDID, worldId);
-        this.setValue(TABLE_ROLE.ROLENAME, roleName);
+        this.setValue(TABLE_ROLE.USER, uuid);
+        this.setValue(TABLE_ROLE.CONTEXT, context);
+        this.setValue(TABLE_ROLE.ROLE, roleName);
         return this;
     }
 }

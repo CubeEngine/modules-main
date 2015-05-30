@@ -17,26 +17,24 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
+import java.util.Collections;
+import java.util.Set;
 import de.cubeisland.engine.module.roles.Roles;
-import de.cubeisland.engine.module.roles.role.Role;
-import de.cubeisland.engine.module.roles.role.RoleProvider;
-import de.cubeisland.engine.module.roles.role.RolesAttachment;
-import de.cubeisland.engine.module.roles.role.RolesManager;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.world.World;
 
 import static de.cubeisland.engine.module.core.util.ChatFormat.*;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 public abstract class RoleCommandHelper extends ContainerCommand
 {
-    protected static final String GLOBAL_PREFIX = "g:";
-    protected final RolesManager manager;
     protected final Roles module;
     protected final WorldManager worldManager;
 
@@ -46,9 +44,13 @@ public abstract class RoleCommandHelper extends ContainerCommand
     public RoleCommandHelper(Roles module, WorldManager wm)
     {
         super(module);
-        this.manager = module.getRolesManager();
         this.module = module;
         this.worldManager = wm;
+    }
+
+    protected Set<Context> toSet(Context context)
+    {
+        return "global".equals(context.getType()) ? GLOBAL_CONTEXT : Collections.singleton(context);
     }
 
     protected World getWorld(CommandContext context, World world)

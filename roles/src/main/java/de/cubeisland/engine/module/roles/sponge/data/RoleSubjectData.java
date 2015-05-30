@@ -13,14 +13,14 @@ import org.spongepowered.api.service.permission.context.Context;
 
 import static java.util.Collections.singleton;
 
-public class RolesSubjectData extends CachingSubjectData
+public class RoleSubjectData extends CachingSubjectData
 {
     private final RoleConfig config;
     private Context context;
     private final Set<Context> contexts;
     private final RoleCollection collection;
 
-    public RolesSubjectData(RolesPermissionService service, RoleConfig config, Context context)
+    public RoleSubjectData(RolesPermissionService service, RoleConfig config, Context context)
     {
         this.config = config;
         this.context = context;
@@ -99,4 +99,85 @@ public class RolesSubjectData extends CachingSubjectData
     {
         return contexts;
     }
+
+    /* TODO rename and delete
+     public boolean rename(String newName)
+    {
+        if (this.provider.getRole(newName) != null)
+        {
+            return false;
+        }
+        this.makeDirty();
+        if (this.isGlobal())
+        {
+            this.manager.dsl.update(TABLE_ROLE).set(DSL.row(TABLE_ROLE.ROLE), DSL.row("g:" + newName)).
+                where(TABLE_ROLE.ROLE.eq(this.getName())).execute();
+        }
+        else
+        {
+            Set<UInteger> worldMirrors = new HashSet<>();
+            for (Entry<World, Triplet<Boolean, Boolean, Boolean>> entry : ((WorldRoleProvider)provider).getWorldMirrors().entrySet())
+            {
+                if (entry.getValue().getSecond())
+                {
+                    worldMirrors.add(wm.getWorldId(entry.getKey()));
+                }
+            }
+            this.manager.dsl.update(TABLE_ROLE).set(TABLE_ROLE.ROLE, newName).
+                where(TABLE_ROLE.ROLE.eq(this.getName()), TABLE_ROLE.CONTEXT.in(worldMirrors)).execute();
+        }
+        this.delete();
+        this.config.roleName = newName;
+        this.provider.addRole(this);
+        for (Role role : this.resolvedRoles)
+        {
+            role.dependentRoles.add(this);
+        }
+        for (ResolvedDataHolder dataHolder : this.dependentRoles)
+        {
+            dataHolder.assignRole(this);
+        }
+        this.config.setTarget(new File(this.config.getTarget().getParent(), this.config.roleName + ".yml"));
+        this.save();
+        return true;
+    }
+
+    public void delete()
+    {
+        for (Role role : this.resolvedRoles)
+        {
+            role.dependentRoles.remove(this);
+        }
+        for (ResolvedDataHolder dataHolder : this.dependentRoles)
+        {
+            dataHolder.removeRole(this);
+        }
+        if (this.isGlobal())
+        {
+            this.manager.dsl.delete(TABLE_ROLE).where(TABLE_ROLE.ROLE.eq(this.getName())).execute();
+        }
+        else
+        {
+            Set<UInteger> worldMirrors = new HashSet<>();
+            for (Entry<World, Triplet<Boolean, Boolean, Boolean>> entry : ((WorldRoleProvider)provider).getWorldMirrors().entrySet())
+            {
+                if (entry.getValue().getSecond())
+                {
+                    worldMirrors.add(wm.getWorldId(entry.getKey()));
+                }
+            }
+            this.manager.dsl.delete(TABLE_ROLE).where(TABLE_ROLE.ROLE.eq(this.getName()),
+                                                      TABLE_ROLE.CONTEXT.in(worldMirrors)).execute();
+        }
+        this.provider.removeRole(this);
+        try
+        {
+            Files.delete(this.config.getTarget().toPath());
+        }
+        catch (IOException e)
+        {
+            logger.error(e, "Could not delete role {}!", this.config.getTarget().getName());
+        }
+    }
+     */
 }

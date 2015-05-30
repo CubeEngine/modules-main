@@ -6,13 +6,13 @@ import java.util.UUID;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.collection.RoleCollection;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
-import de.cubeisland.engine.module.roles.storage.AssignedRole;
-import de.cubeisland.engine.module.roles.storage.UserMetaData;
+import de.cubeisland.engine.module.roles.storage.UserRole;
+import de.cubeisland.engine.module.roles.storage.UserOption;
 import de.cubeisland.engine.module.roles.storage.UserPermission;
 import de.cubeisland.engine.module.service.database.Database;
 import org.spongepowered.api.service.permission.context.Context;
 
-import static de.cubeisland.engine.module.roles.storage.TableData.TABLE_META;
+import static de.cubeisland.engine.module.roles.storage.TableOption.TABLE_META;
 import static de.cubeisland.engine.module.roles.storage.TablePerm.TABLE_PERM;
 import static de.cubeisland.engine.module.roles.storage.TableRole.TABLE_ROLE;
 
@@ -35,11 +35,11 @@ public class UserSubjectData extends CachingSubjectData
         if (getContexts().equals(c) && !options.containsKey(getContexts()))
         {
             String context = c.toString(); // TODO
-            RecordBackedMap<String, String, UserMetaData> map =
+            RecordBackedMap<String, String, UserOption> map =
                 new RecordBackedMap<>(db, TABLE_META,
                                       TABLE_META.KEY, TABLE_META.VALUE,
-                                      TABLE_META.USERID, uuid,
-                                      TABLE_META.WORLDID, context);
+                                      TABLE_META.USER, uuid,
+                                      TABLE_META.CONTEXT, context);
             options.put(getContexts(), map);
         }
     }
@@ -53,8 +53,8 @@ public class UserSubjectData extends CachingSubjectData
             RecordBackedMap<String, Boolean, UserPermission> map =
                 new RecordBackedMap<>(db, TABLE_PERM,
                                       TABLE_PERM.PERM, TABLE_PERM.ISSET,
-                                      TABLE_PERM.USERID, uuid,
-                                      TABLE_PERM.WORLDID, context);
+                                      TABLE_PERM.USER, uuid,
+                                      TABLE_PERM.CONTEXT, context);
             permissions.put(getContexts(), map);
         }
     }
@@ -65,11 +65,11 @@ public class UserSubjectData extends CachingSubjectData
         if (getContexts().equals(c) && !parents.containsKey(getContexts()))
         {
             String context = c.toString(); // TODO
-            RecordBackedList<AssignedRole> list =
+            RecordBackedList<UserRole> list =
                 new RecordBackedList<>(roleCollection, db,
-                                       TABLE_ROLE, TABLE_ROLE.ROLENAME,
-                                       TABLE_ROLE.USERID, uuid,
-                                       TABLE_ROLE.WORLDID, context);
+                                       TABLE_ROLE, TABLE_ROLE.ROLE,
+                                       TABLE_ROLE.USER, uuid,
+                                       TABLE_ROLE.CONTEXT, context);
             Collections.sort(list, (o1, o2) -> {
                 if (o1 instanceof RoleSubject && o2 instanceof RoleSubject)
                 {

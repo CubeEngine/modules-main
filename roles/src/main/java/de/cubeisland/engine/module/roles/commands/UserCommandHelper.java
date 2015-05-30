@@ -17,24 +17,18 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
-import de.cubeisland.engine.module.service.command.ContainerCommand;
-import de.cubeisland.engine.module.service.command.CommandContext;
-import de.cubeisland.engine.module.service.command.CommandSender;
-import de.cubeisland.engine.module.service.user.User;
+import java.util.Collections;
+import java.util.Set;
 import de.cubeisland.engine.module.core.util.ChatFormat;
-import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.roles.Roles;
-import de.cubeisland.engine.module.roles.role.RolesAttachment;
-import de.cubeisland.engine.module.roles.role.RolesManager;
-import org.spongepowered.api.world.World;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.service.permission.context.Context;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 public class UserCommandHelper extends ContainerCommand
 {
-    protected final RolesManager manager;
     protected final WorldManager worldManager;
     protected final Roles module;
 
@@ -44,47 +38,12 @@ public class UserCommandHelper extends ContainerCommand
     public UserCommandHelper(Roles module, WorldManager wm)
     {
         super(module);
-        this.manager = module.getRolesManager();
         this.worldManager = wm;
         this.module = module;
     }
 
-    /**
-     * Returns the world defined with named param "in" or the users world
-     *
-     * @param context
-     * @param world
-     * @return
-     */
-    protected World getWorld(CommandContext context, World world)
+    protected Set<Context> toSet(Context context)
     {
-        if (world != null)
-        {
-            return world;
-        }
-        CommandSender sender = context.getSource();
-        if (sender instanceof User)
-        {
-            User user = (User)sender;
-            world = user.attachOrGet(RolesAttachment.class, this.module).getWorkingWorld();
-            if (world == null)
-            {
-                world = user.getWorld();
-            }
-            else
-            {
-                context.sendTranslated(NEUTRAL, "You are using {world} as current world.", world);
-            }
-            return world;
-        }
-        if (ManagementCommands.curWorldOfConsole == null)
-        {
-            context.sendTranslated(NEUTRAL, "Please provide a world.");
-            context.sendTranslated(POSITIVE, "You can define a world with {text:/roles admin defaultworld <world>}");
-            return null;
-        }
-        world = ManagementCommands.curWorldOfConsole;
-        context.sendTranslated(NEUTRAL, "You are using {world} as current world.", world);
-        return world;
+        return "global".equals(context.getType()) ? GLOBAL_CONTEXT : Collections.singleton(context);
     }
 }

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
-import de.cubeisland.engine.module.roles.role.DataStore.PermissionValue;
+import org.spongepowered.api.util.Tristate;
 
 public class PermissionTree
 {
@@ -85,12 +85,12 @@ public class PermissionTree
         return this.permissions;
     }
 
-    public PermissionValue setPermission(String perm, PermissionValue set)
+    public Tristate setPermission(String perm, Tristate set)
     {
-        if (set == PermissionValue.RESET)
+        if (set == Tristate.UNDEFINED)
         {
-            return PermissionValue.of(this.permissions.remove(perm));
+            return Tristate.fromBoolean(this.permissions.remove(perm));
         }
-        return PermissionValue.of(this.permissions.put(perm, set == PermissionValue.TRUE));
+        return Tristate.fromBoolean(this.permissions.put(perm, set == Tristate.TRUE));
     }
 }

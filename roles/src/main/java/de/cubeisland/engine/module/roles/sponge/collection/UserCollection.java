@@ -29,6 +29,7 @@ public class UserCollection extends BaseSubjectCollection
         this.game = game;
         assignedMirrors = readMirrors(service.getConfig().mirrors.assigned);
         directMirrors = readMirrors(service.getConfig().mirrors.direct);
+        // TODO use mirrors when resolving context
     }
 
     @Override
