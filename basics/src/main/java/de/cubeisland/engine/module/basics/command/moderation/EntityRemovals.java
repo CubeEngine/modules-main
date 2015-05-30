@@ -19,6 +19,7 @@ package de.cubeisland.engine.module.basics.command.moderation;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.google.common.base.Optional;
 import de.cubeisland.engine.module.basics.Basics;
 
 import org.spongepowered.api.data.manipulator.entity.TameableData;
@@ -27,6 +28,7 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.Ambient;
 import org.spongepowered.api.entity.living.Bat;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.Squid;
 import org.spongepowered.api.entity.living.Villager;
 import org.spongepowered.api.entity.living.animal.*;
@@ -40,12 +42,13 @@ public class EntityRemovals
 {
     public EntityRemovals(Basics module)
     {
-        GROUPED_ENTITY_REMOVAL.put("pet", new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_PET, Tameable.class)
+        GROUPED_ENTITY_REMOVAL.put("pet", new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_PET, Living.class)
         {
             @Override
             public boolean extra(Entity entity)
             {
-                return entity.getData(TameableData.class).isPresent();
+                Optional<TameableData> data = entity.getData(TameableData.class);
+                return data.isPresent() && data.get().getOwner() != null; // TODO
             }
         });
         GROUPED_ENTITY_REMOVAL.put("golem", new EntityRemoval(module.perms().COMMAND_BUTCHER_FLAG_GOLEM, Golem.class));

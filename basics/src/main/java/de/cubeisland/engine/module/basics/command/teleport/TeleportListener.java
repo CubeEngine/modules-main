@@ -17,22 +17,24 @@
  */
 package de.cubeisland.engine.module.basics.command.teleport;
 
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.core.util.LocationUtil;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
+import de.cubeisland.engine.module.core.util.LocationUtil;
+import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.user.UserManager;
-
+import org.spongepowered.api.entity.EntityInteractionType;
+import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.EntityTeleportEvent;
 import org.spongepowered.api.event.entity.player.PlayerDeathEvent;
-import org.spongepowered.api.event.entity.player.PlayerInteractEvent;
+import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static org.spongepowered.api.block.BlockTypes.AIR;
 import static org.spongepowered.api.item.ItemTypes.COMPASS;
 
 public class TeleportListener
@@ -52,13 +54,8 @@ public class TeleportListener
         if (event.getEntity() instanceof Player)
         {
             User user = um.getExactUser(event.getEntity().getUniqueId());
-            event.getCause().get().getReason()
-            switch (event.getCause())
-            {
-                case COMMAND:
-                case PLUGIN:
-                    user.get(BasicsAttachment.class).setLastLocation(event.getOldLocation());
-            }
+            // TODO limit cause
+            user.get(BasicsAttachment.class).setLastLocation(event.getOldLocation());
         }
     }
 
@@ -73,58 +70,53 @@ public class TeleportListener
     }
 
     @Subscribe
-    public void onClick(PlayerInteractEvent event)
+    public void onClick(PlayerInteractBlockEvent event)
     {
         if (event.getUser().getItemInHand().transform(ItemStack::getItem).orNull() == COMPASS)
         {
-            if (event.useItemInHand().equals(DENY))
+            event.setCancelled(true);
+            EntityInteractionType type = event.getInteractionType();
+            if (type == EntityInteractionTypes.ATTACK)
             {
-                return;
-            }
-            event.setUseItemInHand(DENY);
-            switch (event.getAction())
-            {
-                case LEFT_CLICK_AIR:
-                case LEFT_CLICK_BLOCK:
-                    if (module.perms().COMPASS_JUMPTO_LEFT.isAuthorized(event.getPlayer()))
+                if (module.perms().COMPASS_JUMPTO_LEFT.isAuthorized(event.getUser()))
+                {
+                    User user = um.getExactUser(event.getUser().getUniqueId());
+                    Location loc;
+                    if (event.getBlock().getType().isSolidCube())
                     {
-                        User user = um.getExactUser(event.getPlayer().getUniqueId());
-                        Location loc;
-                        if (event.getClickedBlock() != null && event.getClickedBlock().getType().isSolid())
-                        {
-                            loc = event.getClickedBlock().getLocation().add(0.5, 1, 0.5);
-                        }
-                        else
-                        {
-                            Block block = user.getTargetBlock(this.module.getConfiguration().navigation.jumpToMaxRange);
-                            if (block == null || block.getType() == AIR)
-                            {
-                                return;
-                            }
-                            loc = block.getLocation().add(0.5, 1, 0.5);
-                        }
-                        user.safeTeleport(loc, PLUGIN, true);
-                        user.sendTranslated(NEUTRAL, "Poof!");
-                        event.setCancelled(true);
+                        loc = event.getBlock().add(0.5, 1, 0.5);
                     }
-                    return;
-                case RIGHT_CLICK_AIR:
-                case RIGHT_CLICK_BLOCK:
-                    if (module.perms().COMPASS_JUMPTO_RIGHT.isAuthorized(event.getUser()))
+                    else
                     {
-                        User user = um.getExactUser(event.getUser().getUniqueId());
-                        Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfiguration().navigation.thru.maxRange,
-                                this.module.getConfiguration().navigation.thru.maxWallThickness);
-                        if (loc == null)
+                        Location block = user.getTargetBlock(this.module.getConfiguration().navigation.jumpToMaxRange);
+                        if (block.getType() == AIR)
                         {
-                            user.sendTranslated(NEGATIVE, "Nothing to pass through!");
                             return;
                         }
-                        loc.setY(loc.getY() + 1);
-                        user.safeTeleport(loc, PLUGIN, true);
-                        user.sendTranslated(NEUTRAL, "You passed through a wall");
-                        event.setCancelled(true);
+                        loc = block.add(0.5, 1, 0.5);
                     }
+                    user.safeTeleport(loc, true);
+                    user.sendTranslated(NEUTRAL, "Poof!");
+                    event.setCancelled(true);
+                }
+            }
+            else if (type == EntityInteractionTypes.USE)
+            {
+                if (module.perms().COMPASS_JUMPTO_RIGHT.isAuthorized(event.getUser()))
+                {
+                    User user = um.getExactUser(event.getUser().getUniqueId());
+                    Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfiguration().navigation.thru.maxRange,
+                                                                   this.module.getConfiguration().navigation.thru.maxWallThickness);
+                    if (loc == null)
+                    {
+                        user.sendTranslated(NEGATIVE, "Nothing to pass through!");
+                        return;
+                    }
+                    loc = loc.add(0, 1, 0);
+                    user.safeTeleport(loc, true);
+                    user.sendTranslated(NEUTRAL, "You passed through a wall");
+                    event.setCancelled(true);
+                }
             }
         }
     }

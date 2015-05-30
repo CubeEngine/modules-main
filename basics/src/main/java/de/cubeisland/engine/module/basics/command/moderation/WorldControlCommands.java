@@ -250,7 +250,7 @@ public class WorldControlCommands
                                             GOLD + EXPERIENCE_ORB.getName());
                     return;
                 }
-                if (type.isAlive())
+                if (Living.class.isAssignableFrom(type.getEntityClass()))
                 {
                     context.sendTranslated(NEGATIVE, "To kill living entities use the {text:/butcher} command!");
                     return;

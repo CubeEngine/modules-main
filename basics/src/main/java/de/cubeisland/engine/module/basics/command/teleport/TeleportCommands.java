@@ -18,6 +18,7 @@
 package de.cubeisland.engine.module.basics.command.teleport;
 
 import java.util.ArrayList;
+import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
@@ -61,15 +62,15 @@ public class TeleportCommands
     {
         if (safe)
         {
-            return user.safeTeleport(loc, PlayerTeleportEvent.TeleportCause.COMMAND, keepDirection);
+            return user.safeTeleport(loc, keepDirection);
         }
+        Vector3d rotation = user.getRotation();
+        boolean ok = user.teleport(loc);
         if (keepDirection)
         {
-            final Location userLocation = user.getLocation();
-            loc.setYaw(userLocation.getYaw());
-            loc.setPitch(userLocation.getPitch());
+            user.setRotation(rotation);
         }
-        return user.teleport(loc, PlayerTeleportEvent.TeleportCause.COMMAND);
+        return ok;
     }
 
     @Command(desc = "Teleport directly to a player.")

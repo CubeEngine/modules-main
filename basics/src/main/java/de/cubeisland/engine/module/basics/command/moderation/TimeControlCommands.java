@@ -17,36 +17,27 @@
  */
 package de.cubeisland.engine.module.basics.command.moderation;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Default;
+import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.core.util.matcher.TimeMatcher;
 import de.cubeisland.engine.module.core.util.matcher.WorldMatcher;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.core.util.matcher.Match;
-import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.service.world.WorldManager;
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 /**
  * Commands changing time. /time /ptime

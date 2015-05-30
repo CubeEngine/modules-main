@@ -63,7 +63,7 @@ public class MovementCommands
         Location loc = context.getLocation().add(0, height - 1, 0);
         if (loc.getBlockY() > ((World)loc.getExtent()).getBuildHeight()) // Over highest loc
         {
-            loc.setY(((World)loc.getExtent()).getBuildHeight());
+            loc.add(0, ((World)loc.getExtent()).getBuildHeight() - loc.getY(), 0);
         }
         Location up1 = loc.getRelative(UP);
         if (!(up1.getType() == AIR && up1.getRelative(UP).getType() == AIR))
@@ -96,14 +96,14 @@ public class MovementCommands
     @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
     public void ascend(User context)
     {
-        Location userLocation = context.getLocation();
-        Location curLoc = userLocation.add(0, 2, 0);
+        Location loc = context.getLocation();
+        Location curLoc = loc.add(0, 2, 0);
         final int maxHeight = ((World)curLoc.getExtent()).getBuildHeight();
         //go upwards until hitting solid blocks
         while (curLoc.getType() == AIR && curLoc.getY() < maxHeight)
         {
             Location rel = curLoc.getRelative(UP);
-            if (rel.getY() < userLocation.getBlockY())
+            if (rel.getY() < loc.getBlockY())
             {
                 context.sendTranslated(NEGATIVE, "You cannot ascend here");
                 return;
@@ -126,8 +126,8 @@ public class MovementCommands
             context.sendTranslated(NEGATIVE, "You cannot ascend here");
             return;
         }
-        userLocation.setY(curLoc.getY() + 1);
-        if (teleport(context, userLocation, true, false, true))
+        loc = loc.add(0, ((World)loc.getExtent()).getBuildHeight() - loc.getY() + 1, 0);
+        if (teleport(context, loc, true, false, true))
         {
             context.sendTranslated(POSITIVE, "Ascended a level!");
         }
@@ -174,7 +174,7 @@ public class MovementCommands
             context.sendTranslated(NEGATIVE, "No block in sight!");
             return;
         }
-        loc.add(0.5, 1, 0.5);
+        loc = loc.add(0.5, 1, 0.5);
         if (teleport(context, loc, true, false, true))
         {
             context.sendTranslated(POSITIVE, "You just jumped!");
