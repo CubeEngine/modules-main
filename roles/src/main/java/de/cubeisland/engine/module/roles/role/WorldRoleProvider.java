@@ -57,7 +57,7 @@ public class WorldRoleProvider extends RoleProvider
         }
         for (RoleConfig config : this.configs.values())
         {
-            Role role = new Role(manager, this, config);
+            Role role = new Role(manager, this, config, );
             if (defaultRoles.contains(config.roleName))
             {
                 role.setDefaultRole(true);

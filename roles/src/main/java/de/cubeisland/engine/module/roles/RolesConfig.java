@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import de.cubeisland.engine.module.roles.config.MirrorConfig;
+import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
@@ -42,19 +43,23 @@ public class RolesConfig extends ReflectedYaml
                  "    world_the_end\n" +
                  "      - guest_in_the_end")
     public Map<String, Set<String>> defaultRoles = new HashMap<>();
-    @Comment("The following configuration would mirror \n" +
-             "roles, assigned roles and directly assigned data\n" +
-             "to the user from world to the end and the nether:\n"+
-             "mirrors:\n" +
-             "  - world: \n" +
-             "    world_the_end: \n" +
-             "      - roles\n" +
-             "      - assigned\n" +
-             "      - users\n" +
-             "    world_nether: \n" +
-             "      - roles\n" +
-             "      - assigned\n" +
-             "      - users\n")
-    @Name("mirrors")
-    public List<MirrorConfig> mirrors = new ArrayList<>();
+
+
+    @Comment("Example for a mirror:\n" +
+        "  world: \n" +
+        "    - world_the_end\n" +
+        "    - world_nether")
+    public Mirrors mirrors;
+
+    public static class Mirrors implements Section
+    {
+        @Comment("The roles to mirror")
+        public Map<String, List<String>> roles = new HashMap<>();
+
+        @Comment("The role assignments to mirror")
+        public Map<String, List<String>> assigned = new HashMap<>();
+
+        @Comment("The direct assignments to mirror")
+        public Map<String, List<String>> direct = new HashMap<>();
+    }
 }
