@@ -19,6 +19,7 @@ package de.cubeisland.engine.module.basics.command.general;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Iterator;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
@@ -26,6 +27,7 @@ import de.cubeisland.engine.module.service.user.UserManager;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerChatEvent;
+import org.spongepowered.api.util.command.CommandSource;
 
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
@@ -59,15 +61,18 @@ public class MuteListener
             }
         }
         // ignored?
-        ArrayList<Player> ignore = new ArrayList<>();
-        for (Player player : event.getRecipients())
+
+        for (Iterator<CommandSource> iterator = event.getSink().getRecipients().iterator(); iterator.hasNext(); )
         {
-            User user = um.getExactUser(player.getUniqueId());
-            if (this.ignore.checkIgnored(user, sender))
+            final CommandSource player = iterator.next();
+            if (player instanceof Player)
             {
-                ignore.add(player);
+                User user = um.getExactUser(player.getName());
+                if (this.ignore.checkIgnored(user, sender))
+                {
+                    iterator.remove();
+                }
             }
         }
-        event.getRecipients().removeAll(ignore);
     }
 }

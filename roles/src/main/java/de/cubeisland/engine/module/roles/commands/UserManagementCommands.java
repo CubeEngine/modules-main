@@ -122,7 +122,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = {"clearurole", "manuclear"})
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in context]")
-    public void clear(CommandContext cContext, @Default User player, @Named("in") Context context) // TODO reader for context
+    public void clear(CommandContext cContext, @Default User player, @Named("in") @Default Context context) // TODO reader for context
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         player.getPlayer().get().getSubjectData().clearParents(contexts);
@@ -141,7 +141,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = "setuperm")
     @Command(alias = "setperm", desc = "Sets a permission for this user [in context]")
-    public void setpermission(CommandContext cContext, @Default User player, String permission, @Default Tristate value, @Named("in") Context context)
+    public void setpermission(CommandContext cContext, @Default User player, String permission, @Default Tristate value, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         if (value == Tristate.UNDEFINED)
@@ -166,7 +166,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = "resetuperm")
     @Command(alias = "resetperm", desc = "Resets a permission for this user [in context]")
-    public void resetpermission(CommandContext cContext, @Default User player, String permission, @Named("in") Context context)
+    public void resetpermission(CommandContext cContext, @Default User player, String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         if (player.getPlayer().get().getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED))
@@ -180,7 +180,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = {"setudata","setumeta","setumetadata"})
     @Command(alias = {"setdata", "setmeta"}, desc = "Sets metadata for this user [in context]")
-    public void setmetadata(CommandContext cContext, @Default User player, String metaKey, String metaValue, @Named("in") Context context)
+    public void setmetadata(CommandContext cContext, @Default User player, String metaKey, String metaValue, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         if (((OptionSubjectData)player.getPlayer().get().getSubjectData()).setOption(contexts, metaKey, metaValue))
@@ -193,7 +193,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = {"resetudata","resetumeta","resetumetadata"})
     @Command(alias = {"resetdata", "resetmeta", "deletedata", "deletemetadata", "deletemeta"}, desc = "Resets metadata for this user [in context]")
-    public void resetmetadata(CommandContext cContext, @Default User player, String metaKey, @Named("in") Context context)
+    public void resetmetadata(CommandContext cContext, @Default User player, String metaKey, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         if (((OptionSubjectData)player.getPlayer().get().getSubjectData()).setOption(contexts, metaKey, null))
@@ -205,7 +205,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = {"clearudata","clearumeta","clearumetadata"})
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Resets metadata for this user [in context]")
-    public void clearMetaData(CommandContext cContext, @Default User player, @Named("in") Context context)
+    public void clearMetaData(CommandContext cContext, @Default User player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         if (((OptionSubjectData)player.getPlayer().get().getSubjectData()).clearOptions(contexts))

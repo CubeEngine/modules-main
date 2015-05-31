@@ -25,6 +25,7 @@ import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.module.core.filesystem.FileManager;
+import de.cubeisland.engine.module.core.i18n.I18n;
 import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.roles.commands.ContextualRole;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
@@ -42,6 +43,8 @@ import de.cubeisland.engine.module.roles.config.PriorityConverter;
 import de.cubeisland.engine.module.service.permission.PermissionManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.service.ProviderExistsException;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 import de.cubeisland.engine.module.roles.storage.TableOption;
@@ -68,6 +71,7 @@ public class Roles extends Module
     @Inject private WorldManager wm;
     @Inject private PermissionManager pm;
     @Inject private Game game;
+    @Inject private I18n i18n;
 
     @Enable
     public void onEnable()
@@ -77,13 +81,15 @@ public class Roles extends Module
         cManager.registerConverter(new PriorityConverter(), Priority.class);
         this.config = fm.loadConfig(this, RolesConfig.class);
 
+        i18n.getCompositor().registerMacro(new ContextFormatter());
+
         db.registerTable(TableRole.class);
         db.registerTable(TablePerm.class);
         db.registerTable(TableOption.class);
 
         RolesPermissionService service = new RolesPermissionService(this, reflector, config, game, db, wm);
 
-        cm.getProviderManager().register(this, new ContextReader(), Context.class);
+        cm.getProviderManager().register(this, new ContextReader(wm), Context.class);
         cm.getProviderManager().register(this, new ContextualRoleReader(), ContextualRole.class);
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
 
@@ -97,6 +103,15 @@ public class Roles extends Module
         cmdRoles.addCommand(cmdUsers);
         cm.addCommands(cmdUsers, this, new UserInformationCommands(this));
         cmdRoles.addCommand(new ManagementCommands(this));
+
+        try
+        {
+            game.getServiceManager().setProvider(game.getPluginManager().getPlugin("CubeEngine").get().getInstance(), PermissionService.class, service);
+        }
+        catch (ProviderExistsException e)
+        {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Disable

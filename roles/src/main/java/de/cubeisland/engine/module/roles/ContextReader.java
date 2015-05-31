@@ -18,22 +18,40 @@
 package de.cubeisland.engine.module.roles;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import com.google.common.base.Optional;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.completer.Completer;
 import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
+import de.cubeisland.engine.butler.parameter.reader.DefaultProvider;
+import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
+import de.cubeisland.engine.butler.parametric.Reader;
 import de.cubeisland.engine.module.roles.commands.ContextualRole;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.world.World;
 
-public class ContextReader implements ArgumentReader<Context>, Completer
+import static java.util.stream.Collectors.toList;
+
+public class ContextReader implements ArgumentReader<Context>, Completer, DefaultValue<Context>
 {
-    // TODO implement me
+    private WorldManager wm;
+
+    public ContextReader(WorldManager wm)
+    {
+        this.wm = wm;
+    }
+
+
     @Override
     public Context read(Class type, CommandInvocation invocation) throws ReaderException
     {
         String token = invocation.currentToken();
         if (token.contains("|"))
         {
+            // TODO implement me
             // then look in mirrors for other contexts
         }
         else // world or global
@@ -42,17 +60,38 @@ public class ContextReader implements ArgumentReader<Context>, Completer
             {
                 return new Context("global", "");
             }
-            // TODO check if world exists
+            Optional<World> world = wm.getWorld(token);
+            if (world.isPresent())
+            {
+                return new Context("world", token.toLowerCase());
+            }
         }
-        return null;
+        throw new ReaderException("Unknown context: {}", token);
+    }
+
+    @Override
+    public Context getDefault(CommandInvocation invocation)
+    {
+        if (invocation.getCommandSource() instanceof User)
+        {
+            return new Context("world", ((User)invocation.getCommandSource()).getWorld().getName());
+        }
+        throw new ReaderException("You have to provide a context");
     }
 
     @Override
     public List<String> getSuggestions(CommandInvocation invocation)
     {
+        String token = invocation.currentToken();
+        List<String> list = wm.getWorlds().stream().map(World::getName).filter(n -> n.toLowerCase().startsWith(token.toLowerCase())).collect(toList());
+        if ("global".startsWith(token.toLowerCase()))
+        {
+            list.add("global");
+        }
+        // TODO implement me
         // first worlds
         // then global
         // last ctx from mirror
-        return null;
+        return list;
     }
 }

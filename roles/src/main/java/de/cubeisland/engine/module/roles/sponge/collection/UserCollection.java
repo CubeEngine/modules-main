@@ -59,7 +59,8 @@ public class UserCollection extends BaseSubjectCollection
             try
             {
                 UUID uuid = UUID.fromString(identifier);
-                Optional<User> user = game.getServiceManager().provideUnchecked(UserStorage.class).get(uuid);
+                // TODO not implemented game.getServiceManager().provideUnchecked(UserStorage.class).get(uuid);
+                Optional<User> user = Optional.absent();
                 if (!user.isPresent())
                 {
                     subject = new UserSubject(service, uuid);

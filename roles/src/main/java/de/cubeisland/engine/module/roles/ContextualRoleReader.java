@@ -30,10 +30,14 @@ public class ContextualRoleReader implements ArgumentReader<ContextualRole>, Com
     @Override
     public ContextualRole read(Class type, CommandInvocation invocation) throws ReaderException
     {
+        String token = invocation.currentToken();
+        ContextualRole role = new ContextualRole();
+        role.roleName = token;
+        return role;
         // has context?
         // last split is rolename
         // check role exists?
-        return null;
+        //return null;
     }
 
     @Override

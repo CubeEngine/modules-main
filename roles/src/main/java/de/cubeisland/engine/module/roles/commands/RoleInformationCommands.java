@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.module.core.util.ChatFormat;
@@ -54,7 +55,7 @@ public class RoleInformationCommands extends ContainerCommand
 
     @Alias(value = "listroles")
     @Command(desc = "Lists all roles in a world or globally")
-    public void list(CommandContext cContext, Context context, @Flag boolean global)
+    public void list(CommandContext cContext, @Default Context context)
     {
         ContextualRole role = new ContextualRole();
         role.contextName = context.getName();
@@ -107,7 +108,7 @@ public class RoleInformationCommands extends ContainerCommand
 
     @Alias(value = "listrperm")
     @Command(alias = "listpermission", desc = "Lists all permissions of given role")
-    public void listperm(CommandContext context, ContextualRole role, @Flag  boolean all)
+    public void listperm(CommandContext context, ContextualRole role, @Flag boolean all)
     {
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
         Map<String, Boolean> permissions = r.getSubjectData().getPermissions(RoleCommands.toSet(role.getContext()));
@@ -150,10 +151,10 @@ public class RoleInformationCommands extends ContainerCommand
         }
         if (options.isEmpty())
         {
-            context.sendTranslated(NEUTRAL, "No metadata set for the role {name} in {world}.", r.getName(), role.getContext());
+            context.sendTranslated(NEUTRAL, "No metadata set for the role {name} in {context}.", r.getName(), role.getContext());
             return;
         }
-        context.sendTranslated(POSITIVE, "Metadata of the role {name} in {world}:", r.getName(), role.getContext());
+        context.sendTranslated(POSITIVE, "Metadata of the role {name} in {context}:", r.getName(), role.getContext());
         if (all)
         {
             context.sendTranslated(POSITIVE, "(Including inherited metadata)");
@@ -172,10 +173,10 @@ public class RoleInformationCommands extends ContainerCommand
         List<Subject> parents = r.getSubjectData().getParents(RoleCommands.toSet(role.getContext()));
         if (parents.isEmpty())
         {
-            context.sendTranslated(NEUTRAL, "The role {name} in {world} has no parent roles.", r.getName(), role.getContext());
+            context.sendTranslated(NEUTRAL, "The role {name} in {context} has no parent roles.", r.getName(), role.getContext());
             return;
         }
-        context.sendTranslated(NEUTRAL, "The role {name} in {world} has following parent roles:", r.getName(), role.getContext());
+        context.sendTranslated(NEUTRAL, "The role {name} in {context} has following parent roles:", r.getName(), role.getContext());
         for (Subject parent : parents)
         {
             context.sendMessage(String.format(RoleCommands.LISTELEM, parent instanceof RoleSubject ? ((RoleSubject)parent).getName() : parent.getIdentifier()));
@@ -190,8 +191,8 @@ public class RoleInformationCommands extends ContainerCommand
         context.sendTranslated(NEUTRAL, "The priority of the role {name} in {context} is: {integer#priority}", r.getName(), role.getContext(), priority.value);
     }
 
-    @Command(alias = {"default","defaultroles","listdefroles"}, desc = "Lists all default roles [in world]")
-    public void listDefaultRoles(CommandContext cContext, @Named("in") Context context)
+    @Command(alias = {"default","defaultroles","listdefroles"}, desc = "Lists all default roles [in context]")
+    public void listDefaultRoles(CommandContext cContext, @Named("in") @Default Context context)
     {
         List<Subject> parents = service.getDefaultData().getParents(RoleCommands.toSet(context));
         if (parents.isEmpty())
