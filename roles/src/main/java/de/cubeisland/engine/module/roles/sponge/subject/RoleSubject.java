@@ -1,12 +1,30 @@
+/**
+ * This file is part of CubeEngine.
+ * CubeEngine is licensed under the GNU General Public License Version 3.
+ *
+ * CubeEngine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * CubeEngine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.cubeisland.engine.module.roles.sponge.subject;
 
 import java.util.Set;
 import com.google.common.base.Optional;
+import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.data.RoleSubjectData;
+import de.cubeisland.engine.module.service.command.CommandSender;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.command.CommandSource;
 
 import static java.util.Collections.singleton;
@@ -29,7 +47,7 @@ public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
     }
 
     @Override
-    public OptionSubjectData getSubjectData()
+    public RoleSubjectData getSubjectData()
     {
         return data;
     }
@@ -62,5 +80,16 @@ public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
     public String getName()
     {
         return roleName.substring(roleName.lastIndexOf("|" + 1));
+    }
+
+    public boolean canAssignAndRemove(CommandSender source)
+    {
+        return false; // TODO permission check
+    }
+
+    public void setPriorityValue(int value)
+    {
+        data.getConfig().priority = Priority.getByValue(value);
+        data.getConfig().save(); // TODO async
     }
 }

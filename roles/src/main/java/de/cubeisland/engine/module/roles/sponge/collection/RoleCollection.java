@@ -1,3 +1,20 @@
+/**
+ * This file is part of CubeEngine.
+ * CubeEngine is licensed under the GNU General Public License Version 3.
+ *
+ * CubeEngine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * CubeEngine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package de.cubeisland.engine.module.roles.sponge.collection;
 
 import java.io.IOException;
@@ -7,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import de.cubeisland.engine.module.roles.Roles;
+import de.cubeisland.engine.module.roles.commands.ContextualRole;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
@@ -35,6 +53,7 @@ public class RoleCollection extends BaseSubjectCollection
         this.reflector = reflector;
 
         mirrors = readMirrors(service.getConfig().mirrors.roles);
+        // TODO add missing selfreferencing mirrors
 
         Path modulePath = module.getProvided(Path.class);
         try
@@ -121,7 +140,6 @@ public class RoleCollection extends BaseSubjectCollection
             subjects.put(identifier, roleSubject);
         }
         return roleSubject;
-        // TODO create new role if not found
     }
 
     @Override
@@ -134,5 +152,16 @@ public class RoleCollection extends BaseSubjectCollection
     public Iterable<Subject> getAllSubjects()
     {
         return new ArrayList<>(subjects.values());
+    }
+
+    public boolean rename(RoleSubject role, String newName)
+    {
+        // TODO rename
+        return false;
+    }
+
+    public void delete(RoleSubject r)
+    {
+        // TODO delete
     }
 }

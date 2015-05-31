@@ -17,15 +17,32 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
+import java.util.Collections;
+import java.util.Set;
 import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.roles.Roles;
+import org.spongepowered.api.service.permission.context.Context;
+
+import static de.cubeisland.engine.module.core.util.ChatFormat.GOLD;
+import static de.cubeisland.engine.module.core.util.ChatFormat.WHITE;
+import static de.cubeisland.engine.module.core.util.ChatFormat.YELLOW;
+import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 @Command(name = "roles", desc = "Manages the roles")
 public class RoleCommands extends ContainerCommand
 {
+    protected final static String LISTELEM = "- " + YELLOW + "%s";
+    protected final static String LISTELEM_VALUE = "- " + YELLOW + "%s" + WHITE + ": " + GOLD + "%s";
+
     public RoleCommands(Roles module)
     {
         super(module);
+    }
+
+    protected static Set<Context> toSet(Context context)
+    {
+        return "global".equals(context.getType()) ? GLOBAL_CONTEXT : Collections.singleton(context);
     }
 }

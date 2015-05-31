@@ -26,6 +26,8 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.module.core.filesystem.FileManager;
 import de.cubeisland.engine.module.core.sponge.EventManager;
+import de.cubeisland.engine.module.roles.commands.ContextualRole;
+import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.service.command.CommandManager;
 import de.cubeisland.engine.module.roles.commands.ManagementCommands;
 import de.cubeisland.engine.module.roles.commands.RoleCommands;
@@ -39,8 +41,9 @@ import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.PriorityConverter;
 import de.cubeisland.engine.module.service.permission.PermissionManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
-import de.cubeisland.engine.module.roles.role.RolesEventHandler;
 import de.cubeisland.engine.module.roles.storage.TableOption;
 import de.cubeisland.engine.module.roles.storage.TablePerm;
 import de.cubeisland.engine.module.roles.storage.TableRole;
@@ -64,6 +67,7 @@ public class Roles extends Module
     @Inject private FileManager fm;
     @Inject private WorldManager wm;
     @Inject private PermissionManager pm;
+    @Inject private Game game;
 
     @Enable
     public void onEnable()
@@ -71,36 +75,33 @@ public class Roles extends Module
         ConverterManager cManager = reflector.getDefaultConverterManager();
         cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);
         cManager.registerConverter(new PriorityConverter(), Priority.class);
+        this.config = fm.loadConfig(this, RolesConfig.class);
 
         db.registerTable(TableRole.class);
         db.registerTable(TablePerm.class);
         db.registerTable(TableOption.class);
 
+        RolesPermissionService service = new RolesPermissionService(this, reflector, config, game, db, wm);
+
+        cm.getProviderManager().register(this, new ContextReader(), Context.class);
+        cm.getProviderManager().register(this, new ContextualRoleReader(), ContextualRole.class);
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
+
         RoleCommands cmdRoles = new RoleCommands(this);
         cm.addCommand(cmdRoles);
-        RoleManagementCommands cmdRole = new RoleManagementCommands(this, wm);
+        RoleManagementCommands cmdRole = new RoleManagementCommands(this, service);
         cmdRoles.addCommand(cmdRole);
-        cm.addCommands(cmdRole, this, new RoleInformationCommands(this, wm));
+        cm.addCommands(cmdRole, this, new RoleInformationCommands(this, service));
 
-        UserManagementCommands cmdUsers = new UserManagementCommands(this, wm);
+        UserManagementCommands cmdUsers = new UserManagementCommands(this, service);
         cmdRoles.addCommand(cmdUsers);
-        cm.addCommands(cmdUsers, this, new UserInformationCommands(this, pm, wm));
+        cm.addCommands(cmdUsers, this, new UserInformationCommands(this));
         cmdRoles.addCommand(new ManagementCommands(this));
-
-        em.registerListener(this, new RolesEventHandler(this));
-
-        this.config = fm.loadConfig(this, RolesConfig.class);
-        tm.runTask(this, () -> {
-            rolesManager.initRoleProviders();
-            rolesManager.recalculateAllRoles();
-        });
     }
 
     @Disable
     public void onDisable()
     {
-        em.removeListeners(this);
     }
 
     public RolesConfig getConfiguration()

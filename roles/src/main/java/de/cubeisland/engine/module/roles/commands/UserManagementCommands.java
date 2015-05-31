@@ -27,6 +27,7 @@ import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.world.WorldManager;
 import org.spongepowered.api.service.permission.Subject;
@@ -36,16 +37,17 @@ import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.roles.commands.RoleCommands.LISTELEM;
 
 @Alias("manuser")
 @Command(name = "user", desc = "Manage users")
-public class UserManagementCommands extends UserCommandHelper
+public class UserManagementCommands extends ContainerCommand
 {
     private RolesPermissionService service;
 
-    public UserManagementCommands(Roles module, WorldManager wm, RolesPermissionService service)
+    public UserManagementCommands(Roles module, RolesPermissionService service)
     {
-        super(module, wm);
+        super(module);
         this.service = service;
     }
 
@@ -69,7 +71,7 @@ public class UserManagementCommands extends UserCommandHelper
             context.sendTranslated(NEGATIVE, "You are not allowed to assign the role {role} in {input#context}!", r, ctx);
             return;
         }
-        Set<Context> contexts = toSet(role.getContext());
+        Set<Context> contexts = RoleCommands.toSet(role.getContext());
         if (temp)
         {
             if (!player.isOnline())
@@ -109,7 +111,7 @@ public class UserManagementCommands extends UserCommandHelper
             context.sendTranslated(NEGATIVE, "You are not allowed to remove the role {role} in {input#context}!", r, ctx);
             return;
         }
-        Set<Context> contexts = toSet(role.getContext());
+        Set<Context> contexts = RoleCommands.toSet(role.getContext());
         if (player.getPlayer().get().getSubjectData().removeParent(contexts, r))
         {
             context.sendTranslated(POSITIVE, "Removed the role {role} from {user} in {input#context}.", r, player, ctx);
@@ -122,7 +124,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in context]")
     public void clear(CommandContext cContext, @Default User player, @Named("in") Context context) // TODO reader for context
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         player.getPlayer().get().getSubjectData().clearParents(contexts);
         cContext.sendTranslated(NEUTRAL, "Cleared the roles of {user} in {ctx}.", player, context);
         SubjectData defaultData = service.getDefaultData();
@@ -132,7 +134,7 @@ public class UserManagementCommands extends UserCommandHelper
             for (Subject subject : defaultData.getParents(contexts))
             {
                 player.getPlayer().get().getTransientSubjectData().addParent(contexts, subject);
-                cContext.sendMessage(String.format(this.LISTELEM, subject instanceof RoleSubject ? ((RoleSubject)subject).getName() : subject.getIdentifier()));
+                cContext.sendMessage(String.format(LISTELEM, subject instanceof RoleSubject ? ((RoleSubject)subject).getName() : subject.getIdentifier()));
             }
         }
     }
@@ -141,7 +143,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(alias = "setperm", desc = "Sets a permission for this user [in context]")
     public void setpermission(CommandContext cContext, @Default User player, String permission, @Default Tristate value, @Named("in") Context context)
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         if (value == Tristate.UNDEFINED)
         {
             resetpermission(cContext, player, permission, context);
@@ -166,7 +168,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(alias = "resetperm", desc = "Resets a permission for this user [in context]")
     public void resetpermission(CommandContext cContext, @Default User player, String permission, @Named("in") Context context)
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         if (player.getPlayer().get().getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED))
         {
             cContext.sendTranslated(NEUTRAL, "Permission {input} of {user} resetted!", permission, player);
@@ -180,7 +182,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(alias = {"setdata", "setmeta"}, desc = "Sets metadata for this user [in context]")
     public void setmetadata(CommandContext cContext, @Default User player, String metaKey, String metaValue, @Named("in") Context context)
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         if (((OptionSubjectData)player.getPlayer().get().getSubjectData()).setOption(contexts, metaKey, metaValue))
         {
             cContext.sendTranslated(POSITIVE, "Metadata {input#key} of {user} set to {input#value}!", metaKey,
@@ -193,7 +195,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(alias = {"resetdata", "resetmeta", "deletedata", "deletemetadata", "deletemeta"}, desc = "Resets metadata for this user [in context]")
     public void resetmetadata(CommandContext cContext, @Default User player, String metaKey, @Named("in") Context context)
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         if (((OptionSubjectData)player.getPlayer().get().getSubjectData()).setOption(contexts, metaKey, null))
         {
             cContext.sendTranslated(NEUTRAL, "Metadata {input#key} of {user} removed!", metaKey, player);
@@ -205,7 +207,7 @@ public class UserManagementCommands extends UserCommandHelper
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Resets metadata for this user [in context]")
     public void clearMetaData(CommandContext cContext, @Default User player, @Named("in") Context context)
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         if (((OptionSubjectData)player.getPlayer().get().getSubjectData()).clearOptions(contexts))
         {
             cContext.sendTranslated(NEUTRAL, "Metadata of {user} cleared!", player);

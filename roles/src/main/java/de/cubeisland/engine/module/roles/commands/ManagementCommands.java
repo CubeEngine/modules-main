@@ -48,9 +48,7 @@ public class ManagementCommands extends ContainerCommand
     public void reload(CommandContext context)
     {
         module.getConfiguration().reload();
-
-        module.getRolesManager().initRoleProviders();
-        module.getRolesManager().recalculateAllRoles();
+        // TODO remove cached data
         context.sendTranslated(POSITIVE, "{text:Roles} reload complete!");
     }
 
@@ -60,7 +58,7 @@ public class ManagementCommands extends ContainerCommand
     {
         // database is up to date so only saving configs
         module.getConfiguration().save();
-        module.getRolesManager().saveAll();
+        // TODO save RoleSubject Configurations
         context.sendTranslated(POSITIVE, "{text:Roles} all configurations saved!");
     }
 

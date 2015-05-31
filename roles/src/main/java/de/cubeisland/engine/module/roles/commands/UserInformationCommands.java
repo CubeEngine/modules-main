@@ -28,6 +28,7 @@ import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import de.cubeisland.engine.module.service.command.CommandContext;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.service.permission.PermissionManager;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.world.WorldManager;
@@ -37,23 +38,21 @@ import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.roles.commands.RoleCommands.LISTELEM_VALUE;
 
 @Command(name = "user", desc = "Manage users")
-public class UserInformationCommands extends UserCommandHelper
+public class UserInformationCommands extends ContainerCommand
 {
-    private PermissionManager pm;
-
-    public UserInformationCommands(Roles module, PermissionManager pm, WorldManager wm)
+    public UserInformationCommands(Roles module)
     {
-        super(module, wm);
-        this.pm = pm;
+        super(module);
     }
 
     @Alias(value = "listuroles")
     @Command(desc = "Lists roles of a user [in context]")
     public void list(CommandContext cContext, @Default User player, @Named("in") Context context)
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         List<Subject> parents = player.getPlayer().get().getSubjectData().getParents(contexts);
 
         cContext.sendTranslated(NEUTRAL, "Roles of {user} in {context}:", player, context);
@@ -61,7 +60,7 @@ public class UserInformationCommands extends UserCommandHelper
         {
             if (parent instanceof RoleSubject)
             {
-                cContext.sendMessage(String.format(this.LISTELEM_VALUE, context.getName().isEmpty() ? context.getType() : context.getName(), ((RoleSubject)parent).getName()));
+                cContext.sendMessage(String.format(LISTELEM_VALUE, context.getName().isEmpty() ? context.getType() : context.getName(), ((RoleSubject)parent).getName()));
             }
         }
     }
@@ -70,7 +69,7 @@ public class UserInformationCommands extends UserCommandHelper
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in context]")
     public void checkpermission(CommandContext cContext, @Default User player, String permission, @Named("in") Context context)
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         Tristate value = player.getPlayer().get().getPermissionValue(contexts, permission);
         // TODO search registered permission
         if (value == Tristate.TRUE)
@@ -99,7 +98,7 @@ public class UserInformationCommands extends UserCommandHelper
     @Command(alias = "listperm", desc = "List permission assigned to a user [in context]")
     public void listpermission(CommandContext cContext, @Default User player, @Named("in") Context context, @Flag boolean all)
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         Map<String, Boolean> permissions = player.getPlayer().get().getSubjectData().getPermissions(contexts);
         if (all)
         {
@@ -118,7 +117,7 @@ public class UserInformationCommands extends UserCommandHelper
         cContext.sendTranslated(NEUTRAL, "Permissions of {user} in {context}:", player, context);
         for (Map.Entry<String, Boolean> entry : permissions.entrySet())
         {
-            cContext.sendMessage(String.format(this.LISTELEM_VALUE, entry.getKey(), entry.getValue()));
+            cContext.sendMessage(String.format(LISTELEM_VALUE, entry.getKey(), entry.getValue()));
         }
     }
 
@@ -126,7 +125,7 @@ public class UserInformationCommands extends UserCommandHelper
     @Command(alias = {"checkdata", "checkmeta"}, desc = "Checks for metadata of a user [in context]")
     public void checkmetadata(CommandContext cContext, @Default User player, String metadatakey, @Named("in") Context context)
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         String value = ((OptionSubjectData)player.getPlayer().get().getSubjectData()).getOptions(contexts).get(metadatakey);
         if (value == null)
         {
@@ -143,7 +142,7 @@ public class UserInformationCommands extends UserCommandHelper
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists assigned metadata from a user [in context]")
     public void listmetadata(CommandContext cContext, @Default User player, @Named("in") Context context, @Flag boolean all)
     {
-        Set<Context> contexts = toSet(context);
+        Set<Context> contexts = RoleCommands.toSet(context);
         Map<String, String> options = ((OptionSubjectData)player.getPlayer().get().getSubjectData()).getOptions(contexts);
         if (all)
         {
@@ -152,7 +151,7 @@ public class UserInformationCommands extends UserCommandHelper
         cContext.sendTranslated(NEUTRAL, "Metadata of {user} in {world}:", player, context);
         for (Map.Entry<String, String> entry : options.entrySet())
         {
-            cContext.sendMessage(String.format(this.LISTELEM_VALUE, entry.getKey(), entry.getValue()));
+            cContext.sendMessage(String.format(LISTELEM_VALUE, entry.getKey(), entry.getValue()));
         }
     }
 }

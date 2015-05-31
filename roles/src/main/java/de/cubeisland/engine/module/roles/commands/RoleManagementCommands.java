@@ -17,6 +17,7 @@
  */
 package de.cubeisland.engine.module.roles.commands;
 
+import java.util.Set;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
@@ -34,21 +35,23 @@ import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.data.RoleSubjectData;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import de.cubeisland.engine.module.service.command.CommandContext;
-import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.module.roles.commands.RoleCommands.toSet;
 
 @Alias("manrole")
 @Command(name = "role", desc = "Manage roles")
-public class RoleManagementCommands extends RoleCommandHelper
+public class RoleManagementCommands extends ContainerCommand
 {
     private RolesPermissionService service;
 
-    public RoleManagementCommands(Roles module, WorldManager wm, RolesPermissionService service)
+    public RoleManagementCommands(Roles module, RolesPermissionService service)
     {
-        super(module, wm);
+        super(module);
         this.service = service;
     }
 
@@ -185,7 +188,7 @@ public class RoleManagementCommands extends RoleCommandHelper
             context.sendTranslated(NEGATIVE, "These are the same names!");
             return;
         }
-        if (role.rename(newName)) // TODO rename
+        if (service.getGroupSubjects().rename(r, newName))
         {
             context.sendTranslated(POSITIVE, "{name#role} renamed to {name#new} in {context}", oldName, newName, role.getContext());
             return;
@@ -207,7 +210,7 @@ public class RoleManagementCommands extends RoleCommandHelper
             return;
         }
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
-        ((RoleSubjectData)r.getSubjectData()).save(true); // TODO force save
+        r.getSubjectData().save(true); // TODO force save
         cContext.sendTranslated(POSITIVE, "Role {name} created!", name);
     }
 
@@ -216,21 +219,25 @@ public class RoleManagementCommands extends RoleCommandHelper
     public void delete(CommandContext context, ContextualRole role)
     {
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
-        role.delete(); // TODO delete
+        service.getGroupSubjects().delete(r);
         context.sendTranslated(POSITIVE, "Deleted the role {name} in {context}!", r.getName(), role.getContext());
     }
-
 
     @Command(alias = {"toggledefault", "toggledef"}, desc = "Toggles whether given role is a default role")
     public void toggleDefaultRole(CommandContext context, ContextualRole role)
     {
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
-        role.setDefaultRole(!role.isDefaultRole());  // TODO defaultRole
-        if (role.isDefaultRole())
+        SubjectData defaultData = service.getDefaultData();
+        Set<Context> contexts = toSet(role.getContext());
+        if (defaultData.getParents(contexts).contains(r))
         {
-            context.sendTranslated(POSITIVE, "{name#role} is now a default role in {context}!", r.getName(), role.getContext());
+            defaultData.removeParent(contexts, r);
+            context.sendTranslated(POSITIVE, "{name#role} is no longer a default role in {context}!", r.getName(),
+                                   role.getContext());
             return;
         }
-        context.sendTranslated(POSITIVE, "{name#role} is no longer a default role in {context}!", r.getName(), role.getContext());
+        defaultData.addParent(contexts, r);
+        context.sendTranslated(POSITIVE, "{name#role} is now a default role in {context}!", r.getName(),
+                               role.getContext());
     }
 }
