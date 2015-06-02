@@ -30,13 +30,34 @@ public class ContextualRoleReader implements ArgumentReader<ContextualRole>, Com
     @Override
     public ContextualRole read(Class type, CommandInvocation invocation) throws ReaderException
     {
-        String token = invocation.currentToken();
+        String token = invocation.consume(1);
+        String[] split = token.split("\\|");
         ContextualRole role = new ContextualRole();
-        role.roleName = token;
+        if (split.length == 3)
+        {
+            role.contextType = split[0];
+            role.contextName = split[1];
+            role.roleName = split[2];
+            // TODO role exists?
+        }
+        else if (split.length == 2)
+        {
+            // TODO search for role in global| and in world|?|
+            role.contextType = "world";
+            role.contextName = split[0];
+            role.roleName = split[1];
+        }
+        else if (split.length == 1)
+        {
+            // TODO search for role in all contexts
+            role.contextType = "?";
+            role.contextName = "?";
+            role.roleName = split[0];
+        }
         return role;
         // has context?
         // last split is rolename
-        // check role exists?
+        // check role exists?l
         //return null;
     }
 

@@ -17,6 +17,8 @@
  */
 package de.cubeisland.engine.module.roles.sponge.data;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -100,6 +102,14 @@ public class RoleSubjectData extends CachingSubjectData
                     }
                     config.parents.add(subject.getIdentifier().substring(5));
                 }
+            }
+            try
+            {
+                Files.createDirectories(config.getFile().toPath().getParent());
+            }
+            catch (IOException e)
+            {
+                throw new IllegalStateException(e);
             }
             config.save();// TODO async
         }

@@ -26,6 +26,8 @@ import java.util.UUID;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.data.UserSubjectData;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.User;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
@@ -38,27 +40,18 @@ import org.spongepowered.api.util.command.CommandSource;
 public class UserSubject extends BaseSubject
 {
     private final UserSubjectData data;
+    private Game game;
     private RolesPermissionService service;
     private User user;
     private final UUID uuid;
 
-    public UserSubject(RolesPermissionService service, User user)
+    public UserSubject(Game game, RolesPermissionService service, UUID uuid)
     {
         super(service.getUserSubjects());
-        this.service = service;
-        this.user = user;
-        this.uuid = user.getUniqueId();
-        this.data = new UserSubjectData(service, uuid);
-    }
-
-    public UserSubject(RolesPermissionService service, UUID uuid)
-    {
-        super(service.getUserSubjects());
+        this.game = game;
         this.service = service;
         this.data = new UserSubjectData(service, uuid);
         this.uuid = uuid;
-
-        // TODO lazy fetch call getUser in separate thread
 
         SubjectData defaultData = service.getDefaultData();
         OptionSubjectData transientData = getTransientSubjectData();
@@ -102,7 +95,8 @@ public class UserSubject extends BaseSubject
         Set<Context> contexts = new HashSet<>();
         for (ContextCalculator calculator : service.getContextCalculators())
         {
-            calculator.accumulateContexts(getUser(), contexts);
+            calculator.accumulateContexts(this, contexts);
+            // TODO calculator.accumulateContexts(getUser(), contexts);
         }
         return contexts;
     }
@@ -111,7 +105,10 @@ public class UserSubject extends BaseSubject
     {
         if (user == null)
         {
-            // TODO create user
+            Optional<Player> player = game.getServer().getPlayer(uuid);
+            user = player.transform(p->(User)p).orNull();
+            // TODO not implemented game.getServiceManager().provideUnchecked(UserStorage.class).get(uuid);
+            // TODO create user if not exists
         }
         return user;
     }

@@ -21,7 +21,6 @@ import java.util.Set;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
@@ -32,7 +31,6 @@ import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.PriorityConverter;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
-import de.cubeisland.engine.module.roles.sponge.data.RoleSubjectData;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.ContainerCommand;
@@ -64,18 +62,18 @@ public class RoleManagementCommands extends ContainerCommand
         switch (type)
         {
             case UNDEFINED:
-                cContext.sendTranslated(NEUTRAL, "{name#permission} has been reset for the role {name} in {context}!",
-                                        permission, r.getName(), role.getContext());
+                cContext.sendTranslated(NEUTRAL, "{name#permission} has been reset for the role {role} in {context}!",
+                                        permission, r, role.getContext());
                 break;
             case TRUE:
                 cContext.sendTranslated(POSITIVE,
-                                        "{name#permission} set to {text:true:color=DARK_GREEN} for the role {name} in {context}!",
-                                        permission, r.getName(), role.getContext());
+                                        "{name#permission} set to {text:true:color=DARK_GREEN} for the role {role} in {context}!",
+                                        permission, r, role.getContext());
                 break;
             case FALSE:
                 cContext.sendTranslated(NEGATIVE,
-                                        "{name#permission} set to {text:false:color=DARK_RED} for the role {name} in {context}!",
-                                        permission, r.getName(), role.getContext());
+                                        "{name#permission} set to {text:false:color=DARK_RED} for the role {naroleme} in {context}!",
+                                        permission, r, role.getContext());
                 break;
         }
     }
@@ -88,12 +86,12 @@ public class RoleManagementCommands extends ContainerCommand
         r.getSubjectData().setOption(toSet(role.getContext()), key, value);
         if (value == null)
         {
-            cContext.sendTranslated(NEUTRAL, "Metadata {input#key} reset for the role {name} in {context}!", key,
-                                   r.getName(), role.getContext());
+            cContext.sendTranslated(NEUTRAL, "Metadata {input#key} reset for the role {role} in {context}!", key, r,
+                                    role.getContext());
             return;
         }
-        cContext.sendTranslated(POSITIVE, "Metadata {input#key} set to {input#value} for the role {name} in {context}!",
-                               key, value, r.getName(), role.getContext());
+        cContext.sendTranslated(POSITIVE, "Metadata {input#key} set to {input#value} for the role {role} in {context}!",
+                                key, value, r, role.getContext());
     }
 
     @Alias(value = "resetrdata")
@@ -109,8 +107,7 @@ public class RoleManagementCommands extends ContainerCommand
     {
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
         r.getSubjectData().clearOptions(toSet(role.getContext()));
-        context.sendTranslated(NEUTRAL, "Metadata cleared for the role {name} in {context}!", r.getName(),
-                               role.getContext());
+        context.sendTranslated(NEUTRAL, "Metadata cleared for the role {role} in {context}!", r, role.getContext());
     }
 
     @Alias(value = {"addrparent", "manradd"})
@@ -121,12 +118,12 @@ public class RoleManagementCommands extends ContainerCommand
         RoleSubject pr = service.getGroupSubjects().get(parentRole.getIdentifier());
         if (r.getSubjectData().addParent(toSet(role.getContext()), pr))
         {
-            context.sendTranslated(POSITIVE, "Added {name#role} as parent role for the role {name} in {context}",
-                                   pr.getName(), r.getName(), role.getContext());
+            context.sendTranslated(POSITIVE, "Added {name#role} as parent role for the role {role} in {context}",
+                                   pr.getName(), r, role.getContext());
             return;
         }
-        context.sendTranslated(NEUTRAL, "{name#role} is already parent role of the role {name} in {context}!",
-                               pr.getName(), r.getName(), role.getContext());
+        context.sendTranslated(NEUTRAL, "{name#role} is already parent role of the role {role} in {context}!",
+                               pr.getName(), r, role.getContext());
         // TODO context.sendTranslated(NEGATIVE, "Circular Dependency! {name#role} depends on the role {name}!", pr.getName(), r.getName());
     }
 
@@ -138,12 +135,12 @@ public class RoleManagementCommands extends ContainerCommand
         RoleSubject pr = service.getGroupSubjects().get(parentRole.getIdentifier());
         if (r.getSubjectData().removeParent(toSet(role.getContext()), pr))
         {
-            context.sendTranslated(NEUTRAL, "{name#role} is not a parent role of the role {name} in {context}!",
-                                   pr.getName(), r.getName(), role.getContext());
+            context.sendTranslated(NEUTRAL, "{role} is not a parent role of the role {role} in {context}!", pr, r,
+                                   role.getContext());
             return;
         }
-        context.sendTranslated(POSITIVE, "Removed the parent role {name} from the role {name} in {context}!",
-                               pr.getName(), r.getName(), role.getContext());
+        context.sendTranslated(POSITIVE, "Removed the parent role {role} from the role {role} in {context}!", pr, r,
+                               role.getContext());
     }
 
     @Alias(value = "clearrparent")
@@ -153,7 +150,8 @@ public class RoleManagementCommands extends ContainerCommand
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
         if (r.getSubjectData().clearParents(toSet(role.getContext())))
         {
-            context.sendTranslated(NEUTRAL, "All parent roles of the role {name} in {context} cleared!", r.getName(), role.getContext());
+            context.sendTranslated(NEUTRAL, "All parent roles of the role {role} in {context} cleared!", r,
+                                   role.getContext());
         }
         // TODO msg
     }
@@ -168,8 +166,8 @@ public class RoleManagementCommands extends ContainerCommand
             ClassedConverter<Priority> converter = new PriorityConverter();
             Priority prio = converter.fromNode(new StringNode(priority), Priority.class, null);
             r.setPriorityValue(prio.value); // TODO set priority
-            context.sendTranslated(POSITIVE, "Priority of the role {name} set to {input#priority} in {context}!",
-                                   r.getName(), priority, role.getContext());
+            context.sendTranslated(POSITIVE, "Priority of the role {role} set to {input#priority} in {context}!", r,
+                                   priority, role.getContext());
         }
         catch (ConversionException ex)
         {
@@ -190,15 +188,17 @@ public class RoleManagementCommands extends ContainerCommand
         }
         if (service.getGroupSubjects().rename(r, newName))
         {
-            context.sendTranslated(POSITIVE, "{name#role} renamed to {name#new} in {context}", oldName, newName, role.getContext());
+            context.sendTranslated(POSITIVE, "{role} renamed to {name#new} in {context}", r, newName,
+                                   role.getContext());
             return;
         }
-        context.sendTranslated(NEGATIVE, "Renaming failed! The role {name} already exists in {context}!", newName, role.getContext());
+        context.sendTranslated(NEGATIVE, "Renaming failed! The role {name} already exists in {context}!", newName,
+                               role.getContext());
     }
 
     @Alias(value = "createrole")
     @Command(desc = "Creates a new role [in context]")
-    public void create(CommandContext cContext, String name, @Named("in") Context context, @Flag boolean global)
+    public void create(CommandContext cContext, String name, @Named("in") @Default Context context)
     {
         ContextualRole role = new ContextualRole();
         role.roleName = name;
@@ -220,7 +220,7 @@ public class RoleManagementCommands extends ContainerCommand
     {
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
         service.getGroupSubjects().delete(r);
-        context.sendTranslated(POSITIVE, "Deleted the role {name} in {context}!", r.getName(), role.getContext());
+        context.sendTranslated(POSITIVE, "Deleted the role {role} in {context}!", r, role.getContext());
     }
 
     @Command(alias = {"toggledefault", "toggledef"}, desc = "Toggles whether given role is a default role")
@@ -232,12 +232,10 @@ public class RoleManagementCommands extends ContainerCommand
         if (defaultData.getParents(contexts).contains(r))
         {
             defaultData.removeParent(contexts, r);
-            context.sendTranslated(POSITIVE, "{name#role} is no longer a default role in {context}!", r.getName(),
-                                   role.getContext());
+            context.sendTranslated(POSITIVE, "{role} is no longer a default role in {context}!", r, role.getContext());
             return;
         }
         defaultData.addParent(contexts, r);
-        context.sendTranslated(POSITIVE, "{name#role} is now a default role in {context}!", r.getName(),
-                               role.getContext());
+        context.sendTranslated(POSITIVE, "{role} is now a default role in {context}!", r, role.getContext());
     }
 }

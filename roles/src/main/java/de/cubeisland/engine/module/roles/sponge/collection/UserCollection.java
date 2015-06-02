@@ -26,6 +26,7 @@ import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.UserSubject;
 import de.cubeisland.engine.module.service.database.Database;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.User;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -59,16 +60,7 @@ public class UserCollection extends BaseSubjectCollection
             try
             {
                 UUID uuid = UUID.fromString(identifier);
-                // TODO not implemented game.getServiceManager().provideUnchecked(UserStorage.class).get(uuid);
-                Optional<User> user = Optional.absent();
-                if (!user.isPresent())
-                {
-                    subject = new UserSubject(service, uuid);
-                }
-                else
-                {
-                    subject = new UserSubject(service, user.get());
-                }
+                subject = new UserSubject(game, service, uuid);
             }
             catch (IllegalArgumentException e)
             {

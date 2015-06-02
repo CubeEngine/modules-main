@@ -82,6 +82,7 @@ public class Roles extends Module
         this.config = fm.loadConfig(this, RolesConfig.class);
 
         i18n.getCompositor().registerMacro(new ContextFormatter());
+        i18n.getCompositor().registerMacro(new RoleFormatter());
 
         db.registerTable(TableRole.class);
         db.registerTable(TablePerm.class);

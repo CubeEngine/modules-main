@@ -281,7 +281,7 @@ public class RecordBackedList<RecordT extends AsyncRecord> implements List<Subje
 
     public void save()
     {
-        records.forEach(RecordT::updateAsync);
+        records.forEach(RecordT::store); // TODO async version
         removed.forEach(RecordT::deleteAsync);
     }
 }

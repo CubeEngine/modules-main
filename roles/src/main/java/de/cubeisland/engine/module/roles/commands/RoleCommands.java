@@ -41,7 +41,7 @@ public class RoleCommands extends ContainerCommand
         super(module);
     }
 
-    protected static Set<Context> toSet(Context context)
+    public static Set<Context> toSet(Context context)
     {
         return "global".equals(context.getType()) ? GLOBAL_CONTEXT : Collections.singleton(context);
     }

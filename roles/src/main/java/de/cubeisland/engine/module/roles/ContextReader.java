@@ -48,7 +48,7 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
     @Override
     public Context read(Class type, CommandInvocation invocation) throws ReaderException
     {
-        String token = invocation.currentToken();
+        String token = invocation.consume(1);
         if (token.contains("|"))
         {
             // TODO implement me

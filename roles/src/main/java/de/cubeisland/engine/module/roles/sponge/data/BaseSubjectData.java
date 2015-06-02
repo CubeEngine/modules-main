@@ -17,7 +17,10 @@
  */
 package de.cubeisland.engine.module.roles.sponge.data;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +30,9 @@ import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 
+import static de.cubeisland.engine.module.roles.commands.RoleCommands.toSet;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 
 /**
@@ -48,50 +53,47 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public Map<String, String> getOptions(Set<Context> contexts)
     {
-        return options.containsKey(contexts) ? unmodifiableMap(options.get(contexts)) : emptyMap();
+        return unmodifiableMap(accumulate(contexts, options, new HashMap<>(), Map::putAll));
+    }
+
+    @Override
+    public Map<String, Boolean> getPermissions(Set<Context> contexts)
+    {
+        return unmodifiableMap(accumulate(contexts, permissions, new HashMap<>(), Map::putAll));
+    }
+
+
+    @Override
+    public List<Subject> getParents(Set<Context> contexts)
+    {
+        return unmodifiableList(accumulate(contexts, parents, new ArrayList<>(), List::addAll));
     }
 
     @Override
     public boolean setOption(Set<Context> contexts, String key, String value)
     {
-        Map<String, String> map = options.get(contexts);
-        if (map == null)
-        {
-            return false;
-        }
-        map.put(key, value);
-        return true;
+        return unCache(operate(contexts, options, map -> map.put(key, value)), contexts, options.keySet());
     }
 
     @Override
     public boolean clearOptions(Set<Context> contexts)
     {
-        Map<String, String> map = options.get(contexts);
-        if (map == null)
-        {
-            return false;
-        }
-        map.clear();
-        return true;
+        return unCache(operate(contexts, options, Map::clear), contexts, options.keySet());
     }
 
     @Override
     public boolean clearOptions()
     {
-        boolean isEmpty = true;
+        boolean changed = false;
         for (Map<String, String> map : options.values())
         {
             if (!map.isEmpty())
             {
-                isEmpty = false;
+                changed = true;
             }
+            map.clear();
         }
-        if (isEmpty)
-        {
-            return false;
-        }
-        options.values().forEach(Map::clear);
-        return true;
+        return changed;
     }
 
     @Override
@@ -101,59 +103,39 @@ public class BaseSubjectData implements OptionSubjectData
     }
 
     @Override
-    public Map<String, Boolean> getPermissions(Set<Context> contexts)
-    {
-        return permissions.containsKey(contexts) ? unmodifiableMap(permissions.get(contexts)) : emptyMap();
-    }
-
-    @Override
     public boolean setPermission(Set<Context> contexts, String permission, Tristate value)
     {
-        Map<String, Boolean> map = permissions.get(contexts);
-        if (map == null)
-        {
-            return false;
-        }
-        if (value == Tristate.UNDEFINED)
-        {
-            map.remove(permission);
-        }
-        else
-        {
-            map.put(permission, value.asBoolean());
-        }
-        return true;
-    }
-
-    @Override
-    public boolean clearPermissions()
-    {
-        boolean isEmpty = true;
-        for (Map<String, Boolean> map : permissions.values())
-        {
-            if (!map.isEmpty())
+        return unCache(operate(contexts, permissions, map -> {
+            if (value == Tristate.UNDEFINED)
             {
-                isEmpty = false;
+                map.remove(permission);
             }
-        }
-        if (isEmpty)
-        {
-            return false;
-        }
-        permissions.values().forEach(Map::clear);
-        return true;
+            else
+            {
+                map.put(permission, value.asBoolean());
+            }
+        }), contexts, permissions.keySet());
     }
 
     @Override
     public boolean clearPermissions(Set<Context> contexts)
     {
-        Map<String, Boolean> map = permissions.get(contexts);
-        if (map == null)
+        return unCache(operate(contexts, permissions, Map::clear), contexts, permissions.keySet());
+    }
+
+    @Override
+    public boolean clearPermissions()
+    {
+        boolean changed = false;
+        for (Map<String, Boolean> map : permissions.values())
         {
-            return false;
+            if (!map.isEmpty())
+            {
+                changed = true;
+            }
+            map.clear();
         }
-        map.clear();
-        return true;
+        return changed;
     }
 
     @Override
@@ -163,38 +145,15 @@ public class BaseSubjectData implements OptionSubjectData
     }
 
     @Override
-    public List<Subject> getParents(Set<Context> contexts)
-    {
-        List<Subject> subjects = parents.get(contexts);
-        if (subjects == null)
-        {
-            return Collections.emptyList();
-        }
-        return Collections.unmodifiableList(subjects);
-    }
-
-    @Override
     public boolean addParent(Set<Context> contexts, Subject parent)
     {
-        List<Subject> list = parents.get(contexts);
-        if (list == null)
-        {
-            return false;
-        }
-        list.add(parent);
-        return true;
+        return unCache(operate(contexts, parents, l -> l.add(parent)), contexts, parents.keySet());
     }
 
     @Override
     public boolean removeParent(Set<Context> contexts, Subject parent)
     {
-        List<Subject> list = parents.get(contexts);
-        if (list == null)
-        {
-            return false;
-        }
-        list.remove(parent);
-        return true;
+        return unCache(operate(contexts, parents, l -> l.remove(parent)), contexts, parents.keySet());
     }
 
     @Override
@@ -207,13 +166,68 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public boolean clearParents(Set<Context> contexts)
     {
-        List<Subject> list = parents.get(contexts);
-        if (list == null)
+        return unCache(operate(contexts, parents, List::clear), contexts, parents.keySet());
+    }
+
+    private boolean unCache(boolean changed, Set<Context> contexts, Set<Set<Context>> keySet)
+    {
+        if (changed)
         {
-            return false;
+            for (Iterator<Set<Context>> it = keySet.iterator(); it.hasNext(); )
+            {
+                final Set<Context> set = it.next();
+                if (set.size() > 1 && !Collections.disjoint(set, contexts))
+                {
+                    it.remove();
+                }
+            }
         }
-        parents.clear();
-        return true;
+        return changed;
+    }
+
+    @FunctionalInterface
+    interface Operator<T>
+    {
+        void operate(T mapOrList);
+    }
+
+    private <T> boolean operate(Set<Context> contexts, Map<Set<Context>, T> all, Operator<T> operator)
+    {
+        boolean changed = false;
+        for (Context context : contexts)
+        {
+            T map = all.get(toSet(context));
+            if (map != null)
+            {
+                operator.operate(map);
+                changed = true;
+            }
+        }
+        return changed;
+    }
+
+    @FunctionalInterface
+    interface Accumulator<T>
+    {
+        void operate(T mapOrList, T other);
+    }
+
+    private <T> T accumulate(Set<Context> contexts, Map<Set<Context>, T> all, T result, Accumulator<T> accumulator)
+    {
+        if (all.containsKey(contexts))
+        {
+            return all.get(contexts);
+        }
+        for (Context context : contexts)
+        {
+            T other = all.get(toSet(context));
+            if (other != null)
+            {
+                accumulator.operate(result, other);
+            }
+        }
+        all.put(contexts, result);
+        return result;
     }
 
     public Set<Context> getContexts()
