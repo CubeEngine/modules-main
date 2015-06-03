@@ -98,7 +98,7 @@ public class RecordBackedList<RecordT extends AsyncRecord> implements List<Subje
     @Override
     public Object[] toArray()
     {
-        return records.stream().map(r -> r.getValue(type)).toArray();
+        return records.stream().map(r -> collection.get(r.getValue(type))).toArray();
     }
 
     @Override

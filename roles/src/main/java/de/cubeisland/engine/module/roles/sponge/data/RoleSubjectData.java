@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import de.cubeisland.engine.module.roles.commands.RoleCommands;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.collection.RoleCollection;
@@ -30,6 +31,7 @@ import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 
+import static de.cubeisland.engine.module.roles.commands.RoleCommands.toSet;
 import static java.util.Collections.singleton;
 
 public class RoleSubjectData extends CachingSubjectData
@@ -50,37 +52,38 @@ public class RoleSubjectData extends CachingSubjectData
     @Override
     protected void cacheOptions(Set<Context> c)
     {
-        if (getContexts().equals(c) && !options.containsKey(getContexts()))
-        {
-            options.put(getContexts(), config.metadata);
-        }
+        c.stream()
+         .filter(ctx -> toSet(ctx).equals(getContexts()) && !options.containsKey(getContexts()))
+         .forEach(ctx -> options.put(getContexts(), config.metadata));
     }
 
     @Override
     protected void cachePermissions(Set<Context> c)
     {
-        if (getContexts().equals(c) && !permissions.containsKey(getContexts()))
-        {
-            permissions.put(getContexts(), config.perms.getPermissions());
-        }
+        c.stream()
+         .filter(ctx -> toSet(ctx).equals(getContexts()) && !permissions.containsKey(getContexts()))
+         .forEach(ctx -> permissions.put(getContexts(), config.perms.getPermissions()));
     }
 
     @Override
     protected void cacheParents(Set<Context> c)
     {
-        if (getContexts().equals(c) && !parents.containsKey(getContexts()))
+        for (Context ctx : c)
         {
-            List<RoleSubject> parents = new ArrayList<>();
-            for (String parent : config.parents)
+            if (toSet(ctx).equals(getContexts()) && !parents.containsKey(getContexts()))
             {
-                if (!parent.contains(RoleSubject.SEPARATOR))
+                List<RoleSubject> parents = new ArrayList<>();
+                for (String parent : config.parents)
                 {
-                    parent = context.getKey() + RoleSubject.SEPARATOR + context.getValue() + RoleSubject.SEPARATOR + parent;
+                    if (!parent.contains(RoleSubject.SEPARATOR))
+                    {
+                        parent = context.getKey() + RoleSubject.SEPARATOR + context.getValue() + RoleSubject.SEPARATOR + parent;
+                    }
+                    parents.add(collection.get("role:" + parent));
                 }
-                parents.add(collection.get("role:" + parent));
+                Collections.sort(parents);
+                this.parents.put(contexts, new ArrayList<>(parents));
             }
-            Collections.sort(parents);
-            this.parents.put(contexts, new ArrayList<>(parents));
         }
     }
 
