@@ -74,12 +74,12 @@ public class UserInformationCommands extends ContainerCommand
         // TODO search registered permission
         if (value == Tristate.TRUE)
         {
-            cContext.sendTranslated(POSITIVE, "The player {user} does have access to {input#permission} in {world}",
+            cContext.sendTranslated(POSITIVE, "The player {user} does have access to {input#permission} in {context}",
                                    player, permission, context);
         }
         else if (value == Tristate.FALSE)
         {
-            cContext.sendTranslated(NEGATIVE, "The player {user} does not have access to {input#permission} in {world}",
+            cContext.sendTranslated(NEGATIVE, "The player {user} does not have access to {input#permission} in {context}",
                                    player, permission, context);
         }
         else
@@ -132,7 +132,7 @@ public class UserInformationCommands extends ContainerCommand
             cContext.sendTranslated(NEUTRAL, "{input#key} is not set for {user} in {context}.", metadatakey, player, context);
             return;
         }
-        cContext.sendTranslated(NEUTRAL, "{input#key}: {input#value} is set for {user} in {world}.", metadatakey, value, player, context);
+        cContext.sendTranslated(NEUTRAL, "{input#key}: {input#value} is set for {user} in {context}.", metadatakey, value, player, context);
         // TODO find origin
         // cContext.sendTranslated(NEUTRAL, "Origin: {name#role}", metadata.get(metadatakey).getOrigin().getName());
         // cContext.sendTranslated(NEUTRAL, "Origin: {text:directly assigned}");
@@ -148,7 +148,7 @@ public class UserInformationCommands extends ContainerCommand
         {
             // TODO recursive
         }
-        cContext.sendTranslated(NEUTRAL, "Metadata of {user} in {world}:", player, context);
+        cContext.sendTranslated(NEUTRAL, "Metadata of {user} in {context}:", player, context);
         for (Map.Entry<String, String> entry : options.entrySet())
         {
             cContext.sendMessage(String.format(LISTELEM_VALUE, entry.getKey(), entry.getValue()));

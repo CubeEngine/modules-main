@@ -72,6 +72,7 @@ public class Roles extends Module
     @Inject private PermissionManager pm;
     @Inject private Game game;
     @Inject private I18n i18n;
+    @Inject private PermissionManager manager;
 
     @Enable
     public void onEnable()
@@ -88,10 +89,10 @@ public class Roles extends Module
         db.registerTable(TablePerm.class);
         db.registerTable(TableOption.class);
 
-        RolesPermissionService service = new RolesPermissionService(this, reflector, config, game, db, wm);
+        RolesPermissionService service = new RolesPermissionService(this, reflector, config, game, db, wm, manager);
 
-        cm.getProviderManager().register(this, new ContextReader(wm), Context.class);
-        cm.getProviderManager().register(this, new ContextualRoleReader(), ContextualRole.class);
+        cm.getProviderManager().register(this, new ContextReader(service, wm), Context.class);
+        cm.getProviderManager().register(this, new ContextualRoleReader(service, wm), ContextualRole.class);
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
 
         RoleCommands cmdRoles = new RoleCommands(this);

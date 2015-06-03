@@ -31,6 +31,7 @@ import de.cubeisland.engine.module.roles.sponge.collection.UserCollection;
 import de.cubeisland.engine.module.roles.sponge.data.DefaultSubjectData;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.Game;
@@ -48,13 +49,13 @@ public class RolesPermissionService implements PermissionService
     private Database db;
     private RolesConfig config;
 
-    public RolesPermissionService(Roles module, Reflector reflector, RolesConfig config, Game game, Database db, WorldManager wm)
+    public RolesPermissionService(Roles module, Reflector reflector, RolesConfig config, Game game, Database db, WorldManager wm, PermissionManager manager)
     {
         this.db = db;
         this.config = config;
         defaultData = new DefaultSubjectData(this, config);
-        collections.put(SUBJECTS_USER, new UserCollection(this, game));
-        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, reflector, wm));
+        collections.put(SUBJECTS_USER, new UserCollection(this, manager, game));
+        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, manager, reflector, wm));
     }
 
     @Override

@@ -17,57 +17,115 @@
  */
 package de.cubeisland.engine.module.roles;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.completer.Completer;
 import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import de.cubeisland.engine.module.roles.commands.ContextualRole;
+import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
+import de.cubeisland.engine.module.roles.sponge.collection.RoleCollection;
+import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
+import de.cubeisland.engine.module.service.command.sender.WrappedCommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.world.World;
 
 public class ContextualRoleReader implements ArgumentReader<ContextualRole>, Completer
 {
-    // TODO implement me
+    private RolesPermissionService service;
+    private WorldManager wm;
+
+    public ContextualRoleReader(RolesPermissionService service, WorldManager wm)
+    {
+        this.service = service;
+        this.wm = wm;
+    }
+
     @Override
     public ContextualRole read(Class type, CommandInvocation invocation) throws ReaderException
     {
         String token = invocation.consume(1);
-        String[] split = token.split("\\|");
+        String[] split = token.toLowerCase().split("\\|");
         ContextualRole role = new ContextualRole();
         if (split.length == 3)
         {
             role.contextType = split[0];
             role.contextName = split[1];
             role.roleName = split[2];
-            // TODO role exists?
         }
         else if (split.length == 2)
         {
-            // TODO search for role in global| and in world|?|
-            role.contextType = "world";
-            role.contextName = split[0];
-            role.roleName = split[1];
+            if ("global".equals(split[0]))
+            {
+                role.contextType = split[0];
+                role.contextName = "";
+                role.roleName = split[1];
+            }
+            else if (wm.getWorld(split[0]).isPresent())
+            {
+                role.contextType = "world";
+                role.contextName = split[0];
+                role.roleName = split[1];
+            }
+            else
+            {
+                role = null;
+            }
         }
         else if (split.length == 1)
         {
-            // TODO search for role in all contexts
-            role.contextType = "?";
-            role.contextName = "?";
-            role.roleName = split[0];
+            for (Subject subject : service.getGroupSubjects().getAllSubjects())
+            {
+                if (split[0].equals(((RoleSubject)subject).getName()))
+                {
+                    Context ctx = subject.getActiveContexts().iterator().next();
+                    role.contextType = ctx.getType();
+                    role.contextName = ctx.getName();
+                    role.roleName = ((RoleSubject)subject).getName();
+                    return role;
+                }
+            }
+            role = null;
+        }
+        if (role == null || !service.getGroupSubjects().hasRegistered(role.getIdentifier())) // check role exists?l
+        {
+            throw new ReaderException("Could not find the role: {input#role}", token);
         }
         return role;
-        // has context?
-        // last split is rolename
-        // check role exists?l
-        //return null;
     }
 
     @Override
     public List<String> getSuggestions(CommandInvocation invocation)
     {
-        // get all roles
-        // first roles in current context
-        // then global
-        // last other roles
-        return null;
+        ArrayList<String> result = new ArrayList<>();
+        String token = invocation.consume(1).toLowerCase();
+        if (!token.contains("|") && invocation.getCommandSource() instanceof User)
+        {
+            World world = ((User)invocation.getCommandSource()).getWorld();
+            Context context = new Context("world", world.getName());
+            for (Subject subject : service.getGroupSubjects().getAllSubjects())
+            {
+                if (((RoleSubject)subject).getName().startsWith(token))
+                {
+                    if (context.equals(subject.getActiveContexts().iterator().next()))
+                    {
+                        result.add(((RoleSubject)subject).getName());
+                    }
+                }
+            }
+        }
+        for (Subject subject : service.getGroupSubjects().getAllSubjects())
+        {
+            if (subject.getIdentifier().startsWith("role:" + token))
+            {
+                result.add(subject.getIdentifier().substring(5));
+            }
+        }
+        return result;
     }
 }

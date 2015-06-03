@@ -25,6 +25,7 @@ import de.cubeisland.engine.module.roles.RolesConfig;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.UserSubject;
 import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.User;
@@ -38,12 +39,14 @@ public class UserCollection extends BaseSubjectCollection
     private final Map<String, String> directMirrors;
     private final Map<String, UserSubject> subjects = new ConcurrentHashMap<>();
     private RolesPermissionService service;
+    private PermissionManager manager;
     private Game game;
 
-    public UserCollection(RolesPermissionService service, Game game)
+    public UserCollection(RolesPermissionService service, PermissionManager manager, Game game)
     {
         super(PermissionService.SUBJECTS_USER);
         this.service = service;
+        this.manager = manager;
         this.game = game;
         assignedMirrors = readMirrors(service.getConfig().mirrors.assigned);
         directMirrors = readMirrors(service.getConfig().mirrors.direct);
@@ -60,7 +63,7 @@ public class UserCollection extends BaseSubjectCollection
             try
             {
                 UUID uuid = UUID.fromString(identifier);
-                subject = new UserSubject(game, service, uuid);
+                subject = new UserSubject(game, service, uuid, manager);
             }
             catch (IllegalArgumentException e)
             {

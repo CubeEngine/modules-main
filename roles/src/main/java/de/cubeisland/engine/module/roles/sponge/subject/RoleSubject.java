@@ -26,11 +26,11 @@ import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.data.RoleSubjectData;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.command.CommandSource;
 
 import static java.util.Collections.singleton;
-import static java.util.Collections.unmodifiableSet;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
@@ -42,9 +42,9 @@ public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
     private Roles module;
     private Context context;
 
-    public RoleSubject(Roles module, RolesPermissionService service, RoleConfig config, Context context)
+    public RoleSubject(Roles module, RolesPermissionService service, RoleConfig config, Context context, PermissionManager manager)
     {
-        super(service.getGroupSubjects());
+        super(service.getGroupSubjects(), manager);
         this.module = module;
         this.context = context;
         this.contexts = context == null ? GLOBAL_CONTEXT : singleton(context);

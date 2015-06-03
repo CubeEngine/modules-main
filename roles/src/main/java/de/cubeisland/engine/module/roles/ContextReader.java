@@ -28,6 +28,7 @@ import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import de.cubeisland.engine.butler.parametric.Reader;
 import de.cubeisland.engine.module.roles.commands.ContextualRole;
+import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.world.WorldManager;
 import org.spongepowered.api.service.permission.context.Context;
@@ -39,7 +40,7 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
 {
     private WorldManager wm;
 
-    public ContextReader(WorldManager wm)
+    public ContextReader(RolesPermissionService service, WorldManager wm)
     {
         this.wm = wm;
     }
@@ -83,15 +84,19 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
     public List<String> getSuggestions(CommandInvocation invocation)
     {
         String token = invocation.currentToken();
-        List<String> list = wm.getWorlds().stream().map(World::getName).filter(n -> n.toLowerCase().startsWith(token.toLowerCase())).collect(toList());
+        List<String> list = wm.getWorlds().stream().map(World::getName).filter(n -> n.toLowerCase().startsWith(
+            token.toLowerCase())).collect(toList());
+        list.addAll(wm.getWorlds().stream()
+                      .filter(world -> world.getName().startsWith(token))
+                      .map(World::getName)
+                      .collect(toList()));
         if ("global".startsWith(token.toLowerCase()))
         {
             list.add("global");
         }
-        // TODO implement me
-        // first worlds
-        // then global
-        // last ctx from mirror
+
+        // TODO last ctx from mirror
+        // TODO show world|<...> only if starting with world|
         return list;
     }
 }

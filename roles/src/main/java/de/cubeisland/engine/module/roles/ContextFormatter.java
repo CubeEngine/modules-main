@@ -31,6 +31,6 @@ public class ContextFormatter extends AbstractFormatter<Context>
     @Override
     public String process(Context object, MacroContext context)
     {
-        return object.getKey() + "|" + object.getValue();
+        return object.getValue().isEmpty() ? object.getKey() : object.getKey() + "|" + object.getValue();
     }
 }

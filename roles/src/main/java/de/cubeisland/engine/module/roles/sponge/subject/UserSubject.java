@@ -26,6 +26,7 @@ import java.util.UUID;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.data.UserSubjectData;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.User;
@@ -45,9 +46,9 @@ public class UserSubject extends BaseSubject
     private User user;
     private final UUID uuid;
 
-    public UserSubject(Game game, RolesPermissionService service, UUID uuid)
+    public UserSubject(Game game, RolesPermissionService service, UUID uuid, PermissionManager manager)
     {
-        super(service.getUserSubjects());
+        super(service.getUserSubjects(), manager);
         this.game = game;
         this.service = service;
         this.data = new UserSubjectData(service, uuid);

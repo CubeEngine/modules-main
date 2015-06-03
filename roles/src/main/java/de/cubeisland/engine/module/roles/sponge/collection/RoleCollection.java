@@ -28,6 +28,7 @@ import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.service.permission.Subject;
@@ -43,13 +44,15 @@ public class RoleCollection extends BaseSubjectCollection
     private final Map<String, RoleSubject> subjects = new ConcurrentHashMap<>();
     private Roles module;
     private RolesPermissionService service;
+    private PermissionManager manager;
     private Reflector reflector;
 
-    public RoleCollection(Roles module, RolesPermissionService service, Reflector reflector, WorldManager wm)
+    public RoleCollection(Roles module, RolesPermissionService service, PermissionManager manager, Reflector reflector, WorldManager wm)
     {
         super(SUBJECTS_GROUP);
         this.module = module;
         this.service = service;
+        this.manager = manager;
         this.reflector = reflector;
 
         mirrors = readMirrors(service.getConfig().mirrors.roles);
@@ -113,7 +116,7 @@ public class RoleCollection extends BaseSubjectCollection
         config.setFile(file);
         config.reload();
         Context context = new Context(ctxType, ctxName);
-        return new RoleSubject(module, service, config, context);
+        return new RoleSubject(module, service, config, context, manager);
     }
 
     @Override
@@ -153,7 +156,7 @@ public class RoleCollection extends BaseSubjectCollection
             RoleConfig config = reflector.create(RoleConfig.class);
             config.roleName = name;
             config.setFile(path.resolve(name + ".yml").toFile());
-            roleSubject = new RoleSubject(module, service, config, "global".equals(ctxType) ? null : new Context(ctxType, ctxName));
+            roleSubject = new RoleSubject(module, service, config, "global".equals(ctxType) ? null : new Context(ctxType, ctxName), manager);
 
             subjects.put(identifier, roleSubject);
         }

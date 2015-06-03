@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Set;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.module.roles.sponge.data.BaseSubjectData;
+import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
@@ -35,10 +37,12 @@ public abstract class BaseSubject implements OptionSubject
 {
     private BaseSubjectData transientData = new BaseSubjectData();
     private final SubjectCollection collection;
+    private PermissionManager permissionManager;
 
-    public BaseSubject(SubjectCollection collection)
+    public BaseSubject(SubjectCollection collection, PermissionManager permissionManager)
     {
         this.collection = collection;
+        this.permissionManager = permissionManager;
     }
 
     @Override
@@ -79,10 +83,10 @@ public abstract class BaseSubject implements OptionSubject
     @Override
     public Tristate getPermissionValue(Set<Context> contexts, String permission)
     {
-        Tristate value = getPermissionValue(contexts, permission, getTransientSubjectData());
+        Tristate value = getPermissionValue(contexts, permission, getTransientSubjectData(), permissionManager, true);
         if (value == Tristate.UNDEFINED)
         {
-            return getPermissionValue(contexts, permission, getSubjectData());
+            return getPermissionValue(contexts, permission, getSubjectData(), permissionManager, true);
         }
         return value;
     }
@@ -141,21 +145,37 @@ public abstract class BaseSubject implements OptionSubject
     }
 
 
-    private static Tristate getPermissionValue(Set<Context> contexts, String permission, OptionSubjectData data)
+    private static Tristate getPermissionValue(Set<Context> contexts, String permission, OptionSubjectData data,
+                                               PermissionManager manager, boolean resolve)
     {
         Boolean state = data.getPermissions(contexts).get(permission);
-        if (state == null)
+        if (state != null)
         {
-            for (Subject subject : data.getParents(contexts))
+            return Tristate.fromBoolean(state);
+        }
+        for (Subject subject : data.getParents(contexts))
+        {
+            Tristate value = subject.getPermissionValue(contexts, permission);
+            if (value != Tristate.UNDEFINED)
             {
-                Tristate value = subject.getPermissionValue(contexts, permission);
-                if (value != Tristate.UNDEFINED)
+                return value;
+            }
+        }
+        if (resolve)
+        {
+            Optional<Permission> perm = manager.getPermission(permission);
+            if (perm.isPresent())
+            {
+                for (String parent : perm.get().allParents())
                 {
-                    return value;
+                    Tristate value = getPermissionValue(contexts, parent, data, manager, false);
+                    if (value != Tristate.UNDEFINED)
+                    {
+                        return value;
+                    }
                 }
             }
-            return Tristate.UNDEFINED;
         }
-        return Tristate.fromBoolean(state);
+        return Tristate.UNDEFINED;
     }
 }
