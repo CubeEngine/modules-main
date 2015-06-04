@@ -118,6 +118,10 @@ public class RecordBackedMap<K, V, RecordT extends AsyncRecord<RecordT>> impleme
     @Override
     public V put(K key, V value)
     {
+        if (value == null)
+        {
+            return remove(key);
+        }
         for (RecordT record : records)
         {
             K recordKey = record.getValue(keyType);
@@ -234,5 +238,6 @@ public class RecordBackedMap<K, V, RecordT extends AsyncRecord<RecordT>> impleme
     {
         records.forEach(RecordT::store); // TODO async
         removed.forEach(RecordT::deleteAsync);
+        removed.clear();
     }
 }

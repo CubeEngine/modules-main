@@ -112,12 +112,12 @@ public class UserSubjectData extends CachingSubjectData
         if (changed)
         {
             permissions.values().stream()
-                       .filter(map -> map instanceof RecordBackedList)
-                       .map(map -> (RecordBackedList)map)
-                       .forEach(RecordBackedList::save);
-            options.values().stream().filter(map -> map instanceof RecordBackedList)
-                       .map(map -> (RecordBackedList)map)
-                       .forEach(RecordBackedList::save);
+                       .filter(map -> map instanceof RecordBackedMap)
+                       .map(map -> (RecordBackedMap)map)
+                       .forEach(RecordBackedMap::save);
+            options.values().stream().filter(map -> map instanceof RecordBackedMap)
+                       .map(map -> (RecordBackedMap)map)
+                       .forEach(RecordBackedMap::save);
             parents.values().stream().filter(map -> map instanceof RecordBackedList)
                        .map(map -> (RecordBackedList)map)
                        .forEach(RecordBackedList::save);
