@@ -175,6 +175,25 @@ public abstract class BaseSubject implements OptionSubject
                     }
                 }
             }
+            else // attempt to find * permissions higher up
+            {
+                int lastDot = permission.lastIndexOf(".");
+                while (lastDot != -1)
+                {
+                    permission = permission.substring(0, lastDot);
+                    Tristate value = getPermissionValue(contexts, permission + ".*", data, manager, false);
+                    if (value != Tristate.UNDEFINED)
+                    {
+                        return value;
+                    }
+                    lastDot = permission.lastIndexOf(".");
+                }
+                Tristate value = getPermissionValue(contexts, "*", data, manager, false);
+                if (value != Tristate.UNDEFINED)
+                {
+                    return value;
+                }
+            }
         }
         return Tristate.UNDEFINED;
     }
