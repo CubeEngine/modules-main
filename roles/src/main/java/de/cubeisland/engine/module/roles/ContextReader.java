@@ -45,7 +45,6 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
         this.wm = wm;
     }
 
-
     @Override
     public Context read(Class type, CommandInvocation invocation) throws ReaderException
     {

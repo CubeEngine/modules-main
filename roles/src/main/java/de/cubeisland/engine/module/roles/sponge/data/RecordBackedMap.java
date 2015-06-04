@@ -232,7 +232,7 @@ public class RecordBackedMap<K, V, RecordT extends AsyncRecord<RecordT>> impleme
 
     public void save()
     {
-        records.forEach(RecordT::updateAsync);
+        records.forEach(RecordT::store); // TODO async
         removed.forEach(RecordT::deleteAsync);
     }
 }
