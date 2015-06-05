@@ -15,34 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.roles.commands;
+package de.cubeisland.engine.module.roles.commands.provider;
 
-import org.spongepowered.api.service.permission.context.Context;
+import de.cubeisland.engine.butler.CommandInvocation;
+import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
+import org.spongepowered.api.util.Tristate;
 
-public class ContextualRole
+public class DefaultPermissionValueProvider implements DefaultValue<Tristate>
 {
-    public String contextType;
-    public String contextName;
-    public String roleName;
-
-    private Context context;
-    private String identifier;
-
-    public String getIdentifier()
+    @Override
+    public Tristate getDefault(CommandInvocation invocation)
     {
-        if (identifier == null)
-        {
-            identifier = "role:" + contextType + (contextName.isEmpty() ? "" : "|" + contextName) + "|" + roleName;
-        }
-        return identifier;
-    }
-
-    public Context getContext()
-    {
-        if (context == null)
-        {
-            context = new Context(contextType, contextName);
-        }
-        return context;
+        return Tristate.TRUE;
     }
 }

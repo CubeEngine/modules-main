@@ -47,9 +47,9 @@ public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
         super(service.getGroupSubjects(), manager);
         this.module = module;
         this.context = context;
-        this.contexts = context == null ? GLOBAL_CONTEXT : singleton(context);
+        this.contexts = "global".equals(context.getType()) ? GLOBAL_CONTEXT : singleton(context);
         this.data = new RoleSubjectData(service, config, context);
-        this.roleName = "role:" + (context == null ? "global" + SEPARATOR : context.getKey() + SEPARATOR + context.getValue() + SEPARATOR) + config.roleName;
+        this.roleName = "role:" + context.getKey() + SEPARATOR +  (context.getName().isEmpty() ? "" : context.getName() + SEPARATOR) + config.roleName;
     }
 
     @Override

@@ -156,7 +156,7 @@ public class RoleCollection extends BaseSubjectCollection
             RoleConfig config = reflector.create(RoleConfig.class);
             config.roleName = name;
             config.setFile(path.resolve(name + ".yml").toFile());
-            roleSubject = new RoleSubject(module, service, config, "global".equals(ctxType) ? null : new Context(ctxType, ctxName), manager);
+            roleSubject = new RoleSubject(module, service, config, new Context(ctxType, ctxName), manager);
 
             subjects.put(identifier, roleSubject);
         }

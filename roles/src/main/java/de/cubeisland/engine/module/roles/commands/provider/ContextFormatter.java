@@ -15,23 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.roles;
+package de.cubeisland.engine.module.roles.commands.provider;
 
 import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
 import de.cubeisland.engine.messagecompositor.macro.MacroContext;
-import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import org.spongepowered.api.service.permission.context.Context;
 
-public class RoleFormatter extends AbstractFormatter<RoleSubject>
+public class ContextFormatter extends AbstractFormatter<Context>
 {
-    public RoleFormatter()
+    public ContextFormatter()
     {
-        super(toSet("role"));
+        super(toSet("context"));
     }
 
     @Override
-    public String process(RoleSubject object, MacroContext context)
+    public String process(Context object, MacroContext context)
     {
-        return object.getName();
+        return object.getValue().isEmpty() ? object.getKey() : object.getKey() + "|" + object.getValue();
     }
 }

@@ -20,6 +20,7 @@ package de.cubeisland.engine.module.roles.commands;
 import java.util.Set;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Complete;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
@@ -28,6 +29,8 @@ import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.module.roles.Roles;
+import de.cubeisland.engine.module.roles.commands.provider.ContextualRole;
+import de.cubeisland.engine.module.roles.commands.provider.PermissionCompleter;
 import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.PriorityConverter;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
@@ -55,7 +58,7 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias("setrperm")
     @Command(alias = "setperm", desc = "Sets the permission for given role")
-    public void setpermission(CommandContext cContext, ContextualRole role, String permission, @Default Tristate type)
+    public void setpermission(CommandContext cContext, ContextualRole role, @Complete(PermissionCompleter.class) String permission, @Default Tristate type)
     {
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
         r.getSubjectData().setPermission(toSet(role.getContext()), permission, type);

@@ -15,19 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.roles;
+package de.cubeisland.engine.module.roles.commands.provider;
 
 import java.util.List;
-import java.util.stream.Collectors;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.completer.Completer;
 import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
-import de.cubeisland.engine.butler.parameter.reader.DefaultProvider;
 import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
-import de.cubeisland.engine.butler.parametric.Reader;
-import de.cubeisland.engine.module.roles.commands.ContextualRole;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.world.WorldManager;

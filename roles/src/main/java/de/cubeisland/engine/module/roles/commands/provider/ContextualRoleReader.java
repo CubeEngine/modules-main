@@ -15,20 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.roles;
+package de.cubeisland.engine.module.roles.commands.provider;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.completer.Completer;
 import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
-import de.cubeisland.engine.module.roles.commands.ContextualRole;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
-import de.cubeisland.engine.module.roles.sponge.collection.RoleCollection;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
-import de.cubeisland.engine.module.service.command.sender.WrappedCommandSender;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.world.WorldManager;
 import org.spongepowered.api.service.permission.Subject;
@@ -112,7 +108,8 @@ public class ContextualRoleReader implements ArgumentReader<ContextualRole>, Com
             {
                 if (((RoleSubject)subject).getName().startsWith(token))
                 {
-                    if (context.equals(subject.getActiveContexts().iterator().next()))
+                    if (!subject.getActiveContexts().isEmpty() && context.equals(
+                        subject.getActiveContexts().iterator().next()))
                     {
                         result.add(((RoleSubject)subject).getName());
                     }

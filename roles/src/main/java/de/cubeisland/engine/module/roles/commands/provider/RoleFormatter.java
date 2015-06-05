@@ -15,17 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.roles;
+package de.cubeisland.engine.module.roles.commands.provider;
 
-import de.cubeisland.engine.butler.CommandInvocation;
-import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
-import org.spongepowered.api.util.Tristate;
+import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
+import de.cubeisland.engine.messagecompositor.macro.MacroContext;
+import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
+import org.spongepowered.api.service.permission.context.Context;
 
-public class DefaultPermissionValueProvider implements DefaultValue<Tristate>
+public class RoleFormatter extends AbstractFormatter<RoleSubject>
 {
-    @Override
-    public Tristate getDefault(CommandInvocation invocation)
+    public RoleFormatter()
     {
-        return Tristate.TRUE;
+        super(toSet("role"));
+    }
+
+    @Override
+    public String process(RoleSubject object, MacroContext context)
+    {
+        return object.getName();
     }
 }

@@ -27,7 +27,13 @@ import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.module.core.filesystem.FileManager;
 import de.cubeisland.engine.module.core.i18n.I18n;
 import de.cubeisland.engine.module.core.sponge.EventManager;
-import de.cubeisland.engine.module.roles.commands.ContextualRole;
+import de.cubeisland.engine.module.roles.commands.provider.ContextFormatter;
+import de.cubeisland.engine.module.roles.commands.provider.ContextReader;
+import de.cubeisland.engine.module.roles.commands.provider.ContextualRole;
+import de.cubeisland.engine.module.roles.commands.provider.ContextualRoleReader;
+import de.cubeisland.engine.module.roles.commands.provider.DefaultPermissionValueProvider;
+import de.cubeisland.engine.module.roles.commands.provider.PermissionCompleter;
+import de.cubeisland.engine.module.roles.commands.provider.RoleFormatter;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.service.command.CommandManager;
 import de.cubeisland.engine.module.roles.commands.ManagementCommands;
@@ -94,6 +100,7 @@ public class Roles extends Module
         cm.getProviderManager().register(this, new ContextReader(service, wm), Context.class);
         cm.getProviderManager().register(this, new ContextualRoleReader(service, wm), ContextualRole.class);
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
+        cm.getProviderManager().register(this, new PermissionCompleter(pm));
 
         RoleCommands cmdRoles = new RoleCommands(this);
         cm.addCommand(cmdRoles);

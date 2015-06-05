@@ -20,16 +20,18 @@ package de.cubeisland.engine.module.roles.commands;
 import java.util.Set;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Complete;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.module.roles.Roles;
+import de.cubeisland.engine.module.roles.commands.provider.ContextualRole;
+import de.cubeisland.engine.module.roles.commands.provider.PermissionCompleter;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.world.WorldManager;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
@@ -141,7 +143,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = "setuperm")
     @Command(alias = "setperm", desc = "Sets a permission for this user [in context]")
-    public void setpermission(CommandContext cContext, @Default User player, String permission, @Default Tristate value, @Named("in") @Default Context context)
+    public void setpermission(CommandContext cContext, @Default User player, @Complete(PermissionCompleter.class) String permission, @Default Tristate value, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         if (value == Tristate.UNDEFINED)

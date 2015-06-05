@@ -22,16 +22,16 @@ import java.util.Map;
 import java.util.Set;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Complete;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.module.roles.Roles;
+import de.cubeisland.engine.module.roles.commands.provider.PermissionCompleter;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.ContainerCommand;
-import de.cubeisland.engine.module.service.permission.PermissionManager;
 import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.world.WorldManager;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
@@ -67,7 +67,7 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "checkuperm")
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in context]")
-    public void checkpermission(CommandContext cContext, @Default User player, String permission, @Named("in") @Default Context context)
+    public void checkpermission(CommandContext cContext, @Default User player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         Tristate value = player.getPlayer().get().getPermissionValue(contexts, permission);

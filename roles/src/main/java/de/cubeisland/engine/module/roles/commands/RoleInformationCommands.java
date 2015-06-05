@@ -23,17 +23,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.parametric.Command;
+import de.cubeisland.engine.butler.parametric.Complete;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.roles.Roles;
+import de.cubeisland.engine.module.roles.commands.provider.ContextualRole;
+import de.cubeisland.engine.module.roles.commands.provider.PermissionCompleter;
 import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.ContainerCommand;
-import de.cubeisland.engine.module.service.world.WorldManager;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
@@ -84,7 +86,7 @@ public class RoleInformationCommands extends ContainerCommand
 
     @Alias(value = "checkrperm")
     @Command(alias = "checkpermission", desc = "Checks the permission in given role")
-    public void checkperm(CommandContext context, ContextualRole role, String permission)
+    public void checkperm(CommandContext context, ContextualRole role, @Complete(PermissionCompleter.class) String permission)
     {
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
         Tristate value = r.getPermissionValue(toSet(role.getContext()), permission);
