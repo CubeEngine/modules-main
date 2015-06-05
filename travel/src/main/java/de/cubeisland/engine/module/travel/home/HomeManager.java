@@ -17,12 +17,17 @@
  */
 package de.cubeisland.engine.module.travel.home;
 
+import com.flowpowered.math.vector.Vector3d;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
 import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.InviteManager;
 import de.cubeisland.engine.module.travel.TelePointManager;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
-import org.bukkit.Location;
+import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.TeleportType.HOME;
@@ -31,9 +36,16 @@ import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visi
 
 public class HomeManager extends TelePointManager<Home>
 {
-    public HomeManager(Travel module, InviteManager iManager)
+    private PermissionManager pm;
+    private WorldManager wm;
+    private UserManager um;
+
+    public HomeManager(Travel module, InviteManager iManager, Database db, PermissionManager pm, WorldManager wm, UserManager um)
     {
-        super(module, iManager);
+        super(module, iManager, db);
+        this.pm = pm;
+        this.wm = wm;
+        this.um = um;
     }
 
     @Override
@@ -41,20 +53,20 @@ public class HomeManager extends TelePointManager<Home>
     {
         for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.TYPE.eq(HOME.value)).fetch())
         {
-            this.addPoint(new Home(teleportPoint, this.module));
+            this.addPoint(new Home(teleportPoint, this.module, pm, wm, um));
         }
         module.getLog().info("{} Homes loaded", this.getCount());
     }
 
     @Override
-    public Home create(User owner, String name, Location location, boolean publicVisibility)
+    public Home create(User owner, String name, Location location, Vector3d rotation, boolean publicVisibility)
     {
         if (this.has(owner, name))
         {
             throw new IllegalArgumentException("Tried to create duplicate home!");
         }
-        TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, name, owner, null, HOME, publicVisibility ? PUBLIC : PRIVATE);
-        Home home = new Home(model, this.module);
+        TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, rotation, wm, name, owner, null, HOME, publicVisibility ? PUBLIC : PRIVATE);
+        Home home = new Home(model, this.module, pm, wm, um);
         model.insertAsync();
         this.addPoint(home);
         return home;

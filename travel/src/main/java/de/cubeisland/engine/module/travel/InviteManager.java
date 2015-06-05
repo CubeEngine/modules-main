@@ -22,8 +22,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import de.cubeisland.engine.module.core.storage.database.Database;
+import de.cubeisland.engine.module.service.database.Database;
 import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.module.travel.storage.TeleportInvite;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 import org.jooq.DSLContext;
@@ -38,9 +39,11 @@ public class InviteManager
     private final DSLContext dsl;
     private final Collection<TeleportInvite> invites;
     private final Map<TeleportPointModel, Set<UInteger>> cachedInvites;
+    private UserManager um;
 
-    public InviteManager(Database database, Travel module)
+    public InviteManager(Database database, Travel module, UserManager um)
     {
+        this.um = um;
         this.dsl = database.getDSL();
         this.module = module;
         this.cachedInvites = new HashMap<>();
@@ -124,7 +127,7 @@ public class InviteManager
         Set<UInteger> invitedUsers = new HashSet<>();
         for (UInteger uid : newInvited)
         {
-            invitedUsers.add(this.module.getCore().getUserManager().getUser(uid).getEntity().getKey());
+            invitedUsers.add(um.getUser(uid).getEntity().getKey());
         }
         for (TeleportInvite invite : invites)
         {

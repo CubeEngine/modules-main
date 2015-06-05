@@ -24,12 +24,16 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import com.flowpowered.math.vector.Vector3d;
+import de.cubeisland.engine.module.core.util.math.Cuboid;
+import de.cubeisland.engine.module.core.util.math.Vector3;
+import de.cubeisland.engine.module.service.database.Database;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
-import org.bukkit.Location;
 import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
@@ -40,9 +44,9 @@ public abstract class TelePointManager<T extends TeleportPoint>
     protected final InviteManager iManager;
     protected final Map<String, Map<String, T>> points = new HashMap<>();
 
-    public TelePointManager(Travel module, InviteManager iManager)
+    public TelePointManager(Travel module, InviteManager iManager, Database db)
     {
-        this.dsl = module.getCore().getDB().getDSL();
+        this.dsl = db.getDSL();
         this.module = module;
         this.iManager = iManager;
     }
@@ -141,7 +145,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
         return this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.OWNER.eq(user.getEntity().getKey())).fetchCount();
     }
 
-    public abstract T create(User owner, String name, Location location, boolean publicVisibility);
+    public abstract T create(User owner, String name, Location location, Vector3d rotation, boolean publicVisibility);
 
     public void delete(T point)
     {
@@ -268,9 +272,12 @@ public abstract class TelePointManager<T extends TeleportPoint>
     public void massDelete(User user, boolean priv, boolean pub, Location firstPoint, Location secondPoint)
     {
         Set<T> points = (user == null) ? this.list(priv, pub) : this.list(user, true, false, false);
+        Cuboid cuboid = new Cuboid(new Vector3(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ()), new Vector3(
+            secondPoint.getX(), secondPoint.getY(), secondPoint.getZ()));
         for (T point : points)
         {
-            if (point.getLocation().getWorld().equals(firstPoint.getWorld()) && point.getLocation().toVector().isInAABB(firstPoint.toVector(), secondPoint.toVector()))
+            Vector3d chp = point.getLocation().getPosition();
+            if (point.getLocation().getExtent().equals(firstPoint.getExtent()) && cuboid.contains(new Vector3(chp.getX(), chp.getY(), chp.getZ())))
             {
                 if (priv && !point.isPublic())
                 {

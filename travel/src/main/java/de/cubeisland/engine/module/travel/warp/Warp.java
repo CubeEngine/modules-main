@@ -20,6 +20,9 @@ package de.cubeisland.engine.module.travel.warp;
 import java.util.Locale;
 import de.cubeisland.engine.module.service.permission.PermDefault;
 import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.TeleportPoint;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
@@ -30,9 +33,12 @@ import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visi
 
 public class Warp extends TeleportPoint
 {
-    public Warp(TeleportPointModel teleportPoint, Travel module)
+    private PermissionManager pm;
+
+    public Warp(TeleportPointModel teleportPoint, Travel module, PermissionManager pm, WorldManager wm, UserManager um)
     {
-        super(teleportPoint, module);
+        super(teleportPoint, module, wm, um);
+        this.pm = pm;
         if (teleportPoint.getValue(TABLE_TP_POINT.VISIBILITY) == PUBLIC.value)
         {
             this.permission = generatePublicPerm();
@@ -51,15 +57,15 @@ public class Warp extends TeleportPoint
             this.iManager.removeInvites(this);
             return;
         }
-        module.getCore().getPermissionManager().removePermission(this.module, permission);
+        pm.removePermission(this.module, permission);
         this.permission = null;
     }
 
     @Override
     protected Permission generatePublicPerm()
     {
-        Permission perm =  module.getBasePermission().childWildcard("warps").childWildcard("access").child(this.getName().toLowerCase(Locale.ENGLISH), PermDefault.TRUE);
-        module.getCore().getPermissionManager().registerPermission(module, perm);
+        Permission perm =  module.getProvided(Permission.class).childWildcard("warps").childWildcard("access").child(this.getName().toLowerCase(Locale.ENGLISH), PermDefault.TRUE);
+        pm.registerPermission(module, perm);
         return perm;
     }
 }

@@ -18,65 +18,65 @@
 package de.cubeisland.engine.module.travel.home;
 
 import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.Travel;
-import org.bukkit.Material;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.entity.EntityInteractionTypes;
+import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
 
-import static org.bukkit.Material.BED;
-import static org.bukkit.Material.BED_BLOCK;
-import static org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static org.spongepowered.api.event.Order.EARLY;
 
-public class HomeListener implements Listener
+public class HomeListener
 {
     private final Travel module;
+    private UserManager um;
+    private WorldManager wm;
     private final HomeManager homeManager;
 
-    public HomeListener(Travel module)
+    public HomeListener(Travel module, UserManager um, WorldManager wm)
     {
         this.module = module;
+        this.um = um;
+        this.wm = wm;
         this.homeManager = module.getHomeManager();
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void rightClickBed(PlayerInteractEvent event)
+    @Subscribe(order = EARLY)
+    public void rightClickBed(PlayerInteractBlockEvent event)
     {
-        if (event.getAction() != RIGHT_CLICK_BLOCK)
+        if (event.getInteractionType() != EntityInteractionTypes.USE || event.getBlock().getType() != BlockTypes.BED)
         {
             return;
         }
-        Material block = event.getClickedBlock().getType();
-        if (block == BED_BLOCK || block == BED)
+        User user = um.getExactUser(event.getUser().getUniqueId());
+        if (user.isSneaking())
         {
-            User user = module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
-            if (user.isSneaking())
+            if (homeManager.has(user, "home"))
             {
-                if (homeManager.has(user, "home"))
+                Home home = homeManager.findOne(user, "home");
+                if (user.getLocation().equals(home.getLocation()))
                 {
-                    Home home = homeManager.findOne(user, "home");
-                    if (user.getLocation().equals(home.getLocation()))
-                    {
-                        return;
-                    }
-                    home.setLocation(user.getLocation());
-                    home.update();
-                    user.sendTranslated(POSITIVE, "Your home has been set!");
+                    return;
                 }
-                else
-                {
-                    if (this.homeManager.getCount(user) == this.module.getConfig().homes.max)
-                    {
-                        user.sendTranslated(CRITICAL, "You have reached your maximum number of homes!");
-                        user.sendTranslated(NEGATIVE, "You have to delete a home to make a new one");
-                        return;
-                    }
-                    homeManager.create(user, "home", user.getLocation(), false);
-                    user.sendTranslated(POSITIVE, "Your home has been created!");
-                }
-                event.setCancelled(true);
+                home.setLocation(user.getLocation(), user.getRotation(), wm);
+                home.update();
+                user.sendTranslated(POSITIVE, "Your home has been set!");
             }
+            else
+            {
+                if (this.homeManager.getCount(user) == this.module.getConfig().homes.max)
+                {
+                    user.sendTranslated(CRITICAL, "You have reached your maximum number of homes!");
+                    user.sendTranslated(NEGATIVE, "You have to delete a home to make a new one");
+                    return;
+                }
+                homeManager.create(user, "home", user.getLocation(), user.getRotation(), false);
+                user.sendTranslated(POSITIVE, "Your home has been created!");
+            }
+            event.setCancelled(true);
         }
     }
 }

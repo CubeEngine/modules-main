@@ -18,10 +18,22 @@
 package de.cubeisland.engine.module.travel;
 
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.modularity.asm.marker.Enable;
+import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
+import de.cubeisland.engine.modularity.core.Maybe;
+import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.module.core.filesystem.FileManager;
+import de.cubeisland.engine.module.core.i18n.I18n;
+import de.cubeisland.engine.module.core.sponge.EventManager;
+import de.cubeisland.engine.module.service.Selector;
 import de.cubeisland.engine.module.service.command.CommandManager;
-import de.cubeisland.engine.module.core.module.Module;
-import de.cubeisland.engine.module.core.storage.database.Database;
 import de.cubeisland.engine.module.core.util.Profiler;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.home.HomeCommand;
 import de.cubeisland.engine.module.travel.home.HomeListener;
 import de.cubeisland.engine.module.travel.home.HomeManager;
@@ -30,6 +42,7 @@ import de.cubeisland.engine.module.travel.storage.TableTeleportPoint;
 import de.cubeisland.engine.module.travel.warp.WarpCommand;
 import de.cubeisland.engine.module.travel.warp.WarpManager;
 
+@ModuleInfo(name = "Travel", description = "Travel anywhere")
 public class Travel extends Module
 {
     private TravelConfig config;
@@ -40,30 +53,39 @@ public class Travel extends Module
 
     private TravelPerm permissions;
 
-    @Override
+    @Inject private FileManager fm;
+    @Inject private Database db;
+    @Inject private Log logger;
+    @Inject private UserManager um;
+    @Inject private CommandManager cm;
+    @Inject private EventManager em;
+    @Inject private PermissionManager pm;
+    @Inject private WorldManager wm;
+    @Inject private Maybe<Selector> selector;
+    @Inject private I18n i18n;
+
+    @Enable
     public void onEnable()
     {
 
-        this.config = this.loadConfig(TravelConfig.class);
-        Database db = this.getCore().getDB();
+        this.config = fm.loadConfig(this, TravelConfig.class);
         db.registerTable(TableTeleportPoint.class);
         db.registerTable(TableInvite.class);
 
         Profiler.startProfiling("travelEnable");
-        this.getLog().trace("Loading TeleportPoints...");
-        this.inviteManager = new InviteManager(db, this);
-        this.homeManager = new HomeManager(this, this.inviteManager);
+        logger.trace("Loading TeleportPoints...");
+        this.inviteManager = new InviteManager(db, this, um);
+        this.homeManager = new HomeManager(this, this.inviteManager, db, pm, wm, um);
         this.homeManager.load();
-        this.warpManager = new WarpManager(this, this.inviteManager);
+        this.warpManager = new WarpManager(this, this.inviteManager, db, pm, wm, um);
         this.warpManager.load();
-        this.getLog().trace("Loaded TeleportPoints in {} ms", Profiler.endProfiling("travelEnable",TimeUnit.MILLISECONDS));
+        logger.trace("Loaded TeleportPoints in {} ms", Profiler.endProfiling("travelEnable", TimeUnit.MILLISECONDS));
 
-        final CommandManager cm = this.getCore().getCommandManager();
-        HomeCommand homeCmd = new HomeCommand(this);
+        HomeCommand homeCmd = new HomeCommand(this, selector, i18n, um, wm);
         cm.addCommand(homeCmd);
-        WarpCommand warpCmd = new WarpCommand(this);
+        WarpCommand warpCmd = new WarpCommand(this, um, wm);
         cm.addCommand(warpCmd);
-        this.getCore().getEventManager().registerListener(this, new HomeListener(this));
+        em.registerListener(this, new HomeListener(this, um, wm));
 
         this.permissions = new TravelPerm(this, homeCmd, warpCmd);
     }
@@ -91,5 +113,10 @@ public class Travel extends Module
     public TravelPerm getPermissions()
     {
         return permissions;
+    }
+
+    public Log getLog()
+    {
+        return logger;
     }
 }

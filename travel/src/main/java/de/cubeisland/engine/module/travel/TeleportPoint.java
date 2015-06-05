@@ -18,13 +18,16 @@
 package de.cubeisland.engine.module.travel;
 
 import java.util.Set;
+import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.permission.Permission;
 import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
-import org.bukkit.Location;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
@@ -32,6 +35,8 @@ import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visi
 public abstract class TeleportPoint
 {
     protected final TeleportPointModel model;
+    private WorldManager wm;
+    private UserManager um;
     protected final Travel module;
     protected final InviteManager iManager;
 
@@ -40,9 +45,11 @@ public abstract class TeleportPoint
 
     protected String ownerName = null;
 
-    public TeleportPoint(TeleportPointModel model, Travel module)
+    public TeleportPoint(TeleportPointModel model, Travel module, WorldManager wm, UserManager um)
     {
         this.model = model;
+        this.wm = wm;
+        this.um = um;
         this.iManager = module.getInviteManager();
         this.module = module;
     }
@@ -54,23 +61,23 @@ public abstract class TeleportPoint
 
     public Location getLocation()
     {
-        Location location = model.getLocation();
-        if (location.getWorld() == null)
+        Location location = model.getLocation(wm);
+        if (location.getExtent() == null)
         {
-            this.module.getLog().warn("Tried to get location from TeleportPoint in deleted world!");
+            module.getLog().warn("Tried to get location from TeleportPoint in deleted world!");
             return null;
         }
         return location;
     }
 
-    public void setLocation(Location location)
+    public void setLocation(Location location, Vector3d rotation, WorldManager wm)
     {
-        model.setLocation(location);
+        model.setLocation(location, rotation, wm);
     }
 
     public User getOwner()
     {
-        return this.module.getCore().getUserManager().getUser(model.getValue(TABLE_TP_POINT.OWNER));
+        return um.getUser(model.getValue(TABLE_TP_POINT.OWNER));
     }
 
     public void setOwner(User owner)
@@ -140,7 +147,7 @@ public abstract class TeleportPoint
     {
         if (this.ownerName == null)
         {
-            this.ownerName = this.module.getCore().getUserManager().getUserName(model.getValue(TABLE_TP_POINT.OWNER));
+            this.ownerName = um.getUserName(model.getValue(TABLE_TP_POINT.OWNER));
         }
         return this.ownerName;
     }

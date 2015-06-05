@@ -29,40 +29,54 @@ import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.result.CommandResult;
+import de.cubeisland.engine.modularity.core.Maybe;
+import de.cubeisland.engine.module.core.i18n.I18n;
+import de.cubeisland.engine.module.core.util.ChatFormat;
+import de.cubeisland.engine.module.core.util.formatter.MessageType;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.command.annotation.ParameterPermission;
 import de.cubeisland.engine.module.service.command.exception.PermissionDeniedException;
-import de.cubeisland.engine.module.service.command.result.confirm.ConfirmResult;
 import de.cubeisland.engine.module.service.command.sender.ConsoleCommandSender;
 import de.cubeisland.engine.module.service.Selector;
+import de.cubeisland.engine.module.service.confirm.ConfirmResult;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.core.util.math.Cuboid;
 import de.cubeisland.engine.module.core.util.math.shape.Shape;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.TpPointCommand;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportInvite;
-import org.bukkit.Location;
+import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import de.cubeisland.engine.module.core.util.ChatFormat.DARK_GREEN;
-import de.cubeisland.engine.module.core.util.ChatFormat.YELLOW;
+import static de.cubeisland.engine.module.core.util.ChatFormat.DARK_GREEN;
+import static de.cubeisland.engine.module.core.util.ChatFormat.YELLOW;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PRIVATE;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 import static java.util.stream.Collectors.toSet;
-import static org.bukkit.event.player.PlayerTeleportEvent.TeleportCause.COMMAND;
 
 @Command(name = "home", desc = "Teleport to your home")
 public class HomeCommand extends TpPointCommand
 {
     private final HomeManager manager;
     private final Travel module;
+    private Maybe<Selector> selector;
+    private I18n i18n;
+    private UserManager um;
+    private WorldManager wm;
 
-    public HomeCommand(Travel module)
+    public HomeCommand(Travel module, Maybe<Selector> selector, I18n i18n, UserManager um, WorldManager wm)
     {
         super(module);
         this.module = module;
+        this.selector = selector;
+        this.i18n = i18n;
+        this.um = um;
+        this.wm = wm;
         this.manager = module.getHomeManager();
     }
 
@@ -106,7 +120,7 @@ public class HomeCommand extends TpPointCommand
             homeInDeletedWorldMessage(sender, h);
             return;
         }
-        if (!sender.teleport(location, COMMAND))
+        if (!sender.teleport(location))
         {
             sender.sendTranslated(CRITICAL, "The teleportation got aborted!");
             return;
@@ -148,7 +162,7 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "The home already exists! You can move it with {text:/home move}");
             return;
         }
-        Home home = this.manager.create(sender, name, sender.getLocation(), isPublic);
+        Home home = this.manager.create(sender, name, sender.getLocation(), sender.getRotation(), isPublic);
         context.sendTranslated(POSITIVE, "Your home {name} has been created!", home.getName());
     }
 
@@ -205,7 +219,7 @@ public class HomeCommand extends TpPointCommand
                 throw new PermissionDeniedException(module.getPermissions().HOME_MOVE_OTHER);
             }
         }
-        home.setLocation(sender.getLocation());
+        home.setLocation(sender.getLocation(), sender.getRotation(), wm);
         home.update();
         if (home.isOwnedBy(sender))
         {
@@ -355,8 +369,7 @@ public class HomeCommand extends TpPointCommand
                 sender.sendMessage(YELLOW + "  " + home.getName() + ":");
                 for (TeleportInvite invite : invites)
                 {
-                    sender.sendMessage("    " + DARK_GREEN + this.module.getCore().getUserManager().getUser(
-                        invite.getValue(TABLE_INVITE.USERKEY)).getDisplayName());
+                    sender.sendMessage("    " + DARK_GREEN + um.getUser(invite.getValue(TABLE_INVITE.USERKEY)).getDisplayName());
                 }
             }
         }
@@ -503,19 +516,19 @@ public class HomeCommand extends TpPointCommand
         String type = "";
         if (isPublic)
         {
-            type = module.getCore().getI18n().translate(sender.getSource().getLocale(), "public");
+            type = i18n.translate(sender.getSource().getLocale(), "public");
             type += " ";
         }
         else if (isPrivate)
         {
-            type = module.getCore().getI18n().translate(sender.getSource().getLocale(), "private");
+            type = i18n.translate(sender.getSource().getLocale(), "private");
             type += " ";
         }
         final Location firstPoint;
         final Location secondPoint;
         if (selection)
         {
-            if (!module.getCore().getModuleManager().getServiceManager().isImplemented(Selector.class))
+            if (selector.isAvailable())
             {
                 sender.sendTranslated(NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
                 return null;
@@ -525,7 +538,7 @@ public class HomeCommand extends TpPointCommand
                 sender.sendTranslated(NEGATIVE, "You have to be in game to use the selection flag");
                 return null;
             }
-            Selector selector = module.getCore().getModuleManager().getServiceManager().getServiceImplementation(Selector.class);
+            Selector selector = this.selector.value();
             Shape shape = selector.getSelection((User)sender.getSource());
             if (!(shape instanceof Cuboid))
             {

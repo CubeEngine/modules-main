@@ -17,12 +17,17 @@
  */
 package de.cubeisland.engine.module.travel.warp;
 
+import com.flowpowered.math.vector.Vector3d;
+import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.permission.PermissionManager;
 import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.InviteManager;
 import de.cubeisland.engine.module.travel.TelePointManager;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
-import org.bukkit.Location;
+import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.TeleportType.WARP;
@@ -31,9 +36,16 @@ import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visi
 
 public class WarpManager extends TelePointManager<Warp>
 {
-    public WarpManager(Travel module, InviteManager iManager)
+    private PermissionManager pm;
+    private WorldManager wm;
+    private UserManager um;
+
+    public WarpManager(Travel module, InviteManager iManager, Database db, PermissionManager pm, WorldManager wm, UserManager um)
     {
-        super(module, iManager);
+        super(module, iManager, db);
+        this.pm = pm;
+        this.wm = wm;
+        this.um = um;
     }
 
     @Override
@@ -41,20 +53,20 @@ public class WarpManager extends TelePointManager<Warp>
     {
         for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.TYPE.eq(WARP.value)).fetch())
         {
-            this.addPoint(new Warp(teleportPoint, this.module));
+            this.addPoint(new Warp(teleportPoint, this.module, pm, wm, um));
         }
         module.getLog().info("{} Homes loaded", this.getCount());
     }
 
     @Override
-    public Warp create(User owner, String name, Location location, boolean publicVisibility)
+    public Warp create(User owner, String name, Location location, Vector3d rotation, boolean publicVisibility)
     {
         if (this.has(owner, name))
         {
             throw new IllegalArgumentException("Tried to create duplicate warp!");
         }
-        TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, name, owner, null, WARP, publicVisibility ? PUBLIC : PRIVATE);
-        Warp warp = new Warp(model, this.module);
+        TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, rotation, wm, name, owner, null, WARP, publicVisibility ? PUBLIC : PRIVATE);
+        Warp warp = new Warp(model, this.module, pm, wm, um);
         model.insertAsync();
         this.addPoint(warp);
         return warp;

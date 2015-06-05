@@ -22,7 +22,7 @@ import de.cubeisland.engine.module.service.permission.PermissionContainer;
 import de.cubeisland.engine.module.travel.home.HomeCommand;
 import de.cubeisland.engine.module.travel.warp.WarpCommand;
 
-import de.cubeisland.engine.module.service.permission.PermDefault.TRUE;
+import static de.cubeisland.engine.module.service.permission.PermDefault.TRUE;
 
 public class TravelPerm extends PermissionContainer<Travel>
 {
