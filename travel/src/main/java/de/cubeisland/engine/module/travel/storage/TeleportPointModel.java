@@ -75,9 +75,10 @@ public class TeleportPointModel extends AsyncRecord<TeleportPointModel>
         this.setValue(TABLE_TP_POINT.X, location.getX());
         this.setValue(TABLE_TP_POINT.Y, location.getY());
         this.setValue(TABLE_TP_POINT.Z, location.getZ());
+
         // TODO rotation
-        // TODO this.setValue(TABLE_TP_POINT.YAW, (double)rotation.getYaw());
-        // TODO this.setValue(TABLE_TP_POINT.PITCH, (double)location.getPitch());
+        this.setValue(TABLE_TP_POINT.YAW, 0d);
+        this.setValue(TABLE_TP_POINT.PITCH, 0d);
     }
 
     public enum TeleportType

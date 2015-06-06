@@ -20,6 +20,7 @@ package de.cubeisland.engine.module.travel;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.modularity.asm.marker.Disable;
 import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Maybe;
@@ -88,6 +89,14 @@ public class Travel extends Module
         em.registerListener(this, new HomeListener(this, um, wm));
 
         this.permissions = new TravelPerm(this, homeCmd, warpCmd);
+    }
+
+    @Disable
+    public void onDisable()
+    {
+        cm.removeCommands(this);
+        em.removeListeners(this);
+        pm.removePermissions(this);
     }
 
     public TravelConfig getConfig()

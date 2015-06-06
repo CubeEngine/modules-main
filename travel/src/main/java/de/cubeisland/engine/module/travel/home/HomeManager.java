@@ -67,10 +67,14 @@ public class HomeManager extends TelePointManager<Home>
         }
         TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, rotation, wm, name, owner, null, HOME, publicVisibility ? PUBLIC : PRIVATE);
         Home home = new Home(model, this.module, pm, wm, um);
-        model.insertAsync();
+        model.insertAsync().exceptionally(this::handle);
         this.addPoint(home);
         return home;
     }
 
-
+    private Integer handle(Throwable throwable)
+    {
+        module.getLog().error(throwable, "Could not store Home");
+        return 0;
+    }
 }

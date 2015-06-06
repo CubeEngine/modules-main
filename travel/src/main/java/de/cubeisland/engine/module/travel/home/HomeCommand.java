@@ -234,10 +234,11 @@ public class HomeCommand extends TpPointCommand
     @Command(alias = {"delete", "rem", "del"}, desc = "Remove a home")
     public void remove(CommandSender sender, @Optional String name, @Default @Optional User owner)
     {
-        Home home = this.manager.getExact(owner, name == null ? "home" : name);
+        name = name == null ? "home" : name;
+        Home home = this.manager.getExact(owner, name);
         if (home == null)
         {
-            homeNotFoundMessage(sender, owner, name == null ? "home" : name);
+            homeNotFoundMessage(sender, owner, name);
             return;
         }
         if (!home.isOwnedBy(sender) && !module.getPermissions().HOME_REMOVE_OTHER.isAuthorized(sender))
@@ -315,7 +316,7 @@ public class HomeCommand extends TpPointCommand
         }
         else
         {
-            sender.sendTranslated(NEUTRAL, "The following homes are available to {user}:", owner.getDisplayName());
+            sender.sendTranslated(NEUTRAL, "The following homes are available to {user}:", owner);
         }
         showList(sender.getSource(), owner, homes);
     }
