@@ -21,28 +21,32 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
-import de.cubeisland.engine.module.service.command.CommandSender;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.module.core.util.Triplet;
+import de.cubeisland.engine.module.core.util.matcher.StringMatcher;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.storage.Lock;
 import de.cubeisland.engine.module.locker.storage.LockManager;
 import de.cubeisland.engine.module.locker.storage.LockType;
 import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
-import org.bukkit.Location;
-import org.bukkit.entity.HumanEntity;
-import org.bukkit.event.Cancellable;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.InventoryHolder;
+import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.module.service.user.UserManager;
+import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.data.manipulator.entity.SneakingData;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityInteractionTypes;
+import org.spongepowered.api.entity.living.Human;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerInteractEvent;
+import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
+import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
+import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.Container;
+import org.spongepowered.api.world.Location;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
 import static de.cubeisland.engine.module.locker.storage.LockType.*;
 
@@ -53,11 +57,17 @@ public class CommandListener
 
     private final Locker module;
     private final LockManager manager;
+    private UserManager um;
+    private Log logger;
+    private StringMatcher stringMatcher;
 
-    public CommandListener(Locker module, LockManager manager)
+    public CommandListener(Locker module, LockManager manager, UserManager um, Log logger, StringMatcher stringMatcher)
     {
         this.module = module;
         this.manager = manager;
+        this.um = um;
+        this.logger = logger;
+        this.stringMatcher = stringMatcher;
     }
 
     public void setCommandType(CommandSender sender, CommandType commandType, String s, boolean b)
@@ -72,8 +82,8 @@ public class CommandListener
 
     private void setCommandType0(CommandSender sender, CommandType commandType, String s, boolean b)
     {
-        map.put((sender).getUniqueId(), new Triplet<>(commandType, s, b));
-        if (this.doesPersist((sender).getUniqueId()))
+        map.put(sender.getUniqueId(), new Triplet<>(commandType, s, b));
+        if (this.doesPersist(sender.getUniqueId()))
         {
             sender.sendTranslated(NEUTRAL, "Persist mode is active. Your command will be repeated until reusing {text:/cpersist}");
         }
@@ -104,52 +114,49 @@ public class CommandListener
     }
 
     @Subscribe
-    public void onRightClickBlock(PlayerInteractEvent event)
+    public void onRightClickBlock(PlayerInteractBlockEvent event)
     {
-        if (event.getAction() == Action.PHYSICAL
-            || event.getAction() == Action.LEFT_CLICK_AIR
-            || event.getAction() == Action.RIGHT_CLICK_AIR
-            || event.getPlayer().isSneaking())
+        if (event.getInteractionType() != EntityInteractionTypes.USE
+            || event.getUser().getData(SneakingData.class).isPresent()
+            || !map.keySet().contains(event.getUser().getUniqueId()))
         {
             return;
         }
-        if (!map.keySet().contains(event.getPlayer().getUniqueId())) return;
-        if (event.getClickedBlock() != null)
-        {
-            User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
-            Location location = event.getClickedBlock().getLocation();
-            Triplet<CommandType, String, Boolean> triplet = map.get(user.getUniqueId());
-            Lock lock = this.manager.getLockAtLocation(location, user, triplet.getFirst() != INFO);
-            if (this.handleInteract1(triplet, lock, user, location.getBlock().getState() instanceof InventoryHolder,
-                     this.manager.canProtect(event.getClickedBlock().getType()), event))
-            {
-                return;
-            }
+        User user = um.getExactUser(event.getUser().getUniqueId());
+        Location location = event.getBlock();
+        Triplet<CommandType, String, Boolean> triplet = map.get(user.getUniqueId());
+        Lock lock = this.manager.getLockAtLocation(location, user, triplet.getFirst() != INFO);
 
-            switch (triplet.getFirst())
-            {
-            case C_PRIVATE:
-                this.manager.createLock(event.getClickedBlock().getType(), location, user, C_PRIVATE.lockType, triplet.getSecond(), triplet.getThird());
-                break;
-            case C_PUBLIC:
-                this.manager.createLock(event.getClickedBlock().getType(), location, user, C_PUBLIC.lockType, triplet.getSecond(), false);
-                break;
-            case C_DONATION:
-                this.manager.createLock(event.getClickedBlock().getType(), location, user, C_DONATION.lockType, triplet.getSecond(), triplet.getThird());
-                break;
-            case C_FREE:
-                this.manager.createLock(event.getClickedBlock().getType(), location, user, C_FREE.lockType, triplet.getSecond(), triplet.getThird());
-                break;
-            case C_GUARDED:
-                this.manager.createLock(event.getClickedBlock().getType(), location, user, C_GUARDED.lockType, triplet.getSecond(), triplet.getThird());
-                break;
-            default:
-                this.handleInteract2(triplet.getFirst(), lock, user, triplet.getSecond(), triplet.getThird(), location,
-                     event.getClickedBlock().getState() instanceof InventoryHolder ? (InventoryHolder)event.getClickedBlock().getState() : null);
-            }
-            this.cmdUsed(user);
-            event.setCancelled(true);
+        TileEntity te = location.getTileEntity().orNull();
+        if (this.handleInteract1(triplet, lock, user, te instanceof Carrier,
+                 this.manager.canProtect(event.getBlock().getType()), event))
+        {
+            return;
         }
+
+        switch (triplet.getFirst())
+        {
+        case C_PRIVATE:
+            this.manager.createLock(event.getBlock().getType(), location, user, C_PRIVATE.lockType, triplet.getSecond(), triplet.getThird());
+            break;
+        case C_PUBLIC:
+            this.manager.createLock(event.getBlock().getType(), location, user, C_PUBLIC.lockType, triplet.getSecond(), false);
+            break;
+        case C_DONATION:
+            this.manager.createLock(event.getBlock().getType(), location, user, C_DONATION.lockType, triplet.getSecond(), triplet.getThird());
+            break;
+        case C_FREE:
+            this.manager.createLock(event.getBlock().getType(), location, user, C_FREE.lockType, triplet.getSecond(), triplet.getThird());
+            break;
+        case C_GUARDED:
+            this.manager.createLock(event.getBlock().getType(), location, user, C_GUARDED.lockType, triplet.getSecond(), triplet.getThird());
+            break;
+        default:
+            this.handleInteract2(triplet.getFirst(), lock, user, triplet.getSecond(), triplet.getThird(), location,
+                 te instanceof TileEntityCarrier ? ((TileEntityCarrier)te) : null);
+        }
+        this.cmdUsed(user);
+        event.setCancelled(true);
     }
 
     private void cmdUsed(User user)
@@ -209,60 +216,64 @@ public class CommandListener
         return false;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @Subscribe
     public void onRightClickEntity(PlayerInteractEntityEvent event)
     {
-        if (event.getPlayer().isSneaking()) return;
-        if (!map.keySet().contains(event.getPlayer().getUniqueId())) return;
-        User user = this.module.getCore().getUserManager().getExactUser(event.getPlayer().getUniqueId());
+        if (event.getInteractionType() != EntityInteractionTypes.USE
+            || event.getUser().getData(SneakingData.class).isPresent()
+            || !map.keySet().contains(event.getUser().getUniqueId()))
+        {
+            return;
+        }
+        User user = um.getExactUser(event.getUser().getUniqueId());
         try
         {
-            Location location = event.getRightClicked().getLocation();
+            Entity target = event.getTargetEntity();
+            Location location = target.getLocation();
             Triplet<CommandType, String, Boolean> triplet = map.get(user.getUniqueId());
-            Lock lock = this.manager.getLockForEntityUID(event.getRightClicked().getUniqueId(), triplet.getFirst() != INFO);
-            if (this.handleInteract1(triplet, lock, user, event.getRightClicked() instanceof InventoryHolder,
-                                     this.manager.canProtect(event.getRightClicked().getType()), event))
+            Lock lock = this.manager.getLockForEntityUID(target.getUniqueId(), triplet.getFirst() != INFO);
+            if (this.handleInteract1(triplet, lock, user, target instanceof Carrier,
+                                     this.manager.canProtect(target.getType()), event))
             {
                 return;
             }
             switch (triplet.getFirst())
             {
             case C_PRIVATE:
-                this.manager.createLock(event.getRightClicked(), user, C_PRIVATE.lockType, triplet.getSecond(), triplet
+                this.manager.createLock(target, user, C_PRIVATE.lockType, triplet.getSecond(), triplet
                     .getThird());
                 break;
             case C_PUBLIC:
-                this.manager.createLock(event.getRightClicked(), user, C_PUBLIC.lockType, triplet.getSecond(), triplet
+                this.manager.createLock(target, user, C_PUBLIC.lockType, triplet.getSecond(), triplet
                     .getThird());
                 break;
             case C_DONATION:
-                this.manager.createLock(event.getRightClicked(), user, C_DONATION.lockType, triplet.getSecond(), triplet
+                this.manager.createLock(target, user, C_DONATION.lockType, triplet.getSecond(), triplet
                     .getThird());
                 break;
             case C_FREE:
-                this.manager.createLock(event.getRightClicked(), user, C_FREE.lockType, triplet.getSecond(), triplet
+                this.manager.createLock(target, user, C_FREE.lockType, triplet.getSecond(), triplet
                     .getThird());
                 break;
             case C_GUARDED:
-                this.manager.createLock(event.getRightClicked(), user, C_GUARDED.lockType, triplet.getSecond(), triplet
+                this.manager.createLock(target, user, C_GUARDED.lockType, triplet.getSecond(), triplet
                     .getThird());
                 break;
             default:
-                this.handleInteract2(triplet.getFirst(), lock, user, triplet.getSecond(), triplet.getThird(), location,
-                                     event.getRightClicked() instanceof InventoryHolder ? (InventoryHolder)event.getRightClicked() : null);
+                this.handleInteract2(triplet.getFirst(), lock, user, triplet.getSecond(), triplet.getThird(), location, target instanceof Carrier ? ((Carrier)target) : null);
             }
             this.cmdUsed(user);
             event.setCancelled(true);
         }
         catch (Exception ex)
         {
-            this.module.getLog().error(ex, "Error with CommandInteract!");
+            logger.error(ex, "Error with CommandInteract!");
             user.sendTranslated(CRITICAL, "An unknown error occurred!");
             user.sendTranslated(CRITICAL, "Please report this error to an administrator.");
         }
     }
 
-    private void handleInteract2(CommandType first, Lock lock, User user, String second, Boolean third, Location location, InventoryHolder possibleHolder)
+    private void handleInteract2(CommandType first, Lock lock, User user, String second, Boolean third, Location location, Carrier possibleHolder)
     {
         switch (first)
         {
@@ -293,10 +304,7 @@ public class CommandListener
                 lock.invalidateKeyBooks();
                 if (possibleHolder != null)
                 {
-                    for (HumanEntity viewer : possibleHolder.getInventory().getViewers())
-                    {
-                        viewer.closeInventory();
-                    }
+                    possibleHolder.getInventory().<Container>query(Container.class).getViewers().forEach(Human::closeInventory);
                 }
             }
             break;
@@ -321,7 +329,7 @@ public class CommandListener
             if (lock.isOwner(user) || module.perms().CMD_GIVE_OTHER.isAuthorized(user))
             {
                 // TODO UUID stuff
-                User newOwner = this.module.getCore().getUserManager().getExactUser(second);
+                User newOwner = um.getExactUser(second);
                 lock.setOwner(newOwner);
                 user.sendTranslated(NEUTRAL, "{user} is now the owner of this protection.", newOwner);
             }
@@ -333,7 +341,7 @@ public class CommandListener
             if (lock.isOwner(user) || lock.hasAdmin(user) || module.perms().CMD_MODIFY_OTHER.isAuthorized(user))
             {
                 short flags = 0;
-                for (ProtectionFlag protectionFlag : ProtectionFlag.matchFlags(second))
+                for (ProtectionFlag protectionFlag : ProtectionFlag.matchFlags(stringMatcher, second))
                 {
                     flags |= protectionFlag.flagValue;
                 }
@@ -356,7 +364,7 @@ public class CommandListener
                 else
                 {
                     short flags = 0;
-                    for (ProtectionFlag protectionFlag : ProtectionFlag.matchFlags(second))
+                    for (ProtectionFlag protectionFlag : ProtectionFlag.matchFlags(stringMatcher, second))
                     {
                         flags |= protectionFlag.flagValue;
                     }

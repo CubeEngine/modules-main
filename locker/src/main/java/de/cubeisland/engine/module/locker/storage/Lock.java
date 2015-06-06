@@ -24,24 +24,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
 import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.LockerAttachment;
+import de.cubeisland.engine.module.service.user.User;
 import org.jooq.Result;
+import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.manipulator.block.OpenData;
+import org.spongepowered.api.data.manipulator.block.PortionData;
+import org.spongepowered.api.data.type.PortionTypes;
+import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.Cancellable;
+import org.spongepowered.api.event.entity.player.PlayerBreakBlockEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.storage.AccessListModel.*;
 import static de.cubeisland.engine.module.locker.storage.LockType.PUBLIC;
 import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
@@ -172,9 +178,8 @@ public class Lock
                 for (ItemStack stack : full.values())
                 {
                     Location location = user.getLocation();
-                    location.getWorld().dropItem(location, stack);
+                    ((World)location.getExtent()).dropItem(location, stack);
                 }
-                user.updateInventory();
             }
             else
             {
@@ -198,7 +203,7 @@ public class Lock
         {
             if (model == null)
             {
-                model = this.manager.dsl.newRecord(TABLE_ACCESS_LIST).newAccess(this.model, modifyUser);
+                model = db.getDSL().newRecord(TABLE_ACCESS_LIST).newAccess(this.model, modifyUser);
                 model.setValue(TABLE_ACCESS_LIST.LEVEL, level);
                 model.insertAsync();
             }
@@ -395,12 +400,12 @@ public class Lock
 
     private AccessListModel getAccess(User user)
     {
-        AccessListModel model = this.manager.dsl.selectFrom(TABLE_ACCESS_LIST).
+        AccessListModel model = db.getDSL().selectFrom(TABLE_ACCESS_LIST).
             where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID)),
                   TABLE_ACCESS_LIST.USER_ID.eq(user.getEntity().getKey())).fetchOne();
         if (model == null)
         {
-            model = this.manager.dsl.selectFrom(TABLE_ACCESS_LIST).
+            model = db.getDSL().selectFrom(TABLE_ACCESS_LIST).
                 where(TABLE_ACCESS_LIST.USER_ID.eq(user.getEntity().getKey()),
                       TABLE_ACCESS_LIST.OWNER_ID.eq(this.getOwner().getEntity().getKey())).fetchOne();
         }
@@ -456,7 +461,8 @@ public class Lock
             this.notifyUsage(user);
             if ((in && out) || module.perms().ACCESS_OTHER.isAuthorized(user)) return; // Has full access
             if (protectedInventory == null) return; // Just checking else do lock
-            InventoryGuardFactory inventoryGuardFactory = InventoryGuardFactory.prepareInventory(protectedInventory, user);
+            InventoryGuardFactory inventoryGuardFactory = module.getModularity().start(InventoryGuardFactory.class);
+            inventoryGuardFactory.prepareInv(protectedInventory, user);
             if (!in)
             {
                 inventoryGuardFactory.blockPutInAll();
@@ -519,7 +525,7 @@ public class Lock
         return LockType.forByte(this.model.getValue(TABLE_LOCK.LOCK_TYPE));
     }
 
-    public void handleBlockBreak(BlockBreakEvent event, User user)
+    public void handleBlockBreak(PlayerBreakBlockEvent event, User user)
     {
         if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getKey()) || module.perms().BREAK_OTHER.isAuthorized(user))
         {
@@ -641,7 +647,7 @@ public class Lock
                 {
                     owner.sendTranslated(NEUTRAL, "{user} accessed one your protection with the id {integer}!", user, this.getId());
                     Location loc = this.getFirstLocation();
-                    owner.sendTranslated(NEUTRAL, "which is located at {vector} in {world}!", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getWorld());
+                    owner.sendTranslated(NEUTRAL, "which is located at {vector} in {world}!", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
                 }
                 else
                 {
@@ -651,7 +657,7 @@ public class Lock
                         {
                             owner.sendTranslated(NEUTRAL, "{user} accessed one of your protected entities!", user);
                             Location loc = entity.getLocation();
-                            owner.sendTranslated(NEUTRAL, "which is located at {vector} in {world}",  new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getWorld());
+                            owner.sendTranslated(NEUTRAL, "which is located at {vector} in {world}",  new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
                             return;
                         }
                     }
@@ -663,7 +669,7 @@ public class Lock
 
     public User getOwner()
     {
-        return this.manager.module.getCore().getUserManager().getUser(this.model.getValue(TABLE_LOCK.OWNER_ID));
+        return um.getUser(this.model.getValue(TABLE_LOCK.OWNER_ID));
     }
 
     public boolean isPublic()
@@ -720,7 +726,7 @@ public class Lock
                 user.sendTranslated(POSITIVE, "The following users have direct access to this protection");
                 for (AccessListModel listModel : accessors)
                 {
-                    User accessor = this.manager.module.getCore().getUserManager().getUser(listModel.getValue(TABLE_ACCESS_LIST.USER_ID));
+                    User accessor = um.getUser(listModel.getValue(TABLE_ACCESS_LIST.USER_ID));
                     if ((listModel.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN)
                     {
                         user.sendMessage("  " + ChatFormat.GREY + "- " + ChatFormat.DARK_GREEN + accessor.getDisplayName() + ChatFormat.GOLD + " [Admin}");
@@ -792,7 +798,7 @@ public class Lock
 
     public List<AccessListModel> getAccessors()
     {
-        return this.manager.dsl.selectFrom(TABLE_ACCESS_LIST).
+        return db.getDSL().selectFrom(TABLE_ACCESS_LIST).
             where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID))).fetch();
     }
 
@@ -803,8 +809,8 @@ public class Lock
             if (this.checkPass(pass))
             {
                 user.sendTranslated(POSITIVE, "Upon hearing the right passphrase the magic surrounding the container gets thinner and lets you pass!");
-                user.playSound(soundLoc, Sound.PISTON_EXTEND, 1, 2);
-                user.playSound(soundLoc, Sound.PISTON_EXTEND, 1, (float)1.5);
+                user.playSound(SoundTypes.PISTON_EXTEND, soundLoc.getPosition(), 1, 2);
+                user.playSound(SoundTypes.PISTON_EXTEND, soundLoc.getPosition(), 1, (float)1.5);
                 user.attachOrGet(LockerAttachment.class, this.manager.module).addUnlock(this);
             }
             else
@@ -828,8 +834,7 @@ public class Lock
      */
     private void doorUse(User user, Location doorClicked)
     {
-        Block block = doorClicked.getBlock();
-        if (block.getType() == IRON_DOOR_BLOCK && !this.manager.module.getConfig().openIronDoorWithClick)
+        if (doorClicked.getType() == BlockTypes.IRON_DOOR && !this.manager.module.getConfig().openIronDoorWithClick)
         {
             user.sendTranslated(NEUTRAL, "You cannot open the heavy door!");
             return;
@@ -838,99 +843,51 @@ public class Lock
         {
             user.sendTranslated(NEUTRAL, "This door is protected by {user}", this.getOwner());
         }
-        if (block.getState().getData() instanceof Door)
+        if (!doorClicked.isCompatible(OpenData.class))
         {
-            Door door;
-            if (((Door)block.getState().getData()).isTopHalf())
-            {
-                block = block.getRelative(DOWN);
-                door = (Door)block.getState().getData();
-            }
-            else
-            {
-                door = (Door)block.getState().getData();
-            }
-            Sound sound;
-            if (door.isOpen())
-            {
-                sound = DOOR_CLOSE;
-            }
-            else
-            {
-                sound = DOOR_OPEN;
-            }
-            Door door2 = null;
-            Location loc2 = null;
-            for (Location location : locations)
-            {
-                if (location.getBlockY() == block.getY() && !location.equals(block.getLocation(doorClicked)))
-                {
-                    door2 = (Door)location.getBlock().getState().getData();
-                    loc2 = location;
-                    break;
-                }
-            }
-            if (door2 == null)
-            {
-                if (door.getItemType() == IRON_DOOR_BLOCK)
-                {
-                    doorClicked.getWorld().playSound(doorClicked, sound, 1, 1);
-                    door.setOpen(!door.isOpen());
-                    block.setData(door.getData());
-                }
-                if (taskId != null) this.manager.module.getCore().getTaskManager().cancelTask(this.manager.module, taskId);
-                if (sound == DOOR_OPEN) this.scheduleAutoClose(door, block.getState(), null, null);
-            }
-            else
-            {
-                boolean old = door.isOpen();
-                door2.setOpen(!door.isOpen()); // Flip
-                if (old != door2.isOpen())
-                {
-
-                    doorClicked.getWorld().playSound(loc2, sound, 1, 1);
-                    loc2.getBlock().setData(door2.getData());
-                    if (door.getItemType() == IRON_DOOR_BLOCK)
-                    {
-                        doorClicked.getWorld().playSound(doorClicked, sound, 1, 1);
-                        door.setOpen(door2.isOpen());
-                        block.setData(door.getData());
-                    }
-                }
-                if (taskId != null) this.manager.module.getCore().getTaskManager().cancelTask(this.manager.module, taskId);
-                if (sound == DOOR_OPEN) this.scheduleAutoClose(door, block.getState(), door2, loc2.getBlock().getState());
-            }
-            this.notifyUsage(user);
+            return;
         }
+        boolean open = doorClicked.getData(OpenData.class).isPresent();
+
+        for (Location door : locations)
+        {
+            if (door.getData(PortionData.class).get() == PortionTypes.TOP)
+            {
+                continue;
+            }
+            if (open)
+            {
+                door.remove(OpenData.class);
+                user.playSound(SoundTypes.DOOR_CLOSE, door.getPosition(), 1);
+            }
+            else
+            {
+                door.offer(door.getOrCreate(OpenData.class).get());
+                user.playSound(SoundTypes.DOOR_OPEN, door.getPosition(), 1);
+            }
+        }
+        if (taskId != null) tm.cancelTask(this.manager.module, taskId);
+        if (!open)
+        {
+            this.scheduleAutoClose();
+        }
+        this.notifyUsage(user);
     }
 
-    private void scheduleAutoClose(final Door door1, final BlockState state1, final Door door2, final BlockState state2)
+    private void scheduleAutoClose()
     {
         if (this.hasFlag(ProtectionFlag.AUTOCLOSE))
         {
             if (!this.manager.module.getConfig().autoCloseEnable) return;
-            taskId = this.manager.module.getCore().getTaskManager().runTaskDelayed(this.manager.module, new Runnable()
-            {
-                @Override
-                public void run()
+            taskId = tm.runTaskDelayed(this.manager.module, (Runnable)() -> {
+                int n = locations.size() / 2;
+                for (Location location : locations)
                 {
-                    door1.setOpen(false);
-                    state1.setData(door1);
-                    if (state1.update())
+                    if (n-- > 0)
                     {
-                        Location location = state1.getLocation();
-                        location.getWorld().playSound(location, DOOR_CLOSE, 1, 1);
+                        ((World)location.getExtent()).playSound(SoundTypes.DOOR_CLOSE, location.getPosition(), 1);
                     }
-                    if (door2 != null)
-                    {
-                        door2.setOpen(false);
-                        state2.setData(door2);
-                        if (state2.update())
-                        {
-                            Location location = state2.getLocation();
-                            location.getWorld().playSound(location, DOOR_CLOSE, 1, 1);
-                        }
-                    }
+                    location.remove(OpenData.class);
                 }
             }, this.manager.module.getConfig().autoCloseSeconds * 20);
         }
@@ -943,13 +900,13 @@ public class Lock
 
     public boolean validateTypeAt(Location location)
     {
-        if (ProtectedType.getProtectedType(location.getBlock().getType()) == this.getProtectedType())
+        if (ProtectedType.getProtectedType(location.getType()) == this.getProtectedType())
         {
             this.isValidType = true;
         }
         else
         {
-            this.manager.module.getLog().warn("ProtectedTypes do not match for Guard at {}" ,location.toString());
+            module.getProvided(Log.class).warn("ProtectedTypes do not match for Guard at {}", location.toString());
         }
         return this.isValidType;
     }

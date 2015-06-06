@@ -40,6 +40,7 @@ import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
 import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.core.util.StringUtils;
+import de.cubeisland.engine.module.core.util.matcher.StringMatcher;
 import de.cubeisland.engine.module.locker.BlockLockerConfiguration;
 import de.cubeisland.engine.module.locker.EntityLockerConfiguration;
 import de.cubeisland.engine.module.locker.Locker;
@@ -50,16 +51,25 @@ import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
+import jdk.nashorn.internal.ir.Block;
 import org.jooq.Result;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.data.manipulator.SingleValueData;
+import org.spongepowered.api.data.manipulator.block.DirectionalData;
+import org.spongepowered.api.data.manipulator.block.HingeData;
+import org.spongepowered.api.data.manipulator.block.PortionData;
+import org.spongepowered.api.data.type.Hinge;
+import org.spongepowered.api.data.type.Hinges;
+import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.world.ChunkLoadEvent;
 import org.spongepowered.api.event.world.ChunkUnloadEvent;
-import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
@@ -76,18 +86,21 @@ import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_A
 import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static java.util.concurrent.CompletableFuture.allOf;
-import static org.spongepowered.api.block.BlockTypes.CHEST;
-import static org.spongepowered.api.block.BlockTypes.TRAPPED_CHEST;
+import static org.spongepowered.api.block.BlockTypes.*;
+import static org.spongepowered.api.data.type.PortionTypes.BOTTOM;
+import static org.spongepowered.api.data.type.PortionTypes.TOP;
 
 @ServiceProvider(LockManager.class)
 public class LockManager
 {
     protected final Locker module;
+    ;
 
     @Inject private Database database;
     @Inject protected WorldManager wm;
     @Inject protected UserManager um;
     @Inject protected TaskManager tm;
+    private final StringMatcher stringMatcher;
     protected Log logger;
 
     public final CommandListener commandListener;
@@ -104,8 +117,9 @@ public class LockManager
     private Future<?> future = null;
 
     @Inject
-    public LockManager(Locker module, EventManager em)
+    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher)
     {
+        this.stringMatcher = stringMatcher;
         logger = module.getProvided(Log.class);
         this.module = module;
         executor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));
@@ -117,7 +131,7 @@ public class LockManager
         {
             throw new RuntimeException("SHA-1 hash algorithm not available!");
         }
-        this.commandListener = new CommandListener(module, this);
+        this.commandListener = new CommandListener(module, this, um, logger, this.stringMatcher);
         em.registerListener(module, this.commandListener);
         em.registerListener(module, this);
     }
@@ -231,23 +245,25 @@ public class LockManager
     {
         queuedChunks.remove(event.getChunk());
         UInteger worldId = wm.getWorldId(event.getChunk().getWorld());
-        Set<Lock> remove = this.getChunkLocksMap(worldId).remove(getChunkKey(event.getChunk().getPosition().getX(), event.getChunk().getPosition().getZ()));
+        Set<Lock> remove = this.getChunkLocksMap(worldId).remove(getChunkKey(event.getChunk().getPosition().getX(),
+                                                                             event.getChunk().getPosition().getZ()));
         if (remove == null) return; // nothing to remove
         Map<Long, Lock> locLockMap = this.getLocLockMap(worldId);
         for (Lock lock : remove) // remove from chunks
         {
             Location firstLoc = lock.getFirstLocation();
             this.locksById.remove(lock.getId());
-            Chunk c1 = firstLoc.getChunk();
+            Chunk c1 = ((World)firstLoc.getExtent()).getChunk(firstLoc.getBlockPosition()).get();
             for (Location location : lock.getLocations())
             {
-                if (location.getChunk() != c1) // different chunks
+                Chunk c2 = ((World)location.getExtent()).getChunk(location.getBlockPosition()).get();
+                if (c2 != c1) // different chunks
                 {
-                    Chunk c2 = location.getChunk();
                     Chunk chunk = event.getChunk();
                     if ((!c1.isLoaded() && c2 == chunk)
                         ||(!c2.isLoaded() && c1 == chunk))
-                    {// Both chunks will be unloaded remove both loc
+                    {
+                        // Both chunks will be unloaded remove both loc
                         for (Location loc : lock.getLocations())
                         {
                             locLockMap.remove(getLocationKey(loc));
@@ -398,10 +414,12 @@ public class LockManager
      */
     public void extendLock(Lock lock, Location location)
     {
-        expectNotNull(lock, "The lock must not be null!");
-        expect(this.getLockAtLocation(location, null, false, false) == null, "Cannot extend Lock onto another!");
+        if (this.getLockAtLocation(location, null, false, false) != null)
+        {
+            throw new IllegalStateException("Cannot extend Lock onto another!");
+        }
         lock.locations.add(location);
-        LockLocationModel model = database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location);
+        LockLocationModel model = database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location, wm);
         model.insertAsync();
         UInteger worldId = wm.getWorldId(((World)location.getExtent()));
         this.getLocLockMap(worldId).put(getLocationKey(location), lock);
@@ -452,14 +470,14 @@ public class LockManager
      * Creates a new Lock at given Location
      *
      * @param material the material at given location (can missmatch if block is just getting placed)
-     * @param location the location to create the lock for
+     * @param block the location to create the lock for
      * @param user the user creating the lock
      * @param lockType the lockType
      * @param password the password
      * @param createKeyBook whether to attempt to create a keyBook
      * @return the created Lock
      */
-    public CompletableFuture<Lock> createLock(BlockType material, Location location, User user, LockType lockType, String password, boolean createKeyBook)
+    public CompletableFuture<Lock> createLock(BlockType material, Location block, User user, LockType lockType, String password, boolean createKeyBook)
     {
         LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
         for (BlockLockerConfiguration blockProtection : this.module.getConfig().blockprotections)
@@ -474,72 +492,97 @@ public class LockManager
                 break;
             }
         }
-        return model.createPassword(this, password).insertAsync().thenCompose(m -> {
-            List<Location> locations = new ArrayList<>();
-            Block block = location.getBlock();
-            // Handle MultiBlock Protections
-            if (material == CHEST)
+
+        List<Location> locations = new ArrayList<>();
+        // Handle MultiBlock Protections
+        if (material == CHEST || material == TRAPPED_CHEST)
+        {
+            for (Direction direction : CARDINAL_DIRECTIONS)
             {
-                if (block.getState() instanceof Chest
-                    && ((Chest)block.getState()).getInventory().getHolder() instanceof DoubleChest)
+                Location relative = block.getRelative(direction);
+                if (relative.getType() == material)
                 {
-                    DoubleChest dc = (DoubleChest)((Chest)block.getState()).getInventory().getHolder();
-                    locations.add(((BlockState)dc.getLeftSide()).getLocation());
-                    locations.add(((BlockState)dc.getRightSide()).getLocation());
+                    locations.add(relative);
                 }
             }
-            else if (material == BlockTypes.WOODEN_DOOR || material == BlockTypes.IRON_DOOR)
+        }
+        else if (material == WOODEN_DOOR
+            || material == IRON_DOOR
+            || material == ACACIA_DOOR
+            || material == BIRCH_DOOR
+            || material == DARK_OAK_DOOR
+            || material == JUNGLE_DOOR
+            || material == SPRUCE_DOOR)
+        {
+            locations.add(block); // Original Block
+            // Find upper/lower door part
+            PortionType portion = block.getData(PortionData.class).get().getValue();
+            Location relative = null;
+            if (portion == BOTTOM)
             {
-                locations.add(location);
-                if (block.getState().getData() instanceof Door)
+                relative = block.getRelative(Direction.UP);
+            }
+            else if (portion == TOP)
+            {
+                relative = block.getRelative(Direction.DOWN);
+            }
+            if (relative != null && relative.getType() == material)
+            {
+                locations.add(relative);
+
+                Direction direction = block.getData(DirectionalData.class).get().getValue();
+                Hinge hinge = block.getData(HingeData.class).get().getValue();
+                direction = getOtherDoorDirection(direction, hinge);
+                Location blockOther = block.getRelative(direction);
+                Location relativeOther = relative.getRelative(direction);
+                if (portion.equals(block.getData(PortionData.class).transform(SingleValueData::getValue).orNull())
+                    && blockOther.getType().equals(relativeOther.getType()))
                 {
-                    Block botBlock;
-                    if (((Door)block.getState().getData()).isTopHalf())
-                    {
-                        locations.add(location.clone().add(0, -1, 0));
-                        botBlock = locations.get(1).getBlock();
-                    }
-                    else
-                    {
-                        botBlock = location.getBlock();
-                        locations.add(location.clone().add(0, 1, 0));
-                    }
-                    for (Direction blockFace : CARDINAL_DIRECTIONS)
-                    {
-                        if (botBlock.getRelative(blockFace).getType() == block.getType()) // same door type
-                        {
-                            Door relativeBot = (Door)botBlock.getRelative(blockFace).getState().getData();
-                            if (!relativeBot.isTopHalf())
-                            {
-                                Door botDoor = (Door)botBlock.getState().getData();
-                                Door topDoor = (Door)botBlock.getRelative(BlockFace.UP).getState().getData();
-                                Door relativeTop = (Door)botBlock.getRelative(blockFace).getRelative(
-                                    BlockFace.UP).getState().getData();
-                                if (botDoor.getFacing() == relativeBot.getFacing()
-                                    && topDoor.getData() != relativeTop.getData()) // Facing same & opposite hinge
-                                {
-                                    locations.add(botBlock.getRelative(blockFace).getLocation());
-                                    locations.add(locations.get(2).clone().add(0, 1, 0));
-                                    break;
-                                }
-                            } // else ignore
-                        }
-                    }
+                    locations.add(blockOther);
+                    locations.add(relativeOther);
                 }
             }
-            if (locations.isEmpty())
-            {
-                locations.add(location);
-            }
-            return allOf(locations.parallelStream().map(loc -> database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(model, loc)).map(
-                AsyncRecord::insertAsync).toArray(CompletableFuture[]::new)).thenApply((v) -> {
-                Lock lock = new Lock(this, model, locations);
-                this.addLoadedLocationLock(lock);
-                lock.showCreatedMessage(user);
-                lock.attemptCreatingKeyBook(user, createKeyBook);
-                return lock;
-            });
-        });
+        }
+        if (locations.isEmpty())
+        {
+            locations.add(block);
+        }
+
+        return model.createPassword(this, password).insertAsync()
+                    .thenCompose(m -> allOf(locations.parallelStream().map(loc -> database.getDSL().newRecord(
+                        TABLE_LOCK_LOCATION).newLocation(model, loc, wm)).map(AsyncRecord::insertAsync).toArray(
+                        CompletableFuture[]::new)).thenApply((v) -> {
+                        Lock lock = new Lock(this, model, locations);
+                        this.addLoadedLocationLock(lock);
+                        lock.showCreatedMessage(user);
+                        lock.attemptCreatingKeyBook(user, createKeyBook);
+                        return lock;
+                    }));
+    }
+
+    public static Direction getOtherDoorDirection(Direction direction, Hinge hinge)
+    {
+        if (direction == Direction.NORTH)
+        {
+            direction = Direction.EAST;
+        }
+        else if (direction == Direction.EAST)
+        {
+            direction = Direction.SOUTH;
+        }
+        else if (direction == Direction.SOUTH)
+        {
+            direction = Direction.WEST;
+        }
+        else if (direction == Direction.WEST)
+        {
+            direction = Direction.NORTH;
+        }
+        if (hinge == Hinges.RIGHT) // TODO check if this is right might be the inverse
+        {
+            direction = direction.getOpposite();
+        }
+        return direction;
     }
 
     /**
@@ -619,40 +662,23 @@ public class LockManager
     }
 
     /**
-     * Returns the lock for given inventory it exists, also sets the location to the holders location if not null
+     * Returns the lock for given inventory it exists
      *
      * @param inventory
-     * @param holderLoc a location object to hold the LockLocation
      * @return the lock for given inventory
      */
-    public Lock getLockOfInventory(Inventory inventory, Location holderLoc)
+    public Lock getLockOfInventory(CarriedInventory<?> inventory)
     {
-        InventoryHolder holder = inventory.getHolder();
-        Lock lock;
-        if (holderLoc == null)
-        {
-            holderLoc = new Location(null, 0, 0, 0);
-        }
+        Carrier holder = inventory.getCarrier().orNull();
         if (holder instanceof Entity)
         {
-            lock = this.getLockForEntityUID(((Entity)holder).getUniqueId());
-            ((Entity)holder).getLocation(holderLoc);
+            return this.getLockForEntityUID(((Entity)holder).getUniqueId());
         }
-        else
+        if (holder instanceof TileEntityCarrier)
         {
-            Location lockLoc;
-            if (holder instanceof BlockState)
-            {
-                lockLoc = ((BlockState)holder).getLocation(holderLoc);
-            }
-            else if (holder instanceof DoubleChest)
-            {
-                lockLoc = ((BlockState)((DoubleChest)holder).getRightSide()).getLocation(holderLoc);
-            }
-            else return null;
-            lock = this.getLockAtLocation(lockLoc, null);
+            return getLockAtLocation(((TileEntityCarrier)holder).getBlock(), null);
         }
-        return lock;
+        return null;
     }
 
     /**

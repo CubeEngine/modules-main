@@ -123,7 +123,6 @@ public class KeyBook
                  Texts.of(currentHolder.getTranslation(NEUTRAL, "won't let you")),
                  Texts.of(currentHolder.getTranslation(NEUTRAL, "open any containers!")));
         item.setType(ItemTypes.PAPER);
-        currentHolder.updateInventory();
         item.offer(display);
         item.offer(lore);
     }

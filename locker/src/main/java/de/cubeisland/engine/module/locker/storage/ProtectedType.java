@@ -39,6 +39,8 @@ public enum ProtectedType
     ;
 
     private final static Map<Byte, ProtectedType> protectedTypes = new HashMap<>();
+    private final static Map<BlockType, ProtectedType> blocks = new HashMap<>();
+    private final static Map<EntityType, ProtectedType> entities = new HashMap<>();
 
     public final byte id;
     public final Collection<ProtectionFlag> supportedFlags;

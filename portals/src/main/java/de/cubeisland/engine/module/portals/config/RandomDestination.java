@@ -18,28 +18,27 @@
 package de.cubeisland.engine.module.portals.config;
 
 import java.util.Random;
-import de.cubeisland.engine.module.core.CubeEngine;
-import de.cubeisland.engine.module.core.sponge.BukkitUtils;
-import de.cubeisland.engine.module.service.user.User;
+import com.google.common.base.Optional;
 import de.cubeisland.engine.module.core.util.Pair;
+import de.cubeisland.engine.module.portals.Portals;
 import de.cubeisland.engine.module.service.world.ConfigWorld;
-import de.cubeisland.engine.module.portals.PortalManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
-import org.bukkit.Chunk;
-import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.craftbukkit.v1_8_R2.entity.CraftEntity;
-import org.bukkit.entity.Entity;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.data.manipulator.entity.PassengerData;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 public class RandomDestination extends Destination
 {
     private final Random random = new Random();
+    private Game game;
 
-    public RandomDestination(WorldManager wm, World world)
+    public RandomDestination(Game game, WorldManager wm, World world)
     {
+        this.game = game;
         this.type = Type.RANDOM;
         this.world = new ConfigWorld(wm, world);
     }
@@ -49,41 +48,28 @@ public class RandomDestination extends Destination
     }
 
     @Override
-    public void teleport(Entity entity, PortalManager manager, boolean safe)
+    public void teleport(Entity entity, Portals module, boolean safe)
     {
-        if (entity instanceof User)
+        if (!(entity instanceof Player))
         {
-            if (entity.isInsideVehicle())
-            {
-                entity = entity.getVehicle();
-            }
-            World world = this.world.getWorld();
-            Block block;
-            do
-            {
-                Pair<Integer, Chunk> config = manager.getRandomDestinationSetting(world);
-                int x = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
-                int z = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
-                Chunk chunk = world.getChunkAt(config.getRight().getX() + x, config.getRight().getZ() + z);
-
-                block = chunk.getBlock(random.nextInt(16), 0, random.nextInt(16));
-                block = block.getWorld().getHighestBlockAt(block.getLocation());
-            }
-            while (!block.getRelative(BlockFace.DOWN).getType().isSolid()); // do not land on water or lava :)
-
-            if ((entity.getLocation().getWorld() == world || entity instanceof User) && entity.getPassenger() == null)
-            {
-                entity.teleport(block.getLocation());
-            }
-            else if (entity instanceof CraftEntity)
-            {
-                BukkitUtils.teleport(manager.module, ((CraftEntity)entity).getHandle(), block.getLocation());
-            }
-            else
-            {
-                manager.module.getLog().warn("Could not teleport entity: {}", entity);
-            }
+            // TODO particles
+            return;
         }
-        // else ignore
+        Optional<PassengerData> vehicle = entity.getData(PassengerData.class);
+        if (vehicle.isPresent())
+        {
+            entity = vehicle.get().getBaseVehicle();
+        }
+        World world = this.world.getWorld();
+        Location block;
+        Pair<Integer, Chunk> config = module.getRandomDestinationSetting(world);
+        Chunk chunk = config.getRight();
+        int x = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
+        int z = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
+        chunk = world.loadChunk(chunk.getPosition().getX() + x * 16, 0, chunk.getPosition().getZ() + z * 16, true).get();
+        block = world.getFullBlock(chunk.getPosition().add(random.nextInt(16), 0, random.nextInt(16)));
+        game.getTeleportHelper().getSafeLocation(chunk.getFullBlock(random.nextInt(16), world.getBuildHeight() / 4,
+                                                                    random.nextInt(16)));
+        entity.setLocation(block);
     }
 }

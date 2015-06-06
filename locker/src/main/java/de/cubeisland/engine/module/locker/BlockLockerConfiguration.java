@@ -18,7 +18,10 @@
 package de.cubeisland.engine.module.locker;
 
 import de.cubeisland.engine.converter.ConversionException;
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
 import de.cubeisland.engine.module.locker.storage.ProtectedType;
+import javafx.scene.paint.Material;
 import org.spongepowered.api.block.BlockType;
 
 /**
@@ -44,24 +47,17 @@ public class BlockLockerConfiguration extends LockerSubConfig<BlockLockerConfigu
 
     public static class BlockLockerConfigConverter extends LockerSubConfigConverter<BlockLockerConfiguration>
     {
+        private MaterialMatcher mm;
+
+        public BlockLockerConfigConverter(Log logger, MaterialMatcher mm)
+        {
+            super(logger);
+            this.mm = mm;
+        }
+
         protected BlockLockerConfiguration fromString(String s) throws ConversionException
         {
-            BlockType material;
-            try
-            {
-                material = Material.valueOf(s);
-            }
-            catch (IllegalArgumentException ignore)
-            {
-                try
-                {
-                    material = Material.getMaterial(Integer.valueOf(s));
-                }
-                catch (NumberFormatException ignoreToo)
-                {
-                    material = Match.material().material(s);
-                }
-            }
+            BlockType material = mm.block(s);
             if (material == null)
             {
                 throw ConversionException.of(this, s, "Invalid BlockType!");

@@ -27,11 +27,19 @@ import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.NullNode;
 import de.cubeisland.engine.converter.node.StringNode;
+import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.module.locker.storage.LockType;
 import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
 
 public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> extends SimpleConverter<C>
 {
+    private Log logger;
+
+    public LockerSubConfigConverter(Log logger)
+    {
+        this.logger = logger;
+    }
+
     @Override
     public Node toNode(C object) throws ConversionException
     {
@@ -96,9 +104,9 @@ public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> 
                     for (Node listedNode : list.getValue())
                     {
                         ProtectionFlag flag = ProtectionFlag.valueOf(listedNode.asText());
+                        configuration.defaultFlags.add(flag);
                         if (configuration.protectedType.supportedFlags.contains(flag))
                         {
-                            configuration.defaultFlags.add(flag);
                         }
                         else
                         {

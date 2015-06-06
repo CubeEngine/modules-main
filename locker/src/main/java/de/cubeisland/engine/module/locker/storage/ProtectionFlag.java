@@ -26,9 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import de.cubeisland.engine.module.core.util.StringUtils;
-import de.cubeisland.engine.module.core.util.matcher.Match;
-
-import de.cubeisland.engine.module.core.util.StringUtils.startsWithIgnoreCase;
+import de.cubeisland.engine.module.core.util.matcher.StringMatcher;
 
 import static de.cubeisland.engine.module.core.util.StringUtils.startsWithIgnoreCase;
 import static java.util.stream.Collectors.toList;
@@ -108,13 +106,13 @@ public enum ProtectionFlag
         return matchedFlags.stream().map(flag -> token + flag.replaceFirst(subToken, "")).collect(toList());
     }
 
-    public static ProtectionFlag match(String toMatch)
+    public static ProtectionFlag match(StringMatcher stringMatcher, String toMatch)
     {
-        String match = Match.string().matchString(toMatch, flags.keySet());
+        String match = stringMatcher.matchString(toMatch, flags.keySet());
         return flags.get(match);
     }
 
-    public static Set<ProtectionFlag> matchFlags(String param)
+    public static Set<ProtectionFlag> matchFlags(StringMatcher stringMatcher, String param)
     {
         HashSet<ProtectionFlag> result = new HashSet<>();
         if (param == null)
@@ -124,7 +122,7 @@ public enum ProtectionFlag
         String[] flags = StringUtils.explode(",", param);
         for (String flag : flags)
         {
-            ProtectionFlag match = ProtectionFlag.match(flag);
+            ProtectionFlag match = ProtectionFlag.match(stringMatcher, flag);
             if (match != null)
             {
                 result.add(match);

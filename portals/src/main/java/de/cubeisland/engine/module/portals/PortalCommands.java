@@ -17,7 +17,6 @@
  */
 package de.cubeisland.engine.module.portals;
 
-import java.io.File;
 import java.util.Set;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.filter.Restricted;
@@ -47,16 +46,14 @@ import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITI
 public class PortalCommands extends ContainerCommand
 {
     private final Portals module;
-    private final PortalManager manager;
     private Selector selector;
     private Reflector reflector;
     private WorldManager wm;
 
-    public PortalCommands(Portals module, PortalManager manager, Selector selector, Reflector reflector, WorldManager wm)
+    public PortalCommands(Portals module, Selector selector, Reflector reflector, WorldManager wm)
     {
         super(module);
         this.module = module;
-        this.manager = manager;
         this.selector = selector;
         this.reflector = reflector;
         this.wm = wm;
@@ -73,7 +70,7 @@ public class PortalCommands extends ContainerCommand
             context.sendTranslated(NEGATIVE, "Please select a cuboid first!");
             return;
         }
-        if (this.manager.getPortal(name) != null)
+        if (module.getPortal(name) != null)
         {
             context.sendTranslated(NEGATIVE, "A portal named {input} already exists!", name);
             return;
@@ -89,10 +86,10 @@ public class PortalCommands extends ContainerCommand
 
         config.destination = destination;
 
-        config.setFile(new File(manager.portalsDir, name + ".yml"));
+        config.setFile(module.getPortalFile(name));
         config.save();
-        Portal portal = new Portal(module, manager, name, config);
-        this.manager.addPortal(portal);
+        Portal portal = new Portal(module, name, config);
+        module.addPortal(portal);
         sender.attachOrGet(PortalsAttachment.class, module).setPortal(portal);
         context.sendTranslated(POSITIVE, "Portal {name} created!", portal.getName());
         if (destination == null)
@@ -168,7 +165,7 @@ public class PortalCommands extends ContainerCommand
     @Command(desc = "Lists the portals")
     public void list(CommandContext context, @Default World world)
     {
-        Set<Portal> portals = manager.getPortals(world);
+        Set<Portal> portals = module.getPortals(world);
         if (portals.isEmpty())
         {
             context.sendTranslated(POSITIVE, "There are no portals in {world}", world);

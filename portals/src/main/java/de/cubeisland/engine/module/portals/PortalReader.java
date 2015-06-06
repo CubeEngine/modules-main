@@ -36,7 +36,7 @@ public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal
     public Portal read(Class type, CommandInvocation invocation) throws ReaderException
     {
         String portalName = invocation.consume(1);
-        Portal portal = this.module.getPortalManager().getPortal(portalName);
+        Portal portal = this.module.getPortal(portalName);
         if (portal == null)
         {
             throw new ReaderException("Portal {input} not found", portalName);

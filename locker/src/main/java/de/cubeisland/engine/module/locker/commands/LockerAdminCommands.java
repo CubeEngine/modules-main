@@ -19,18 +19,14 @@ package de.cubeisland.engine.module.locker.commands;
 
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
 import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.storage.Lock;
 import de.cubeisland.engine.module.locker.storage.LockManager;
-import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
-import org.bukkit.inventory.InventoryHolder;
-
-import de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
-import de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.item.inventory.Carrier;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
@@ -73,8 +69,11 @@ public class LockerAdminCommands extends ContainerCommand
             case ENTITY_CONTAINER_LIVING:
                 if (lock.isBlockLock())
                 {
-                    ((User)context.getSource()).openInventory(((InventoryHolder)lock.getFirstLocation().getBlock()
-                                                                                        .getState()).getInventory());
+                    TileEntity te = lock.getFirstLocation().getTileEntity().orNull();
+                    if (te instanceof Carrier)
+                    {
+                        ((User)context.getSource()).openInventory(((Carrier)te).getInventory());
+                    }
                 }
                 else
                 {
@@ -103,7 +102,7 @@ public class LockerAdminCommands extends ContainerCommand
         if (lock == null) return;
         if (lock.isBlockLock())
         {
-            ((User)context.getSource()).safeTeleport(lock.getFirstLocation(), TeleportCause.PLUGIN, false);
+            ((User)context.getSource()).safeTeleport(lock.getFirstLocation(), false);
         }
         else
         {

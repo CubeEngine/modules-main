@@ -34,14 +34,12 @@ import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITI
 public class Portal
 {
     private final Portals module;
-    private final PortalManager manager;
     private final String name;
     protected final PortalConfig config;
 
-    public Portal(Portals module, PortalManager manager, String name, PortalConfig config)
+    public Portal(Portals module, String name, PortalConfig config)
     {
         this.module = module;
-        this.manager = manager;
         this.name = name;
         this.config = config;
     }
@@ -76,7 +74,7 @@ public class Portal
         }
         else
         {
-            this.config.destination.teleport(entity, this.manager, this.config.safeTeleport);
+            this.config.destination.teleport(entity, module, this.config.safeTeleport);
         }
     }
 
@@ -92,7 +90,7 @@ public class Portal
 
     public void delete()
     {
-        this.manager.removePortal(this);
+        module.removePortal(this);
         this.config.getFile().delete();
     }
 

@@ -32,6 +32,7 @@ import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.world.WorldManager;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -43,17 +44,17 @@ import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITI
 public class PortalModifyCommand extends ContainerCommand
 {
     private Portals module;
-    private final PortalManager manager;
     private Selector selector;
     private WorldManager wm;
+    private Game game;
 
-    public PortalModifyCommand(Portals module, PortalManager manager, Selector selector, WorldManager wm)
+    public PortalModifyCommand(Portals module, Selector selector, WorldManager wm, Game game)
     {
         super(module);
         this.module = module;
-        this.manager = manager;
         this.selector = selector;
         this.wm = wm;
+        this.game = game;
     }
 
     @Command(desc = "Changes the owner of a portal")
@@ -79,7 +80,7 @@ public class PortalModifyCommand extends ContainerCommand
     @Command(alias = "randdest", desc = "Changes the destination of the selected portal to a random position each time")
     public void randomDestination(CommandContext context, World world, @Default Portal portal)
     {
-        this.destination(context, new RandomDestination(wm, world), portal);
+        this.destination(context, new RandomDestination(game, wm, world), portal);
     }
 
     @Command(desc = "Changes a portals location")
