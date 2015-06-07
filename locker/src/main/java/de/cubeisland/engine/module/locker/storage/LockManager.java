@@ -39,6 +39,7 @@ import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
 import de.cubeisland.engine.module.core.sponge.EventManager;
+import de.cubeisland.engine.module.core.util.BlockUtil;
 import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.matcher.StringMatcher;
 import de.cubeisland.engine.module.locker.BlockLockerConfiguration;
@@ -51,7 +52,6 @@ import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
-import jdk.nashorn.internal.ir.Block;
 import org.jooq.Result;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.block.BlockType;
@@ -61,7 +61,6 @@ import org.spongepowered.api.data.manipulator.block.DirectionalData;
 import org.spongepowered.api.data.manipulator.block.HingeData;
 import org.spongepowered.api.data.manipulator.block.PortionData;
 import org.spongepowered.api.data.type.Hinge;
-import org.spongepowered.api.data.type.Hinges;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -94,7 +93,6 @@ import static org.spongepowered.api.data.type.PortionTypes.TOP;
 public class LockManager
 {
     protected final Locker module;
-    ;
 
     @Inject private Database database;
     @Inject protected WorldManager wm;
@@ -532,7 +530,7 @@ public class LockManager
 
                 Direction direction = block.getData(DirectionalData.class).get().getValue();
                 Hinge hinge = block.getData(HingeData.class).get().getValue();
-                direction = getOtherDoorDirection(direction, hinge);
+                direction = BlockUtil.getOtherDoorDirection(direction, hinge);
                 Location blockOther = block.getRelative(direction);
                 Location relativeOther = relative.getRelative(direction);
                 if (portion.equals(block.getData(PortionData.class).transform(SingleValueData::getValue).orNull())
@@ -558,31 +556,6 @@ public class LockManager
                         lock.attemptCreatingKeyBook(user, createKeyBook);
                         return lock;
                     }));
-    }
-
-    public static Direction getOtherDoorDirection(Direction direction, Hinge hinge)
-    {
-        if (direction == Direction.NORTH)
-        {
-            direction = Direction.EAST;
-        }
-        else if (direction == Direction.EAST)
-        {
-            direction = Direction.SOUTH;
-        }
-        else if (direction == Direction.SOUTH)
-        {
-            direction = Direction.WEST;
-        }
-        else if (direction == Direction.WEST)
-        {
-            direction = Direction.NORTH;
-        }
-        if (hinge == Hinges.RIGHT) // TODO check if this is right might be the inverse
-        {
-            direction = direction.getOpposite();
-        }
-        return direction;
     }
 
     /**
@@ -771,4 +744,8 @@ public class LockManager
         return database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(user.getEntity().getKey())));
     }
 
+    public Database getDB()
+    {
+        return database;
+    }
 }

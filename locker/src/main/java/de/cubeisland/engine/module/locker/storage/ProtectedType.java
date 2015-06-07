@@ -22,7 +22,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.spongepowered.api.block.BlockType;
+import static org.spongepowered.api.block.BlockTypes.*;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.monster.Monster;
+
+import static org.spongepowered.api.entity.EntityTypes.*;
 
 import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;
 
@@ -67,54 +72,48 @@ public enum ProtectedType
 
     public static ProtectedType getProtectedType(BlockType material)
     {
-        switch (material)
+        if (material.equals(CHEST) || material.equals(TRAPPED_CHEST) || material.equals(DISPENSER) || material.equals(
+            DROPPER) || material.equals(FURNACE) || material.equals(LIT_FURNACE) || material.equals(BREWING_STAND)
+            || material.equals(BEACON) || material.equals(HOPPER))
         {
-            case CHEST:
-            case TRAPPED_CHEST:
-            case DISPENSER:
-            case DROPPER:
-            case FURNACE:
-            case BURNING_FURNACE:
-            case BREWING_STAND:
-            case BEACON:
-            case HOPPER:
-                return CONTAINER;
-            case WOODEN_DOOR:
-            case IRON_DOOR_BLOCK:
-            case FENCE_GATE:
-            case TRAP_DOOR:
-                return DOOR;
-        default:
-            if (material.getId() < 256) return BLOCK;
+            return CONTAINER;
         }
-        throw new IllegalStateException("Material of block is an item!?");
+        else if (material.equals(WOODEN_DOOR) || material.equals(SPRUCE_DOOR) || material.equals(BIRCH_DOOR)
+            || material.equals(JUNGLE_DOOR) || material.equals(ACACIA_DOOR) || material.equals(DARK_OAK_DOOR)
+            || material.equals(IRON_DOOR) || material.equals(FENCE_GATE) || material.equals(TRAPDOOR))
+        {
+            return DOOR;
+        }
+        return BLOCK;
     }
 
     public static ProtectedType getProtectedType(EntityType type)
     {
-        switch (type)
+        if (type.equals(CHESTED_MINECART) || type.equals(HOPPER_MINECART))
         {
-        case MINECART_CHEST:
-        case MINECART_HOPPER:
             return ENTITY_CONTAINER;
-        case HORSE:
+        }
+        else if (type.equals(HORSE))
+        {
             return ENTITY_CONTAINER_LIVING;
-        case LEASH_HITCH:
-        case PAINTING:
-        case ITEM_FRAME:
-        case MINECART_FURNACE:
-        case MINECART_TNT:
-        case MINECART_MOB_SPAWNER:
+        }
+        else if (type.equals(LEASH_HITCH) || type.equals(PAINTING) || type.equals(ITEM_FRAME) || type.equals(
+            FURNACE_MINECART) || type.equals(TNT_MINECART) || type.equals(MOB_SPAWNER_MINECART))
+        {
             return ENTITY;
-        case BOAT:
-        case MINECART:
+        }
+        else if (type.equals(BOAT) || type.equals(RIDEABLE_MINECART))
+        {
             return ENTITY_VEHICLE;
-        default:
-            if (!Match.entity().isMonster(type) && type.isAlive())
+        }
+        else
+        {
+            if (!Monster.class.isAssignableFrom(type.getEntityClass())
+            && Living.class.isAssignableFrom(type.getEntityClass()))
             {
                 return ENTITY_LIVING;
             }
-            throw new IllegalArgumentException(type.name() + " is not allowed!");
+            throw new IllegalArgumentException(type.getName() + " is not allowed!");
         }
     }
 }

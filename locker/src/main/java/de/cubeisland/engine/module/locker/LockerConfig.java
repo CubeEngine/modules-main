@@ -30,6 +30,9 @@ import org.spongepowered.api.entity.EntityTypes;
 
 import static de.cubeisland.engine.module.locker.storage.LockType.PRIVATE;
 import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;
+import static org.spongepowered.api.entity.EntityTypes.ITEM_FRAME;
+import static org.spongepowered.api.entity.EntityTypes.LEASH_HITCH;
+import static org.spongepowered.api.entity.EntityTypes.PAINTING;
 
 @SuppressWarnings("all")
 public class LockerConfig extends ReflectedYaml
@@ -161,12 +164,11 @@ public class LockerConfig extends ReflectedYaml
         {
             for (EntityLockerConfiguration entityProtection : entityProtections)
             {
-                switch (entityProtection.type)
+                if (entityProtection.type.equals(LEASH_HITCH)
+                    || entityProtection.type.equals(PAINTING)
+                    || entityProtection.type.equals(ITEM_FRAME))
                 {
-                    case LEASH_HITCH:
-                    case PAINTING:
-                    case ITEM_FRAME:
-                        detachableEntityCount++;
+                    detachableEntityCount++;
                 }
             }
         }

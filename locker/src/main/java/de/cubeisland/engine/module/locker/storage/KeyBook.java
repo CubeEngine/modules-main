@@ -37,11 +37,12 @@ import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITI
 import static org.spongepowered.api.effect.sound.SoundTypes.BLAZE_HIT;
 import static org.spongepowered.api.effect.sound.SoundTypes.GHAST_SCREAM;
 import static org.spongepowered.api.effect.sound.SoundTypes.PISTON_EXTEND;
+import static org.spongepowered.api.item.ItemTypes.PAPER;
 
 public class KeyBook
 {
     public static final String TITLE = ChatFormat.RESET.toString() + ChatFormat.GOLD + "KeyBook " + ChatFormat.DARK_GREY + "#";
-    public final ItemStack item;
+    public ItemStack item;
     public final User currentHolder;
     private final Locker module;
     public final long lockID;
@@ -117,14 +118,14 @@ public class KeyBook
         LoreData lore = item.getOrCreate(LoreData.class).get();
 
         display.setDisplayName(Texts.of(TextColors.DARK_RED, "Broken KeyBook"));
-        lore.set(Texts.of(currentHolder.getTranslation(NEUTRAL, "This KeyBook")),
-                 Texts.of(currentHolder.getTranslation(NEUTRAL, "looks old and")),
-                 Texts.of(currentHolder.getTranslation(NEUTRAL, "used up. It")),
-                 Texts.of(currentHolder.getTranslation(NEUTRAL, "won't let you")),
-                 Texts.of(currentHolder.getTranslation(NEUTRAL, "open any containers!")));
-        item.setType(ItemTypes.PAPER);
+        lore.set(Texts.of(currentHolder.getTranslation(NEUTRAL, "This KeyBook")), Texts.of(currentHolder.getTranslation(
+            NEUTRAL, "looks old and")), Texts.of(currentHolder.getTranslation(NEUTRAL, "used up. It")), Texts.of(
+            currentHolder.getTranslation(NEUTRAL, "won't let you")), Texts.of(currentHolder.getTranslation(NEUTRAL,
+                                                                                                           "open any containers!")));
         item.offer(display);
         item.offer(lore);
+        item = module.getGame().getRegistry().getItemBuilder().fromItemStack(item).itemType(PAPER).build();
+        currentHolder.setItemInHand(item);
     }
 
     public boolean isValidFor(Lock lock)

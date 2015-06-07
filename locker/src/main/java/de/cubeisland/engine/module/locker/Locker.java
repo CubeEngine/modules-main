@@ -39,8 +39,11 @@ import de.cubeisland.engine.module.locker.storage.TableLockLocations;
 import de.cubeisland.engine.module.locker.storage.TableLocks;
 import de.cubeisland.engine.module.service.command.CommandManager;
 import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.module.service.task.Task;
+import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.reflect.Reflector;
+import org.spongepowered.api.Game;
 
 public class Locker extends Module
 {
@@ -66,6 +69,9 @@ public class Locker extends Module
     @Inject private Log logger;
     @Inject private StringMatcher sm;
     @Inject private EntityMatcher entityMatcher;
+    @Inject private Game game;
+    @Inject private TaskManager tm;
+
 
     @Enable
     public void onEnable()
@@ -117,6 +123,21 @@ public class Locker extends Module
     public LockerConfig getConfig()
     {
         return this.config;
+    }
+
+    public Game getGame()
+    {
+        return game;
+    }
+
+    public UserManager getUserManager()
+    {
+        return um;
+    }
+
+    public TaskManager getTaskManager()
+    {
+        return tm;
     }
 
     /*

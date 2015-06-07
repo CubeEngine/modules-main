@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
@@ -31,11 +32,14 @@ import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.LockerAttachment;
+import de.cubeisland.engine.module.service.database.Database;
 import de.cubeisland.engine.module.service.user.User;
 import org.jooq.Result;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.manipulator.DisplayNameData;
 import org.spongepowered.api.data.manipulator.block.OpenData;
 import org.spongepowered.api.data.manipulator.block.PortionData;
+import org.spongepowered.api.data.manipulator.item.LoreData;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Entity;
@@ -44,15 +48,19 @@ import org.spongepowered.api.event.entity.player.PlayerBreakBlockEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.storage.AccessListModel.*;
+import static de.cubeisland.engine.module.locker.storage.KeyBook.TITLE;
 import static de.cubeisland.engine.module.locker.storage.LockType.PUBLIC;
 import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
 import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static java.util.stream.Collectors.toList;
+import static org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK;
 
 public class Lock
 {
@@ -60,8 +68,9 @@ public class Lock
     private final LockManager manager;
     protected final LockModel model;
     protected final ArrayList<Location> locations = new ArrayList<>();
+    private final Database db;
 
-    private Integer taskId = null; // for autoclosing doors
+    private UUID taskId = null; // for autoclosing doors
 
     /**
      * EntityLock
@@ -71,6 +80,7 @@ public class Lock
      */
     public Lock(LockManager manager, LockModel model)
     {
+        this.db = manager.getDB();
         this.module = manager.module;
         this.manager = manager;
         this.model = model;
@@ -87,10 +97,7 @@ public class Lock
     public Lock(LockManager manager, LockModel model, Result<LockLocationModel> lockLocs)
     {
         this(manager, model);
-        for (LockLocationModel lockLoc : lockLocs)
-        {
-            this.locations.add(this.getLocation(lockLoc));
-        }
+        this.locations.addAll(lockLocs.stream().map(this::getLocation).collect(toList()));
         this.isValidType = false;
     }
 
@@ -156,34 +163,37 @@ public class Lock
             user.sendTranslated(POSITIVE, "KeyBooks are not enabled!");
             return;
         }
-        if (third)
+        if (!third)
         {
-            if (user.getItemInHand().isPresent() && user.getItemInHand().get().getItem() == ItemTypes.BOOK)
+            return;
+        }
+        ItemStack itemStack = user.getItemInHand().orNull();
+        if (itemStack != null && itemStack.getItem() == ItemTypes.BOOK)
+        {
+            itemStack.setQuantity(itemStack.getQuantity() - 1);
+        }
+        if (user.getItemInHand().transform(ItemStack::getItem).orNull() != ItemTypes.BOOK)
+        {
+            user.sendTranslated(NEGATIVE, "Could not create KeyBook! You need to hold a book in your hand in order to do this!");
+            return;
+        }
+        ItemStack item = module.getGame().getRegistry().getItemBuilder().itemType(ENCHANTED_BOOK).quantity(
+            1).build();
+        DisplayNameData display = item.getOrCreate(DisplayNameData.class).get();
+        item.offer(display.setDisplayName(Texts.of(getColorPass() + TITLE + getId())));
+        LoreData lore = item.getOrCreate(LoreData.class).get();
+        lore.set(Texts.of(user.getTranslation(NEUTRAL, "This book can")), Texts.of(user.getTranslation(NEUTRAL,
+                                                                                                       "unlock a magically")),
+                 Texts.of(user.getTranslation(NEUTRAL, "locked protection")));
+        item.offer(lore);
+        user.setItemInHand(item);
+        if (itemStack != null)
+        {
+            user.getInventory().offer(itemStack);
+            if (itemStack.getQuantity() != 0)
             {
-                ItemStack itemStack = user.getItemInHand().get();
-                itemStack.setQuantity(itemStack.getQuantity() - 1);
-            }
-            if (user.getItemInHand().transform(ItemStack::getItem).orNull() == ItemTypes.BOOK)
-            {
-                ItemStack itemStack = new ItemStack(ItemTypes.ENCHANTED_BOOK, 1);
-                ItemMeta itemMeta = itemStack.getItemMeta();
-                itemMeta.setDisplayName(this.getColorPass() + KeyBook.TITLE + this.getId());
-                // TODO remove chatcolors in translated text
-                itemMeta.setLore(Arrays.asList(user.getTranslation(NEUTRAL, ChatFormat.YELLOW + "This book can"), user
-                    .getTranslation(NEUTRAL, ChatFormat.YELLOW + "unlock a magically"), user
-                                                   .getTranslation(NEUTRAL, ChatFormat.YELLOW + "locked protection")));
-                itemStack.setItemMeta(itemMeta);
-                user.setItemInHand(itemStack);
-                HashMap<Integer, ItemStack> full = user.getInventory().addItem(new ItemStack(Material.BOOK, amount));
-                for (ItemStack stack : full.values())
-                {
-                    Location location = user.getLocation();
-                    ((World)location.getExtent()).dropItem(location, stack);
-                }
-            }
-            else
-            {
-                user.sendTranslated(NEGATIVE, "Could not create KeyBook! You need to hold a book in your hand in order to do this!");
+                // TODO drop items in world
+                //((World)location.getExtent()).dropItem(location, stack);
             }
         }
     }
@@ -669,7 +679,7 @@ public class Lock
 
     public User getOwner()
     {
-        return um.getUser(this.model.getValue(TABLE_LOCK.OWNER_ID));
+        return module.getUserManager().getUser(this.model.getValue(TABLE_LOCK.OWNER_ID));
     }
 
     public boolean isPublic()
@@ -726,7 +736,7 @@ public class Lock
                 user.sendTranslated(POSITIVE, "The following users have direct access to this protection");
                 for (AccessListModel listModel : accessors)
                 {
-                    User accessor = um.getUser(listModel.getValue(TABLE_ACCESS_LIST.USER_ID));
+                    User accessor = module.getUserManager().getUser(listModel.getValue(TABLE_ACCESS_LIST.USER_ID));
                     if ((listModel.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN)
                     {
                         user.sendMessage("  " + ChatFormat.GREY + "- " + ChatFormat.DARK_GREEN + accessor.getDisplayName() + ChatFormat.GOLD + " [Admin}");
@@ -866,7 +876,7 @@ public class Lock
                 user.playSound(SoundTypes.DOOR_OPEN, door.getPosition(), 1);
             }
         }
-        if (taskId != null) tm.cancelTask(this.manager.module, taskId);
+        if (taskId != null) module.getTaskManager().cancelTask(this.manager.module, taskId);
         if (!open)
         {
             this.scheduleAutoClose();
@@ -879,7 +889,7 @@ public class Lock
         if (this.hasFlag(ProtectionFlag.AUTOCLOSE))
         {
             if (!this.manager.module.getConfig().autoCloseEnable) return;
-            taskId = tm.runTaskDelayed(this.manager.module, (Runnable)() -> {
+            taskId = module.getTaskManager().runTaskDelayed(this.manager.module, () -> {
                 int n = locations.size() / 2;
                 for (Location location : locations)
                 {
@@ -889,7 +899,7 @@ public class Lock
                     }
                     location.remove(OpenData.class);
                 }
-            }, this.manager.module.getConfig().autoCloseSeconds * 20);
+            }, this.manager.module.getConfig().autoCloseSeconds * 20).orNull();
         }
     }
 
