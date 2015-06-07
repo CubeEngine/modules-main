@@ -651,7 +651,6 @@ public class EntityDataChanger<EntityInterface>
                                     @Override
                                     void fillValues()
                                     {
-                                        HorseColors
                                         this.map.put("white", HorseColors.WHITE);
                                         this.map.put("creamy", HorseColors.CREAMY);
                                         this.map.put("chestnut", HorseColors.CHESTNUT);

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.teleport;
+package de.cubeisland.engine.module.teleport;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
@@ -46,11 +46,11 @@ import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITI
  */
 public class SpawnCommands
 {
-    private final Basics module;
+    private final Teleport module;
     private EventManager em;
     private UserManager um;
 
-    public SpawnCommands(Basics basics, EventManager em, UserManager um)
+    public SpawnCommands(Teleport basics, EventManager em, UserManager um)
     {
         this.module = basics;
         this.em = em;

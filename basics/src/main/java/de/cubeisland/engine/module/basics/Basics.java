@@ -44,11 +44,11 @@ import de.cubeisland.engine.module.basics.command.moderation.PaintingListener;
 import de.cubeisland.engine.module.basics.command.moderation.TimeControlCommands;
 import de.cubeisland.engine.module.basics.command.moderation.WorldControlCommands;
 import de.cubeisland.engine.module.basics.command.moderation.spawnmob.SpawnMobCommand;
-import de.cubeisland.engine.module.basics.command.teleport.MovementCommands;
-import de.cubeisland.engine.module.basics.command.teleport.SpawnCommands;
-import de.cubeisland.engine.module.basics.command.teleport.TeleportCommands;
-import de.cubeisland.engine.module.basics.command.teleport.TeleportListener;
-import de.cubeisland.engine.module.basics.command.teleport.TeleportRequestCommands;
+import de.cubeisland.engine.module.teleport.MovementCommands;
+import de.cubeisland.engine.module.teleport.SpawnCommands;
+import de.cubeisland.engine.module.teleport.TeleportCommands;
+import de.cubeisland.engine.module.teleport.TeleportListener;
+import de.cubeisland.engine.module.teleport.TeleportRequestCommands;
 import de.cubeisland.engine.module.basics.storage.TableBasicsUser;
 import de.cubeisland.engine.module.basics.storage.TableIgnorelist;
 import de.cubeisland.engine.module.basics.storage.TableMail;
@@ -144,11 +144,7 @@ public class Basics extends Module
         em.registerListener(this, new PaintingListener(this, um));
 
         logger.trace("{} ms - Teleport-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
-        //Teleport:
-        cm.addCommands(cm, this, new MovementCommands(this));
-        cm.addCommands(cm, this, new SpawnCommands(this, em, um));
-        cm.addCommands(cm, this, new TeleportCommands(this, um));
-        cm.addCommands(cm, this, new TeleportRequestCommands(this, taskManager, um));
+
         logger.trace("{} ms - Teleport/Fly-Listener", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         em.registerListener(this, new TeleportListener(this, um));
         em.registerListener(this, new FixListener(this));

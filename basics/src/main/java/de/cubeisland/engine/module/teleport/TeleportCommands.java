@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.teleport;
+package de.cubeisland.engine.module.teleport;
 
 import java.util.ArrayList;
 import com.flowpowered.math.vector.Vector3d;
@@ -49,10 +49,10 @@ import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
  */
 public class TeleportCommands
 {
-    private final Basics module;
+    private final Teleport module;
     private UserManager um;
 
-    public TeleportCommands(Basics module, UserManager um)
+    public TeleportCommands(Teleport module, UserManager um)
     {
         this.module = module;
         this.um = um;

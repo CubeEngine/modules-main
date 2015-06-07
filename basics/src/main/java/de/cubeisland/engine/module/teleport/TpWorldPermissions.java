@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.teleport;
+package de.cubeisland.engine.module.teleport;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,13 +31,13 @@ import org.spongepowered.api.world.World;
  * Dynamically registered Permissions for each world.
  */
 @SuppressWarnings("all")
-public class TpWorldPermissions extends PermissionContainer<Basics>
+public class TpWorldPermissions extends PermissionContainer<Teleport>
 {
     private final Permission COMMAND_TPWORLD;
     private final Map<String, Permission> permissions = new HashMap<>();
     private PermissionManager pm;
 
-    public TpWorldPermissions(Basics module, BasicsPerm perm, WorldManager wm, PermissionManager pm)
+    public TpWorldPermissions(Teleport module, TeleportPerm perm, WorldManager wm, PermissionManager pm)
     {
         super(module);
         this.pm = pm;
@@ -62,7 +62,6 @@ public class TpWorldPermissions extends PermissionContainer<Basics>
         if (perm == null)
         {
             perm = initWorldPermission(world);
-            pm.notifyPermissionRegistrationCompleted(this.module, perm);
         }
         return perm;
     }

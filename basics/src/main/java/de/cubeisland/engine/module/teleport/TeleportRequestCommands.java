@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.teleport;
+package de.cubeisland.engine.module.teleport;
 
 import java.util.UUID;
 import com.google.common.base.Optional;
@@ -38,11 +38,11 @@ import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
  */
 public class TeleportRequestCommands
 {
-    private final Basics module;
+    private final Teleport module;
     private TaskManager taskManager;
     private UserManager um;
 
-    public TeleportRequestCommands(Basics module, TaskManager taskManager, UserManager um)
+    public TeleportRequestCommands(Teleport module, TaskManager taskManager, UserManager um)
     {
         this.module = module;
         this.taskManager = taskManager;
@@ -64,7 +64,7 @@ public class TeleportRequestCommands
         player.get(BasicsAttachment.class).setPendingTpToRequest(context.getUniqueId());
         player.get(BasicsAttachment.class).removePendingTpFromRequest();
         context.sendTranslated(POSITIVE, "Teleport request sent to {user}!", player);
-        int waitTime = this.module.getConfiguration().commands.teleportRequestWait * 20;
+        int waitTime = this.module.getConfig().teleportRequestWait * 20;
         if (waitTime > 0)
         {
             final User sendingUser = context;
@@ -98,19 +98,15 @@ public class TeleportRequestCommands
         player.get(BasicsAttachment.class).setPendingTpFromRequest(context.getUniqueId());
         player.get(BasicsAttachment.class).removePendingTpToRequest();
         context.sendTranslated(POSITIVE, "Teleport request send to {user}!", player);
-        int waitTime = this.module.getConfiguration().commands.teleportRequestWait * 20;
+        int waitTime = this.module.getConfig().teleportRequestWait * 20;
         if (waitTime > 0)
         {
             final User sendingUser = context;
-            final Optional<UUID> taskID = taskManager.runTaskDelayed(this.module, new Runnable()
-            {
-                public void run()
-                {
-                    player.get(BasicsAttachment.class).removeTpRequestCancelTask();
-                    player.get(BasicsAttachment.class).removePendingTpFromRequest();
-                    sendingUser.sendTranslated(NEGATIVE, "{user} did not accept your teleport request.", player);
-                    player.sendTranslated(NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
-                }
+            final Optional<UUID> taskID = taskManager.runTaskDelayed(this.module, () -> {
+                player.get(BasicsAttachment.class).removeTpRequestCancelTask();
+                player.get(BasicsAttachment.class).removePendingTpFromRequest();
+                sendingUser.sendTranslated(NEGATIVE, "{user} did not accept your teleport request.", player);
+                player.sendTranslated(NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
             }, waitTime); // wait x - seconds
             UUID oldtaskID = player.get(BasicsAttachment.class).getTpRequestCancelTask();
             if (oldtaskID != null)

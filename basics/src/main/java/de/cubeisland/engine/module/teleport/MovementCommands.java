@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.teleport;
+package de.cubeisland.engine.module.teleport;
 
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
@@ -32,7 +32,6 @@ import de.cubeisland.engine.module.service.user.User;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.module.basics.command.teleport.TeleportCommands.teleport;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.AIR;
 import static org.spongepowered.api.block.BlockTypes.GLASS;
@@ -45,9 +44,9 @@ import static org.spongepowered.api.util.Direction.UP;
  */
 public class MovementCommands
 {
-    private final Basics module;
+    private final Teleport module;
 
-    public MovementCommands(Basics module)
+    public MovementCommands(Teleport module)
     {
         this.module = module;
     }
@@ -75,7 +74,7 @@ public class MovementCommands
         {
             loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS);
         }
-        if (teleport(context, loc, true, false, true)) // is save anyway so we do not need to check again
+        if (TeleportCommands.teleport(context, loc, true, false, true)) // is save anyway so we do not need to check again
         {
             context.sendTranslated(POSITIVE, "You have just been lifted!");
         }
@@ -86,7 +85,7 @@ public class MovementCommands
     public void top(User context)
     {
         Location loc = BlockUtil.getHighestBlockAt(context.getLocation()).add(.5, 0, .5);
-        if (teleport(context, loc, true, false, true)) // is save anyway so we do not need to check again
+        if (TeleportCommands.teleport(context, loc, true, false, true)) // is save anyway so we do not need to check again
         {
             context.sendTranslated(POSITIVE, "You are now on top!");
         }
@@ -127,7 +126,7 @@ public class MovementCommands
             return;
         }
         loc = loc.add(0, ((World)loc.getExtent()).getBuildHeight() - loc.getY() + 1, 0);
-        if (teleport(context, loc, true, false, true))
+        if (TeleportCommands.teleport(context, loc, true, false, true))
         {
             context.sendTranslated(POSITIVE, "Ascended a level!");
         }
@@ -158,7 +157,7 @@ public class MovementCommands
             return;
         }
         //reached new location
-        if (teleport(context, curLoc, true, false, true))
+        if (TeleportCommands.teleport(context, curLoc, true, false, true))
         {
             context.sendTranslated(POSITIVE, "Descended a level!");
         }
@@ -168,14 +167,14 @@ public class MovementCommands
     @Restricted(value = User.class, msg = "Jumping in the console is not allowed! Go play outside!")
     public void jumpTo(User context)
     {
-        Location loc = context.getTargetBlock(this.module.getConfiguration().navigation.jumpToMaxRange);
+        Location loc = context.getTargetBlock(this.module.getConfig().navigation.jumpToMaxRange);
         if (loc.getType() == AIR)
         {
             context.sendTranslated(NEGATIVE, "No block in sight!");
             return;
         }
         loc = loc.add(0.5, 1, 0.5);
-        if (teleport(context, loc, true, false, true))
+        if (TeleportCommands.teleport(context, loc, true, false, true))
         {
             context.sendTranslated(POSITIVE, "You just jumped!");
         }
@@ -185,14 +184,14 @@ public class MovementCommands
     @Restricted(value = User.class, msg = "Passing through firewalls in the console is not allowed! Go play outside!")
     public void through(User context)
     {
-        Location loc = LocationUtil.getBlockBehindWall(context, this.module.getConfiguration().navigation.thru.maxRange,
-                                                               this.module.getConfiguration().navigation.thru.maxWallThickness);
+        Location loc = LocationUtil.getBlockBehindWall(context, this.module.getConfig().navigation.thru.maxRange,
+                                                               this.module.getConfig().navigation.thru.maxWallThickness);
         if (loc == null)
         {
             context.sendTranslated(NEGATIVE, "Nothing to pass through!");
             return;
         }
-        if (teleport(context, loc, true, false, true))
+        if (TeleportCommands.teleport(context, loc, true, false, true))
         {
             context.sendTranslated(POSITIVE, "You just passed the wall!");
         }
@@ -214,7 +213,7 @@ public class MovementCommands
             }
             if (loc != null)
             {
-                if (teleport(context, loc, !unsafe, true, true))
+                if (TeleportCommands.teleport(context, loc, !unsafe, true, true))
                 {
                     context.sendTranslated(POSITIVE, "Teleported to your death point!");
                 }
@@ -233,7 +232,7 @@ public class MovementCommands
                 context.sendTranslated(NEGATIVE, "You never teleported!");
                 return;
             }
-            if (teleport(context, loc, !unsafe, true, true))
+            if (TeleportCommands.teleport(context, loc, !unsafe, true, true))
             {
                 context.sendTranslated(POSITIVE, "Teleported to your last location!");
             }
@@ -258,7 +257,7 @@ public class MovementCommands
             return;
         }
         loc = loc.add(0.5, 1, 0.5);
-        if (teleport(player, loc, true, false, true))
+        if (TeleportCommands.teleport(player, loc, true, false, true))
         {
             context.sendTranslated(POSITIVE, "You just placed {user} where you were looking!", player);
             player.sendTranslated(POSITIVE, "You were placed somewhere!");
@@ -284,9 +283,9 @@ public class MovementCommands
             return;
         }
         Location userLoc = player.getLocation();
-        if (teleport(player, sender.getLocation(), true, false, false))
+        if (TeleportCommands.teleport(player, sender.getLocation(), true, false, false))
         {
-            if (teleport(sender, userLoc, true, false, false))
+            if (TeleportCommands.teleport(sender, userLoc, true, false, false))
             {
                 if (!context.equals(sender))
                 {
@@ -296,7 +295,7 @@ public class MovementCommands
                 context.sendTranslated(POSITIVE, "Swapped position with {user}!", player);
                 return;
             }
-            teleport(player, userLoc, false, true, false);
+            TeleportCommands.teleport(player, userLoc, false, true, false);
         }
         context.sendTranslated(NEGATIVE, "Could not teleport both players!");
     }

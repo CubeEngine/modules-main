@@ -150,7 +150,7 @@ public class LockerConfig extends ReflectedYaml
 
         if (this.protectWhenOnlyOffline && this.protectWhenOnlyOnline)
         {
-            logger.warn("[Locker] Invalid Configuration! Cannot protect only when offline AND only when online");
+            throw new IllegalArgumentException("Invalid Configuration! Cannot protect only when offline AND only when online");
         }
         detachableEntityCount = -1;
     }

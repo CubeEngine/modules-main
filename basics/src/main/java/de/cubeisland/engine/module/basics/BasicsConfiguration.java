@@ -46,10 +46,6 @@ public class BasicsConfiguration extends ReflectedYaml
 
         public int butcherDefaultRadius = 20;
 
-        @Comment({"The seconds until a teleport request is automatically denied.",
-                  "Use -1 to never automatically deny. (Will lose information after some time when disconnecting)"})
-        public int teleportRequestWait = -1;
-
         public int nearDefaultRadius = 20;
 
         @Name("mute.default-mute-time")
@@ -116,10 +112,6 @@ public class BasicsConfiguration extends ReflectedYaml
         }
     }
 
-    @Comment({"The world to teleport to when using /spawn",
-              "Use {} if you want to use the spawn of the world the player is in."})
-    public ConfigWorld mainWorld;
-
     public AfkSection autoAfk;
 
     public class AfkSection implements Section
@@ -130,23 +122,6 @@ public class BasicsConfiguration extends ReflectedYaml
         @Comment({"How often the server will check for afk players",
         "Set to 0 to disable auto-afk"})
         public Duration check = Period.seconds(1).toStandardDuration();
-    }
-
-    public NavigationSection navigation;
-
-    public class NavigationSection implements Section
-    {
-        public ThruSection thru;
-
-        public class ThruSection implements Section
-        {
-            public int maxRange = 15;
-
-            public int maxWallThickness = 15;
-        }
-
-        @Name("jumpto.max-range")
-        public int jumpToMaxRange = 300;
     }
 
     @Name("changepainting.max.distance")
