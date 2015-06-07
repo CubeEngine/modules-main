@@ -48,9 +48,6 @@ public class BasicsConfiguration extends ReflectedYaml
 
         public int nearDefaultRadius = 20;
 
-        @Name("mute.default-mute-time")
-        public Duration defaultMuteTime = new Duration(0);
-
         public Collection<BlockType> itemBlacklist = new LinkedList<BlockType>()
         {
             {
@@ -112,17 +109,7 @@ public class BasicsConfiguration extends ReflectedYaml
         }
     }
 
-    public AfkSection autoAfk;
 
-    public class AfkSection implements Section
-    {
-        @Comment("Players will be automatically displayed as afk after this amount of time")
-        public Duration after = Period.minutes(5).toStandardDuration();
-
-        @Comment({"How often the server will check for afk players",
-        "Set to 0 to disable auto-afk"})
-        public Duration check = Period.seconds(1).toStandardDuration();
-    }
 
     @Name("changepainting.max.distance")
     public int maxChangePaintingDistance = 10;

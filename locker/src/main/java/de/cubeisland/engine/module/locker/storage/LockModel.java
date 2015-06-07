@@ -41,7 +41,7 @@ public class LockModel extends AsyncRecord<LockModel>
 
     public LockModel newLock(User user, LockType lockType, ProtectedType type, UUID entityUUID)
     {
-        this.setValue(TABLE_LOCK.OWNER_ID, user.getEntity().getKey());
+        this.setValue(TABLE_LOCK.OWNER_ID, user.getEntity().getId());
         this.setValue(TABLE_LOCK.LOCK_TYPE, lockType.id);
         this.setValue(TABLE_LOCK.FLAGS, (short)0); // none
         this.setValue(TABLE_LOCK.PROTECTED_TYPE, type.id);

@@ -30,9 +30,7 @@ import java.util.concurrent.ThreadFactory;
 import de.cubeisland.engine.logscribe.LogFactory;
 import de.cubeisland.engine.module.core.filesystem.FileManager;
 import de.cubeisland.engine.module.core.logging.LoggingUtil;
-import de.cubeisland.engine.module.service.Economy;
 import de.cubeisland.engine.module.service.database.Database;
-import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.logscribe.Log;
@@ -421,7 +419,7 @@ public class ConomyManager
     {
         Result<AccountModel> accountModels = this.dsl.selectFrom(TABLE_ACCOUNT).where(TABLE_ACCOUNT.KEY.eq(
             this.dsl.select(TABLE_BANK_ACCESS.ACCOUNTID).from(TABLE_BANK_ACCESS).where(TABLE_BANK_ACCESS.USERID.eq(
-                user.getEntity().getKey())))).fetch();
+                user.getEntity().getId())))).fetch();
         Set<BankAccount> accounts = new HashSet<>();
         for (AccountModel accountModel : accountModels)
         {
@@ -477,7 +475,7 @@ public class ConomyManager
     protected AccountModel loadUserAccount(User holder)
     {
         return this.dsl.selectFrom(TABLE_ACCOUNT).where(TABLE_ACCOUNT.USER_ID.eq(
-            holder.getEntity().getKey())).fetchOneInto(TABLE_ACCOUNT);
+            holder.getEntity().getId())).fetchOneInto(TABLE_ACCOUNT);
     }
 
     public List<BankAccessModel> getBankAccess(AccountModel model)

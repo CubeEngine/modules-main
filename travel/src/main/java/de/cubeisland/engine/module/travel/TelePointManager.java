@@ -142,7 +142,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
 
     public int getCount(User user)
     {
-        return this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.OWNER.eq(user.getEntity().getKey())).fetchCount();
+        return this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.OWNER.eq(user.getEntity().getId())).fetchCount();
     }
 
     public abstract T create(User owner, String name, Location location, Vector3d rotation, boolean publicVisibility);

@@ -205,7 +205,7 @@ public class MovementCommands
         boolean backPerm = module.perms().COMMAND_BACK_USE.isAuthorized(context);
         if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(context))
         {
-            Location loc = context.get(BasicsAttachment.class).getDeathLocation();
+            Location loc = context.get(TeleportAttachment.class).getDeathLocation();
             if (!backPerm && loc == null)
             {
                 context.sendTranslated(NEGATIVE, "No death point found!");
@@ -219,14 +219,14 @@ public class MovementCommands
                 }
                 else
                 {
-                    context.get(BasicsAttachment.class).setDeathLocation(loc);
+                    context.get(TeleportAttachment.class).setDeathLocation(loc);
                 }
                 return;
             }
         }
         if (backPerm)
         {
-            Location loc = context.get(BasicsAttachment.class).getLastLocation();
+            Location loc = context.get(TeleportAttachment.class).getLastLocation();
             if (loc == null)
             {
                 context.sendTranslated(NEGATIVE, "You never teleported!");

@@ -52,7 +52,7 @@ public class BankAccessModel extends AsyncRecord<BankAccessModel>
 
     public void setUser(UserEntity userEntity)
     {
-        this.setValue(TABLE_BANK_ACCESS.USERID, userEntity.getKey());
+        this.setValue(TABLE_BANK_ACCESS.USERID, userEntity.getId());
     }
 
     public void setAccessLevel(AccessLevel level)

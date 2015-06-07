@@ -8,8 +8,6 @@ import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 
 public class TeleportConfiguration extends ReflectedYaml
 {
-
-
     @Comment({"The world to teleport to when using /spawn",
               "Use {} if you want to use the spawn of the world the player is in."})
     public ConfigWorld mainWorld;
@@ -17,8 +15,6 @@ public class TeleportConfiguration extends ReflectedYaml
     @Comment({"The seconds until a teleport request is automatically denied.",
               "Use -1 to never automatically deny. (Will lose information after some time when disconnecting)"})
     public int teleportRequestWait = -1;
-
-
 
     public NavigationSection navigation;
 

@@ -707,8 +707,8 @@ public class LockManager
                 accessType = ACCESS_ALL; // with AdminAccess
             }
             AccessListModel accessListModel = database.getDSL().selectFrom(TABLE_ACCESS_LIST).where(
-                TABLE_ACCESS_LIST.USER_ID.eq(modifyUser.getEntity().getKey()),
-                TABLE_ACCESS_LIST.OWNER_ID.eq(sender.getEntity().getKey())).fetchOne();
+                TABLE_ACCESS_LIST.USER_ID.eq(modifyUser.getEntity().getId()),
+                TABLE_ACCESS_LIST.OWNER_ID.eq(sender.getEntity().getId())).fetchOne();
             if (add)
             {
                 if (accessListModel == null)
@@ -741,7 +741,7 @@ public class LockManager
 
     public CompletableFuture<Integer> purgeLocksFrom(User user)
     {
-        return database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(user.getEntity().getKey())));
+        return database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(user.getEntity().getId())));
     }
 
     public Database getDB()

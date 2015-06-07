@@ -32,26 +32,22 @@ import de.cubeisland.engine.module.basics.command.general.IgnoreCommands;
 import de.cubeisland.engine.module.basics.command.general.InformationCommands;
 import de.cubeisland.engine.module.basics.command.general.LagTimer;
 import de.cubeisland.engine.module.basics.command.general.ListCommand;
-import de.cubeisland.engine.module.basics.command.general.MailCommand;
+import de.cubeisland.engine.module.mail.MailCommand;
 import de.cubeisland.engine.module.basics.command.general.MuteListener;
 import de.cubeisland.engine.module.basics.command.general.PlayerCommands;
 import de.cubeisland.engine.module.basics.command.general.RolesListCommand;
 import de.cubeisland.engine.module.basics.command.moderation.DoorCommand;
 import de.cubeisland.engine.module.basics.command.moderation.InventoryCommands;
 import de.cubeisland.engine.module.basics.command.moderation.ItemCommands;
-import de.cubeisland.engine.module.basics.command.moderation.KickBanCommands;
+import de.cubeisland.engine.module.kickban.KickBanCommands;
 import de.cubeisland.engine.module.basics.command.moderation.PaintingListener;
 import de.cubeisland.engine.module.basics.command.moderation.TimeControlCommands;
 import de.cubeisland.engine.module.basics.command.moderation.WorldControlCommands;
 import de.cubeisland.engine.module.basics.command.moderation.spawnmob.SpawnMobCommand;
-import de.cubeisland.engine.module.teleport.MovementCommands;
-import de.cubeisland.engine.module.teleport.SpawnCommands;
-import de.cubeisland.engine.module.teleport.TeleportCommands;
 import de.cubeisland.engine.module.teleport.TeleportListener;
-import de.cubeisland.engine.module.teleport.TeleportRequestCommands;
 import de.cubeisland.engine.module.basics.storage.TableBasicsUser;
 import de.cubeisland.engine.module.basics.storage.TableIgnorelist;
-import de.cubeisland.engine.module.basics.storage.TableMail;
+import de.cubeisland.engine.module.mail.storage.TableMail;
 import de.cubeisland.engine.module.core.filesystem.FileManager;
 import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
@@ -102,8 +98,6 @@ public class Basics extends Module
         Profiler.startProfiling("basicsEnable");
 
         this.config = fm.loadConfig(this, BasicsConfiguration.class);
-        db.registerTable(TableBasicsUser.class);
-        db.registerTable(TableIgnorelist.class);
         db.registerTable(TableMail.class);
         logger.trace("{} ms - Basics.Permission", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         perms = new BasicsPerm(this, wm, pm);
@@ -113,19 +107,15 @@ public class Basics extends Module
 
         logger.trace("{} ms - General-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         //General:
-        IgnoreCommands ignoreCommands = new IgnoreCommands(this, db);
-        cm.addCommands(cm, this, ignoreCommands);
-        cm.addCommands(cm, this, new ChatCommands(this, um, cm));
         cm.addCommands(cm, this, new InformationCommands(this, wm, materialMatcher));
         cm.addCommand(new MailCommand(this, um, taskManager, db));
         cm.addCommands(cm, this, new PlayerCommands(this, um, em, taskManager, cm, banManager));
         logger.trace("{} ms - General-Listener", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         em.registerListener(this, new GeneralsListener(this, um));
-        em.registerListener(this, new MuteListener(this, ignoreCommands, um));
         logger.trace("{} ms - Moderation-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         //Moderation:
-        cm.addCommands(cm, this, new InventoryCommands(this, invGuard));
-        cm.addCommands(cm, this, new ItemCommands(this));
+        cm.addCommands( this, new InventoryCommands(this, invGuard));
+        cm.addCommands( this, new ItemCommands(this));
         cm.addCommands(cm, this, new KickBanCommands(this, banManager, um, game));
         cm.addCommands(cm, this, new SpawnMobCommand(this));
         cm.addCommands(cm, this, new TimeControlCommands(this, taskManager, wm));

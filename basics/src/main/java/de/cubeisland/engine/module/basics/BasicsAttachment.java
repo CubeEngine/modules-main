@@ -25,37 +25,12 @@ import org.spongepowered.api.world.Location;
 
 public class BasicsAttachment extends UserAttachment
 {
-    private long lastAction = 0;
-    private BasicsUser basicUser = null;
-    private boolean afk;
-    private Location lastLocation = null;
-    private UUID tpRequestCancelTask;
-    private UUID pendingTpToRequest;
-    private UUID pendingTpFromRequest;
+
+
+
     private ItemStack[] stashedArmor;
     private ItemStack[] stashedInventory;
-    private UUID lastWhisper;
-    private Location deathLocation;
 
-    public long getLastAction()
-    {
-        return this.lastAction;
-    }
-
-    public long updateLastAction()
-    {
-        return this.lastAction = System.currentTimeMillis();
-    }
-
-    public void setAfk(boolean afk)
-    {
-        this.afk = afk;
-    }
-
-    public boolean isAfk()
-    {
-        return afk;
-    }
 
     private boolean unlimitedItems = false;
 
@@ -69,69 +44,8 @@ public class BasicsAttachment extends UserAttachment
         this.unlimitedItems = b;
     }
 
-    public BasicsUser getBasicsUser()
-    {
-        if (basicUser == null)
-        {
-            this.basicUser = new BasicsUser((Database)this.getModule().getModularity().start(Database.class), this.getHolder());
-        }
-        return basicUser;
-    }
 
-    public Location getLastLocation()
-    {
-        return lastLocation;
-    }
 
-    public void setLastLocation(Location lastLocation)
-    {
-        this.lastLocation = lastLocation;
-    }
-
-    public void setTpRequestCancelTask(UUID tpRequestCancelTask)
-    {
-        this.tpRequestCancelTask = tpRequestCancelTask;
-    }
-
-    public UUID getTpRequestCancelTask()
-    {
-        return tpRequestCancelTask;
-    }
-
-    public void removeTpRequestCancelTask()
-    {
-        this.tpRequestCancelTask = null;
-    }
-
-    public void setPendingTpToRequest(UUID pendingTpToRequest)
-    {
-        this.pendingTpToRequest = pendingTpToRequest;
-    }
-
-    public UUID getPendingTpToRequest()
-    {
-        return pendingTpToRequest;
-    }
-
-    public void removePendingTpToRequest()
-    {
-        pendingTpToRequest = null;
-    }
-
-    public void setPendingTpFromRequest(UUID pendingTpFromRequest)
-    {
-        this.pendingTpFromRequest = pendingTpFromRequest;
-    }
-
-    public UUID getPendingTpFromRequest()
-    {
-        return pendingTpFromRequest;
-    }
-
-    public void removePendingTpFromRequest()
-    {
-        pendingTpFromRequest = null;
-    }
 
     public void setStashedArmor(ItemStack[] stashedArmor)
     {
@@ -153,35 +67,5 @@ public class BasicsAttachment extends UserAttachment
         return stashedInventory;
     }
 
-    public void setLastWhisper(UUID lastWhisper)
-    {
-        this.lastWhisper = lastWhisper;
-    }
 
-    public UUID getLastWhisper()
-    {
-        return lastWhisper;
-    }
-
-    public void resetLastAction()
-    {
-        this.lastAction = 0;
-    }
-
-    public void setDeathLocation(Location deathLocation)
-    {
-        this.deathLocation = deathLocation;
-    }
-
-    /**
-     * Also nulls the location
-     *
-     * @return the location
-     */
-    public Location getDeathLocation()
-    {
-        Location loc = deathLocation;
-        deathLocation = null;
-        return loc;
-    }
 }

@@ -142,23 +142,7 @@ public class BasicsPerm extends PermissionContainer<Basics>
      */
     public final Permission COMMAND_GOD_KEEP = COMMAND_GOD.child("keep");
 
-    private final Permission COMMAND_AFK = COMMAND.childWildcard("afk");
-    private final Permission COMMAND_AFK_PREVENT = COMMAND_AFK.newWildcard("prevent");
-    /**
-     * Prevents from being displayed as no longer afk automatically unless using chat
-     */
-    public final Permission PREVENT_AUTOUNAFK = COMMAND_AFK_PREVENT.child("autounafk", FALSE);
-    /**
-     * Prevents from being displayed as afk automatically
-     */
-    public final Permission PREVENT_AUTOAFK = COMMAND_AFK_PREVENT.child("autoafk", FALSE);
 
-    /**
-     * Allows to set or unset the afk status of other players
-     */
-    public final Permission COMMAND_AFK_OTHER = COMMAND_AFK.child("other");
-
-    public final Permission COMMAND_IGNORE_PREVENT = COMMAND.childWildcard("ignore").child("prevent",FALSE);
 
     private final Permission COMMAND_BUTCHER = COMMAND.childWildcard("butcher");
     private final Permission COMMAND_BUTCHER_FLAG = COMMAND_BUTCHER.childWildcard("flag");
@@ -186,9 +170,6 @@ public class BasicsPerm extends PermissionContainer<Basics>
     public final Permission COMMAND_FLY_KEEP = COMMAND_FLY.child("keep");
     public final Permission COMMAND_FLY_OTHER = COMMAND_FLY.child("other");
 
-    private final Permission COMPASS_JUMPTO = getBasePerm().childWildcard("compass").childWildcard("jumpto");
-    public final Permission COMPASS_JUMPTO_LEFT = COMPASS_JUMPTO.child("left");
-    public final Permission COMPASS_JUMPTO_RIGHT = COMPASS_JUMPTO.child("right");
 
     private final Permission COMMAND_KICK = COMMAND.childWildcard("kick");
     public final Permission COMMAND_KICK_ALL = COMMAND_KICK.child("all");

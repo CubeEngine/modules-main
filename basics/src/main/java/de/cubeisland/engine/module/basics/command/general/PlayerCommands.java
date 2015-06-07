@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Random;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
@@ -49,7 +50,6 @@ import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.user.UserList;
 import de.cubeisland.engine.module.service.user.UserManager;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.player.gamemode.GameMode;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
 import org.spongepowered.api.text.Text;
@@ -70,7 +70,6 @@ public class PlayerCommands
     private BanManager banManager;
     private Game game;
     private final Basics module;
-    private AfkListener afkListener;
 
     public PlayerCommands(Basics basics, UserManager um, EventManager em, TaskManager taskManager, CommandManager cm, BanManager banManager, Game game)
     {
@@ -79,19 +78,7 @@ public class PlayerCommands
         this.cm = cm;
         this.banManager = banManager;
         this.game = game;
-        final long autoAfk;
-        final long afkCheck;
-        afkCheck = basics.getConfiguration().autoAfk.check.getMillis();
-        if (afkCheck > 0)
-        {
-            autoAfk = basics.getConfiguration().autoAfk.after.getMillis();
-            this.afkListener = new AfkListener(basics, um, autoAfk, afkCheck);
-            em.registerListener(basics, this.afkListener);
-            if (autoAfk > 0)
-            {
-                taskManager.runTimer(basics, this.afkListener, 20, afkCheck / 50); // this is in ticks so /50
-            }
-        }
+
     }
 
     @Command(desc = "Refills your hunger bar")
@@ -409,28 +396,7 @@ public class PlayerCommands
         context.sendTranslated(NEGATIVE, "You ended your life. Why? {text:\\:(:color=DARK_RED}");
     }
 
-    @Command(desc = "Displays that you are afk")
-    public void afk(CommandContext context, @Default User player)
-    {
-        if (!context.getSource().equals(player))
-        {
-            context.ensurePermission(module.perms().COMMAND_AFK_OTHER);
-        }
-        if (!player.isOnline())
-        {
-            context.sendTranslated(NEGATIVE, "{user} is not online!", player);
-            return;
-        }
-        if (player.get(BasicsAttachment.class).isAfk())
-        {
-            player.get(BasicsAttachment.class).updateLastAction();
-            this.afkListener.run();
-            return;
-        }
-        player.get(BasicsAttachment.class).setAfk(true);
-        player.get(BasicsAttachment.class).resetLastAction();
-        this.um.broadcastStatus("is now afk.", player);
-    }
+
 
     @Command(desc = "Displays informations from a player!")
     public void whois(CommandSender context, User player)
@@ -627,5 +593,13 @@ public class PlayerCommands
         {
             context.sendTranslated(POSITIVE, "{player} cannot fly anymore!", player);
         }
+    }
+
+
+
+    @Command(alias = "roll", desc = "Shows a random number from 0 to 100")
+    public void rand(CommandSender context)
+    {
+        this.um.broadcastTranslatedStatus(NEUTRAL, "rolled a {integer}!", context, new Random().nextInt(100));
     }
 }

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.storage;
+package de.cubeisland.engine.module.mail.storage;
 
 import de.cubeisland.engine.module.core.util.Version;
 import de.cubeisland.engine.module.service.database.AutoIncrementTable;

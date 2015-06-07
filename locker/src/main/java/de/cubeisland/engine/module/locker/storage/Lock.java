@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
@@ -380,7 +379,7 @@ public class Lock
             return;
         }
         if (event.isCancelled()) return;
-        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getKey())) return; // Its the owner
+        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getId())) return; // Its the owner
         switch (this.getLockType())
         {
             case PRIVATE: // block changes
@@ -412,12 +411,12 @@ public class Lock
     {
         AccessListModel model = db.getDSL().selectFrom(TABLE_ACCESS_LIST).
             where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID)),
-                  TABLE_ACCESS_LIST.USER_ID.eq(user.getEntity().getKey())).fetchOne();
+                  TABLE_ACCESS_LIST.USER_ID.eq(user.getEntity().getId())).fetchOne();
         if (model == null)
         {
             model = db.getDSL().selectFrom(TABLE_ACCESS_LIST).
-                where(TABLE_ACCESS_LIST.USER_ID.eq(user.getEntity().getKey()),
-                      TABLE_ACCESS_LIST.OWNER_ID.eq(this.getOwner().getEntity().getKey())).fetchOne();
+                where(TABLE_ACCESS_LIST.USER_ID.eq(user.getEntity().getId()),
+                      TABLE_ACCESS_LIST.OWNER_ID.eq(this.getOwner().getEntity().getId())).fetchOne();
         }
         return model;
     }
@@ -537,7 +536,7 @@ public class Lock
 
     public void handleBlockBreak(PlayerBreakBlockEvent event, User user)
     {
-        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getKey()) || module.perms().BREAK_OTHER.isAuthorized(user))
+        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getId()) || module.perms().BREAK_OTHER.isAuthorized(user))
         {
             this.delete(user);
             return;
@@ -565,7 +564,7 @@ public class Lock
 
     public boolean handleEntityDamage(Cancellable event, User user)
     {
-        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getKey()) || module.perms().BREAK_OTHER.isAuthorized(user))
+        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getId()) || module.perms().BREAK_OTHER.isAuthorized(user))
         {
             user.sendTranslated(NEUTRAL, "The magic surrounding this entity quivers as you hit it!");
             return true;
@@ -592,7 +591,7 @@ public class Lock
 
     public boolean isOwner(User user)
     {
-        return this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getKey());
+        return this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getId());
     }
 
     public boolean hasAdmin(User user)
@@ -923,7 +922,7 @@ public class Lock
 
     public void setOwner(User owner)
     {
-        this.model.setValue(TABLE_LOCK.OWNER_ID, owner.getEntity().getKey());
+        this.model.setValue(TABLE_LOCK.OWNER_ID, owner.getEntity().getId());
         this.model.updateAsync();
     }
 

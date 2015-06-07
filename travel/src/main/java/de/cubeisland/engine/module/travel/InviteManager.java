@@ -52,7 +52,7 @@ public class InviteManager
 
     public void invite(TeleportPointModel tPP, User user)
     {
-        TeleportInvite invite = this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getValue(TABLE_TP_POINT.KEY), user.getEntity().getKey());
+        TeleportInvite invite = this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getValue(TABLE_TP_POINT.KEY), user.getEntity().getId());
         this.invites.add(invite);
         invite.insertAsync();
     }
@@ -88,7 +88,7 @@ public class InviteManager
         Set<TeleportInvite> invites = new HashSet<>();
         for (TeleportInvite invite : this.invites)
         {
-            if (invite.getValue(TABLE_INVITE.USERKEY).equals(user.getEntity().getKey()))
+            if (invite.getValue(TABLE_INVITE.USERKEY).equals(user.getEntity().getId()))
             {
                 invites.add(invite);
             }
@@ -127,7 +127,7 @@ public class InviteManager
         Set<UInteger> invitedUsers = new HashSet<>();
         for (UInteger uid : newInvited)
         {
-            invitedUsers.add(um.getUser(uid).getEntity().getKey());
+            invitedUsers.add(um.getUser(uid).getEntity().getId());
         }
         for (TeleportInvite invite : invites)
         {

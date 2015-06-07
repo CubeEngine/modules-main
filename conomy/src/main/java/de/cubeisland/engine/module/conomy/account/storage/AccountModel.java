@@ -41,7 +41,7 @@ public class AccountModel extends AsyncRecord<AccountModel>
 
     public void setUser(UserEntity user)
     {
-        this.setValue(TABLE_ACCOUNT.USER_ID, user.getKey());
+        this.setValue(TABLE_ACCOUNT.USER_ID, user.getId());
     }
 
     public AccountModel newAccount(User user, String name, long balance, boolean hidden)

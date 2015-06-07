@@ -43,7 +43,7 @@ public class TeleportPointModel extends AsyncRecord<TeleportPointModel>
         this.setLocation(location, rotation, wm);
 
         this.setValue(TABLE_TP_POINT.NAME, name);
-        this.setValue(TABLE_TP_POINT.OWNER, owner.getEntity().getKey());
+        this.setValue(TABLE_TP_POINT.OWNER, owner.getEntity().getId());
         this.setValue(TABLE_TP_POINT.TYPE, type.value);
         this.setValue(TABLE_TP_POINT.VISIBILITY, visibility.value);
 

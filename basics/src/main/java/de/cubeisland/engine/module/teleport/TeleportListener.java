@@ -39,12 +39,12 @@ import static org.spongepowered.api.item.ItemTypes.COMPASS;
 
 public class TeleportListener
 {
-    private final Basics module;
+    private final Teleport module;
     private UserManager um;
 
-    public TeleportListener(Basics basics, UserManager um)
+    public TeleportListener(Teleport module, UserManager um)
     {
-        this.module = basics;
+        this.module = module;
         this.um = um;
     }
 
@@ -55,7 +55,7 @@ public class TeleportListener
         {
             User user = um.getExactUser(event.getEntity().getUniqueId());
             // TODO limit cause
-            user.get(BasicsAttachment.class).setLastLocation(event.getOldLocation());
+            user.get(TeleportAttachment.class).setLastLocation(event.getOldLocation());
         }
     }
 
@@ -65,7 +65,7 @@ public class TeleportListener
         User user = um.getExactUser(event.getEntity().getUniqueId());
         if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(user))
         {
-            user.get(BasicsAttachment.class).setDeathLocation(user.getLocation());
+            user.get(TeleportAttachment.class).setDeathLocation(user.getLocation());
         }
     }
 
@@ -88,7 +88,7 @@ public class TeleportListener
                     }
                     else
                     {
-                        Location block = user.getTargetBlock(this.module.getConfiguration().navigation.jumpToMaxRange);
+                        Location block = user.getTargetBlock(this.module.getConfig().navigation.jumpToMaxRange);
                         if (block.getType() == AIR)
                         {
                             return;
@@ -105,8 +105,8 @@ public class TeleportListener
                 if (module.perms().COMPASS_JUMPTO_RIGHT.isAuthorized(event.getUser()))
                 {
                     User user = um.getExactUser(event.getUser().getUniqueId());
-                    Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfiguration().navigation.thru.maxRange,
-                                                                   this.module.getConfiguration().navigation.thru.maxWallThickness);
+                    Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfig().navigation.thru.maxRange,
+                                                                   this.module.getConfig().navigation.thru.maxWallThickness);
                     if (loc == null)
                     {
                         user.sendTranslated(NEGATIVE, "Nothing to pass through!");

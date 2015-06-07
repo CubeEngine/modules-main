@@ -41,11 +41,11 @@ public class TeleportPerm extends PermissionContainer<Teleport>
     /**
      * Prevents from being teleported by someone else
      */
-    public final Permission TELEPORT_PREVENT_TP = TELEPORT_PREVENT.child("tp",FALSE);
+    public final Permission TELEPORT_PREVENT_TP = TELEPORT_PREVENT.child("tp", FALSE);
     /**
      * Prevents from teleporting to you
      */
-    public final Permission TELEPORT_PREVENT_TPTO = TELEPORT_PREVENT.child("tpto",FALSE);
+    public final Permission TELEPORT_PREVENT_TPTO = TELEPORT_PREVENT.child("tpto", FALSE);
 
     private final Permission COMMAND_TPALL = COMMAND.childWildcard("tpall");
     /**
@@ -75,4 +75,9 @@ public class TeleportPerm extends PermissionContainer<Teleport>
      * Allows using the back command after dieing (if this is not set you won't be able to tp back to your deathpoint)
      */
     public final Permission COMMAND_BACK_ONDEATH = COMMAND_BACK.child("ondeath");
+
+    private final Permission COMPASS_JUMPTO = getBasePerm().childWildcard("compass").childWildcard("jumpto");
+    public final Permission COMPASS_JUMPTO_LEFT = COMPASS_JUMPTO.child("left");
+    public final Permission COMPASS_JUMPTO_RIGHT = COMPASS_JUMPTO.child("right");
+
 }

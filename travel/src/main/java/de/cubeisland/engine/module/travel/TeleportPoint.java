@@ -82,14 +82,14 @@ public abstract class TeleportPoint
 
     public void setOwner(User owner)
     {
-        this.model.setValue(TABLE_TP_POINT.OWNER, owner.getEntity().getKey());
+        this.model.setValue(TABLE_TP_POINT.OWNER, owner.getEntity().getId());
     }
 
     public boolean isOwnedBy(CommandSender user)
     {
         if (user instanceof User)
         {
-            return model.getValue(TABLE_TP_POINT.OWNER).equals(((User)user).getEntity().getKey());
+            return model.getValue(TABLE_TP_POINT.OWNER).equals(((User)user).getEntity().getId());
         }
         return false;
     }
@@ -100,7 +100,7 @@ public abstract class TeleportPoint
         {
             this.invited = iManager.getInvited(model);
         }
-        this.invited.add(user.getEntity().getKey());
+        this.invited.add(user.getEntity().getId());
         iManager.invite(this.getModel(), user);
     }
 
@@ -110,13 +110,13 @@ public abstract class TeleportPoint
         {
             this.invited = iManager.getInvited(model);
         }
-        this.invited.remove(user.getEntity().getKey());
+        this.invited.remove(user.getEntity().getId());
         iManager.updateInvited(this.model, this.invited);
     }
 
     public boolean isInvited(User user)
     {
-        return this.getInvited().contains(user.getEntity().getKey()) || this.isPublic();
+        return this.getInvited().contains(user.getEntity().getId()) || this.isPublic();
     }
 
     public void setVisibility(Visibility visibility)

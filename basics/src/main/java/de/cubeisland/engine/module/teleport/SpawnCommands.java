@@ -100,7 +100,7 @@ public class SpawnCommands
     @Command(desc = "Teleports a player to spawn")
     public void spawn(CommandSender context, @Default User player, @Optional World world, @Flag boolean force)
     {
-        world = world == null ? module.getConfiguration().mainWorld.getWorld() : world;
+        world = world == null ? module.getConfig().mainWorld.getWorld() : world;
         if (world == null)
         {
             world = player.getWorld();
@@ -132,7 +132,7 @@ public class SpawnCommands
     public void tpworld(User context, World world)
     {
         final Location spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
-        if (!module.perms().tpWorld().getPermission(world.getName()).isAuthorized(context))
+        if (!module.permsTpWorld().getPermission(world.getName()).isAuthorized(context))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to teleport to this world!");
             return;

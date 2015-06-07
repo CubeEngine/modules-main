@@ -49,7 +49,7 @@ public class ColoredSigns
             for (int i = 0; i < lines.size(); i++)
             {
                 final Text text = lines.get(i);
-                newData.setLine(i, Texts.fromLegacy(Texts.toPlain(text)));
+                newData.setLine(i, Texts.legacy().fromUnchecked(Texts.toPlain(text)));
             }
             event.setNewData(newData);
         }

@@ -106,18 +106,7 @@ public class GeneralsListener
         }
     }
 
-    @Subscribe(order = POST)
-    public void onAfterJoin(PlayerJoinEvent event)
-    {
-        BasicsUser bUser = this.module.getBasicsUser(event.getUser());
-        int amount = bUser.countMail();
-        if (amount > 0)
-        {
-            User user = um.getExactUser(event.getUser().getUniqueId());
-            user.sendTranslatedN(POSITIVE, amount, "You have a new mail!", "You have {amount} of mail!", amount);
-            user.sendTranslated(NEUTRAL, "Use {text:/mail read} to display them.");
-        }
-    }
+
 
     @Subscribe
     public void onPlayerJoin(PlayerJoinEvent event)

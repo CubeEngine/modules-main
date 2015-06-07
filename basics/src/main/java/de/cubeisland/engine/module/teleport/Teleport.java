@@ -49,6 +49,11 @@ public class Teleport extends Module
         return this.permissions;
     }
 
+    public TpWorldPermissions permsTpWorld()
+    {
+        return tpWorld;
+    }
+
     public TeleportConfiguration getConfig()
     {
         return config;

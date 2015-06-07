@@ -33,7 +33,7 @@ public class AccessListModel extends AsyncRecord<AccessListModel>
     public AccessListModel newAccess(LockModel model, User modifyUser)
     {
         this.setValue(TABLE_ACCESS_LIST.LOCK_ID, model.getValue(TABLE_LOCK.ID));
-        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getEntity().getKey());
+        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getEntity().getId());
         this.setValue(TABLE_ACCESS_LIST.LEVEL, ACCESS_FULL);
         return this;
     }
@@ -41,9 +41,9 @@ public class AccessListModel extends AsyncRecord<AccessListModel>
     public AccessListModel newGlobalAccess(User sender, User modifyUser, short accessType)
     {
         this.setValue(TABLE_ACCESS_LIST.LOCK_ID, null);
-        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getEntity().getKey());
+        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getEntity().getId());
         this.setValue(TABLE_ACCESS_LIST.LEVEL, ACCESS_FULL);
-        this.setValue(TABLE_ACCESS_LIST.OWNER_ID, sender.getEntity().getKey());
+        this.setValue(TABLE_ACCESS_LIST.OWNER_ID, sender.getEntity().getId());
         return this;
     }
 

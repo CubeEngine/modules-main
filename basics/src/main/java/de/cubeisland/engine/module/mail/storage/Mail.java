@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.storage;
+package de.cubeisland.engine.module.mail.storage;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
@@ -26,7 +26,6 @@ import de.cubeisland.engine.module.service.user.UserManager;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
-import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
 
 @Entity
 @Table(name = "mail")
@@ -34,25 +33,26 @@ public class Mail extends AsyncRecord<Mail>
 {
     public Mail()
     {
-        super(TABLE_MAIL);
+        super(TableMail.TABLE_MAIL);
     }
 
-    public Mail newMail(BasicsUserEntity userId, UInteger senderId, String message)
+    public Mail newMail(User user, UInteger senderId, String message)
     {
-        this.setValue(TABLE_MAIL.MESSAGE, message);
-        this.setValue(TABLE_MAIL.USERID, userId.getValue(TABLE_BASIC_USER.KEY));
-        this.setValue(TABLE_MAIL.SENDERID, senderId);
+        this.setValue(TableMail.TABLE_MAIL.MESSAGE, message);
+        this.setValue(TableMail.TABLE_MAIL.USERID, user.getEntity().getId());
+        this.setValue(TableMail.TABLE_MAIL.SENDERID, senderId);
         return this;
     }
 
     public String readMail(UserManager um)
     {
-        UInteger value = this.getValue(TABLE_MAIL.SENDERID);
+        UInteger value = this.getValue(TableMail.TABLE_MAIL.SENDERID);
         if (value == null || value.longValue() == 0)
         {
-            return ChatFormat.RED + "CONSOLE" + ChatFormat.WHITE + ": " + this.getValue(TABLE_MAIL.MESSAGE);
+            return ChatFormat.RED + "CONSOLE" + ChatFormat.WHITE + ": " + this.getValue(TableMail.TABLE_MAIL.MESSAGE);
         }
-        User user = um.getUser(this.getValue(TABLE_MAIL.SENDERID));
-        return ChatFormat.DARK_GREEN + user.getDisplayName() + ChatFormat.WHITE + ": " + this.getValue(TABLE_MAIL.MESSAGE);
+        User user = um.getUser(this.getValue(TableMail.TABLE_MAIL.SENDERID));
+        return ChatFormat.DARK_GREEN + user.getDisplayName() + ChatFormat.WHITE + ": " + this.getValue(
+            TableMail.TABLE_MAIL.MESSAGE);
     }
 }

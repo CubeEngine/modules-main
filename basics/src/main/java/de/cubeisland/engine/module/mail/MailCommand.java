@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.general;
+package de.cubeisland.engine.module.mail;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,7 +27,9 @@ import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.module.mail.storage.Mail;
+import de.cubeisland.engine.module.mail.storage.TableMail;
 import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.database.Database;
@@ -37,25 +39,23 @@ import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.BasicsUser;
-import de.cubeisland.engine.module.basics.storage.Mail;
 import de.cubeisland.engine.module.service.user.UserManager;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.module.basics.storage.TableMail.TABLE_MAIL;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 @Command(name = "mail", desc = "Manages your server mail.")
 public class MailCommand extends ContainerCommand
 {
-    private final Basics module;
+    private final Module module;
     private final UserManager um;
     private final TaskManager taskManager;
     private final Database db;
 
-    public MailCommand(Basics module, UserManager um, TaskManager taskManager, Database db)
+    public MailCommand(Module module, UserManager um, TaskManager taskManager, Database db)
     {
         super(module);
         this.module = module;
@@ -85,8 +85,8 @@ public class MailCommand extends ContainerCommand
             context.sendTranslated(NEGATIVE, "Otherwise be quiet!");
             return;
         }
-        BasicsUser bUser = sender.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser();
-        if (bUser.countMail() == 0)
+        MailAttachment attachment = sender.attachOrGet(MailAttachment.class, module);
+        if (attachment.countMail() == 0)
         {
             context.sendTranslated(NEUTRAL, "You do not have any mail!");
             return;
@@ -94,11 +94,11 @@ public class MailCommand extends ContainerCommand
         List<Mail> mails;
         if (player == null) //get mails
         {
-            mails = bUser.getMails();
+            mails = attachment.getMails();
         }
         else //Search for mail of that user
         {
-            mails = bUser.getMailsFrom(player);
+            mails = attachment.getMailsFrom(player);
         }
         if (mails.isEmpty()) // Mailbox is not empty but no message from that player
         {
@@ -118,7 +118,7 @@ public class MailCommand extends ContainerCommand
     @Command(desc = "Shows the mail of other players.")
     public void spy(CommandSender context, User player)
     {
-        List<Mail> mails = player.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().getMails();
+        List<Mail> mails = player.attachOrGet(MailAttachment.class, module).getMails();
         if (mails.isEmpty()) // Mailbox is not empty but no message from that player
         {
             context.sendTranslated(NEUTRAL, "{user} does not have any mail!", player);
@@ -129,7 +129,7 @@ public class MailCommand extends ContainerCommand
         for (Mail mail : mails)
         {
             i++;
-            sb.append("\n").append(ChatFormat.WHITE).append(i).append(": ").append(mail.getValue(TABLE_MAIL.MESSAGE));
+            sb.append("\n").append(ChatFormat.WHITE).append(i).append(": ").append(mail.getValue(TableMail.TABLE_MAIL.MESSAGE));
         }
         context.sendTranslated(NEUTRAL, "{user}'s mail: {input#mails}", player, ChatFormat.parseFormats(sb.toString()));
     }
@@ -155,18 +155,18 @@ public class MailCommand extends ContainerCommand
         }
         for (User user : users)
         {
-            user.attachOrGet(BasicsAttachment.class, module).getBasicsUser().addMail(sender, message);
+            user.attachOrGet(MailAttachment.class, module).addMail(sender, message);
             alreadySend.add(user.getId());
         }
-        final UInteger senderId = sender == null ? null : sender.getEntity().getKey();
-        taskManager.runAsynchronousTaskDelayed(this.module, (Runnable)() -> {
+        final UInteger senderId = sender == null ? null : sender.getEntity().getId();
+        taskManager.runAsynchronousTaskDelayed(this.module, () -> {
             DSLContext dsl = db.getDSL();
             Collection<Query> queries = new ArrayList<>();
             for (Long userId : um.getAllIds())
             {
                 if (!alreadySend.contains(userId))
                 {
-                    queries.add(dsl.insertInto(TABLE_MAIL, TABLE_MAIL.MESSAGE, TABLE_MAIL.USERID, TABLE_MAIL.SENDERID).values(message, UInteger.valueOf(userId), senderId));
+                    queries.add(dsl.insertInto(TableMail.TABLE_MAIL, TableMail.TABLE_MAIL.MESSAGE, TableMail.TABLE_MAIL.USERID, TableMail.TABLE_MAIL.SENDERID).values(message, UInteger.valueOf(userId), senderId));
                 }
             }
             dsl.batch(queries).execute();
@@ -178,16 +178,17 @@ public class MailCommand extends ContainerCommand
     @Restricted(value = User.class, msg = "The console has no mails!")
     public void remove(User context, Integer mailId)
     {
-        BasicsUser bUser = context.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser();
-        if (bUser.countMail() == 0)
+        MailAttachment attachment = context.attachOrGet(MailAttachment.class, module);
+        if (attachment.countMail() == 0)
         {
             context.sendTranslated(NEUTRAL, "You do not have any mail!");
             return;
         }
         try
         {
-            Mail mail = bUser.getMails().get(mailId);
-            db.getDSL().delete(TABLE_MAIL).where(TABLE_MAIL.KEY.eq(mail.getValue(TABLE_MAIL.KEY))).execute();
+            Mail mail = attachment.getMails().get(mailId);
+            db.getDSL().delete(TableMail.TABLE_MAIL).where(TableMail.TABLE_MAIL.KEY.eq(mail.getValue(
+                TableMail.TABLE_MAIL.KEY))).execute();
             context.sendTranslated(POSITIVE, "Deleted Mail #{integer#mailid}", mailId);
         }
         catch (IndexOutOfBoundsException e)
@@ -202,11 +203,11 @@ public class MailCommand extends ContainerCommand
     {
         if (player == null)
         {
-            context.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMail();
+            context.attachOrGet(MailAttachment.class, module).clearMail();
             context.sendTranslated(NEUTRAL, "Cleared all mails!");
             return;
         }
-        context.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().clearMailFrom(player);
+        context.attachOrGet(MailAttachment.class, module).clearMailFrom(player);
         context.sendTranslated(NEUTRAL, "Cleared all mail from {user}!", player instanceof User ? player : "console");
     }
 
@@ -214,7 +215,7 @@ public class MailCommand extends ContainerCommand
     {
         for (User user : users)
         {
-            user.attachOrGet(BasicsAttachment.class, this.module).getBasicsUser().addMail(from, message);
+            user.attachOrGet(MailAttachment.class, module).addMail(from, message);
             if (user.isOnline())
             {
                 user.sendTranslated(NEUTRAL, "You just got a mail from {user}!", from.getName());
