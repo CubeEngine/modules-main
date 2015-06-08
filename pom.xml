@@ -33,6 +33,7 @@
     <module>locker</module>
     <module>worlds</module>
     <module>portals</module>
+    <module>teleport</module>
   </modules>
 
   <build>

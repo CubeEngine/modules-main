@@ -17,8 +17,6 @@
  */
 package de.cubeisland.engine.module.teleport;
 
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.core.util.LocationUtil;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.user.UserManager;

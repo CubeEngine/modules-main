@@ -22,8 +22,6 @@ import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Label;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.core.util.BlockUtil;
 import de.cubeisland.engine.module.core.util.LocationUtil;
 import de.cubeisland.engine.module.service.command.CommandSender;
