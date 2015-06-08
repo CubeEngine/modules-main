@@ -87,11 +87,7 @@ public class SpawnCommands
             {
                 continue;
             }
-            if (!TeleportCommands.teleport(aPlayer, loc, true, force, true))
-            {
-                context.sendTranslated(NEGATIVE, "Teleport failed!");
-                return;
-            }
+            aPlayer.getPlayer().get().setLocation(loc);
         }
         um.broadcastTranslated(POSITIVE, "Teleported everyone to the spawn of {world}!", world);
     }
@@ -99,12 +95,12 @@ public class SpawnCommands
     @Command(desc = "Teleports a player to spawn")
     public void spawn(CommandSender context, @Default User player, @Optional World world, @Flag boolean force)
     {
-        world = world == null ? module.getConfig().mainWorld.getWorld() : world;
+        world = world == null ? module.getConfig().getMainWorld() : world;
         if (world == null)
         {
             world = player.getWorld();
         }
-        force = force && module.perms().COMMAND_SPAWN_FORCE.isAuthorized(context);
+        force = force && module.perms().COMMAND_SPAWN_FORCE.isAuthorized(context) || context.getUniqueId().equals(player.getUniqueId());
         if (!player.isOnline())
         {
             context.sendTranslated(NEGATIVE, "You cannot teleport an offline player to spawn!");
@@ -117,11 +113,7 @@ public class SpawnCommands
         }
         final Location spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
         Vector3d rotation = player.getRotation();
-        if (!TeleportCommands.teleport(player, spawnLocation, true, force, true))
-        {
-            context.sendTranslated(NEGATIVE, "Teleport failed!");
-            return;
-        }
+        player.getPlayer().get().setLocation(spawnLocation);
         player.setRotation(rotation);
         context.sendTranslated(POSITIVE, "You are now standing at the spawn in {world}!", world);
     }
@@ -137,10 +129,8 @@ public class SpawnCommands
             return;
         }
         Vector3d rotation = context.getRotation();
-        if (TeleportCommands.teleport(context, spawnLocation, true, false, true))
-        {
-            context.sendTranslated(POSITIVE, "Teleported to the spawn of world {world}!", world);
-        }
+        context.getPlayer().get().setLocation(spawnLocation);
+        context.sendTranslated(POSITIVE, "Teleported to the spawn of world {world}!", world);
         context.setRotation(rotation);
     }
 }

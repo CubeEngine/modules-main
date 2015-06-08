@@ -22,6 +22,7 @@ import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.spongepowered.api.world.World;
 
 public class TeleportConfiguration extends ReflectedYaml
 {
@@ -34,6 +35,11 @@ public class TeleportConfiguration extends ReflectedYaml
     public int teleportRequestWait = -1;
 
     public NavigationSection navigation;
+
+    public World getMainWorld()
+    {
+        return mainWorld == null ? null : mainWorld.getWorld();
+    }
 
     public class NavigationSection implements Section
     {

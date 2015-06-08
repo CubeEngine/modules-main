@@ -51,7 +51,7 @@ public class TeleportPerm extends PermissionContainer<Teleport>
      */
     public final Permission COMMAND_TP_OTHER = COMMAND_TP.child("other");
 
-    public final Permission COMMAND_TPPOS_SAFE = COMMAND.childWildcard("tppos").child("safe");
+    public final Permission COMMAND_TPPOS_UNSAFE = COMMAND.childWildcard("tppos").child("unsafe");
 
     private final Permission TELEPORT = getBasePerm().childWildcard("teleport");
     private final Permission TELEPORT_PREVENT = TELEPORT.newWildcard("prevent");

@@ -18,7 +18,6 @@
 package de.cubeisland.engine.module.teleport;
 
 import java.util.ArrayList;
-import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
@@ -57,21 +56,6 @@ public class TeleportCommands
         this.um = um;
     }
 
-    public static boolean teleport(User user, Location loc, boolean safe, boolean force, boolean keepDirection)
-    {
-        if (safe)
-        {
-            return user.safeTeleport(loc, keepDirection);
-        }
-        Vector3d rotation = user.getRotation();
-        boolean ok = user.teleport(loc);
-        if (keepDirection)
-        {
-            user.setRotation(rotation);
-        }
-        return ok;
-    }
-
     @Command(desc = "Teleport directly to a player.")
     public void tp(CommandSender context, User player, @Optional User target, @Flag boolean force, @Flag boolean unsafe)
     {
@@ -99,7 +83,7 @@ public class TeleportCommands
 
         if (!context.equals(player))
         {
-            if (module.perms().TELEPORT_PREVENT_TP.isAuthorized(player)) // teleport the user
+            if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(player)) // teleport the user
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to teleport {user}!", player);
                 return;
@@ -128,8 +112,12 @@ public class TeleportCommands
             context.sendTranslated(NEUTRAL, "You just teleported {user} to {user}... Not very useful right?", player, player);
             return;
         }
-        if (TeleportCommands.teleport(player, target.getLocation(), !unsafe, force, true))
+        if (!unsafe || player.getPlayer().get().setLocationSafely(target.getLocation()))
         {
+            if (unsafe)
+            {
+                player.getPlayer().get().setLocation(target.getLocation());
+            }
             context.sendTranslated(POSITIVE, "You teleported to {user}!", target);
         }
     }
@@ -156,8 +144,12 @@ public class TeleportCommands
                 noTp.add(p.getName());
                 continue;
             }
-            if (!teleport(um.getExactUser(p.getUniqueId()), player.getLocation(), !unsafe,
-                          force, true))
+            Location target = player.getLocation();
+            if (unsafe)
+            {
+                p.getPlayer().get().setLocation(target);
+            }
+            else if (!p.getPlayer().get().setLocationSafely(target))
             {
                 noTp.add(p.getName());
             }
@@ -190,8 +182,13 @@ public class TeleportCommands
             context.sendTranslated(NEGATIVE, "You are not allowed to teleport {user}!", player);
             return;
         }
-        if (TeleportCommands.teleport(player, sender.getLocation(), !unsafe, force, true))
+
+        if (!unsafe || player.getPlayer().get().setLocationSafely(sender.getLocation()))
         {
+            if (unsafe)
+            {
+                player.getPlayer().get().setLocation(sender.getLocation());
+            }
             context.sendTranslated(POSITIVE, "You teleported {user} to you!", player);
             player.sendTranslated(POSITIVE, "You were teleported to {sender}", sender);
         }
@@ -204,16 +201,21 @@ public class TeleportCommands
         User sender = (User)context.getSource();
         force = force && module.perms().COMMAND_TPHEREALL_FORCE.isAuthorized(context.getSource());
         ArrayList<String> noTp = new ArrayList<>();
-        for (User player : um.getOnlineUsers())
+        Location target = sender.getLocation();
+        for (User p : um.getOnlineUsers())
         {
-            if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(player))
+            if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(p))
             {
-                noTp.add(player.getName());
+                noTp.add(p.getName());
                 continue;
             }
-            if (!teleport(player, sender.getLocation(), !unsafe, force, true))
+            if (unsafe)
             {
-                noTp.add(player.getName());
+                p.getPlayer().get().setLocation(target);
+            }
+            else if (!p.getPlayer().get().setLocationSafely(target))
+            {
+                noTp.add(p.getName());
             }
         }
         context.sendTranslated(POSITIVE, "You teleported everyone to you!");
@@ -229,12 +231,16 @@ public class TeleportCommands
     public void tppos(CommandSender context, Integer x, Integer y, Integer z, // TODO optional y coord
                       @Default @Named({"world", "w"}) World world,
                       @Default @Named({"player", "p"}) User player,
-                      @Flag boolean safe)
+                      @Flag boolean unsafe)
     {
         Location loc = new Location(world, x, y, z).add(0.5, 0, 0.5);
-        safe = safe && module.perms().COMMAND_TPPOS_SAFE.isAuthorized(context);
-        if (TeleportCommands.teleport(player, loc, safe, false, true))
+        unsafe = unsafe && module.perms().COMMAND_TPPOS_UNSAFE.isAuthorized(context);
+        if (!unsafe || player.getPlayer().get().setLocationSafely(loc))
         {
+            if (unsafe)
+            {
+                player.getPlayer().get().setLocation(loc);
+            }
             context.sendTranslated(POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new BlockVector3(x, y, z), world);
         }
     }

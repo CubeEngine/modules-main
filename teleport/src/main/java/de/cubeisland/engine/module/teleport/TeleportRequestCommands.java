@@ -51,7 +51,12 @@ public class TeleportRequestCommands
     @Restricted(value = User.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
     public void tpa(User context, User player)
     {
-        context.get(TeleportAttachment.class).removeTpRequestCancelTask();
+        if (player.getUniqueId().equals(context.getUniqueId()))
+        {
+            context.sendTranslated(NEUTRAL, "Teleporting you to yourself? Done.");
+            return;
+        }
+        context.attachOrGet(TeleportAttachment.class, module).removeTpRequestCancelTask();
         if (!player.isOnline())
         {
             context.sendTranslated(NEGATIVE, "{user} is not online!", player);
@@ -59,25 +64,25 @@ public class TeleportRequestCommands
         }
         player.sendTranslated(POSITIVE, "{sender} wants to teleport to you!", context);
         player.sendTranslated(NEUTRAL, "Use {text:/tpaccept} to accept or {text:/tpdeny} to deny the request!");
-        player.get(TeleportAttachment.class).setPendingTpToRequest(context.getUniqueId());
-        player.get(TeleportAttachment.class).removePendingTpFromRequest();
+        player.attachOrGet(TeleportAttachment.class, module).setPendingTpToRequest(context.getUniqueId());
+        player.attachOrGet(TeleportAttachment.class, module).removePendingTpFromRequest();
         context.sendTranslated(POSITIVE, "Teleport request sent to {user}!", player);
         int waitTime = this.module.getConfig().teleportRequestWait * 20;
         if (waitTime > 0)
         {
             final User sendingUser = context;
             final Optional<UUID> taskID = taskManager.runTaskDelayed(this.module, (Runnable)() -> {
-                player.get(TeleportAttachment.class).removeTpRequestCancelTask();
-                player.get(TeleportAttachment.class).removePendingTpToRequest();
+                player.attachOrGet(TeleportAttachment.class, module).removeTpRequestCancelTask();
+                player.attachOrGet(TeleportAttachment.class, module).removePendingTpToRequest();
                 sendingUser.sendTranslated(NEGATIVE, "{user} did not accept your teleport request.", player);
                 player.sendTranslated(NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
             }, waitTime); // wait x - seconds
-            UUID oldtaskID = player.get(TeleportAttachment.class).getTpRequestCancelTask();
+            UUID oldtaskID = player.attachOrGet(TeleportAttachment.class, module).getTpRequestCancelTask();
             if (oldtaskID != null)
             {
                 taskManager.cancelTask(this.module, oldtaskID);
             }
-            player.get(TeleportAttachment.class).setTpRequestCancelTask(taskID.get());
+            player.attachOrGet(TeleportAttachment.class, module).setTpRequestCancelTask(taskID.get());
         }
     }
 
@@ -85,7 +90,12 @@ public class TeleportRequestCommands
     @Restricted(value = User.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
     public void tpahere(User context, User player)
     {
-        context.get(TeleportAttachment.class).removeTpRequestCancelTask();
+        if (player.getUniqueId().equals(context.getUniqueId()))
+        {
+            context.sendTranslated(NEUTRAL, "Teleporting yourself to you? Done.");
+            return;
+        }
+        context.attachOrGet(TeleportAttachment.class, module).removeTpRequestCancelTask();
         if (!player.isOnline())
         {
             context.sendTranslated(NEGATIVE, "{user} is not online!");
@@ -93,20 +103,20 @@ public class TeleportRequestCommands
         }
         player.sendTranslated(POSITIVE, "{sender} wants to teleport you to them!", context);
         player.sendTranslated(NEUTRAL, "Use {text:/tpaccept} to accept or {text:/tpdeny} to deny the request!");
-        player.get(TeleportAttachment.class).setPendingTpFromRequest(context.getUniqueId());
-        player.get(TeleportAttachment.class).removePendingTpToRequest();
+        player.attachOrGet(TeleportAttachment.class, module).setPendingTpFromRequest(context.getUniqueId());
+        player.attachOrGet(TeleportAttachment.class, module).removePendingTpToRequest();
         context.sendTranslated(POSITIVE, "Teleport request send to {user}!", player);
         int waitTime = this.module.getConfig().teleportRequestWait * 20;
         if (waitTime > 0)
         {
             final User sendingUser = context;
             final Optional<UUID> taskID = taskManager.runTaskDelayed(this.module, () -> {
-                player.get(TeleportAttachment.class).removeTpRequestCancelTask();
-                player.get(TeleportAttachment.class).removePendingTpFromRequest();
+                player.attachOrGet(TeleportAttachment.class, module).removeTpRequestCancelTask();
+                player.attachOrGet(TeleportAttachment.class, module).removePendingTpFromRequest();
                 sendingUser.sendTranslated(NEGATIVE, "{user} did not accept your teleport request.", player);
                 player.sendTranslated(NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
             }, waitTime); // wait x - seconds
-            UUID oldtaskID = player.get(TeleportAttachment.class).getTpRequestCancelTask();
+            UUID oldtaskID = player.attachOrGet(TeleportAttachment.class, module).getTpRequestCancelTask();
             if (oldtaskID != null)
             {
                 taskManager.cancelTask(this.module, oldtaskID);
@@ -119,49 +129,43 @@ public class TeleportRequestCommands
     @Restricted(value = User.class, msg = "No one wants to teleport to you!")
     public void tpaccept(User context)
     {
-        UUID uuid = context.get(TeleportAttachment.class).getPendingTpToRequest();
+        UUID uuid = context.attachOrGet(TeleportAttachment.class, module).getPendingTpToRequest();
         if (uuid == null)
         {
-            uuid = context.get(TeleportAttachment.class).getPendingTpFromRequest();
+            uuid = context.attachOrGet(TeleportAttachment.class, module).getPendingTpFromRequest();
             if (uuid == null)
             {
                 context.sendTranslated(NEGATIVE, "You don't have any pending requests!");
                 return;
             }
-            context.get(TeleportAttachment.class).removePendingTpFromRequest();
+            context.attachOrGet(TeleportAttachment.class, module).removePendingTpFromRequest();
             User user = um.getExactUser(uuid);
             if (user == null || !user.isOnline())
             {
                 context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", user);
                 return;
             }
-            if (!TeleportCommands.teleport(context, user.getLocation(), true, false, true))
-            {
-                return;
-            }
+            context.getPlayer().get().setLocation(user.getLocation());
             user.sendTranslated(POSITIVE, "{user} accepted your teleport request!", context);
             context.sendTranslated(POSITIVE, "You accepted a teleport to {user}!", user);
         }
         else
         {
-            context.get(TeleportAttachment.class).removePendingTpToRequest();
+            context.attachOrGet(TeleportAttachment.class, module).removePendingTpToRequest();
             User user = um.getExactUser(uuid);
             if (user == null || !user.isOnline())
             {
                 context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", um.getExactUser(uuid).getName());
                 return;
             }
-            if (!TeleportCommands.teleport(user, context.getLocation(), true, false, true))
-            {
-                return;
-            }
+            user.getPlayer().get().setLocation(context.getLocation());
             user.sendTranslated(POSITIVE, "{user} accepted your teleport request!", context);
             context.sendTranslated(POSITIVE, "You accepted a teleport to {user}!", user);
         }
-        UUID taskID = context.get(TeleportAttachment.class).getTpRequestCancelTask();
+        UUID taskID = context.attachOrGet(TeleportAttachment.class, module).getTpRequestCancelTask();
         if (taskID != null)
         {
-            context.get(TeleportAttachment.class).removeTpRequestCancelTask();
+            context.attachOrGet(TeleportAttachment.class, module).removeTpRequestCancelTask();
             taskManager.cancelTask(this.module, taskID);
         }
     }
@@ -170,11 +174,11 @@ public class TeleportRequestCommands
     @Restricted(value = User.class, msg = "No one wants to teleport to you!")
     public void tpdeny(User sender)
     {
-        UUID tpa =  sender.get(TeleportAttachment.class).getPendingTpToRequest();
-        UUID tpahere = sender.get(TeleportAttachment.class).getPendingTpFromRequest();
+        UUID tpa =  sender.attachOrGet(TeleportAttachment.class, module).getPendingTpToRequest();
+        UUID tpahere = sender.attachOrGet(TeleportAttachment.class, module).getPendingTpFromRequest();
         if (tpa != null)
         {
-            sender.get(TeleportAttachment.class).removePendingTpToRequest();
+            sender.attachOrGet(TeleportAttachment.class, module).removePendingTpToRequest();
             User user = um.getExactUser(tpa);
             if (user == null)
             {
@@ -185,7 +189,7 @@ public class TeleportRequestCommands
         }
         else if (tpahere != null)
         {
-            sender.get(TeleportAttachment.class).removePendingTpFromRequest();
+            sender.attachOrGet(TeleportAttachment.class, module).removePendingTpFromRequest();
             User user = um.getExactUser(tpahere);
             if (user == null)
             {
@@ -199,10 +203,10 @@ public class TeleportRequestCommands
             sender.sendTranslated(NEGATIVE, "You don't have any pending requests!");
             return;
         }
-        UUID taskID = sender.get(TeleportAttachment.class).getTpRequestCancelTask();
+        UUID taskID = sender.attachOrGet(TeleportAttachment.class, module).getTpRequestCancelTask();
         if (taskID != null)
         {
-            sender.get(TeleportAttachment.class).removeTpRequestCancelTask();
+            sender.attachOrGet(TeleportAttachment.class, module).removeTpRequestCancelTask();
             taskManager.cancelTask(this.module, taskID);
         }
     }

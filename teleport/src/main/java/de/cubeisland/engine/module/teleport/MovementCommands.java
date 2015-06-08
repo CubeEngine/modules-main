@@ -72,10 +72,8 @@ public class MovementCommands
         {
             loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS);
         }
-        if (TeleportCommands.teleport(context, loc, true, false, true)) // is save anyway so we do not need to check again
-        {
-            context.sendTranslated(POSITIVE, "You have just been lifted!");
-        }
+        context.getPlayer().get().setLocation(loc);
+        context.sendTranslated(POSITIVE, "You have just been lifted!");
     }
 
     @Command(desc = "Teleports to the highest point at your position.")
@@ -83,10 +81,8 @@ public class MovementCommands
     public void top(User context)
     {
         Location loc = BlockUtil.getHighestBlockAt(context.getLocation()).add(.5, 0, .5);
-        if (TeleportCommands.teleport(context, loc, true, false, true)) // is save anyway so we do not need to check again
-        {
-            context.sendTranslated(POSITIVE, "You are now on top!");
-        }
+        context.getPlayer().get().setLocation(loc);
+        context.sendTranslated(POSITIVE, "You are now on top!");
     }
 
     @Command(desc = "Teleports you to the next safe spot upwards.")
@@ -124,10 +120,8 @@ public class MovementCommands
             return;
         }
         loc = loc.add(0, ((World)loc.getExtent()).getBuildHeight() - loc.getY() + 1, 0);
-        if (TeleportCommands.teleport(context, loc, true, false, true))
-        {
-            context.sendTranslated(POSITIVE, "Ascended a level!");
-        }
+        context.getPlayer().get().setLocation(loc);
+        context.sendTranslated(POSITIVE, "Ascended a level!");
     }
 
     @Command(desc = "Teleports you to the next safe spot downwards.")
@@ -155,10 +149,8 @@ public class MovementCommands
             return;
         }
         //reached new location
-        if (TeleportCommands.teleport(context, curLoc, true, false, true))
-        {
-            context.sendTranslated(POSITIVE, "Descended a level!");
-        }
+        context.getPlayer().get().setLocation(curLoc);
+        context.sendTranslated(POSITIVE, "Descended a level!");
     }
 
     @Command(alias = {"jump", "j"}, desc = "Jumps to the position you are looking at.")
@@ -172,10 +164,8 @@ public class MovementCommands
             return;
         }
         loc = loc.add(0.5, 1, 0.5);
-        if (TeleportCommands.teleport(context, loc, true, false, true))
-        {
-            context.sendTranslated(POSITIVE, "You just jumped!");
-        }
+        context.getPlayer().get().setLocation(loc);
+        context.sendTranslated(POSITIVE, "You just jumped!");
     }
 
     @Command(alias = "thru", desc = "Jumps to the position you are looking at.")
@@ -189,10 +179,8 @@ public class MovementCommands
             context.sendTranslated(NEGATIVE, "Nothing to pass through!");
             return;
         }
-        if (TeleportCommands.teleport(context, loc, true, false, true))
-        {
-            context.sendTranslated(POSITIVE, "You just passed the wall!");
-        }
+        context.getPlayer().get().setLocation(loc);
+        context.sendTranslated(POSITIVE, "You just passed the wall!");
     }
 
     @Command(desc = "Teleports you to your last location")
@@ -203,7 +191,7 @@ public class MovementCommands
         boolean backPerm = module.perms().COMMAND_BACK_USE.isAuthorized(context);
         if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(context))
         {
-            Location loc = context.get(TeleportAttachment.class).getDeathLocation();
+            Location loc = context.attachOrGet(TeleportAttachment.class, module).getDeathLocation();
             if (!backPerm && loc == null)
             {
                 context.sendTranslated(NEGATIVE, "No death point found!");
@@ -211,27 +199,36 @@ public class MovementCommands
             }
             if (loc != null)
             {
-                if (TeleportCommands.teleport(context, loc, !unsafe, true, true))
+                if (!unsafe || context.getPlayer().get().setLocationSafely(loc))
                 {
+                    if (unsafe)
+                    {
+                        context.getPlayer().get().setLocation(loc);
+                    }
                     context.sendTranslated(POSITIVE, "Teleported to your death point!");
                 }
                 else
                 {
-                    context.get(TeleportAttachment.class).setDeathLocation(loc);
+                    context.attachOrGet(TeleportAttachment.class, module).setDeathLocation(loc);
                 }
                 return;
             }
         }
         if (backPerm)
         {
-            Location loc = context.get(TeleportAttachment.class).getLastLocation();
+            Location loc = context.attachOrGet(TeleportAttachment.class, module).getLastLocation();
             if (loc == null)
             {
                 context.sendTranslated(NEGATIVE, "You never teleported!");
                 return;
             }
-            if (TeleportCommands.teleport(context, loc, !unsafe, true, true))
+
+            if (!unsafe || context.getPlayer().get().setLocationSafely(loc))
             {
+                if (unsafe)
+                {
+                    context.getPlayer().get().setLocation(loc);
+                }
                 context.sendTranslated(POSITIVE, "Teleported to your last location!");
             }
             return;
@@ -255,11 +252,9 @@ public class MovementCommands
             return;
         }
         loc = loc.add(0.5, 1, 0.5);
-        if (TeleportCommands.teleport(player, loc, true, false, true))
-        {
-            context.sendTranslated(POSITIVE, "You just placed {user} where you were looking!", player);
-            player.sendTranslated(POSITIVE, "You were placed somewhere!");
-        }
+        player.getPlayer().get().setLocation(loc);
+        context.sendTranslated(POSITIVE, "You just placed {user} where you were looking!", player);
+        player.sendTranslated(POSITIVE, "You were placed somewhere!");
     }
 
     @Command(desc = "Swaps you and another players position")
@@ -281,20 +276,13 @@ public class MovementCommands
             return;
         }
         Location userLoc = player.getLocation();
-        if (TeleportCommands.teleport(player, sender.getLocation(), true, false, false))
+        player.getPlayer().get().setLocation(sender.getLocation());
+        sender.getPlayer().get().setLocation(userLoc);
+        if (!context.equals(sender))
         {
-            if (TeleportCommands.teleport(sender, userLoc, true, false, false))
-            {
-                if (!context.equals(sender))
-                {
-                    context.sendTranslated(POSITIVE, "Swapped position of {user} and {user}!", player, sender);
-                    return;
-                }
-                context.sendTranslated(POSITIVE, "Swapped position with {user}!", player);
-                return;
-            }
-            TeleportCommands.teleport(player, userLoc, false, true, false);
+            context.sendTranslated(POSITIVE, "Swapped position of {user} and {user}!", player, sender);
+            return;
         }
-        context.sendTranslated(NEGATIVE, "Could not teleport both players!");
+        context.sendTranslated(POSITIVE, "Swapped position with {user}!", player);
     }
 }

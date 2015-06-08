@@ -53,7 +53,7 @@ public class TeleportListener
         {
             User user = um.getExactUser(event.getEntity().getUniqueId());
             // TODO limit cause
-            user.get(TeleportAttachment.class).setLastLocation(event.getOldLocation());
+            user.attachOrGet(TeleportAttachment.class, module).setLastLocation(event.getOldLocation());
         }
     }
 
@@ -63,58 +63,60 @@ public class TeleportListener
         User user = um.getExactUser(event.getEntity().getUniqueId());
         if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(user))
         {
-            user.get(TeleportAttachment.class).setDeathLocation(user.getLocation());
+            user.attachOrGet(TeleportAttachment.class, module).setDeathLocation(user.getLocation());
         }
     }
 
     @Subscribe
     public void onClick(PlayerInteractBlockEvent event)
     {
-        if (event.getUser().getItemInHand().transform(ItemStack::getItem).orNull() == COMPASS)
+        // TODO left click air is not handled
+        if (event.getUser().getItemInHand().transform(ItemStack::getItem).orNull() != COMPASS)
         {
-            event.setCancelled(true);
-            EntityInteractionType type = event.getInteractionType();
-            if (type == EntityInteractionTypes.ATTACK)
+            return;
+        }
+        event.setCancelled(true);
+        EntityInteractionType type = event.getInteractionType();
+        if (type == EntityInteractionTypes.ATTACK)
+        {
+            if (module.perms().COMPASS_JUMPTO_LEFT.isAuthorized(event.getUser()))
             {
-                if (module.perms().COMPASS_JUMPTO_LEFT.isAuthorized(event.getUser()))
+                User user = um.getExactUser(event.getUser().getUniqueId());
+                Location loc;
+                if (event.getBlock().getType().isSolidCube())
                 {
-                    User user = um.getExactUser(event.getUser().getUniqueId());
-                    Location loc;
-                    if (event.getBlock().getType().isSolidCube())
-                    {
-                        loc = event.getBlock().add(0.5, 1, 0.5);
-                    }
-                    else
-                    {
-                        Location block = user.getTargetBlock(this.module.getConfig().navigation.jumpToMaxRange);
-                        if (block.getType() == AIR)
-                        {
-                            return;
-                        }
-                        loc = block.add(0.5, 1, 0.5);
-                    }
-                    user.safeTeleport(loc, true);
-                    user.sendTranslated(NEUTRAL, "Poof!");
-                    event.setCancelled(true);
+                    loc = event.getBlock().add(0.5, 1, 0.5);
                 }
-            }
-            else if (type == EntityInteractionTypes.USE)
-            {
-                if (module.perms().COMPASS_JUMPTO_RIGHT.isAuthorized(event.getUser()))
+                else
                 {
-                    User user = um.getExactUser(event.getUser().getUniqueId());
-                    Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfig().navigation.thru.maxRange,
-                                                                   this.module.getConfig().navigation.thru.maxWallThickness);
-                    if (loc == null)
+                    Location block = user.getTargetBlock(this.module.getConfig().navigation.jumpToMaxRange);
+                    if (block.getType() == AIR)
                     {
-                        user.sendTranslated(NEGATIVE, "Nothing to pass through!");
                         return;
                     }
-                    loc = loc.add(0, 1, 0);
-                    user.safeTeleport(loc, true);
-                    user.sendTranslated(NEUTRAL, "You passed through a wall");
-                    event.setCancelled(true);
+                    loc = block.add(0.5, 1, 0.5);
                 }
+                event.getUser().setLocation(loc);
+                user.sendTranslated(NEUTRAL, "Poof!");
+                event.setCancelled(true);
+            }
+        }
+        else if (type == EntityInteractionTypes.USE)
+        {
+            if (module.perms().COMPASS_JUMPTO_RIGHT.isAuthorized(event.getUser()))
+            {
+                User user = um.getExactUser(event.getUser().getUniqueId());
+                Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfig().navigation.thru.maxRange,
+                                                               this.module.getConfig().navigation.thru.maxWallThickness);
+                if (loc == null)
+                {
+                    user.sendTranslated(NEGATIVE, "Nothing to pass through!");
+                    return;
+                }
+                loc = loc.add(0, 1, 0);
+                event.getUser().setLocation(loc);
+                user.sendTranslated(NEUTRAL, "You passed through a wall");
+                event.setCancelled(true);
             }
         }
     }

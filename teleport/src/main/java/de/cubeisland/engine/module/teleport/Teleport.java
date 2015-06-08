@@ -18,6 +18,7 @@
 package de.cubeisland.engine.module.teleport;
 
 import javax.inject.Inject;
+import de.cubeisland.engine.modularity.asm.marker.Disable;
 import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
@@ -52,13 +53,22 @@ public class Teleport extends Module
         permissions = new TeleportPerm(this);
         tpWorld = new TpWorldPermissions(this, permissions, wm, pm); // per world permissions
 
-        //Teleport:
         cm.addCommands(cm, this, new MovementCommands(this));
         cm.addCommands(cm, this, new SpawnCommands(this, em, um));
         cm.addCommands(cm, this, new TeleportCommands(this, um));
         cm.addCommands(cm, this, new TeleportRequestCommands(this, tm, um));
 
+        em.registerListener(this, new TeleportListener(this, um));
 
+        // TODO load after roles, if OptionSubjects available => per role spawn?
+    }
+
+    @Disable
+    public void onDisable()
+    {
+        cm.removeCommands(this);
+        em.removeListeners(this);
+        pm.removePermissions(this);
     }
 
     public TeleportPerm perms()
