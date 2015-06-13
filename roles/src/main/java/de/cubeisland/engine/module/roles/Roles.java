@@ -17,13 +17,21 @@
  */
 package de.cubeisland.engine.module.roles;
 
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import javax.inject.Inject;
+import com.google.common.base.Optional;
 import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.Disable;
 import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
+import de.cubeisland.engine.modularity.core.Modularity;
 import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.modularity.core.ValueProvider;
+import de.cubeisland.engine.modularity.core.graph.DependencyInformation;
 import de.cubeisland.engine.module.core.filesystem.FileManager;
 import de.cubeisland.engine.module.core.i18n.I18n;
 import de.cubeisland.engine.module.core.sponge.EventManager;
@@ -113,19 +121,34 @@ public class Roles extends Module
         cm.addCommands(cmdUsers, this, new UserInformationCommands(this));
         cmdRoles.addCommand(new ManagementCommands(this));
 
-        try
+        ValueProvider<SettableInvocationHandler> provider = getModularity().getProvider(SettableInvocationHandler.class);
+        if (provider == null)
         {
-            game.getServiceManager().setProvider(game.getPluginManager().getPlugin("CubeEngine").get().getInstance(), PermissionService.class, service);
+            provider = new InvocationHandlerProvider(new SettableInvocationHandler());
+            getModularity().registerProvider(SettableInvocationHandler.class, provider);
         }
-        catch (ProviderExistsException e)
+        SettableInvocationHandler handler = getProvided(SettableInvocationHandler.class).with(service);
+
+        if (!game.getServiceManager().provide(PermissionService.class).isPresent())
         {
-            throw new IllegalStateException(e);
+            PermissionService proxy = (PermissionService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{PermissionService.class}, handler);
+            try
+            {
+                game.getServiceManager().setProvider(game.getPluginManager().getPlugin("CubeEngine").get().getInstance(), PermissionService.class, proxy);
+            }
+            catch (ProviderExistsException e)
+            {
+                throw new IllegalStateException(e);
+            }
         }
     }
 
     @Disable
     public void onDisable()
     {
+        cm.removeCommands(this);
+        em.removeListeners(this);
+        getProvided(SettableInvocationHandler.class).with(null);
     }
 
     public RolesConfig getConfiguration()
@@ -136,5 +159,45 @@ public class Roles extends Module
     public Log getLog()
     {
         return logger;
+    }
+
+    private static class SettableInvocationHandler implements InvocationHandler
+    {
+        public Object target;
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
+        {
+            try
+            {
+                return method.invoke(target, args);
+            }
+            catch (InvocationTargetException e)
+            {
+                throw e.getCause();
+            }
+        }
+
+        public SettableInvocationHandler with(Object target)
+        {
+            this.target = target;
+            return this;
+        }
+    }
+
+    private static class InvocationHandlerProvider implements ValueProvider<SettableInvocationHandler>
+    {
+        private SettableInvocationHandler handler;
+
+        public InvocationHandlerProvider(SettableInvocationHandler handler)
+        {
+            this.handler = handler;
+        }
+
+        @Override
+        public SettableInvocationHandler get(DependencyInformation info, Modularity modularity)
+        {
+            return handler;
+        }
     }
 }
