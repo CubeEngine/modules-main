@@ -21,6 +21,8 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
+import java.util.List;
 import javax.inject.Inject;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.converter.ConverterManager;
@@ -60,6 +62,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.util.Tristate;
 import de.cubeisland.engine.module.roles.storage.TableOption;
 import de.cubeisland.engine.module.roles.storage.TablePerm;
@@ -87,6 +90,7 @@ public class Roles extends Module
     @Inject private Game game;
     @Inject private I18n i18n;
     @Inject private PermissionManager manager;
+    private RolesPermissionService service;
 
     @Enable
     public void onEnable()
@@ -103,7 +107,7 @@ public class Roles extends Module
         db.registerTable(TablePerm.class);
         db.registerTable(TableOption.class);
 
-        RolesPermissionService service = new RolesPermissionService(this, reflector, config, game, db, wm, manager);
+        service = new RolesPermissionService(this, reflector, config, game, db, wm, manager);
 
         cm.getProviderManager().register(this, new ContextReader(service, wm), Context.class);
         cm.getProviderManager().register(this, new ContextualRoleReader(service, wm), ContextualRole.class);
@@ -128,6 +132,7 @@ public class Roles extends Module
             getModularity().registerProvider(SettableInvocationHandler.class, provider);
         }
         SettableInvocationHandler handler = getProvided(SettableInvocationHandler.class).with(service);
+        handler.meta.forEach(service::registerContextCalculator); // readd contextcalculators
 
         if (!game.getServiceManager().provide(PermissionService.class).isPresent())
         {
@@ -148,7 +153,7 @@ public class Roles extends Module
     {
         cm.removeCommands(this);
         em.removeListeners(this);
-        getProvided(SettableInvocationHandler.class).with(null);
+        getProvided(SettableInvocationHandler.class).with(null).and(service.getContextCalculators());
     }
 
     public RolesConfig getConfiguration()
@@ -163,7 +168,8 @@ public class Roles extends Module
 
     private static class SettableInvocationHandler implements InvocationHandler
     {
-        public Object target;
+        private Object target;
+        private List<ContextCalculator> meta = Collections.emptyList();
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
@@ -181,6 +187,12 @@ public class Roles extends Module
         public SettableInvocationHandler with(Object target)
         {
             this.target = target;
+            return this;
+        }
+
+        public SettableInvocationHandler and(List<ContextCalculator> meta)
+        {
+            this.meta = meta;
             return this;
         }
     }
