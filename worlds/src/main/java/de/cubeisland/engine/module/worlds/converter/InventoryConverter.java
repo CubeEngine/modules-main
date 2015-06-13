@@ -30,7 +30,7 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.craftbukkit.v1_8_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.item.inventory.Inventory;

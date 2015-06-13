@@ -40,15 +40,15 @@ import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.matcher.Match;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsConfiguration;
-import org.bukkit.Location;
+import org.spongepowered.api.world.Location;
 import org.bukkit.Material;
 import org.bukkit.WeatherType;
 import org.bukkit.World;
-import org.bukkit.entity.Entity;
+import org.spongepowered.api.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 
