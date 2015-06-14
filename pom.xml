@@ -34,6 +34,9 @@
     <module>worlds</module>
     <module>portals</module>
     <module>teleport</module>
+    <module>mail</module>
+    <module>kickban</module>
+    <module>vanillaplus</module>
   </modules>
 
   <build>

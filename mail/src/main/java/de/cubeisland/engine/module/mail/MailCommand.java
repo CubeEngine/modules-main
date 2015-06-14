@@ -27,35 +27,35 @@ import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.mail.storage.Mail;
 import de.cubeisland.engine.module.mail.storage.TableMail;
-import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.module.service.command.ContainerCommand;
 import de.cubeisland.engine.module.service.database.Database;
 import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.core.util.ChatFormat;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.module.basics.BasicsUser;
 import de.cubeisland.engine.module.service.user.UserManager;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.text.TextBuilder;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static org.spongepowered.api.text.format.TextColors.WHITE;
 
 @Command(name = "mail", desc = "Manages your server mail.")
 public class MailCommand extends ContainerCommand
 {
-    private final Module module;
+    private final MailModule module;
     private final UserManager um;
     private final TaskManager taskManager;
     private final Database db;
 
-    public MailCommand(Module module, UserManager um, TaskManager taskManager, Database db)
+    public MailCommand(MailModule module, UserManager um, TaskManager taskManager, Database db)
     {
         super(module);
         this.module = module;
@@ -105,13 +105,13 @@ public class MailCommand extends ContainerCommand
             context.sendTranslated(NEUTRAL, "You do not have any mail from {user}.", player);
             return;
         }
-        StringBuilder sb = new StringBuilder();
+        context.sendTranslated(POSITIVE, "Your mail:");
         for (int i = 0; i < mails.size(); i++)
         {
             Mail mail = mails.get(i);
-            sb.append("\n").append(ChatFormat.WHITE).append(i+1).append(": ").append(mail.readMail(um));
+            context.sendMessage(Texts.of("\n", WHITE, i+1, ": ", mail.readMail(um)));
         }
-        context.sendTranslated(POSITIVE, "Your mail: {input#mails}", ChatFormat.parseFormats(sb.toString()));
+
     }
 
     @Alias(value = "spymail")

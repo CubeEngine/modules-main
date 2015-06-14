@@ -21,13 +21,9 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
-import de.cubeisland.engine.module.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.Section;
-import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.joda.time.Duration;
-import org.joda.time.Period;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.item.ItemType;
 
@@ -40,7 +36,6 @@ public class BasicsConfiguration extends ReflectedYaml
 
     public class CommandsSection implements Section
     {
-        public int spawnmobLimit = 20;
 
         public int removeDefaultRadius = 20;
 

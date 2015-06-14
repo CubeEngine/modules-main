@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.moderation.spawnmob;
+package de.cubeisland.engine.module.vanillaplus.spawnmob;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.matcher.Match;
@@ -36,12 +35,9 @@ import org.bukkit.entity.Skeleton;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.monster.Skeleton;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 

@@ -24,30 +24,21 @@ import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Maybe;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.module.basics.command.general.ChatCommands;
 import de.cubeisland.engine.module.basics.command.general.ColoredSigns;
 import de.cubeisland.engine.module.fixes.FixListener;
 import de.cubeisland.engine.module.basics.command.general.GeneralsListener;
-import de.cubeisland.engine.module.basics.command.general.IgnoreCommands;
 import de.cubeisland.engine.module.basics.command.general.InformationCommands;
 import de.cubeisland.engine.module.basics.command.general.LagTimer;
 import de.cubeisland.engine.module.basics.command.general.ListCommand;
-import de.cubeisland.engine.module.mail.MailCommand;
-import de.cubeisland.engine.module.basics.command.general.MuteListener;
 import de.cubeisland.engine.module.basics.command.general.PlayerCommands;
 import de.cubeisland.engine.module.basics.command.general.RolesListCommand;
 import de.cubeisland.engine.module.basics.command.moderation.DoorCommand;
 import de.cubeisland.engine.module.basics.command.moderation.InventoryCommands;
 import de.cubeisland.engine.module.basics.command.moderation.ItemCommands;
-import de.cubeisland.engine.module.kickban.KickBanCommands;
 import de.cubeisland.engine.module.basics.command.moderation.PaintingListener;
 import de.cubeisland.engine.module.basics.command.moderation.TimeControlCommands;
 import de.cubeisland.engine.module.basics.command.moderation.WorldControlCommands;
-import de.cubeisland.engine.module.basics.command.moderation.spawnmob.SpawnMobCommand;
-import de.cubeisland.engine.module.teleport.TeleportListener;
-import de.cubeisland.engine.module.basics.storage.TableBasicsUser;
-import de.cubeisland.engine.module.basics.storage.TableIgnorelist;
-import de.cubeisland.engine.module.mail.storage.TableMail;
+import de.cubeisland.engine.module.vanillaplus.SpawnMobCommand;
 import de.cubeisland.engine.module.core.filesystem.FileManager;
 import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
@@ -80,10 +71,8 @@ public class Basics extends Module
     @Inject private Database db;
     @Inject private EventManager em;
     @Inject private CommandManager cm;
-    @Inject private Log logger;
     @Inject private UserManager um;
     @Inject private FileManager fm;
-    @Inject private Maybe<Roles> roles;
     @Inject private WorldManager wm;
     @Inject private TaskManager taskManager;
     @Inject private BanManager banManager;
@@ -95,55 +84,21 @@ public class Basics extends Module
     @Enable
     public void onEnable()
     {
-        Profiler.startProfiling("basicsEnable");
-
         this.config = fm.loadConfig(this, BasicsConfiguration.class);
-        db.registerTable(TableMail.class);
-        logger.trace("{} ms - Basics.Permission", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         perms = new BasicsPerm(this, wm, pm);
         um.addDefaultAttachment(BasicsAttachment.class, this);
-
         em.registerListener(this, new ColoredSigns(this));
-
-        logger.trace("{} ms - General-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
-        //General:
         cm.addCommands(cm, this, new InformationCommands(this, wm, materialMatcher));
-        cm.addCommand(new MailCommand(this, um, taskManager, db));
         cm.addCommands(cm, this, new PlayerCommands(this, um, em, taskManager, cm, banManager));
-        logger.trace("{} ms - General-Listener", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
         em.registerListener(this, new GeneralsListener(this, um));
-        logger.trace("{} ms - Moderation-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
-        //Moderation:
         cm.addCommands( this, new InventoryCommands(this, invGuard));
         cm.addCommands( this, new ItemCommands(this));
-        cm.addCommands(cm, this, new KickBanCommands(this, banManager, um, game));
-        cm.addCommands(cm, this, new SpawnMobCommand(this));
         cm.addCommands(cm, this, new TimeControlCommands(this, taskManager, wm));
         cm.addCommands(cm, this, new WorldControlCommands(this));
-
-        if (roles.isAvailable())
-        {
-            cm.addCommands(cm, this, new RolesListCommand(this, um, game));
-        }
-        else
-        {
-            logger.info("No Roles-Module found!");
-            cm.addCommands(cm, this, new ListCommand(this, um, game));
-        }
-
         em.registerListener(this, new PaintingListener(this, um));
-
-        logger.trace("{} ms - Teleport-Commands", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
-
-        logger.trace("{} ms - Teleport/Fly-Listener", Profiler.getCurrentDelta("basicsEnable", TimeUnit.MILLISECONDS));
-        em.registerListener(this, new TeleportListener(this, um));
         em.registerListener(this, new FixListener(this));
-
         this.lagTimer = new LagTimer(this);
-
         cm.addCommands(cm, this, new DoorCommand(this));
-
-        logger.trace("{} ms - done", Profiler.endProfiling("basicsEnable", TimeUnit.MILLISECONDS));
     }
 
     public BasicsConfiguration getConfiguration()
@@ -154,10 +109,5 @@ public class Basics extends Module
     public LagTimer getLagTimer()
     {
         return this.lagTimer;
-    }
-
-    public BasicsUser getBasicsUser(Player player)
-    {
-        return um.getExactUser(player.getUniqueId()).attachOrGet(BasicsAttachment.class, this).getBasicsUser();
     }
 }

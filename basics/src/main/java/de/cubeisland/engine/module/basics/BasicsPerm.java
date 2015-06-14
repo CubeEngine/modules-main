@@ -17,7 +17,6 @@
  */
 package de.cubeisland.engine.module.basics;
 
-import de.cubeisland.engine.module.teleport.TpWorldPermissions;
 import de.cubeisland.engine.module.service.permission.Permission;
 import de.cubeisland.engine.module.service.permission.PermissionContainer;
 import de.cubeisland.engine.module.service.permission.PermissionManager;
@@ -142,8 +141,6 @@ public class BasicsPerm extends PermissionContainer<Basics>
      */
     public final Permission COMMAND_GOD_KEEP = COMMAND_GOD.child("keep");
 
-
-
     private final Permission COMMAND_BUTCHER = COMMAND.childWildcard("butcher");
     private final Permission COMMAND_BUTCHER_FLAG = COMMAND_BUTCHER.childWildcard("flag");
     public final Permission COMMAND_BUTCHER_FLAG_PET = COMMAND_BUTCHER_FLAG.child("pet");
@@ -170,17 +167,6 @@ public class BasicsPerm extends PermissionContainer<Basics>
     public final Permission COMMAND_FLY_KEEP = COMMAND_FLY.child("keep");
     public final Permission COMMAND_FLY_OTHER = COMMAND_FLY.child("other");
 
-
-    private final Permission COMMAND_KICK = COMMAND.childWildcard("kick");
-    public final Permission COMMAND_KICK_ALL = COMMAND_KICK.child("all");
-    public final Permission COMMAND_KICK_NOREASON = COMMAND_KICK.newPerm("noreason");
-
-    public final Permission COMMAND_STACK_FULLSTACK = COMMAND.childWildcard("stack").child("fullstack");
-
-    public final Permission COMMAND_BAN_NOREASON = COMMAND.childWildcard("ban").child("noreason");
-    public final Permission COMMAND_IPBAN_NOREASON = COMMAND.childWildcard("ipban").child("noreason", FALSE);
-    public final Permission COMMAND_TEMPBAN_NOREASON = COMMAND.childWildcard("tempban").child("noreason",FALSE);
-    
     /**
      * Allows to change the walkspeed of other players
      */
@@ -193,8 +179,9 @@ public class BasicsPerm extends PermissionContainer<Basics>
     // TODO maybe permissions for obfuscated format?
 
     public final Permission CHANGEPAINTING = getBasePerm().child("changepainting");
-    public final Permission KICK_RECEIVEMESSAGE = getBasePerm().childWildcard("kick").child("receivemessage");
-    public final Permission BAN_RECEIVEMESSAGE = getBasePerm().childWildcard("ban").child("receivemessage");
+
 
     public final Permission OVERSTACKED_ANVIL_AND_BREWING = getBasePerm().child("allow-overstacked-anvil-and-brewing");
+    public final Permission COMMAND_STACK_FULLSTACK = COMMAND.childWildcard("stack").child("fullstack");
+
 }

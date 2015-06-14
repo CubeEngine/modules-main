@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.moderation.spawnmob;
+package de.cubeisland.engine.module.vanillaplus.spawnmob;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,7 +26,6 @@ import java.util.Random;
 import java.util.Set;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.module.core.sponge.BukkitUtils;
-import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.service.user.User;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.DisplayNameData;
@@ -47,7 +46,6 @@ import org.spongepowered.api.data.type.HorseVariant;
 import org.spongepowered.api.data.type.HorseVariants;
 import org.spongepowered.api.data.type.OcelotType;
 import org.spongepowered.api.data.type.OcelotTypes;
-import org.spongepowered.api.data.type.Profession;
 import org.spongepowered.api.data.type.SkeletonTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Ageable;
@@ -65,10 +63,8 @@ import org.spongepowered.api.entity.living.monster.Slime;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.monster.ZombiePigman;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
 
 import static org.spongepowered.api.item.ItemTypes.SADDLE;
-import static org.spongepowered.api.text.Texts.fromLegacy;
 
 
 public class EntityDataChanger<EntityInterface>

@@ -15,31 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.moderation.spawnmob;
+package de.cubeisland.engine.module.vanillaplus.spawnmob;
 
-import java.util.Collections;
 import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.core.util.matcher.Match;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsConfiguration;
-import org.spongepowered.api.world.Location;
-import org.bukkit.Material;
-import org.spongepowered.api.entity.Entity;
-import org.bukkit.util.Vector;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
+import de.cubeisland.engine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.data.manipulator.entity.PassengerData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.Location;
 
-import static de.cubeisland.engine.module.basics.command.moderation.spawnmob.SpawnMob.spawnMobs;
+import static de.cubeisland.engine.module.vanillaplus.spawnmob.SpawnMob.spawnMobs;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.AIR;
 
@@ -48,11 +37,11 @@ import static org.spongepowered.api.block.BlockTypes.AIR;
  */
 public class SpawnMobCommand
 {
-    private final BasicsConfiguration config;
+    private VanillaPlus module;
 
-    public SpawnMobCommand(Basics basics)
+    public SpawnMobCommand(VanillaPlus module)
     {
-        config = basics.getConfiguration();
+        this.module = module;
     }
 
     @Command(desc = "Spawns the specified Mob")
@@ -85,9 +74,9 @@ public class SpawnMobCommand
             context.sendTranslated(NEUTRAL, "And how am i supposed to know which mobs to despawn?");
             return;
         }
-        if (amount > config.commands.spawnmobLimit)
+        if (amount > module.getConfig().spawnmobLimit)
         {
-            context.sendTranslated(NEGATIVE, "The serverlimit is set to {amount}, you cannot spawn more mobs at once!", config.commands.spawnmobLimit);
+            context.sendTranslated(NEGATIVE, "The serverlimit is set to {amount}, you cannot spawn more mobs at once!", module.getConfig().spawnmobLimit);
             return;
         }
         loc = loc.add(0.5, 0, 0.5);
@@ -107,9 +96,10 @@ public class SpawnMobCommand
             while (entitySpawned.getData(PassengerData.class).isPresent())
             {
                 entitySpawned = entitySpawned.getData(PassengerData.class).get().getVehicle();
-                message = context.getTranslation(NONE, "{input#entity} riding {input}", entitySpawned.getType().getName(), message).get(context.getLocale());
+                message = context.getTranslation(NONE, "{input#entity} riding {input}", entitySpawned.getType().getName(), message).getTranslation().get(context.getLocale());
             }
-            message = context.getTranslation(POSITIVE, "Spawned {amount} {input#message}!", amount, message).get(context.getLocale());
+            message = context.getTranslation(POSITIVE, "Spawned {amount} {input#message}!", amount, message).getTranslation().get(
+                context.getLocale());
             context.sendMessage(message);
         }
     }

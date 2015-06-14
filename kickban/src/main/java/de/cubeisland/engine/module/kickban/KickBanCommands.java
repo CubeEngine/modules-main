@@ -28,7 +28,6 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
 import de.cubeisland.engine.module.service.ban.BanManager;
 import de.cubeisland.engine.module.service.ban.IpBan;
 import de.cubeisland.engine.module.service.ban.UserBan;
@@ -41,7 +40,6 @@ import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.TimeConversionException;
-import de.cubeisland.engine.module.basics.Basics;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.entity.JoinData;
 import org.spongepowered.api.text.Texts;
@@ -62,7 +60,7 @@ import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
  */
 public class KickBanCommands
 {
-    private final Basics module;
+    private final KickBan module;
     private final BanManager banManager;
     private final UserManager um;
     private Game game;
@@ -70,7 +68,7 @@ public class KickBanCommands
     private static final String kickMessage = "You have been kicked from the server!";
     private static final String banMessage = "You have been banned from this server!";
 
-    public KickBanCommands(Basics module, BanManager banManager, UserManager um, Game game)
+    public KickBanCommands(KickBan module, BanManager banManager, UserManager um, Game game)
     {
         this.module = module;
         this.banManager = banManager;
@@ -311,7 +309,7 @@ public class KickBanCommands
     {
         if (!game.getServer().getOnlineMode())
         {
-            if (this.module.getConfiguration().commands.disallowBanIfOfflineMode)
+            if (this.module.getConfiguration().disallowBanIfOfflineMode)
             {
                 context.sendTranslated(NEGATIVE, "Banning players by name is not allowed in offline-mode!");
                 context.sendTranslated(NEUTRAL, "You can change this in your Basics-Configuration.");

@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.general;
+package de.cubeisland.engine.module.vanillaplus;
 
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
@@ -27,32 +28,30 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.result.CommandResult;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.user.UserManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.text.format.TextColors;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
-import static org.spongepowered.api.text.format.TextColors.GRAY;
-import static org.spongepowered.api.text.format.TextColors.WHITE;
+import static org.spongepowered.api.text.format.TextColors.*;
 
 public class ListCommand
 {
     protected static final Comparator<User> USER_COMPARATOR = new UserComparator();
-    private final Basics module;
+    private final VanillaPlus module;
     private UserManager um;
     private Game game;
 
-    public ListCommand(Basics module, UserManager um, Game game)
+    public ListCommand(VanillaPlus module, UserManager um, Game game)
     {
         this.module = module;
         this.um = um;
@@ -62,8 +61,23 @@ public class ListCommand
     protected SortedMap<String, Set<User>> groupUsers(Set<User> users)
     {
         SortedMap<String, Set<User>> grouped = new TreeMap<>();
-        grouped.put(ChatFormat.GOLD + "Players", users);
-
+        for (User user : users)
+        {
+            Player player = user.getPlayer().get();
+            SubjectData data = player.getSubjectData();
+            String listGroup = "&6Players";
+            if (data instanceof OptionSubjectData)
+            {
+                listGroup = ((OptionSubjectData)data).getOptions(player.getActiveContexts()).get("list-group");
+            }
+            Set<User> assigned = grouped.get(listGroup);
+            if (assigned == null)
+            {
+                assigned = new LinkedHashSet<>();
+                grouped.put(listGroup, assigned);
+            }
+            assigned.add(user);
+        }
         return grouped;
     }
 
@@ -98,7 +112,7 @@ public class ListCommand
             {
                 continue;
             }
-            TextBuilder builder = Texts.of(entry.getKey(), WHITE, ":").builder();
+            TextBuilder builder = Texts.of(ChatFormat.fromLegacy(entry.getKey(), '&'), WHITE, ":").builder();
             builder.append(formatUser(it.next()));
             while (it.hasNext())
             {
@@ -113,10 +127,13 @@ public class ListCommand
     private Text formatUser(User user)
     {
         Text result = Texts.of(DARK_GREEN, user.getDisplayName());
+        // TODO chat module pass info that player is afk
+        /*
         if (user.attachOrGet(BasicsAttachment.class, module).isAfk())
         {
             result = result.builder().append(Texts.of(WHITE, "(", GRAY, "afk", ")")).build();
         }
+        */
         return result;
     }
 

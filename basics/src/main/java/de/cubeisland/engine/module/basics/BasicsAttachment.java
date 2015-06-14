@@ -17,20 +17,13 @@
  */
 package de.cubeisland.engine.module.basics;
 
-import java.util.UUID;
-import de.cubeisland.engine.module.service.database.Database;
 import de.cubeisland.engine.module.service.user.UserAttachment;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.world.Location;
 
 public class BasicsAttachment extends UserAttachment
 {
-
-
-
     private ItemStack[] stashedArmor;
     private ItemStack[] stashedInventory;
-
 
     private boolean unlimitedItems = false;
 
@@ -43,9 +36,6 @@ public class BasicsAttachment extends UserAttachment
     {
         this.unlimitedItems = b;
     }
-
-
-
 
     public void setStashedArmor(ItemStack[] stashedArmor)
     {
@@ -66,6 +56,4 @@ public class BasicsAttachment extends UserAttachment
     {
         return stashedInventory;
     }
-
-
 }
