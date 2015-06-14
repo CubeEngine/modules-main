@@ -15,25 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.moderation;
+package de.cubeisland.engine.module.vanillaplus.removal;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
-import de.cubeisland.engine.module.core.util.ChatFormat;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
 import de.cubeisland.engine.module.core.util.matcher.EntityMatcher;
 import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
 import de.cubeisland.engine.module.core.util.matcher.StringMatcher;
-import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.core.util.StringUtils;
@@ -49,37 +44,28 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 
 import de.cubeisland.engine.module.core.util.ChatFormat.GOLD;
 import de.cubeisland.engine.module.core.util.ChatFormat.YELLOW;
-import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.storage.WorldProperties;
-import org.spongepowered.api.world.weather.Weather;
-import org.spongepowered.api.world.weather.Weathers;
 
 import static de.cubeisland.engine.module.core.util.ChatFormat.GOLD;
 import static de.cubeisland.engine.module.core.util.ChatFormat.YELLOW;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
-import static java.util.stream.Collectors.*;
 import static java.util.stream.Collectors.toList;
 import static org.bukkit.entity.EntityType.*;
 import static org.spongepowered.api.entity.EntityTypes.*;
-import static org.spongepowered.api.world.weather.Weathers.THUNDER_STORM;
 
 /**
  * Commands controlling / affecting worlds. /weather /remove /butcher
  */
-public class WorldControlCommands
+public class RemovalCommands
 {
     public static final int RADIUS_INFINITE = -1;
     private final BasicsConfiguration config;
@@ -89,7 +75,8 @@ public class WorldControlCommands
     private StringMatcher stringMatcher;
     private final EntityRemovals entityRemovals;
 
-    public WorldControlCommands(Basics module, EntityMatcher entityMatcher, MaterialMatcher materialMatcher, StringMatcher stringMatcher)
+    public RemovalCommands(Basics module, EntityMatcher entityMatcher, MaterialMatcher materialMatcher,
+                           StringMatcher stringMatcher)
     {
         this.module = module;
         this.entityMatcher = entityMatcher;
@@ -97,102 +84,6 @@ public class WorldControlCommands
         this.stringMatcher = stringMatcher;
         this.config = module.getConfiguration();
         this.entityRemovals = new EntityRemovals(module);
-    }
-
-    public enum Weather
-    {
-        SUN, RAIN, STORM
-    }
-
-    @Command(desc = "Changes the weather")
-    public void weather(CommandContext context, Weather weather, @Optional Integer duration, @Default @Named({"in", "world"}) World world)
-    {
-        boolean sunny = true;
-        boolean noThunder = true;
-        duration = (duration == null ? 10000000 : duration) * 20;
-        switch (weather)
-        {
-            case SUN:
-                sunny = true;
-                noThunder = true;
-                break;
-            case RAIN:
-                sunny = false;
-                noThunder = true;
-                break;
-            case STORM:
-                sunny = false;
-                noThunder = false;
-                break;
-        }
-
-        WorldProperties worldProp = world.getProperties();
-        if (worldProp.isThundering() != noThunder && worldProp.isRaining() != sunny) // weather is not changing
-        {
-            context.sendTranslated(POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather.name());
-        }
-        else
-        {
-            context.sendTranslated(POSITIVE, "Changed weather in {world} to {input#weather}!", world, weather.name());
-        }
-        worldProp.setRaining(!sunny);
-        worldProp.setThundering(!noThunder);
-        worldProp.setRainTime(duration);
-    }
-
-    public enum PlayerWeather
-    {
-        CLEAR, DOWNFALL, RESET
-    }
-
-    @Command(alias = "playerweather", desc = "Changes your weather")
-    public void pweather(CommandContext context, PlayerWeather weather, @Default @Named("player") User player)
-    {
-        if (!player.isOnline())
-        {
-            context.sendTranslated(NEGATIVE, "{user} is not online!", player);
-            return;
-        }
-        switch (weather)
-        {
-            case CLEAR:
-                player.setPlayerWeather(Weathers.CLEAR);
-                if (context.getSource().equals(player))
-                {
-                    context.sendTranslated(POSITIVE, "Your weather is now clear!");
-                }
-                else
-                {
-                    player.sendTranslated(POSITIVE, "Your weather is now clear!");
-                    context.sendTranslated(POSITIVE, "{user}s weather is now clear!", player);
-                }
-                return;
-            case DOWNFALL:
-                player.setPlayerWeather(Weathers.RAIN);
-                if (context.getSource().equals(player))
-                {
-                    context.sendTranslated(POSITIVE, "Your weather is now not clear!");
-                }
-                else
-                {
-                    player.sendTranslated(POSITIVE, "Your weather is now not clear!");
-                    context.sendTranslated(POSITIVE, "{user}s weather is now not clear!", player);
-                }
-                return;
-            case RESET:
-                player.resetPlayerWeather();
-                if (context.getSource().equals(player))
-                {
-                    context.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
-                }
-                else
-                {
-                    player.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
-                    context.sendTranslated(POSITIVE, "{user}s weather is now reset to server weather!", player);
-                }
-                return;
-        }
-        throw new IncorrectUsageException("You did something wrong!");
     }
 
     @Command(desc = "Removes entities in a world")

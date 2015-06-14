@@ -28,14 +28,28 @@ import de.cubeisland.engine.module.service.command.CommandManager;
 import de.cubeisland.engine.module.service.user.UserManager;
 import org.spongepowered.api.Game;
 
+/**
+ * Overrides and improves Vanilla Kick and Ban Commands:
+ *
+ * /ban 	Adds player to banlist.
+ * /ban-ip 	Adds IP address to banlist.
+ * /banlist Displays banlist.
+ * /kick 	Kicks a player off a server.
+ * /pardon 	Removes entries from the banlist.
+ */
 @ModuleInfo(name = "KickBan", description = "Kick and Ban players")
 public class KickBan extends Module
 {
-    @Inject private CommandManager cm;
-    @Inject private BanManager bm;
-    @Inject private UserManager um;
-    @Inject private Game game;
-    @Inject private FileManager fm;
+    @Inject
+    private CommandManager cm;
+    @Inject
+    private BanManager bm;
+    @Inject
+    private UserManager um;
+    @Inject
+    private Game game;
+    @Inject
+    private FileManager fm;
     private KickBanPerms perms;
     private KickBanConfig config;
 

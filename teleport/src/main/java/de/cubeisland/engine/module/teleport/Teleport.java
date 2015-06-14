@@ -30,6 +30,11 @@ import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
 
+/**
+ * /setworldspawn 	Sets the world spawn.
+ * /spawnpoint 	Sets the spawn point for a player.
+ * /tp 	Teleports entities.
+ */
 @ModuleInfo(name = "Teleport", description = "Better Teleportation")
 public class Teleport extends Module
 {

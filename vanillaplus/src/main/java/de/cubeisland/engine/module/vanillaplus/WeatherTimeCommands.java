@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.moderation;
+package de.cubeisland.engine.module.vanillaplus;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
@@ -31,27 +32,31 @@ import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.core.util.matcher.TimeMatcher;
 import de.cubeisland.engine.module.core.util.matcher.WorldMatcher;
+import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.world.WorldManager;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.world.weather.Weathers;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 
 /**
  * Commands changing time. /time /ptime
  */
-public class TimeControlCommands
+public class WeatherTimeCommands
 {
-    private final Basics module;
+    private final VanillaPlus module;
     private final TaskManager taskmgr;
     private WorldManager wm;
     private WorldMatcher worldMatcher;
     private TimeMatcher timeMatcher;
     private final LockTask lockTask;
 
-    public TimeControlCommands(Basics module, TaskManager taskmgr, WorldManager wm, WorldMatcher worldMatcher, TimeMatcher timeMatcher)
+    public WeatherTimeCommands(VanillaPlus module, TaskManager taskmgr, WorldManager wm, WorldMatcher worldMatcher,
+                               TimeMatcher timeMatcher)
     {
         this.module = module;
         this.taskmgr = taskmgr;
@@ -271,5 +276,101 @@ public class TimeControlCommands
                 this.taskid = null;
             }
         }
+    }
+
+    public enum Weather
+    {
+        SUN, RAIN, STORM
+    }
+
+    @Command(desc = "Changes the weather")
+    public void weather(CommandContext context, Weather weather, @Optional Integer duration, @Default @Named({"in", "world"}) World world)
+    {
+        boolean sunny = true;
+        boolean noThunder = true;
+        duration = (duration == null ? 10000000 : duration) * 20;
+        switch (weather)
+        {
+            case SUN:
+                sunny = true;
+                noThunder = true;
+                break;
+            case RAIN:
+                sunny = false;
+                noThunder = true;
+                break;
+            case STORM:
+                sunny = false;
+                noThunder = false;
+                break;
+        }
+
+        WorldProperties worldProp = world.getProperties();
+        if (worldProp.isThundering() != noThunder && worldProp.isRaining() != sunny) // weather is not changing
+        {
+            context.sendTranslated(POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather.name());
+        }
+        else
+        {
+            context.sendTranslated(POSITIVE, "Changed weather in {world} to {input#weather}!", world, weather.name());
+        }
+        worldProp.setRaining(!sunny);
+        worldProp.setThundering(!noThunder);
+        worldProp.setRainTime(duration);
+    }
+
+    public enum PlayerWeather
+    {
+        CLEAR, DOWNFALL, RESET
+    }
+
+    @Command(alias = "playerweather", desc = "Changes your weather")
+    public void pweather(CommandContext context, PlayerWeather weather, @Default @Named("player") User player)
+    {
+        if (!player.isOnline())
+        {
+            context.sendTranslated(NEGATIVE, "{user} is not online!", player);
+            return;
+        }
+        switch (weather)
+        {
+            case CLEAR:
+                player.setPlayerWeather(Weathers.CLEAR);
+                if (context.getSource().equals(player))
+                {
+                    context.sendTranslated(POSITIVE, "Your weather is now clear!");
+                }
+                else
+                {
+                    player.sendTranslated(POSITIVE, "Your weather is now clear!");
+                    context.sendTranslated(POSITIVE, "{user}s weather is now clear!", player);
+                }
+                return;
+            case DOWNFALL:
+                player.setPlayerWeather(Weathers.RAIN);
+                if (context.getSource().equals(player))
+                {
+                    context.sendTranslated(POSITIVE, "Your weather is now not clear!");
+                }
+                else
+                {
+                    player.sendTranslated(POSITIVE, "Your weather is now not clear!");
+                    context.sendTranslated(POSITIVE, "{user}s weather is now not clear!", player);
+                }
+                return;
+            case RESET:
+                player.resetPlayerWeather();
+                if (context.getSource().equals(player))
+                {
+                    context.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
+                }
+                else
+                {
+                    player.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
+                    context.sendTranslated(POSITIVE, "{user}s weather is now reset to server weather!", player);
+                }
+                return;
+        }
+        throw new IncorrectUsageException("You did something wrong!");
     }
 }

@@ -31,6 +31,16 @@ import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATI
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 
+/**
+ * All Whitelist related commands:
+ *
+ * {@link #add}
+ * {@link #remove}
+ * {@link #list}
+ * {@link #on}
+ * {@link #off}
+ * {@link #wipe}
+ */
 @Command(name = "whitelist", desc = "Allows you to manage your whitelist")
 public class WhitelistCommand extends ContainerCommand
 {

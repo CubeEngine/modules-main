@@ -17,14 +17,10 @@
  */
 package de.cubeisland.engine.module.basics;
 
-import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
-import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Maybe;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.module.basics.command.general.ColoredSigns;
 import de.cubeisland.engine.module.fixes.FixListener;
 import de.cubeisland.engine.module.basics.command.general.GeneralsListener;
 import de.cubeisland.engine.module.basics.command.general.InformationCommands;
@@ -36,15 +32,13 @@ import de.cubeisland.engine.module.basics.command.moderation.DoorCommand;
 import de.cubeisland.engine.module.basics.command.moderation.InventoryCommands;
 import de.cubeisland.engine.module.basics.command.moderation.ItemCommands;
 import de.cubeisland.engine.module.basics.command.moderation.PaintingListener;
-import de.cubeisland.engine.module.basics.command.moderation.TimeControlCommands;
-import de.cubeisland.engine.module.basics.command.moderation.WorldControlCommands;
+import de.cubeisland.engine.module.basics.command.moderation.WeatherTimeCommands;
+import de.cubeisland.engine.module.vanillaplus.removal.RemovalCommands;
 import de.cubeisland.engine.module.vanillaplus.SpawnMobCommand;
 import de.cubeisland.engine.module.core.filesystem.FileManager;
 import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
-import de.cubeisland.engine.module.core.util.Profiler;
 import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
-import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.service.ban.BanManager;
 import de.cubeisland.engine.module.service.command.CommandManager;
 import de.cubeisland.engine.module.service.database.Database;
@@ -53,7 +47,6 @@ import de.cubeisland.engine.module.service.task.TaskManager;
 import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.player.Player;
 
 @ModuleInfo(name = "Basics", description = "Basic Functionality")
 public class Basics extends Module
@@ -92,9 +85,9 @@ public class Basics extends Module
         cm.addCommands(cm, this, new PlayerCommands(this, um, em, taskManager, cm, banManager));
         em.registerListener(this, new GeneralsListener(this, um));
         cm.addCommands( this, new InventoryCommands(this, invGuard));
-        cm.addCommands( this, new ItemCommands(this));
-        cm.addCommands(cm, this, new TimeControlCommands(this, taskManager, wm));
-        cm.addCommands(cm, this, new WorldControlCommands(this));
+        cm.addCommands(this, new ItemCommands(this));
+        cm.addCommands(cm, this, new WeatherTimeCommands(this, taskManager, wm));
+        cm.addCommands(cm, this, new RemovalCommands(this));
         em.registerListener(this, new PaintingListener(this, um));
         em.registerListener(this, new FixListener(this));
         this.lagTimer = new LagTimer(this);

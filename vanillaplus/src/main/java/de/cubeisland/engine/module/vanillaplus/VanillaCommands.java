@@ -30,20 +30,18 @@ import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.modularity.core.Module;
 
+import de.cubeisland.engine.module.core.module.ModuleCommands;
 import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.core.sponge.CoreModule;
 import de.cubeisland.engine.module.service.permission.Permission;
 import de.cubeisland.engine.module.service.permission.PermissionManager;
 import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.core.util.Profiler;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
@@ -53,7 +51,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class VanillaCommands
 {
-    private static final String SOURCE_LINK = "https://github.com/CubeEngineDev/CubeEngine/tree/";
     private final VanillaPlus module;
     private Game game;
 
@@ -66,23 +63,6 @@ public class VanillaCommands
 
         COMMAND_VERSION_PLUGINS = module.getProvided(Permission.class).childWildcard("command").childWildcard("version").child("plugins");
         pm.registerPermission(module, COMMAND_VERSION_PLUGINS);
-    }
-
-    public static void showSourceVersion(CommandSender context, String sourceVersion)
-    {
-        if (sourceVersion == null)
-        {
-            return;
-        }
-        if (sourceVersion.contains("-") && sourceVersion.length() > 40)
-        {
-            final String commit = sourceVersion.substring(sourceVersion.lastIndexOf('-') + 1,
-                                                          sourceVersion.length() - 32);
-            context.sendTranslated(POSITIVE, "Source Version: {input}", sourceVersion);
-            context.sendTranslated(POSITIVE, "Source link: {input}", SOURCE_LINK + commit);
-            return;
-        }
-        context.sendTranslated(POSITIVE, "Source Version: unknown");
     }
 
     @Command(alias = {"shutdown", "killserver", "quit"}, desc = "Shuts down the server")
@@ -304,7 +284,7 @@ public class VanillaCommands
                                    module.getInformation().getVersion());
             if (source)
             {
-                showSourceVersion(context.getSource(), module.getInformation().getSourceVersion());
+                ModuleCommands.showSourceVersion(context.getSource(), module.getInformation().getSourceVersion());
             }
             return;
         }
@@ -339,7 +319,7 @@ public class VanillaCommands
         context.sendMessage(" ");
         if (instance.get().getInstance() instanceof CoreModule && source)
         {
-            showSourceVersion(context.getSource(), module.getInformation().getSourceVersion());
+            ModuleCommands.showSourceVersion(context.getSource(), module.getInformation().getSourceVersion());
         }
         /* TODO if possible later get detailed descriptions
         context.sendTranslated(NEUTRAL, "Description: {input}", instance.getDescription().getDescription() == null ? "NONE" : instance.getDescription().getDescription());
