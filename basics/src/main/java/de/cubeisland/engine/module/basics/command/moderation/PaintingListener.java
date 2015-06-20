@@ -22,9 +22,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.service.user.UserManager;
 
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.entity.EntityTypes;

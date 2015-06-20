@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.vanillaplus.removal;
 
-import de.cubeisland.engine.module.service.permission.Permission;
+import de.cubeisland.engine.service.permission.Permission;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.service.permission.Subject;
 

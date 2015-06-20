@@ -21,7 +21,7 @@ import java.util.LinkedList;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.module.core.util.Pair;
 import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.service.task.TaskManager;
+import de.cubeisland.engine.service.task.TaskManager;
 
 public class LagTimer implements Runnable
 {

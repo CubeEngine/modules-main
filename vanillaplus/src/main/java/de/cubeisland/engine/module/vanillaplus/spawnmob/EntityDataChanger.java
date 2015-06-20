@@ -26,7 +26,7 @@ import java.util.Random;
 import java.util.Set;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.module.core.sponge.BukkitUtils;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.service.user.User;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.DisplayNameData;
 import org.spongepowered.api.data.manipulator.DyeableData;

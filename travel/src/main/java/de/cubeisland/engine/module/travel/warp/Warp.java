@@ -18,11 +18,11 @@
 package de.cubeisland.engine.module.travel.warp;
 
 import java.util.Locale;
-import de.cubeisland.engine.module.service.permission.PermDefault;
-import de.cubeisland.engine.module.service.permission.Permission;
-import de.cubeisland.engine.module.service.permission.PermissionManager;
-import de.cubeisland.engine.module.service.user.UserManager;
-import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.service.permission.PermDefault;
+import de.cubeisland.engine.service.permission.Permission;
+import de.cubeisland.engine.service.permission.PermissionManager;
+import de.cubeisland.engine.service.user.UserManager;
+import de.cubeisland.engine.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.TeleportPoint;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;

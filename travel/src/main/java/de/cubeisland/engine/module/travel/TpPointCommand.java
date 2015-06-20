@@ -18,9 +18,9 @@
 package de.cubeisland.engine.module.travel;
 
 import java.util.Set;
-import de.cubeisland.engine.module.service.command.ContainerCommand;
-import de.cubeisland.engine.module.service.command.CommandSender;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.service.command.ContainerCommand;
+import de.cubeisland.engine.service.command.CommandSender;
+import de.cubeisland.engine.service.user.User;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
 

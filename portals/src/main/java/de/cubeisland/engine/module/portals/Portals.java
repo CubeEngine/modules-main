@@ -43,11 +43,11 @@ import de.cubeisland.engine.module.portals.config.Destination;
 import de.cubeisland.engine.module.portals.config.DestinationReader;
 import de.cubeisland.engine.module.portals.config.DestinationConverter;
 import de.cubeisland.engine.module.portals.config.PortalConfig;
-import de.cubeisland.engine.module.service.Selector;
-import de.cubeisland.engine.module.service.command.CommandManager;
-import de.cubeisland.engine.module.service.task.TaskManager;
-import de.cubeisland.engine.module.service.user.UserManager;
-import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.service.Selector;
+import de.cubeisland.engine.service.command.CommandManager;
+import de.cubeisland.engine.service.task.TaskManager;
+import de.cubeisland.engine.service.user.UserManager;
+import de.cubeisland.engine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.Entity;
@@ -56,7 +56,7 @@ import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.module.core.filesystem.FileExtensionFilter.YAML;
+import static de.cubeisland.engine.service.filesystem.FileExtensionFilter.YAML;
 import static java.util.stream.Collectors.toSet;
 
 @ModuleInfo(name = "Portals", description = "Create and use portals")

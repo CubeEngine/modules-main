@@ -17,15 +17,15 @@
  */
 package de.cubeisland.engine.module.travel.storage;
 
-import de.cubeisland.engine.module.service.database.AutoIncrementTable;
-import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.service.database.AutoIncrementTable;
+import de.cubeisland.engine.service.database.Database;
 import de.cubeisland.engine.module.core.util.Version;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.module.service.user.TableUser.TABLE_USER;
-import static de.cubeisland.engine.module.service.world.TableWorld.TABLE_WORLD;
+import static de.cubeisland.engine.service.user.TableUser.TABLE_USER;
+import static de.cubeisland.engine.service.world.TableWorld.TABLE_WORLD;
 
 public class TableTeleportPoint extends AutoIncrementTable<TeleportPointModel, UInteger>
 {

@@ -20,8 +20,7 @@ package de.cubeisland.engine.module.roles.commands;
 import java.util.Collections;
 import java.util.Set;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.module.core.util.ChatFormat;
-import de.cubeisland.engine.module.service.command.ContainerCommand;
+import de.cubeisland.engine.service.command.ContainerCommand;
 import de.cubeisland.engine.module.roles.Roles;
 import org.spongepowered.api.service.permission.context.Context;
 

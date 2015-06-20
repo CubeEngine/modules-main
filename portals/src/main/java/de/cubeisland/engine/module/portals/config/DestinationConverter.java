@@ -25,9 +25,9 @@ import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.module.core.util.WorldLocation;
-import de.cubeisland.engine.module.service.world.ConfigWorld;
+import de.cubeisland.engine.service.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.config.Destination.Type;
-import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.service.world.WorldManager;
 
 public class DestinationConverter extends SingleClassConverter<Destination>
 {

@@ -24,11 +24,11 @@ import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import de.cubeisland.engine.module.service.command.CommandContext;
-import de.cubeisland.engine.module.service.command.ContainerCommand;
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.user.UserList;
-import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.service.command.CommandContext;
+import de.cubeisland.engine.service.command.ContainerCommand;
+import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.user.UserList;
+import de.cubeisland.engine.service.user.UserManager;
 import org.spongepowered.api.data.manipulator.entity.JoinData;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;

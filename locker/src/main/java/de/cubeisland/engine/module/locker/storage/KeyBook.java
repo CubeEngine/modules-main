@@ -19,10 +19,9 @@ package de.cubeisland.engine.module.locker.storage;
 
 import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.locker.Locker;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.DisplayNameData;
 import org.spongepowered.api.data.manipulator.item.LoreData;
 import org.spongepowered.api.item.ItemTypes;

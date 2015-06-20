@@ -17,12 +17,12 @@
  */
 package de.cubeisland.engine.module.basics;
 
-import de.cubeisland.engine.module.service.permission.Permission;
-import de.cubeisland.engine.module.service.permission.PermissionContainer;
-import de.cubeisland.engine.module.service.permission.PermissionManager;
-import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.service.permission.Permission;
+import de.cubeisland.engine.service.permission.PermissionContainer;
+import de.cubeisland.engine.service.permission.PermissionManager;
+import de.cubeisland.engine.service.world.WorldManager;
 
-import static de.cubeisland.engine.module.service.permission.PermDefault.FALSE;
+import static de.cubeisland.engine.service.permission.PermDefault.FALSE;
 
 @SuppressWarnings("all")
 public class BasicsPerm extends PermissionContainer<Basics>

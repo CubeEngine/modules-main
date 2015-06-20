@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
-import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.service.command.CommandSender;
 import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.matcher.Match;
 import org.spongepowered.api.world.Location;

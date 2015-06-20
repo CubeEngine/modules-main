@@ -21,7 +21,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Transient;
-import de.cubeisland.engine.module.service.world.ConfigWorld;
+import de.cubeisland.engine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;

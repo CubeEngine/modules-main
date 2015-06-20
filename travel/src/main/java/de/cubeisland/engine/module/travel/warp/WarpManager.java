@@ -18,11 +18,11 @@
 package de.cubeisland.engine.module.travel.warp;
 
 import com.flowpowered.math.vector.Vector3d;
-import de.cubeisland.engine.module.service.database.Database;
-import de.cubeisland.engine.module.service.permission.PermissionManager;
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.user.UserManager;
-import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.service.database.Database;
+import de.cubeisland.engine.service.permission.PermissionManager;
+import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.user.UserManager;
+import de.cubeisland.engine.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.InviteManager;
 import de.cubeisland.engine.module.travel.TelePointManager;
 import de.cubeisland.engine.module.travel.Travel;

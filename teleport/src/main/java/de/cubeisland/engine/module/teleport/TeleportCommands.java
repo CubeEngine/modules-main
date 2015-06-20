@@ -26,10 +26,10 @@ import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.module.service.command.CommandContext;
-import de.cubeisland.engine.module.service.command.CommandSender;
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.service.command.CommandContext;
+import de.cubeisland.engine.service.command.CommandSender;
+import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.user.UserManager;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 

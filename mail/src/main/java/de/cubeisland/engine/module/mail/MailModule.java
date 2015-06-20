@@ -24,10 +24,10 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.mail.storage.TableMail;
-import de.cubeisland.engine.module.service.command.CommandManager;
-import de.cubeisland.engine.module.service.database.Database;
-import de.cubeisland.engine.module.service.task.TaskManager;
-import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.service.command.CommandManager;
+import de.cubeisland.engine.service.database.Database;
+import de.cubeisland.engine.service.task.TaskManager;
+import de.cubeisland.engine.service.user.UserManager;
 
 @ModuleInfo(name = "Mail", description = "Send ingame Mails")
 public class MailModule extends Module

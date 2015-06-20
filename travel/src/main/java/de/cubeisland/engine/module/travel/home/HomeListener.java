@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.travel.home;
 
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.user.UserManager;
-import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.user.UserManager;
+import de.cubeisland.engine.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.Travel;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.entity.SneakingData;

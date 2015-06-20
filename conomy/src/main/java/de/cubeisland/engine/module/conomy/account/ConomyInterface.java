@@ -23,9 +23,9 @@ import java.util.Locale;
 import java.util.UUID;
 import javax.inject.Inject;
 import de.cubeisland.engine.module.conomy.Conomy;
-import de.cubeisland.engine.module.service.Economy;
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.service.Economy;
+import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.user.UserManager;
 
 public class ConomyInterface implements Economy
 {

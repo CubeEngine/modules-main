@@ -21,9 +21,9 @@ import java.util.UUID;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.module.service.task.TaskManager;
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.service.task.TaskManager;
+import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.user.UserManager;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 

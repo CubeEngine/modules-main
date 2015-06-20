@@ -22,7 +22,7 @@ import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import de.cubeisland.engine.module.core.i18n.I18n;
+import de.cubeisland.engine.service.i18n.I18n;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
 

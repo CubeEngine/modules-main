@@ -24,8 +24,8 @@ import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import de.cubeisland.engine.module.portals.Portal;
 import de.cubeisland.engine.module.portals.Portals;
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.world.WorldManager;
+import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.world.WorldManager;
 import org.spongepowered.api.world.World;
 
 public class DestinationReader implements ArgumentReader<Destination>

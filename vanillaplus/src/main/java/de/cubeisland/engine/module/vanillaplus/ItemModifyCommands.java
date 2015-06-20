@@ -24,7 +24,7 @@ import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.service.user.User;
 import org.spongepowered.api.data.manipulator.DisplayNameData;
 import org.spongepowered.api.data.manipulator.SkullData;
 import org.spongepowered.api.data.manipulator.item.DurabilityData;
@@ -39,7 +39,7 @@ import org.spongepowered.api.text.Texts;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
-import static de.cubeisland.engine.module.service.command.readers.EnchantmentReader.getPossibleEnchantments;
+import static de.cubeisland.engine.service.command.readers.EnchantmentReader.getPossibleEnchantments;
 import static org.spongepowered.api.item.ItemTypes.SKULL;
 
 /**

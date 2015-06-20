@@ -20,12 +20,11 @@ package de.cubeisland.engine.module.roles.commands.provider;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.completer.Completer;
-import de.cubeisland.engine.module.service.permission.PermissionManager;
+import de.cubeisland.engine.service.permission.PermissionManager;
 
 import static java.util.stream.Collectors.toList;
 

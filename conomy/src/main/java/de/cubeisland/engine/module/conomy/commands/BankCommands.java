@@ -26,16 +26,16 @@ import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
-import de.cubeisland.engine.module.service.command.ContainerCommand;
-import de.cubeisland.engine.module.service.command.CommandSender;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.service.command.ContainerCommand;
+import de.cubeisland.engine.service.command.CommandSender;
+import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.UserAccount;
-import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.service.user.UserManager;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
 

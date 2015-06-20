@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.locker;
 
 import java.util.HashSet;
 import java.util.Set;
-import de.cubeisland.engine.module.service.user.UserAttachment;
+import de.cubeisland.engine.service.user.UserAttachment;
 import de.cubeisland.engine.module.locker.storage.Lock;
 
 public class LockerAttachment extends UserAttachment

@@ -27,10 +27,10 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.module.service.command.CommandSender;
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.user.UserManager;
-import de.cubeisland.engine.module.service.world.WorldSetSpawnEvent;
+import de.cubeisland.engine.service.command.CommandSender;
+import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.user.UserManager;
+import de.cubeisland.engine.service.world.WorldSetSpawnEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 

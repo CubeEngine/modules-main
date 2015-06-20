@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.locker;
 
-import de.cubeisland.engine.module.service.permission.PermDefault;
-import de.cubeisland.engine.module.service.permission.Permission;
-import de.cubeisland.engine.module.service.permission.PermissionContainer;
+import de.cubeisland.engine.service.permission.PermDefault;
+import de.cubeisland.engine.service.permission.Permission;
+import de.cubeisland.engine.service.permission.PermissionContainer;
 import de.cubeisland.engine.module.locker.commands.LockerAdminCommands;
 import de.cubeisland.engine.module.locker.commands.LockerCommands;
 import de.cubeisland.engine.module.locker.commands.LockerCreateCommands;

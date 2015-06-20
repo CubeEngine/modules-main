@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.basics;
 
-import de.cubeisland.engine.module.service.user.UserAttachment;
+import de.cubeisland.engine.service.user.UserAttachment;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 public class BasicsAttachment extends UserAttachment

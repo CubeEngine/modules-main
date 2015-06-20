@@ -17,11 +17,9 @@
  */
 package de.cubeisland.engine.module.portals;
 
-import java.util.ArrayList;
 import java.util.List;
-import de.cubeisland.engine.module.core.util.LocationUtil;
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.user.UserManager;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;

@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.portals.config;
 
 import de.cubeisland.engine.module.core.util.WorldLocation;
 import de.cubeisland.engine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.module.service.world.ConfigWorld;
+import de.cubeisland.engine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;

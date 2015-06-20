@@ -22,10 +22,10 @@ import de.cubeisland.engine.modularity.asm.marker.Disable;
 import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.module.core.filesystem.FileManager;
-import de.cubeisland.engine.module.service.ban.BanManager;
-import de.cubeisland.engine.module.service.command.CommandManager;
-import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.service.filesystem.FileManager;
+import de.cubeisland.engine.service.ban.BanManager;
+import de.cubeisland.engine.service.command.CommandManager;
+import de.cubeisland.engine.service.user.UserManager;
 import org.spongepowered.api.Game;
 
 /**

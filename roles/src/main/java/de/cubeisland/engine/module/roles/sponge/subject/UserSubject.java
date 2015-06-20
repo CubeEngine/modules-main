@@ -26,7 +26,7 @@ import java.util.UUID;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.data.UserSubjectData;
-import de.cubeisland.engine.module.service.permission.PermissionManager;
+import de.cubeisland.engine.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.User;

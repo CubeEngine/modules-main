@@ -31,12 +31,12 @@ import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.modularity.core.Module;
 
 import de.cubeisland.engine.module.core.module.ModuleCommands;
-import de.cubeisland.engine.module.service.command.CommandContext;
-import de.cubeisland.engine.module.service.command.CommandSender;
+import de.cubeisland.engine.service.command.CommandContext;
+import de.cubeisland.engine.service.command.CommandSender;
 import de.cubeisland.engine.module.core.sponge.CoreModule;
-import de.cubeisland.engine.module.service.permission.Permission;
-import de.cubeisland.engine.module.service.permission.PermissionManager;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.service.permission.Permission;
+import de.cubeisland.engine.service.permission.PermissionManager;
+import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.core.util.Profiler;
 import org.spongepowered.api.Game;

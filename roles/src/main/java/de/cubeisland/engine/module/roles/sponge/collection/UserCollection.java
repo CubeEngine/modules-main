@@ -20,18 +20,13 @@ package de.cubeisland.engine.module.roles.sponge.collection;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import com.google.common.base.Optional;
-import de.cubeisland.engine.module.roles.RolesConfig;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.UserSubject;
-import de.cubeisland.engine.module.service.database.Database;
-import de.cubeisland.engine.module.service.permission.PermissionManager;
+import de.cubeisland.engine.service.database.Database;
+import de.cubeisland.engine.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.entity.player.User;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.user.UserStorage;
 
 public class UserCollection extends BaseSubjectCollection
 {

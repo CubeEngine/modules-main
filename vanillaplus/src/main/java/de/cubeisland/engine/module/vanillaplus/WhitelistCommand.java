@@ -20,11 +20,11 @@ package de.cubeisland.engine.module.vanillaplus;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.module.service.command.CommandSender;
-import de.cubeisland.engine.module.service.command.ContainerCommand;
-import de.cubeisland.engine.module.service.command.sender.ConsoleCommandSender;
+import de.cubeisland.engine.service.command.CommandSender;
+import de.cubeisland.engine.service.command.ContainerCommand;
+import de.cubeisland.engine.service.command.sender.ConsoleCommandSender;
 import de.cubeisland.engine.module.core.sponge.CoreModule;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.service.user.User;
 import org.spongepowered.api.data.manipulator.entity.WhitelistData;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;

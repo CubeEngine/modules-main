@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
-import de.cubeisland.engine.module.service.database.AsyncRecord;
-import de.cubeisland.engine.module.service.database.Database;
-import de.cubeisland.engine.module.service.database.Table;
+import de.cubeisland.engine.service.database.AsyncRecord;
+import de.cubeisland.engine.service.database.Database;
+import de.cubeisland.engine.service.database.Table;
 import org.jooq.Result;
 import org.jooq.TableField;
 

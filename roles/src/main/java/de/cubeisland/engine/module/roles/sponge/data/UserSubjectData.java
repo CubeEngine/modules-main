@@ -24,7 +24,7 @@ import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.collection.RoleCollection;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
 import de.cubeisland.engine.module.roles.storage.UserRole;
-import de.cubeisland.engine.module.service.database.Database;
+import de.cubeisland.engine.service.database.Database;
 import org.spongepowered.api.service.permission.context.Context;
 
 import static de.cubeisland.engine.module.roles.commands.RoleCommands.toSet;

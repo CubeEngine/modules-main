@@ -17,10 +17,10 @@
  */
 package de.cubeisland.engine.module.kickban;
 
-import de.cubeisland.engine.module.service.permission.Permission;
-import de.cubeisland.engine.module.service.permission.PermissionContainer;
+import de.cubeisland.engine.service.permission.Permission;
+import de.cubeisland.engine.service.permission.PermissionContainer;
 
-import static de.cubeisland.engine.module.service.permission.PermDefault.FALSE;
+import static de.cubeisland.engine.service.permission.PermDefault.FALSE;
 
 public class KickBanPerms extends PermissionContainer<KickBan>
 {

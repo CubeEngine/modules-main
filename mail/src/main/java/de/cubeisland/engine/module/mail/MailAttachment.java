@@ -20,10 +20,10 @@ package de.cubeisland.engine.module.mail;
 import java.util.ArrayList;
 import java.util.List;
 import de.cubeisland.engine.module.mail.storage.Mail;
-import de.cubeisland.engine.module.service.command.CommandSender;
-import de.cubeisland.engine.module.service.database.Database;
-import de.cubeisland.engine.module.service.user.User;
-import de.cubeisland.engine.module.service.user.UserAttachment;
+import de.cubeisland.engine.service.command.CommandSender;
+import de.cubeisland.engine.service.database.Database;
+import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.user.UserAttachment;
 import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
 

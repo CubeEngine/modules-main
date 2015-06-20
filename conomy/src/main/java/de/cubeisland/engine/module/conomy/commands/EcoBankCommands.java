@@ -18,14 +18,14 @@
 package de.cubeisland.engine.module.conomy.commands;
 
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.module.service.command.ContainerCommand;
-import de.cubeisland.engine.module.service.command.CommandContext;
-import de.cubeisland.engine.module.service.command.CommandSender;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.service.command.ContainerCommand;
+import de.cubeisland.engine.service.command.CommandContext;
+import de.cubeisland.engine.service.command.CommandSender;
+import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import de.cubeisland.engine.module.service.user.UserManager;
+import de.cubeisland.engine.service.user.UserManager;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
 

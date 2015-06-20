@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import de.cubeisland.engine.module.core.util.WorldLocation;
-import de.cubeisland.engine.module.service.world.ConfigWorld;
+import de.cubeisland.engine.service.world.ConfigWorld;
 import de.cubeisland.engine.module.worlds.Worlds;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;

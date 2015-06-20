@@ -19,9 +19,9 @@ package de.cubeisland.engine.module.locker.commands;
 
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.module.service.command.ContainerCommand;
-import de.cubeisland.engine.module.service.command.CommandContext;
-import de.cubeisland.engine.module.service.user.User;
+import de.cubeisland.engine.service.command.ContainerCommand;
+import de.cubeisland.engine.service.command.CommandContext;
+import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.storage.Lock;
 import de.cubeisland.engine.module.locker.storage.LockManager;
