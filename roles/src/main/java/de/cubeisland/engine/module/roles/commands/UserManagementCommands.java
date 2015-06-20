@@ -76,7 +76,7 @@ public class UserManagementCommands extends ContainerCommand
         Set<Context> contexts = RoleCommands.toSet(role.getContext());
         if (temp)
         {
-            if (!player.isOnline())
+            if (!player.getPlayer().isPresent())
             {
                 context.sendTranslated(NEGATIVE, "You cannot assign a temporary role to a offline player!");
                 return;

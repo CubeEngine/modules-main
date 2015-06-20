@@ -22,7 +22,9 @@ import de.cubeisland.engine.module.service.user.UserManager;
 import de.cubeisland.engine.module.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.Travel;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.data.manipulator.entity.SneakingData;
 import org.spongepowered.api.entity.EntityInteractionTypes;
+import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
 
@@ -47,21 +49,22 @@ public class HomeListener
     @Subscribe(order = EARLY)
     public void rightClickBed(PlayerInteractBlockEvent event)
     {
-        if (event.getInteractionType() != EntityInteractionTypes.USE || event.getBlock().getType() != BlockTypes.BED)
+        if (event.getInteractionType() != EntityInteractionTypes.USE || event.getBlock().getBlockType() != BlockTypes.BED)
         {
             return;
         }
-        User user = um.getExactUser(event.getUser().getUniqueId());
-        if (user.isSneaking())
+        Player player = event.getUser();
+        User user = um.getExactUser(player.getUniqueId());
+        if (player.getData(SneakingData.class).isPresent())
         {
             if (homeManager.has(user, "home"))
             {
                 Home home = homeManager.findOne(user, "home");
-                if (user.getLocation().equals(home.getLocation()))
+                if (player.getLocation().equals(home.getLocation()))
                 {
                     return;
                 }
-                home.setLocation(user.getLocation(), user.getRotation(), wm);
+                home.setLocation(player.getLocation(), player.getRotation(), wm);
                 home.update();
                 user.sendTranslated(POSITIVE, "Your home has been set!");
             }
@@ -73,7 +76,7 @@ public class HomeListener
                     user.sendTranslated(NEGATIVE, "You have to delete a home to make a new one");
                     return;
                 }
-                homeManager.create(user, "home", user.getLocation(), user.getRotation(), false);
+                homeManager.create(user, "home", player.getLocation(), player.getRotation(), false);
                 user.sendTranslated(POSITIVE, "Your home has been created!");
             }
             event.setCancelled(true);

@@ -60,7 +60,7 @@ public class PortalModifyCommand extends ContainerCommand
     @Command(desc = "Changes the owner of a portal")
     public void owner(CommandContext context, User owner, @Default Portal portal)
     {
-        portal.config.owner = owner.getOfflinePlayer();
+        portal.config.owner = owner.getUser();
         portal.config.save();
         context.sendTranslated(POSITIVE, "{user} is now the owner of {name#portal}!", owner, portal.getName());
     }
@@ -106,14 +106,14 @@ public class PortalModifyCommand extends ContainerCommand
     public void exit(CommandContext context, @Default Portal portal)
     {
         User sender = (User)context.getSource();
-        Location location = sender.getLocation();
+        Location location = sender.asPlayer().getLocation();
         if (portal.config.world.getWorld() != location.getExtent())
         {
             // TODO range check? range in config
             context.sendTranslated(NEGATIVE, "A portals exit cannot be in an other world than its location!");
             return;
         }
-        portal.config.location.destination = new WorldLocation(location, sender.getRotation());
+        portal.config.location.destination = new WorldLocation(location, sender.asPlayer().getRotation());
         portal.config.save();
         context.sendTranslated(POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
     }

@@ -17,46 +17,22 @@
  */
 package de.cubeisland.engine.module.vanillaplus;
 
-import java.util.ArrayList;
-import java.util.List;
 import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parameter.FixedValues;
-import de.cubeisland.engine.butler.parameter.TooFewArgumentsException;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.matcher.EnchantMatcher;
-import de.cubeisland.engine.module.core.util.matcher.Match;
 import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
-import de.cubeisland.engine.module.service.command.CommandContext;
 import de.cubeisland.engine.module.service.command.CommandSender;
-import de.cubeisland.engine.module.service.paginate.PaginatedResult;
 import de.cubeisland.engine.module.service.user.User;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.data.manipulator.DisplayNameData;
-import org.spongepowered.api.data.manipulator.SkullData;
-import org.spongepowered.api.data.manipulator.item.DurabilityData;
-import org.spongepowered.api.data.manipulator.item.LoreData;
-import org.spongepowered.api.data.property.UseLimitProperty;
-import org.spongepowered.api.data.type.SkullTypes;
-import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 
-import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
-import static de.cubeisland.engine.module.service.command.readers.EnchantmentReader.getPossibleEnchantments;
-import static org.spongepowered.api.item.ItemTypes.SKULL;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.ITEM_DATA;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
 

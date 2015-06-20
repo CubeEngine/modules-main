@@ -57,7 +57,7 @@ public class TeleportRequestCommands
             return;
         }
         context.attachOrGet(TeleportAttachment.class, module).removeTpRequestCancelTask();
-        if (!player.isOnline())
+        if (!player.getPlayer().isPresent())
         {
             context.sendTranslated(NEGATIVE, "{user} is not online!", player);
             return;
@@ -96,7 +96,7 @@ public class TeleportRequestCommands
             return;
         }
         context.attachOrGet(TeleportAttachment.class, module).removeTpRequestCancelTask();
-        if (!player.isOnline())
+        if (!player.getPlayer().isPresent())
         {
             context.sendTranslated(NEGATIVE, "{user} is not online!");
             return;
@@ -140,12 +140,12 @@ public class TeleportRequestCommands
             }
             context.attachOrGet(TeleportAttachment.class, module).removePendingTpFromRequest();
             User user = um.getExactUser(uuid);
-            if (user == null || !user.isOnline())
+            if (user == null || !user.getPlayer().isPresent())
             {
                 context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", user);
                 return;
             }
-            context.getPlayer().get().setLocation(user.getLocation());
+            context.getPlayer().get().setLocation(user.asPlayer().getLocation());
             user.sendTranslated(POSITIVE, "{user} accepted your teleport request!", context);
             context.sendTranslated(POSITIVE, "You accepted a teleport to {user}!", user);
         }
@@ -153,12 +153,12 @@ public class TeleportRequestCommands
         {
             context.attachOrGet(TeleportAttachment.class, module).removePendingTpToRequest();
             User user = um.getExactUser(uuid);
-            if (user == null || !user.isOnline())
+            if (user == null || !user.getPlayer().isPresent())
             {
                 context.sendTranslated(NEGATIVE, "{user} seems to have disappeared.", um.getExactUser(uuid).getName());
                 return;
             }
-            user.getPlayer().get().setLocation(context.getLocation());
+            user.getPlayer().get().setLocation(context.asPlayer().getLocation());
             user.sendTranslated(POSITIVE, "{user} accepted your teleport request!", context);
             context.sendTranslated(POSITIVE, "You accepted a teleport to {user}!", user);
         }

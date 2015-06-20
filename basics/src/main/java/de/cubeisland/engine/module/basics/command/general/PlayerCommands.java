@@ -44,6 +44,8 @@ import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.user.UserList;
 import de.cubeisland.engine.module.service.user.UserManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.manipulator.entity.JoinData;
+import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.Location;
 
@@ -217,7 +219,7 @@ public class PlayerCommands
     private static final long SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
     @Command(desc = "Shows when given player was online the last time")
-    public void seen(CommandSender context, User player)
+    public void seen(CommandSender context, Player player)
     {
         if (player.isOnline())
         {
@@ -225,7 +227,7 @@ public class PlayerCommands
             return;
         }
 
-        Date lastPlayed = player.getLastPlayed();
+        Date lastPlayed = player.getData(JoinData.class).get().getFirstPlayed();
         if (System.currentTimeMillis() - lastPlayed.getTime() <= SEVEN_DAYS) // If less than 7 days show timeframe instead of date
         {
             context.sendTranslated(NEUTRAL, "{user} was last seen {input#date}.", player, TimeUtil.format(
@@ -330,6 +332,11 @@ public class PlayerCommands
         BasicsUserEntity bUser = module.getBasicsUser(player.getPlayer().get()).getEntity();
         bUser.setValue(TABLE_BASIC_USER.GODMODE, !bUser.getValue(TABLE_BASIC_USER.GODMODE));
         player.setInvulnerable(bUser.getValue(TABLE_BASIC_USER.GODMODE));
+        /*
+        InvulnerabilityData data = ((CoreModule)core).getGame().getRegistry().getManipulatorRegistry().getBuilder(InvulnerabilityData.class).get().create();
+        data.setInvulnerableTicks(100000000);
+        offer(data);
+         */
         if (bUser.getValue(TABLE_BASIC_USER.GODMODE))
         {
             if (!other)

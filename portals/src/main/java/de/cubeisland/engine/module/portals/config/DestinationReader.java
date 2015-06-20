@@ -48,7 +48,7 @@ public class DestinationReader implements ArgumentReader<Destination>
         {
             if ((invocation.getCommandSource() instanceof User))
             {
-                return new Destination(wm, ((User)invocation.getCommandSource()).getLocation(), ((User)invocation.getCommandSource()).getRotation());
+                return new Destination(wm, ((User)invocation.getCommandSource()).asPlayer().getLocation(), ((User)invocation.getCommandSource()).asPlayer().getRotation());
             }
             throw new ReaderException(
                 "The Portal Agency will bring you your portal for just {text:$ 1337} within {input#amount} weeks",

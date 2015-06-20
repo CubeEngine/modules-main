@@ -118,6 +118,11 @@ public class GeneralsListener
             if (module.perms().COMMAND_GOD_KEEP.isAuthorized(user))
             {
                 user.setInvulnerable(true);
+                /*
+                InvulnerabilityData data = ((CoreModule)core).getGame().getRegistry().getManipulatorRegistry().getBuilder(InvulnerabilityData.class).get().create();
+        data.setInvulnerableTicks(100000000);
+        offer(data);
+                 */
             }
             else
             {

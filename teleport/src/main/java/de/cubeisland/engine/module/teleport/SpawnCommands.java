@@ -66,11 +66,11 @@ public class SpawnCommands
             {
                 throw new TooFewArgumentsException();
             }
-            final Location loc = ((User)context).getLocation();
+            final Location loc = ((User)context).asPlayer().getLocation();
             x = loc.getBlockX();
             y = loc.getBlockY();
             z = loc.getBlockZ();
-            direction = ((User)context).getRotation();
+            direction = ((User)context).asPlayer().getRotation();
         }
         em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location(world, x, y, z), direction));
         world.getWorldStorage().getWorldProperties().setSpawnPosition(new Vector3i(x, y, z));
@@ -98,10 +98,10 @@ public class SpawnCommands
         world = world == null ? module.getConfig().getMainWorld() : world;
         if (world == null)
         {
-            world = player.getWorld();
+            world = player.asPlayer().getWorld();
         }
         force = force && module.perms().COMMAND_SPAWN_FORCE.isAuthorized(context) || context.getUniqueId().equals(player.getUniqueId());
-        if (!player.isOnline())
+        if (!player.getPlayer().isPresent())
         {
             context.sendTranslated(NEGATIVE, "You cannot teleport an offline player to spawn!");
             return;
@@ -112,9 +112,9 @@ public class SpawnCommands
             return;
         }
         final Location spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
-        Vector3d rotation = player.getRotation();
+        Vector3d rotation = player.asPlayer().getRotation();
         player.getPlayer().get().setLocation(spawnLocation);
-        player.setRotation(rotation);
+        player.asPlayer().setRotation(rotation);
         context.sendTranslated(POSITIVE, "You are now standing at the spawn in {world}!", world);
     }
 
@@ -128,9 +128,9 @@ public class SpawnCommands
             context.sendTranslated(NEGATIVE, "You are not allowed to teleport to this world!");
             return;
         }
-        Vector3d rotation = context.getRotation();
+        Vector3d rotation = context.asPlayer().getRotation();
         context.getPlayer().get().setLocation(spawnLocation);
         context.sendTranslated(POSITIVE, "Teleported to the spawn of world {world}!", world);
-        context.setRotation(rotation);
+        context.asPlayer().setRotation(rotation);
     }
 }

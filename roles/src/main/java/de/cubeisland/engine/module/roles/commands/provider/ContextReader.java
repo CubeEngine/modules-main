@@ -70,7 +70,7 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
     {
         if (invocation.getCommandSource() instanceof User)
         {
-            return new Context("world", ((User)invocation.getCommandSource()).getWorld().getName());
+            return new Context("world", ((User)invocation.getCommandSource()).asPlayer().getWorld().getName());
         }
         throw new ReaderException("You have to provide a context");
     }

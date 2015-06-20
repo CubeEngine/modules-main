@@ -102,7 +102,7 @@ public class ContextualRoleReader implements ArgumentReader<ContextualRole>, Com
         String token = invocation.consume(1).toLowerCase();
         if (!token.contains("|") && invocation.getCommandSource() instanceof User)
         {
-            World world = ((User)invocation.getCommandSource()).getWorld();
+            World world = ((User)invocation.getCommandSource()).asPlayer().getWorld();
             Context context = new Context("world", world.getName());
             for (Subject subject : service.getGroupSubjects().getAllSubjects())
             {

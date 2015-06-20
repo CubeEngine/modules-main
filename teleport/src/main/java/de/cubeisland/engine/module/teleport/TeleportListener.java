@@ -17,6 +17,7 @@
  */
 package de.cubeisland.engine.module.teleport;
 
+import com.google.common.base.Optional;
 import de.cubeisland.engine.module.core.util.LocationUtil;
 import de.cubeisland.engine.module.service.user.User;
 import de.cubeisland.engine.module.service.user.UserManager;
@@ -28,6 +29,8 @@ import org.spongepowered.api.event.entity.EntityTeleportEvent;
 import org.spongepowered.api.event.entity.player.PlayerDeathEvent;
 import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.blockray.BlockRay;
+import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
@@ -63,7 +66,7 @@ public class TeleportListener
         User user = um.getExactUser(event.getEntity().getUniqueId());
         if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(user))
         {
-            user.attachOrGet(TeleportAttachment.class, module).setDeathLocation(user.getLocation());
+            user.attachOrGet(TeleportAttachment.class, module).setDeathLocation(user.asPlayer().getLocation());
         }
     }
 
@@ -83,18 +86,18 @@ public class TeleportListener
             {
                 User user = um.getExactUser(event.getUser().getUniqueId());
                 Location loc;
-                if (event.getBlock().getType().isSolidCube())
+                if (event.getBlock().getBlockType().isSolidCube())
                 {
                     loc = event.getBlock().add(0.5, 1, 0.5);
                 }
                 else
                 {
-                    Location block = user.getTargetBlock(this.module.getConfig().navigation.jumpToMaxRange);
-                    if (block.getType() == AIR)
+                    Optional<BlockRayHit> end = BlockRay.from(user.asPlayer()).end();
+                    if (!end.isPresent())
                     {
                         return;
                     }
-                    loc = block.add(0.5, 1, 0.5);
+                    loc = end.get().getLocation().add(0.5, 1, 0.5);
                 }
                 event.getUser().setLocation(loc);
                 user.sendTranslated(NEUTRAL, "Poof!");

@@ -120,11 +120,7 @@ public class HomeCommand extends TpPointCommand
             homeInDeletedWorldMessage(sender, h);
             return;
         }
-        if (!sender.teleport(location))
-        {
-            sender.sendTranslated(CRITICAL, "The teleportation got aborted!");
-            return;
-        }
+        sender.asPlayer().setLocation(location);
         if (h.getWelcomeMsg() != null)
         {
             sender.sendMessage(h.getWelcomeMsg());
@@ -162,7 +158,7 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "The home already exists! You can move it with {text:/home move}");
             return;
         }
-        Home home = this.manager.create(sender, name, sender.getLocation(), sender.getRotation(), isPublic);
+        Home home = this.manager.create(sender, name, sender.asPlayer().getLocation(), sender.asPlayer().getRotation(), isPublic);
         context.sendTranslated(POSITIVE, "Your home {name} has been created!", home.getName());
     }
 
@@ -219,7 +215,7 @@ public class HomeCommand extends TpPointCommand
                 throw new PermissionDeniedException(module.getPermissions().HOME_MOVE_OTHER);
             }
         }
-        home.setLocation(sender.getLocation(), sender.getRotation(), wm);
+        home.setLocation(sender.asPlayer().getLocation(), sender.asPlayer().getRotation(), wm);
         home.update();
         if (home.isOwnedBy(sender))
         {
@@ -403,7 +399,7 @@ public class HomeCommand extends TpPointCommand
             return;
         }
         h.invite(player);
-        if (player.isOnline())
+        if (player.getPlayer().isPresent())
         {
             player.sendTranslated(NEUTRAL,
                                   "{user} invited you to their home. To teleport to it use: /home {name#home} {name}",
@@ -439,7 +435,7 @@ public class HomeCommand extends TpPointCommand
             return;
         }
         h.unInvite(player);
-        if (player.isOnline())
+        if (player.getPlayer().isPresent())
         {
             player.sendTranslated(NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.getName());
         }

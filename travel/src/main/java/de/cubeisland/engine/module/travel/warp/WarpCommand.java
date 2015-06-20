@@ -101,11 +101,7 @@ public class WarpCommand extends TpPointCommand
             warpInDeletedWorldMessage(sender, w);
             return;
         }
-        if (!sender.teleport(location))
-        {
-            sender.sendTranslated(CRITICAL, "The teleportation got aborted!");
-            return;
-        }
+        sender.asPlayer().setLocation(location);
         if (w.getWelcomeMsg() != null)
         {
             sender.sendMessage(w.getWelcomeMsg());
@@ -147,7 +143,7 @@ public class WarpCommand extends TpPointCommand
             sender.sendTranslated(NEGATIVE, "The warp already exists! You can move it with {text:/warp move}");
             return;
         }
-        Warp warp = manager.create(sender, name, sender.getLocation(), sender.getRotation(), !priv);
+        Warp warp = manager.create(sender, name, sender.asPlayer().getLocation(), sender.asPlayer().getRotation(), !priv);
         sender.sendTranslated(POSITIVE, "Your warp {name} has been created!", warp.getName());
     }
 
@@ -199,7 +195,7 @@ public class WarpCommand extends TpPointCommand
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_MOVE_OTHER);
         }
-        w.setLocation(sender.getLocation(), sender.getRotation(), wm);
+        w.setLocation(sender.asPlayer().getLocation(), sender.asPlayer().getRotation(), wm);
         w.update();
         if (w.isOwnedBy(sender))
         {
@@ -386,7 +382,7 @@ public class WarpCommand extends TpPointCommand
             return;
         }
         w.invite(player);
-        if (player.isOnline())
+        if (player.getPlayer().isPresent())
         {
             player.sendTranslated(NEUTRAL, "{user} invited you to their private warp. To teleport to it use: /warp {name#warp} {user}", sender, w.getName(), sender);
         }
@@ -419,7 +415,7 @@ public class WarpCommand extends TpPointCommand
             return;
         }
         w.unInvite(player);
-        if (player.isOnline())
+        if (player.getPlayer().isPresent())
         {
             player.sendTranslated(NEUTRAL, "You are no longer invited to {user}'s warp {name#warp}", sender, w.getName());
         }

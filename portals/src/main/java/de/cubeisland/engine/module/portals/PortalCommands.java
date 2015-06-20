@@ -80,8 +80,8 @@ public class PortalCommands extends ContainerCommand
         PortalConfig config = reflector.create(PortalConfig.class);
         config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
         config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
-        config.location.destination = new WorldLocation(sender.getLocation(), sender.getRotation());
-        config.owner = sender.getOfflinePlayer();
+        config.location.destination = new WorldLocation(sender.asPlayer().getLocation(), sender.asPlayer().getRotation());
+        config.owner = sender.getUser();
         config.world = new ConfigWorld(wm, (World)p1.getExtent());
 
         config.destination = destination;

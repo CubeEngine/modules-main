@@ -69,7 +69,7 @@ public class TeleportCommands
             }
             player = (User)context;
         }
-        if (!target.isOnline())
+        if (!target.getPlayer().isPresent())
         {
             context.sendTranslated(NEGATIVE, "Teleportation only works with online players!");
             return;
@@ -112,11 +112,11 @@ public class TeleportCommands
             context.sendTranslated(NEUTRAL, "You just teleported {user} to {user}... Not very useful right?", player, player);
             return;
         }
-        if (!unsafe || player.getPlayer().get().setLocationSafely(target.getLocation()))
+        if (!unsafe || player.getPlayer().get().setLocationSafely(target.asPlayer().getLocation()))
         {
             if (unsafe)
             {
-                player.getPlayer().get().setLocation(target.getLocation());
+                player.getPlayer().get().setLocation(target.asPlayer().getLocation());
             }
             context.sendTranslated(POSITIVE, "You teleported to {user}!", target);
         }
@@ -125,7 +125,7 @@ public class TeleportCommands
     @Command(desc = "Teleports everyone directly to a player.")
     public void tpall(CommandContext context, User player, @Flag boolean force, @Flag boolean unsafe)
     {
-        if (!player.isOnline())
+        if (!player.getPlayer().isPresent())
         {
             context.sendTranslated(NEGATIVE, "You cannot teleport to an offline player!");
             return;
@@ -144,7 +144,7 @@ public class TeleportCommands
                 noTp.add(p.getName());
                 continue;
             }
-            Location target = player.getLocation();
+            Location target = player.asPlayer().getLocation();
             if (unsafe)
             {
                 p.getPlayer().get().setLocation(target);
@@ -166,7 +166,7 @@ public class TeleportCommands
     public void tphere(CommandContext context, User player, @Flag boolean force, @Flag boolean unsafe)
     {
         User sender = (User)context.getSource();
-        if (!player.isOnline())
+        if (!player.getPlayer().isPresent())
         {
             context.sendTranslated(NEGATIVE, "You cannot teleport an offline player to you!");
             return;
@@ -183,11 +183,11 @@ public class TeleportCommands
             return;
         }
 
-        if (!unsafe || player.getPlayer().get().setLocationSafely(sender.getLocation()))
+        if (!unsafe || player.getPlayer().get().setLocationSafely(sender.asPlayer().getLocation()))
         {
             if (unsafe)
             {
-                player.getPlayer().get().setLocation(sender.getLocation());
+                player.getPlayer().get().setLocation(sender.asPlayer().getLocation());
             }
             context.sendTranslated(POSITIVE, "You teleported {user} to you!", player);
             player.sendTranslated(POSITIVE, "You were teleported to {sender}", sender);
@@ -201,7 +201,7 @@ public class TeleportCommands
         User sender = (User)context.getSource();
         force = force && module.perms().COMMAND_TPHEREALL_FORCE.isAuthorized(context.getSource());
         ArrayList<String> noTp = new ArrayList<>();
-        Location target = sender.getLocation();
+        Location target = sender.asPlayer().getLocation();
         for (User p : um.getOnlineUsers())
         {
             if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(p))

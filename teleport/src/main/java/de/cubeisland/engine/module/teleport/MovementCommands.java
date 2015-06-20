@@ -17,6 +17,7 @@
  */
 package de.cubeisland.engine.module.teleport;
 
+import com.google.common.base.Optional;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
@@ -27,6 +28,8 @@ import de.cubeisland.engine.module.core.util.LocationUtil;
 import de.cubeisland.engine.module.service.command.CommandSender;
 import de.cubeisland.engine.module.service.command.annotation.CommandPermission;
 import de.cubeisland.engine.module.service.user.User;
+import org.spongepowered.api.util.blockray.BlockRay;
+import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -57,18 +60,18 @@ public class MovementCommands
             context.sendTranslated(NEGATIVE, "Invalid height. The height has to be a whole number greater than 0!");
             return;
         }
-        Location loc = context.getLocation().add(0, height - 1, 0);
-        if (loc.getBlockY() > ((World)loc.getExtent()).getBuildHeight()) // Over highest loc
+        Location loc = context.asPlayer().getLocation().add(0, height - 1, 0);
+        if (loc.getBlockY() > ((World)loc.getExtent()).getDimension().getBuildHeight()) // Over highest loc
         {
-            loc.add(0, ((World)loc.getExtent()).getBuildHeight() - loc.getY(), 0);
+            loc.add(0, ((World)loc.getExtent()).getDimension().getBuildHeight() - loc.getY(), 0);
         }
         Location up1 = loc.getRelative(UP);
-        if (!(up1.getType() == AIR && up1.getRelative(UP).getType() == AIR))
+        if (!(up1.getBlockType() == AIR && up1.getRelative(UP).getBlockType() == AIR))
         {
             context.sendTranslated(NEGATIVE, "Your destination seems to be obstructed!");
             return;
         }
-        if (loc.getType() == AIR)
+        if (loc.getBlockType() == AIR)
         {
             loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS);
         }
@@ -80,7 +83,7 @@ public class MovementCommands
     @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
     public void top(User context)
     {
-        Location loc = BlockUtil.getHighestBlockAt(context.getLocation()).add(.5, 0, .5);
+        Location loc = BlockUtil.getHighestBlockAt(context.asPlayer().getLocation()).add(.5, 0, .5);
         context.getPlayer().get().setLocation(loc);
         context.sendTranslated(POSITIVE, "You are now on top!");
     }
@@ -89,11 +92,11 @@ public class MovementCommands
     @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
     public void ascend(User context)
     {
-        Location loc = context.getLocation();
+        Location loc = context.asPlayer().getLocation();
         Location curLoc = loc.add(0, 2, 0);
-        final int maxHeight = ((World)curLoc.getExtent()).getBuildHeight();
+        final int maxHeight = ((World)curLoc.getExtent()).getDimension().getBuildHeight();
         //go upwards until hitting solid blocks
-        while (curLoc.getType() == AIR && curLoc.getY() < maxHeight)
+        while (curLoc.getBlockType() == AIR && curLoc.getY() < maxHeight)
         {
             Location rel = curLoc.getRelative(UP);
             if (rel.getY() < loc.getBlockY())
@@ -105,7 +108,7 @@ public class MovementCommands
         }
         curLoc = curLoc.getRelative(UP);
         // go upwards until hitting 2 airblocks again
-        while (!(curLoc.getType() == AIR && curLoc.getRelative(DOWN).getType() == AIR) && curLoc.getY() < maxHeight)
+        while (!(curLoc.getBlockType() == AIR && curLoc.getRelative(DOWN).getBlockType() == AIR) && curLoc.getY() < maxHeight)
         {
             Location rel = curLoc.getRelative(UP);
             if (rel.getY() == 0)
@@ -119,7 +122,7 @@ public class MovementCommands
             context.sendTranslated(NEGATIVE, "You cannot ascend here");
             return;
         }
-        loc = loc.add(0, ((World)loc.getExtent()).getBuildHeight() - loc.getY() + 1, 0);
+        loc = loc.add(0, ((World)loc.getExtent()).getDimension().getBuildHeight() - loc.getY() + 1, 0);
         context.getPlayer().get().setLocation(loc);
         context.sendTranslated(POSITIVE, "Ascended a level!");
     }
@@ -128,17 +131,17 @@ public class MovementCommands
     @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
     public void descend(User context)
     {
-        final Location userLocation = context.getLocation();
+        final Location userLocation = context.asPlayer().getLocation();
         Location curLoc = userLocation;
         //go downwards until hitting solid blocks
-        while (curLoc.getType() == AIR && curLoc.getBlockY() > 0)
+        while (curLoc.getBlockType() == AIR && curLoc.getBlockY() > 0)
         {
             curLoc = curLoc.add(0, -1, 0);
         }
         // go downwards until hitting 2 airblocks & a solid block again
-        while (!((curLoc.getType() == AIR)
-            && (curLoc.getRelative(UP).getType() == AIR)
-            && (curLoc.getRelative(DOWN).getType() != AIR))
+        while (!((curLoc.getBlockType() == AIR)
+            && (curLoc.getRelative(UP).getBlockType() == AIR)
+            && (curLoc.getRelative(DOWN).getBlockType() != AIR))
             && curLoc.getBlockY() > 0)
         {
             curLoc = curLoc.add(0, -1, 0);
@@ -157,13 +160,13 @@ public class MovementCommands
     @Restricted(value = User.class, msg = "Jumping in the console is not allowed! Go play outside!")
     public void jumpTo(User context)
     {
-        Location loc = context.getTargetBlock(this.module.getConfig().navigation.jumpToMaxRange);
-        if (loc.getType() == AIR)
+        Optional<BlockRayHit> end = BlockRay.from(context.asPlayer()).end();
+        if (!end.isPresent())
         {
             context.sendTranslated(NEGATIVE, "No block in sight!");
             return;
         }
-        loc = loc.add(0.5, 1, 0.5);
+        Location loc = end.get().getLocation().add(0.5, 1, 0.5);
         context.getPlayer().get().setLocation(loc);
         context.sendTranslated(POSITIVE, "You just jumped!");
     }
@@ -240,19 +243,18 @@ public class MovementCommands
     @Restricted(value = User.class)
     public void place(User context, User player)
     {
-        if (!player.isOnline())
+        if (!player.getPlayer().isPresent())
         {
             context.sendTranslated(NEGATIVE, "You cannot move an offline player!");
             return;
         }
-        Location loc = context.getTargetBlock(350, AIR);
-        if (loc.getType() == AIR)
+        Optional<BlockRayHit> end = BlockRay.from(context.asPlayer()).end();
+        if (!end.isPresent())
         {
             context.sendTranslated(NEGATIVE, "No block in sight!");
             return;
         }
-        loc = loc.add(0.5, 1, 0.5);
-        player.getPlayer().get().setLocation(loc);
+        player.getPlayer().get().setLocation(end.get().getLocation().add(0.5, 1, 0.5));
         context.sendTranslated(POSITIVE, "You just placed {user} where you were looking!", player);
         player.sendTranslated(POSITIVE, "You were placed somewhere!");
     }
@@ -260,7 +262,7 @@ public class MovementCommands
     @Command(desc = "Swaps you and another players position")
     public void swap(CommandSender context, User player, @Default @Label("player") User sender)
     {
-        if (!player.isOnline() || !sender.isOnline())
+        if (!player.getPlayer().isPresent() || !sender.getPlayer().isPresent())
         {
             context.sendTranslated(NEGATIVE, "You cannot move an offline player!");
             return;
@@ -275,8 +277,8 @@ public class MovementCommands
             context.sendTranslated(NEUTRAL, "Truly a hero! Trying to swap a users position with himself...");
             return;
         }
-        Location userLoc = player.getLocation();
-        player.getPlayer().get().setLocation(sender.getLocation());
+        Location userLoc = player.asPlayer().getLocation();
+        player.getPlayer().get().setLocation(sender.asPlayer().getLocation());
         sender.getPlayer().get().setLocation(userLoc);
         if (!context.equals(sender))
         {
