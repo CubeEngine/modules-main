@@ -71,7 +71,7 @@ public class TeleportRequestCommands
         if (waitTime > 0)
         {
             final User sendingUser = context;
-            final Optional<UUID> taskID = taskManager.runTaskDelayed(this.module, (Runnable)() -> {
+            final UUID taskID = taskManager.runTaskDelayed(this.module, (Runnable)() -> {
                 player.attachOrGet(TeleportAttachment.class, module).removeTpRequestCancelTask();
                 player.attachOrGet(TeleportAttachment.class, module).removePendingTpToRequest();
                 sendingUser.sendTranslated(NEGATIVE, "{user} did not accept your teleport request.", player);
@@ -82,7 +82,7 @@ public class TeleportRequestCommands
             {
                 taskManager.cancelTask(this.module, oldtaskID);
             }
-            player.attachOrGet(TeleportAttachment.class, module).setTpRequestCancelTask(taskID.get());
+            player.attachOrGet(TeleportAttachment.class, module).setTpRequestCancelTask(taskID);
         }
     }
 
@@ -110,7 +110,7 @@ public class TeleportRequestCommands
         if (waitTime > 0)
         {
             final User sendingUser = context;
-            final Optional<UUID> taskID = taskManager.runTaskDelayed(this.module, () -> {
+            final UUID taskID = taskManager.runTaskDelayed(this.module, () -> {
                 player.attachOrGet(TeleportAttachment.class, module).removeTpRequestCancelTask();
                 player.attachOrGet(TeleportAttachment.class, module).removePendingTpFromRequest();
                 sendingUser.sendTranslated(NEGATIVE, "{user} did not accept your teleport request.", player);
@@ -121,7 +121,7 @@ public class TeleportRequestCommands
             {
                 taskManager.cancelTask(this.module, oldtaskID);
             }
-            player.get(TeleportAttachment.class).setTpRequestCancelTask(taskID.get());
+            player.get(TeleportAttachment.class).setTpRequestCancelTask(taskID);
         }
     }
 
