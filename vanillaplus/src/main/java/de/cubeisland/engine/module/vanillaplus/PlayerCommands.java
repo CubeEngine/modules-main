@@ -154,7 +154,7 @@ public class PlayerCommands
     {
         if (!force)
         {
-            if (module.perms().COMMAND_KILL_PREVENT.isAuthorized(user) || this.module.getBasicsUser(user.getPlayer().get()).getEntity().getValue(TABLE_BASIC_USER.GODMODE))
+            if (module.perms().COMMAND_KILL_PREVENT.isAuthorized(user) || this.module.getBasicsUser(user.asPlayer()).getEntity().getValue(TABLE_BASIC_USER.GODMODE))
             {
                 context.sendTranslated(NEGATIVE, "You cannot kill {user}!", user);
                 return false;

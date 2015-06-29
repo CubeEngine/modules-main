@@ -96,7 +96,7 @@ public class KeyBook
                 this.invalidate();
                 currentHolder.playSound(GHAST_SCREAM, effectLocation.getPosition(), 1, 1);
 
-                final Vector3d userDirection = currentHolder.getPlayer().get().getRotation();
+                final Vector3d userDirection = currentHolder.asPlayer().getRotation();
                 currentHolder.damage(1);
                 currentHolder.setVelocity(userDirection.mul(-3));
                 return false;

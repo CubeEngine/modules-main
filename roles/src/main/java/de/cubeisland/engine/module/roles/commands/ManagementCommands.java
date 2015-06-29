@@ -79,10 +79,10 @@ public class ManagementCommands extends ContainerCommand
 
         if (sender instanceof User)
         {
-            SubjectData data = ((User)sender).getPlayer().get().getTransientSubjectData();
+            SubjectData data = ((User)sender).asPlayer().getTransientSubjectData();
             if (data instanceof OptionSubjectData)
             {
-                ((OptionSubjectData)data).setOption(((User)sender).getPlayer().get().getActiveContexts(), "CubeEngine:roles:active-world", world.getName());
+                ((OptionSubjectData)data).setOption(((User)sender).asPlayer().getActiveContexts(), "CubeEngine:roles:active-world", world.getName());
             }
             return;
         }

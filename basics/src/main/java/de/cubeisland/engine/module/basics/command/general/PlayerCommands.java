@@ -283,7 +283,7 @@ public class PlayerCommands
             {
                 context.sendTranslated(NEUTRAL, "OP: {text:true:color=BRIGHT_GREEN}");
             }
-            Timestamp muted = module.getBasicsUser(player.getPlayer().get()).getEntity().getValue(TABLE_BASIC_USER.MUTED);
+            Timestamp muted = module.getBasicsUser(player.asPlayer()).getEntity().getValue(TABLE_BASIC_USER.MUTED);
             if (muted != null && muted.getTime() > System.currentTimeMillis())
             {
                 context.sendTranslated(NEUTRAL, "Muted until {input#time}", DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale()).format(muted));
@@ -329,7 +329,7 @@ public class PlayerCommands
             }
             other = true;
         }
-        BasicsUserEntity bUser = module.getBasicsUser(player.getPlayer().get()).getEntity();
+        BasicsUserEntity bUser = module.getBasicsUser(player.asPlayer()).getEntity();
         bUser.setValue(TABLE_BASIC_USER.GODMODE, !bUser.getValue(TABLE_BASIC_USER.GODMODE));
         player.setInvulnerable(bUser.getValue(TABLE_BASIC_USER.GODMODE));
         /*

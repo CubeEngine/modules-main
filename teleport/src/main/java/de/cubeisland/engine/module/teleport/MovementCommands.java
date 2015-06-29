@@ -75,7 +75,7 @@ public class MovementCommands
         {
             loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS);
         }
-        context.getPlayer().get().setLocation(loc);
+        context.asPlayer().setLocation(loc);
         context.sendTranslated(POSITIVE, "You have just been lifted!");
     }
 
@@ -84,7 +84,7 @@ public class MovementCommands
     public void top(User context)
     {
         Location loc = BlockUtil.getHighestBlockAt(context.asPlayer().getLocation()).add(.5, 0, .5);
-        context.getPlayer().get().setLocation(loc);
+        context.asPlayer().setLocation(loc);
         context.sendTranslated(POSITIVE, "You are now on top!");
     }
 
@@ -123,7 +123,7 @@ public class MovementCommands
             return;
         }
         loc = loc.add(0, ((World)loc.getExtent()).getDimension().getBuildHeight() - loc.getY() + 1, 0);
-        context.getPlayer().get().setLocation(loc);
+        context.asPlayer().setLocation(loc);
         context.sendTranslated(POSITIVE, "Ascended a level!");
     }
 
@@ -152,7 +152,7 @@ public class MovementCommands
             return;
         }
         //reached new location
-        context.getPlayer().get().setLocation(curLoc);
+        context.asPlayer().setLocation(curLoc);
         context.sendTranslated(POSITIVE, "Descended a level!");
     }
 
@@ -167,7 +167,7 @@ public class MovementCommands
             return;
         }
         Location loc = end.get().getLocation().add(0.5, 1, 0.5);
-        context.getPlayer().get().setLocation(loc);
+        context.asPlayer().setLocation(loc);
         context.sendTranslated(POSITIVE, "You just jumped!");
     }
 
@@ -182,7 +182,7 @@ public class MovementCommands
             context.sendTranslated(NEGATIVE, "Nothing to pass through!");
             return;
         }
-        context.getPlayer().get().setLocation(loc);
+        context.asPlayer().setLocation(loc);
         context.sendTranslated(POSITIVE, "You just passed the wall!");
     }
 
@@ -202,11 +202,11 @@ public class MovementCommands
             }
             if (loc != null)
             {
-                if (!unsafe || context.getPlayer().get().setLocationSafely(loc))
+                if (!unsafe || context.asPlayer().setLocationSafely(loc))
                 {
                     if (unsafe)
                     {
-                        context.getPlayer().get().setLocation(loc);
+                        context.asPlayer().setLocation(loc);
                     }
                     context.sendTranslated(POSITIVE, "Teleported to your death point!");
                 }
@@ -226,11 +226,11 @@ public class MovementCommands
                 return;
             }
 
-            if (!unsafe || context.getPlayer().get().setLocationSafely(loc))
+            if (!unsafe || context.asPlayer().setLocationSafely(loc))
             {
                 if (unsafe)
                 {
-                    context.getPlayer().get().setLocation(loc);
+                    context.asPlayer().setLocation(loc);
                 }
                 context.sendTranslated(POSITIVE, "Teleported to your last location!");
             }
@@ -254,7 +254,7 @@ public class MovementCommands
             context.sendTranslated(NEGATIVE, "No block in sight!");
             return;
         }
-        player.getPlayer().get().setLocation(end.get().getLocation().add(0.5, 1, 0.5));
+        player.asPlayer().setLocation(end.get().getLocation().add(0.5, 1, 0.5));
         context.sendTranslated(POSITIVE, "You just placed {user} where you were looking!", player);
         player.sendTranslated(POSITIVE, "You were placed somewhere!");
     }
@@ -278,8 +278,8 @@ public class MovementCommands
             return;
         }
         Location userLoc = player.asPlayer().getLocation();
-        player.getPlayer().get().setLocation(sender.asPlayer().getLocation());
-        sender.getPlayer().get().setLocation(userLoc);
+        player.asPlayer().setLocation(sender.asPlayer().getLocation());
+        sender.asPlayer().setLocation(userLoc);
         if (!context.equals(sender))
         {
             context.sendTranslated(POSITIVE, "Swapped position of {user} and {user}!", player, sender);

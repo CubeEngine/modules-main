@@ -63,7 +63,7 @@ public class ListCommand
         SortedMap<String, Set<User>> grouped = new TreeMap<>();
         for (User user : users)
         {
-            Player player = user.getPlayer().get();
+            Player player = user.asPlayer();
             SubjectData data = player.getSubjectData();
             String listGroup = "&6Players";
             if (data instanceof OptionSubjectData)
@@ -88,7 +88,7 @@ public class ListCommand
 
         for (User user : um.getOnlineUsers())
         {
-            if (context instanceof User && !((User)context).canSee(user.getPlayer().get()))
+            if (context instanceof User && !((User)context).canSee(user.asPlayer()))
             {
                 continue;
             }

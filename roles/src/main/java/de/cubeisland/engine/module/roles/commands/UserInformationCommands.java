@@ -53,7 +53,7 @@ public class UserInformationCommands extends ContainerCommand
     public void list(CommandContext cContext, @Default User player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
-        List<Subject> parents = player.getPlayer().get().getSubjectData().getParents(contexts);
+        List<Subject> parents = player.asPlayer().getSubjectData().getParents(contexts);
 
         cContext.sendTranslated(NEUTRAL, "Roles of {user} in {context}:", player, context);
         for (Subject parent : parents)
@@ -70,7 +70,7 @@ public class UserInformationCommands extends ContainerCommand
     public void checkpermission(CommandContext cContext, @Default User player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
-        Tristate value = player.getPlayer().get().getPermissionValue(contexts, permission);
+        Tristate value = player.asPlayer().getPermissionValue(contexts, permission);
         // TODO search registered permission
         if (value == Tristate.TRUE)
         {
@@ -99,7 +99,7 @@ public class UserInformationCommands extends ContainerCommand
     public void listpermission(CommandContext cContext, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
-        Map<String, Boolean> permissions = player.getPlayer().get().getSubjectData().getPermissions(contexts);
+        Map<String, Boolean> permissions = player.asPlayer().getSubjectData().getPermissions(contexts);
         if (all)
         {
             // TODO recursive
@@ -126,7 +126,7 @@ public class UserInformationCommands extends ContainerCommand
     public void checkmetadata(CommandContext cContext, @Default User player, String metadatakey, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
-        String value = ((OptionSubjectData)player.getPlayer().get().getSubjectData()).getOptions(contexts).get(metadatakey);
+        String value = ((OptionSubjectData)player.asPlayer().getSubjectData()).getOptions(contexts).get(metadatakey);
         if (value == null)
         {
             cContext.sendTranslated(NEUTRAL, "{input#key} is not set for {user} in {context}.", metadatakey, player, context);
@@ -143,7 +143,7 @@ public class UserInformationCommands extends ContainerCommand
     public void listmetadata(CommandContext cContext, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
-        Map<String, String> options = ((OptionSubjectData)player.getPlayer().get().getSubjectData()).getOptions(contexts);
+        Map<String, String> options = ((OptionSubjectData)player.asPlayer().getSubjectData()).getOptions(contexts);
         if (all)
         {
             // TODO recursive

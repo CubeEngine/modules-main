@@ -67,8 +67,8 @@ public class RandomDestination extends Destination
         int x = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
         int z = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
         chunk = world.loadChunk(chunk.getPosition().getX() + x * 16, 0, chunk.getPosition().getZ() + z * 16, true).get();
-        block = world.getFullBlock(chunk.getPosition().add(random.nextInt(16), 0, random.nextInt(16)));
-        game.getTeleportHelper().getSafeLocation(chunk.getFullBlock(random.nextInt(16), world.getDimension().getBuildHeight() / 4,
+        block = world.getLocation(chunk.getPosition().add(random.nextInt(16), 0, random.nextInt(16)));
+        game.getTeleportHelper().getSafeLocation(chunk.getLocation(random.nextInt(16), world.getDimension().getBuildHeight() / 4,
                                                                     random.nextInt(16)));
         entity.setLocation(block);
     }

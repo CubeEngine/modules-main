@@ -123,7 +123,8 @@ public class InformationCommands
     @Restricted(value = User.class, msg = "{text:ProTip}: I assume you are looking right at your screen, right?")
     public void compass(User context)
     {
-        context.sendTranslated(NEUTRAL, "You are looking to {input#direction}!", getClosest(context.getPlayer().get().getRotation()).name()); // TODO translation of direction
+        context.sendTranslated(NEUTRAL, "You are looking to {input#direction}!", getClosest(
+            context.asPlayer().getRotation()).name()); // TODO translation of direction
     }
 
     @Command(desc = "Displays your current depth.")
@@ -276,7 +277,7 @@ public class InformationCommands
         final String label = context.getInvocation().getLabels().get(0).toLowerCase(ENGLISH);
         if (context.isSource(User.class))
         {
-            context.sendTranslated(MessageType.NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}", ((User)context.getSource()).getPing());
+            context.sendTranslated(MessageType.NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}", ((User)context.getSource()).asPlayer().getConnection().getPing());
             return;
         }
         context.sendTranslated(NEUTRAL, label + " in the console?");

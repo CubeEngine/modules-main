@@ -18,7 +18,6 @@
 package de.cubeisland.engine.module.teleport;
 
 import java.util.UUID;
-import com.google.common.base.Optional;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.service.task.TaskManager;
