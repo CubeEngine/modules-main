@@ -42,22 +42,22 @@ public class TpPointCommand extends ContainerCommand
             {
                 if (user != null && point.isOwnedBy(user))
                 {
-                    context.sendTranslated(NEUTRAL, "  {name#tppoint} ({text:public})", point.getName());
+                    context.sendTranslated(NEUTRAL, "  {tppoint} ({text:public})", point);
                 }
                 else
                 {
-                    context.sendTranslated(NEUTRAL, "  {user}:{name#tppoint} ({text:public})", point.getOwnerName(), point.getName());
+                    context.sendTranslated(NEUTRAL, "  {user}:{tppoint} ({text:public})", point.getOwnerName(), point);
                 }
             }
             else
             {
                 if (user != null && point.isOwnedBy(user))
                 {
-                    context.sendTranslated(NEUTRAL, "  {name#tppoint} ({text:private})", point.getName());
+                    context.sendTranslated(NEUTRAL, "  {tppoint} ({text:private})", point);
                 }
                 else
                 {
-                    context.sendTranslated(NEUTRAL, "  {user}:{name#tppoint} ({text:private})", point.getOwnerName(), point.getName());
+                    context.sendTranslated(NEUTRAL, "  {user}:{tppoint} ({text:private})", point.getOwnerName(), point);
                 }
             }
         }
