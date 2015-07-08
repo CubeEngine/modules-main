@@ -69,7 +69,7 @@ import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.core.util.BlockUtil.CARDINAL_DIRECTIONS;
 import static de.cubeisland.engine.module.core.util.BlockUtil.getChunk;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;

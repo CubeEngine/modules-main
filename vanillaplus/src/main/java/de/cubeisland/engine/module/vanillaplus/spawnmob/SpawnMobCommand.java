@@ -29,7 +29,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.vanillaplus.spawnmob.SpawnMob.spawnMobs;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.AIR;
 
 /**

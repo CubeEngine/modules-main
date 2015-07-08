@@ -17,21 +17,21 @@
  */
 package de.cubeisland.engine.module.roles.commands.provider;
 
-import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
-import de.cubeisland.engine.messagecompositor.macro.MacroContext;
+import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
+import de.cubeisland.engine.messagecompositor.parser.component.Text;
+import de.cubeisland.engine.messagecompositor.parser.formatter.AbstractFormatter;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
-import org.spongepowered.api.service.permission.context.Context;
 
 public class RoleFormatter extends AbstractFormatter<RoleSubject>
 {
     public RoleFormatter()
     {
-        super(toSet("role"));
+        super("role");
     }
 
     @Override
-    public String process(RoleSubject object, MacroContext context)
+    public MessageComponent format(RoleSubject object, de.cubeisland.engine.messagecompositor.parser.formatter.Context context)
     {
-        return object.getName();
+        return new Text(object.getName());
     }
 }

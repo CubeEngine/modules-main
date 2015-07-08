@@ -31,7 +31,7 @@ import de.cubeisland.engine.service.user.UserList;
 import de.cubeisland.engine.service.user.UserManager;
 import org.spongepowered.api.data.manipulator.entity.JoinData;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 
 @Command(name = "eco", desc = "Administrative commands for Conomy")
 public class EcoCommands extends ContainerCommand

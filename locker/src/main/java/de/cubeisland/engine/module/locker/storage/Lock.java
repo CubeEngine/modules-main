@@ -51,7 +51,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.storage.AccessListModel.*;
 import static de.cubeisland.engine.module.locker.storage.KeyBook.TITLE;
 import static de.cubeisland.engine.module.locker.storage.LockType.PUBLIC;

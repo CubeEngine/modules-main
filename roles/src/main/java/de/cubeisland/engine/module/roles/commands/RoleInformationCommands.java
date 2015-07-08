@@ -40,7 +40,7 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static de.cubeisland.engine.module.roles.commands.RoleCommands.toSet;
 import static org.spongepowered.api.util.Tristate.FALSE;
 import static org.spongepowered.api.util.Tristate.TRUE;

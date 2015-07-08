@@ -33,7 +33,7 @@ import org.spongepowered.api.data.manipulator.block.OpenData;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class DoorCommand
 {

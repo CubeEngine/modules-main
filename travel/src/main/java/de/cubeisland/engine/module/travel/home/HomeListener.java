@@ -28,7 +28,7 @@ import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.event.Order.EARLY;
 
 public class HomeListener

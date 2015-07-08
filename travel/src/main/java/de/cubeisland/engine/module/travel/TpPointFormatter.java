@@ -17,19 +17,21 @@
  */
 package de.cubeisland.engine.module.travel;
 
-import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
-import de.cubeisland.engine.messagecompositor.macro.MacroContext;
+import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
+import de.cubeisland.engine.messagecompositor.parser.component.Text;
+import de.cubeisland.engine.messagecompositor.parser.formatter.AbstractFormatter;
+import de.cubeisland.engine.messagecompositor.parser.formatter.Context;
 
 public class TpPointFormatter extends AbstractFormatter<TeleportPoint>
 {
     public TpPointFormatter()
     {
-        super(toSet("tppoint"));
+        super("tppoint");
     }
 
     @Override
-    public String process(TeleportPoint object, MacroContext context)
+    public MessageComponent format(TeleportPoint object, Context context)
     {
-        return object.getName(); // TODO click to tp
+        return new Text(object.getName()); // TODO click to tp
     }
 }

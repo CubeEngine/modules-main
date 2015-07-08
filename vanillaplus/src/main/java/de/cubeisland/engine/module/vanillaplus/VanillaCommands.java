@@ -46,7 +46,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class VanillaCommands

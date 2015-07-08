@@ -27,9 +27,9 @@ import de.cubeisland.engine.module.core.sponge.CoreModule;
 import de.cubeisland.engine.service.user.User;
 import org.spongepowered.api.data.manipulator.entity.WhitelistData;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
 
 /**
  * All Whitelist related commands:

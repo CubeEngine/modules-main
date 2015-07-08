@@ -29,8 +29,8 @@ import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
 
 @Command(name = "admin", desc = "Manages the module", alias = "manadmin")
 public class ManagementCommands extends ContainerCommand

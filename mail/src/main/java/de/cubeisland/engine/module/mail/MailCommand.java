@@ -42,7 +42,7 @@ import org.jooq.types.UInteger;
 import org.spongepowered.api.text.Texts;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.text.format.TextColors.WHITE;
 
 @Command(name = "mail", desc = "Manages your server mail.")

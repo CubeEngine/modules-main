@@ -32,7 +32,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.ITEM_DATA;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
 

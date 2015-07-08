@@ -24,7 +24,7 @@ import de.cubeisland.engine.service.task.TaskManager;
 import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.service.user.UserManager;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains Teleport-Request commands.

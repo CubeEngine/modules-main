@@ -39,7 +39,7 @@ import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.core.util.Pair;
 import de.cubeisland.engine.module.core.util.StringUtils;
-import de.cubeisland.engine.module.core.util.formatter.MessageType;
+import de.cubeisland.engine.service.i18n.formatter.MessageType;
 import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
 import de.cubeisland.engine.module.core.util.math.BlockVector2;
 import de.cubeisland.engine.module.core.util.math.BlockVector3;
@@ -60,7 +60,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 
 import static de.cubeisland.engine.module.core.util.ChatFormat.*;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static java.util.Locale.ENGLISH;
 import static org.spongepowered.api.util.Direction.*;
 

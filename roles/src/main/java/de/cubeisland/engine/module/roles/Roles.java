@@ -99,8 +99,8 @@ public class Roles extends Module
         cManager.registerConverter(new PriorityConverter(), Priority.class);
         this.config = fm.loadConfig(this, RolesConfig.class);
 
-        i18n.getCompositor().registerMacro(new ContextFormatter());
-        i18n.getCompositor().registerMacro(new RoleFormatter());
+        i18n.getCompositor().registerFormatter(new ContextFormatter());
+        i18n.getCompositor().registerFormatter(new RoleFormatter());
 
         db.registerTable(TableRole.class);
         db.registerTable(TablePerm.class);

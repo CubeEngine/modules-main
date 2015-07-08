@@ -22,7 +22,7 @@ import de.cubeisland.engine.service.command.ContainerCommand;
 import de.cubeisland.engine.service.command.CommandSender;
 import de.cubeisland.engine.service.user.User;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
 
 public class TpPointCommand extends ContainerCommand
 {

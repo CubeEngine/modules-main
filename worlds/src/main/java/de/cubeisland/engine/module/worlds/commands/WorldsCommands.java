@@ -50,7 +50,7 @@ import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
 
 import static de.cubeisland.engine.service.filesystem.FileExtensionFilter.YAML;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 
 @Command(name = "worlds", desc = "Worlds commands")
 public class WorldsCommands extends ContainerCommand

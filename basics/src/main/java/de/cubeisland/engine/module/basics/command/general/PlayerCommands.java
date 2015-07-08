@@ -50,7 +50,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static java.text.DateFormat.SHORT;
 import static org.spongepowered.api.entity.player.gamemode.GameModes.CREATIVE;
 

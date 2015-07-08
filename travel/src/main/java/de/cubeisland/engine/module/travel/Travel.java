@@ -73,7 +73,7 @@ public class Travel extends Module
         db.registerTable(TableTeleportPoint.class);
         db.registerTable(TableInvite.class);
 
-        i18n.getCompositor().registerMacro(new TpPointFormatter());
+        i18n.getCompositor().registerFormatter(new TpPointFormatter());
 
         Profiler.startProfiling("travelEnable");
         logger.trace("Loading TeleportPoints...");

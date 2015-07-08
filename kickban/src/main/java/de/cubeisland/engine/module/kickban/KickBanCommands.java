@@ -48,7 +48,7 @@ import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.module.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.module.core.util.ChatFormat.GREY;
 import static de.cubeisland.engine.module.core.util.ChatFormat.RED;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains commands to manage kicks/bans.

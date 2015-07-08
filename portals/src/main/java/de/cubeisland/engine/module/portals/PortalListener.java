@@ -26,7 +26,7 @@ import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.EntityTeleportEvent;
 import org.spongepowered.api.event.entity.player.PlayerMoveEvent;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
 
 public class PortalListener
 {

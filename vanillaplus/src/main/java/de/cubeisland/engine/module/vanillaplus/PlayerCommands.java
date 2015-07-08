@@ -35,9 +35,9 @@ import org.spongepowered.api.entity.player.gamemode.GameModes;
 import org.spongepowered.api.text.Text;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.POSITIVE;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.entity.player.gamemode.GameModes.CREATIVE;
 import static org.spongepowered.api.entity.player.gamemode.GameModes.SURVIVAL;
 

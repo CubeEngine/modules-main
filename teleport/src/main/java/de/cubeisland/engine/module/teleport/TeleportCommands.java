@@ -35,7 +35,7 @@ import org.spongepowered.api.world.World;
 
 import static de.cubeisland.engine.module.core.util.ChatFormat.DARK_GREEN;
 import static de.cubeisland.engine.module.core.util.ChatFormat.WHITE;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains commands to teleport to players/worlds/position.

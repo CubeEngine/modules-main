@@ -37,7 +37,7 @@ import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.UserAccount;
 import de.cubeisland.engine.service.user.UserManager;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 
 @Command(name = "bank", desc = "Manages your money in banks.")
 public class BankCommands extends ContainerCommand

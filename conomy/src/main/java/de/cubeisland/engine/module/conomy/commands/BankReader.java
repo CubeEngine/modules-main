@@ -24,7 +24,7 @@ import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.service.i18n.I18n;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class BankReader implements ArgumentReader<BankAccount>
 {

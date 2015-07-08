@@ -49,8 +49,8 @@ import de.cubeisland.engine.module.worlds.player.PlayerDataConfig;
 import de.cubeisland.engine.reflect.Reflector;
 
 import static de.cubeisland.engine.service.filesystem.FileExtensionFilter.YAML;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEUTRAL;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.world.DimensionTypes.END;
 import static org.spongepowered.api.world.DimensionTypes.NETHER;
 import static org.spongepowered.api.world.DimensionTypes.OVERWORLD;

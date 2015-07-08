@@ -34,12 +34,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Skeleton;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.monster.Skeleton;
 import org.spongepowered.api.item.ItemTypes;
 
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.NEGATIVE;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class SpawnMob
 {

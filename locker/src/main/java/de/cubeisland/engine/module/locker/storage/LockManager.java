@@ -77,7 +77,7 @@ import org.spongepowered.api.world.World;
 import static de.cubeisland.engine.module.core.util.BlockUtil.CARDINAL_DIRECTIONS;
 import static de.cubeisland.engine.module.core.util.LocationUtil.getChunkKey;
 import static de.cubeisland.engine.module.core.util.LocationUtil.getLocationKey;
-import static de.cubeisland.engine.module.core.util.formatter.MessageType.*;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static de.cubeisland.engine.module.locker.storage.AccessListModel.ACCESS_ALL;
 import static de.cubeisland.engine.module.locker.storage.AccessListModel.ACCESS_FULL;
 import static de.cubeisland.engine.module.locker.storage.ProtectedType.getProtectedType;

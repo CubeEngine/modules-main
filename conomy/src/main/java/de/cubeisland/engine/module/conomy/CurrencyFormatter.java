@@ -17,8 +17,10 @@
  */
 package de.cubeisland.engine.module.conomy;
 
-import de.cubeisland.engine.messagecompositor.macro.AbstractFormatter;
-import de.cubeisland.engine.messagecompositor.macro.MacroContext;
+import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
+import de.cubeisland.engine.messagecompositor.parser.component.Text;
+import de.cubeisland.engine.messagecompositor.parser.formatter.AbstractFormatter;
+import de.cubeisland.engine.messagecompositor.parser.formatter.Context;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 
 public class CurrencyFormatter extends AbstractFormatter<Double>
@@ -27,13 +29,13 @@ public class CurrencyFormatter extends AbstractFormatter<Double>
 
     public CurrencyFormatter(ConomyManager manager)
     {
+        super("currency");
         this.manager = manager;
-        this.names.add("currency");
     }
 
     @Override
-    public String process(Double object, MacroContext context)
+    public MessageComponent format(Double object, Context context)
     {
-        return manager.format(object);
+        return new Text(manager.format(object));
     }
 }
