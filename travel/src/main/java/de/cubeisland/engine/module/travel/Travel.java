@@ -68,12 +68,11 @@ public class Travel extends Module
     @Enable
     public void onEnable()
     {
-
         this.config = fm.loadConfig(this, TravelConfig.class);
         db.registerTable(TableTeleportPoint.class);
         db.registerTable(TableInvite.class);
 
-        i18n.getCompositor().registerFormatter(new TpPointFormatter());
+        i18n.getCompositor().registerFormatter(new TpPointFormatter(i18n));
 
         Profiler.startProfiling("travelEnable");
         logger.trace("Loading TeleportPoints...");

@@ -18,20 +18,31 @@
 package de.cubeisland.engine.module.travel;
 
 import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
-import de.cubeisland.engine.messagecompositor.parser.component.Text;
 import de.cubeisland.engine.messagecompositor.parser.formatter.AbstractFormatter;
 import de.cubeisland.engine.messagecompositor.parser.formatter.Context;
+import de.cubeisland.engine.module.travel.home.Home;
+import de.cubeisland.engine.service.i18n.I18n;
+
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.NONE;
+import static de.cubeisland.engine.service.i18n.formatter.component.ClickComponent.runCommand;
+import static de.cubeisland.engine.service.i18n.formatter.component.HoverComponent.hoverText;
+import static de.cubeisland.engine.service.i18n.formatter.component.StyledComponent.styled;
+import static org.spongepowered.api.text.format.TextStyles.UNDERLINE;
 
 public class TpPointFormatter extends AbstractFormatter<TeleportPoint>
 {
-    public TpPointFormatter()
+    private I18n i18n;
+
+    public TpPointFormatter(I18n i18n)
     {
         super("tppoint");
+        this.i18n = i18n;
     }
 
     @Override
     public MessageComponent format(TeleportPoint object, Context context)
     {
-        return new Text(object.getName()); // TODO click to tp
+        String cmd = "/" + (object instanceof Home ? "home" : "warp") + " tp " + object.getName() + " " + object.getOwnerName();
+        return styled(UNDERLINE, runCommand(cmd, hoverText(i18n.getTranslation(context.getLocale(), NONE, "Click to teleport to {}", object.getName()), object.getName())));
     }
 }
