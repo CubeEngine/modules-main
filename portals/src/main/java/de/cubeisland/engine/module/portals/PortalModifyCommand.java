@@ -60,7 +60,7 @@ public class PortalModifyCommand extends ContainerCommand
     @Command(desc = "Changes the owner of a portal")
     public void owner(CommandContext context, User owner, @Default Portal portal)
     {
-        portal.config.owner = owner.getUser();
+        portal.config.owner = owner.getUser().getName();
         portal.config.save();
         context.sendTranslated(POSITIVE, "{user} is now the owner of {name#portal}!", owner, portal.getName());
     }

@@ -30,7 +30,7 @@ public class PortalConfig extends ReflectedYaml
 {
     public boolean safeTeleport = false;
     public boolean teleportNonPlayers = false;
-    public User owner;
+    public String owner;
     public ConfigWorld world;
 
     public PortalRegion location = new PortalRegion();
