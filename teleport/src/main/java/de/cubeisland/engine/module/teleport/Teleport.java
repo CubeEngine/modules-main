@@ -73,7 +73,7 @@ public class Teleport extends Module
     {
         cm.removeCommands(this);
         em.removeListeners(this);
-        pm.removePermissions(this);
+        pm.cleanup(this);
     }
 
     public TeleportPerm perms()

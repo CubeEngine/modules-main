@@ -24,6 +24,7 @@ import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.Enable;
 import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.service.filesystem.FileManager;
 import de.cubeisland.engine.service.command.CommandManager;
 import de.cubeisland.engine.service.world.WorldManager;
@@ -42,6 +43,7 @@ public class Worlds extends Module
     private WorldsPermissions perms;
     private Multiverse multiverse;
     @Inject private Reflector reflector;
+    @Inject private EventManager em;
     @Inject private CommandManager cm;
     @Inject private WorldManager wm;
     @Inject private Game game;
@@ -64,7 +66,7 @@ public class Worlds extends Module
 
         try
         {
-            multiverse = new Multiverse(this, fm.loadConfig(this, WorldsConfig.class), wm, modulePath, cm, logger);
+            multiverse = new Multiverse(this, fm.loadConfig(this, WorldsConfig.class), wm, modulePath, cm, logger, em, reflector);
         }
         catch (IOException e)
         {

@@ -470,7 +470,8 @@ public class Lock
             this.notifyUsage(user);
             if ((in && out) || module.perms().ACCESS_OTHER.isAuthorized(user)) return; // Has full access
             if (protectedInventory == null) return; // Just checking else do lock
-            InventoryGuardFactory inventoryGuardFactory = module.getModularity().start(InventoryGuardFactory.class);
+            InventoryGuardFactory inventoryGuardFactory = module.getModularity().getInstance(
+                InventoryGuardFactory.class);
             inventoryGuardFactory.prepareInv(protectedInventory, user);
             if (!in)
             {

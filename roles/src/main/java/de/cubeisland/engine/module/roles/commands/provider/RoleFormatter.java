@@ -17,10 +17,11 @@
  */
 package de.cubeisland.engine.module.roles.commands.provider;
 
-import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
-import de.cubeisland.engine.messagecompositor.parser.component.Text;
-import de.cubeisland.engine.messagecompositor.parser.formatter.AbstractFormatter;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.AbstractFormatter;
+import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.dirigent.parser.component.Text;
 
 public class RoleFormatter extends AbstractFormatter<RoleSubject>
 {
@@ -30,7 +31,7 @@ public class RoleFormatter extends AbstractFormatter<RoleSubject>
     }
 
     @Override
-    public MessageComponent format(RoleSubject object, de.cubeisland.engine.messagecompositor.parser.formatter.Context context)
+    public Component format(RoleSubject object, Context context)
     {
         return new Text(object.getName());
     }

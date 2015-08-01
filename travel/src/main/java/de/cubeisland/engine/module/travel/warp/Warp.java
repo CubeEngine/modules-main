@@ -18,8 +18,6 @@
 package de.cubeisland.engine.module.travel.warp;
 
 import java.util.Locale;
-import de.cubeisland.engine.service.permission.PermDefault;
-import de.cubeisland.engine.service.permission.Permission;
 import de.cubeisland.engine.service.permission.PermissionManager;
 import de.cubeisland.engine.service.user.UserManager;
 import de.cubeisland.engine.service.world.WorldManager;
@@ -27,6 +25,7 @@ import de.cubeisland.engine.module.travel.TeleportPoint;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
@@ -57,15 +56,12 @@ public class Warp extends TeleportPoint
             this.iManager.removeInvites(this);
             return;
         }
-        pm.removePermission(this.module, permission);
         this.permission = null;
     }
 
     @Override
-    protected Permission generatePublicPerm()
+    protected PermissionDescription generatePublicPerm()
     {
-        Permission perm =  module.getProvided(Permission.class).childWildcard("warps").childWildcard("access").child(this.getName().toLowerCase(Locale.ENGLISH), PermDefault.TRUE);
-        pm.registerPermission(module, perm);
-        return perm;
+        return pm.register(module, "warps.access." + getName(), "", null);
     }
 }

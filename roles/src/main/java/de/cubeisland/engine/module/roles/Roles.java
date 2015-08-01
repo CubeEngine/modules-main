@@ -111,7 +111,7 @@ public class Roles extends Module
         cm.getProviderManager().register(this, new ContextReader(service, wm), Context.class);
         cm.getProviderManager().register(this, new ContextualRoleReader(service, wm), ContextualRole.class);
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
-        cm.getProviderManager().register(this, new PermissionCompleter(pm));
+        cm.getProviderManager().register(this, new PermissionCompleter(service));
 
         RoleCommands cmdRoles = new RoleCommands(this);
         cm.addCommand(cmdRoles);

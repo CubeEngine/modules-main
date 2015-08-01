@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.roles.commands.provider;
 
-import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
-import de.cubeisland.engine.messagecompositor.parser.component.Text;
-import de.cubeisland.engine.messagecompositor.parser.formatter.AbstractFormatter;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.AbstractFormatter;
+import org.cubeengine.dirigent.parser.component.Text;
 import org.spongepowered.api.service.permission.context.Context;
 
 public class ContextFormatter extends AbstractFormatter<Context>
@@ -30,7 +30,7 @@ public class ContextFormatter extends AbstractFormatter<Context>
     }
 
     @Override
-    public MessageComponent format(Context object, de.cubeisland.engine.messagecompositor.parser.formatter.Context context)
+    public Component format(Context object, org.cubeengine.dirigent.formatter.Context context)
     {
         return new Text(object.getValue().isEmpty() ? object.getKey() : object.getKey() + "|" + object.getValue());
     }

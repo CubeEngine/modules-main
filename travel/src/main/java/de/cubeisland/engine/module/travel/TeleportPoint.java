@@ -20,13 +20,13 @@ package de.cubeisland.engine.module.travel;
 import java.util.Set;
 import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.permission.Permission;
 import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.service.user.UserManager;
 import de.cubeisland.engine.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
@@ -40,7 +40,7 @@ public abstract class TeleportPoint
     protected final Travel module;
     protected final InviteManager iManager;
 
-    protected Permission permission;
+    protected PermissionDescription permission;
     protected Set<UInteger> invited;
 
     protected String ownerName = null;
@@ -184,8 +184,8 @@ public abstract class TeleportPoint
 
     public boolean canAccess(User user)
     {
-        return this.isPublic() ? this.permission.isAuthorized(user) : (this.isInvited(user) || this.isOwnedBy(user));
+        return this.isPublic() ? user.hasPermission(permission.getId()) : (this.isInvited(user) || this.isOwnedBy(user));
     }
 
-    protected abstract Permission generatePublicPerm();
+    protected abstract PermissionDescription generatePublicPerm();
 }

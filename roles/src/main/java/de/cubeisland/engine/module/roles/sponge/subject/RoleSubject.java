@@ -25,7 +25,6 @@ import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.data.RoleSubjectData;
 import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.permission.Permission;
 import de.cubeisland.engine.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.command.CommandSource;
@@ -90,13 +89,14 @@ public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
 
     public boolean canAssignAndRemove(CommandSender source)
     {
-        Permission perm = module.getProvided(Permission.class);
-        perm = perm.childWildcard(context.getType());
-        if (!context.getName().isEmpty())
+        String perm = module.getModularity().getInstance(PermissionManager.class).getModulePermission(module).getId();
+        perm += "." + context.getType() + "." + context.getName();
+        if (!perm.endsWith("."))
         {
-            perm = perm.childWildcard(context.getName());
+            perm += ".";
         }
-        return source.hasPermission(perm.child(roleName).getFullName());
+        perm += roleName;
+        return source.hasPermission(perm);
     }
 
     public void setPriorityValue(int value)

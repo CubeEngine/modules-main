@@ -17,12 +17,17 @@
  */
 package de.cubeisland.engine.module.roles.sponge;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import com.google.common.base.Optional;
+import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.RolesConfig;
 import de.cubeisland.engine.module.roles.sponge.collection.RoleCollection;
@@ -33,9 +38,16 @@ import de.cubeisland.engine.service.permission.PermissionManager;
 import de.cubeisland.engine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.ContextCalculator;
+import org.spongepowered.api.util.Tristate;
+
+import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 public class RolesPermissionService implements PermissionService
 {
@@ -43,11 +55,16 @@ public class RolesPermissionService implements PermissionService
     private final List<ContextCalculator> calculators = new CopyOnWriteArrayList<>();
 
     private final DefaultSubjectData defaultData;
+    private Game game;
     private Database db;
     private RolesConfig config;
 
+    private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<String, PermissionDescription>();
+    private Collection<PermissionDescription> descriptions;
+
     public RolesPermissionService(Roles module, Reflector reflector, RolesConfig config, Game game, Database db, WorldManager wm, PermissionManager manager)
     {
+        this.game = game;
         this.db = db;
         this.config = config;
         defaultData = new DefaultSubjectData(this, config);
@@ -104,5 +121,40 @@ public class RolesPermissionService implements PermissionService
     public RolesConfig getConfig()
     {
         return config;
+    }
+
+    @Override
+    public Optional<Builder> newDescriptionBuilder(Object plugin)
+    {
+        // TODO somehow allow modules
+        Optional<PluginContainer> container = game.getPluginManager().fromInstance(plugin);
+        return Optional.of(new RolesPermissionDescriptionBuilder(container.get(), this));
+    }
+
+    @Override
+    public Optional<PermissionDescription> getDescription(String permission)
+    {
+        return Optional.fromNullable(descriptionMap.get(permission));
+    }
+
+    @Override
+    public Collection<PermissionDescription> getDescriptions()
+    {
+        if (descriptions == null)
+        {
+            descriptions = Collections.unmodifiableCollection(descriptionMap.values());
+        }
+        return descriptions;
+    }
+
+    protected PermissionDescription addDescription(RolesPermissionDescription desc, Map<String, Tristate> roleAssignments)
+    {
+        SubjectCollection subjects = getSubjects(SUBJECTS_ROLE_TEMPLATE);
+        roleAssignments.entrySet().forEach(e -> subjects.get(e.getKey()).getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), e.getValue()));
+
+        descriptionMap.put(desc.getId().toLowerCase(), desc);
+        descriptions = null;
+        System.out.println(" #PERM#  " + desc.getId().toLowerCase());
+        return desc;
     }
 }

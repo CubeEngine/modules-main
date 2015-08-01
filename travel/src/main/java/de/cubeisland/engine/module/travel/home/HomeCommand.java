@@ -107,7 +107,7 @@ public class HomeCommand extends TpPointCommand
                 homeNotFoundMessage(sender, owner, home);
                 return;
             }
-            if (!module.getPermissions().HOME_TP_OTHER.isAuthorized(sender))
+            if (!sender.hasPermission(module.getPermissions().HOME_TP_OTHER.getId()))
             {
                 throw new PermissionDeniedException(module.getPermissions().HOME_TP_OTHER);
             }
@@ -139,7 +139,8 @@ public class HomeCommand extends TpPointCommand
     public void set(CommandContext context, @Optional String name, @ParameterPermission @Flag(longName = "public", name = "pub") boolean isPublic)
     {
         User sender = (User)context.getSource();
-        if (this.manager.getCount(sender) >= this.module.getConfig().homes.max && !module.getPermissions().HOME_SET_MORE.isAuthorized(context.getSource()))
+        if (this.manager.getCount(sender) >= this.module.getConfig().homes.max
+            && !context.getSource().hasPermission(module.getPermissions().HOME_SET_MORE.getId()))
         {
             context.sendTranslated(NEGATIVE, "You have reached your maximum number of homes!");
             context.sendTranslated(NEUTRAL, "You have to delete a home to make a new one");
@@ -208,7 +209,7 @@ public class HomeCommand extends TpPointCommand
         }
         if (!home.isOwnedBy(sender))
         {
-            if (!module.getPermissions().HOME_MOVE_OTHER.isAuthorized(sender))
+            if (!sender.hasPermission(module.getPermissions().HOME_MOVE_OTHER.getId()))
             {
                 throw new PermissionDeniedException(module.getPermissions().HOME_MOVE_OTHER);
             }
@@ -235,7 +236,7 @@ public class HomeCommand extends TpPointCommand
             homeNotFoundMessage(sender, owner, name);
             return;
         }
-        if (!home.isOwnedBy(sender) && !module.getPermissions().HOME_REMOVE_OTHER.isAuthorized(sender))
+        if (!home.isOwnedBy(sender) && !sender.hasPermission(module.getPermissions().HOME_REMOVE_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().HOME_REMOVE_OTHER);
         }
@@ -257,7 +258,7 @@ public class HomeCommand extends TpPointCommand
             homeNotFoundMessage(sender, owner, name);
             return;
         }
-        if (!home.isOwnedBy(sender) && !module.getPermissions().HOME_RENAME_OTHER.isAuthorized(sender))
+        if (!home.isOwnedBy(sender) && !sender.hasPermission(module.getPermissions().HOME_RENAME_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().HOME_RENAME_OTHER);
         }
@@ -331,7 +332,7 @@ public class HomeCommand extends TpPointCommand
     @Command(name = "ilist", alias = "invited", desc = "List all players invited to your homes")
     public void invitedList(CommandSender sender, @Default User owner)
     {
-        if (!owner.equals(sender) && !module.getPermissions().HOME_LIST_OTHER.isAuthorized(sender))
+        if (!owner.equals(sender) && !sender.hasPermission(module.getPermissions().HOME_LIST_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().HOME_LIST_OTHER);
         }
@@ -443,7 +444,7 @@ public class HomeCommand extends TpPointCommand
     @Command(name = "private", alias = {"makeprivate", "setprivate"}, desc = "Make one of your homes private")
     public void makePrivate(CommandSender sender, @Optional String home, @Default User owner)
     {
-        if (!owner.equals(sender) && !module.getPermissions().HOME_PRIVATE_OTHER.isAuthorized(sender))
+        if (!owner.equals(sender) && !sender.hasPermission(module.getPermissions().HOME_PRIVATE_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().HOME_PRIVATE_OTHER);
         }
@@ -471,7 +472,7 @@ public class HomeCommand extends TpPointCommand
     @Command(name = "public", alias = {"makepublic", "setpublic"}, desc = "Make one of your homes public")
     public void makePublic(CommandSender sender, @Optional String home, @Default User owner)
     {
-        if (!owner.equals(sender) && !module.getPermissions().HOME_PUBLIC_OTHER.isAuthorized(sender))
+        if (!owner.equals(sender) && !sender.hasPermission(module.getPermissions().HOME_PUBLIC_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().HOME_PUBLIC_OTHER);
         }

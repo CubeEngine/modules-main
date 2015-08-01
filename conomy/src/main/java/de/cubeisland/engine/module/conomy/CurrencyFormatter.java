@@ -17,10 +17,10 @@
  */
 package de.cubeisland.engine.module.conomy;
 
-import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
-import de.cubeisland.engine.messagecompositor.parser.component.Text;
-import de.cubeisland.engine.messagecompositor.parser.formatter.AbstractFormatter;
-import de.cubeisland.engine.messagecompositor.parser.formatter.Context;
+import org.cubeengine.dirigent.parser.component.MessageComponent;
+import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.parser.formatter.AbstractFormatter;
+import org.cubeengine.dirigent.parser.formatter.Context;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 
 public class CurrencyFormatter extends AbstractFormatter<Double>

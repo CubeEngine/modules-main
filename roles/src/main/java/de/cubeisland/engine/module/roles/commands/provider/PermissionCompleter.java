@@ -25,16 +25,19 @@ import java.util.Set;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.completer.Completer;
 import de.cubeisland.engine.service.permission.PermissionManager;
+import org.spongepowered.api.service.pagination.PaginationService;
+import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.api.service.permission.PermissionService;
 
 import static java.util.stream.Collectors.toList;
 
 public class PermissionCompleter implements Completer
 {
-    private PermissionManager pm;
+    private PermissionService ps;
 
-    public PermissionCompleter(PermissionManager pm)
+    public PermissionCompleter(PermissionService ps)
     {
-        this.pm = pm;
+        this.ps = ps;
     }
 
     @Override
@@ -42,7 +45,8 @@ public class PermissionCompleter implements Completer
     {
         Set<String> result = new HashSet<>();
         String token = invocation.consume(1);
-        for (String permission : pm.getPermissions().keySet().stream().filter(p -> p.startsWith(token)).collect(toList()))
+
+        for (String permission : ps.getDescriptions().stream().map(PermissionDescription::getId).filter(p -> p.startsWith(token)).collect(toList()))
         {
             String substring = permission.substring(token.length());
             int i = substring.indexOf(".");

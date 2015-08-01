@@ -87,7 +87,7 @@ public class WarpCommand extends TpPointCommand
             warpNotFoundMessage(sender, owner, warp);
             return;
         }
-        if (!w.canAccess(sender) && !module.getPermissions().WARP_TP_OTHER.isAuthorized(sender))
+        if (!w.canAccess(sender) && sender.hasPermission(module.getPermissions().WARP_TP_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_TP_OTHER);
         }
@@ -187,7 +187,7 @@ public class WarpCommand extends TpPointCommand
             warpNotFoundMessage(sender, owner, warp);
             return;
         }
-        if (!w.isOwnedBy(sender) && !module.getPermissions().WARP_MOVE_OTHER.isAuthorized(sender))
+        if (!w.isOwnedBy(sender) && sender.hasPermission(module.getPermissions().WARP_MOVE_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_MOVE_OTHER);
         }
@@ -212,7 +212,7 @@ public class WarpCommand extends TpPointCommand
             warpNotFoundMessage(sender, owner, warp);
             return;
         }
-        if (!w.isOwnedBy(sender) && !module.getPermissions().WARP_REMOVE_OTHER.isAuthorized(sender))
+        if (!w.isOwnedBy(sender) && sender.hasPermission(module.getPermissions().WARP_REMOVE_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_REMOVE_OTHER);
         }
@@ -234,7 +234,7 @@ public class WarpCommand extends TpPointCommand
             warpNotFoundMessage(sender, owner, warp);
             return;
         }
-        if (!w.isOwnedBy(sender) && !module.getPermissions().WARP_RENAME_OTHER.isAuthorized(sender))
+        if (!w.isOwnedBy(sender) && sender.hasPermission(module.getPermissions().WARP_RENAME_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_RENAME_OTHER);
         }
@@ -421,7 +421,7 @@ public class WarpCommand extends TpPointCommand
     @Command(name = "private", alias = "makeprivate", desc = "Make a players warp private")
     public void makePrivate(CommandSender sender, @Optional String warp, @Default User owner)
     {
-        if (!owner.equals(sender) && !module.getPermissions().WARP_PUBLIC_OTHER.isAuthorized(sender))
+        if (!owner.equals(sender) && sender.hasPermission(module.getPermissions().WARP_PUBLIC_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_PUBLIC_OTHER);
         }
@@ -448,7 +448,7 @@ public class WarpCommand extends TpPointCommand
     @Command(name = "public", desc = "Make a users warp public")
     public void makePublic(CommandSender sender, @Optional String warp, @Default User owner)
     {
-        if (!owner.equals(sender) && !module.getPermissions().WARP_PUBLIC_OTHER.isAuthorized(sender))
+        if (!owner.equals(sender) && sender.hasPermission(module.getPermissions().WARP_PUBLIC_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_PUBLIC_OTHER);
         }

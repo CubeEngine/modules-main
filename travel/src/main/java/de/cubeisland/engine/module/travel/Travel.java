@@ -89,7 +89,7 @@ public class Travel extends Module
         cm.addCommand(warpCmd);
         em.registerListener(this, new HomeListener(this, um, wm));
 
-        this.permissions = new TravelPerm(this, homeCmd, warpCmd);
+        this.permissions = new TravelPerm(this);
     }
 
     @Disable
@@ -97,7 +97,7 @@ public class Travel extends Module
     {
         cm.removeCommands(this);
         em.removeListeners(this);
-        pm.removePermissions(this);
+        pm.cleanup(this);
     }
 
     public TravelConfig getConfig()

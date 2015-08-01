@@ -19,11 +19,14 @@ package de.cubeisland.engine.module.roles.sponge.subject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.stream.Collectors;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.module.roles.sponge.data.BaseSubjectData;
-import de.cubeisland.engine.service.permission.Permission;
 import de.cubeisland.engine.service.permission.PermissionManager;
+import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
@@ -32,6 +35,7 @@ import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.unmodifiableList;
+import static java.util.stream.Collectors.toList;
 
 public abstract class BaseSubject implements OptionSubject
 {
@@ -163,37 +167,51 @@ public abstract class BaseSubject implements OptionSubject
         }
         if (resolve)
         {
-            Optional<Permission> perm = manager.getPermission(permission);
-            if (perm.isPresent())
+            List<String> implicits = new ArrayList<>();
+
+            // Search for implicit parents first...
+            int lastDot = permission.lastIndexOf(".");
+            while (lastDot != -1)
             {
-                for (String parent : perm.get().allParents())
-                {
-                    Tristate value = getPermissionValue(contexts, parent, data, manager, false);
-                    if (value != Tristate.UNDEFINED)
-                    {
-                        return value;
-                    }
-                }
+                permission = permission.substring(0, lastDot);
+                implicits.add(permission);
+                lastDot = permission.lastIndexOf(".");
             }
-            else // attempt to find * permissions higher up
+            Tristate value = Tristate.UNDEFINED;
+            for (String parent : implicits)
             {
-                int lastDot = permission.lastIndexOf(".");
-                while (lastDot != -1)
-                {
-                    permission = permission.substring(0, lastDot);
-                    Tristate value = getPermissionValue(contexts, permission + ".*", data, manager, false);
-                    if (value != Tristate.UNDEFINED)
-                    {
-                        return value;
-                    }
-                    lastDot = permission.lastIndexOf(".");
-                }
-                Tristate value = getPermissionValue(contexts, "*", data, manager, false);
+                value = getPermissionValue(contexts, parent, data, manager, false); // not recursive (we got all already)
                 if (value != Tristate.UNDEFINED)
                 {
-                    return value;
+                    break;
                 }
             }
+            if (value == Tristate.FALSE) // Always False return
+            {
+                return value;
+            }
+            // else UNDEFINED OR TRUE
+
+            // Seach for explicit parents...
+            PermissionDescription perm = manager.getPermission(permission);
+            if (perm != null)
+            {
+                List<String> explicits = perm.getAssignedSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE)
+                         .entrySet().stream()
+                         .filter(entry -> entry.getKey().getIdentifier().startsWith("permission:"))
+                         .map(entry -> entry.getKey().getIdentifier().substring(11))
+                         .collect(toList());
+
+                for (String parent : explicits)
+                {
+                    value = value.and(getPermissionValue(contexts, parent, data, manager, true)); // recursive
+                    if (value == Tristate.FALSE)
+                    {
+                        return value;
+                    }
+                }
+            }
+            return value;
         }
         return Tristate.UNDEFINED;
     }

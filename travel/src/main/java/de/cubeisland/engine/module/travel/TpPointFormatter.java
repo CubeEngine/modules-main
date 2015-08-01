@@ -17,11 +17,11 @@
  */
 package de.cubeisland.engine.module.travel;
 
-import de.cubeisland.engine.messagecompositor.parser.component.MessageComponent;
-import de.cubeisland.engine.messagecompositor.parser.formatter.AbstractFormatter;
-import de.cubeisland.engine.messagecompositor.parser.formatter.Context;
 import de.cubeisland.engine.module.travel.home.Home;
 import de.cubeisland.engine.service.i18n.I18n;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.AbstractFormatter;
+import org.cubeengine.dirigent.formatter.Context;
 
 import static de.cubeisland.engine.service.i18n.formatter.MessageType.NONE;
 import static de.cubeisland.engine.service.i18n.formatter.component.ClickComponent.runCommand;
@@ -40,7 +40,7 @@ public class TpPointFormatter extends AbstractFormatter<TeleportPoint>
     }
 
     @Override
-    public MessageComponent format(TeleportPoint object, Context context)
+    public Component format(TeleportPoint object, Context context)
     {
         String cmd = "/" + (object instanceof Home ? "home" : "warp") + " tp " + object.getName() + " " + object.getOwnerName();
         return styled(UNDERLINE, runCommand(cmd, hoverText(i18n.getTranslation(context.getLocale(), NONE, "Click to teleport to {}", object.getName()), object.getName())));

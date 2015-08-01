@@ -37,7 +37,7 @@ public class LagTimer implements Runnable
     public LagTimer(Basics module)
     {
         this.logger = module.getProvided(Log.class);
-        module.getModularity().start(TaskManager.class).runTimer(module, this, 200, 20); //start timer after 10 sec
+        module.getModularity().getInstance(TaskManager.class).runTimer(module, this, 200, 20); //start timer after 10 sec
     }
 
     @Override

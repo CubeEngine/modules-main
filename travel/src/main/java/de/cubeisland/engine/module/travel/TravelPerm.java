@@ -17,66 +17,40 @@
  */
 package de.cubeisland.engine.module.travel;
 
-import de.cubeisland.engine.service.permission.Permission;
 import de.cubeisland.engine.service.permission.PermissionContainer;
-import de.cubeisland.engine.module.travel.home.HomeCommand;
-import de.cubeisland.engine.module.travel.warp.WarpCommand;
-
-import static de.cubeisland.engine.service.permission.PermDefault.TRUE;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 public class TravelPerm extends PermissionContainer<Travel>
 {
-    public TravelPerm(Travel module, HomeCommand homeCmd, WarpCommand warpCmd)
+    public TravelPerm(Travel module)
     {
         super(module);
-        HOME_TP_OTHER = homeCmd.getPermission("tp").child("other");
-        HOME_SET_MORE = homeCmd.getPermission("set").child("more");
-        HOME_MOVE_OTHER = homeCmd.getPermission("move").child("other");
-        HOME_REMOVE_OTHER = homeCmd.getPermission("remove").child("other");
-        HOME_RENAME_OTHER = homeCmd.getPermission("rename").child("other");
-        HOME_LIST_OTHER = homeCmd.getPermission("list").child("other");
-        HOME_PRIVATE_OTHER = homeCmd.getPermission("private").child("other");
-        HOME_PUBLIC_OTHER = homeCmd.getPermission("public").child("other");
-
-        WARP_TP_OTHER = warpCmd.getPermission("tp").child("other");
-        WARP_MOVE_OTHER = warpCmd.getPermission("move").child("other");
-        WARP_REMOVE_OTHER = warpCmd.getPermission("remove").child("other");
-        WARP_RENAME_OTHER = warpCmd.getPermission("rename").child("other");
-        WARP_LIST_OTHER = warpCmd.getPermission("list").child("other");
-        WARP_PRIVATE_OTHER = warpCmd.getPermission("private").child("other");
-        WARP_PUBLIC_OTHER = warpCmd.getPermission("public").child("other");
-
-        HOME_USER.attach(homeCmd.getPermission("tp"),
-                         homeCmd.getPermission("set"),
-                         homeCmd.getPermission("move"),
-                         homeCmd.getPermission("remove"),
-                         homeCmd.getPermission("rename"),
-                         homeCmd.getPermission("list"),
-                         homeCmd.getPermission("private"),
-                         homeCmd.getPermission("greeting"),
-                         homeCmd.getPermission("ilist"),
-                         homeCmd.getPermission("invite"),
-                         homeCmd.getPermission("uninvite"));
-
-        this.registerAllPermissions();
     }
 
-    public final Permission HOME_USER = getBasePerm().child("home-user", TRUE);
+    private final PermissionDescription COMMAND = register("command", "Base Commands Permission", null);
 
-    public final Permission HOME_TP_OTHER;
-    public final Permission HOME_SET_MORE;
-    public final Permission HOME_MOVE_OTHER;
-    public final Permission HOME_REMOVE_OTHER;
-    public final Permission HOME_RENAME_OTHER;
-    public final Permission HOME_LIST_OTHER;
-    public final Permission HOME_PRIVATE_OTHER;
-    public final Permission HOME_PUBLIC_OTHER;
+    public final PermissionDescription HOME_USER = register("home-user", "Home Permission Group for normal users", null);
+    /* TODO
+    HOME_USER.attach(homeCmd.getPermission("tp"), homeCmd.getPermission("set"), homeCmd.getPermission("move"),
+                         homeCmd.getPermission("remove"), homeCmd.getPermission("rename"), homeCmd.getPermission(
+            "list"), homeCmd.getPermission("private"), homeCmd.getPermission("greeting"), homeCmd.getPermission(
+            "ilist"), homeCmd.getPermission("invite"), homeCmd.getPermission("uninvite"));
+     */
 
-    public final Permission WARP_TP_OTHER;
-    public final Permission WARP_MOVE_OTHER;
-    public final Permission WARP_REMOVE_OTHER;
-    public final Permission WARP_RENAME_OTHER;
-    public final Permission WARP_LIST_OTHER;
-    public final Permission WARP_PRIVATE_OTHER;
-    public final Permission WARP_PUBLIC_OTHER;
+    public final PermissionDescription HOME_TP_OTHER = register("home.tp.other", "", COMMAND);
+    public final PermissionDescription HOME_SET_MORE = register("home.set.more", "", COMMAND);
+    public final PermissionDescription HOME_MOVE_OTHER = register("home.move.other", "", COMMAND);
+    public final PermissionDescription HOME_REMOVE_OTHER = register("home.remove.other", "", COMMAND);
+    public final PermissionDescription HOME_RENAME_OTHER = register("home.rename.other", "", COMMAND);
+    public final PermissionDescription HOME_LIST_OTHER = register("home.list.other", "", COMMAND);
+    public final PermissionDescription HOME_PRIVATE_OTHER = register("home.private.other", "", COMMAND);
+    public final PermissionDescription HOME_PUBLIC_OTHER = register("home.public.other", "", COMMAND);
+
+    public final PermissionDescription WARP_TP_OTHER = register("warp.tp.other", "", COMMAND);
+    public final PermissionDescription WARP_MOVE_OTHER = register("warp.move.other", "", COMMAND);
+    public final PermissionDescription WARP_REMOVE_OTHER = register("warp.remove.other", "", COMMAND);
+    public final PermissionDescription WARP_RENAME_OTHER = register("warp.rename.other", "", COMMAND);
+    public final PermissionDescription WARP_LIST_OTHER = register("warp.list.other", "", COMMAND);
+    public final PermissionDescription WARP_PRIVATE_OTHER = register("warp.private.other", "", COMMAND);
+    public final PermissionDescription WARP_PUBLIC_OTHER = register("warp.public.other", "", COMMAND);
 }
