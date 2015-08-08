@@ -89,7 +89,7 @@ public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
 
     public boolean canAssignAndRemove(CommandSender source)
     {
-        String perm = module.getModularity().getInstance(PermissionManager.class).getModulePermission(module).getId();
+        String perm = module.getModularity().provide(PermissionManager.class).getModulePermission(module).getId();
         perm += "." + context.getType() + "." + context.getName();
         if (!perm.endsWith("."))
         {

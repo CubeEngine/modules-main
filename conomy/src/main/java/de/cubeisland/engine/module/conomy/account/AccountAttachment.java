@@ -66,7 +66,7 @@ public class AccountAttachment extends UserAttachment
     public UserAccount createAccount()
     {
         if (this.userAccount != null) return this.getAccount();
-        AccountModel model = getModule().getModularity().getInstance(Database.class).getDSL().newRecord(TABLE_ACCOUNT).
+        AccountModel model = getModule().getModularity().provide(Database.class).getDSL().newRecord(TABLE_ACCOUNT).
             newAccount(getHolder(), null,(long) (this.manager.config.defaultBalance * this.manager.config.fractionalDigitsFactor()), false);
         model.insertAsync();
         this.userAccount = new UserAccount(this, this.manager, model);

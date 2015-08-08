@@ -40,7 +40,7 @@ public class MailAttachment extends UserAttachment
 
     private DSLContext dsl()
     {
-        return getModule().getModularity().getInstance(Database.class).getDSL();
+        return getModule().getModularity().provide(Database.class).getDSL();
     }
 
     public List<Mail> getMails()

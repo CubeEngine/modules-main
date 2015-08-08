@@ -26,13 +26,13 @@ import java.util.List;
 import javax.inject.Inject;
 import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.modularity.core.LifeCycle;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Modularity;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.ValueProvider;
-import de.cubeisland.engine.modularity.core.graph.DependencyInformation;
 import de.cubeisland.engine.service.filesystem.FileManager;
 import de.cubeisland.engine.service.i18n.I18n;
 import de.cubeisland.engine.module.core.sponge.EventManager;
@@ -124,12 +124,9 @@ public class Roles extends Module
         cm.addCommands(cmdUsers, this, new UserInformationCommands(this));
         cmdRoles.addCommand(new ManagementCommands(this));
 
-        ValueProvider<SettableInvocationHandler> provider = getModularity().getProvider(SettableInvocationHandler.class);
-        if (provider == null)
-        {
-            provider = new InvocationHandlerProvider(new SettableInvocationHandler());
-            getModularity().registerProvider(SettableInvocationHandler.class, provider);
-        }
+        ValueProvider<SettableInvocationHandler> provider = new InvocationHandlerProvider(new SettableInvocationHandler());
+        getModularity().registerProvider(SettableInvocationHandler.class, provider);
+
         SettableInvocationHandler handler = getProvided(SettableInvocationHandler.class).with(service);
         handler.meta.forEach(service::registerContextCalculator); // readd contextcalculators
 
@@ -206,7 +203,7 @@ public class Roles extends Module
         }
 
         @Override
-        public SettableInvocationHandler get(DependencyInformation info, Modularity modularity)
+        public SettableInvocationHandler get(LifeCycle lifeCycle, Modularity modularity)
         {
             return handler;
         }
