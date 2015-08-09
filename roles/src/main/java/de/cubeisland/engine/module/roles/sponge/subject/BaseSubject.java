@@ -18,11 +18,15 @@
 package de.cubeisland.engine.module.roles.sponge.subject;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
+import javax.xml.transform.stream.StreamSource;
 import com.google.common.base.Optional;
+import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.data.BaseSubjectData;
 import de.cubeisland.engine.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -30,23 +34,35 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.StreamSupport.stream;
+import static org.spongepowered.api.service.permission.PermissionService.SUBJECTS_ROLE_TEMPLATE;
 
-public abstract class BaseSubject implements OptionSubject
+public abstract class BaseSubject<T extends OptionSubjectData> implements OptionSubject
 {
+    public static final String PERMISSION_TEMPLATE_PREFIX = "permission:";
     private BaseSubjectData transientData = new BaseSubjectData();
     private final SubjectCollection collection;
-    private PermissionManager permissionManager;
+    protected RolesPermissionService service;
+    private T data;
 
-    public BaseSubject(SubjectCollection collection, PermissionManager permissionManager)
+    public BaseSubject(SubjectCollection collection, RolesPermissionService service, T data)
     {
         this.collection = collection;
-        this.permissionManager = permissionManager;
+        this.service = service;
+        this.data = data;
+    }
+
+    @Override
+    public T getSubjectData()
+    {
+        return data;
     }
 
     @Override
@@ -87,10 +103,10 @@ public abstract class BaseSubject implements OptionSubject
     @Override
     public Tristate getPermissionValue(Set<Context> contexts, String permission)
     {
-        Tristate value = getPermissionValue(contexts, permission, getTransientSubjectData(), permissionManager, true);
+        Tristate value = getPermissionValue(contexts, permission, getTransientSubjectData(), service, true);
         if (value == Tristate.UNDEFINED)
         {
-            return getPermissionValue(contexts, permission, getSubjectData(), permissionManager, true);
+            return getPermissionValue(contexts, permission, getSubjectData(), service, true);
         }
         return value;
     }
@@ -150,7 +166,7 @@ public abstract class BaseSubject implements OptionSubject
 
 
     private static Tristate getPermissionValue(Set<Context> contexts, String permission, OptionSubjectData data,
-                                               PermissionManager manager, boolean resolve)
+                                               PermissionService service, boolean resolve)
     {
         Boolean state = data.getPermissions(contexts).get(permission);
         if (state != null)
@@ -180,7 +196,7 @@ public abstract class BaseSubject implements OptionSubject
             Tristate value = Tristate.UNDEFINED;
             for (String parent : implicits)
             {
-                value = getPermissionValue(contexts, parent, data, manager, false); // not recursive (we got all already)
+                value = getPermissionValue(contexts, parent, data, service, false); // not recursive (we got all already)
                 if (value != Tristate.UNDEFINED)
                 {
                     break;
@@ -193,18 +209,18 @@ public abstract class BaseSubject implements OptionSubject
             // else UNDEFINED OR TRUE
 
             // Seach for explicit parents...
-            PermissionDescription perm = manager.getPermission(permission);
+            PermissionDescription perm = service.getDescription(permission).orNull();
             if (perm != null)
             {
-                List<String> explicits = perm.getAssignedSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE)
-                         .entrySet().stream()
-                         .filter(entry -> entry.getKey().getIdentifier().startsWith("permission:"))
-                         .map(entry -> entry.getKey().getIdentifier().substring(11))
-                         .collect(toList());
+                List<String> explicits = stream(service.getSubjects(SUBJECTS_ROLE_TEMPLATE).getAllSubjects().spliterator(), false)
+                    .filter(s -> s.getSubjectData() != data)
+                    .filter(s -> s.getIdentifier().startsWith(PERMISSION_TEMPLATE_PREFIX))
+                    .map(s -> s.getIdentifier().substring(PERMISSION_TEMPLATE_PREFIX.length()))
+                    .collect(toList());
 
                 for (String parent : explicits)
                 {
-                    value = value.and(getPermissionValue(contexts, parent, data, manager, true)); // recursive
+                    value = value.and(getPermissionValue(contexts, parent, data, service, true)); // recursive
                     if (value == Tristate.FALSE)
                     {
                         return value;
@@ -214,5 +230,18 @@ public abstract class BaseSubject implements OptionSubject
             return value;
         }
         return Tristate.UNDEFINED;
+    }
+
+
+    @Override
+    public Set<Context> getActiveContexts()
+    {
+        Set<Context> contexts = new HashSet<>();
+        for (ContextCalculator calculator : service.getContextCalculators())
+        {
+            calculator.accumulateContexts(this, contexts);
+            // TODO calculator.accumulateContexts(getUser(), contexts); for user
+        }
+        return contexts;
     }
 }

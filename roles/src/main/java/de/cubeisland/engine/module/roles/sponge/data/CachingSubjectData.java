@@ -144,4 +144,10 @@ public abstract class CachingSubjectData extends BaseSubjectData
     }
 
 
+    public void reload()
+    {
+        this.parents.clear();
+        this.options.clear();
+        this.permissions.clear();
+    }
 }

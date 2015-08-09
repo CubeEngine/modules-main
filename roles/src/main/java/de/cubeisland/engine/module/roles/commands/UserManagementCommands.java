@@ -110,7 +110,7 @@ public class UserManagementCommands extends ContainerCommand
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
         if (!r.canAssignAndRemove(context.getSource()))
         {
-            context.sendTranslated(NEGATIVE, "You are not allowed to remove the role {role} in {input#context}!", r, ctx);
+            context.sendTranslated(NEGATIVE, "You are not allowedR to remove the role {role} in {input#context}!", r, ctx);
             return;
         }
         Set<Context> contexts = RoleCommands.toSet(role.getContext());

@@ -28,20 +28,18 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 
-public class UserCollection extends BaseSubjectCollection
+public class UserCollection extends BaseSubjectCollection<UserSubject>
 {
     private final Map<String, String> assignedMirrors;
     private final Map<String, String> directMirrors;
-    private final Map<String, UserSubject> subjects = new ConcurrentHashMap<>();
+
     private RolesPermissionService service;
-    private PermissionManager manager;
     private Game game;
 
-    public UserCollection(RolesPermissionService service, PermissionManager manager, Game game)
+    public UserCollection(RolesPermissionService service, Game game)
     {
         super(PermissionService.SUBJECTS_USER);
         this.service = service;
-        this.manager = manager;
         this.game = game;
         assignedMirrors = readMirrors(service.getConfig().mirrors.assigned);
         directMirrors = readMirrors(service.getConfig().mirrors.direct);
@@ -50,34 +48,29 @@ public class UserCollection extends BaseSubjectCollection
     }
 
     @Override
-    public Subject get(String identifier)
+    protected UserSubject getNew(String identifier)
     {
-        UserSubject subject = subjects.get(identifier);
-        if (subject == null)
+        try
         {
-            try
-            {
-                UUID uuid = UUID.fromString(identifier);
-                subject = new UserSubject(game, service, uuid, manager);
-            }
-            catch (IllegalArgumentException e)
-            {
-                throw new IllegalArgumentException("Provided identifier must be a uuid, was " + identifier);
-            }
+            return new UserSubject(game, service, UUID.fromString(identifier));
         }
-        return subject;
+        catch (IllegalArgumentException e)
+        {
+            throw new IllegalArgumentException("Provided identifier must be a uuid, was " + identifier);
+        }
     }
 
     @Override
     public boolean hasRegistered(String identifier)
     {
         // TODO DB-Lookup ?
-        return false;
+        return super.hasRegistered(identifier) || false;
     }
 
     @Override
     public Iterable<Subject> getAllSubjects()
     {
+        Iterable<Subject> allSubjects = super.getAllSubjects();
         // TODO lazy DB-Lookup
         return null;
     }

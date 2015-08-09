@@ -17,24 +17,31 @@
  */
 package de.cubeisland.engine.module.roles.sponge.collection;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import com.fasterxml.jackson.databind.util.ArrayIterator;
 import de.cubeisland.engine.module.roles.RolesConfig;
+import de.cubeisland.engine.module.roles.sponge.subject.UserSubject;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.util.Tristate;
 
 import static de.cubeisland.engine.module.roles.sponge.subject.RoleSubject.SEPARATOR;
 import static org.spongepowered.api.util.Tristate.UNDEFINED;
 
-public abstract class BaseSubjectCollection implements SubjectCollection
+public abstract class BaseSubjectCollection<T extends OptionSubject> implements SubjectCollection
 {
     private final String identifier;
+
+    protected final Map<String, T> subjects = new ConcurrentHashMap<>();
 
     public BaseSubjectCollection(String identifier)
     {
@@ -97,4 +104,30 @@ public abstract class BaseSubjectCollection implements SubjectCollection
             result.put(subject, state.asBoolean());
         }
     }
+
+    @Override
+    public final T get(String identifier)
+    {
+        T subject = subjects.get(identifier);
+        if (subject == null)
+        {
+            subject = getNew(identifier);
+            subjects.put(identifier, subject);
+        }
+        return subject;
+    }
+
+    @Override
+    public boolean hasRegistered(String identifier)
+    {
+        return subjects.containsKey(identifier);
+    }
+
+    @Override
+    public Iterable<Subject> getAllSubjects()
+    {
+        return new ArrayList<>(subjects.values());
+    }
+
+    protected abstract T getNew(String identifier);
 }

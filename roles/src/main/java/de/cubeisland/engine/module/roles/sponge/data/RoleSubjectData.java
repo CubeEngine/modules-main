@@ -210,4 +210,11 @@ public class RoleSubjectData extends CachingSubjectData
         }
     }
      */
+
+    @Override
+    public void reload()
+    {
+        config.reload();
+        super.reload();
+    }
 }

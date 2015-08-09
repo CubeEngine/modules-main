@@ -32,29 +32,21 @@ import org.spongepowered.api.util.command.CommandSource;
 import static java.util.Collections.singleton;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
-public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
+public class RoleSubject extends BaseSubject<RoleSubjectData> implements Comparable<RoleSubject>
 {
     public static final String SEPARATOR = "|";
-    private final RoleSubjectData data;
     private final String roleName;
     private final Set<Context> contexts;
     private Roles module;
     private Context context;
 
-    public RoleSubject(Roles module, RolesPermissionService service, RoleConfig config, Context context, PermissionManager manager)
+    public RoleSubject(Roles module, RolesPermissionService service, RoleConfig config, Context context)
     {
-        super(service.getGroupSubjects(), manager);
+        super(service.getGroupSubjects(), service, new RoleSubjectData(service, config, context));
         this.module = module;
         this.context = context;
         this.contexts = "global".equals(context.getType()) ? GLOBAL_CONTEXT : singleton(context);
-        this.data = new RoleSubjectData(service, config, context);
         this.roleName = "role:" + context.getKey() + SEPARATOR +  (context.getName().isEmpty() ? "" : context.getName() + SEPARATOR) + config.roleName;
-    }
-
-    @Override
-    public RoleSubjectData getSubjectData()
-    {
-        return data;
     }
 
     @Override
@@ -79,7 +71,7 @@ public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
     public int compareTo(RoleSubject o)
     {
         // Higher priority first
-        return -Integer.compare(data.getConfig().priority.value, o.data.getConfig().priority.value);
+        return -Integer.compare(getSubjectData().getConfig().priority.value, o.getSubjectData().getConfig().priority.value);
     }
 
     public String getName()
@@ -101,7 +93,7 @@ public class RoleSubject extends BaseSubject implements Comparable<RoleSubject>
 
     public void setPriorityValue(int value)
     {
-        data.getConfig().priority = Priority.getByValue(value);
-        data.getConfig().save(); // TODO async
+        getSubjectData().getConfig().priority = Priority.getByValue(value);
+        getSubjectData().getConfig().save(); // TODO async
     }
 }

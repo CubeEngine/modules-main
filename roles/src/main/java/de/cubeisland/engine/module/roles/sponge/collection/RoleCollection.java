@@ -33,12 +33,13 @@ import de.cubeisland.engine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.world.World;
 
 import static de.cubeisland.engine.service.filesystem.FileExtensionFilter.YAML;
 import static org.spongepowered.api.service.permission.PermissionService.SUBJECTS_GROUP;
 
-public class RoleCollection extends BaseSubjectCollection
+public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 {
     private final Map<String, String> mirrors;
     private final Map<String, RoleSubject> subjects = new ConcurrentHashMap<>();
@@ -116,51 +117,45 @@ public class RoleCollection extends BaseSubjectCollection
         config.setFile(file);
         config.reload();
         Context context = new Context(ctxType, ctxName);
-        return new RoleSubject(module, service, config, context, manager);
+        return new RoleSubject(module, service, config, context);
     }
 
-    @Override
-    public RoleSubject get(String identifier)
-    {
-        // TODO apply mirrors
-        RoleSubject roleSubject = subjects.get(identifier);
-        if (roleSubject == null)
-        {
-            if (!identifier.startsWith("role:"))
-            {
-                // must be <ctxType>|<ctxName>|<roleName>
-                throw new IllegalArgumentException("Provided identifier is not a role: " + identifier);
-            }
-            String name = identifier.substring(5);
-            String[] split = name.split("\\|");
-            String ctxType = split[0];
-            String ctxName = "";
-            if (split.length == 3)
-            {
-                ctxName = split[1];
-                name = split[2];
-            }
-            else if (split.length == 2)
-            {
-                name = split[1];
-            }
-            else
-            {
-                throw new IllegalArgumentException("Provided identifier has an invalid context: " + identifier);
-            }
-            Path path = module.getProvided(Path.class).resolve(ctxType);
-            if (!ctxName.isEmpty())
-            {
-                path = path.resolve(ctxName);
-            }
-            RoleConfig config = reflector.create(RoleConfig.class);
-            config.roleName = name;
-            config.setFile(path.resolve(name + ".yml").toFile());
-            roleSubject = new RoleSubject(module, service, config, new Context(ctxType, ctxName), manager);
 
-            subjects.put(identifier, roleSubject);
+    @Override
+    protected RoleSubject getNew(String identifier)
+    {
+        if (!identifier.startsWith("role:"))
+        {
+            // must be <ctxType>|<ctxName>|<roleName>
+            throw new IllegalArgumentException("Provided identifier is not a role: " + identifier);
         }
-        return roleSubject;
+        String name = identifier.substring(5);
+        String[] split = name.split("\\|");
+        String ctxType = split[0];
+        String ctxName = "";
+        if (split.length == 3)
+        {
+            ctxName = split[1];
+            name = split[2];
+        }
+        else if (split.length == 2)
+        {
+            name = split[1];
+        }
+        else
+        {
+            throw new IllegalArgumentException("Provided identifier has an invalid context: " + identifier);
+        }
+        Path path = module.getProvided(Path.class).resolve(ctxType);
+        if (!ctxName.isEmpty())
+        {
+            path = path.resolve(ctxName);
+        }
+        RoleConfig config = reflector.create(RoleConfig.class);
+        config.roleName = name;
+        config.setFile(path.resolve(name + ".yml").toFile());
+        config.reload();
+        return new RoleSubject(module, service, config, new Context(ctxType, ctxName));
     }
 
     @Override
@@ -184,5 +179,13 @@ public class RoleCollection extends BaseSubjectCollection
     public void delete(RoleSubject r)
     {
         // TODO delete
+    }
+
+    public void reload()
+    {
+        for (RoleSubject subject : subjects.values())
+        {
+            subject.getSubjectData().reload();
+        }
     }
 }

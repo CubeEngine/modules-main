@@ -21,6 +21,7 @@ import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.roles.Roles;
+import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.service.command.CommandContext;
 import de.cubeisland.engine.service.command.CommandSender;
 import de.cubeisland.engine.service.command.ContainerCommand;
@@ -36,11 +37,13 @@ import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
 public class ManagementCommands extends ContainerCommand
 {
     private Roles module;
+    private RolesPermissionService service;
 
-    public ManagementCommands(Roles module)
+    public ManagementCommands(Roles module, RolesPermissionService service)
     {
         super(module);
         this.module = module;
+        this.service = service;
     }
 
     @Alias(value = "manload")
@@ -48,6 +51,7 @@ public class ManagementCommands extends ContainerCommand
     public void reload(CommandContext context)
     {
         module.getConfiguration().reload();
+        service.getGroupSubjects().reload();
         // TODO remove cached data
         context.sendTranslated(POSITIVE, "{text:Roles} reload complete!");
     }

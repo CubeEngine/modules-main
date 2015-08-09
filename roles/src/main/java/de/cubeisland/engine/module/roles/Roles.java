@@ -33,6 +33,8 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Modularity;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.ValueProvider;
+import de.cubeisland.engine.modularity.core.marker.Setup;
+import de.cubeisland.engine.modularity.core.service.ServiceProvider;
 import de.cubeisland.engine.service.filesystem.FileManager;
 import de.cubeisland.engine.service.i18n.I18n;
 import de.cubeisland.engine.module.core.sponge.EventManager;
@@ -91,22 +93,46 @@ public class Roles extends Module
     @Inject private PermissionManager manager;
     private RolesPermissionService service;
 
-    @Enable
-    public void onEnable()
+
+    @Setup
+    public void onSetup()
     {
         ConverterManager cManager = reflector.getDefaultConverterManager();
         cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);
         cManager.registerConverter(new PriorityConverter(), Priority.class);
         this.config = fm.loadConfig(this, RolesConfig.class);
 
+        service = new RolesPermissionService(this, reflector, config, game, db, wm, manager);
+
+        ValueProvider<SettableInvocationHandler> provider = new InvocationHandlerProvider(new SettableInvocationHandler());
+        getModularity().registerProvider(SettableInvocationHandler.class, provider);
+
+        SettableInvocationHandler handler = getProvided(SettableInvocationHandler.class).with(service);
+        handler.meta.forEach(service::registerContextCalculator); // read contextcalculators
+
+        if (!game.getServiceManager().provide(PermissionService.class).isPresent())
+        {
+            PermissionService proxy = (PermissionService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{PermissionService.class}, handler);
+            try
+            {
+                game.getServiceManager().setProvider(game.getPluginManager().getPlugin("CubeEngine").get().getInstance(), PermissionService.class, proxy);
+            }
+            catch (ProviderExistsException e)
+            {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
+    @Enable
+    public void onEnable()
+    {
         i18n.getCompositor().registerFormatter(new ContextFormatter());
         i18n.getCompositor().registerFormatter(new RoleFormatter());
 
         db.registerTable(TableRole.class);
         db.registerTable(TablePerm.class);
         db.registerTable(TableOption.class);
-
-        service = new RolesPermissionService(this, reflector, config, game, db, wm, manager);
 
         cm.getProviderManager().register(this, new ContextReader(service, wm), Context.class);
         cm.getProviderManager().register(this, new ContextualRoleReader(service, wm), ContextualRole.class);
@@ -122,26 +148,7 @@ public class Roles extends Module
         UserManagementCommands cmdUsers = new UserManagementCommands(this, service);
         cmdRoles.addCommand(cmdUsers);
         cm.addCommands(cmdUsers, this, new UserInformationCommands(this));
-        cmdRoles.addCommand(new ManagementCommands(this));
-
-        ValueProvider<SettableInvocationHandler> provider = new InvocationHandlerProvider(new SettableInvocationHandler());
-        getModularity().registerProvider(SettableInvocationHandler.class, provider);
-
-        SettableInvocationHandler handler = getProvided(SettableInvocationHandler.class).with(service);
-        handler.meta.forEach(service::registerContextCalculator); // readd contextcalculators
-
-        if (!game.getServiceManager().provide(PermissionService.class).isPresent())
-        {
-            PermissionService proxy = (PermissionService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{PermissionService.class}, handler);
-            try
-            {
-                game.getServiceManager().setProvider(game.getPluginManager().getPlugin("CubeEngine").get().getInstance(), PermissionService.class, proxy);
-            }
-            catch (ProviderExistsException e)
-            {
-                throw new IllegalStateException(e);
-            }
-        }
+        cmdRoles.addCommand(new ManagementCommands(this, service));
     }
 
     @Disable

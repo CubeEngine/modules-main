@@ -38,20 +38,16 @@ import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.command.CommandSource;
 
-public class UserSubject extends BaseSubject
+public class UserSubject extends BaseSubject<UserSubjectData>
 {
-    private final UserSubjectData data;
     private Game game;
-    private RolesPermissionService service;
     private User user;
     private final UUID uuid;
 
-    public UserSubject(Game game, RolesPermissionService service, UUID uuid, PermissionManager manager)
+    public UserSubject(Game game, RolesPermissionService service, UUID uuid)
     {
-        super(service.getUserSubjects(), manager);
+        super(service.getUserSubjects(), service, new UserSubjectData(service, uuid));
         this.game = game;
-        this.service = service;
-        this.data = new UserSubjectData(service, uuid);
         this.uuid = uuid;
 
         SubjectData defaultData = service.getDefaultData();
@@ -73,12 +69,6 @@ public class UserSubject extends BaseSubject
     }
 
     @Override
-    public OptionSubjectData getSubjectData()
-    {
-        return data;
-    }
-
-    @Override
     public String getIdentifier()
     {
         return uuid.toString();
@@ -88,18 +78,6 @@ public class UserSubject extends BaseSubject
     public Optional<CommandSource> getCommandSource()
     {
         return getUser().getPlayer().transform(e -> (CommandSource)e);
-    }
-
-    @Override
-    public Set<Context> getActiveContexts()
-    {
-        Set<Context> contexts = new HashSet<>();
-        for (ContextCalculator calculator : service.getContextCalculators())
-        {
-            calculator.accumulateContexts(this, contexts);
-            // TODO calculator.accumulateContexts(getUser(), contexts);
-        }
-        return contexts;
     }
 
     public User getUser()
