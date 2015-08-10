@@ -22,7 +22,7 @@ import de.cubeisland.engine.service.user.UserManager;
 import de.cubeisland.engine.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.Travel;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.manipulator.entity.SneakingData;
+import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
 import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
@@ -49,13 +49,13 @@ public class HomeListener
     @Subscribe(order = EARLY)
     public void rightClickBed(PlayerInteractBlockEvent event)
     {
-        if (event.getInteractionType() != EntityInteractionTypes.USE || event.getBlock().getBlockType() != BlockTypes.BED)
+        if (event.getInteractionType() != EntityInteractionTypes.USE || event.getBlock().getType() != BlockTypes.BED)
         {
             return;
         }
         Player player = event.getUser();
         User user = um.getExactUser(player.getUniqueId());
-        if (player.getData(SneakingData.class).isPresent())
+        if (player.get(SneakingData.class).isPresent())
         {
             if (homeManager.has(user, "home"))
             {
