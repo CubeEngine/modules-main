@@ -18,14 +18,13 @@
 package de.cubeisland.engine.module.portals.config;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.common.base.Optional;
 import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.module.core.util.WorldLocation;
 import de.cubeisland.engine.service.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.Portal;
 import de.cubeisland.engine.module.portals.Portals;
 import de.cubeisland.engine.service.world.WorldManager;
-import org.spongepowered.api.data.manipulator.entity.PassengerData;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -88,11 +87,7 @@ public class Destination
             rotation = location.getRotation();
             break;
         }
-        Optional<PassengerData> passenger = entity.getData(PassengerData.class);
-        if (passenger.isPresent())
-        {
-            entity = passenger.get().getBaseVehicle();
-        }
+        entity = entity.get(Keys.BASE_VEHICLE).or(entity);
         if (safe)
         {
             entity.setLocationSafely(loc);

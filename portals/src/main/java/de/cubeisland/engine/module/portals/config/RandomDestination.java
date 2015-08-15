@@ -18,13 +18,12 @@
 package de.cubeisland.engine.module.portals.config;
 
 import java.util.Random;
-import com.google.common.base.Optional;
 import de.cubeisland.engine.module.core.util.Pair;
 import de.cubeisland.engine.module.portals.Portals;
 import de.cubeisland.engine.service.world.ConfigWorld;
 import de.cubeisland.engine.service.world.WorldManager;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.data.manipulator.entity.PassengerData;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.world.Chunk;
@@ -55,11 +54,7 @@ public class RandomDestination extends Destination
             // TODO particles
             return;
         }
-        Optional<PassengerData> vehicle = entity.getData(PassengerData.class);
-        if (vehicle.isPresent())
-        {
-            entity = vehicle.get().getBaseVehicle();
-        }
+        entity = entity.get(Keys.BASE_VEHICLE).or(entity);
         World world = this.world.getWorld();
         Location block;
         Pair<Integer, Chunk> config = module.getRandomDestinationSetting(world);
