@@ -18,15 +18,15 @@
 package de.cubeisland.engine.module.kickban;
 
 import javax.inject.Inject;
-import de.cubeisland.engine.modularity.core.marker.Disable;
-import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.service.filesystem.FileManager;
-import de.cubeisland.engine.service.ban.BanManager;
+import de.cubeisland.engine.modularity.core.marker.Disable;
+import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.service.command.CommandManager;
+import de.cubeisland.engine.service.filesystem.FileManager;
 import de.cubeisland.engine.service.user.UserManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.service.ban.BanService;
 
 /**
  * Overrides and improves Vanilla Kick and Ban Commands:
@@ -40,16 +40,11 @@ import org.spongepowered.api.Game;
 @ModuleInfo(name = "KickBan", description = "Kick and Ban players")
 public class KickBan extends Module
 {
-    @Inject
-    private CommandManager cm;
-    @Inject
-    private BanManager bm;
-    @Inject
-    private UserManager um;
-    @Inject
-    private Game game;
-    @Inject
-    private FileManager fm;
+    @Inject private CommandManager cm;
+    @Inject private BanService bs;
+    @Inject private UserManager um;
+    @Inject private Game game;
+    @Inject private FileManager fm;
     private KickBanPerms perms;
     private KickBanConfig config;
 
@@ -58,7 +53,7 @@ public class KickBan extends Module
     public void onEnable()
     {
         this.perms = new KickBanPerms(this);
-        cm.addCommands(this, new KickBanCommands(this, bm, um, game));
+        cm.addCommands(this, new KickBanCommands(this, bs, um, game));
         config = fm.loadConfig(this, KickBanConfig.class);
     }
 

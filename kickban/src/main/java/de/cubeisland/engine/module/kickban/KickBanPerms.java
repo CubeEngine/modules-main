@@ -17,30 +17,25 @@
  */
 package de.cubeisland.engine.module.kickban;
 
-import de.cubeisland.engine.service.permission.Permission;
 import de.cubeisland.engine.service.permission.PermissionContainer;
-
-import static de.cubeisland.engine.service.permission.PermDefault.FALSE;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 public class KickBanPerms extends PermissionContainer<KickBan>
 {
     public KickBanPerms(KickBan module)
     {
         super(module);
-        registerAllPermissions();
     }
 
-    public final Permission COMMAND = getBasePerm().childWildcard("command");
+    private final PermissionDescription COMMAND = register("command", "Base Commands Permission", null);
 
-    private final Permission COMMAND_KICK = COMMAND.childWildcard("kick");
-    public final Permission COMMAND_KICK_ALL = COMMAND_KICK.child("all");
-    public final Permission COMMAND_KICK_NOREASON = COMMAND_KICK.newPerm("noreason");
+    public final PermissionDescription COMMAND_KICK_ALL = register("kick.all", "Allows kicking all players", COMMAND);
+    public final PermissionDescription COMMAND_KICK_NOREASON = register("kick.noreason", "Allows kicking without providing a reason", COMMAND);
 
-    public final Permission COMMAND_BAN_NOREASON = COMMAND.childWildcard("ban").child("noreason");
-    public final Permission COMMAND_IPBAN_NOREASON = COMMAND.childWildcard("ipban").child("noreason", FALSE);
-    public final Permission COMMAND_TEMPBAN_NOREASON = COMMAND.childWildcard("tempban").child("noreason",FALSE);
+    public final PermissionDescription COMMAND_BAN_NOREASON = register("ban.noreason", "Allows banning without providing a reason",COMMAND);
+    public final PermissionDescription COMMAND_IPBAN_NOREASON = register("ipban.noreason", "Allows banning without providing a reason",COMMAND);
+    public final PermissionDescription COMMAND_TEMPBAN_NOREASON = register("tempban.noreason", "Allows banning without providing a reason",COMMAND);
 
-    public final Permission KICK_RECEIVEMESSAGE = getBasePerm().childWildcard("kick").child("receivemessage");
-    public final Permission BAN_RECEIVEMESSAGE = getBasePerm().childWildcard("ban").child("receivemessage");
-
+    public final PermissionDescription KICK_RECEIVEMESSAGE = register("kick.receivemessage", "Enables notification when a player gets kicked", COMMAND);
+    public final PermissionDescription BAN_RECEIVEMESSAGE = register("ban.receivemessage", "Enables notification when a player gets banned", COMMAND);
 }

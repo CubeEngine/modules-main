@@ -39,7 +39,6 @@ import de.cubeisland.engine.service.filesystem.FileManager;
 import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
 import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
-import de.cubeisland.engine.service.ban.BanManager;
 import de.cubeisland.engine.service.command.CommandManager;
 import de.cubeisland.engine.service.database.Database;
 import de.cubeisland.engine.service.permission.PermissionManager;
@@ -47,6 +46,7 @@ import de.cubeisland.engine.service.task.TaskManager;
 import de.cubeisland.engine.service.user.UserManager;
 import de.cubeisland.engine.service.world.WorldManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.service.ban.BanService;
 
 @ModuleInfo(name = "Basics", description = "Basic Functionality")
 public class Basics extends Module
@@ -68,7 +68,7 @@ public class Basics extends Module
     @Inject private FileManager fm;
     @Inject private WorldManager wm;
     @Inject private TaskManager taskManager;
-    @Inject private BanManager banManager;
+    @Inject private BanService bs;
     @Inject private PermissionManager pm;
     @Inject private InventoryGuardFactory invGuard;
     @Inject private MaterialMatcher materialMatcher;
@@ -82,7 +82,7 @@ public class Basics extends Module
         um.addDefaultAttachment(BasicsAttachment.class, this);
         em.registerListener(this, new ColoredSigns(this));
         cm.addCommands(cm, this, new InformationCommands(this, wm, materialMatcher));
-        cm.addCommands(cm, this, new PlayerCommands(this, um, em, taskManager, cm, banManager));
+        cm.addCommands(cm, this, new PlayerCommands(this, um, em, taskManager, cm, bs));
         em.registerListener(this, new GeneralsListener(this, um));
         cm.addCommands( this, new InventoryCommands(this, invGuard));
         cm.addCommands(this, new ItemCommands(this));

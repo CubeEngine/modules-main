@@ -30,12 +30,10 @@ import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
-import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
 import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.core.util.TimeUtil;
 import de.cubeisland.engine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.service.ban.BanManager;
 import de.cubeisland.engine.service.ban.UserBan;
 import de.cubeisland.engine.service.command.CommandManager;
 import de.cubeisland.engine.service.command.CommandSender;
@@ -44,12 +42,11 @@ import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.service.user.UserList;
 import de.cubeisland.engine.service.user.UserManager;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.data.manipulator.entity.JoinData;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.Location;
 
-import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
 import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static java.text.DateFormat.SHORT;
 import static org.spongepowered.api.entity.player.gamemode.GameModes.CREATIVE;
@@ -58,16 +55,16 @@ public class PlayerCommands
 {
     private final UserManager um;
     private CommandManager cm;
-    private BanManager banManager;
+    private BanService banService;
     private Game game;
     private final Basics module;
 
-    public PlayerCommands(Basics basics, UserManager um, EventManager em, TaskManager taskManager, CommandManager cm, BanManager banManager, Game game)
+    public PlayerCommands(Basics basics, UserManager um, EventManager em, TaskManager taskManager, CommandManager cm, BanService banService, Game game)
     {
         this.module = basics;
         this.um = um;
         this.cm = cm;
-        this.banManager = banManager;
+        this.banService = banService;
         this.game = game;
 
     }
