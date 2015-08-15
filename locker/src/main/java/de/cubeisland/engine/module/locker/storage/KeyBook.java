@@ -17,25 +17,24 @@
  */
 package de.cubeisland.engine.module.locker.storage;
 
+import java.util.Arrays;
 import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.locker.Locker;
-import org.spongepowered.api.data.manipulator.DisplayNameData;
-import org.spongepowered.api.data.manipulator.item.LoreData;
+import de.cubeisland.engine.service.user.User;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.effect.sound.SoundTypes.BLAZE_HIT;
-import static org.spongepowered.api.effect.sound.SoundTypes.GHAST_SCREAM;
-import static org.spongepowered.api.effect.sound.SoundTypes.PISTON_EXTEND;
+import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.data.key.Keys.DISPLAY_NAME;
+import static org.spongepowered.api.data.key.Keys.ITEM_LORE;
+import static org.spongepowered.api.effect.sound.SoundTypes.*;
 import static org.spongepowered.api.item.ItemTypes.PAPER;
 
 public class KeyBook
@@ -52,15 +51,14 @@ public class KeyBook
         this.item = item;
         this.currentHolder = currentHolder;
         this.module = module;
-        keyBookName = Texts.toPlain(item.getData(DisplayNameData.class).get().getDisplayName());
+        keyBookName = item.get(DISPLAY_NAME).transform(Texts::toPlain).or("");
         lockID = Long.valueOf(keyBookName.substring(keyBookName.indexOf('#') + 1, keyBookName.length()));
     }
 
     public static KeyBook getKeyBook(ItemStack item, User currentHolder, Locker module)
     {
         if (item.getItem() == ItemTypes.ENCHANTED_BOOK
-            && item.getData(DisplayNameData.class).isPresent()
-            && Texts.toPlain(item.getData(DisplayNameData.class).get().getDisplayName()).contains(KeyBook.TITLE))
+            && item.get(DISPLAY_NAME).transform(Texts::toPlain).transform(s -> s.contains(TITLE)).or(false))
         {
             try
             {
@@ -83,8 +81,8 @@ public class KeyBook
                 {
                     currentHolder.sendTranslated(POSITIVE,
                                                  "As you approach with your KeyBook the magic lock disappears!");
-                    currentHolder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
-                    currentHolder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, (float)1.5);
+                    currentHolder.asPlayer().playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
+                    currentHolder.asPlayer().playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, (float)1.5);
                     lock.notifyKeyUsage(currentHolder);
                 }
                 return true;
@@ -94,37 +92,37 @@ public class KeyBook
                 currentHolder.sendTranslated(NEGATIVE, "You try to open the container with your KeyBook");
                 currentHolder.sendTranslated(NEGATIVE, "but you get forcefully pushed away!");
                 this.invalidate();
-                currentHolder.playSound(GHAST_SCREAM, effectLocation.getPosition(), 1, 1);
+                currentHolder.asPlayer().playSound(GHAST_SCREAM, effectLocation.getPosition(), 1, 1);
 
                 final Vector3d userDirection = currentHolder.asPlayer().getRotation();
-                currentHolder.damage(1);
-                currentHolder.setVelocity(userDirection.mul(-3));
+
+                // TODO damaging player working? /w effects see Lock for effects playing manually
+                currentHolder.asPlayer().offer(Keys.HEALTH, currentHolder.asPlayer().getHealthData().health().get() - 1);
+                VelocityData velocity = currentHolder.asPlayer().getOrCreate(VelocityData.class).get();
+                velocity.velocity().set(userDirection.mul(-3));
+                currentHolder.asPlayer().offer(velocity);
                 return false;
             }
         }
         else
         {
             currentHolder.sendTranslated(NEUTRAL, "You try to open the container with your KeyBook but nothing happens!");
-            currentHolder.playSound(BLAZE_HIT, effectLocation.getPosition(), 1, 1);
-            currentHolder.playSound(BLAZE_HIT, effectLocation.getPosition(), 1, (float)0.8);
+            currentHolder.asPlayer().playSound(BLAZE_HIT, effectLocation.getPosition(), 1, 1);
+            currentHolder.asPlayer().playSound(BLAZE_HIT, effectLocation.getPosition(), 1, (float)0.8);
             return false;
         }
     }
 
     public void invalidate()
     {
-        DisplayNameData display = item.getOrCreate(DisplayNameData.class).get();
-        LoreData lore = item.getOrCreate(LoreData.class).get();
-
-        display.setDisplayName(Texts.of(TextColors.DARK_RED, "Broken KeyBook"));
-        lore.set(Texts.of(currentHolder.getTranslation(NEUTRAL, "This KeyBook")), Texts.of(currentHolder.getTranslation(
-            NEUTRAL, "looks old and")), Texts.of(currentHolder.getTranslation(NEUTRAL, "used up. It")), Texts.of(
-            currentHolder.getTranslation(NEUTRAL, "won't let you")), Texts.of(currentHolder.getTranslation(NEUTRAL,
-                                                                                                           "open any containers!")));
-        item.offer(display);
-        item.offer(lore);
-        item = module.getGame().getRegistry().getItemBuilder().fromItemStack(item).itemType(PAPER).build();
-        currentHolder.setItemInHand(item);
+        item.offer(DISPLAY_NAME, Texts.of(TextColors.DARK_RED, "Broken KeyBook"));
+        item.offer(ITEM_LORE, Arrays.asList(currentHolder.getTranslation(NEUTRAL, "This KeyBook"),
+                                            currentHolder.getTranslation(NEUTRAL, "looks old and"),
+                                            currentHolder.getTranslation(NEUTRAL, "used up. It"),
+                                            currentHolder.getTranslation(NEUTRAL, "won't let you"),
+                                            currentHolder.getTranslation(NEUTRAL, "open any containers!")));
+        item = module.getGame().getRegistry().createItemBuilder().fromItemStack(item).itemType(PAPER).build();
+        currentHolder.asPlayer().setItemInHand(item);
     }
 
     public boolean isValidFor(Lock lock)

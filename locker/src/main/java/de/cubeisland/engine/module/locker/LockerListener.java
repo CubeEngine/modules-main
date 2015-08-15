@@ -32,13 +32,7 @@ import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.block.tileentity.carrier.Dropper;
 import org.spongepowered.api.block.tileentity.carrier.Hopper;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.data.manipulator.block.DirectionalData;
-import org.spongepowered.api.data.manipulator.block.HingeData;
-import org.spongepowered.api.data.manipulator.block.OpenData;
-import org.spongepowered.api.data.manipulator.block.PortionData;
-import org.spongepowered.api.data.manipulator.entity.DamageableData;
-import org.spongepowered.api.data.manipulator.entity.SneakingData;
-import org.spongepowered.api.data.manipulator.entity.VehicleData;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.hanging.Hanging;
@@ -53,7 +47,6 @@ import org.spongepowered.api.event.block.BlockRedstoneUpdateEvent;
 import org.spongepowered.api.event.block.FluidSpreadEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.EntityDeathEvent;
-import org.spongepowered.api.event.entity.EntityExplosionEvent;
 import org.spongepowered.api.event.entity.EntityTameEvent;
 import org.spongepowered.api.event.entity.living.LivingChangeHealthEvent;
 import org.spongepowered.api.event.entity.player.PlayerBreakBlockEvent;
@@ -98,12 +91,12 @@ public class LockerListener
         if (!this.module.getConfig().protectBlockFromRClick) return;
         if (event.getInteractionType() != USE) return;
         User user = um.getExactUser(event.getUser().getUniqueId());
-        Location location = event.getBlock();
+        Location location = event.getLocation();
         Lock lock = this.manager.getLockAtLocation(location, user);
-        Location block = event.getBlock();
+        Location block = event.getLocation();
         if (block.getTileEntity().orNull() instanceof Carrier)
         {
-            if (module.perms().DENY_CONTAINER.isAuthorized(user))
+            if (user.hasPermission(module.perms().DENY_CONTAINER.getId()))
             {
                 user.sendTranslated(NEGATIVE, "Strong magic prevents you from accessing any inventory!");
                 event.setCancelled(true);
@@ -112,9 +105,9 @@ public class LockerListener
             if (lock == null) return;
             lock.handleInventoryOpen(event, null, null, user);
         }
-        else if (block.isCompatible(OpenData.class))
+        else if (block.supports(Keys.OPEN))
         {
-            if (module.perms().DENY_DOOR.isAuthorized(user))
+            if (user.hasPermission(module.perms().DENY_DOOR.getId()))
             {
                 user.sendTranslated(NEGATIVE, "Strong magic prevents you from accessing any door!");
                 event.setCancelled(true);
@@ -135,7 +128,7 @@ public class LockerListener
         if (!this.module.getConfig().protectEntityFromRClick) return;
         Entity entity = event.getTargetEntity();
         User user = um.getExactUser(event.getUser().getUniqueId());
-        if (module.perms().DENY_ENTITY.isAuthorized(user))
+        if (user.hasPermission(module.perms().DENY_ENTITY.getId()))
         {
             user.sendTranslated(NEGATIVE, "Strong magic prevents you from reaching this entity!");
             event.setCancelled(true);
@@ -143,7 +136,7 @@ public class LockerListener
         }
         Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
         if (lock == null) return;
-        if (entity instanceof Carrier || (entity.getType() == HORSE && event.getUser().getData(SneakingData.class).isPresent()))
+        if (entity instanceof Carrier || (entity.getType() == HORSE && event.getUser().get(Keys.IS_SNEAKING).get()))
         {
             lock.handleInventoryOpen(event, null, null, user);
         }
@@ -171,7 +164,7 @@ public class LockerListener
         {
             if (carrier instanceof TileEntityCarrier)
             {
-                loc = ((TileEntityCarrier)carrier).getBlock();
+                loc = ((TileEntityCarrier)carrier).getLocation();
             }
             else if (carrier instanceof Entity)
             {
@@ -208,9 +201,10 @@ public class LockerListener
     @Subscribe
     public void onEntityDeath(EntityDeathEvent event)
     {
+        // TODO waiting for EntityDamageEvent in Cause Enhancement PR
         Optional<Cause> cause = event.getCause();
         Entity entity = event.getEntity();
-        if (entity.isCompatible(VehicleData.class))
+        if (entity.supports(Keys.VEHICLE))
         {
             if (!this.module.getConfig().protectVehicleFromBreak) return;
 

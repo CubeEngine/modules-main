@@ -56,10 +56,7 @@ import org.jooq.Result;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.data.manipulator.SingleValueData;
-import org.spongepowered.api.data.manipulator.block.DirectionalData;
-import org.spongepowered.api.data.manipulator.block.HingeData;
-import org.spongepowered.api.data.manipulator.block.PortionData;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.entity.Entity;
@@ -306,12 +303,12 @@ public class LockManager
         if (repairExpand && lock != null && lock.isSingleBlockLock())
         {
             Location block = lock.getFirstLocation();
-            if (block.getType() == CHEST || block.getType() == TRAPPED_CHEST)
+            if (block.getBlockType() == CHEST || block.getBlockType() == TRAPPED_CHEST)
             {
                 for (Direction cardinalDirection : CARDINAL_DIRECTIONS)
                 {
                     Location relative = block.getRelative(cardinalDirection);
-                    if (relative.getType() == block.getType())
+                    if (relative.getBlockType() == block.getBlockType())
                     {
                         if (this.getLockAtLocation(relative,null, false,false)== null)
                         {
@@ -394,8 +391,8 @@ public class LockManager
     {
         if (lock != null && access)
         {
-            if ((this.module.getConfig().protectWhenOnlyOffline && lock.getOwner().isOnline())
-            || (this.module.getConfig().protectWhenOnlyOnline && !lock.getOwner().isOnline()))
+            if ((this.module.getConfig().protectWhenOnlyOffline && lock.getOwner().asPlayer().isOnline())
+            || (this.module.getConfig().protectWhenOnlyOnline && !lock.getOwner().asPlayer().isOnline()))
             {
                 return null;
             }
@@ -433,7 +430,7 @@ public class LockManager
      */
     public void removeLock(Lock lock, User user, boolean destroyed)
     {
-        if (destroyed || lock.isOwner(user) || module.perms().CMD_REMOVE_OTHER.isAuthorized(user))
+        if (destroyed || lock.isOwner(user) || user.hasPermission(module.perms().CMD_REMOVE_OTHER.getId()))
         {
             this.locksById.remove(lock.getId());
             lock.model.deleteAsync();
@@ -498,7 +495,7 @@ public class LockManager
             for (Direction direction : CARDINAL_DIRECTIONS)
             {
                 Location relative = block.getRelative(direction);
-                if (relative.getType() == material)
+                if (relative.getBlockType() == material)
                 {
                     locations.add(relative);
                 }
@@ -514,7 +511,7 @@ public class LockManager
         {
             locations.add(block); // Original Block
             // Find upper/lower door part
-            PortionType portion = block.getData(PortionData.class).get().getValue();
+            PortionType portion = block.get(Keys.PORTION_TYPE).get();
             Location relative = null;
             if (portion == BOTTOM)
             {
@@ -524,17 +521,17 @@ public class LockManager
             {
                 relative = block.getRelative(Direction.DOWN);
             }
-            if (relative != null && relative.getType() == material)
+            if (relative != null && relative.getBlockType() == material)
             {
                 locations.add(relative);
 
-                Direction direction = block.getData(DirectionalData.class).get().getValue();
-                Hinge hinge = block.getData(HingeData.class).get().getValue();
+                Direction direction = block.get(Keys.DIRECTION).get();
+                Hinge hinge = block.get(Keys.HINGE_POSITION).get();
                 direction = BlockUtil.getOtherDoorDirection(direction, hinge);
                 Location blockOther = block.getRelative(direction);
                 Location relativeOther = relative.getRelative(direction);
-                if (portion.equals(block.getData(PortionData.class).transform(SingleValueData::getValue).orNull())
-                    && blockOther.getType().equals(relativeOther.getType()))
+                if (portion.equals(block.get(Keys.PORTION_TYPE).orNull())
+                    && blockOther.getBlockType().equals(relativeOther.getBlockType()))
                 {
                     locations.add(blockOther);
                     locations.add(relativeOther);
@@ -649,7 +646,7 @@ public class LockManager
         }
         if (holder instanceof TileEntityCarrier)
         {
-            return getLockAtLocation(((TileEntityCarrier)holder).getBlock(), null);
+            return getLockAtLocation(((TileEntityCarrier)holder).getLocation(), null);
         }
         return null;
     }

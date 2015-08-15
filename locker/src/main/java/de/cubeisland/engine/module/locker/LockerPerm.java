@@ -17,12 +17,9 @@
  */
 package de.cubeisland.engine.module.locker;
 
-import de.cubeisland.engine.service.permission.PermDefault;
-import de.cubeisland.engine.service.permission.Permission;
-import de.cubeisland.engine.service.permission.PermissionContainer;
-import de.cubeisland.engine.module.locker.commands.LockerAdminCommands;
 import de.cubeisland.engine.module.locker.commands.LockerCommands;
-import de.cubeisland.engine.module.locker.commands.LockerCreateCommands;
+import de.cubeisland.engine.service.permission.PermissionContainer;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 @SuppressWarnings("all")
 public class LockerPerm extends PermissionContainer<Locker>
@@ -30,65 +27,47 @@ public class LockerPerm extends PermissionContainer<Locker>
     public LockerPerm(Locker module, LockerCommands mainCmd)
     {
         super(module);
-        LockerCreateCommands createCmd = (LockerCreateCommands)mainCmd.getCommand("create");
-        PROTECT.attach(mainCmd.getPermission("info"),
-                       mainCmd.getPermission("persist"),
-                       mainCmd.getPermission("remove"),
-                       mainCmd.getPermission("unlock"),
-                       mainCmd.getPermission("modify"),
-                       mainCmd.getPermission("unlock"),
-                       mainCmd.getPermission("key"),
-                       mainCmd.getPermission("flag"),
-                       mainCmd.getPermission("give"),
-                       createCmd.getPermission("private"),
-                       createCmd.getPermission("public"),
-                       createCmd.getPermission("donation"),
-                       createCmd.getPermission("free"),
-                       createCmd.getPermission("password"),
-                       createCmd.getPermission("guarded"),
-                       CMD_INFO_SHOW_OWNER);
-        MODERATOR.attach(PROTECT, SHOW_OWNER, CMD_INFO_OTHER, ACCESS_OTHER, CMD_REMOVE_OTHER);
-        LockerAdminCommands adminCmd = (LockerAdminCommands)mainCmd.getCommand("admin");
-        ADMIN.attach(BREAK_OTHER, EXPAND_OTHER, CMD_REMOVE_OTHER, CMD_KEY_OTHER, CMD_MODIFY_OTHER, CMD_GIVE_OTHER, EXPAND_OTHER,
-                     adminCmd.getPermission("view"),
-                     adminCmd.getPermission("remove"),
-                     adminCmd.getPermission("tp"),
-                     adminCmd.getPermission("purge"),
-            //         adminCmd.getChild("cleanup"),
-              //       adminCmd.getChild("list"),
-            MODERATOR);
-        this.registerAllPermissions();
     }
 
-    private final Permission DENY = getBasePerm().childWildcard("deny", PermDefault.FALSE);
+    // TODO invert deny permissions
+    public final PermissionDescription DENY_CONTAINER = register("deny.container", "", null);
+    public final PermissionDescription DENY_DOOR = register("deny.door", "", null);
+    public final PermissionDescription DENY_ENTITY = register("deny.entity", "", null);
+    public final PermissionDescription DENY_HANGING = register("deny.hanging", "", null);
 
-    public final Permission DENY_CONTAINER = DENY.child("container", PermDefault.FALSE);
-    public final Permission DENY_DOOR = DENY.child("door", PermDefault.FALSE);
-    public final Permission DENY_ENTITY = DENY.child("entity", PermDefault.FALSE);
-    public final Permission DENY_HANGING = DENY.child("hanging", PermDefault.FALSE);
+    public final PermissionDescription SHOW_OWNER = register("show-owner", "", null);
+    public final PermissionDescription BREAK_OTHER = register("break-other", "", null);
+    public final PermissionDescription ACCESS_OTHER = register("access-other", "", null);
+    public final PermissionDescription EXPAND_OTHER = register("break-other", "", null);
 
-    public final Permission SHOW_OWNER = getBasePerm().child("show-owner");
-    public final Permission BREAK_OTHER = getBasePerm().child("break-other");
-    public final Permission ACCESS_OTHER = getBasePerm().child("access-other");
-    public final Permission EXPAND_OTHER = getBasePerm().child("break-other");
+    public final PermissionDescription PREVENT_NOTIFY = register("prevent-notify", "", null);
 
-    public final Permission PREVENT_NOTIFY = getBasePerm().child("prevent-notify");
+    private final PermissionDescription COMMAND = register("command", "", null);
 
-    private final Permission LOCKER_COMMAND = getBasePerm().childWildcard("command").childWildcard("locker");
+    public final PermissionDescription CMD_REMOVE_OTHER = register("locker.remove.other", "", COMMAND);
+    public final PermissionDescription CMD_KEY_OTHER = register("locker.key.other", "", COMMAND);
+    public final PermissionDescription CMD_MODIFY_OTHER = register("locker.modify.other", "", COMMAND);
+    public final PermissionDescription CMD_GIVE_OTHER = register("locker.give.other", "", COMMAND);
 
-    public final Permission CMD_REMOVE_OTHER = LOCKER_COMMAND.childWildcard("remove").child("other");
-    public final Permission CMD_KEY_OTHER = LOCKER_COMMAND.childWildcard("key").child("other");
-    public final Permission CMD_MODIFY_OTHER = LOCKER_COMMAND.childWildcard("modify").child("other");
-    public final Permission CMD_GIVE_OTHER = LOCKER_COMMAND.childWildcard("give").child("other");
+    public final PermissionDescription CMD_INFO_OTHER = register("locker.info.other", "", COMMAND);
+    public final PermissionDescription CMD_INFO_SHOW_OWNER =  register("locker.info.show-owner", "", null);
 
-    private final Permission CMD_INFO = LOCKER_COMMAND.childWildcard("info");
+    public final PermissionDescription PROTECT = registerS("protect", "", null,
+                                                          "command.locker.info.use",
+                                                          "command.locker.persist.use",
+                                                          "command.locker.remove.use",
+                                                          "command.locker.unlock.use",
+                                                          "command.locker.modify.use",
+                                                          "command.locker.key.use",
+                                                          "command.locker.flag.use",
+                                                          "command.locker.give.use",
+                                                          "command.locker.create.private.use",
+                                                          "command.locker.create.public.use",
+                                                          "command.locker.create.donation.use",
+                                                          "command.locker.create.free.use",
+                                                          "command.locker.create.password.use",
+                                                          "command.locker.create.guarded.use",
+                                                          "command.locker.info.show-owner");
 
-    public final Permission CMD_INFO_OTHER = CMD_INFO.child("other");
-    public final Permission CMD_INFO_SHOW_OWNER = CMD_INFO.child("show-owner");
-
-    public final Permission PROTECT = getBasePerm().child("protect");
-    public final Permission ADMIN = getBasePerm().child("admin");
-    public final Permission MODERATOR = getBasePerm().child("moderator");
-
-
+    public final PermissionDescription MODERATOR = register("moderator", "", null, PROTECT, SHOW_OWNER, CMD_INFO_OTHER, ACCESS_OTHER, CMD_REMOVE_OTHER);
 }
