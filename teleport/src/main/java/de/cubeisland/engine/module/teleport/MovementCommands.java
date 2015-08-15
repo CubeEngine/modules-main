@@ -191,8 +191,8 @@ public class MovementCommands
     @Restricted(value = User.class, msg = "Unfortunately teleporting is still not implemented in the game {text:'Life'}!")
     public void back(User context, @Flag boolean unsafe)
     {
-        boolean backPerm = module.perms().COMMAND_BACK_USE.isAuthorized(context);
-        if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(context))
+        boolean backPerm = context.hasPermission(module.perms().COMMAND_BACK_USE.getId());
+        if (context.hasPermission(module.perms().COMMAND_BACK_ONDEATH.getId()))
         {
             Location loc = context.attachOrGet(TeleportAttachment.class, module).getDeathLocation();
             if (!backPerm && loc == null)

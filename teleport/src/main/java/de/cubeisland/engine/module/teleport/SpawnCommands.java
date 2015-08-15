@@ -83,7 +83,7 @@ public class SpawnCommands
         Location loc = world.getSpawnLocation().add(0.5, 0, 0.5);
         for (User aPlayer : um.getOnlineUsers())
         {
-            if (!force && module.perms().COMMAND_SPAWN_PREVENT.isAuthorized(aPlayer))
+            if (!force && aPlayer.hasPermission(module.perms().CMD_SPAWN_PREVENT.getId()))
             {
                 continue;
             }
@@ -100,13 +100,14 @@ public class SpawnCommands
         {
             world = player.asPlayer().getWorld();
         }
-        force = force && module.perms().COMMAND_SPAWN_FORCE.isAuthorized(context) || context.getUniqueId().equals(player.getUniqueId());
+        force = force && context.hasPermission(module.perms().CMD_SPAWN_FORCE.getId()) || context.getUniqueId().equals(
+            player.getUniqueId());
         if (!player.getPlayer().isPresent())
         {
             context.sendTranslated(NEGATIVE, "You cannot teleport an offline player to spawn!");
             return;
         }
-        if (!force && module.perms().COMMAND_SPAWN_PREVENT.isAuthorized(player))
+        if (!force && player.hasPermission(module.perms().CMD_SPAWN_PREVENT.getId()))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to spawn {user}!", player);
             return;
@@ -123,7 +124,7 @@ public class SpawnCommands
     public void tpworld(User context, World world)
     {
         final Location spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
-        if (!module.permsTpWorld().getPermission(world.getName()).isAuthorized(context))
+        if (!context.hasPermission(module.permsTpWorld().getPermission(world.getName()).getId()))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to teleport to this world!");
             return;

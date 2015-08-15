@@ -63,7 +63,7 @@ public class TeleportListener
     public void onDeath(PlayerDeathEvent event)
     {
         User user = um.getExactUser(event.getEntity().getUniqueId());
-        if (module.perms().COMMAND_BACK_ONDEATH.isAuthorized(user))
+        if (user.hasPermission(module.perms().COMMAND_BACK_ONDEATH.getId()))
         {
             user.attachOrGet(TeleportAttachment.class, module).setDeathLocation(user.asPlayer().getLocation());
         }
@@ -81,13 +81,13 @@ public class TeleportListener
         EntityInteractionType type = event.getInteractionType();
         if (type == EntityInteractionTypes.ATTACK)
         {
-            if (module.perms().COMPASS_JUMPTO_LEFT.isAuthorized(event.getUser()))
+            if (event.getUser().hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
             {
                 User user = um.getExactUser(event.getUser().getUniqueId());
                 Location loc;
-                if (event.getBlock().getBlockType().isSolidCube())
+                if (event.getBlock().getType().isSolidCube())
                 {
-                    loc = event.getBlock().add(0.5, 1, 0.5);
+                    loc = event.getLocation().add(0.5, 1, 0.5);
                 }
                 else
                 {
@@ -105,7 +105,7 @@ public class TeleportListener
         }
         else if (type == EntityInteractionTypes.USE)
         {
-            if (module.perms().COMPASS_JUMPTO_RIGHT.isAuthorized(event.getUser()))
+            if (event.getUser().hasPermission(module.perms().COMPASS_JUMPTO_RIGHT.getId()))
             {
                 User user = um.getExactUser(event.getUser().getUniqueId());
                 Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfig().navigation.thru.maxRange,

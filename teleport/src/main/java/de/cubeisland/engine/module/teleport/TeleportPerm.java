@@ -17,84 +17,56 @@
  */
 package de.cubeisland.engine.module.teleport;
 
-import de.cubeisland.engine.service.permission.Permission;
 import de.cubeisland.engine.service.permission.PermissionContainer;
-
-import static de.cubeisland.engine.service.permission.PermDefault.FALSE;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 public class TeleportPerm extends PermissionContainer<Teleport>
 {
+
+
     public TeleportPerm(Teleport module)
     {
         super(module);
     }
 
-    public final Permission COMMAND = getBasePerm().childWildcard("command");
+    final PermissionDescription COMMAND = register("command", "", null);
 
-    private final Permission COMMAND_SPAWN = COMMAND.childWildcard("spawn");
-    /**
-     * Prevents from being teleported to spawn by someone else
-     */
-    public final Permission COMMAND_SPAWN_PREVENT = COMMAND_SPAWN.child("prevent");
-    /**
-     * Allows teleporting a player to spawn even if the player has the prevent permission
-     */
-    public final Permission COMMAND_SPAWN_FORCE = COMMAND_SPAWN.child("force");
+    public final PermissionDescription CMD_SPAWN_PREVENT = register("spawn.prevent",
+                                                                    "Prevents from being teleported to spawn by someone else",
+                                                                    COMMAND);
+    public final PermissionDescription CMD_SPAWN_FORCE = register("spawn.force",
+                                                                  "Allows teleporting a player to spawn even if the player has the prevent permission",
+                                                                  COMMAND);
 
-    private final Permission COMMAND_TP = COMMAND.childWildcard("tp");
-    /**
-     * Ignores all prevent permissions when using the /tp command
-     */
-    public final Permission COMMAND_TP_FORCE = COMMAND_TP.child("force");
-    /**
-     * Allows teleporting another player
-     */
-    public final Permission COMMAND_TP_OTHER = COMMAND_TP.child("other");
+    public final PermissionDescription COMMAND_TP_FORCE = register("tp.force",
+                                                                   "Ignores all prevent permissions when using the /tp command",
+                                                                   COMMAND);
+    public final PermissionDescription COMMAND_TP_OTHER = register("tp.other", "Allows teleporting another player",
+                                                                   COMMAND);
 
-    public final Permission COMMAND_TPPOS_UNSAFE = COMMAND.childWildcard("tppos").child("unsafe");
+    public final PermissionDescription TELEPORT_PREVENT_TP = register("teleport.prevent.tp",
+                                                                      "Prevents from being teleported by someone else",
+                                                                      null);
+    public final PermissionDescription TELEPORT_PREVENT_TPTO = register("teleport.prevent.tpto",
+                                                                        "Prevents from teleporting to you", null);
 
-    private final Permission TELEPORT = getBasePerm().childWildcard("teleport");
-    private final Permission TELEPORT_PREVENT = TELEPORT.newWildcard("prevent");
-    /**
-     * Prevents from being teleported by someone else
-     */
-    public final Permission TELEPORT_PREVENT_TP = TELEPORT_PREVENT.child("tp", FALSE);
-    /**
-     * Prevents from teleporting to you
-     */
-    public final Permission TELEPORT_PREVENT_TPTO = TELEPORT_PREVENT.child("tpto", FALSE);
+    public final PermissionDescription COMMAND_TPALL_FORCE = register("tpall.force",
+                                                                      "Ignores all prevent permissions when using the /tpall command",
+                                                                      COMMAND);
+    public final PermissionDescription COMMAND_TPHERE_FORCE = register("tphere.force",
+                                                                       "Ignores all prevent permissions when using the /tphere command",
+                                                                       COMMAND);
+    public final PermissionDescription COMMAND_TPHEREALL_FORCE = register("tphereall.force",
+                                                                          "Ignores all prevent permissions when using the /tphereall command",
+                                                                          COMMAND);
+    public final PermissionDescription COMMAND_BACK_USE = register("back.use", "Allows using the back command", COMMAND);
+    public final PermissionDescription COMMAND_BACK_ONDEATH = register("back.ondeath",
+                                                                       "Allows using the back command after dieing (if this is not set you won't be able to tp back to your deathpoint)",
+                                                                       COMMAND);
 
-    private final Permission COMMAND_TPALL = COMMAND.childWildcard("tpall");
-    /**
-     * Ignores all prevent permissions when using the /tpall command
-     */
-    public final Permission COMMAND_TPALL_FORCE = COMMAND_TPALL.child("force");
+    public final PermissionDescription COMPASS_JUMPTO_LEFT = register("compass.jumpto.left", "", null);
+    public final PermissionDescription COMPASS_JUMPTO_RIGHT = register("right", "", null);
 
-    private final Permission COMMAND_TPHERE = COMMAND.childWildcard("tphere");
-    /**
-     * Ignores all prevent permissions when using the /tphere command
-     */
-    public final Permission COMMAND_TPHERE_FORCE = COMMAND_TPHERE.child("force");
-
-    private final Permission COMMAND_TPHEREALL = COMMAND.childWildcard("tphereall");
-    /**
-     * Ignores all prevent permissions when using the /tphereall command
-     */
-    public final Permission COMMAND_TPHEREALL_FORCE = COMMAND_TPHEREALL.child("force");
-
-    private final Permission COMMAND_BACK = COMMAND.childWildcard("back");
-
-    /**
-     * Allows using the back command
-     */
-    public final Permission COMMAND_BACK_USE = COMMAND_BACK.child("use");
-    /**
-     * Allows using the back command after dieing (if this is not set you won't be able to tp back to your deathpoint)
-     */
-    public final Permission COMMAND_BACK_ONDEATH = COMMAND_BACK.child("ondeath");
-
-    private final Permission COMPASS_JUMPTO = getBasePerm().childWildcard("compass").childWildcard("jumpto");
-    public final Permission COMPASS_JUMPTO_LEFT = COMPASS_JUMPTO.child("left");
-    public final Permission COMPASS_JUMPTO_RIGHT = COMPASS_JUMPTO.child("right");
+    public final PermissionDescription COMMAND_TPPOS_UNSAFE = register("tppos.unsafe", "", COMMAND);
 
 }

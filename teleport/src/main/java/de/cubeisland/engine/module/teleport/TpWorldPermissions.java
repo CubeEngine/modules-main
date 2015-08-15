@@ -19,10 +19,10 @@ package de.cubeisland.engine.module.teleport;
 
 import java.util.HashMap;
 import java.util.Map;
-import de.cubeisland.engine.service.permission.Permission;
 import de.cubeisland.engine.service.permission.PermissionContainer;
 import de.cubeisland.engine.service.permission.PermissionManager;
 import de.cubeisland.engine.service.world.WorldManager;
+import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.World;
 
 /**
@@ -31,32 +31,31 @@ import org.spongepowered.api.world.World;
 @SuppressWarnings("all")
 public class TpWorldPermissions extends PermissionContainer<Teleport>
 {
-    private final Permission COMMAND_TPWORLD;
-    private final Map<String, Permission> permissions = new HashMap<>();
+    private final Map<String, PermissionDescription> permissions = new HashMap<>();
+    private TeleportPerm perm;
     private PermissionManager pm;
 
     public TpWorldPermissions(Teleport module, TeleportPerm perm, WorldManager wm, PermissionManager pm)
     {
         super(module);
+        this.perm = perm;
         this.pm = pm;
-        COMMAND_TPWORLD = perm.COMMAND.childWildcard("tpworld");
         for (final World world : wm.getWorlds())
         {
             initWorldPermission(world.getName());
         }
     }
 
-    private Permission initWorldPermission(String world)
+    private PermissionDescription initWorldPermission(String world)
     {
-        Permission perm = COMMAND_TPWORLD.child(world);
-        permissions.put(world, perm);
-        pm.registerPermission(module, perm);
-        return perm;
+        PermissionDescription worldPerm = register("tpworld." + world, "", perm.COMMAND);
+        permissions.put(world, worldPerm);
+        return worldPerm;
     }
 
-    public Permission getPermission(String world)
+    public PermissionDescription getPermission(String world)
     {
-        Permission perm = permissions.get(world);
+        PermissionDescription perm = permissions.get(world);
         if (perm == null)
         {
             perm = initWorldPermission(world);

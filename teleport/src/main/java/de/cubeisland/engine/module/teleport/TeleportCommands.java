@@ -74,8 +74,8 @@ public class TeleportCommands
             context.sendTranslated(NEGATIVE, "Teleportation only works with online players!");
             return;
         }
-        force = force && module.perms().COMMAND_TP_FORCE.isAuthorized(context);
-        if (!context.equals(player) && !module.perms().COMMAND_TP_OTHER.isAuthorized(context)) // teleport other persons
+        force = force && context.hasPermission(module.perms().COMMAND_TP_FORCE.getId());
+        if (!context.equals(player) && !context.hasPermission(module.perms().COMMAND_TP_OTHER.getId())) // teleport other persons
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to teleport other people!");
             return;
@@ -83,7 +83,7 @@ public class TeleportCommands
 
         if (!context.equals(player))
         {
-            if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(player)) // teleport the user
+            if (!force && player.hasPermission(module.perms().TELEPORT_PREVENT_TP.getId())) // teleport the user
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to teleport {user}!", player);
                 return;
@@ -91,9 +91,9 @@ public class TeleportCommands
         } // else equals tp -> no need to check tp perm
         if (!context.equals(target))
         {
-            if (module.perms().TELEPORT_PREVENT_TPTO.isAuthorized(target)) // teleport to the target
+            if (target.hasPermission(module.perms().TELEPORT_PREVENT_TPTO.getId())) // teleport to the target
             {
-                if (module.perms().COMMAND_TP_FORCE.isAuthorized(context))
+                if (context.hasPermission(module.perms().COMMAND_TP_FORCE.getId()))
                 {
                     context.sendTranslated(POSITIVE, "Use the {text:-force (-f)} flag to teleport to this player."); //Show force flag if has permission
                 }
@@ -130,8 +130,8 @@ public class TeleportCommands
             context.sendTranslated(NEGATIVE, "You cannot teleport to an offline player!");
             return;
         }
-        force = force && module.perms().COMMAND_TPALL_FORCE.isAuthorized(context.getSource());
-        if (!force && module.perms().TELEPORT_PREVENT_TPTO.isAuthorized(player))
+        force = force && context.getSource().hasPermission(module.perms().COMMAND_TPALL_FORCE.getId());
+        if (!force && player.hasPermission(module.perms().TELEPORT_PREVENT_TPTO.getId()))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to teleport to {user}!", player);
             return;
@@ -139,7 +139,7 @@ public class TeleportCommands
         ArrayList<String> noTp = new ArrayList<>();
         for (User p : um.getOnlineUsers())
         {
-            if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(p))
+            if (!force && p.hasPermission(module.perms().TELEPORT_PREVENT_TP.getId()))
             {
                 noTp.add(p.getName());
                 continue;
@@ -171,13 +171,13 @@ public class TeleportCommands
             context.sendTranslated(NEGATIVE, "You cannot teleport an offline player to you!");
             return;
         }
-        force = force && module.perms().COMMAND_TPHERE_FORCE.isAuthorized(sender);
+        force = force && sender.hasPermission(module.perms().COMMAND_TPHERE_FORCE.getId());
         if ( sender.equals(player))
         {
             context.sendTranslated(NEUTRAL, "You found yourself!");
             return;
         }
-        if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(player))
+        if (!force && player.hasPermission(module.perms().TELEPORT_PREVENT_TP.getId()))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to teleport {user}!", player);
             return;
@@ -199,12 +199,12 @@ public class TeleportCommands
     public void tphereall(CommandContext context, @Flag boolean force, @Flag boolean unsafe)
     {
         User sender = (User)context.getSource();
-        force = force && module.perms().COMMAND_TPHEREALL_FORCE.isAuthorized(context.getSource());
+        force = force && context.getSource().hasPermission(module.perms().COMMAND_TPHEREALL_FORCE.getId());
         ArrayList<String> noTp = new ArrayList<>();
         Location target = sender.asPlayer().getLocation();
         for (User p : um.getOnlineUsers())
         {
-            if (!force && module.perms().TELEPORT_PREVENT_TP.isAuthorized(p))
+            if (!force && p.hasPermission(module.perms().TELEPORT_PREVENT_TP.getId()))
             {
                 noTp.add(p.getName());
                 continue;
@@ -234,7 +234,7 @@ public class TeleportCommands
                       @Flag boolean unsafe)
     {
         Location loc = new Location(world, x, y, z).add(0.5, 0, 0.5);
-        unsafe = unsafe && module.perms().COMMAND_TPPOS_UNSAFE.isAuthorized(context);
+        unsafe = unsafe && context.hasPermission(module.perms().COMMAND_TPPOS_UNSAFE.getId());
         if (!unsafe || player.getPlayer().get().setLocationSafely(loc))
         {
             if (unsafe)
