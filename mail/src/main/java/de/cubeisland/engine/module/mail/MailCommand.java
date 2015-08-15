@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
@@ -34,15 +36,21 @@ import de.cubeisland.engine.service.command.CommandSender;
 import de.cubeisland.engine.service.command.ContainerCommand;
 import de.cubeisland.engine.service.database.Database;
 import de.cubeisland.engine.service.task.TaskManager;
+import de.cubeisland.engine.service.user.TableUser;
 import de.cubeisland.engine.service.user.User;
+import de.cubeisland.engine.service.user.UserEntity;
 import de.cubeisland.engine.service.user.UserManager;
 import org.jooq.DSLContext;
 import org.jooq.Query;
+import org.jooq.Record1;
+import org.jooq.Result;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.text.Texts;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
+import static de.cubeisland.engine.module.mail.storage.TableMail.TABLE_MAIL;
 import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
+import static de.cubeisland.engine.service.user.TableUser.TABLE_USER;
 import static org.spongepowered.api.text.format.TextColors.WHITE;
 
 @Command(name = "mail", desc = "Manages your server mail.")
@@ -127,7 +135,7 @@ public class MailCommand extends ContainerCommand
         for (Mail mail : mails)
         {
             i++;
-            sb.append("\n").append(ChatFormat.WHITE).append(i).append(": ").append(mail.getValue(TableMail.TABLE_MAIL.MESSAGE));
+            sb.append("\n").append(ChatFormat.WHITE).append(i).append(": ").append(mail.getValue(TABLE_MAIL.MESSAGE));
         }
         context.sendTranslated(NEUTRAL, "{user}'s mail: {input#mails}", player, ChatFormat.parseFormats(sb.toString()));
     }
@@ -145,7 +153,7 @@ public class MailCommand extends ContainerCommand
     public void sendAll(CommandSender context, final @Greed(INFINITE) String message)
     {
         Set<User> users = um.getOnlineUsers();
-        final Set<Long> alreadySend = new HashSet<>();
+        final Set<UInteger> alreadySend = new HashSet<>();
         User sender = null;
         if (context instanceof User)
         {
@@ -154,19 +162,18 @@ public class MailCommand extends ContainerCommand
         for (User user : users)
         {
             user.attachOrGet(MailAttachment.class, module).addMail(sender, message);
-            alreadySend.add(user.getId());
+            alreadySend.add(user.getEntity().getId());
         }
         final UInteger senderId = sender == null ? null : sender.getEntity().getId();
         taskManager.runAsynchronousTaskDelayed(this.module, () -> {
             DSLContext dsl = db.getDSL();
-            Collection<Query> queries = new ArrayList<>();
-            for (Long userId : um.getAllIds())
-            {
-                if (!alreadySend.contains(userId))
-                {
-                    queries.add(dsl.insertInto(TableMail.TABLE_MAIL, TableMail.TABLE_MAIL.MESSAGE, TableMail.TABLE_MAIL.USERID, TableMail.TABLE_MAIL.SENDERID).values(message, UInteger.valueOf(userId), senderId));
-                }
-            }
+
+            Collection<Query> queries = dsl.select(TABLE_USER.KEY).from(TABLE_USER).where(TABLE_USER.KEY.notIn(
+                alreadySend)).fetch()
+                       .map(Record1::value1).stream()
+                       .map(userKey -> dsl.insertInto(TABLE_MAIL, TABLE_MAIL.MESSAGE, TABLE_MAIL.USERID, TABLE_MAIL.SENDERID)
+                                          .values(message, userKey, senderId))
+                       .collect(Collectors.toList());
             dsl.batch(queries).execute();
         }, 0);
         context.sendTranslated(POSITIVE, "Sent mail to everyone!");
@@ -185,8 +192,8 @@ public class MailCommand extends ContainerCommand
         try
         {
             Mail mail = attachment.getMails().get(mailId);
-            db.getDSL().delete(TableMail.TABLE_MAIL).where(TableMail.TABLE_MAIL.KEY.eq(mail.getValue(
-                TableMail.TABLE_MAIL.KEY))).execute();
+            db.getDSL().delete(TABLE_MAIL).where(TABLE_MAIL.KEY.eq(mail.getValue(
+                TABLE_MAIL.KEY))).execute();
             context.sendTranslated(POSITIVE, "Deleted Mail #{integer#mailid}", mailId);
         }
         catch (IndexOutOfBoundsException e)
@@ -214,7 +221,7 @@ public class MailCommand extends ContainerCommand
         for (User user : users)
         {
             user.attachOrGet(MailAttachment.class, module).addMail(from, message);
-            if (user.isOnline())
+            if (user.asPlayer().isOnline())
             {
                 user.sendTranslated(NEUTRAL, "You just got a mail from {user}!", from.getName());
             }

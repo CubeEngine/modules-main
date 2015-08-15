@@ -57,12 +57,12 @@ public class MailAttachment extends UserAttachment
         List<Mail> mails = new ArrayList<>();
         for (Mail mail : this.getMails())
         {
-            long senderId = 0;
+            UInteger senderId = UInteger.valueOf(0);
             if (sender instanceof User)
             {
-                senderId = ((User)sender).getId();
+                senderId = ((User)sender).getEntity().getId();
             }
-            if (mail.getValue(TABLE_MAIL.SENDERID).longValue() == senderId)
+            if (mail.getValue(TABLE_MAIL.SENDERID).equals(senderId))
             {
                 mails.add(mail);
             }
