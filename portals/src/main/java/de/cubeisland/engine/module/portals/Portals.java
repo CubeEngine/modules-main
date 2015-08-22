@@ -127,7 +127,14 @@ public class Portals extends Module
             PortalConfig load = reflector.load(PortalConfig.class, file.toFile());
             String fileName = file.getFileName().toString();
             Portal portal = new Portal(this, fileName.substring(0, fileName.lastIndexOf(".yml")), load);
-            this.addPortal(portal);
+            try
+            {
+                this.addPortal(portal);
+            }
+            catch (Exception e)
+            {
+                logger.error("Could not load portal {}", portal.getName());
+            }
         }
         logger.info("{} portals loaded!", this.portals.size());
         logger.debug("in {} chunks", this.chunksWithPortals.size());
@@ -140,8 +147,6 @@ public class Portals extends Module
 
     protected void addPortal(Portal portal)
     {
-        this.portals.put(portal.getName().toLowerCase(), portal);
-
         List<Pair<Integer,Integer>> chunks = portal.getChunks();
         for (Pair<Integer, Integer> chunk : chunks)
         {
@@ -154,6 +159,8 @@ public class Portals extends Module
             }
             list.add(portal);
         }
+
+        this.portals.put(portal.getName().toLowerCase(), portal);
     }
 
     protected void removePortal(Portal portal)

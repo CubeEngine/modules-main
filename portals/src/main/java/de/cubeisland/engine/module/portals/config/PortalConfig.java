@@ -28,6 +28,7 @@ import org.spongepowered.api.entity.player.User;
 @SuppressWarnings("all")
 public class PortalConfig extends ReflectedYaml
 {
+    @Comment("When true portal will attempt to find a safe spot nearby if the destination is not safe")
     public boolean safeTeleport = false;
     public boolean teleportNonPlayers = false;
     public String owner;

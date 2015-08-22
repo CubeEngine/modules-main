@@ -160,13 +160,13 @@ public class MovementCommands
     @Restricted(value = User.class, msg = "Jumping in the console is not allowed! Go play outside!")
     public void jumpTo(User context)
     {
-        Optional<BlockRayHit> end = BlockRay.from(context.asPlayer()).end();
+        Optional<BlockRayHit<World>> end = BlockRay.from(context.asPlayer()).end();
         if (!end.isPresent())
         {
             context.sendTranslated(NEGATIVE, "No block in sight!");
             return;
         }
-        Location loc = end.get().getLocation().add(0.5, 1, 0.5);
+        Location<World> loc = end.get().getLocation().add(0.5, 1, 0.5);
         context.asPlayer().setLocation(loc);
         context.sendTranslated(POSITIVE, "You just jumped!");
     }
@@ -248,7 +248,7 @@ public class MovementCommands
             context.sendTranslated(NEGATIVE, "You cannot move an offline player!");
             return;
         }
-        Optional<BlockRayHit> end = BlockRay.from(context.asPlayer()).end();
+        Optional<BlockRayHit<World>> end = BlockRay.from(context.asPlayer()).end();
         if (!end.isPresent())
         {
             context.sendTranslated(NEGATIVE, "No block in sight!");

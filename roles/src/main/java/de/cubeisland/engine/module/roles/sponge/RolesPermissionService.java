@@ -154,7 +154,7 @@ public class RolesPermissionService implements PermissionService
 
         descriptionMap.put(desc.getId().toLowerCase(), desc);
         descriptions = null;
-        System.out.println(" #PERM#  " + desc.getId().toLowerCase());
+        System.out.print(" #PERM#  " + desc.getId().toLowerCase() + "\n");
         return desc;
     }
 }

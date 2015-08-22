@@ -56,15 +56,14 @@ public class RandomDestination extends Destination
         }
         entity = entity.get(Keys.BASE_VEHICLE).or(entity);
         World world = this.world.getWorld();
-        Location block;
+        Location<World> block;
         Pair<Integer, Chunk> config = module.getRandomDestinationSetting(world);
         Chunk chunk = config.getRight();
         int x = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
         int z = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
         chunk = world.loadChunk(chunk.getPosition().getX() + x * 16, 0, chunk.getPosition().getZ() + z * 16, true).get();
         block = world.getLocation(chunk.getPosition().add(random.nextInt(16), 0, random.nextInt(16)));
-        game.getTeleportHelper().getSafeLocation(chunk.getLocation(random.nextInt(16), world.getDimension().getBuildHeight() / 4,
-                                                                    random.nextInt(16)));
+        block = game.getTeleportHelper().getSafeLocation(block).or(block);
         entity.setLocation(block);
     }
 }

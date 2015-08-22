@@ -32,6 +32,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
@@ -84,14 +85,14 @@ public class TeleportListener
             if (event.getUser().hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
             {
                 User user = um.getExactUser(event.getUser().getUniqueId());
-                Location loc;
+                Location<World> loc;
                 if (event.getBlock().getType().isSolidCube())
                 {
                     loc = event.getLocation().add(0.5, 1, 0.5);
                 }
                 else
                 {
-                    Optional<BlockRayHit> end = BlockRay.from(user.asPlayer()).end();
+                    Optional<BlockRayHit<World>> end = BlockRay.from(user.asPlayer()).end();
                     if (!end.isPresent())
                     {
                         return;
