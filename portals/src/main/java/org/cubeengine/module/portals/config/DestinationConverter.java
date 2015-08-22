@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.portals.config;
+package org.cubeengine.module.portals.config;
 
 import java.util.Map;
 import de.cubeisland.engine.converter.ConversionException;
@@ -25,8 +25,8 @@ import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
 import org.cubeengine.module.core.util.WorldLocation;
+import org.cubeengine.module.portals.config.Destination.Type;
 import org.cubeengine.service.world.ConfigWorld;
-import de.cubeisland.engine.module.portals.config.Destination.Type;
 import org.cubeengine.service.world.WorldManager;
 
 public class DestinationConverter extends SingleClassConverter<Destination>

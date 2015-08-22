@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.portals.config;
+package org.cubeengine.module.portals.config;
 
 import java.util.Random;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
-import de.cubeisland.engine.module.portals.Portal;
-import de.cubeisland.engine.module.portals.Portals;
+import org.cubeengine.module.portals.Portal;
+import org.cubeengine.module.portals.Portals;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.world.World;

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.portals;
+package org.cubeengine.module.portals;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,10 +39,10 @@ import de.cubeisland.engine.modularity.core.Module;
 import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.core.util.LocationUtil;
 import org.cubeengine.module.core.util.Pair;
-import de.cubeisland.engine.module.portals.config.Destination;
-import de.cubeisland.engine.module.portals.config.DestinationReader;
-import de.cubeisland.engine.module.portals.config.DestinationConverter;
-import de.cubeisland.engine.module.portals.config.PortalConfig;
+import org.cubeengine.module.portals.config.Destination;
+import org.cubeengine.module.portals.config.DestinationReader;
+import org.cubeengine.module.portals.config.DestinationConverter;
+import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.task.TaskManager;

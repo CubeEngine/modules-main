@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.portals;
+package org.cubeengine.module.portals;
 
 import java.util.ArrayList;
 import java.util.List;
 import org.cubeengine.module.core.util.Pair;
 import org.cubeengine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.module.portals.config.PortalConfig;
+import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.user.User;
 import org.spongepowered.api.entity.Entity;

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.portals;
+package org.cubeengine.module.portals;
 
 import java.util.Set;
 import de.cubeisland.engine.butler.alias.Alias;
@@ -27,8 +27,8 @@ import de.cubeisland.engine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.WorldLocation;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.core.util.math.shape.Cuboid;
-import de.cubeisland.engine.module.portals.config.Destination;
-import de.cubeisland.engine.module.portals.config.PortalConfig;
+import org.cubeengine.module.portals.config.Destination;
+import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;

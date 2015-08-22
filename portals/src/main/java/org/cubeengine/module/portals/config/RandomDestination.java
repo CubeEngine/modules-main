@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.portals.config;
+package org.cubeengine.module.portals.config;
 
 import java.util.Random;
 import org.cubeengine.module.core.util.Pair;
-import de.cubeisland.engine.module.portals.Portals;
+import org.cubeengine.module.portals.Portals;
 import org.cubeengine.service.world.ConfigWorld;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
