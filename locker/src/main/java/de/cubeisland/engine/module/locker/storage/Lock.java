@@ -332,8 +332,10 @@ public class Lock
 
     private Location getLocation(LockLocationModel model)
     {
-        return new Location(this.manager.wm.getWorld(model.getValue(TABLE_LOCK_LOCATION.WORLD_ID)), model.getValue(
-            TABLE_LOCK_LOCATION.X), model.getValue(TABLE_LOCK_LOCATION.Y), model.getValue(TABLE_LOCK_LOCATION.Z));
+        return new Location(this.manager.wm.getWorld(model.getValue(TABLE_LOCK_LOCATION.WORLD_ID)),
+                            model.getValue(TABLE_LOCK_LOCATION.X).doubleValue(),
+                            model.getValue(TABLE_LOCK_LOCATION.Y).doubleValue(),
+                            model.getValue(TABLE_LOCK_LOCATION.Z).doubleValue());
     }
 
     public boolean isBlockLock()
