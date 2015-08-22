@@ -18,15 +18,15 @@
 package de.cubeisland.engine.module.travel;
 
 import de.cubeisland.engine.module.travel.home.Home;
-import de.cubeisland.engine.service.i18n.I18n;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.formatter.Context;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NONE;
-import static de.cubeisland.engine.service.i18n.formatter.component.ClickComponent.runCommand;
-import static de.cubeisland.engine.service.i18n.formatter.component.HoverComponent.hoverText;
-import static de.cubeisland.engine.service.i18n.formatter.component.StyledComponent.styled;
+import static org.cubeengine.service.i18n.formatter.MessageType.NONE;
+import static org.cubeengine.service.i18n.formatter.component.ClickComponent.runCommand;
+import static org.cubeengine.service.i18n.formatter.component.HoverComponent.hoverText;
+import static org.cubeengine.service.i18n.formatter.component.StyledComponent.styled;
 import static org.spongepowered.api.text.format.TextStyles.UNDERLINE;
 
 public class TpPointFormatter extends AbstractFormatter<TeleportPoint>

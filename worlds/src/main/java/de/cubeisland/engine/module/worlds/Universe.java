@@ -31,19 +31,19 @@ import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import de.cubeisland.engine.service.permission.Permission;
-import de.cubeisland.engine.module.core.util.McUUID;
-import de.cubeisland.engine.module.core.util.Pair;
-import de.cubeisland.engine.module.core.util.StringUtils;
-import de.cubeisland.engine.module.core.util.WorldLocation;
-import de.cubeisland.engine.service.world.ConfigWorld;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.module.core.util.McUUID;
+import org.cubeengine.module.core.util.Pair;
+import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.module.core.util.WorldLocation;
+import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.module.worlds.config.UniverseConfig;
 import de.cubeisland.engine.module.worlds.config.WorldConfig;
 import de.cubeisland.engine.module.worlds.player.PlayerDataConfig;
 import de.cubeisland.engine.reflect.Reflector;
 
-import static de.cubeisland.engine.service.filesystem.FileExtensionFilter.DAT;
-import static de.cubeisland.engine.service.filesystem.FileExtensionFilter.YAML;
+import static org.cubeengine.service.filesystem.FileExtensionFilter.DAT;
+import static org.cubeengine.service.filesystem.FileExtensionFilter.YAML;
 
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.world.Location;

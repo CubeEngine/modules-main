@@ -33,9 +33,9 @@ import de.cubeisland.engine.module.roles.sponge.collection.RoleCollection;
 import de.cubeisland.engine.module.roles.sponge.collection.UserCollection;
 import de.cubeisland.engine.module.roles.sponge.data.DefaultSubjectData;
 import de.cubeisland.engine.reflect.Reflector;
-import de.cubeisland.engine.service.database.Database;
-import de.cubeisland.engine.service.permission.PermissionManager;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.database.Database;
+import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -150,7 +150,8 @@ public class RolesPermissionService implements PermissionService
     protected PermissionDescription addDescription(RolesPermissionDescription desc, Map<String, Tristate> roleAssignments)
     {
         SubjectCollection subjects = getSubjects(SUBJECTS_ROLE_TEMPLATE);
-        roleAssignments.entrySet().forEach(e -> subjects.get(e.getKey()).getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), e.getValue()));
+        roleAssignments.entrySet().forEach(e -> subjects.get(e.getKey()).getTransientSubjectData().setPermission(
+            GLOBAL_CONTEXT, desc.getId(), e.getValue()));
 
         descriptionMap.put(desc.getId().toLowerCase(), desc);
         descriptions = null;

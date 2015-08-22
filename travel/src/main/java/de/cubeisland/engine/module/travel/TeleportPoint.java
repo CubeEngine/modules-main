@@ -19,10 +19,10 @@ package de.cubeisland.engine.module.travel;
 
 import java.util.Set;
 import com.flowpowered.math.vector.Vector3d;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserManager;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserManager;
+import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
 import org.jooq.types.UInteger;

@@ -30,15 +30,15 @@ import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.modularity.core.Module;
 
-import de.cubeisland.engine.module.core.module.ModuleCommands;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.module.core.sponge.CoreModule;
+import org.cubeengine.module.core.module.ModuleCommands;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.module.core.sponge.CoreModule;
 import de.cubeisland.engine.service.permission.Permission;
-import de.cubeisland.engine.service.permission.PermissionManager;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.module.core.util.ChatFormat;
-import de.cubeisland.engine.module.core.util.Profiler;
+import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.service.user.User;
+import org.cubeengine.module.core.util.ChatFormat;
+import org.cubeengine.module.core.util.Profiler;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -46,7 +46,6 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class VanillaCommands

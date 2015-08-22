@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.conomy.account.storage;
 
-import de.cubeisland.engine.service.database.AsyncRecord;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserEntity;
+import org.cubeengine.service.database.AsyncRecord;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserEntity;
 
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 

@@ -29,16 +29,15 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.converter.converter.generic.CollectionConverter;
-import de.cubeisland.engine.module.core.util.ChatFormat;
-import de.cubeisland.engine.module.core.util.StringUtils;
-import de.cubeisland.engine.module.core.util.TimeConversionException;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.command.sender.WrappedCommandSender;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserList;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.module.core.util.ChatFormat;
+import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.module.core.util.TimeConversionException;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.command.sender.WrappedCommandSender;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserList;
+import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.manipulator.mutable.entity.JoinData;
 import org.spongepowered.api.service.ban.BanService;
@@ -50,8 +49,6 @@ import org.spongepowered.api.util.ban.Bans;
 import org.spongepowered.api.util.command.CommandSource;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.module.core.util.ChatFormat.*;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains commands to manage kicks/bans.

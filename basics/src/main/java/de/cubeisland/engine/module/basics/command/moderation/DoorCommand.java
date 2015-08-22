@@ -23,17 +23,17 @@ import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.core.util.math.Vector3;
-import de.cubeisland.engine.module.core.util.math.shape.Sphere;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.module.core.util.math.Vector3;
+import org.cubeengine.module.core.util.math.shape.Sphere;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.block.OpenData;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class DoorCommand
 {

@@ -22,14 +22,14 @@ import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.commands.CommandListener.CommandType;
 import de.cubeisland.engine.module.locker.storage.LockManager;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
 
 @Command(name = "create", desc = "Creates various protections")

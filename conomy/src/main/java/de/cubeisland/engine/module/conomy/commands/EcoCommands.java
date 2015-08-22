@@ -24,14 +24,12 @@ import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserList;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserList;
+import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.data.manipulator.entity.JoinData;
-
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 
 @Command(name = "eco", desc = "Administrative commands for Conomy")
 public class EcoCommands extends ContainerCommand

@@ -24,23 +24,23 @@ import de.cubeisland.engine.butler.parameter.FixedValues;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.core.util.WorldLocation;
-import de.cubeisland.engine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.module.core.util.math.shape.Cuboid;
+import org.cubeengine.module.core.util.WorldLocation;
+import org.cubeengine.module.core.util.math.BlockVector3;
+import org.cubeengine.module.core.util.math.shape.Cuboid;
 import de.cubeisland.engine.module.portals.config.Destination;
 import de.cubeisland.engine.module.portals.config.PortalConfig;
-import de.cubeisland.engine.service.Selector;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.world.ConfigWorld;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.Selector;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 @Command(name = "portals", desc = "The portal commands", alias = "mvp")
 public class PortalCommands extends ContainerCommand

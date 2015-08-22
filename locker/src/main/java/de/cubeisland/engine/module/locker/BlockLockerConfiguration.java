@@ -19,9 +19,8 @@ package de.cubeisland.engine.module.locker;
 
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
+import org.cubeengine.module.core.util.matcher.MaterialMatcher;
 import de.cubeisland.engine.module.locker.storage.ProtectedType;
-import javafx.scene.paint.Material;
 import org.spongepowered.api.block.BlockType;
 
 /**

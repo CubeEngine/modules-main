@@ -19,17 +19,17 @@ package de.cubeisland.engine.module.portals;
 
 import java.util.ArrayList;
 import java.util.List;
-import de.cubeisland.engine.module.core.util.Pair;
-import de.cubeisland.engine.module.core.util.math.BlockVector3;
+import org.cubeengine.module.core.util.Pair;
+import org.cubeengine.module.core.util.math.BlockVector3;
 import de.cubeisland.engine.module.portals.config.PortalConfig;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 public class Portal
 {

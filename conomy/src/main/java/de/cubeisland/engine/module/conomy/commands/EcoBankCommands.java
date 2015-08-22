@@ -18,16 +18,16 @@
 package de.cubeisland.engine.module.conomy.commands;
 
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.service.user.UserManager;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 @Command(name = "bank", desc = "Administrative commands for Conomy Banks.")
 public class EcoBankCommands extends ContainerCommand

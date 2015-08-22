@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.travel.storage;
 
-import de.cubeisland.engine.service.database.AsyncRecord;
+import org.cubeengine.service.database.AsyncRecord;
 import org.jooq.types.UInteger;
 
 import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;

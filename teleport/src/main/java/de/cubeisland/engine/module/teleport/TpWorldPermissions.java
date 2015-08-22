@@ -19,9 +19,9 @@ package de.cubeisland.engine.module.teleport;
 
 import java.util.HashMap;
 import java.util.Map;
-import de.cubeisland.engine.service.permission.PermissionContainer;
-import de.cubeisland.engine.service.permission.PermissionManager;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.World;
 

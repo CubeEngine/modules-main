@@ -28,10 +28,10 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.result.CommandResult;
-import de.cubeisland.engine.module.core.util.ChatFormat;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.module.core.util.ChatFormat;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.service.permission.SubjectData;
@@ -40,8 +40,8 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextBuilder;
 import org.spongepowered.api.text.Texts;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.text.format.TextColors.*;
 
 public class ListCommand

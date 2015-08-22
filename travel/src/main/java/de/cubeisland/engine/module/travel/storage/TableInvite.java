@@ -17,13 +17,13 @@
  */
 package de.cubeisland.engine.module.travel.storage;
 
-import de.cubeisland.engine.module.core.util.Version;
-import de.cubeisland.engine.service.database.Database;
-import de.cubeisland.engine.service.database.Table;
+import org.cubeengine.module.core.util.Version;
+import org.cubeengine.service.database.Database;
+import org.cubeengine.service.database.Table;
 import org.jooq.TableField;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.service.user.TableUser.TABLE_USER;
+import static org.cubeengine.service.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
 public class TableInvite extends Table<TeleportInvite>

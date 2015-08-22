@@ -19,9 +19,9 @@ package de.cubeisland.engine.module.mail.storage;
 
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import de.cubeisland.engine.service.database.AsyncRecord;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.service.database.AsyncRecord;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserManager;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;

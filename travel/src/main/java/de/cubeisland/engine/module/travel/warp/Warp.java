@@ -17,10 +17,9 @@
  */
 package de.cubeisland.engine.module.travel.warp;
 
-import java.util.Locale;
-import de.cubeisland.engine.service.permission.PermissionManager;
-import de.cubeisland.engine.service.user.UserManager;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.service.user.UserManager;
+import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.TeleportPoint;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportPointModel;

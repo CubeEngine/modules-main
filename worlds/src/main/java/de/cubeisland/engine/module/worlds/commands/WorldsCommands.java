@@ -30,17 +30,17 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.module.core.util.ChatFormat;
-import de.cubeisland.engine.module.core.util.Pair;
-import de.cubeisland.engine.module.core.util.WorldLocation;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
+import org.cubeengine.module.core.util.ChatFormat;
+import org.cubeengine.module.core.util.Pair;
+import org.cubeengine.module.core.util.WorldLocation;
 
-import de.cubeisland.engine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.service.world.ConfigWorld;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.module.core.util.math.BlockVector3;
+import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.module.worlds.Multiverse;
 import de.cubeisland.engine.module.worlds.Universe;
 import de.cubeisland.engine.module.worlds.Worlds;
@@ -49,8 +49,7 @@ import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.service.filesystem.FileExtensionFilter.YAML;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.service.filesystem.FileExtensionFilter.YAML;
 
 @Command(name = "worlds", desc = "Worlds commands")
 public class WorldsCommands extends ContainerCommand

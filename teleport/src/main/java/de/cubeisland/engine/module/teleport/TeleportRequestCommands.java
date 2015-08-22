@@ -20,11 +20,9 @@ package de.cubeisland.engine.module.teleport;
 import java.util.UUID;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.service.task.TaskManager;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserManager;
-
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
+import org.cubeengine.service.task.TaskManager;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserManager;
 
 /**
  * Contains Teleport-Request commands.

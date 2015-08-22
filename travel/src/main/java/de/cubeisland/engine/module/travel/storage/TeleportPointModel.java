@@ -19,9 +19,9 @@ package de.cubeisland.engine.module.travel.storage;
 
 import javax.persistence.Transient;
 import com.flowpowered.math.vector.Vector3d;
-import de.cubeisland.engine.service.database.AsyncRecord;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.database.AsyncRecord;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 

@@ -23,27 +23,20 @@ import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.BasicsUser;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
-import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.roles.RoleAppliedEvent;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.entity.GameModeData;
 import org.spongepowered.api.data.manipulator.entity.InvulnerabilityData;
 import org.spongepowered.api.data.manipulator.entity.TameableData;
 import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerChangeWorldEvent;
 import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
-import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
-import org.spongepowered.api.event.entity.player.PlayerQuitEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Texts;
 
 import static de.cubeisland.engine.module.basics.storage.TableBasicsUser.TABLE_BASIC_USER;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
-import static java.lang.Integer.MAX_VALUE;
-import static org.spongepowered.api.event.Order.POST;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 public class GeneralsListener
 {

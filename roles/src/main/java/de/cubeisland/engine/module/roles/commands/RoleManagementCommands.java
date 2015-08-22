@@ -35,13 +35,12 @@ import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.PriorityConverter;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.ContainerCommand;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.ContainerCommand;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static de.cubeisland.engine.module.roles.commands.RoleCommands.toSet;
 
 @Alias("manrole")

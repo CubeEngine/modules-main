@@ -22,13 +22,13 @@ import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.service.filesystem.FileManager;
-import de.cubeisland.engine.module.core.sponge.EventManager;
-import de.cubeisland.engine.service.command.CommandManager;
-import de.cubeisland.engine.service.permission.PermissionManager;
-import de.cubeisland.engine.service.task.TaskManager;
-import de.cubeisland.engine.service.user.UserManager;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.filesystem.FileManager;
+import org.cubeengine.module.core.sponge.EventManager;
+import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.service.task.TaskManager;
+import org.cubeengine.service.user.UserManager;
+import org.cubeengine.service.world.WorldManager;
 
 /**
  * /setworldspawn 	Sets the world spawn.

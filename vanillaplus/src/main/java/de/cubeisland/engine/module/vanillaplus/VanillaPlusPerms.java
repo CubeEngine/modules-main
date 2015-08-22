@@ -18,7 +18,7 @@
 package de.cubeisland.engine.module.vanillaplus;
 
 import de.cubeisland.engine.service.permission.Permission;
-import de.cubeisland.engine.service.permission.PermissionContainer;
+import org.cubeengine.service.permission.PermissionContainer;
 
 import static de.cubeisland.engine.service.permission.PermDefault.FALSE;
 

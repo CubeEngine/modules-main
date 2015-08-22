@@ -18,11 +18,11 @@
 package de.cubeisland.engine.module.travel;
 
 import java.util.Set;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 
 public class TpPointCommand extends ContainerCommand
 {

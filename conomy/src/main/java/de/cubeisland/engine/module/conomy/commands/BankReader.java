@@ -22,9 +22,9 @@ import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import de.cubeisland.engine.service.i18n.I18n;
+import org.cubeengine.service.i18n.I18n;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class BankReader implements ArgumentReader<BankAccount>
 {

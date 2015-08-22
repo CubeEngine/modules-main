@@ -18,7 +18,7 @@
 package de.cubeisland.engine.module.roles.storage;
 
 import java.util.UUID;
-import de.cubeisland.engine.service.database.AsyncRecord;
+import org.cubeengine.service.database.AsyncRecord;
 
 import static de.cubeisland.engine.module.roles.storage.TableOption.TABLE_META;
 

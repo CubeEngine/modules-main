@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.module.core.util.StringUtils;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.matcher.Match;
 import org.spongepowered.api.world.Location;
 import org.bukkit.Material;
@@ -34,12 +34,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Skeleton;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
+import org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.monster.Skeleton;
 import org.spongepowered.api.item.ItemTypes;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class SpawnMob
 {

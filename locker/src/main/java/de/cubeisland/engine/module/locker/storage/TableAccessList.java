@@ -17,13 +17,13 @@
  */
 package de.cubeisland.engine.module.locker.storage;
 
-import de.cubeisland.engine.module.core.util.Version;
-import de.cubeisland.engine.service.database.AutoIncrementTable;
-import de.cubeisland.engine.service.database.Database;
+import org.cubeengine.module.core.util.Version;
+import org.cubeengine.service.database.AutoIncrementTable;
+import org.cubeengine.service.database.Database;
 import org.jooq.TableField;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.service.user.TableUser.TABLE_USER;
+import static org.cubeengine.service.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static org.jooq.impl.SQLDataType.SMALLINT;
 

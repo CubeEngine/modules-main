@@ -22,16 +22,16 @@ import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.user.User;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 @Command(name = "admin", desc = "Manages the module", alias = "manadmin")
 public class ManagementCommands extends ContainerCommand

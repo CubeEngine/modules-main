@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.travel;
 
-import de.cubeisland.engine.service.permission.PermissionContainer;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 public class TravelPerm extends PermissionContainer<Travel>

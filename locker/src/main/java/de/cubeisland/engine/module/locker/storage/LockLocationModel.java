@@ -17,8 +17,8 @@
  */
 package de.cubeisland.engine.module.locker.storage;
 
-import de.cubeisland.engine.service.database.AsyncRecord;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.database.AsyncRecord;
+import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 

@@ -31,11 +31,11 @@ import de.cubeisland.engine.module.conomy.commands.BankReader;
 import de.cubeisland.engine.module.conomy.commands.EcoBankCommands;
 import de.cubeisland.engine.module.conomy.commands.EcoCommands;
 import de.cubeisland.engine.module.conomy.commands.MoneyCommand;
-import de.cubeisland.engine.service.filesystem.FileManager;
-import de.cubeisland.engine.service.i18n.I18n;
-import de.cubeisland.engine.service.command.CommandManager;
-import de.cubeisland.engine.service.database.Database;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.service.filesystem.FileManager;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.database.Database;
+import org.cubeengine.service.user.UserManager;
 
 public class Conomy extends Module
 {

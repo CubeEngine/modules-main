@@ -20,10 +20,10 @@ package de.cubeisland.engine.module.locker.storage;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.UUID;
-import de.cubeisland.engine.service.database.AsyncRecord;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.module.core.util.ChatFormat;
-import de.cubeisland.engine.module.core.util.StringUtils;
+import org.cubeengine.service.database.AsyncRecord;
+import org.cubeengine.service.user.User;
+import org.cubeengine.module.core.util.ChatFormat;
+import org.cubeengine.module.core.util.StringUtils;
 
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 

@@ -19,17 +19,17 @@ package de.cubeisland.engine.module.locker.commands;
 
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.user.User;
 import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.storage.Lock;
 import de.cubeisland.engine.module.locker.storage.LockManager;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.item.inventory.Carrier;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 @Command(name = "admin", desc = "Administrate the protections")
 public class LockerAdminCommands extends ContainerCommand

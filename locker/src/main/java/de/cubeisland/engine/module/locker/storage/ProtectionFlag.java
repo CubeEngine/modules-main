@@ -24,11 +24,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import de.cubeisland.engine.module.core.util.StringUtils;
-import de.cubeisland.engine.module.core.util.matcher.StringMatcher;
+import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.module.core.util.matcher.StringMatcher;
 
-import static de.cubeisland.engine.module.core.util.StringUtils.startsWithIgnoreCase;
+import static org.cubeengine.module.core.util.StringUtils.startsWithIgnoreCase;
 import static java.util.stream.Collectors.toList;
 
 /**

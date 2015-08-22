@@ -18,9 +18,9 @@
 package de.cubeisland.engine.module.roles.storage;
 
 import java.util.UUID;
-import de.cubeisland.engine.service.database.Database;
-import de.cubeisland.engine.service.database.Table;
-import de.cubeisland.engine.module.core.util.Version;
+import org.cubeengine.service.database.Database;
+import org.cubeengine.service.database.Table;
+import org.cubeengine.module.core.util.Version;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 

@@ -20,13 +20,13 @@ package de.cubeisland.engine.module.roles.commands;
 import java.util.Collections;
 import java.util.Set;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.service.command.ContainerCommand;
+import org.cubeengine.service.command.ContainerCommand;
 import de.cubeisland.engine.module.roles.Roles;
 import org.spongepowered.api.service.permission.context.Context;
 
-import static de.cubeisland.engine.module.core.util.ChatFormat.GOLD;
-import static de.cubeisland.engine.module.core.util.ChatFormat.WHITE;
-import static de.cubeisland.engine.module.core.util.ChatFormat.YELLOW;
+import static org.cubeengine.module.core.util.ChatFormat.GOLD;
+import static org.cubeengine.module.core.util.ChatFormat.WHITE;
+import static org.cubeengine.module.core.util.ChatFormat.YELLOW;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 @Command(name = "roles", desc = "Manages the roles")

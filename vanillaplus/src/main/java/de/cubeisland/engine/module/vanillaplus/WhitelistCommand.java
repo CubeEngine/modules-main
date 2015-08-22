@@ -20,15 +20,15 @@ package de.cubeisland.engine.module.vanillaplus;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.command.sender.ConsoleCommandSender;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.command.sender.ConsoleCommandSender;
+import org.cubeengine.service.user.User;
 import org.spongepowered.api.Game;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 /**
  * All Whitelist related commands:

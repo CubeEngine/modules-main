@@ -18,9 +18,9 @@
 package de.cubeisland.engine.module.basics;
 
 import de.cubeisland.engine.service.permission.Permission;
-import de.cubeisland.engine.service.permission.PermissionContainer;
-import de.cubeisland.engine.service.permission.PermissionManager;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.service.world.WorldManager;
 
 import static de.cubeisland.engine.service.permission.PermDefault.FALSE;
 

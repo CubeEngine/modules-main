@@ -25,19 +25,19 @@ import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.core.util.StringUtils;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserList;
+import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserList;
 import org.spongepowered.api.entity.player.gamemode.GameMode;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
 import org.spongepowered.api.text.Text;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.entity.player.gamemode.GameModes.CREATIVE;
 import static org.spongepowered.api.entity.player.gamemode.GameModes.SURVIVAL;
 

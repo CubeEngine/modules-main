@@ -18,15 +18,15 @@
 package de.cubeisland.engine.module.portals;
 
 import java.util.List;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.EntityTeleportEvent;
 import org.spongepowered.api.event.entity.player.PlayerMoveEvent;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 public class PortalListener
 {

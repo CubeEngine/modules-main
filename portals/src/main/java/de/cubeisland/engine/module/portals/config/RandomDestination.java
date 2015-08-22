@@ -18,10 +18,10 @@
 package de.cubeisland.engine.module.portals.config;
 
 import java.util.Random;
-import de.cubeisland.engine.module.core.util.Pair;
+import org.cubeengine.module.core.util.Pair;
 import de.cubeisland.engine.module.portals.Portals;
-import de.cubeisland.engine.service.world.ConfigWorld;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;

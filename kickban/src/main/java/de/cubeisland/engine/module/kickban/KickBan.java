@@ -22,9 +22,9 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
-import de.cubeisland.engine.service.command.CommandManager;
-import de.cubeisland.engine.service.filesystem.FileManager;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.filesystem.FileManager;
+import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ban.BanService;
 

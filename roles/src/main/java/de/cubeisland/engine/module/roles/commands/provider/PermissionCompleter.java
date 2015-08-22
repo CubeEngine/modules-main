@@ -24,8 +24,6 @@ import java.util.List;
 import java.util.Set;
 import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.completer.Completer;
-import de.cubeisland.engine.service.permission.PermissionManager;
-import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 

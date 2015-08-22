@@ -23,16 +23,15 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.core.util.StringUtils;
-import de.cubeisland.engine.module.core.util.matcher.EnchantMatcher;
-import de.cubeisland.engine.module.core.util.matcher.MaterialMatcher;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.module.core.util.matcher.EnchantMatcher;
+import org.cubeengine.module.core.util.matcher.MaterialMatcher;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.ITEM_DATA;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
 

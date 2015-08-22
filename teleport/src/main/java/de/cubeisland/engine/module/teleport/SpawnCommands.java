@@ -25,17 +25,17 @@ import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.core.sponge.EventManager;
-import de.cubeisland.engine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserManager;
-import de.cubeisland.engine.service.world.WorldSetSpawnEvent;
+import org.cubeengine.module.core.sponge.EventManager;
+import org.cubeengine.module.core.util.math.BlockVector3;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserManager;
+import org.cubeengine.service.world.WorldSetSpawnEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 /**
  * Contains spawn-commands.

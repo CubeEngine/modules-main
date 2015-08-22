@@ -18,9 +18,9 @@
 package de.cubeisland.engine.module.teleport;
 
 import com.google.common.base.Optional;
-import de.cubeisland.engine.module.core.util.LocationUtil;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.module.core.util.LocationUtil;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.entity.EntityInteractionType;
 import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
@@ -34,8 +34,8 @@ import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.item.ItemTypes.COMPASS;
 
 public class TeleportListener

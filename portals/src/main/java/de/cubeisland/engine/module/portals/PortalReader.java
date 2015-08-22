@@ -21,7 +21,7 @@ import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.user.User;
 
 public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal>
 {

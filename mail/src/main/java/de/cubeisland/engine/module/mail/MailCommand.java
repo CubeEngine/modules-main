@@ -17,40 +17,33 @@
  */
 package de.cubeisland.engine.module.mail;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.core.util.ChatFormat;
+import org.cubeengine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.mail.storage.Mail;
-import de.cubeisland.engine.module.mail.storage.TableMail;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.database.Database;
-import de.cubeisland.engine.service.task.TaskManager;
-import de.cubeisland.engine.service.user.TableUser;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserEntity;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.database.Database;
+import org.cubeengine.service.task.TaskManager;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserManager;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record1;
-import org.jooq.Result;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.text.Texts;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
 import static de.cubeisland.engine.module.mail.storage.TableMail.TABLE_MAIL;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
-import static de.cubeisland.engine.service.user.TableUser.TABLE_USER;
+import static org.cubeengine.service.user.TableUser.TABLE_USER;
 import static org.spongepowered.api.text.format.TextColors.WHITE;
 
 @Command(name = "mail", desc = "Manages your server mail.")

@@ -28,15 +28,14 @@ import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
-import de.cubeisland.engine.service.permission.PermissionManager;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.service.filesystem.FileExtensionFilter.YAML;
+import static org.cubeengine.service.filesystem.FileExtensionFilter.YAML;
 import static org.spongepowered.api.service.permission.PermissionService.SUBJECTS_GROUP;
 
 public class RoleCollection extends BaseSubjectCollection<RoleSubject>

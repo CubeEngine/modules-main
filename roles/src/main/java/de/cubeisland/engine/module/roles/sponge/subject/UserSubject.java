@@ -17,7 +17,6 @@
  */
 package de.cubeisland.engine.module.roles.sponge.subject;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -26,14 +25,13 @@ import java.util.UUID;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.data.UserSubjectData;
-import de.cubeisland.engine.service.permission.PermissionManager;
+import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.User;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.command.CommandSource;

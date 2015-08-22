@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.worlds.player;
 
-import de.cubeisland.engine.service.world.ConfigWorld;
+import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 
 @SuppressWarnings("all")

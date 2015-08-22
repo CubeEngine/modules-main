@@ -24,10 +24,10 @@ import de.cubeisland.engine.converter.converter.SingleClassConverter;
 import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
-import de.cubeisland.engine.module.core.util.WorldLocation;
-import de.cubeisland.engine.service.world.ConfigWorld;
+import org.cubeengine.module.core.util.WorldLocation;
+import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.module.portals.config.Destination.Type;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.world.WorldManager;
 
 public class DestinationConverter extends SingleClassConverter<Destination>
 {

@@ -17,13 +17,12 @@
  */
 package de.cubeisland.engine.module.portals.config;
 
-import de.cubeisland.engine.module.core.util.WorldLocation;
-import de.cubeisland.engine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.service.world.ConfigWorld;
+import org.cubeengine.module.core.util.WorldLocation;
+import org.cubeengine.module.core.util.math.BlockVector3;
+import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.spongepowered.api.entity.player.User;
 
 @SuppressWarnings("all")
 public class PortalConfig extends ReflectedYaml

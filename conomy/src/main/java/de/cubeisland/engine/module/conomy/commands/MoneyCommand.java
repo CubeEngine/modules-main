@@ -27,20 +27,20 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserList;
-import de.cubeisland.engine.module.core.util.ChatFormat;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserList;
+import org.cubeengine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.UserAccount;
 import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.service.user.UserManager;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 
 @Command(name = "money", desc = "Manage your money")

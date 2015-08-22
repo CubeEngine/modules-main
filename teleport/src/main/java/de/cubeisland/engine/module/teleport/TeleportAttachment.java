@@ -18,7 +18,7 @@
 package de.cubeisland.engine.module.teleport;
 
 import java.util.UUID;
-import de.cubeisland.engine.service.user.UserAttachment;
+import org.cubeengine.service.user.UserAttachment;
 import org.spongepowered.api.world.Location;
 
 public class TeleportAttachment extends UserAttachment

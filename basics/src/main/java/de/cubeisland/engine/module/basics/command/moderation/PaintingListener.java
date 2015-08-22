@@ -22,9 +22,9 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.user.User;
 import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.service.user.UserManager;
+import org.cubeengine.service.user.UserManager;
 
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.entity.EntityTypes;
@@ -33,8 +33,8 @@ import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 public class PaintingListener
 {

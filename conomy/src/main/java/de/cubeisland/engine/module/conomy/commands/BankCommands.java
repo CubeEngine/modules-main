@@ -26,18 +26,16 @@ import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.module.core.util.ChatFormat;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.user.User;
+import org.cubeengine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import de.cubeisland.engine.module.conomy.account.UserAccount;
-import de.cubeisland.engine.service.user.UserManager;
-
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
+import org.cubeengine.service.user.UserManager;
 
 @Command(name = "bank", desc = "Manages your money in banks.")
 public class BankCommands extends ContainerCommand

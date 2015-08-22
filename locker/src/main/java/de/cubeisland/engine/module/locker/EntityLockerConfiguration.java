@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.locker;
 
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.module.core.util.matcher.EntityMatcher;
+import org.cubeengine.module.core.util.matcher.EntityMatcher;
 import de.cubeisland.engine.module.locker.storage.ProtectedType;
 import org.spongepowered.api.entity.EntityType;
 

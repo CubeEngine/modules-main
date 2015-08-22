@@ -17,7 +17,7 @@
  */
 package de.cubeisland.engine.module.teleport;
 
-import de.cubeisland.engine.service.world.ConfigWorld;
+import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;

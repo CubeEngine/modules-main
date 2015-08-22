@@ -36,18 +36,18 @@ import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.module.core.sponge.EventManager;
-import de.cubeisland.engine.module.core.util.LocationUtil;
-import de.cubeisland.engine.module.core.util.Pair;
+import org.cubeengine.module.core.sponge.EventManager;
+import org.cubeengine.module.core.util.LocationUtil;
+import org.cubeengine.module.core.util.Pair;
 import de.cubeisland.engine.module.portals.config.Destination;
 import de.cubeisland.engine.module.portals.config.DestinationReader;
 import de.cubeisland.engine.module.portals.config.DestinationConverter;
 import de.cubeisland.engine.module.portals.config.PortalConfig;
-import de.cubeisland.engine.service.Selector;
-import de.cubeisland.engine.service.command.CommandManager;
-import de.cubeisland.engine.service.task.TaskManager;
-import de.cubeisland.engine.service.user.UserManager;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.Selector;
+import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.task.TaskManager;
+import org.cubeengine.service.user.UserManager;
+import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.Entity;
@@ -56,7 +56,7 @@ import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.service.filesystem.FileExtensionFilter.YAML;
+import static org.cubeengine.service.filesystem.FileExtensionFilter.YAML;
 import static java.util.stream.Collectors.toSet;
 
 @ModuleInfo(name = "Portals", description = "Create and use portals")

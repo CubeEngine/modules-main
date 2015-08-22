@@ -18,7 +18,7 @@
 package de.cubeisland.engine.module.locker;
 
 import de.cubeisland.engine.module.locker.commands.LockerCommands;
-import de.cubeisland.engine.service.permission.PermissionContainer;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 @SuppressWarnings("all")

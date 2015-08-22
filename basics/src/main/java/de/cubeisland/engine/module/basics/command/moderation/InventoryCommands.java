@@ -20,17 +20,17 @@ package de.cubeisland.engine.module.basics.command.moderation;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.module.core.util.InventoryGuardFactory;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.user.User;
+import org.cubeengine.module.core.util.InventoryGuardFactory;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 /**
  * Contains commands that allow to modify an inventory.

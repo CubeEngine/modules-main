@@ -17,14 +17,14 @@
  */
 package de.cubeisland.engine.module.conomy.account.storage;
 
-import de.cubeisland.engine.module.core.util.Version;
-import de.cubeisland.engine.service.database.AutoIncrementTable;
-import de.cubeisland.engine.service.database.Database;
+import org.cubeengine.module.core.util.Version;
+import org.cubeengine.service.database.AutoIncrementTable;
+import org.cubeengine.service.database.Database;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.service.user.TableUser.TABLE_USER;
+import static org.cubeengine.service.user.TableUser.TABLE_USER;
 import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
 
 public class TableBankAccess extends AutoIncrementTable<BankAccessModel, UInteger>

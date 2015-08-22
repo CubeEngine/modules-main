@@ -17,8 +17,8 @@
  */
 package de.cubeisland.engine.module.locker.storage;
 
-import de.cubeisland.engine.service.database.AsyncRecord;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.database.AsyncRecord;
+import org.cubeengine.service.user.User;
 
 import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;

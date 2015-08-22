@@ -25,8 +25,8 @@ import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.world.World;
 

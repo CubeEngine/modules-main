@@ -24,8 +24,8 @@ import de.cubeisland.engine.module.roles.config.Priority;
 import de.cubeisland.engine.module.roles.config.RoleConfig;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.data.RoleSubjectData;
-import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.permission.PermissionManager;
+import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.command.CommandSource;
 

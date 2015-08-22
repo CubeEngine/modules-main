@@ -29,15 +29,14 @@ import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.module.roles.Roles;
 import de.cubeisland.engine.module.roles.commands.provider.PermissionCompleter;
 import de.cubeisland.engine.module.roles.sponge.subject.RoleSubject;
-import de.cubeisland.engine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.ContainerCommand;
-import de.cubeisland.engine.service.user.User;
+import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.user.User;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static de.cubeisland.engine.module.roles.commands.RoleCommands.LISTELEM_VALUE;
 
 @Command(name = "user", desc = "Manage users")

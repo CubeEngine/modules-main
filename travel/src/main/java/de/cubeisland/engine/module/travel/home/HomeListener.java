@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.travel.home;
 
-import de.cubeisland.engine.service.user.User;
-import de.cubeisland.engine.service.user.UserManager;
-import de.cubeisland.engine.service.world.WorldManager;
+import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.UserManager;
+import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.Travel;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
@@ -28,7 +28,6 @@ import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
 
-import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.event.Order.EARLY;
 
 public class HomeListener

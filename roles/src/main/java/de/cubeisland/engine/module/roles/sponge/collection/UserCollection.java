@@ -19,11 +19,8 @@ package de.cubeisland.engine.module.roles.sponge.collection;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
 import de.cubeisland.engine.module.roles.sponge.RolesPermissionService;
 import de.cubeisland.engine.module.roles.sponge.subject.UserSubject;
-import de.cubeisland.engine.service.database.Database;
-import de.cubeisland.engine.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
