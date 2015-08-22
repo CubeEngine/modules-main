@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel;
+package org.cubeengine.module.travel;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -25,13 +25,13 @@ import java.util.Set;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
-import de.cubeisland.engine.module.travel.storage.TeleportInvite;
-import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
+import org.cubeengine.module.travel.storage.TeleportInvite;
+import org.cubeengine.module.travel.storage.TeleportPointModel;
 import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
-import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
+import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
+import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
 public class InviteManager
 {

@@ -15,24 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel.home;
+package org.cubeengine.module.travel.home;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.cubeengine.module.travel.InviteManager;
+import org.cubeengine.module.travel.TelePointManager;
+import org.cubeengine.module.travel.Travel;
+import org.cubeengine.module.travel.storage.TableTeleportPoint;
+import org.cubeengine.module.travel.storage.TeleportPointModel;
+import org.cubeengine.module.travel.storage.TeleportPointModel.TeleportType;
+import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
-import de.cubeisland.engine.module.travel.InviteManager;
-import de.cubeisland.engine.module.travel.TelePointManager;
-import de.cubeisland.engine.module.travel.Travel;
-import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
 import org.spongepowered.api.world.Location;
-
-import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.TeleportType.HOME;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PRIVATE;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 
 public class HomeManager extends TelePointManager<Home>
 {
@@ -51,7 +49,8 @@ public class HomeManager extends TelePointManager<Home>
     @Override
     public void load()
     {
-        for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.TYPE.eq(HOME.value)).fetch())
+        for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TableTeleportPoint.TABLE_TP_POINT).where(
+            TableTeleportPoint.TABLE_TP_POINT.TYPE.eq(TeleportType.HOME.value)).fetch())
         {
             this.addPoint(new Home(teleportPoint, this.module, pm, wm, um));
         }
@@ -65,7 +64,7 @@ public class HomeManager extends TelePointManager<Home>
         {
             throw new IllegalArgumentException("Tried to create duplicate home!");
         }
-        TeleportPointModel model = this.dsl.newRecord(TABLE_TP_POINT).newTPPoint(location, rotation, wm, name, owner, null, HOME, publicVisibility ? PUBLIC : PRIVATE);
+        TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT).newTPPoint(location, rotation, wm, name, owner, null, TeleportType.HOME, publicVisibility ? Visibility.PUBLIC : Visibility.PRIVATE);
         Home home = new Home(model, this.module, pm, wm, um);
         model.insertAsync().exceptionally(this::handle);
         this.addPoint(home);

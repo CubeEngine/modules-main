@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel;
+package org.cubeengine.module.travel;
 
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -35,13 +35,13 @@ import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
-import de.cubeisland.engine.module.travel.home.HomeCommand;
-import de.cubeisland.engine.module.travel.home.HomeListener;
-import de.cubeisland.engine.module.travel.home.HomeManager;
-import de.cubeisland.engine.module.travel.storage.TableInvite;
-import de.cubeisland.engine.module.travel.storage.TableTeleportPoint;
-import de.cubeisland.engine.module.travel.warp.WarpCommand;
-import de.cubeisland.engine.module.travel.warp.WarpManager;
+import org.cubeengine.module.travel.home.HomeCommand;
+import org.cubeengine.module.travel.home.HomeListener;
+import org.cubeengine.module.travel.home.HomeManager;
+import org.cubeengine.module.travel.storage.TableInvite;
+import org.cubeengine.module.travel.storage.TableTeleportPoint;
+import org.cubeengine.module.travel.warp.WarpCommand;
+import org.cubeengine.module.travel.warp.WarpManager;
 
 @ModuleInfo(name = "Travel", description = "Travel anywhere")
 public class Travel extends Module

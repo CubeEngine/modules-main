@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel.home;
+package org.cubeengine.module.travel.home;
 
+import org.cubeengine.module.travel.Travel;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
-import de.cubeisland.engine.module.travel.Travel;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
 import org.spongepowered.api.entity.EntityInteractionTypes;

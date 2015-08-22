@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel.storage;
+package org.cubeengine.module.travel.storage;
 
 import javax.persistence.Transient;
 import com.flowpowered.math.vector.Vector3d;
@@ -25,7 +25,7 @@ import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
+import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
 public class TeleportPointModel extends AsyncRecord<TeleportPointModel>
 {

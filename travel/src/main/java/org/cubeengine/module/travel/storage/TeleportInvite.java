@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel.storage;
+package org.cubeengine.module.travel.storage;
 
 import org.cubeengine.service.database.AsyncRecord;
 import org.jooq.types.UInteger;
 
-import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
+import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
 
 public class TeleportInvite extends AsyncRecord<TeleportInvite>
 {

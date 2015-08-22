@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel;
+package org.cubeengine.module.travel;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -30,12 +30,12 @@ import org.cubeengine.module.core.util.math.Vector3;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.user.User;
 import org.cubeengine.module.core.util.StringUtils;
-import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
+import org.cubeengine.module.travel.storage.TeleportPointModel;
 import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.world.Location;
 
-import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
+import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
 public abstract class TelePointManager<T extends TeleportPoint>
 {

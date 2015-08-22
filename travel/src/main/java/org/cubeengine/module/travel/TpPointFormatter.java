@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel;
+package org.cubeengine.module.travel;
 
-import de.cubeisland.engine.module.travel.home.Home;
+import org.cubeengine.module.travel.home.Home;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;

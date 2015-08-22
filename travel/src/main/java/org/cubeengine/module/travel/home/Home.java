@@ -15,19 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel.home;
+package org.cubeengine.module.travel.home;
 
-import de.cubeisland.engine.module.travel.TeleportPoint;
-import de.cubeisland.engine.module.travel.Travel;
-import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
-import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
+import org.cubeengine.module.travel.TeleportPoint;
+import org.cubeengine.module.travel.Travel;
+import org.cubeengine.module.travel.storage.TeleportPointModel;
+import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
+import org.cubeengine.module.travel.storage.TableTeleportPoint;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.service.permission.PermissionDescription;
-
-import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 
 public class Home extends TeleportPoint
 {
@@ -37,7 +35,7 @@ public class Home extends TeleportPoint
     {
         super(teleportPoint, module, wm, um);
         this.pm = pm;
-        if (teleportPoint.getValue(TABLE_TP_POINT.VISIBILITY) == PUBLIC.value)
+        if (teleportPoint.getValue(TableTeleportPoint.TABLE_TP_POINT.VISIBILITY) == Visibility.PUBLIC.value)
         {
             this.permission = this.generatePublicPerm();
             return;
@@ -49,7 +47,7 @@ public class Home extends TeleportPoint
     {
         super.setVisibility(visibility);
         model.updateAsync();
-        if (visibility == PUBLIC)
+        if (visibility == Visibility.PUBLIC)
         {
             this.permission = generatePublicPerm();
             this.iManager.removeInvites(this);

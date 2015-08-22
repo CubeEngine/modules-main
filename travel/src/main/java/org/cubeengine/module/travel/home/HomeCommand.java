@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel.home;
+package org.cubeengine.module.travel.home;
 
 import java.util.Set;
 import de.cubeisland.engine.butler.CommandInvocation;
@@ -30,6 +30,10 @@ import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
 import de.cubeisland.engine.butler.result.CommandResult;
 import de.cubeisland.engine.modularity.core.Maybe;
+import org.cubeengine.module.travel.TpPointCommand;
+import org.cubeengine.module.travel.Travel;
+import org.cubeengine.module.travel.storage.TeleportInvite;
+import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.CommandSender;
@@ -43,17 +47,12 @@ import org.cubeengine.module.core.util.math.Cuboid;
 import org.cubeengine.module.core.util.math.shape.Shape;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
-import de.cubeisland.engine.module.travel.TpPointCommand;
-import de.cubeisland.engine.module.travel.Travel;
-import de.cubeisland.engine.module.travel.storage.TeleportInvite;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
-import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PRIVATE;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
+import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
 import static java.util.stream.Collectors.toSet;
 
 @Command(name = "home", desc = "Teleport to your home")
@@ -459,7 +458,7 @@ public class HomeCommand extends TpPointCommand
             sender.sendTranslated(NEGATIVE, "This home is already private!");
             return;
         }
-        h.setVisibility(PRIVATE);
+        h.setVisibility(Visibility.PRIVATE);
         if (h.isOwnedBy(sender))
         {
             sender.sendTranslated(POSITIVE, "Your home {name} is now private", h.getName());
@@ -487,7 +486,7 @@ public class HomeCommand extends TpPointCommand
             sender.sendTranslated(NEGATIVE, "This home is already public!");
             return;
         }
-        h.setVisibility(PUBLIC);
+        h.setVisibility(Visibility.PUBLIC);
         if (h.isOwnedBy(sender))
         {
             sender.sendTranslated(POSITIVE, "Your home {name} is now public", h.getName());

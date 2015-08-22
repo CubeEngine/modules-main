@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel.storage;
+package org.cubeengine.module.travel.storage;
 
 import org.cubeengine.service.database.AutoIncrementTable;
 import org.cubeengine.service.database.Database;

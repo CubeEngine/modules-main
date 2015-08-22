@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel.warp;
+package org.cubeengine.module.travel.warp;
 
 import java.util.Set;
 import de.cubeisland.engine.butler.CommandInvocation;
@@ -28,6 +28,10 @@ import de.cubeisland.engine.butler.parametric.Greed;
 import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.module.travel.TpPointCommand;
+import org.cubeengine.module.travel.Travel;
+import org.cubeengine.module.travel.storage.TeleportInvite;
+import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.command.exception.PermissionDeniedException;
@@ -36,17 +40,12 @@ import org.cubeengine.service.confirm.ConfirmResult;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
-import de.cubeisland.engine.module.travel.TpPointCommand;
-import de.cubeisland.engine.module.travel.Travel;
-import de.cubeisland.engine.module.travel.storage.TeleportInvite;
 import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.module.core.util.ChatFormat.DARK_GREEN;
 import static org.cubeengine.module.core.util.ChatFormat.YELLOW;
-import static de.cubeisland.engine.module.travel.storage.TableInvite.TABLE_INVITE;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PRIVATE;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
+import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
 import static java.util.stream.Collectors.toSet;
 
 @Command(name = "warp", desc = "Teleport to a warp")
@@ -435,7 +434,7 @@ public class WarpCommand extends TpPointCommand
             sender.sendTranslated(NEGATIVE, "This warp is already private!");
             return;
         }
-        w.setVisibility(PRIVATE);
+        w.setVisibility(Visibility.PRIVATE);
         if (w.isOwnedBy(sender))
         {
             sender.sendTranslated(POSITIVE, "Your warp {name} is now private", w.getName());
@@ -462,7 +461,7 @@ public class WarpCommand extends TpPointCommand
             sender.sendTranslated(NEGATIVE, "This warp is already public!");
             return;
         }
-        w.setVisibility(PUBLIC);
+        w.setVisibility(Visibility.PUBLIC);
         if (w.isOwnedBy(sender))
         {
             sender.sendTranslated(POSITIVE, "Your warp {name} is now public", w.getName());

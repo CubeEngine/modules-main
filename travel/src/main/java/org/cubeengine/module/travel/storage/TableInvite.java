@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel.storage;
+package org.cubeengine.module.travel.storage;
 
 import org.cubeengine.module.core.util.Version;
 import org.cubeengine.service.database.Database;
@@ -24,7 +24,6 @@ import org.jooq.TableField;
 import org.jooq.types.UInteger;
 
 import static org.cubeengine.service.user.TableUser.TABLE_USER;
-import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
 public class TableInvite extends Table<TeleportInvite>
 {
@@ -37,7 +36,7 @@ public class TableInvite extends Table<TeleportInvite>
         super(prefix + "teleportinvites", new Version(1), db);
         this.setPrimaryKey(USERKEY, TELEPORTPOINT);
         this.addForeignKey(TABLE_USER.getPrimaryKey(), USERKEY);
-        this.addForeignKey(TABLE_TP_POINT.getPrimaryKey(), TELEPORTPOINT);
+        this.addForeignKey(TableTeleportPoint.TABLE_TP_POINT.getPrimaryKey(), TELEPORTPOINT);
         this.addFields(TELEPORTPOINT, USERKEY);
         TABLE_INVITE = this;
     }

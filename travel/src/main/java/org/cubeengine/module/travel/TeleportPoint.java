@@ -15,22 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.travel;
+package org.cubeengine.module.travel;
 
 import java.util.Set;
 import com.flowpowered.math.vector.Vector3d;
+import org.cubeengine.module.travel.storage.TeleportPointModel;
+import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
-import de.cubeisland.engine.module.travel.storage.TeleportPointModel;
-import de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.Location;
 
-import static de.cubeisland.engine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
-import static de.cubeisland.engine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
+import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
 public abstract class TeleportPoint
 {
@@ -179,7 +178,7 @@ public abstract class TeleportPoint
 
     public boolean isPublic()
     {
-        return this.getVisibility() == PUBLIC;
+        return this.getVisibility() == Visibility.PUBLIC;
     }
 
     public boolean canAccess(User user)
