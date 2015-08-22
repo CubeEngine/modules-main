@@ -19,7 +19,9 @@ package de.cubeisland.engine.module.basics;
 
 import java.util.List;
 import de.cubeisland.engine.module.basics.Basics;
+import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.data.manipulator.tileentity.SignData;
+import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.block.tileentity.SignChangeEvent;
 import org.spongepowered.api.service.permission.Subject;
@@ -45,11 +47,11 @@ public class ColoredSigns
         if (module.perms().SIGN_COLORED.isAuthorized((Subject)event.getCause().get())) // ALL colors
         {
             SignData newData = event.getNewData();
-            List<Text> lines = newData.getLines();
+            ListValue<Text> lines = newData.lines();
             for (int i = 0; i < lines.size(); i++)
             {
                 final Text text = lines.get(i);
-                newData.setLine(i, Texts.legacy().fromUnchecked(Texts.toPlain(text)));
+                lines.set(i, Texts.legacy().fromUnchecked(Texts.toPlain(text)));
             }
             event.setNewData(newData);
         }

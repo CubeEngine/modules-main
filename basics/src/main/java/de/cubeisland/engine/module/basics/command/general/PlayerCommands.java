@@ -42,6 +42,8 @@ import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.service.user.UserList;
 import de.cubeisland.engine.service.user.UserManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.text.Texts;
@@ -49,6 +51,7 @@ import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.service.i18n.formatter.MessageType.*;
 import static java.text.DateFormat.SHORT;
+import static java.text.DateFormat.getAvailableLocales;
 import static org.spongepowered.api.entity.player.gamemode.GameModes.CREATIVE;
 
 public class PlayerCommands
@@ -80,13 +83,13 @@ public class PlayerCommands
                 return;
             }
             User sender = (User)context;
-            sender.setFoodLevel(20);
-            sender.setSaturation(20);
-            sender.setExhaustion(0);
+            sender.asPlayer().offer(Keys.FOOD_LEVEL, 20);
+            sender.asPlayer().offer(Keys.SATURATION, 20.0);
+            sender.asPlayer().offer(Keys.EXHAUSTION, 0.0);
             context.sendTranslated(POSITIVE, "You are now fed!");
             return;
         }
-        if (!module.perms().COMMAND_FEED_OTHER.isAuthorized(context))
+        if (!context.hasPermission(module.perms().COMMAND_FEED_OTHER))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to feed other players!");
             return;
@@ -112,9 +115,9 @@ public class PlayerCommands
             {
                 user.sendTranslated(POSITIVE, "You got fed by {user}!", context);
             }
-            user.setFoodLevel(20);
-            user.setSaturation(20);
-            user.setExhaustion(0);
+            user.asPlayer().offer(Keys.FOOD_LEVEL, 20);
+            user.asPlayer().offer(Keys.SATURATION, 20.0);
+            user.asPlayer().offer(Keys.EXHAUSTION, 0.0);
         }
     }
 
@@ -130,13 +133,13 @@ public class PlayerCommands
                 return;
             }
             User sender = (User)context;
-            sender.setFoodLevel(0);
-            sender.setSaturation(0);
-            sender.setExhaustion(4);
+            sender.asPlayer().offer(Keys.FOOD_LEVEL, 0);
+            sender.asPlayer().offer(Keys.SATURATION, 0.0);
+            sender.asPlayer().offer(Keys.EXHAUSTION, 4.0);
             context.sendTranslated(NEGATIVE, "You are now starving!");
             return;
         }
-        if (!module.perms().COMMAND_STARVE_OTHER.isAuthorized(context))
+        if (!context.hasPermission(module.perms().COMMAND_STARVE_OTHER))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to let other players starve!");
             return;
@@ -162,9 +165,9 @@ public class PlayerCommands
             {
                 user.sendTranslated(NEUTRAL, "You are suddenly starving!");
             }
-            user.setFoodLevel(0);
-            user.setSaturation(0);
-            user.setExhaustion(4);
+            user.asPlayer().offer(Keys.FOOD_LEVEL, 0);
+            user.asPlayer().offer(Keys.SATURATION, 0.0);
+            user.asPlayer().offer(Keys.EXHAUSTION, 4.0);
         }
     }
 
@@ -179,11 +182,11 @@ public class PlayerCommands
                 return;
             }
             User sender = (User)context;
-            sender.setHealth(sender.getMaxHealth());
+            sender.asPlayer().offer(Keys.HEALTH, sender.asPlayer().get(Keys.MAX_HEALTH).get());
             sender.sendTranslated(POSITIVE, "You are now healed!");
             return;
         }
-        if (!module.perms().COMMAND_HEAL_OTHER.isAuthorized(context))
+        if (!context.hasPermission(module.perms().COMMAND_HEAL_OTHER))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to heal other players!");
             return;
@@ -209,7 +212,7 @@ public class PlayerCommands
             {
                 user.sendTranslated(POSITIVE, "You got healed by {sender}!", context);
             }
-            user.setHealth(user.getMaxHealth());
+            user.asPlayer().offer(Keys.HEALTH, user.asPlayer().get(Keys.MAX_HEALTH).get());
         }
     }
 
@@ -224,11 +227,10 @@ public class PlayerCommands
             return;
         }
 
-        Date lastPlayed = player.getData(JoinData.class).get().getFirstPlayed();
+        Date lastPlayed = player.get(Keys.FIRST_DATE_PLAYED).get();
         if (System.currentTimeMillis() - lastPlayed.getTime() <= SEVEN_DAYS) // If less than 7 days show timeframe instead of date
         {
-            context.sendTranslated(NEUTRAL, "{user} was last seen {input#date}.", player, TimeUtil.format(
-                context.getLocale(), new Date(lastPlayed.getTime())));
+            context.sendTranslated(NEUTRAL, "{user} was last seen {input#date}.", player, TimeUtil.format(context.getLocale(), new Date(lastPlayed.getTime())));
             return;
         }
         Date date = new Date(lastPlayed.getTime());
@@ -242,7 +244,7 @@ public class PlayerCommands
     @Command(desc = "Displays informations from a player!")
     public void whois(CommandSender context, User player)
     {
-        if (player.isOnline())
+        if (player.asPlayer().isOnline())
         {
             context.sendTranslated(NEUTRAL, "Nickname: {user}", player);
         }
@@ -326,59 +328,55 @@ public class PlayerCommands
             }
             other = true;
         }
-        BasicsUserEntity bUser = module.getBasicsUser(player.asPlayer()).getEntity();
-        bUser.setValue(TABLE_BASIC_USER.GODMODE, !bUser.getValue(TABLE_BASIC_USER.GODMODE));
-        player.setInvulnerable(bUser.getValue(TABLE_BASIC_USER.GODMODE));
-        /*
-        InvulnerabilityData data = ((CoreModule)core).getGame().getRegistry().getManipulatorRegistry().getBuilder(InvulnerabilityData.class).get().create();
-        data.setInvulnerableTicks(100000000);
-        offer(data);
-         */
-        if (bUser.getValue(TABLE_BASIC_USER.GODMODE))
+
+        Integer invTime = player.asPlayer().get(Keys.INVULNERABILITY).or(0);
+        if (invTime > 0)
         {
+            player.asPlayer().remove(Keys.INVULNERABILITY);
             if (!other)
             {
-                context.sendTranslated(POSITIVE, "You are now invincible!");
+                context.sendTranslated(NEUTRAL, "You are no longer invincible!");
                 return;
             }
-            player.sendTranslated(POSITIVE, "You are now invincible!");
-            context.sendTranslated(POSITIVE, "{user} is now invincible!", player);
+            player.sendTranslated(NEUTRAL, "You are no longer invincible!");
+            context.sendTranslated(NEUTRAL, "{user} is no longer invincible!", player);
             return;
         }
+        player.asPlayer().offer(Keys.INVULNERABILITY, Integer.MAX_VALUE);
         if (!other)
         {
-            context.sendTranslated(NEUTRAL, "You are no longer invincible!");
+            context.sendTranslated(POSITIVE, "You are now invincible!");
             return;
         }
-        player.sendTranslated(NEUTRAL, "You are no longer invincible!");
-        context.sendTranslated(NEUTRAL, "{user} is no longer invincible!", player);
+        player.sendTranslated(POSITIVE, "You are now invincible!");
+        context.sendTranslated(POSITIVE, "{user} is now invincible!", player);
     }
 
     @Command(desc = "Changes your walkspeed.")
-    public void walkspeed(CommandSender context, Float speed, @Default User player)
+    public void walkspeed(CommandSender context, Double speed, @Default User player)
     {
         boolean other = false;
         if (!context.equals(player))
         {
-            if (!module.perms().COMMAND_WALKSPEED_OTHER.isAuthorized(context))
+            if (!context.hasPermission(module.perms().COMMAND_WALKSPEED_OTHER))
             {
                 context.sendTranslated(NEGATIVE, "You are not allowed to change the walk speed of an other player!");
                 return;
             }
             other = true;
         }
-        if (!player.isOnline())
+        if (!player.getUser().isOnline())
         {
             context.sendTranslated(NEGATIVE, "{user} is offline!", player.getName());
             return;
         }
         if (speed >= 0 && speed <= 10)
         {
-            player.setWalkSpeed(speed / 10f);
+            player.asPlayer().offer(Keys.WALKING_SPEED, speed / 10.0);
             player.sendTranslated(POSITIVE, "You can now walk at {decimal:2}!", speed);
             return;
         }
-        player.setWalkSpeed(0.2f);
+        player.asPlayer().offer(Keys.WALKING_SPEED, 0.2);
         if (speed != null && speed > 9000)
         {
             player.sendTranslated(NEGATIVE, "It's over 9000!");
@@ -387,14 +385,14 @@ public class PlayerCommands
     }
 
     @Command(desc = "Lets you fly away")
-    public void fly(CommandSender context,@Optional Float flyspeed, @Default @Named("player") User player)
+    public void fly(CommandSender context, @Optional Float flyspeed, @Default @Named("player") User player)
     {
         // new cmd system does not provide a way for defaultProvider to give custom messages
         //context.sendTranslated(NEUTRAL, "{text:ProTip}: If your server flies away it will go offline.");
         //context.sendTranslated(NEUTRAL, "So... Stopping the Server in {text:3..:color=RED}");
 
         // PermissionChecks
-        if (!context.equals(player) && !module.perms().COMMAND_FLY_OTHER.isAuthorized(context))
+        if (!context.equals(player) && !context.hasPermission(module.perms().COMMAND_FLY_OTHER))
         {
             context.sendTranslated(NEGATIVE, "You are not allowed to change the fly mode of other player!");
             return;
@@ -404,7 +402,7 @@ public class PlayerCommands
         {
             if (flyspeed >= 0 && flyspeed <= 10)
             {
-                player.setFlySpeed(flyspeed / 10f);
+                player.asPlayer().offer(Keys.FLYING_SPEED, flyspeed / 10f);
                 player.sendTranslated(POSITIVE, "You can now fly at {decimal#speed:2}!", flyspeed);
                 if (!player.equals(context))
                 {
@@ -419,14 +417,14 @@ public class PlayerCommands
                 }
                 context.sendTranslated(NEGATIVE, "FlySpeed has to be a Number between {text:0} and {text:10}!");
             }
-            player.setAllowFlight(true);
-            player.setFlying(true);
+            player.asPlayer().offer(Keys.CAN_FLY, true);
+            player.asPlayer().offer(Keys.FLYING, true);
             return;
         }
-        player.setAllowFlight(!player.getAllowFlight());
-        if (player.getAllowFlight())
+        player.asPlayer().offer(Keys.CAN_FLY, !player.asPlayer().getValue(Keys.CAN_FLY));
+        if (player.asPlayer().getValue(Keys.CAN_FLY))
         {
-            player.setFlySpeed(0.1f);
+            player.asPlayer().offer(FLYING_SPEED, 0.1);
             player.sendTranslated(POSITIVE, "You can now fly!");
             if (!player.equals(context))
             {
@@ -443,9 +441,4 @@ public class PlayerCommands
 
 
 
-    @Command(alias = "roll", desc = "Shows a random number from 0 to 100")
-    public void rand(CommandSender context)
-    {
-        this.um.broadcastTranslatedStatus(NEUTRAL, "rolled a {integer}!", context, new Random().nextInt(100));
-    }
 }

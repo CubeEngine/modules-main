@@ -30,11 +30,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
+import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.module.core.sponge.EventManager;
 import de.cubeisland.engine.service.command.CommandManager;
 import de.cubeisland.engine.service.command.CommandSender;
-import de.cubeisland.engine.service.permission.Permission;
 import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.module.core.util.McUUID;
 import de.cubeisland.engine.module.core.util.StringUtils;
@@ -55,11 +55,13 @@ import static org.spongepowered.api.world.DimensionTypes.END;
 import static org.spongepowered.api.world.DimensionTypes.NETHER;
 import static org.spongepowered.api.world.DimensionTypes.OVERWORLD;
 
-import org.spongepowered.api.data.manipulator.entity.JoinData;
-import org.spongepowered.api.data.manipulator.entity.RespawnLocationData;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.entity.RespawnLocationData;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.entity.EntityEnterPortalEvent;
+import org.spongepowered.api.event.entity.EntityExitPortalEvent;
 import org.spongepowered.api.event.entity.EntityTeleportEvent;
 import org.spongepowered.api.event.entity.player.PlayerChangeWorldEvent;
 import org.spongepowered.api.event.entity.player.PlayerDeathEvent;
@@ -68,7 +70,9 @@ import org.spongepowered.api.event.entity.player.PlayerLeaveBedEvent;
 import org.spongepowered.api.event.entity.player.PlayerQuitEvent;
 import org.spongepowered.api.event.entity.player.PlayerRespawnEvent;
 import org.spongepowered.api.event.world.WorldLoadEvent;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.world.Dimension;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -106,8 +110,6 @@ public class Multiverse
 
         this.dirPlayers = modulePath.resolve("players"); // config for last world
         Files.createDirectories(this.dirPlayers);
-
-        this.updateToUUID();
 
         this.dirErrors = modulePath.resolve("errors");
         Files.createDirectories(dirErrors);
@@ -198,44 +200,6 @@ public class Multiverse
             this.config.save();
         }
         em.registerListener(this.module, this);
-    }
-
-    private void updateToUUID()
-    {
-        try
-        {
-            Map<String,Path> playerNames = new HashMap<>();
-            for (Path path : Files.newDirectoryStream(this.dirPlayers, YAML))
-            {
-                String name = StringUtils.stripFileExtension(path.getFileName().toString());
-                if (!McUUID.UUID_PATTERN.matcher(name).find())
-                {
-                    playerNames.put(name, path);
-                }
-            }
-            if (playerNames.isEmpty())
-            {
-                return;
-            }
-            logger.info("Converting {} PlayerConfigs...", playerNames.size());
-            Map<String,UUID> uuids = McUUID.getUUIDForNames(playerNames.keySet());
-            for (Entry<String, UUID> entry : uuids.entrySet())
-            {
-                if (entry.getValue() != null)
-                {
-                    Path oldPath = playerNames.get(entry.getKey());
-                    PlayerConfig load = reflector.load(PlayerConfig.class, oldPath.toFile(), false);
-                    load.setFile(this.dirPlayers.resolve(entry.getValue().toString() + YAML.getExtention()).toFile());
-                    load.lastName = entry.getKey();
-                    load.save();
-                    Files.delete(oldPath);
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            throw new IllegalStateException(e); // TODO better exception
-        }
     }
 
     private void searchUniverses(Map<String, Set<World>> found, Collection<World> worldList, CommandSender sender)
@@ -338,7 +302,7 @@ public class Multiverse
                         errorFile.getFileName().toString());
             PlayerDataConfig pdc = reflector.create(PlayerDataConfig.class);
             pdc.setHead(new SimpleDateFormat().format(new Date()) + " " +
-                            Texts.toPlain(((Player)player).getDisplayNameData().getDisplayName()) + "(" + player.getUniqueId() + ") ported to " + player.getWorld().getName() +
+                            player.getName() + "(" + player.getUniqueId() + ") ported to " + player.getWorld().getName() +
                             " but couldn't create the universe",
                         "This are the items the player had previously. They got overwritten!");
             pdc.setFile(errorFile.toFile());
@@ -367,96 +331,60 @@ public class Multiverse
         {
             event.setCancelled(true); // TODO check if player has access to the world he is currently in
             User user = um.getExactUser(player.getUniqueId());
-            user.sendTranslated(NEGATIVE, "You are not allowed to enter the universe {name#universe}!", universe.getName());
+            user.sendTranslated(NEGATIVE, "You are not allowed to enter the universe {name#universe}!",
+                                universe.getName());
         }
     }
 
+
+    // TODO handle different Netherportal / Endportal behaviour
     @Subscribe
-    public void onPortalUse(PlayerPortalEvent event)
+    public void onPortalEnter(EntityEnterPortalEvent event)
     {
-        World world = event.getPlayer().getWorld();
-        Universe universe = this.getUniverseFrom(world);
-        TravelAgent agent = event.getPortalTravelAgent();
-        switch (event.getCause())
-        {
-        case NETHER_PORTAL:
-            if (universe.hasNetherTarget(world))
-            {
-                event.setTo(universe.handleNetherTarget(event.getFrom(), agent));
-                event.useTravelAgent(true);
-            }
-            break;
-        case END_PORTAL:
-            if (universe.hasEndTarget(world))
-            {
-                event.setTo(universe.handleEndTarget(event.getFrom()));
-                event.useTravelAgent(event.getTo().getWorld().getEnvironment() == Environment.THE_END);
-            }
-            break;
-        }
+        Universe universe = getUniverseFrom(event.getEntity().getWorld());
+        //universe.handleNetherTarget()
+        //universe.handleEndTarget()
     }
 
     @Subscribe
-    public void onEntityPortal(EntityPortalEvent event)
+    public void onPortalExit(EntityExitPortalEvent event)
     {
-        World world = event.getEntity().getWorld();
-        Universe fromUniverse = this.getUniverseFrom(world);
-        TravelAgent agent = event.getPortalTravelAgent();
-        if (event.getTo() == null)
+    }
+
+
+    @Subscribe
+    public void onUniverseChange(EntityTeleportEvent event) // TODO instead PortalEvent?
+    {
+        Location oldLoc = event.getOldLocation();
+        Location newLoc = event.getNewLocation();
+        if (oldLoc.getExtent().equals(newLoc.getExtent()))
         {
             return;
         }
-        switch (event.getTo().getWorld().getEnvironment())
+        if (oldLoc.getExtent() instanceof World && newLoc.getExtent() instanceof World)
         {
-        case NETHER:
-            if (fromUniverse.hasNetherTarget(world))
-            {
-                event.setTo(fromUniverse.handleNetherTarget(event.getFrom(), agent));
-                event.useTravelAgent(true);
-            }
-            break;
-        case THE_END:
-            if (fromUniverse.hasEndTarget(world))
-            {
-                event.setTo(fromUniverse.handleEndTarget(event.getEntity().getLocation()));
-                event.useTravelAgent(true);
-            }
-            break;
-        case NORMAL:
-            if (event.getFrom().getWorld().getEnvironment() == Environment.THE_END)
-            {
-                event.setTo(fromUniverse.handleEndTarget(event.getFrom()));
-            }
-            else
-            {
-                event.setTo(fromUniverse.handleNetherTarget(event.getFrom(), event.getPortalTravelAgent()));
-                event.useTravelAgent(true);
-            }
-        }
-        if (this.getUniverseFrom(event.getTo().getWorld()) != fromUniverse) // Changing universe
-        {
-            if (event.getEntity() instanceof Player)
+            Universe oldUniverse = getUniverseFrom(((World)oldLoc.getExtent()));
+            Universe newUniverse = getUniverseFrom(((World)newLoc.getExtent()));
+            if (oldUniverse == newUniverse)
             {
                 return;
             }
-            Universe toUniverse = this.getUniverseFrom(event.getTo().getWorld());
-            if (fromUniverse.getConfig().entityTp.enable && toUniverse.getConfig().entityTp.enable)
+
+            if (!(event.getEntity() instanceof Player))
             {
-                if (event.getEntity() instanceof InventoryHolder)
+                // Can Entities teleport?
+                if (oldUniverse.getConfig().entityTp.enable && newUniverse.getConfig().entityTp.enable)
                 {
-                    if (fromUniverse.getConfig().entityTp.inventory && toUniverse.getConfig().entityTp.inventory)
-                    {
-                        return;
-                    }
-                    else
+                    event.setCancelled(true);
+                }
+                if (event.getEntity() instanceof Carrier)
+                {
+                    // Can Carriers (InventoryHolders) teleport?
+                    if (oldUniverse.getConfig().entityTp.inventory && newUniverse.getConfig().entityTp.inventory)
                     {
                         event.setCancelled(true);
                     }
                 }
-            }
-            else
-            {
-                event.setCancelled(true);
             }
         }
     }
@@ -464,7 +392,7 @@ public class Multiverse
     @Subscribe(order = Order.EARLY)
     public void onJoin(PlayerJoinEvent event)
     {
-        if (this.config.adjustFirstSpawn && !event.getUser().getData(JoinData.class).isPresent()) // TODO
+        if (this.config.adjustFirstSpawn && !event.getUser().get(Keys.FIRST_DATE_PLAYED).isPresent())
         {
             Universe universe = this.universes.get(this.config.mainUniverse);
             World world = universe.getMainWorld();
@@ -493,7 +421,7 @@ public class Multiverse
             world = event.getUser().getWorld();
         }
         Universe universe = this.getUniverseFrom(world);
-        event.setRespawnLocation(universe.getRespawnLocation(world, event.isBedSpawn(), event.getRespawnLocation()));
+        event.setNewRespawnLocation(universe.getRespawnLocation(world, event.isBedSpawn(), event.getRespawnLocation()));
     }
 
     @Subscribe
@@ -505,9 +433,14 @@ public class Multiverse
     @Subscribe
     public void onBedLeave(final PlayerLeaveBedEvent event)
     {
-        // TODO #waitingForBukkit for a better solution https://bukkit.atlassian.net/browse/BUKKIT-1916
+        if (!event.wasSpawnSet())
+        {
+            return;
+        }
         if (!this.getUniverseFrom((World)event.getBed().getExtent()).getWorldConfig((World)event.getBed().getExtent()).spawn.allowBedRespawn)
         {
+            Vector3d vector3d = event.getUser().get(Keys.RESPAWN_LOCATIONS).get().get(event.getEntity().getWorld().getUniqueId());
+            event.setSpawnLocation();
             // Wait until spawn is set & reset it
             final Location spawnLocation = event.getUser().getOrCreate(RespawnLocationData.class).get().getRespawnLocation()
             tm.runTaskDelayed(module, () -> event.getUser().offer(event.getUser().getOrCreate(RespawnLocationData.class).get().setRespawnLocation(spawnLocation)), 1);

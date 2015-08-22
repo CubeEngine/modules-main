@@ -46,6 +46,8 @@ import de.cubeisland.engine.service.world.WorldManager;
 import de.cubeisland.engine.module.travel.TpPointCommand;
 import de.cubeisland.engine.module.travel.Travel;
 import de.cubeisland.engine.module.travel.storage.TeleportInvite;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
@@ -362,10 +364,10 @@ public class HomeCommand extends TpPointCommand
             Set<TeleportInvite> invites = this.iManager.getInvites(home.getModel());
             if (!invites.isEmpty())
             {
-                sender.sendMessage(YELLOW + "  " + home.getName() + ":");
+                sender.sendMessage(Texts.of(TextColors.GOLD, "  ", home.getName(), ":"));
                 for (TeleportInvite invite : invites)
                 {
-                    sender.sendMessage("    " + DARK_GREEN + um.getUser(invite.getValue(TABLE_INVITE.USERKEY)).getDisplayName());
+                    sender.sendMessage(Texts.of("    ", TextColors.DARK_GREEN, um.getUser(invite.getValue(TABLE_INVITE.USERKEY)).getDisplayName()));
                 }
             }
         }

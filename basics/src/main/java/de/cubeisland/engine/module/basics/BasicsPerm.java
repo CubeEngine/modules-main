@@ -72,7 +72,6 @@ public class BasicsPerm extends PermissionContainer<Basics>
     /**
      * Without this permission the player will loose god-mode leaving the server or changing the world
      */
-    public final Permission COMMAND_GOD_KEEP = COMMAND_GOD.child("keep");
 
     private final Permission COMMAND_BUTCHER = COMMAND.childWildcard("butcher");
     private final Permission COMMAND_BUTCHER_FLAG = COMMAND_BUTCHER.childWildcard("flag");

@@ -29,7 +29,6 @@ import de.cubeisland.engine.butler.parametric.Default;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Named;
 import de.cubeisland.engine.butler.parametric.Optional;
-import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.core.util.matcher.TimeMatcher;
 import de.cubeisland.engine.module.core.util.matcher.WorldMatcher;
 import de.cubeisland.engine.service.command.CommandContext;

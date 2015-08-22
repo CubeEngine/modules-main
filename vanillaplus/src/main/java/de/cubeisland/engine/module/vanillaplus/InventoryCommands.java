@@ -56,7 +56,7 @@ public class InventoryCommands
                 return;
             }
         }
-        player.getInventory().clear();
+        player.getUser().getInventory().clear();
         org.spongepowered.api.entity.player.User user = player.getOfflinePlayer();
         if (removeArmor)
         {

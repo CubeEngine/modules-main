@@ -17,6 +17,7 @@
  */
 package de.cubeisland.engine.module.basics.command.general;
 
+import java.util.UUID;
 import com.google.common.base.Optional;
 import de.cubeisland.engine.module.basics.Basics;
 import de.cubeisland.engine.module.basics.BasicsAttachment;
@@ -26,6 +27,7 @@ import de.cubeisland.engine.module.core.util.ChatFormat;
 import de.cubeisland.engine.module.roles.RoleAppliedEvent;
 import de.cubeisland.engine.service.user.User;
 import de.cubeisland.engine.service.user.UserManager;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.entity.GameModeData;
 import org.spongepowered.api.data.manipulator.entity.InvulnerabilityData;
 import org.spongepowered.api.data.manipulator.entity.TameableData;
@@ -69,93 +71,19 @@ public class GeneralsListener
     }
 
     @Subscribe
-    public void onLeave(PlayerQuitEvent event)
-    {
-        BasicsUserEntity bUser = this.module.getBasicsUser(event.getUser()).getEntity();
-        if (!module.perms().COMMAND_GOD_KEEP.isAuthorized(event.getUser()))
-        {
-            bUser.setValue(TABLE_BASIC_USER.GODMODE, false);
-        }
-        bUser.updateAsync();
-        if (!module.perms().COMMAND_GAMEMODE_KEEP.isAuthorized(event.getUser()))
-        {
-            GameModeData mode = event.getUser().getOrCreate(GameModeData.class).get();
-            mode.setGameMode(event.getUser().getWorld().getProperties().getGameMode());
-            event.getUser().offer(mode); // reset gamemode to default on the server
-        }
-    }
-
-    @Subscribe
-    public void onWorldChange(PlayerChangeWorldEvent event)
-    {
-        BasicsUserEntity bUser = this.module.getBasicsUser(event.getUser()).getEntity();
-        if (!module.perms().COMMAND_GOD_KEEP.isAuthorized(event.getUser()))
-        {
-            bUser.setValue(TABLE_BASIC_USER.GODMODE, false);
-            event.getUser().offer(event.getUser().getOrCreate(InvulnerabilityData.class).get().setInvulnerableTicks(MAX_VALUE));
-        }
-        bUser.updateAsync();
-        if (!module.perms().COMMAND_GAMEMODE_KEEP.isAuthorized(event.getUser()))
-        {
-            GameModeData mode = event.getUser().getOrCreate(GameModeData.class).get();
-            mode.setGameMode(event.getUser().getWorld().getProperties().getGameMode());
-            event.getUser().offer(mode); // reset gamemode to default on the server
-        }
-    }
-
-
-
-    @Subscribe
-    public void onPlayerJoin(PlayerJoinEvent event)
-    {
-        User user = um.getExactUser(event.getUser().getUniqueId());
-        BasicsUser bUser = this.module.getBasicsUser(event.getUser());
-        if (bUser.getEntity().getValue(TABLE_BASIC_USER.GODMODE))
-        {
-            if (module.perms().COMMAND_GOD_KEEP.isAuthorized(user))
-            {
-                user.setInvulnerable(true);
-                /*
-                InvulnerabilityData data = ((CoreModule)core).getGame().getRegistry().getManipulatorRegistry().getBuilder(InvulnerabilityData.class).get().create();
-        data.setInvulnerableTicks(100000000);
-        offer(data);
-                 */
-            }
-            else
-            {
-                bUser.getEntity().setValue(TABLE_BASIC_USER.GODMODE, false);
-                bUser.getEntity().updateAsync();
-            }
-        }
-    }
-
-    @Subscribe
     public void onInteractWithTamed(PlayerInteractEntityEvent event)
     {
-        Optional<TameableData> tameable = event.getTargetEntity().getData(TameableData.class);
-        if (tameable.isPresent())
+        UUID uuid = event.getTargetEntity().get(Keys.TAMED_OWNER).or(Optional.<UUID>absent()).orNull();
+        if (uuid != null)
         {
-            if (!event.getUser().equals(tameable.get().getOwner()))
+
+            if (!event.getUser().getUniqueId().equals(uuid))
             {
                 User clicker = um.getExactUser(event.getUser().getUniqueId());
+                User owner = um.getExactUser(uuid);
                 clicker.sendTranslated(POSITIVE, "This {name#entity} belongs to {tamer}!",
-                                       event.getEntity().getType().getName(), tameable.get().getOwner());
+                                       event.getEntity().getType().getName(), owner);
             }
-        }
-    }
-
-    @Subscribe(order = POST)
-    public void onPlayerJoin(RoleAppliedEvent event)
-    {
-        String meta = event.getAttachment().getCurrentMetadataString("tablist-prefix");
-        if (meta != null)
-        {
-            String colored = ChatFormat.parseFormats(meta) + event.getUser().getDisplayName();
-            if (colored.length() > 16)
-            {
-                colored = colored.substring(0,16);
-            }
-            event.getUser().getPlayer().get().getTabList().getPlayer(event.getUser().getUniqueId()).get().setDisplayName(Texts.of(colored));
         }
     }
 }

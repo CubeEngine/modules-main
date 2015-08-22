@@ -23,9 +23,8 @@ import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.service.command.CommandSender;
 import de.cubeisland.engine.service.command.ContainerCommand;
 import de.cubeisland.engine.service.command.sender.ConsoleCommandSender;
-import de.cubeisland.engine.module.core.sponge.CoreModule;
 import de.cubeisland.engine.service.user.User;
-import org.spongepowered.api.data.manipulator.entity.WhitelistData;
+import org.spongepowered.api.Game;
 
 import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEGATIVE;
 import static de.cubeisland.engine.service.i18n.formatter.MessageType.NEUTRAL;
@@ -44,12 +43,14 @@ import static de.cubeisland.engine.service.i18n.formatter.MessageType.POSITIVE;
 @Command(name = "whitelist", desc = "Allows you to manage your whitelist")
 public class WhitelistCommand extends ContainerCommand
 {
-    private final CoreModule core;
+    private final VanillaPlus module;
+    private Game game;
 
-    public WhitelistCommand(CoreModule core)
+    public WhitelistCommand(VanillaPlus module, Game game)
     {
-        super(core);
-        this.core = core;
+        super(module);
+        this.module = module;
+        this.game = game;
     }
 
     @Override
@@ -93,7 +94,7 @@ public class WhitelistCommand extends ContainerCommand
     @Command(desc = "Lists all the whitelisted players")
     public void list(CommandSender context)
     {
-        /* TODO
+            /* TODO
         Set<org.spongepowered.api.entity.player.User> whitelist = this.core.getGame().getServer().getWhitelistedPlayers();
         if (!this.core.getGame().getServer().hasWhitelist())
         {
