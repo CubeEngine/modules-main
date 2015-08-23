@@ -43,6 +43,7 @@ import org.cubeengine.service.database.Database;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.UserManager;
 import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
 
 @ModuleInfo(name = "Locker", description = "Puts a Lock on your stuff")
@@ -72,6 +73,7 @@ public class Locker extends Module
     @Inject private EntityMatcher entityMatcher;
     @Inject private Game game;
     @Inject private TaskManager tm;
+    @Inject private WorldManager wm;
 
 
     @Enable
@@ -84,7 +86,7 @@ public class Locker extends Module
         db.registerTable(TableLocks.class);
         db.registerTable(TableLockLocations.class);
         db.registerTable(TableAccessList.class);
-        manager = new LockManager(this, em, sm);
+        manager = new LockManager(this, em, sm, db, wm, um, tm);
         LockerCommands lockerCmd = new LockerCommands(this, manager, um);
         cm.addCommand(lockerCmd);
         lockerCmd.addCommand(new LockerCreateCommands(this, manager));

@@ -87,15 +87,14 @@ import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.data.type.PortionTypes.BOTTOM;
 import static org.spongepowered.api.data.type.PortionTypes.TOP;
 
-@ServiceProvider(LockManager.class)
 public class LockManager
 {
     protected final Locker module;
 
-    @Inject private Database database;
-    @Inject protected WorldManager wm;
-    @Inject protected UserManager um;
-    @Inject protected TaskManager tm;
+    private Database database;
+    protected WorldManager wm;
+    protected UserManager um;
+    protected TaskManager tm;
     private final StringMatcher stringMatcher;
     protected Log logger;
 
@@ -112,10 +111,13 @@ public class LockManager
     private final ExecutorService executor;
     private Future<?> future = null;
 
-    @Inject
-    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher)
+    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, WorldManager wm, UserManager um, TaskManager tm)
     {
         this.stringMatcher = stringMatcher;
+        this.database = database;
+        this.wm = wm;
+        this.um = um;
+        this.tm = tm;
         logger = module.getProvided(Log.class);
         this.module = module;
         executor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));

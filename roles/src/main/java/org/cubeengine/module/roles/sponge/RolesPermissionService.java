@@ -150,8 +150,7 @@ public class RolesPermissionService implements PermissionService
     protected PermissionDescription addDescription(RolesPermissionDescription desc, Map<String, Tristate> roleAssignments)
     {
         SubjectCollection subjects = getSubjects(SUBJECTS_ROLE_TEMPLATE);
-        roleAssignments.entrySet().forEach(e -> subjects.get(e.getKey()).getTransientSubjectData().setPermission(
-            GLOBAL_CONTEXT, desc.getId(), e.getValue()));
+        roleAssignments.entrySet().forEach(e -> subjects.get(e.getKey()).getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), e.getValue()));
 
         descriptionMap.put(desc.getId().toLowerCase(), desc);
         descriptions = null;

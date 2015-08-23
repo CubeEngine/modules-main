@@ -103,7 +103,7 @@ public class LockerListener
         Location block = event.getLocation();
         if (block.getTileEntity().orNull() instanceof Carrier)
         {
-            if (user.hasPermission(module.perms().DENY_CONTAINER.getId()))
+            if (!user.hasPermission(module.perms().DENY_CONTAINER.getId()))
             {
                 user.sendTranslated(NEGATIVE, "Strong magic prevents you from accessing any inventory!");
                 event.setCancelled(true);
@@ -114,7 +114,7 @@ public class LockerListener
         }
         else if (block.supports(Keys.OPEN))
         {
-            if (user.hasPermission(module.perms().DENY_DOOR.getId()))
+            if (!user.hasPermission(module.perms().DENY_DOOR.getId()))
             {
                 user.sendTranslated(NEGATIVE, "Strong magic prevents you from accessing any door!");
                 event.setCancelled(true);
@@ -135,7 +135,7 @@ public class LockerListener
         if (!this.module.getConfig().protectEntityFromRClick) return;
         Entity entity = event.getTargetEntity();
         User user = um.getExactUser(event.getUser().getUniqueId());
-        if (user.hasPermission(module.perms().DENY_ENTITY.getId()))
+        if (!user.hasPermission(module.perms().DENY_ENTITY.getId()))
         {
             user.sendTranslated(NEGATIVE, "Strong magic prevents you from reaching this entity!");
             event.setCancelled(true);

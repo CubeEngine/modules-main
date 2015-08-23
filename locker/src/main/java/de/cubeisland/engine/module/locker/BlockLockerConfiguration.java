@@ -41,7 +41,7 @@ public class BlockLockerConfiguration extends LockerSubConfig<BlockLockerConfigu
 
     public String getTitle()
     {
-        return type.getName();
+        return type.getId();
     }
 
     public static class BlockLockerConfigConverter extends LockerSubConfigConverter<BlockLockerConfiguration>

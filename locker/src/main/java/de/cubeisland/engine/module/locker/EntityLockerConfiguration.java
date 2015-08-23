@@ -33,7 +33,7 @@ public class EntityLockerConfiguration extends LockerSubConfig<EntityLockerConfi
 
     public String getTitle()
     {
-        return type.getName();
+        return type.getId();
     }
 
     public static class EntityLockerConfigConverter extends LockerSubConfigConverter<EntityLockerConfiguration>

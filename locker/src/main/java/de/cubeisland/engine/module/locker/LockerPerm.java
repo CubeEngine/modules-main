@@ -52,6 +52,8 @@ public class LockerPerm extends PermissionContainer<Locker>
     public final PermissionDescription CMD_INFO_OTHER = register("locker.info.other", "", COMMAND);
     public final PermissionDescription CMD_INFO_SHOW_OWNER =  register("locker.info.show-owner", "", null);
 
+    // TODO Locker grouping Perms on commands
+    /*
     public final PermissionDescription PROTECT = registerS("protect", "", null,
                                                           "command.locker.info.use",
                                                           "command.locker.persist.use",
@@ -69,5 +71,7 @@ public class LockerPerm extends PermissionContainer<Locker>
                                                           "command.locker.create.guarded.use",
                                                           "command.locker.info.show-owner");
 
+
     public final PermissionDescription MODERATOR = register("moderator", "", null, PROTECT, SHOW_OWNER, CMD_INFO_OTHER, ACCESS_OTHER, CMD_REMOVE_OTHER);
+    */
 }
