@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.storage;
+package org.cubeengine.module.locker.storage;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -34,21 +34,18 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
-import javax.inject.Inject;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.core.marker.Enable;
-import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
 import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.core.util.BlockUtil;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.core.util.matcher.StringMatcher;
-import de.cubeisland.engine.module.locker.BlockLockerConfiguration;
-import de.cubeisland.engine.module.locker.EntityLockerConfiguration;
-import de.cubeisland.engine.module.locker.Locker;
-import de.cubeisland.engine.module.locker.commands.CommandListener;
+import org.cubeengine.module.locker.BlockLockerConfiguration;
+import org.cubeengine.module.locker.EntityLockerConfiguration;
+import org.cubeengine.module.locker.Locker;
+import org.cubeengine.module.locker.commands.CommandListener;
 import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.service.database.Database;
-import org.cubeengine.service.i18n.formatter.MessageType;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
@@ -75,12 +72,11 @@ import org.spongepowered.api.world.World;
 import static org.cubeengine.module.core.util.BlockUtil.CARDINAL_DIRECTIONS;
 import static org.cubeengine.module.core.util.LocationUtil.getChunkKey;
 import static org.cubeengine.module.core.util.LocationUtil.getLocationKey;
-import static de.cubeisland.engine.module.locker.storage.AccessListModel.ACCESS_ALL;
-import static de.cubeisland.engine.module.locker.storage.AccessListModel.ACCESS_FULL;
-import static de.cubeisland.engine.module.locker.storage.ProtectedType.getProtectedType;
-import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
-import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
-import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_ALL;
+import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_FULL;
+import static org.cubeengine.module.locker.storage.ProtectedType.getProtectedType;
+import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static java.util.concurrent.CompletableFuture.allOf;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.*;
@@ -176,12 +172,14 @@ public class LockManager
         Chunk chunk = queuedChunks.poll();
         UInteger world_id = this.wm.getWorldId(chunk.getWorld());
         Result<LockModel> models = this.database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.in(
-            this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID).from(TABLE_LOCK_LOCATION).where(
-                TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id), TABLE_LOCK_LOCATION.CHUNKX.eq(chunk.getPosition().getX()),
-                TABLE_LOCK_LOCATION.CHUNKZ.eq(chunk.getPosition().getZ())))).fetch();
+            this.database.getDSL().select(TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID).from(
+                TableLockLocations.TABLE_LOCK_LOCATION).where(
+                TableLockLocations.TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id), TableLockLocations.TABLE_LOCK_LOCATION.CHUNKX.eq(chunk.getPosition().getX()),
+                TableLockLocations.TABLE_LOCK_LOCATION.CHUNKZ.eq(chunk.getPosition().getZ())))).fetch();
         Map<UInteger, Result<LockLocationModel>> locations = LockManager.
-            this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION).where(TABLE_LOCK_LOCATION.LOCK_ID.in(
-            models.getValues(TABLE_LOCK.ID))).fetch().intoGroups(TABLE_LOCK_LOCATION.LOCK_ID);
+            this.database.getDSL().selectFrom(TableLockLocations.TABLE_LOCK_LOCATION).where(
+            TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID.in(
+            models.getValues(TABLE_LOCK.ID))).fetch().intoGroups(TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID);
         for (LockModel model : models)
         {
             Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
@@ -417,7 +415,7 @@ public class LockManager
             throw new IllegalStateException("Cannot extend Lock onto another!");
         }
         lock.locations.add(location);
-        LockLocationModel model = database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location, wm);
+        LockLocationModel model = database.getDSL().newRecord(TableLockLocations.TABLE_LOCK_LOCATION).newLocation(lock.model, location, wm);
         model.insertAsync();
         UInteger worldId = wm.getWorldId(((World)location.getExtent()));
         this.getLocLockMap(worldId).put(getLocationKey(location), lock);
@@ -548,7 +546,7 @@ public class LockManager
 
         return model.createPassword(this, password).insertAsync()
                     .thenCompose(m -> allOf(locations.parallelStream().map(loc -> database.getDSL().newRecord(
-                        TABLE_LOCK_LOCATION).newLocation(model, loc, wm)).map(AsyncRecord::insertAsync).toArray(
+                        TableLockLocations.TABLE_LOCK_LOCATION).newLocation(model, loc, wm)).map(AsyncRecord::insertAsync).toArray(
                         CompletableFuture[]::new)).thenApply((v) -> {
                         Lock lock = new Lock(this, model, locations);
                         this.addLoadedLocationLock(lock);
@@ -670,8 +668,8 @@ public class LockManager
         LockModel lockModel = database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.eq(UInteger.valueOf(lockID))).fetchOne();
         if (lockModel != null)
         {
-            Result<LockLocationModel> fetch = database.getDSL().selectFrom(TABLE_LOCK_LOCATION)
-                                                      .where(TABLE_LOCK_LOCATION.LOCK_ID.eq(lockModel.getValue(TABLE_LOCK.ID)))
+            Result<LockLocationModel> fetch = database.getDSL().selectFrom(TableLockLocations.TABLE_LOCK_LOCATION)
+                                                      .where(TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID.eq(lockModel.getValue(TABLE_LOCK.ID)))
                                                       .fetch();
             if (fetch.isEmpty())
             {

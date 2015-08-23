@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.commands;
+package org.cubeengine.module.locker.commands;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,11 +24,11 @@ import java.util.concurrent.TimeUnit;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.core.util.Triplet;
 import org.cubeengine.module.core.util.matcher.StringMatcher;
-import de.cubeisland.engine.module.locker.Locker;
-import de.cubeisland.engine.module.locker.storage.Lock;
-import de.cubeisland.engine.module.locker.storage.LockManager;
-import de.cubeisland.engine.module.locker.storage.LockType;
-import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
+import org.cubeengine.module.locker.Locker;
+import org.cubeengine.module.locker.storage.Lock;
+import org.cubeengine.module.locker.storage.LockManager;
+import org.cubeengine.module.locker.storage.LockType;
+import org.cubeengine.module.locker.storage.ProtectionFlag;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
@@ -48,9 +48,6 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
-
-import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
-import static de.cubeisland.engine.module.locker.storage.LockType.*;
 
 public class CommandListener
 {

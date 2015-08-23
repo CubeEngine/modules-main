@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.commands;
+package org.cubeengine.module.locker.commands;
 
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
+import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.user.User;
-import de.cubeisland.engine.module.locker.Locker;
-import de.cubeisland.engine.module.locker.storage.Lock;
-import de.cubeisland.engine.module.locker.storage.LockManager;
+import org.cubeengine.module.locker.Locker;
+import org.cubeengine.module.locker.storage.Lock;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.item.inventory.Carrier;
 

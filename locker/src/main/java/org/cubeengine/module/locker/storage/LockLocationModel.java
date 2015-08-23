@@ -15,37 +15,36 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.storage;
+package org.cubeengine.module.locker.storage;
 
 import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
-import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 
 public class LockLocationModel extends AsyncRecord<LockLocationModel>
 {
     public LockLocationModel()
     {
-        super(TABLE_LOCK_LOCATION);
+        super(TableLockLocations.TABLE_LOCK_LOCATION);
     }
 
     public LockLocationModel newLocation(LockModel model, Location location, WorldManager wm)
     {
         this.setLocation(location, wm);
-        this.setValue(TABLE_LOCK_LOCATION.LOCK_ID, model.getValue(TABLE_LOCK.ID));
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID, model.getValue(TABLE_LOCK.ID));
         return this;
     }
 
     private void setLocation(Location location, WorldManager wm)
     {
-        this.setValue(TABLE_LOCK_LOCATION.WORLD_ID, wm.getWorldId(((World)location.getExtent())));
-        this.setValue(TABLE_LOCK_LOCATION.X, location.getBlockX());
-        this.setValue(TABLE_LOCK_LOCATION.Y, location.getBlockY());
-        this.setValue(TABLE_LOCK_LOCATION.Z, location.getBlockZ());
-        this.setValue(TABLE_LOCK_LOCATION.CHUNKX, location.getBlockX() >> 4);
-        this.setValue(TABLE_LOCK_LOCATION.CHUNKZ, location.getBlockZ() >> 4);
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.WORLD_ID, wm.getWorldId(((World)location.getExtent())));
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.X, location.getBlockX());
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.Y, location.getBlockY());
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.Z, location.getBlockZ());
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.CHUNKX, location.getBlockX() >> 4);
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.CHUNKZ, location.getBlockZ() >> 4);
     }
 }

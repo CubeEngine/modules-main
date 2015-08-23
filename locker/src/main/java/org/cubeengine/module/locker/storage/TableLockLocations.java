@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.storage;
+package org.cubeengine.module.locker.storage;
 
 import org.cubeengine.service.database.AutoIncrementTable;
 import org.cubeengine.module.core.util.Version;
@@ -24,7 +24,7 @@ import org.jooq.TableField;
 import org.jooq.types.UInteger;
 
 import static org.cubeengine.service.world.TableWorld.TABLE_WORLD;
-import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static org.jooq.impl.SQLDataType.INTEGER;
 
 public class TableLockLocations extends AutoIncrementTable<LockLocationModel, UInteger>

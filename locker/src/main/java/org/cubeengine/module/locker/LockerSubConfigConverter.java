@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker;
+package org.cubeengine.module.locker;
 
 import java.util.ArrayList;
 import java.util.Map.Entry;
@@ -28,8 +28,8 @@ import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.NullNode;
 import de.cubeisland.engine.converter.node.StringNode;
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.module.locker.storage.LockType;
-import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
+import org.cubeengine.module.locker.storage.LockType;
+import org.cubeengine.module.locker.storage.ProtectionFlag;
 
 public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> extends SimpleConverter<C>
 {

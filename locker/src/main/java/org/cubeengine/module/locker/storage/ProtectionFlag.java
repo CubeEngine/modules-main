@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.storage;
+package org.cubeengine.module.locker.storage;
 
 import java.util.ArrayList;
 import java.util.Arrays;

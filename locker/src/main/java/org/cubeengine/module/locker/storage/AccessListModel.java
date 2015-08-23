@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.storage;
+package org.cubeengine.module.locker.storage;
 
 import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.service.user.User;
 
-import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
-import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 
 public class AccessListModel extends AsyncRecord<AccessListModel>
 {

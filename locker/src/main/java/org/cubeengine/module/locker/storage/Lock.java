@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.storage;
+package org.cubeengine.module.locker.storage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,8 +29,8 @@ import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.InventoryGuardFactory;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.module.locker.Locker;
-import de.cubeisland.engine.module.locker.LockerAttachment;
+import org.cubeengine.module.locker.Locker;
+import org.cubeengine.module.locker.LockerAttachment;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.user.User;
 import org.jooq.Result;
@@ -47,12 +47,9 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.module.locker.storage.AccessListModel.*;
-import static de.cubeisland.engine.module.locker.storage.KeyBook.TITLE;
-import static de.cubeisland.engine.module.locker.storage.LockType.PUBLIC;
-import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
-import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
-import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.LockType.PUBLIC;
+import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static java.util.stream.Collectors.toList;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
@@ -175,7 +172,7 @@ public class Lock
             return;
         }
         ItemStack item = module.getGame().getRegistry().createItemBuilder().itemType(ENCHANTED_BOOK).quantity(1).build();
-        item.offer(Keys.DISPLAY_NAME, Texts.of(getColorPass() + TITLE + getId()));
+        item.offer(Keys.DISPLAY_NAME, Texts.of(getColorPass() + KeyBook.TITLE + getId()));
         item.offer(Keys.ITEM_LORE, Arrays.asList(user.getTranslation(NEUTRAL, "This book can"), user.getTranslation(
             NEUTRAL, "unlock a magically"), user.getTranslation(NEUTRAL, "locked protection")));
         user.asPlayer().setItemInHand(item);
@@ -335,8 +332,9 @@ public class Lock
 
     private Location<World> getLocation(LockLocationModel model)
     {
-        return new Location<>(this.manager.wm.getWorld(model.getValue(TABLE_LOCK_LOCATION.WORLD_ID)), model.getValue(
-            TABLE_LOCK_LOCATION.X), model.getValue(TABLE_LOCK_LOCATION.Y), model.getValue(TABLE_LOCK_LOCATION.Z));
+        return new Location<>(this.manager.wm.getWorld(model.getValue(TableLockLocations.TABLE_LOCK_LOCATION.WORLD_ID)), model.getValue(
+            TableLockLocations.TABLE_LOCK_LOCATION.X), model.getValue(TableLockLocations.TABLE_LOCK_LOCATION.Y), model.getValue(
+            TableLockLocations.TABLE_LOCK_LOCATION.Z));
     }
 
     public boolean isBlockLock()

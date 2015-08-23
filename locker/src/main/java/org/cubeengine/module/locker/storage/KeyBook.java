@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.storage;
+package org.cubeengine.module.locker.storage;
 
 import java.util.Arrays;
 import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.core.util.ChatFormat;
-import de.cubeisland.engine.module.locker.Locker;
+import org.cubeengine.module.locker.Locker;
 import org.cubeengine.service.user.User;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;

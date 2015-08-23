@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker;
+package org.cubeengine.module.locker;
 
 import java.util.HashSet;
 import java.util.Set;
 import org.cubeengine.service.user.UserAttachment;
-import de.cubeisland.engine.module.locker.storage.Lock;
+import org.cubeengine.module.locker.storage.Lock;
 
 public class LockerAttachment extends UserAttachment
 {

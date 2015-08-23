@@ -15,12 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker;
+package org.cubeengine.module.locker;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Transient;
+import org.cubeengine.module.locker.storage.ProtectionFlag;
 import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
@@ -28,8 +29,7 @@ import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityTypes;
 
-import static de.cubeisland.engine.module.locker.storage.LockType.PRIVATE;
-import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;
+import static org.cubeengine.module.locker.storage.LockType.PRIVATE;
 import static org.spongepowered.api.entity.EntityTypes.ITEM_FRAME;
 import static org.spongepowered.api.entity.EntityTypes.LEASH_HITCH;
 import static org.spongepowered.api.entity.EntityTypes.PAINTING;
@@ -130,15 +130,20 @@ public class LockerConfig extends ReflectedYaml
             blockprotections.add(new BlockLockerConfiguration(BlockTypes.FURNACE));
             blockprotections.add(new BlockLockerConfiguration(BlockTypes.LIT_FURNACE));
             blockprotections.add(new BlockLockerConfiguration(BlockTypes.BREWING_STAND));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.DISPENSER).defaultFlags(BLOCK_REDSTONE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.DROPPER).defaultFlags(BLOCK_REDSTONE));
+            blockprotections.add(new BlockLockerConfiguration(BlockTypes.DISPENSER).defaultFlags(
+                ProtectionFlag.BLOCK_REDSTONE));
+            blockprotections.add(new BlockLockerConfiguration(BlockTypes.DROPPER).defaultFlags(
+                ProtectionFlag.BLOCK_REDSTONE));
             blockprotections.add(new BlockLockerConfiguration(BlockTypes.STANDING_SIGN));
             blockprotections.add(new BlockLockerConfiguration(BlockTypes.WALL_SIGN));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.WOODEN_DOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
+            blockprotections.add(new BlockLockerConfiguration(BlockTypes.WOODEN_DOOR).defaultFlags(
+                ProtectionFlag.BLOCK_REDSTONE, ProtectionFlag.AUTOCLOSE));
             blockprotections.add(new BlockLockerConfiguration(BlockTypes.IRON_DOOR));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.TRAPDOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.FENCE_GATE).defaultFlags(AUTOCLOSE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.HOPPER).defaultFlags(HOPPER_IN, HOPPER_OUT));
+            blockprotections.add(new BlockLockerConfiguration(BlockTypes.TRAPDOOR).defaultFlags(
+                ProtectionFlag.BLOCK_REDSTONE, ProtectionFlag.AUTOCLOSE));
+            blockprotections.add(new BlockLockerConfiguration(BlockTypes.FENCE_GATE).defaultFlags(
+                ProtectionFlag.AUTOCLOSE));
+            blockprotections.add(new BlockLockerConfiguration(BlockTypes.HOPPER).defaultFlags(ProtectionFlag.HOPPER_IN, ProtectionFlag.HOPPER_OUT));
         }
         if (protEntityEnable && (entityProtections == null || entityProtections.isEmpty()))
         {

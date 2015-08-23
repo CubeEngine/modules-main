@@ -15,13 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.storage;
+package org.cubeengine.module.locker.storage;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-
-import static de.cubeisland.engine.module.locker.storage.ProtectedType.*;
 
 public enum LockType
 {

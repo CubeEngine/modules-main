@@ -15,33 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker;
+package org.cubeengine.module.locker;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import com.google.common.base.Optional;
 import org.cubeengine.module.core.util.BlockUtil;
-import de.cubeisland.engine.module.locker.storage.Lock;
-import de.cubeisland.engine.module.locker.storage.LockManager;
+import org.cubeengine.module.locker.storage.Lock;
+import org.cubeengine.module.locker.storage.LockManager;
+import org.cubeengine.module.locker.storage.ProtectionFlag;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.Piston;
-import org.spongepowered.api.block.tileentity.carrier.Dropper;
-import org.spongepowered.api.block.tileentity.carrier.Hopper;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.block.HingeData;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.hanging.Hanging;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.entity.vehicle.minecart.MinecartHopper;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.block.BlockBurnEvent;
@@ -57,7 +53,6 @@ import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
 import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.event.inventory.ContainerOpenEvent;
-import org.spongepowered.api.event.world.WorldExplosionEvent;
 import org.spongepowered.api.event.world.WorldOnExplosionEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -68,10 +63,8 @@ import org.spongepowered.api.world.World;
 
 import static org.cubeengine.module.core.util.BlockUtil.CARDINAL_DIRECTIONS;
 import static org.cubeengine.module.core.util.BlockUtil.getChunk;
-import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.cubeengine.module.core.util.BlockUtil.getOtherDoorDirection;
 import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.data.type.PortionTypes.TOP;
 import static org.spongepowered.api.entity.EntityInteractionTypes.USE;
@@ -408,7 +401,7 @@ public class LockerListener
         Lock lock = this.manager.getLockAtLocation(block, null);
         if (lock != null)
         {
-            if (lock.hasFlag(BLOCK_REDSTONE))
+            if (lock.hasFlag(ProtectionFlag.BLOCK_REDSTONE))
             {
                 event.setNewSignalStrength(event.getOldSignalStrength());
             }

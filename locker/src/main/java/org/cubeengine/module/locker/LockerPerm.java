@@ -15,9 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker;
+package org.cubeengine.module.locker;
 
-import de.cubeisland.engine.module.locker.commands.LockerCommands;
+import org.cubeengine.module.locker.commands.LockerCommands;
 import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.storage;
+package org.cubeengine.module.locker.storage;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,14 +29,12 @@ import org.spongepowered.api.entity.living.monster.Monster;
 
 import static org.spongepowered.api.entity.EntityTypes.*;
 
-import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;
-
 public enum ProtectedType
 {
-    CONTAINER(1, HOPPER_IN, HOPPER_MINECART_IN, HOPPER_MINECART_OUT, HOPPER_OUT),
-    DOOR(2, BLOCK_REDSTONE, AUTOCLOSE),
-    BLOCK(3, BLOCK_REDSTONE),
-    ENTITY_CONTAINER(4, HOPPER_IN, HOPPER_MINECART_IN, HOPPER_MINECART_OUT, HOPPER_OUT),
+    CONTAINER(1, ProtectionFlag.HOPPER_IN, ProtectionFlag.HOPPER_MINECART_IN, ProtectionFlag.HOPPER_MINECART_OUT, ProtectionFlag.HOPPER_OUT),
+    DOOR(2, ProtectionFlag.BLOCK_REDSTONE, ProtectionFlag.AUTOCLOSE),
+    BLOCK(3, ProtectionFlag.BLOCK_REDSTONE),
+    ENTITY_CONTAINER(4, ProtectionFlag.HOPPER_IN, ProtectionFlag.HOPPER_MINECART_IN, ProtectionFlag.HOPPER_MINECART_OUT, ProtectionFlag.HOPPER_OUT),
     ENTITY_LIVING(5),
     ENTITY_VEHICLE(6),
     ENTITY(7),

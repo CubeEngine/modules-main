@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.commands;
+package org.cubeengine.module.locker.commands;
 
 import java.util.List;
 import de.cubeisland.engine.butler.CommandInvocation;
@@ -32,12 +32,12 @@ import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.user.User;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.module.locker.Locker;
-import de.cubeisland.engine.module.locker.commands.CommandListener.CommandType;
-import de.cubeisland.engine.module.locker.storage.KeyBook;
-import de.cubeisland.engine.module.locker.storage.Lock;
-import de.cubeisland.engine.module.locker.storage.LockManager;
-import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
+import org.cubeengine.module.locker.Locker;
+import org.cubeengine.module.locker.commands.CommandListener.CommandType;
+import org.cubeengine.module.locker.storage.KeyBook;
+import org.cubeengine.module.locker.storage.Lock;
+import org.cubeengine.module.locker.storage.LockManager;
+import org.cubeengine.module.locker.storage.ProtectionFlag;
 import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.Location;
@@ -45,7 +45,6 @@ import org.spongepowered.api.world.Location;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
-import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
 
 @Command(name = "locker", desc = "Locker commands", alias = "l")
 public class LockerCommands extends ContainerCommand

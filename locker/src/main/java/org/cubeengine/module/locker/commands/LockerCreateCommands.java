@@ -15,22 +15,21 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker.commands;
+package org.cubeengine.module.locker.commands;
 
 import de.cubeisland.engine.butler.alias.Alias;
 import de.cubeisland.engine.butler.filter.Restricted;
 import de.cubeisland.engine.butler.parametric.Command;
 import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.module.locker.commands.CommandListener.CommandType;
+import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.user.User;
-import de.cubeisland.engine.module.locker.Locker;
-import de.cubeisland.engine.module.locker.commands.CommandListener.CommandType;
-import de.cubeisland.engine.module.locker.storage.LockManager;
+import org.cubeengine.module.locker.Locker;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
-import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
 
 @Command(name = "create", desc = "Creates various protections")
 public class LockerCreateCommands extends ContainerCommand
@@ -61,7 +60,7 @@ public class LockerCreateCommands extends ContainerCommand
     @Restricted(value = User.class, msg = "This command can only be used in game")
     public void cPrivate(User context, @Optional String password, @Flag(name = "key", longName = "keybook") boolean keybook)
     {
-        this.setCreateProtection(context, C_PRIVATE, password, keybook);
+        this.setCreateProtection(context, CommandType.C_PRIVATE, password, keybook);
     }
 
     @Alias(value = "cpublic")
@@ -69,7 +68,7 @@ public class LockerCreateCommands extends ContainerCommand
     @Restricted(value = User.class, msg = "This command can only be used in game")
     public void cPublic(User context)
     {
-        this.setCreateProtection(context, C_PUBLIC, null, false);
+        this.setCreateProtection(context, CommandType.C_PUBLIC, null, false);
     }
 
     @Alias(value = "cdonation")
@@ -77,7 +76,7 @@ public class LockerCreateCommands extends ContainerCommand
     @Restricted(value = User.class, msg = "This command can only be used in game")
     public void cDonation(User context, @Optional String password, @Flag(name = "key", longName = "keybook") boolean keybook)
     {
-        this.setCreateProtection(context, C_DONATION, password, keybook);
+        this.setCreateProtection(context, CommandType.C_DONATION, password, keybook);
     }
 
     @Alias(value = "cfree")
@@ -85,7 +84,7 @@ public class LockerCreateCommands extends ContainerCommand
     @Restricted(value = User.class, msg = "This command can only be used in game")
     public void cFree(User context, @Optional String password, @Flag(name = "key", longName = "keybook") boolean keybook)
     {
-        this.setCreateProtection(context, C_FREE, password, keybook);
+        this.setCreateProtection(context, CommandType.C_FREE, password, keybook);
     }
 
     @Alias(value = "cpassword")
@@ -93,7 +92,7 @@ public class LockerCreateCommands extends ContainerCommand
     @Restricted(value = User.class, msg = "This command can only be used in game")
     public void cPassword(User context, String password, @Flag(name = "key", longName = "keybook") boolean keybook) // same as private but with pw
     {
-        this.setCreateProtection(context, C_PRIVATE, password, keybook);
+        this.setCreateProtection(context, CommandType.C_PRIVATE, password, keybook);
     }
 
     @Alias(value = "cguarded")
@@ -101,6 +100,6 @@ public class LockerCreateCommands extends ContainerCommand
     @Restricted(value = User.class, msg = "This command can only be used in game")
     public void cguarded(User context, @Optional String password, @Flag(name = "key", longName = "keybook") boolean keybook) // same as private but with pw
     {
-        this.setCreateProtection(context, C_GUARDED, password, keybook);
+        this.setCreateProtection(context, CommandType.C_GUARDED, password, keybook);
     }
 }

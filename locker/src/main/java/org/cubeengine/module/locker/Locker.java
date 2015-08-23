@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker;
+package org.cubeengine.module.locker;
 
 import javax.inject.Inject;
 import de.cubeisland.engine.converter.ConverterManager;
@@ -24,20 +24,20 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.Module;
+import org.cubeengine.module.locker.BlockLockerConfiguration.BlockLockerConfigConverter;
+import org.cubeengine.module.locker.EntityLockerConfiguration.EntityLockerConfigConverter;
+import org.cubeengine.module.locker.commands.LockerAdminCommands;
+import org.cubeengine.module.locker.commands.LockerCommands;
+import org.cubeengine.module.locker.commands.LockerCreateCommands;
+import org.cubeengine.module.locker.storage.LockManager;
+import org.cubeengine.module.locker.storage.TableAccessList;
+import org.cubeengine.module.locker.storage.TableLockLocations;
+import org.cubeengine.module.locker.storage.TableLocks;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.core.util.matcher.EntityMatcher;
 import org.cubeengine.module.core.util.matcher.MaterialMatcher;
 import org.cubeengine.module.core.util.matcher.StringMatcher;
-import de.cubeisland.engine.module.locker.BlockLockerConfiguration.BlockLockerConfigConverter;
-import de.cubeisland.engine.module.locker.EntityLockerConfiguration.EntityLockerConfigConverter;
-import de.cubeisland.engine.module.locker.commands.LockerAdminCommands;
-import de.cubeisland.engine.module.locker.commands.LockerCommands;
-import de.cubeisland.engine.module.locker.commands.LockerCreateCommands;
-import de.cubeisland.engine.module.locker.storage.LockManager;
-import de.cubeisland.engine.module.locker.storage.TableAccessList;
-import de.cubeisland.engine.module.locker.storage.TableLockLocations;
-import de.cubeisland.engine.module.locker.storage.TableLocks;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.task.TaskManager;

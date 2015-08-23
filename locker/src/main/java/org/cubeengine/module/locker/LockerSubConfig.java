@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.locker;
+package org.cubeengine.module.locker;
 
 import java.util.Arrays;
 import java.util.List;
-import de.cubeisland.engine.module.locker.storage.LockType;
-import de.cubeisland.engine.module.locker.storage.ProtectedType;
-import de.cubeisland.engine.module.locker.storage.ProtectionFlag;
+import org.cubeengine.module.locker.storage.LockType;
+import org.cubeengine.module.locker.storage.ProtectedType;
+import org.cubeengine.module.locker.storage.ProtectionFlag;
 
 public abstract class LockerSubConfig<This extends LockerSubConfig,T>
 {
