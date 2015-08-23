@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.kickban;
+package org.cubeengine.module.kickban;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -49,6 +49,10 @@ import org.spongepowered.api.util.ban.Bans;
 import org.spongepowered.api.util.command.CommandSource;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
+import static org.cubeengine.module.core.util.ChatFormat.RED;
+import static org.cubeengine.module.core.util.ChatFormat.DARK_GREEN;
+import static org.cubeengine.module.core.util.ChatFormat.GREY;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains commands to manage kicks/bans.
@@ -394,6 +398,5 @@ public class KickBanCommands
         context.sendTranslated(POSITIVE, "The following {amount} players are banned from this server",
                                userBans.size());
         context.sendMessage(Texts.of(StringUtils.implode(GREY + ", ", userBans)));
-        return;
     }
 }
