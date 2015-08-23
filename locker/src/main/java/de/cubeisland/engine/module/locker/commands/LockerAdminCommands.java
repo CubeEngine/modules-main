@@ -72,7 +72,7 @@ public class LockerAdminCommands extends ContainerCommand
                     TileEntity te = lock.getFirstLocation().getTileEntity().orNull();
                     if (te instanceof Carrier)
                     {
-                        ((User)context.getSource()).openInventory(((Carrier)te).getInventory());
+                        ((User)context.getSource()).asPlayer().openInventory(((Carrier)te).getInventory());
                     }
                 }
                 else
@@ -102,7 +102,7 @@ public class LockerAdminCommands extends ContainerCommand
         if (lock == null) return;
         if (lock.isBlockLock())
         {
-            ((User)context.getSource()).safeTeleport(lock.getFirstLocation(), false);
+            ((User)context.getSource()).asPlayer().setLocation(lock.getFirstLocation());
         }
         else
         {

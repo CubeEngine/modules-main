@@ -71,7 +71,7 @@ public class LockerCommands extends ContainerCommand
         {
             this.persist(context);
         }
-        KeyBook keyBook = KeyBook.getKeyBook((context).getItemInHand().orNull(), context, this.module);
+        KeyBook keyBook = KeyBook.getKeyBook((context).asPlayer().getItemInHand().orNull(), context, this.module);
         if (keyBook != null)
         {
             Lock lock = this.manager.getLockById(keyBook.lockID);
@@ -85,7 +85,7 @@ public class LockerCommands extends ContainerCommand
                 }
                 else
                 {
-                    for (Entity entity : context.getWorld().getEntities())
+                    for (Entity entity : context.asPlayer().getWorld().getEntities())
                     {
                         if (entity.getUniqueId().equals(lock.getEntityUID()))
                         {

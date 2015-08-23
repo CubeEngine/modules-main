@@ -20,6 +20,7 @@ package de.cubeisland.engine.module.locker;
 import javax.inject.Inject;
 import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.Module;
@@ -44,6 +45,7 @@ import org.cubeengine.service.user.UserManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.Game;
 
+@ModuleInfo(name = "Locker", description = "Puts a Lock on your stuff")
 public class Locker extends Module
 {
     private LockerConfig config;

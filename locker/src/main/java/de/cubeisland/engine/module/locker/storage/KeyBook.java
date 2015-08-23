@@ -31,6 +31,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.data.key.Keys.DISPLAY_NAME;
 import static org.spongepowered.api.data.key.Keys.ITEM_LORE;
 import static org.spongepowered.api.effect.sound.SoundTypes.*;

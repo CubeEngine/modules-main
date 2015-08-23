@@ -54,6 +54,7 @@ import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_A
 import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static java.util.stream.Collectors.toList;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
 import static org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK;
 
@@ -62,7 +63,7 @@ public class Lock
     private final Locker module;
     private final LockManager manager;
     protected final LockModel model;
-    protected final ArrayList<Location> locations = new ArrayList<>();
+    protected final ArrayList<Location<World>> locations = new ArrayList<>();
     private final Database db;
 
     private UUID taskId = null; // for autoclosing doors
@@ -96,7 +97,7 @@ public class Lock
         this.isValidType = false;
     }
 
-    public Lock(LockManager manager, LockModel model, List<Location> locations)
+    public Lock(LockManager manager, LockModel model, List<Location<World>> locations)
     {
         this(manager, model);
         this.locations.addAll(locations);
@@ -332,9 +333,9 @@ public class Lock
         }
     }
 
-    private Location getLocation(LockLocationModel model)
+    private Location<World> getLocation(LockLocationModel model)
     {
-        return new Location(this.manager.wm.getWorld(model.getValue(TABLE_LOCK_LOCATION.WORLD_ID)), model.getValue(
+        return new Location<>(this.manager.wm.getWorld(model.getValue(TABLE_LOCK_LOCATION.WORLD_ID)), model.getValue(
             TABLE_LOCK_LOCATION.X), model.getValue(TABLE_LOCK_LOCATION.Y), model.getValue(TABLE_LOCK_LOCATION.Z));
     }
 
@@ -348,17 +349,17 @@ public class Lock
         return this.locations.size() == 1;
     }
 
-    public Location getFirstLocation()
+    public Location<World> getFirstLocation()
     {
         return this.locations.get(0);
     }
 
-    public ArrayList<Location> getLocations()
+    public ArrayList<Location<World>> getLocations()
     {
         return this.locations;
     }
 
-    public void handleBlockDoorUse(Cancellable event, User user, Location clickedDoor)
+    public void handleBlockDoorUse(Cancellable event, User user, Location<World> clickedDoor)
     {
         if (this.getLockType() == PUBLIC)
         {
@@ -839,7 +840,7 @@ public class Lock
      * @param user
      * @param doorClicked
      */
-    private void doorUse(User user, Location doorClicked)
+    private void doorUse(User user, Location<World> doorClicked)
     {
         if (doorClicked.getBlockType() == IRON_DOOR && !manager.module.getConfig().openIronDoorWithClick)
         {

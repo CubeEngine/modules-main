@@ -48,6 +48,7 @@ import de.cubeisland.engine.module.locker.Locker;
 import de.cubeisland.engine.module.locker.commands.CommandListener;
 import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.service.database.Database;
+import org.cubeengine.service.i18n.formatter.MessageType;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
@@ -81,6 +82,7 @@ import static de.cubeisland.engine.module.locker.storage.TableAccessList.TABLE_A
 import static de.cubeisland.engine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static de.cubeisland.engine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static java.util.concurrent.CompletableFuture.allOf;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.data.type.PortionTypes.BOTTOM;
 import static org.spongepowered.api.data.type.PortionTypes.TOP;
@@ -406,7 +408,7 @@ public class LockManager
      * @param lock the lock to extend
      * @param location the location to extend to
      */
-    public void extendLock(Lock lock, Location location)
+    public void extendLock(Lock lock, Location<World> location)
     {
         if (this.getLockAtLocation(location, null, false, false) != null)
         {
@@ -471,7 +473,7 @@ public class LockManager
      * @param createKeyBook whether to attempt to create a keyBook
      * @return the created Lock
      */
-    public CompletableFuture<Lock> createLock(BlockType material, Location block, User user, LockType lockType, String password, boolean createKeyBook)
+    public CompletableFuture<Lock> createLock(BlockType material, Location<World> block, User user, LockType lockType, String password, boolean createKeyBook)
     {
         LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
         for (BlockLockerConfiguration blockProtection : this.module.getConfig().blockprotections)
@@ -487,7 +489,7 @@ public class LockManager
             }
         }
 
-        List<Location> locations = new ArrayList<>();
+        List<Location<World>> locations = new ArrayList<>();
         // Handle MultiBlock Protections
         if (material == CHEST || material == TRAPPED_CHEST)
         {
@@ -511,7 +513,7 @@ public class LockManager
             locations.add(block); // Original Block
             // Find upper/lower door part
             PortionType portion = block.get(Keys.PORTION_TYPE).get();
-            Location relative = null;
+            Location<World> relative = null;
             if (portion == BOTTOM)
             {
                 relative = block.getRelative(Direction.UP);
@@ -527,8 +529,8 @@ public class LockManager
                 Direction direction = block.get(Keys.DIRECTION).get();
                 Hinge hinge = block.get(Keys.HINGE_POSITION).get();
                 direction = BlockUtil.getOtherDoorDirection(direction, hinge);
-                Location blockOther = block.getRelative(direction);
-                Location relativeOther = relative.getRelative(direction);
+                Location<World> blockOther = block.getRelative(direction);
+                Location<World> relativeOther = relative.getRelative(direction);
                 if (portion.equals(block.get(Keys.PORTION_TYPE).orNull())
                     && blockOther.getBlockType().equals(relativeOther.getBlockType()))
                 {

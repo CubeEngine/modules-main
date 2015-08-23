@@ -18,6 +18,8 @@
 package de.cubeisland.engine.module.locker;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import com.google.common.base.Optional;
 import org.cubeengine.module.core.util.BlockUtil;
@@ -33,6 +35,7 @@ import org.spongepowered.api.block.tileentity.carrier.Dropper;
 import org.spongepowered.api.block.tileentity.carrier.Hopper;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.block.HingeData;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.hanging.Hanging;
@@ -54,22 +57,27 @@ import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
 import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.event.inventory.ContainerOpenEvent;
+import org.spongepowered.api.event.world.WorldExplosionEvent;
+import org.spongepowered.api.event.world.WorldOnExplosionEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import static org.cubeengine.module.core.util.BlockUtil.CARDINAL_DIRECTIONS;
 import static org.cubeengine.module.core.util.BlockUtil.getChunk;
 import static de.cubeisland.engine.module.locker.storage.ProtectionFlag.*;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.cubeengine.module.core.util.BlockUtil.getOtherDoorDirection;
 import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.data.type.PortionTypes.TOP;
 import static org.spongepowered.api.entity.EntityInteractionTypes.USE;
 import static org.spongepowered.api.entity.EntityTypes.HORSE;
 import static org.spongepowered.api.util.Direction.*;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 public class LockerListener
 {
@@ -201,6 +209,8 @@ public class LockerListener
     public void onEntityDeath(EntityDeathEvent event)
     {
         // TODO waiting for EntityDamageEvent in Cause Enhancement PR
+
+        /*
         Optional<Cause> cause = event.getCause();
         Entity entity = event.getEntity();
         if (entity.supports(Keys.VEHICLE))
@@ -260,14 +270,15 @@ public class LockerListener
             }
         }
         lock.handleEntityDeletion(user);
+        */
     }
 
     @Subscribe(order = Order.EARLY)
     public void onPlace(PlayerPlaceBlockEvent event)
     {
-        Location placed = event.getBlock();
+        Location<World> placed = event.getLocation();
         User user = um.getExactUser(event.getUser().getUniqueId());
-        BlockType type = placed.getType();
+        BlockType type = placed.getBlockType();
         if (type == CHEST || type == TRAPPED_CHEST)
         {
             if (onPlaceChest(event, placed, user))
@@ -306,16 +317,16 @@ public class LockerListener
     private boolean onPlaceDoor(PlayerPlaceBlockEvent event, Location placed, User user)
     {
         BlockState doorState = event.getReplacementBlock().getState();
-        Hinge hinge = doorState.getManipulator(HingeData.class).get().getValue();
-        Direction direction = doorState.getManipulator(DirectionalData.class).get().getValue();
+        Hinge hinge = doorState.get(Keys.HINGE_POSITION).get();
+        Direction direction = doorState.get(Keys.DIRECTION).get();
 
         Location relative = placed.getRelative(BlockUtil.getOtherDoorDirection(direction, hinge));
-        if (!isDoor(relative.getType()))
+        if (!isDoor(relative.getBlockType()))
         {
             return false; // Not a door
         }
-        if (!relative.getData(DirectionalData.class).get().getValue().equals(direction)
-            || relative.getData(HingeData.class).get().getValue() == hinge)
+
+        if (!relative.get(Keys.DIRECTION).get().equals(direction) || relative.get(Keys.HINGE_POSITION) == hinge)
         {
             return false; // Not a doubledoor
         }
@@ -328,7 +339,8 @@ public class LockerListener
                 lock.delete(user);
                 return true;
             }
-            if (placed.getData(PortionData.class).get().getValue() == TOP)
+
+            if (placed.get(Keys.PORTION_TYPE) == TOP)
             {
                 relative = placed.getRelative(DOWN);
             }
@@ -337,7 +349,7 @@ public class LockerListener
                 relative = placed.getRelative(UP);
             }
 
-            if (lock.isOwner(user) || lock.hasAdmin(user) || module.perms().EXPAND_OTHER.isAuthorized(user))
+            if (lock.isOwner(user) || lock.hasAdmin(user) || user.hasPermission(module.perms().EXPAND_OTHER.getId()))
             {
                 this.manager.extendLock(lock, placed);
                 this.manager.extendLock(lock, relative);
@@ -358,7 +370,7 @@ public class LockerListener
         Location relativeLoc;
         for (Direction direction : CARDINAL_DIRECTIONS)
         {
-            if (placed.getType() != placed.getRelative(direction).getType()) // bindable chest
+            if (placed.getBlockType() != placed.getRelative(direction).getBlockType()) // bindable chest
             {
                 continue;
             }
@@ -373,9 +385,9 @@ public class LockerListener
                 user.sendTranslated(NEUTRAL, "Nearby BlockProtection is not valid!");
                 lock.delete(user);
             }
-            else if (lock.isOwner(user) || lock.hasAdmin(user) || module.perms().EXPAND_OTHER.isAuthorized(user))
+            else if (lock.isOwner(user) || lock.hasAdmin(user) || user.hasPermission(module.perms().EXPAND_OTHER.getId()))
             {
-                this.manager.extendLock(lock, event.getBlock());
+                this.manager.extendLock(lock, event.getLocation());
                 user.sendTranslated(POSITIVE, "Protection expanded!");
             }
             else
@@ -392,7 +404,7 @@ public class LockerListener
     public void onBlockRedstone(BlockRedstoneUpdateEvent event)
     {
         if (!this.module.getConfig().protectFromRedstone) return;
-        Location block = event.getBlock();
+        Location<World> block = event.getLocation();
         Lock lock = this.manager.getLockAtLocation(block, null);
         if (lock != null)
         {
@@ -412,15 +424,8 @@ public class LockerListener
         {
             return;
         }
-        for (Location block : event.getBlocks())
-        {
-            Lock lock = this.manager.getLockAtLocation(block, null);
-            if (lock != null)
-            {
-                event.setCancelled(true);
-                return;
-            }
-        }
+        List<Location<World>> blocks = event.getLocations();
+        blocks.removeAll(blocks.stream().filter(b -> manager.getLockAtLocation(b, null) != null).collect(toList()));
     }
 
     @Subscribe
@@ -428,7 +433,7 @@ public class LockerListener
     {
         if (!this.module.getConfig().protectFromBlockBreak) return;
         User user = um.getExactUser(event.getUser().getUniqueId());
-        Location location = event.getBlock();
+        Location<World> location = event.getLocation();
         Lock lock = this.manager.getLockAtLocation(location, user);
         if (lock != null)
         {
@@ -465,7 +470,7 @@ public class LockerListener
             for (Hanging hanging : hangings)
             {
                 entityLoc = hanging.getLocation();
-                if (entityLoc.getRelative(hanging.getDirectionalData().getValue()).equals(location))
+                if (entityLoc.getRelative(hanging.getDirectionalData().direction().get()).equals(location))
                 {
                     lock = this.manager.getLockForEntityUID(hanging.getUniqueId());
                     if (lock != null)
@@ -477,32 +482,30 @@ public class LockerListener
         }
     }
 
-    @Subscribe
-    public void onBlockExplode(EntityExplosionEvent event)
+    @Subscribe(order = Order.LAST)
+    public void onBlockExplode(WorldOnExplosionEvent event)
     {
         if (!this.module.getConfig().protectBlockFromExplosion) return;
-        for (Location block : event.getBlocks())
-        {
-            Lock lock = this.manager.getLockAtLocation(block, null);
-            if (lock != null)
-            {
-                event.setCancelled(true);
-            }
-        }
+
+        List<Location<World>> blocks = event.getLocations();
+        blocks.removeAll(blocks.stream().filter(block -> manager.getLockAtLocation(block, null) != null).collect(toList()));
+
+        List<Entity> entities = event.getEntities();
+        entities.removeAll(entities.stream().filter(e -> manager.getLockForEntityUID(e.getUniqueId()) != null).collect(toList()));
     }
 
     @Subscribe
     public void onBlockBurn(BlockBurnEvent event)
     {
         if (!this.module.getConfig().protectBlockFromFire) return;
-        Location location = event.getBlock();
+        Location<World> location = event.getLocation();
         Lock lock = this.manager.getLockAtLocation(location, null);
         if (lock != null)
         {
             event.setCancelled(true);
             return;
         }
-        for (Location block : BlockUtil.getDetachableBlocks(event.getBlock()))
+        for (Location block : BlockUtil.getDetachableBlocks(event.getLocation()))
         {
             lock = this.manager.getLockAtLocation(block, null);
             if (lock != null)
@@ -513,6 +516,8 @@ public class LockerListener
         }
     }
 
+    // TODO InventoryMovements
+    /*
     @Subscribe
     public void onHopperItemMove(InventoryMoveItemEvent event)
     {
@@ -541,6 +546,7 @@ public class LockerListener
             }
         }
     }
+    */
 
     @Subscribe
     public void onWaterLavaFlow(FluidSpreadEvent event)
@@ -549,7 +555,7 @@ public class LockerListener
         {
             return;
         }
-        event.getBlocks().stream().filter(b -> BlockUtil.isNonFluidProofBlock(b.getType())).forEach(b -> {
+        event.getLocations().stream().filter(b -> BlockUtil.isNonFluidProofBlock(b.getBlockType())).forEach(b -> {
             Lock lock = this.manager.getLockAtLocation(b, null);
             if (lock != null)
             {

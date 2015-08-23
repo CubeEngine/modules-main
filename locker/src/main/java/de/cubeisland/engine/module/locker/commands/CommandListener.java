@@ -34,7 +34,7 @@ import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.data.manipulator.entity.SneakingData;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.living.Human;
@@ -45,6 +45,9 @@ import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 import static de.cubeisland.engine.module.locker.commands.CommandListener.CommandType.*;
 import static de.cubeisland.engine.module.locker.storage.LockType.*;
@@ -116,13 +119,13 @@ public class CommandListener
     public void onRightClickBlock(PlayerInteractBlockEvent event)
     {
         if (event.getInteractionType() != EntityInteractionTypes.USE
-            || event.getUser().getData(SneakingData.class).isPresent()
+            || event.getUser().get(Keys.IS_SNEAKING).get()
             || !map.keySet().contains(event.getUser().getUniqueId()))
         {
             return;
         }
         User user = um.getExactUser(event.getUser().getUniqueId());
-        Location location = event.getBlock();
+        Location<World> location = event.getLocation();
         Triplet<CommandType, String, Boolean> triplet = map.get(user.getUniqueId());
         Lock lock = this.manager.getLockAtLocation(location, user, triplet.getFirst() != INFO);
 
@@ -219,7 +222,7 @@ public class CommandListener
     public void onRightClickEntity(PlayerInteractEntityEvent event)
     {
         if (event.getInteractionType() != EntityInteractionTypes.USE
-            || event.getUser().getData(SneakingData.class).isPresent()
+            || event.getUser().get(Keys.IS_SNEAKING).get()
             || !map.keySet().contains(event.getUser().getUniqueId()))
         {
             return;
@@ -308,7 +311,7 @@ public class CommandListener
             }
             break;
         case KEYS:
-            if (lock.isOwner(user) || module.perms().CMD_KEY_OTHER.isAuthorized(user))
+            if (lock.isOwner(user) || user.hasPermission(module.perms().CMD_KEY_OTHER.getId()))
             {
                 if (lock.isPublic())
                 {
@@ -325,7 +328,7 @@ public class CommandListener
             }
             break;
         case GIVE:
-            if (lock.isOwner(user) || module.perms().CMD_GIVE_OTHER.isAuthorized(user))
+            if (lock.isOwner(user) || user.hasPermission(module.perms().CMD_GIVE_OTHER.getId()))
             {
                 // TODO UUID stuff
                 User newOwner = um.getExactUser(second);
@@ -337,7 +340,7 @@ public class CommandListener
                 user.sendTranslated(NEGATIVE, "This is not your protection!");
             }
         case FLAGS_SET:
-            if (lock.isOwner(user) || lock.hasAdmin(user) || module.perms().CMD_MODIFY_OTHER.isAuthorized(user))
+            if (lock.isOwner(user) || lock.hasAdmin(user) || user.hasPermission(module.perms().CMD_MODIFY_OTHER.getId()))
             {
                 short flags = 0;
                 for (ProtectionFlag protectionFlag : ProtectionFlag.matchFlags(stringMatcher, second))
@@ -353,7 +356,7 @@ public class CommandListener
             }
             break;
         case FLAGS_UNSET:
-            if (lock.isOwner(user) || lock.hasAdmin(user) || module.perms().CMD_MODIFY_OTHER.isAuthorized(user))
+            if (lock.isOwner(user) || lock.hasAdmin(user) || user.hasPermission(module.perms().CMD_MODIFY_OTHER.getId()))
             {
                 if ("all".equalsIgnoreCase(second))
                 {
