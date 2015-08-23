@@ -43,6 +43,7 @@ import org.spongepowered.api.util.Tristate;
 import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
 import static org.spongepowered.api.util.Tristate.FALSE;
 import static org.spongepowered.api.util.Tristate.TRUE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 @Command(name = "role", desc = "Manage roles")
 public class RoleInformationCommands extends ContainerCommand

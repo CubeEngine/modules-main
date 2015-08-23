@@ -23,6 +23,7 @@ import de.cubeisland.engine.butler.parametric.Command;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains Teleport-Request commands.

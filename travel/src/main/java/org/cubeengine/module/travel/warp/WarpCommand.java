@@ -47,6 +47,7 @@ import static org.cubeengine.module.core.util.ChatFormat.DARK_GREEN;
 import static org.cubeengine.module.core.util.ChatFormat.YELLOW;
 import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
 import static java.util.stream.Collectors.toSet;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 @Command(name = "warp", desc = "Teleport to a warp")
 public class WarpCommand extends TpPointCommand

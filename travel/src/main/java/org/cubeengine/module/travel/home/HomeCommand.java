@@ -53,6 +53,7 @@ import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static java.util.stream.Collectors.toSet;
 
 @Command(name = "home", desc = "Teleport to your home")

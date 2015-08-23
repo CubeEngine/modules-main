@@ -35,6 +35,7 @@ import org.spongepowered.api.world.World;
 
 import static org.cubeengine.module.core.util.ChatFormat.DARK_GREEN;
 import static org.cubeengine.module.core.util.ChatFormat.WHITE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains commands to teleport to players/worlds/position.

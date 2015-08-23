@@ -37,6 +37,7 @@ import static org.spongepowered.api.block.BlockTypes.AIR;
 import static org.spongepowered.api.block.BlockTypes.GLASS;
 import static org.spongepowered.api.util.Direction.DOWN;
 import static org.spongepowered.api.util.Direction.UP;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains commands for fast movement. /up /ascend /descend /jumpto /through

@@ -27,6 +27,7 @@ import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Subscribe;
 import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 import static org.spongepowered.api.event.Order.EARLY;
 
