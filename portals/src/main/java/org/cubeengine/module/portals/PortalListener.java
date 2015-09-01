@@ -21,10 +21,9 @@ import java.util.List;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.EntityTeleportEvent;
-import org.spongepowered.api.event.entity.player.PlayerMoveEvent;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.entity.DisplaceEntityEvent;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
@@ -39,23 +38,19 @@ public class PortalListener
         this.um = um;
     }
 
-    @Subscribe
-    public void onTeleport(EntityTeleportEvent event)
+    @Listener
+    public void onTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event)
     {
-        if (!(event.getEntity() instanceof Player))
-        {
-            return;
-        }
-        List<Portal> portals = this.module.getPortalsInChunk(event.getNewLocation());
+        List<Portal> portals = this.module.getPortalsInChunk(event.getNewTransform().getLocation());
         if (portals == null)
         {
             return;
         }
         for (Portal portal : portals)
         {
-            if (portal.has(event.getNewLocation()))
+            if (portal.has(event.getNewTransform().getLocation()))
             {
-                User user = um.getExactUser(event.getEntity().getUniqueId());
+                User user = um.getExactUser(event.getTargetEntity().getUniqueId());
                 PortalsAttachment attachment = user.attachOrGet(PortalsAttachment.class, module);
                 attachment.setInPortal(true);
                 if (attachment.isDebug())
@@ -68,10 +63,14 @@ public class PortalListener
         }
     }
 
-    @Subscribe
-    public void onEntityTeleport(EntityTeleportEvent event)
+    @Listener
+    public void onEntityTeleport(DisplaceEntityEvent.Teleport event)
     {
-        List<Portal> portals = module.getPortalsInChunk(event.getOldLocation());
+        if (event.getTargetEntity() instanceof Player)
+        {
+            return;
+        }
+        List<Portal> portals = module.getPortalsInChunk(event.getOldTransform().getLocation());
         if (portals == null)
         {
             return;
@@ -79,36 +78,36 @@ public class PortalListener
         for (Portal portal : portals)
         {
             List<Entity> entities = module.getEntitiesInPortal(portal);
-            if (portal.has(event.getNewLocation()))
+            if (portal.has(event.getNewTransform().getLocation()))
             {
-                entities.add(event.getEntity());
+                entities.add(event.getTargetEntity());
                 return;
             }
             else
             {
-                entities.remove(event.getEntity());
+                entities.remove(event.getTargetEntity());
             }
         }
     }
 
-    @Subscribe
-    public void onMove(PlayerMoveEvent event)
+    @Listener
+    public void onMove(DisplaceEntityEvent.Move.TargetPlayer event)
     {
-        if (event.getOldLocation().getExtent() != event.getNewLocation().getExtent()
-            || event.getOldLocation().getBlockX() == event.getNewLocation().getBlockX()
-            && event.getOldLocation().getBlockY() == event.getNewLocation().getBlockY()
-            && event.getOldLocation().getBlockZ() == event.getNewLocation().getBlockZ())
+        if (event.getOldTransform().getExtent() != event.getNewTransform().getExtent()
+            || event.getOldTransform().getLocation().getBlockX() == event.getNewTransform().getLocation().getBlockX()
+            && event.getOldTransform().getLocation().getBlockY() == event.getNewTransform().getLocation().getBlockY()
+            && event.getOldTransform().getLocation().getBlockZ() == event.getNewTransform().getLocation().getBlockZ())
         {
             return;
         }
-        List<Portal> portals = module.getPortalsInChunk(event.getNewLocation());
-        User user = um.getExactUser(event.getUser().getUniqueId());
+        List<Portal> portals = module.getPortalsInChunk(event.getNewTransform().getLocation());
+        User user = um.getExactUser(event.getTargetEntity().getUniqueId());
         PortalsAttachment attachment = user.attachOrGet(PortalsAttachment.class, module);
         if (portals != null)
         {
             for (Portal portal : portals)
             {
-                if (portal.has(event.getNewLocation()))
+                if (portal.has(event.getNewTransform().getLocation()))
                 {
                     if (attachment.isDebug())
                     {
@@ -125,7 +124,7 @@ public class PortalListener
                     }
                     else if (!attachment.isInPortal())
                     {
-                        portal.teleport(event.getUser());
+                        portal.teleport(event.getTargetEntity());
                     }
                     return;
                 }

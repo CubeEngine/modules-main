@@ -19,7 +19,7 @@ package de.cubeisland.engine.module.mail;
 
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
-import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;

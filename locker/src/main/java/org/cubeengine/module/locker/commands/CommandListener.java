@@ -36,17 +36,17 @@ import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityInteractionTypes;
 import org.spongepowered.api.entity.living.Human;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
-import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import static org.cubeengine.module.locker.commands.CommandListener.CommandType.*;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 public class CommandListener
@@ -112,23 +112,23 @@ public class CommandListener
         return true;
     }
 
-    @Subscribe
-    public void onRightClickBlock(PlayerInteractBlockEvent event)
+    @Listener
+    public void onRightClickBlock(InteractBlockEvent.SourcePlayer event)
     {
-        if (event.getInteractionType() != EntityInteractionTypes.USE
-            || event.getUser().get(Keys.IS_SNEAKING).get()
-            || !map.keySet().contains(event.getUser().getUniqueId()))
+        if ( !(event instanceof InteractBlockEvent.Use)
+            || event.getSourceEntity().get(Keys.IS_SNEAKING).get()
+            || !map.keySet().contains(event.getSourceEntity().getUniqueId()))
         {
             return;
         }
-        User user = um.getExactUser(event.getUser().getUniqueId());
-        Location<World> location = event.getLocation();
+        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        Location<World> location = event.getTargetLocation();
         Triplet<CommandType, String, Boolean> triplet = map.get(user.getUniqueId());
         Lock lock = this.manager.getLockAtLocation(location, user, triplet.getFirst() != INFO);
 
         TileEntity te = location.getTileEntity().orNull();
         if (this.handleInteract1(triplet, lock, user, te instanceof Carrier,
-                 this.manager.canProtect(event.getBlock().getType()), event))
+                 this.manager.canProtect(event.getTargetLocation().getBlockType()), event))
         {
             return;
         }
@@ -136,19 +136,19 @@ public class CommandListener
         switch (triplet.getFirst())
         {
         case C_PRIVATE:
-            this.manager.createLock(event.getBlock().getType(), location, user, C_PRIVATE.lockType, triplet.getSecond(), triplet.getThird());
+            this.manager.createLock(event.getTargetLocation().getBlockType(), location, user, C_PRIVATE.lockType, triplet.getSecond(), triplet.getThird());
             break;
         case C_PUBLIC:
-            this.manager.createLock(event.getBlock().getType(), location, user, C_PUBLIC.lockType, triplet.getSecond(), false);
+            this.manager.createLock(event.getTargetLocation().getBlockType(), location, user, C_PUBLIC.lockType, triplet.getSecond(), false);
             break;
         case C_DONATION:
-            this.manager.createLock(event.getBlock().getType(), location, user, C_DONATION.lockType, triplet.getSecond(), triplet.getThird());
+            this.manager.createLock(event.getTargetLocation().getBlockType(), location, user, C_DONATION.lockType, triplet.getSecond(), triplet.getThird());
             break;
         case C_FREE:
-            this.manager.createLock(event.getBlock().getType(), location, user, C_FREE.lockType, triplet.getSecond(), triplet.getThird());
+            this.manager.createLock(event.getTargetLocation().getBlockType(), location, user, C_FREE.lockType, triplet.getSecond(), triplet.getThird());
             break;
         case C_GUARDED:
-            this.manager.createLock(event.getBlock().getType(), location, user, C_GUARDED.lockType, triplet.getSecond(), triplet.getThird());
+            this.manager.createLock(event.getTargetLocation().getBlockType(), location, user, C_GUARDED.lockType, triplet.getSecond(), triplet.getThird());
             break;
         default:
             this.handleInteract2(triplet.getFirst(), lock, user, triplet.getSecond(), triplet.getThird(), location,
@@ -215,16 +215,16 @@ public class CommandListener
         return false;
     }
 
-    @Subscribe
-    public void onRightClickEntity(PlayerInteractEntityEvent event)
+    @Listener
+    public void onRightClickEntity(InteractEntityEvent.SourcePlayer event)
     {
-        if (event.getInteractionType() != EntityInteractionTypes.USE
-            || event.getUser().get(Keys.IS_SNEAKING).get()
-            || !map.keySet().contains(event.getUser().getUniqueId()))
+        if (!(event instanceof InteractEntityEvent.Use)
+            || event.getSourceEntity().get(Keys.IS_SNEAKING).get()
+            || !map.keySet().contains(event.getSourceEntity().getUniqueId()))
         {
             return;
         }
-        User user = um.getExactUser(event.getUser().getUniqueId());
+        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
         try
         {
             Entity target = event.getTargetEntity();
@@ -383,11 +383,11 @@ public class CommandListener
 
     public enum CommandType
     {
-        C_PRIVATE(PRIVATE),
-        C_PUBLIC(PUBLIC),
-        C_DONATION(DONATION),
-        C_FREE(FREE),
-        C_GUARDED(GUARDED),
+        C_PRIVATE(LockType.PRIVATE),
+        C_PUBLIC(LockType.PUBLIC),
+        C_DONATION(LockType.DONATION),
+        C_FREE(LockType.FREE),
+        C_GUARDED(LockType.GUARDED),
         INFO,
         MODIFY,
         REMOVE,

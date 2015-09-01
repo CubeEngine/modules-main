@@ -39,7 +39,7 @@ import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.entity.player.PlayerBreakBlockEvent;
+import org.spongepowered.api.event.block.BreakBlockEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -47,6 +47,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import static org.cubeengine.module.locker.storage.AccessListModel.*;
 import static org.cubeengine.module.locker.storage.LockType.PUBLIC;
 import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
@@ -527,7 +528,7 @@ public class Lock
         return LockType.forByte(this.model.getValue(TABLE_LOCK.LOCK_TYPE));
     }
 
-    public void handleBlockBreak(PlayerBreakBlockEvent event, User user)
+    public void handleBlockBreak(BreakBlockEvent.SourcePlayer event, User user)
     {
         if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getId()) || user.hasPermission(
             module.perms().BREAK_OTHER.getId()))

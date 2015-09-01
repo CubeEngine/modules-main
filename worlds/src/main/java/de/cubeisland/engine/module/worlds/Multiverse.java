@@ -57,7 +57,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.RespawnLocationData;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.EntityEnterPortalEvent;
 import org.spongepowered.api.event.entity.EntityExitPortalEvent;
 import org.spongepowered.api.event.entity.EntityTeleportEvent;

@@ -42,6 +42,7 @@ import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.Location;
 
+import static org.cubeengine.module.locker.commands.CommandListener.CommandType.*;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;

@@ -30,7 +30,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.entity.GameModeData;
 import org.spongepowered.api.data.manipulator.entity.InvulnerabilityData;
 import org.spongepowered.api.data.manipulator.entity.TameableData;
-import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;

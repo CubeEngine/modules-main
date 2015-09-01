@@ -21,7 +21,7 @@ import de.cubeisland.engine.module.basics.Basics;
 import org.spongepowered.api.data.manipulator.entity.FlyingData;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
-import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.entity.player.PlayerQuitEvent;
 import org.spongepowered.api.event.inventory.InventoryClickEvent;

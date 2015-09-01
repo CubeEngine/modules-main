@@ -29,6 +29,7 @@ import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
@@ -37,22 +38,34 @@ import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.hanging.Hanging;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.BlockBurnEvent;
 import org.spongepowered.api.event.block.BlockMoveEvent;
 import org.spongepowered.api.event.block.BlockRedstoneUpdateEvent;
+import org.spongepowered.api.event.block.BreakBlockEvent;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.FluidSpreadEvent;
+import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.block.MoveBlockEvent;
+import org.spongepowered.api.event.block.PlaceBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.EntityDeathEvent;
 import org.spongepowered.api.event.entity.EntityTameEvent;
+import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.entity.TameEntityEvent;
 import org.spongepowered.api.event.entity.living.LivingChangeHealthEvent;
 import org.spongepowered.api.event.entity.player.PlayerBreakBlockEvent;
 import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
 import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.event.inventory.ContainerOpenEvent;
+import org.spongepowered.api.event.inventory.viewer.ViewerOpenContainerEvent;
+import org.spongepowered.api.event.world.WorldExplosionEvent;
 import org.spongepowered.api.event.world.WorldOnExplosionEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -85,15 +98,14 @@ public class LockerListener
         this.um = um;
     }
 
-    @Subscribe
-    public void onPlayerInteract(PlayerInteractBlockEvent event)
+    @Listener
+    public void onPlayerInteract(InteractBlockEvent.Use.SourcePlayer event)
     {
         if (!this.module.getConfig().protectBlockFromRClick) return;
-        if (event.getInteractionType() != USE) return;
-        User user = um.getExactUser(event.getUser().getUniqueId());
-        Location location = event.getLocation();
+        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        Location location = event.getTargetLocation();
         Lock lock = this.manager.getLockAtLocation(location, user);
-        Location block = event.getLocation();
+        Location block = event.getTargetLocation();
         if (block.getTileEntity().orNull() instanceof Carrier)
         {
             if (!user.hasPermission(module.perms().DENY_CONTAINER.getId()))
@@ -122,12 +134,12 @@ public class LockerListener
         }
     }
 
-    @Subscribe
-    public void onPlayerInteractEntity(PlayerInteractEntityEvent event)
+    @Listener
+    public void onPlayerInteractEntity(InteractEntityEvent.SourcePlayer event)
     {
         if (!this.module.getConfig().protectEntityFromRClick) return;
         Entity entity = event.getTargetEntity();
-        User user = um.getExactUser(event.getUser().getUniqueId());
+        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
         if (!user.hasPermission(module.perms().DENY_ENTITY.getId()))
         {
             user.sendTranslated(NEGATIVE, "Strong magic prevents you from reaching this entity!");
@@ -136,7 +148,7 @@ public class LockerListener
         }
         Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
         if (lock == null) return;
-        if (entity instanceof Carrier || (entity.getType() == HORSE && event.getUser().get(Keys.IS_SNEAKING).get()))
+        if (entity instanceof Carrier || (entity.getType() == HORSE && event.getSourceEntity().get(Keys.IS_SNEAKING).get()))
         {
             lock.handleInventoryOpen(event, null, null, user);
         }
@@ -146,8 +158,8 @@ public class LockerListener
         }
     }
 
-    @Subscribe
-    public void onInventoryOpen(ContainerOpenEvent event)
+    @Listener
+    public void onInventoryOpen(ViewerOpenContainerEvent event)
     {
         if (!(event.getViewer() instanceof Player) || !(event.getContainer() instanceof CarriedInventory))
         {
@@ -177,14 +189,14 @@ public class LockerListener
         lock.handleInventoryOpen(event, event.getContainer(), loc, user);
     }
 
-    @Subscribe
-    public void onEntityDamageEntity(LivingChangeHealthEvent event)
+    @Listener
+    public void onEntityDamageEntity(DamageEntityEvent event)
     {
         if (!this.module.getConfig().protectEntityFromDamage) return;
-        Living entity = event.getEntity();
+        Entity entity = event.getTargetEntity();
         Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
         if (lock == null) return;
-        Optional<Cause> cause = event.getCause();
+        Cause cause = event.getCause();
         // TODO update to this when done https://github.com/SpongePowered/SpongeAPI/pull/712
         if (cause.isPresent() && cause.get().getCause() instanceof Player)
         {
@@ -198,12 +210,9 @@ public class LockerListener
         }
     }
 
-    @Subscribe
-    public void onEntityDeath(EntityDeathEvent event)
+    @Listener
+    public void onEntityDeath(DestructEntityEvent event)
     {
-        // TODO waiting for EntityDamageEvent in Cause Enhancement PR
-
-        /*
         Optional<Cause> cause = event.getCause();
         Entity entity = event.getEntity();
         if (entity.supports(Keys.VEHICLE))
@@ -263,13 +272,16 @@ public class LockerListener
             }
         }
         lock.handleEntityDeletion(user);
-        */
     }
 
-    @Subscribe(order = Order.EARLY)
-    public void onPlace(PlayerPlaceBlockEvent event)
+    @Listener(order = Order.EARLY)
+    public void onPlace(PlaceBlockEvent.SourcePlayer event)
     {
-        Location<World> placed = event.getLocation();
+        for (BlockTransaction placed : event.getTransactions())
+        {
+        }
+    // TODO
+        Location<World> placed = event.g();
         User user = um.getExactUser(event.getUser().getUniqueId());
         BlockType type = placed.getBlockType();
         if (type == CHEST || type == TRAPPED_CHEST)
@@ -307,7 +319,7 @@ public class LockerListener
             || type == JUNGLE_DOOR || type == ACACIA_DOOR || type == DARK_OAK_DOOR;
     }
 
-    private boolean onPlaceDoor(PlayerPlaceBlockEvent event, Location placed, User user)
+    private boolean onPlaceDoor(PlaceBlockEvent.SourcePlayer event, Location placed, User user)
     {
         BlockState doorState = event.getReplacementBlock().getState();
         Hinge hinge = doorState.get(Keys.HINGE_POSITION).get();
@@ -358,7 +370,7 @@ public class LockerListener
         return false;
     }
 
-    private boolean onPlaceChest(PlayerPlaceBlockEvent event, Location placed, User user)
+    private boolean onPlaceChest(PlaceBlockEvent.SourcePlayer event, Location placed, User user)
     {
         Location relativeLoc;
         for (Direction direction : CARDINAL_DIRECTIONS)
@@ -393,7 +405,7 @@ public class LockerListener
         return false;
     }
 
-    @Subscribe
+    @Listener
     public void onBlockRedstone(BlockRedstoneUpdateEvent event)
     {
         if (!this.module.getConfig().protectFromRedstone) return;
@@ -408,8 +420,8 @@ public class LockerListener
         }
     }
 
-    @Subscribe
-    public void onBlockPistonExtend(BlockMoveEvent event)
+    @Listener
+    public void onBlockPistonExtend(ChangeBlockEvent.SourceBlock event)
     {
         if (!this.module.getConfig().protectFromPistonMove) return;
         Optional<Cause> cause = event.getCause();
@@ -421,8 +433,8 @@ public class LockerListener
         blocks.removeAll(blocks.stream().filter(b -> manager.getLockAtLocation(b, null) != null).collect(toList()));
     }
 
-    @Subscribe
-    public void onBlockBreak(PlayerBreakBlockEvent event)
+    @Listener
+    public void onBlockBreak(BreakBlockEvent.SourcePlayer event)
     {
         if (!this.module.getConfig().protectFromBlockBreak) return;
         User user = um.getExactUser(event.getUser().getUniqueId());
@@ -475,8 +487,8 @@ public class LockerListener
         }
     }
 
-    @Subscribe(order = Order.LAST)
-    public void onBlockExplode(WorldOnExplosionEvent event)
+    @Listener(order = Order.LAST)
+    public void onBlockExplode(WorldExplosionEvent event)
     {
         if (!this.module.getConfig().protectBlockFromExplosion) return;
 
@@ -487,8 +499,8 @@ public class LockerListener
         entities.removeAll(entities.stream().filter(e -> manager.getLockForEntityUID(e.getUniqueId()) != null).collect(toList()));
     }
 
-    @Subscribe
-    public void onBlockBurn(BlockBurnEvent event)
+    @Listener
+    public void onBlockBurn(BreakBlockEvent event) // TODO burning cause?
     {
         if (!this.module.getConfig().protectBlockFromFire) return;
         Location<World> location = event.getLocation();
@@ -510,8 +522,7 @@ public class LockerListener
     }
 
     // TODO InventoryMovements
-    /*
-    @Subscribe
+    @Listener
     public void onHopperItemMove(InventoryMoveItemEvent event)
     {
         if (this.module.getConfig().noProtectFromHopper) return;
@@ -539,10 +550,9 @@ public class LockerListener
             }
         }
     }
-    */
 
-    @Subscribe
-    public void onWaterLavaFlow(FluidSpreadEvent event)
+    @Listener
+    public void onWaterLavaFlow(MoveBlockEvent event)
     {
         if (!this.module.getConfig().protectBlocksFromWaterLava)
         {
@@ -557,13 +567,9 @@ public class LockerListener
         });
     }
 
-    @Subscribe
-    public void onTame(EntityTameEvent event)
+    @Listener
+    public void onTame(TameEntityEvent.SourcePlayer event)
     {
-        if (!(event.getTamer() instanceof Player))
-        {
-            return;
-        }
         for (ConfigWorld world : module.getConfig().disableAutoProtect)
         {
             if (event.getEntity().getWorld().equals(world.getWorld()))

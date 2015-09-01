@@ -21,6 +21,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
+import static org.cubeengine.module.locker.storage.ProtectedType.*;
+
 public enum LockType
 {
     PRIVATE(1, CONTAINER, DOOR, BLOCK, ENTITY_CONTAINER, ENTITY_LIVING, ENTITY_VEHICLE, ENTITY, ENTITY_CONTAINER_LIVING),

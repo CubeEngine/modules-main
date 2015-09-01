@@ -23,10 +23,9 @@ import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
-import org.spongepowered.api.entity.EntityInteractionTypes;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.InteractBlockEvent;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 import static org.spongepowered.api.event.Order.EARLY;
@@ -46,14 +45,14 @@ public class HomeListener
         this.homeManager = module.getHomeManager();
     }
 
-    @Subscribe(order = EARLY)
-    public void rightClickBed(PlayerInteractBlockEvent event)
+    @Listener(order = EARLY)
+    public void rightClickBed(InteractBlockEvent.Use.SourcePlayer event)
     {
-        if (event.getInteractionType() != EntityInteractionTypes.USE || event.getBlock().getType() != BlockTypes.BED)
+        if (event.getTargetLocation().getBlockType() != BlockTypes.BED)
         {
             return;
         }
-        Player player = event.getUser();
+        Player player = event.getSourceEntity();
         User user = um.getExactUser(player.getUniqueId());
         if (player.get(SneakingData.class).isPresent())
         {

@@ -30,7 +30,7 @@ import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.hanging.Painting;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.Subscribe;
+import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;

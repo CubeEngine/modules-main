@@ -21,13 +21,11 @@ import com.google.common.base.Optional;
 import org.cubeengine.module.core.util.LocationUtil;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
-import org.spongepowered.api.entity.EntityInteractionType;
-import org.spongepowered.api.entity.EntityInteractionTypes;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Subscribe;
-import org.spongepowered.api.event.entity.EntityTeleportEvent;
-import org.spongepowered.api.event.entity.player.PlayerDeathEvent;
-import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.DisplaceEntityEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
@@ -49,46 +47,46 @@ public class TeleportListener
         this.um = um;
     }
 
-    @Subscribe
-    public void onTeleport(EntityTeleportEvent event)
+    @Listener
+    public void onTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event)
     {
-        if (event.getEntity() instanceof Player)
-        {
-            User user = um.getExactUser(event.getEntity().getUniqueId());
-            // TODO limit cause
-            user.attachOrGet(TeleportAttachment.class, module).setLastLocation(event.getOldLocation());
-        }
+        User user = um.getExactUser(event.getTargetEntity().getUniqueId());
+        // TODO limit cause
+        user.attachOrGet(TeleportAttachment.class, module).setLastLocation(event.getOldTransform().getLocation()); // TODO transform
     }
 
-    @Subscribe
-    public void onDeath(PlayerDeathEvent event)
+    @Listener
+    public void onDeath(DestructEntityEvent event)
     {
-        User user = um.getExactUser(event.getEntity().getUniqueId());
+        if (!(event.getTargetEntity() instanceof Player))
+        {
+            return;
+        }
+        User user = um.getExactUser(event.getTargetEntity().getUniqueId());
         if (user.hasPermission(module.perms().COMMAND_BACK_ONDEATH.getId()))
         {
             user.attachOrGet(TeleportAttachment.class, module).setDeathLocation(user.asPlayer().getLocation());
         }
     }
 
-    @Subscribe
-    public void onClick(PlayerInteractBlockEvent event)
+    @Listener
+    public void onClick(InteractBlockEvent.SourcePlayer event)
     {
         // TODO left click air is not handled
-        if (event.getUser().getItemInHand().transform(ItemStack::getItem).orNull() != COMPASS)
+        if (event.getSourceEntity().getItemInHand().transform(ItemStack::getItem).orNull() != COMPASS)
         {
             return;
         }
         event.setCancelled(true);
-        EntityInteractionType type = event.getInteractionType();
-        if (type == EntityInteractionTypes.ATTACK)
+        if (event instanceof InteractBlockEvent.Attack)
         {
-            if (event.getUser().hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
+            if (event.getSourceEntity().hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
             {
-                User user = um.getExactUser(event.getUser().getUniqueId());
+                User user = um.getExactUser(event.getSourceEntity().getUniqueId());
                 Location<World> loc;
-                if (event.getBlock().getType().isSolidCube())
+                if (event.getTargetLocation().getBlockType().isSolidCube())
                 {
-                    loc = event.getLocation().add(0.5, 1, 0.5);
+                    loc = event.getTargetLocation().add(0.5, 1, 0.5);
                 }
                 else
                 {
@@ -99,16 +97,16 @@ public class TeleportListener
                     }
                     loc = end.get().getLocation().add(0.5, 1, 0.5);
                 }
-                event.getUser().setLocation(loc);
+                event.getSourceEntity().setLocation(loc);
                 user.sendTranslated(NEUTRAL, "Poof!");
                 event.setCancelled(true);
             }
         }
-        else if (type == EntityInteractionTypes.USE)
+        else if (event instanceof InteractBlockEvent.Use)
         {
-            if (event.getUser().hasPermission(module.perms().COMPASS_JUMPTO_RIGHT.getId()))
+            if (event.getSourceEntity().hasPermission(module.perms().COMPASS_JUMPTO_RIGHT.getId()))
             {
-                User user = um.getExactUser(event.getUser().getUniqueId());
+                User user = um.getExactUser(event.getSourceEntity().getUniqueId());
                 Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfig().navigation.thru.maxRange,
                                                                this.module.getConfig().navigation.thru.maxWallThickness);
                 if (loc == null)
@@ -117,7 +115,7 @@ public class TeleportListener
                     return;
                 }
                 loc = loc.add(0, 1, 0);
-                event.getUser().setLocation(loc);
+                event.getSourceEntity().setLocation(loc);
                 user.sendTranslated(NEUTRAL, "You passed through a wall");
                 event.setCancelled(true);
             }
