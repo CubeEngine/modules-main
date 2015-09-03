@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import com.google.common.base.Optional;
+import com.google.common.base.Predicate;
 import org.cubeengine.module.core.util.BlockUtil;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
@@ -28,45 +29,35 @@ import org.cubeengine.module.locker.storage.ProtectionFlag;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.ConfigWorld;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.hanging.Hanging;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.BlockBurnEvent;
-import org.spongepowered.api.event.block.BlockMoveEvent;
-import org.spongepowered.api.event.block.BlockRedstoneUpdateEvent;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.BreakBlockEvent;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.block.FluidSpreadEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.MoveBlockEvent;
+import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.block.PlaceBlockEvent;
+import org.spongepowered.api.event.block.PlaceBlockEvent.SourcePlayer;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.EntityDeathEvent;
-import org.spongepowered.api.event.entity.EntityTameEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.TameEntityEvent;
-import org.spongepowered.api.event.entity.living.LivingChangeHealthEvent;
-import org.spongepowered.api.event.entity.player.PlayerBreakBlockEvent;
-import org.spongepowered.api.event.entity.player.PlayerInteractBlockEvent;
-import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
-import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
-import org.spongepowered.api.event.inventory.ContainerOpenEvent;
 import org.spongepowered.api.event.inventory.viewer.ViewerOpenContainerEvent;
 import org.spongepowered.api.event.world.WorldExplosionEvent;
-import org.spongepowered.api.event.world.WorldOnExplosionEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.Direction;
@@ -74,16 +65,17 @@ import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.module.core.util.BlockUtil.CARDINAL_DIRECTIONS;
-import static org.cubeengine.module.core.util.BlockUtil.getChunk;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.cubeengine.module.core.util.BlockUtil.CARDINAL_DIRECTIONS;
+import static org.cubeengine.module.core.util.BlockUtil.getChunk;
+import static org.cubeengine.module.locker.storage.ProtectionFlag.BLOCK_REDSTONE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.*;
+import static org.spongepowered.api.data.key.Keys.POWERED;
 import static org.spongepowered.api.data.type.PortionTypes.TOP;
-import static org.spongepowered.api.entity.EntityInteractionTypes.USE;
 import static org.spongepowered.api.entity.EntityTypes.HORSE;
 import static org.spongepowered.api.util.Direction.*;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 public class LockerListener
 {
@@ -213,8 +205,8 @@ public class LockerListener
     @Listener
     public void onEntityDeath(DestructEntityEvent event)
     {
-        Optional<Cause> cause = event.getCause();
-        Entity entity = event.getEntity();
+        Optional<Player> playerCause = event.getCause().getFirst(Player.class);
+        Entity entity = event.getTargetEntity();
         if (entity.supports(Keys.VEHICLE))
         {
             if (!this.module.getConfig().protectVehicleFromBreak) return;
@@ -222,15 +214,17 @@ public class LockerListener
             Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
             if (lock == null) return;
 
-            if (cause.isPresent() && cause.get().getCause() instanceof Player)
+
+            if (playerCause.isPresent())
             {
-                User user = um.getExactUser(((Player)cause.get().getCause()).getUniqueId());
+                User user = um.getExactUser(playerCause.get().getUniqueId());
                 if (lock.isOwner(user))
                 {
                     lock.handleEntityDeletion(user);
                     return;
                 }
             }
+
             if (module.getConfig().protectVehicleFromEnvironmental)
             {
                 event.setCancelled(true);
@@ -240,11 +234,11 @@ public class LockerListener
         }
         if (entity instanceof Hanging) // leash / itemframe / image
         {
-            if (cause.isPresent() && cause.get().getCause() instanceof Player)
+            if (playerCause.isPresent())
             {
                 Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
-                User user = um.getExactUser(((Player)cause.get().getCause()).getUniqueId());
-                if (module.perms().DENY_HANGING.isAuthorized(user))
+                User user = um.getExactUser(playerCause.get().getUniqueId());
+                if (user.hasPermission(module.perms().DENY_HANGING.getId()))
                 {
                     event.setCancelled(true);
                     return;
@@ -261,11 +255,11 @@ public class LockerListener
         // no need to check if allowed to kill as this would have caused an DamageEvent before / this is only to cleanup database
         Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
         if (lock == null) return;
-        Optional<DamageableData> damageData = entity.getData(DamageableData.class);
+        Optional<DamageableData> damageData = entity.get(DamageableData.class);
         User user = null;
         if (damageData.isPresent())
         {
-            Living living = damageData.get().getLastAttacker().orNull();
+            Living living = damageData.get().lastAttacker().get().orNull();
             if (living instanceof Player)
             {
                 user = um.getExactUser(living.getUniqueId());
@@ -277,38 +271,39 @@ public class LockerListener
     @Listener(order = Order.EARLY)
     public void onPlace(PlaceBlockEvent.SourcePlayer event)
     {
-        for (BlockTransaction placed : event.getTransactions())
+        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        for (BlockTransaction trans : event.getTransactions())
         {
-        }
-    // TODO
-        Location<World> placed = event.g();
-        User user = um.getExactUser(event.getUser().getUniqueId());
-        BlockType type = placed.getBlockType();
-        if (type == CHEST || type == TRAPPED_CHEST)
-        {
-            if (onPlaceChest(event, placed, user))
+            BlockSnapshot placed = trans.getFinalReplacement();
+            BlockType type = placed.getState().getType();
+
+            if (type == CHEST || type == TRAPPED_CHEST)
+            {
+                if (onPlaceChest(event, placed.getLocation().get(), user))
+                {
+                    return;
+                }
+            }
+            else if (isDoor(type))
+            {
+                if (onPlaceDoor(event, placed, user))
+                {
+                    return;
+                }
+            }
+            if (module.getConfig().disableAutoProtect.stream().map(ConfigWorld::getWorld).collect(toSet()).contains(
+                placed.getLocation().get().getExtent()))
             {
                 return;
             }
-        }
-        else if (isDoor(type))
-        {
-            if (onPlaceDoor(event, placed, user))
+            for (BlockLockerConfiguration blockprotection : this.module.getConfig().blockprotections)
             {
-                return;
-            }
-        }
-        if (module.getConfig().disableAutoProtect.stream().map(ConfigWorld::getWorld).collect(toSet()).contains(placed.getExtent()))
-        {
-            return;
-        }
-        for (BlockLockerConfiguration blockprotection : this.module.getConfig().blockprotections)
-        {
-            if (blockprotection.isType(type))
-            {
-                if (!blockprotection.autoProtect) return;
-                this.manager.createLock(type, placed, user, blockprotection.autoProtectType, null, false);
-                return;
+                if (blockprotection.isType(type))
+                {
+                    if (!blockprotection.autoProtect) return;
+                    this.manager.createLock(type, placed.getLocation().get(), user, blockprotection.autoProtectType, null, false);
+                    return;
+                }
             }
         }
     }
@@ -319,13 +314,14 @@ public class LockerListener
             || type == JUNGLE_DOOR || type == ACACIA_DOOR || type == DARK_OAK_DOOR;
     }
 
-    private boolean onPlaceDoor(PlaceBlockEvent.SourcePlayer event, Location placed, User user)
+    private boolean onPlaceDoor(SourcePlayer event, BlockSnapshot placed, User user)
     {
-        BlockState doorState = event.getReplacementBlock().getState();
+        Location<World> location = placed.getLocation().get();
+        BlockState doorState = placed.getState();
         Hinge hinge = doorState.get(Keys.HINGE_POSITION).get();
         Direction direction = doorState.get(Keys.DIRECTION).get();
 
-        Location relative = placed.getRelative(BlockUtil.getOtherDoorDirection(direction, hinge));
+        Location<World> relative = location.getRelative(BlockUtil.getOtherDoorDirection(direction, hinge));
         if (!isDoor(relative.getBlockType()))
         {
             return false; // Not a door
@@ -347,16 +343,16 @@ public class LockerListener
 
             if (placed.get(Keys.PORTION_TYPE) == TOP)
             {
-                relative = placed.getRelative(DOWN);
+                relative = location.getRelative(DOWN);
             }
             else
             {
-                relative = placed.getRelative(UP);
+                relative = location.getRelative(UP);
             }
 
             if (lock.isOwner(user) || lock.hasAdmin(user) || user.hasPermission(module.perms().EXPAND_OTHER.getId()))
             {
-                this.manager.extendLock(lock, placed);
+                this.manager.extendLock(lock, location);
                 this.manager.extendLock(lock, relative);
                 user.sendTranslated(POSITIVE, "Protection expanded!");
             }
@@ -392,7 +388,7 @@ public class LockerListener
             }
             else if (lock.isOwner(user) || lock.hasAdmin(user) || user.hasPermission(module.perms().EXPAND_OTHER.getId()))
             {
-                this.manager.extendLock(lock, event.getLocation());
+                this.manager.extendLock(lock, placed);
                 user.sendTranslated(POSITIVE, "Protection expanded!");
             }
             else
@@ -406,16 +402,18 @@ public class LockerListener
     }
 
     @Listener
-    public void onBlockRedstone(BlockRedstoneUpdateEvent event)
+    public void onBlockRedstone(NotifyNeighborBlockEvent.Power.SourceBlock event)
     {
         if (!this.module.getConfig().protectFromRedstone) return;
-        Location<World> block = event.getLocation();
-        Lock lock = this.manager.getLockAtLocation(block, null);
-        if (lock != null)
+
+        for (BlockTransaction trans : event.getTransactions())
         {
-            if (lock.hasFlag(ProtectionFlag.BLOCK_REDSTONE))
+            Location<World> location = trans.getDefaultReplacement().getLocation().get();
+            Lock lock = manager.getLockAtLocation(location, null);
+            if (lock != null && lock.hasFlag(BLOCK_REDSTONE)
+                && trans.getDefaultReplacement().getState().get(POWERED).get())
             {
-                event.setNewSignalStrength(event.getOldSignalStrength());
+                trans.setCustomReplacement(trans.getDefaultReplacement().with(POWERED, false).get());
             }
         }
     }
@@ -424,63 +422,68 @@ public class LockerListener
     public void onBlockPistonExtend(ChangeBlockEvent.SourceBlock event)
     {
         if (!this.module.getConfig().protectFromPistonMove) return;
-        Optional<Cause> cause = event.getCause();
-        if (!cause.isPresent() || !(cause.get().getCause() instanceof Piston))
+        Cause cause = event.getCause();
+        Optional<Player> playerCause = cause.getFirst(Player.class);
+        if (playerCause.isPresent())
         {
-            return;
+            event.getTransactions().stream()
+                 .filter(b -> manager.getLockAtLocation(b.getOriginal().getLocation().get(), null) != null)
+                 .forEach(b -> b.setIsValid(false));
         }
-        List<Location<World>> blocks = event.getLocations();
-        blocks.removeAll(blocks.stream().filter(b -> manager.getLockAtLocation(b, null) != null).collect(toList()));
     }
 
     @Listener
     public void onBlockBreak(BreakBlockEvent.SourcePlayer event)
     {
         if (!this.module.getConfig().protectFromBlockBreak) return;
-        User user = um.getExactUser(event.getUser().getUniqueId());
-        Location<World> location = event.getLocation();
-        Lock lock = this.manager.getLockAtLocation(location, user);
-        if (lock != null)
+        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        for (BlockTransaction trans : event.getTransactions())
         {
-            lock.handleBlockBreak(event, user);
-            return;
-        }
-        for (Location block : BlockUtil.getDetachableBlocks(location))
-        {
-            lock = this.manager.getLockAtLocation(block, user);
+            Location<World> location = trans.getOriginal().getLocation().get();
+            Lock lock = manager.getLockAtLocation(location, null);
             if (lock != null)
             {
                 lock.handleBlockBreak(event, user);
-                return;
             }
-        }
-        // Search for Detachable Entities
-        if (module.getConfig().protectsDetachableEntities())
-        {
-            Set<Chunk> chunks = new HashSet<>();
-            chunks.add(getChunk(location));
-            chunks.add(getChunk(location.getRelative(NORTH)));
-            chunks.add(getChunk(location.getRelative(EAST)));
-            chunks.add(getChunk(location.getRelative(SOUTH)));
-            chunks.add(getChunk(location.getRelative(WEST)));
-            Set<Hanging> hangings = new HashSet<>();
-            for (Chunk chunk : chunks)
-            {
-                hangings.addAll(chunk.getEntities().stream()
-                     .filter(entity -> entity instanceof Hanging)
-                     .map(entity -> (Hanging)entity).collect(toList()));
 
-            }
-            Location entityLoc;
-            for (Hanging hanging : hangings)
+            for (Location block : BlockUtil.getDetachableBlocks(location))
             {
-                entityLoc = hanging.getLocation();
-                if (entityLoc.getRelative(hanging.getDirectionalData().direction().get()).equals(location))
+                lock = this.manager.getLockAtLocation(block, user);
+                if (lock != null)
                 {
-                    lock = this.manager.getLockForEntityUID(hanging.getUniqueId());
-                    if (lock != null)
+                    lock.handleBlockBreak(event, user);
+                    return;
+                }
+            }
+
+            // Search for Detachable Entities
+            if (module.getConfig().protectsDetachableEntities())
+            {
+                Set<Chunk> chunks = new HashSet<>();
+                chunks.add(getChunk(location));
+                chunks.add(getChunk(location.getRelative(NORTH)));
+                chunks.add(getChunk(location.getRelative(EAST)));
+                chunks.add(getChunk(location.getRelative(SOUTH)));
+                chunks.add(getChunk(location.getRelative(WEST)));
+                Set<Hanging> hangings = new HashSet<>();
+                for (Chunk chunk : chunks)
+                {
+                    hangings.addAll(chunk.getEntities().stream()
+                                         .filter(entity -> entity instanceof Hanging)
+                                         .map(entity -> (Hanging)entity).collect(toList()));
+
+                }
+                Location entityLoc;
+                for (Hanging hanging : hangings)
+                {
+                    entityLoc = hanging.getLocation();
+                    if (entityLoc.getRelative(hanging.getDirectionalData().direction().get()).equals(location))
                     {
-                        lock.handleBlockBreak(event, user);
+                        lock = this.manager.getLockForEntityUID(hanging.getUniqueId());
+                        if (lock != null)
+                        {
+                            lock.handleBlockBreak(event, user);
+                        }
                     }
                 }
             }
@@ -488,35 +491,42 @@ public class LockerListener
     }
 
     @Listener(order = Order.LAST)
-    public void onBlockExplode(WorldExplosionEvent event)
+    public void onBlockExplode(WorldExplosionEvent.Detonate event)
     {
         if (!this.module.getConfig().protectBlockFromExplosion) return;
+        for (BlockTransaction trans : event.getTransactions())
+        {
+            Location<World> location = trans.getOriginal().getLocation().get();
+            if (manager.getLockAtLocation(location, null) != null)
+            {
+                trans.setIsValid(false);
+            }
+        }
 
-        List<Location<World>> blocks = event.getLocations();
-        blocks.removeAll(blocks.stream().filter(block -> manager.getLockAtLocation(block, null) != null).collect(toList()));
-
-        List<Entity> entities = event.getEntities();
-        entities.removeAll(entities.stream().filter(e -> manager.getLockForEntityUID(e.getUniqueId()) != null).collect(toList()));
+        event.filterEntities(input -> manager.getLockForEntityUID(input.getUniqueId()) != null);
     }
 
     @Listener
-    public void onBlockBurn(BreakBlockEvent event) // TODO burning cause?
+    public void onBlockBurn(BreakBlockEvent.SourceBlock event) // TODO burning cause?
     {
         if (!this.module.getConfig().protectBlockFromFire) return;
-        Location<World> location = event.getLocation();
-        Lock lock = this.manager.getLockAtLocation(location, null);
-        if (lock != null)
+        for (BlockTransaction trans : event.getTransactions())
         {
-            event.setCancelled(true);
-            return;
-        }
-        for (Location block : BlockUtil.getDetachableBlocks(event.getLocation()))
-        {
-            lock = this.manager.getLockAtLocation(block, null);
+            Location<World> location = trans.getOriginal().getLocation().get();
+            Lock lock = manager.getLockAtLocation(location, null);
             if (lock != null)
             {
-                event.setCancelled(true);
-                return;
+                trans.setIsValid(false);
+                continue;
+            }
+            for (Location block : BlockUtil.getDetachableBlocks(location))
+            {
+                lock = this.manager.getLockAtLocation(block, null);
+                if (lock != null)
+                {
+                    trans.setIsValid(false);
+                    break;
+                }
             }
         }
     }
