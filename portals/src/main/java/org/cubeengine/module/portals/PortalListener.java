@@ -41,14 +41,14 @@ public class PortalListener
     @Listener
     public void onTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event)
     {
-        List<Portal> portals = this.module.getPortalsInChunk(event.getNewTransform().getLocation());
+        List<Portal> portals = this.module.getPortalsInChunk(event.getToTransform().getLocation());
         if (portals == null)
         {
             return;
         }
         for (Portal portal : portals)
         {
-            if (portal.has(event.getNewTransform().getLocation()))
+            if (portal.has(event.getToTransform().getLocation()))
             {
                 User user = um.getExactUser(event.getTargetEntity().getUniqueId());
                 PortalsAttachment attachment = user.attachOrGet(PortalsAttachment.class, module);
@@ -70,7 +70,7 @@ public class PortalListener
         {
             return;
         }
-        List<Portal> portals = module.getPortalsInChunk(event.getOldTransform().getLocation());
+        List<Portal> portals = module.getPortalsInChunk(event.getFromTransform().getLocation());
         if (portals == null)
         {
             return;
@@ -78,7 +78,7 @@ public class PortalListener
         for (Portal portal : portals)
         {
             List<Entity> entities = module.getEntitiesInPortal(portal);
-            if (portal.has(event.getNewTransform().getLocation()))
+            if (portal.has(event.getToTransform().getLocation()))
             {
                 entities.add(event.getTargetEntity());
                 return;
@@ -93,21 +93,21 @@ public class PortalListener
     @Listener
     public void onMove(DisplaceEntityEvent.Move.TargetPlayer event)
     {
-        if (event.getOldTransform().getExtent() != event.getNewTransform().getExtent()
-            || event.getOldTransform().getLocation().getBlockX() == event.getNewTransform().getLocation().getBlockX()
-            && event.getOldTransform().getLocation().getBlockY() == event.getNewTransform().getLocation().getBlockY()
-            && event.getOldTransform().getLocation().getBlockZ() == event.getNewTransform().getLocation().getBlockZ())
+        if (event.getFromTransform().getExtent() != event.getToTransform().getExtent()
+            || event.getFromTransform().getLocation().getBlockX() == event.getToTransform().getLocation().getBlockX()
+            && event.getFromTransform().getLocation().getBlockY() == event.getToTransform().getLocation().getBlockY()
+            && event.getFromTransform().getLocation().getBlockZ() == event.getToTransform().getLocation().getBlockZ())
         {
             return;
         }
-        List<Portal> portals = module.getPortalsInChunk(event.getNewTransform().getLocation());
+        List<Portal> portals = module.getPortalsInChunk(event.getToTransform().getLocation());
         User user = um.getExactUser(event.getTargetEntity().getUniqueId());
         PortalsAttachment attachment = user.attachOrGet(PortalsAttachment.class, module);
         if (portals != null)
         {
             for (Portal portal : portals)
             {
-                if (portal.has(event.getNewTransform().getLocation()))
+                if (portal.has(event.getToTransform().getLocation()))
                 {
                     if (attachment.isDebug())
                     {

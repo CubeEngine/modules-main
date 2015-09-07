@@ -52,7 +52,7 @@ public class TeleportListener
     {
         User user = um.getExactUser(event.getTargetEntity().getUniqueId());
         // TODO limit cause
-        user.attachOrGet(TeleportAttachment.class, module).setLastLocation(event.getOldTransform().getLocation()); // TODO transform
+        user.attachOrGet(TeleportAttachment.class, module).setLastLocation(event.getFromTransform().getLocation()); // TODO transform
     }
 
     @Listener
@@ -70,23 +70,28 @@ public class TeleportListener
     }
 
     @Listener
-    public void onClick(InteractBlockEvent.SourcePlayer event)
+    public void onClick(InteractBlockEvent event)
     {
-        // TODO left click air is not handled
-        if (event.getSourceEntity().getItemInHand().transform(ItemStack::getItem).orNull() != COMPASS)
+        Optional<Player> source = event.getCause().first(Player.class);
+        if (!source.isPresent())
+        {
+            return;
+        }
+        Player player = source.get();
+        if (source.get().getItemInHand().transform(ItemStack::getItem).orNull() != COMPASS)
         {
             return;
         }
         event.setCancelled(true);
         if (event instanceof InteractBlockEvent.Attack)
         {
-            if (event.getSourceEntity().hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
+            if (player.hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
             {
-                User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+                User user = um.getExactUser(player.getUniqueId());
                 Location<World> loc;
-                if (event.getTargetLocation().getBlockType().isSolidCube())
+                if (event.getTargetBlock().getState().getType().isSolidCube())
                 {
-                    loc = event.getTargetLocation().add(0.5, 1, 0.5);
+                    loc = event.getTargetBlock().getLocation().get().add(0.5, 1, 0.5);
                 }
                 else
                 {
@@ -97,16 +102,16 @@ public class TeleportListener
                     }
                     loc = end.get().getLocation().add(0.5, 1, 0.5);
                 }
-                event.getSourceEntity().setLocation(loc);
+                player.setLocation(loc);
                 user.sendTranslated(NEUTRAL, "Poof!");
                 event.setCancelled(true);
             }
         }
         else if (event instanceof InteractBlockEvent.Use)
         {
-            if (event.getSourceEntity().hasPermission(module.perms().COMPASS_JUMPTO_RIGHT.getId()))
+            if (player.hasPermission(module.perms().COMPASS_JUMPTO_RIGHT.getId()))
             {
-                User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+                User user = um.getExactUser(player.getUniqueId());
                 Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfig().navigation.thru.maxRange,
                                                                this.module.getConfig().navigation.thru.maxWallThickness);
                 if (loc == null)
@@ -115,10 +120,11 @@ public class TeleportListener
                     return;
                 }
                 loc = loc.add(0, 1, 0);
-                event.getSourceEntity().setLocation(loc);
+                player.setLocation(loc);
                 user.sendTranslated(NEUTRAL, "You passed through a wall");
                 event.setCancelled(true);
             }
         }
+        // TODO left click air is not handled OR is it?
     }
 }
