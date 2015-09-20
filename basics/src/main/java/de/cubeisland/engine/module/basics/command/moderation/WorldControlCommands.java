@@ -176,6 +176,11 @@ public class WorldControlCommands
             context.sendTranslated(NEGATIVE, "The radius has to be a whole number greater than 0!");
             return;
         }
+        if (radius > 1000)
+        {
+            context.sendTranslated(NEGATIVE, "Radius is too big. If you want to remove everything try -1 radius instead");
+            return;
+        }
         Location loc = context instanceof User ? ((User)context).getLocation() : null;
         if (loc != null && !loc.getWorld().equals(world))
         {
@@ -323,6 +328,11 @@ public class WorldControlCommands
         }
         lightning = lightning && module.perms().COMMAND_BUTCHER_FLAG_LIGHTNING.isAuthorized(context);
         List<Entity> list;
+        if (radius > 1000)
+        {
+            context.sendTranslated(NEGATIVE, "Radius is too big. If you want to kill everything try -all instead");
+            return;
+        }
         if (context instanceof User && !(radius == -1))
         {
             list = ((User)context).getNearbyEntities(radius, radius, radius);
