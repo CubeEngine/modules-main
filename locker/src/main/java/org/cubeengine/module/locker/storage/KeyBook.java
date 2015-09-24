@@ -22,7 +22,7 @@ import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.locker.Locker;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.item.ItemTypes;
@@ -41,12 +41,12 @@ public class KeyBook
 {
     public static final String TITLE = ChatFormat.RESET.toString() + ChatFormat.GOLD + "KeyBook " + ChatFormat.DARK_GREY + "#";
     public ItemStack item;
-    public final User currentHolder;
+    public final MultilingualPlayer currentHolder;
     private final Locker module;
     public final long lockID;
     private final String keyBookName;
 
-    private KeyBook(ItemStack item, User currentHolder, Locker module)
+    private KeyBook(ItemStack item, MultilingualPlayer currentHolder, Locker module)
     {
         this.item = item;
         this.currentHolder = currentHolder;
@@ -55,7 +55,7 @@ public class KeyBook
         lockID = Long.valueOf(keyBookName.substring(keyBookName.indexOf('#') + 1, keyBookName.length()));
     }
 
-    public static KeyBook getKeyBook(ItemStack item, User currentHolder, Locker module)
+    public static KeyBook getKeyBook(ItemStack item, MultilingualPlayer currentHolder, Locker module)
     {
         if (item.getItem() == ItemTypes.ENCHANTED_BOOK
             && item.get(DISPLAY_NAME).transform(Texts::toPlain).transform(s -> s.contains(TITLE)).or(false))
@@ -81,8 +81,8 @@ public class KeyBook
                 {
                     currentHolder.sendTranslated(POSITIVE,
                                                  "As you approach with your KeyBook the magic lock disappears!");
-                    currentHolder.asPlayer().playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
-                    currentHolder.asPlayer().playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, (float)1.5);
+                    currentHolder.original().playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
+                    currentHolder.original().playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, (float)1.5);
                     lock.notifyKeyUsage(currentHolder);
                 }
                 return true;
@@ -92,23 +92,23 @@ public class KeyBook
                 currentHolder.sendTranslated(NEGATIVE, "You try to open the container with your KeyBook");
                 currentHolder.sendTranslated(NEGATIVE, "but you get forcefully pushed away!");
                 this.invalidate();
-                currentHolder.asPlayer().playSound(GHAST_SCREAM, effectLocation.getPosition(), 1, 1);
+                currentHolder.original().playSound(GHAST_SCREAM, effectLocation.getPosition(), 1, 1);
 
-                final Vector3d userDirection = currentHolder.asPlayer().getRotation();
+                final Vector3d userDirection = currentHolder.original().getRotation();
 
                 // TODO damaging player working? /w effects see Lock for effects playing manually
-                currentHolder.asPlayer().offer(Keys.HEALTH, currentHolder.asPlayer().getHealthData().health().get() - 1);
-                VelocityData velocity = currentHolder.asPlayer().getOrCreate(VelocityData.class).get();
+                currentHolder.original().offer(Keys.HEALTH, currentHolder.original().getHealthData().health().get() - 1);
+                VelocityData velocity = currentHolder.original().getOrCreate(VelocityData.class).get();
                 velocity.velocity().set(userDirection.mul(-3));
-                currentHolder.asPlayer().offer(velocity);
+                currentHolder.original().offer(velocity);
                 return false;
             }
         }
         else
         {
             currentHolder.sendTranslated(NEUTRAL, "You try to open the container with your KeyBook but nothing happens!");
-            currentHolder.asPlayer().playSound(BLAZE_HIT, effectLocation.getPosition(), 1, 1);
-            currentHolder.asPlayer().playSound(BLAZE_HIT, effectLocation.getPosition(), 1, (float)0.8);
+            currentHolder.original().playSound(BLAZE_HIT, effectLocation.getPosition(), 1, 1);
+            currentHolder.original().playSound(BLAZE_HIT, effectLocation.getPosition(), 1, (float)0.8);
             return false;
         }
     }
@@ -122,7 +122,7 @@ public class KeyBook
                                             currentHolder.getTranslation(NEUTRAL, "won't let you"),
                                             currentHolder.getTranslation(NEUTRAL, "open any containers!")));
         item = module.getGame().getRegistry().createItemBuilder().fromItemStack(item).itemType(PAPER).build();
-        currentHolder.asPlayer().setItemInHand(item);
+        currentHolder.original().setItemInHand(item);
     }
 
     public boolean isValidFor(Lock lock)

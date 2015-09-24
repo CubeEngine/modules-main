@@ -30,7 +30,7 @@ import org.cubeengine.module.portals.config.RandomDestination;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.world.Location;
@@ -58,9 +58,9 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Changes the owner of a portal")
-    public void owner(CommandContext context, User owner, @Default Portal portal)
+    public void owner(CommandContext context, MultilingualPlayer owner, @Default Portal portal)
     {
-        portal.config.owner = owner.getUser().getName();
+        portal.config.owner = owner.original().getName();
         portal.config.save();
         context.sendTranslated(POSITIVE, "{user} is now the owner of {name#portal}!", owner, portal.getName());
     }
@@ -84,10 +84,10 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Changes a portals location")
-    @Restricted(value = User.class, msg = "You have to be ingame to do this!")
+    @Restricted(value = MultilingualPlayer.class, msg = "You have to be ingame to do this!")
     public void location(CommandContext context, @Default Portal portal)
     {
-        User sender = (User)context.getSource();
+        MultilingualPlayer sender = (MultilingualPlayer)context.getSource();
         if (!(selector.getSelection(sender) instanceof Cuboid))
         {
             context.sendTranslated(NEGATIVE, "Please select a cuboid first!");
@@ -102,18 +102,18 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Modifies the location where a player exits when teleporting a portal")
-    @Restricted(value = User.class, msg = "You have to be ingame to do this!")
+    @Restricted(value = MultilingualPlayer.class, msg = "You have to be ingame to do this!")
     public void exit(CommandContext context, @Default Portal portal)
     {
-        User sender = (User)context.getSource();
-        Location location = sender.asPlayer().getLocation();
+        MultilingualPlayer sender = (MultilingualPlayer)context.getSource();
+        Location location = sender.original().getLocation();
         if (portal.config.world.getWorld() != location.getExtent())
         {
             // TODO range check? range in config
             context.sendTranslated(NEGATIVE, "A portals exit cannot be in an other world than its location!");
             return;
         }
-        portal.config.location.destination = new WorldLocation(location, sender.asPlayer().getRotation());
+        portal.config.location.destination = new WorldLocation(location, sender.original().getRotation());
         portal.config.save();
         context.sendTranslated(POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
     }

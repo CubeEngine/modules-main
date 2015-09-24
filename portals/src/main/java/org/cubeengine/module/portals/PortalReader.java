@@ -21,7 +21,7 @@ import de.cubeisland.engine.butler.CommandInvocation;
 import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 
 public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal>
 {
@@ -48,9 +48,9 @@ public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal
     public Portal getDefault(CommandInvocation invocation)
     {
         Portal portal = null;
-        if (invocation.getCommandSource() instanceof User)
+        if (invocation.getCommandSource() instanceof MultilingualPlayer)
         {
-            portal = ((User)invocation.getCommandSource()).attachOrGet(PortalsAttachment.class, module).getPortal();
+            portal = ((MultilingualPlayer)invocation.getCommandSource()).attachOrGet(PortalsAttachment.class, module).getPortal();
         }
         if (portal == null)
         {

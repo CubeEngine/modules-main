@@ -33,13 +33,15 @@ import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.storage.TeleportInvite;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.command.CommandContext;
-import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.command.Multilingual;
 import org.cubeengine.service.command.exception.PermissionDeniedException;
-import org.cubeengine.service.command.sender.ConsoleCommandSender;
 import org.cubeengine.service.confirm.ConfirmResult;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualCommandSource;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.util.command.source.ConsoleSource;
 import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
@@ -69,16 +71,16 @@ public class WarpCommand extends TpPointCommand
     @Override
     protected boolean selfExecute(CommandInvocation invocation)
     {
-        if (invocation.getCommandSource() instanceof User)
+        if (invocation.getCommandSource() instanceof MultilingualPlayer)
         {
             return getCommand("tp").execute(invocation);
         }
         return super.selfExecute(invocation);
     }
 
-    @Restricted(User.class)
+    @Restricted(MultilingualPlayer.class)
     @Command(desc = "Teleport to a warp")
-    public void tp(User sender, String warp, @Default User owner)
+    public void tp(MultilingualPlayer sender, String warp, @Default MultilingualPlayer owner)
     {
         Warp w = manager.findOne(owner, warp);
         if (w == null)
@@ -96,7 +98,7 @@ public class WarpCommand extends TpPointCommand
             warpInDeletedWorldMessage(sender, w);
             return;
         }
-        sender.asPlayer().setLocation(location);
+        sender.original().setLocation(location);
         if (w.getWelcomeMsg() != null)
         {
             sender.sendMessage(w.getWelcomeMsg());
@@ -111,10 +113,10 @@ public class WarpCommand extends TpPointCommand
                                w.getOwnerName());
     }
 
-    @Restricted(User.class)
+    @Restricted(MultilingualPlayer.class)
     @Alias(value = {"createwarp", "mkwarp", "makewarp"})
     @Command(alias = "make", desc = "Create a warp")
-    public void create(User sender, String name, @Flag(name = "priv", longName = "private") boolean priv) // TODO flag permission "private"
+    public void create(MultilingualPlayer sender, String name, @Flag(name = "priv", longName = "private") boolean priv) // TODO flag permission "private"
     {
         if (this.manager.getCount() >= this.module.getConfig().warps.max)
         {
@@ -138,14 +140,14 @@ public class WarpCommand extends TpPointCommand
             sender.sendTranslated(NEGATIVE, "The warp already exists! You can move it with {text:/warp move}");
             return;
         }
-        Warp warp = manager.create(sender, name, sender.asPlayer().getLocation(), sender.asPlayer().getRotation(), !priv);
+        Warp warp = manager.create(sender, name, sender.original().getLocation(), sender.original().getRotation(), !priv);
         sender.sendTranslated(POSITIVE, "Your warp {name} has been created!", warp.getName());
     }
 
     @Command(desc = "Set the welcome message of warps", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
-    public void greeting(CommandSender sender, String warp,
+    public void greeting(MultilingualCommandSource sender, String warp,
                          @Label("welcome message") @Greed(INFINITE) @Optional String message,
-                         @Default @Named("owner") User owner,
+                         @Default @Named("owner") MultilingualPlayer owner,
                          @Flag boolean append)
     {
         // TODO permission other
@@ -173,12 +175,12 @@ public class WarpCommand extends TpPointCommand
             sender.sendTranslated(POSITIVE, "The welcome message for the warp {name} of {user} is now set to:",
                                    w.getName(), owner);
         }
-        sender.sendMessage(w.getWelcomeMsg());
+        sender.getSource().sendMessage(Texts.of(w.getWelcomeMsg()));
     }
 
-    @Restricted(User.class)
+    @Restricted(MultilingualPlayer.class)
     @Command(desc = "Move a warp")
-    public void move(User sender, String warp, @Default User owner)
+    public void move(MultilingualPlayer sender, String warp, @Default MultilingualPlayer owner)
     {
         Warp w = manager.getExact(owner, warp);
         if (w == null)
@@ -190,7 +192,7 @@ public class WarpCommand extends TpPointCommand
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_MOVE_OTHER);
         }
-        w.setLocation(sender.asPlayer().getLocation(), sender.asPlayer().getRotation(), wm);
+        w.setLocation(sender.original().getLocation(), sender.original().getRotation(), wm);
         w.update();
         if (w.isOwnedBy(sender))
         {
@@ -203,7 +205,7 @@ public class WarpCommand extends TpPointCommand
 
     @Alias(value = {"removewarp", "deletewarp", "delwarp", "remwarp"})
     @Command(alias = "delete", desc = "Remove a warp")
-    public void remove(CommandSender sender, String warp, @Default User owner)
+    public void remove(MultilingualCommandSource sender, String warp, @Default MultilingualPlayer owner)
     {
         Warp w = manager.getExact(owner, warp);
         if (w == null)
@@ -225,7 +227,7 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(desc = "Rename a warp")
-    public void rename(CommandSender sender, String warp, @Label("new name") String newName, @Default @Named("owner") User owner)
+    public void rename(MultilingualCommandSource sender, String warp, @Label("new name") String newName, @Default @Named("owner") MultilingualPlayer owner)
     {
         Warp w = manager.getExact(owner, warp);
         if (w == null)
@@ -258,7 +260,7 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(desc = "List warps of a player")
-    public void list(CommandContext context, @Default User owner,
+    public void list(CommandContext context, @Default MultilingualPlayer owner,
                      @Flag(name = "pub", longName = "public") boolean pub,
                      @Flag boolean owned, @Flag boolean invited)
     {
@@ -299,7 +301,7 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(desc = "List all available warps")
-    public void listAll(CommandSender sender)
+    public void listAll(MultilingualCommandSource sender)
     {
         int count = this.manager.getCount();
         if (count == 0)
@@ -312,7 +314,7 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(alias = {"ilist", "invited"}, desc = "List all players invited to your warps")
-    public void invitedList(CommandContext sender, @Default User owner) // TODO named permission "other"
+    public void invitedList(CommandContext sender, @Default MultilingualPlayer owner) // TODO named permission "other"
     {
         Set<Warp> warps = this.manager.list(owner, true, false, false).stream()
                                       .filter(w -> !w.getInvited().isEmpty())
@@ -344,16 +346,15 @@ public class WarpCommand extends TpPointCommand
                 sender.sendMessage(YELLOW + "  " + w.getName() + ":");
                 for (TeleportInvite invite : invites)
                 {
-                    sender.sendMessage("    " + DARK_GREEN + um.getUser(invite.getValue(
-                        TABLE_INVITE.USERKEY)).getDisplayName());
+                    sender.sendMessage("    " + DARK_GREEN + um.getById(invite.getValue(TABLE_INVITE.USERKEY)).get().getUser().getName());
                 }
             }
         }
     }
 
-    @Restricted(User.class)
+    @Restricted(MultilingualPlayer.class)
     @Command(desc = "Invite a user to one of your warps")
-    public void invite(User sender, String warp, User player)
+    public void invite(MultilingualPlayer sender, String warp, MultilingualPlayer player)
     {
         Warp w = this.manager.findOne(sender, warp);
         if (w == null || !w.isOwnedBy(sender))
@@ -376,17 +377,14 @@ public class WarpCommand extends TpPointCommand
             sender.sendTranslated(NEGATIVE, "{user} is already invited to your warp!", player);
             return;
         }
-        w.invite(player);
-        if (player.getPlayer().isPresent())
-        {
-            player.sendTranslated(NEUTRAL, "{user} invited you to their private warp. To teleport to it use: /warp {name#warp} {user}", sender, w.getName(), sender);
-        }
+        w.invite(player.getSource());
+        player.sendTranslated(NEUTRAL, "{user} invited you to their private warp. To teleport to it use: /warp {name#warp} {user}", sender, w.getName(), sender);
         sender.sendTranslated(POSITIVE, "{user} is now invited to your warp {name}", player, w.getName());
     }
 
-    @Restricted(User.class)
+    @Restricted(MultilingualPlayer.class)
     @Command(desc = "Uninvite a player from one of your warps")
-    public void unInvite(User sender, String warp, User player)
+    public void unInvite(MultilingualPlayer sender, String warp, MultilingualPlayer player)
     {
         Warp w = this.manager.getExact(sender, warp);
         if (w == null || !w.isOwnedBy(sender))
@@ -410,15 +408,12 @@ public class WarpCommand extends TpPointCommand
             return;
         }
         w.unInvite(player);
-        if (player.getPlayer().isPresent())
-        {
-            player.sendTranslated(NEUTRAL, "You are no longer invited to {user}'s warp {name#warp}", sender, w.getName());
-        }
+        player.sendTranslated(NEUTRAL, "You are no longer invited to {user}'s warp {name#warp}", sender, w.getName());
         sender.sendTranslated(POSITIVE, "{user} is no longer invited to your warp {name}", player, w.getName());
     }
 
     @Command(name = "private", alias = "makeprivate", desc = "Make a players warp private")
-    public void makePrivate(CommandSender sender, @Optional String warp, @Default User owner)
+    public void makePrivate(MultilingualCommandSource sender, @Optional String warp, @Default MultilingualPlayer owner)
     {
         if (!owner.equals(sender) && sender.hasPermission(module.getPermissions().WARP_PUBLIC_OTHER.getId()))
         {
@@ -445,7 +440,7 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(name = "public", desc = "Make a users warp public")
-    public void makePublic(CommandSender sender, @Optional String warp, @Default User owner)
+    public void makePublic(MultilingualCommandSource sender, @Optional String warp, @Default MultilingualPlayer owner)
     {
         if (!owner.equals(sender) && sender.hasPermission(module.getPermissions().WARP_PUBLIC_OTHER.getId()))
         {
@@ -473,11 +468,11 @@ public class WarpCommand extends TpPointCommand
 
     @Alias(value = "clearwarps")
     @Command(desc = "Clear all warps (of a player)")
-    public ConfirmResult clear(final CommandContext context, @Optional User owner,
+    public ConfirmResult clear(final CommandContext context, @Optional MultilingualPlayer owner,
                                @Flag(name = "pub", longName = "public") boolean pub,
                                @Flag(name = "priv", longName = "private") boolean priv)
     {
-        if (this.module.getConfig().clearOnlyFromConsole && !(context.getSource() instanceof ConsoleCommandSender))
+        if (this.module.getConfig().clearOnlyFromConsole && !(context.getSource() instanceof ConsoleSource))
         {
             context.sendTranslated(NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return null;
@@ -528,7 +523,7 @@ public class WarpCommand extends TpPointCommand
     }
 
 
-    private void warpInDeletedWorldMessage(CommandSender sender, Warp warp)
+    private void warpInDeletedWorldMessage(MultilingualPlayer sender, Warp warp)
     {
         if (warp.isOwnedBy(sender))
         {
@@ -540,9 +535,9 @@ public class WarpCommand extends TpPointCommand
         }
     }
 
-    private void warpNotFoundMessage(CommandSender sender, User user, String name)
+    private void warpNotFoundMessage(MultilingualCommandSource sender, MultilingualPlayer user, String name)
     {
-        if (sender.equals(user))
+        if (sender.getSource().equals(user.getSource()))
         {
             sender.sendTranslated(NEGATIVE, "You have no warp named {name#warp}!", name);
         }

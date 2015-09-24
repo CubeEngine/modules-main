@@ -34,21 +34,23 @@ import org.cubeengine.module.travel.TpPointCommand;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.storage.TeleportInvite;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
+import org.cubeengine.service.command.property.RawPermission;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.command.CommandContext;
-import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.command.annotation.ParameterPermission;
 import org.cubeengine.service.command.exception.PermissionDeniedException;
-import org.cubeengine.service.command.sender.ConsoleCommandSender;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.confirm.ConfirmResult;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualCommandSource;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.module.core.util.math.Cuboid;
 import org.cubeengine.module.core.util.math.shape.Shape;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.command.source.ConsoleSource;
 import org.spongepowered.api.world.Location;
 
 import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
@@ -80,16 +82,16 @@ public class HomeCommand extends TpPointCommand
     @Override
     protected boolean selfExecute(CommandInvocation invocation)
     {
-        if (invocation.getCommandSource() instanceof User)
+        if (invocation.getCommandSource() instanceof MultilingualPlayer)
         {
             return getCommand("tp").execute(invocation);
         }
         return super.selfExecute(invocation);
     }
 
-    @Restricted(User.class)
+    @Restricted(MultilingualPlayer.class)
     @Command(desc = "Teleport to a home")
-    public void tp(User sender, @Optional String home, @Default User owner)
+    public void tp(MultilingualPlayer sender, @Optional String home, @Default MultilingualPlayer owner)
     {
         home = home == null ? "home" : home;
         Home h = this.manager.findOne(owner, home);
@@ -117,7 +119,7 @@ public class HomeCommand extends TpPointCommand
             homeInDeletedWorldMessage(sender, h);
             return;
         }
-        sender.asPlayer().setLocation(location);
+        sender.original().setLocation(location);
         if (h.getWelcomeMsg() != null)
         {
             sender.sendMessage(h.getWelcomeMsg());
@@ -134,10 +136,10 @@ public class HomeCommand extends TpPointCommand
 
     @Alias("sethome")
     @Command(alias = {"create", "sethome", "createhome"}, desc = "Set your home")
-    @Restricted(value = User.class, msg = "Ok so I'll need your new address then. No seriously this won't work!")
+    @Restricted(value = MultilingualPlayer.class, msg = "Ok so I'll need your new address then. No seriously this won't work!")
     public void set(CommandContext context, @Optional String name, @ParameterPermission @Flag(longName = "public", name = "pub") boolean isPublic)
     {
-        User sender = (User)context.getSource();
+        MultilingualPlayer sender = (MultilingualPlayer)context.getSource();
         if (this.manager.getCount(sender) >= this.module.getConfig().homes.max
             && !context.getSource().hasPermission(module.getPermissions().HOME_SET_MORE.getId()))
         {
@@ -156,15 +158,15 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "The home already exists! You can move it with {text:/home move}");
             return;
         }
-        Home home = this.manager.create(sender, name, sender.asPlayer().getLocation(), sender.asPlayer().getRotation(), isPublic);
+        Home home = this.manager.create(sender, name, sender.original().getLocation(), sender.original().getRotation(), isPublic);
         context.sendTranslated(POSITIVE, "Your home {name} has been created!", home.getName());
     }
 
     @Command(desc = "Set the welcome message of homes", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
-    public void greeting(CommandSender sender,
+    public void greeting(MultilingualCommandSource sender,
                          String home,
                          @Optional @Label("welcome message") @Greed(INFINITE) String message,
-                         @Default @Named("owner") User owner,
+                         @Default @Named("owner") MultilingualPlayer owner,
                          @Flag boolean append)
     {
         Home h = this.manager.getExact(owner, home);
@@ -191,12 +193,12 @@ public class HomeCommand extends TpPointCommand
             sender.sendTranslated(POSITIVE, "The welcome message for the home {name} of {user} is now set to:",
                                    h.getName(), owner);
         }
-        sender.sendMessage(h.getWelcomeMsg());
+        sender.getSource().sendMessage(Texts.of(h.getWelcomeMsg()));
     }
 
-    @Restricted(value = User.class, msg = "I am calling the moving company right now!")
+    @Restricted(value = MultilingualPlayer.class, msg = "I am calling the moving company right now!")
     @Command(alias = "replace", desc = "Move a home")
-    public void move(User sender, @Optional String name, @Default User owner)
+    public void move(MultilingualPlayer sender, @Optional String name, @Default MultilingualPlayer owner)
     {
         name = name == null ? "home" : name;
         Home home = this.manager.getExact(owner, name);
@@ -213,7 +215,7 @@ public class HomeCommand extends TpPointCommand
                 throw new PermissionDeniedException(module.getPermissions().HOME_MOVE_OTHER);
             }
         }
-        home.setLocation(sender.asPlayer().getLocation(), sender.asPlayer().getRotation(), wm);
+        home.setLocation(sender.original().getLocation(), sender.original().getRotation(), wm);
         home.update();
         if (home.isOwnedBy(sender))
         {
@@ -226,7 +228,7 @@ public class HomeCommand extends TpPointCommand
 
     @Alias(value = {"remhome", "removehome", "delhome", "deletehome"})
     @Command(alias = {"delete", "rem", "del"}, desc = "Remove a home")
-    public void remove(CommandSender sender, @Optional String name, @Default @Optional User owner)
+    public void remove(MultilingualCommandSource sender, @Optional String name, @Default @Optional MultilingualPlayer owner)
     {
         name = name == null ? "home" : name;
         Home home = this.manager.getExact(owner, name);
@@ -249,7 +251,7 @@ public class HomeCommand extends TpPointCommand
     }
 
     @Command(desc = "Rename a home")
-    public void rename(CommandSender sender, String name, @Label("new name") String newName, @Default @Optional User owner)
+    public void rename(MultilingualCommandSource sender, String name, @Label("new name") String newName, @Default @Optional MultilingualPlayer owner)
     {
         Home home = manager.getExact(owner, name);
         if (home == null)
@@ -284,14 +286,18 @@ public class HomeCommand extends TpPointCommand
 
     @Alias(value = {"listhomes", "homes"})
     @Command(alias = "listhomes", desc = "Lists homes a player can access")
-    public void list(CommandContext sender, @Default User owner,
+    public void list(MultilingualCommandSource sender, @Default MultilingualPlayer owner,
                      @Flag(name = "pub", longName = "public") boolean isPublic,
                      @Flag boolean owned,
                      @Flag boolean invited) throws Exception
     {
         if (!owner.equals(sender.getSource()))
         {
-            sender.ensurePermission(module.getPermissions().HOME_LIST_OTHER);
+            PermissionDescription otherPerm = module.getPermissions().HOME_LIST_OTHER;
+            if (!sender.hasPermission(otherPerm.getId()))
+            {
+                throw new PermissionDeniedException(new RawPermission(otherPerm.getId(), Texts.toPlain(otherPerm.getDescription())));
+            }
         }
         Set<Home> homes = this.manager.list(owner, owned, isPublic, invited);
         if (homes.isEmpty())
@@ -312,11 +318,11 @@ public class HomeCommand extends TpPointCommand
         {
             sender.sendTranslated(NEUTRAL, "The following homes are available to {user}:", owner);
         }
-        showList(sender.getSource(), owner, homes);
+        showList(sender, owner, homes);
     }
 
     @Command(alias = "listhomes", desc = "Lists all homes")
-    public void listAll(CommandSender sender)
+    public void listAll(MultilingualCommandSource sender)
     {
         int count = this.manager.getCount();
         if (count == 0)
@@ -329,7 +335,7 @@ public class HomeCommand extends TpPointCommand
     }
 
     @Command(name = "ilist", alias = "invited", desc = "List all players invited to your homes")
-    public void invitedList(CommandSender sender, @Default User owner)
+    public void invitedList(MultilingualCommandSource sender, @Default MultilingualPlayer owner)
     {
         if (!owner.equals(sender) && !sender.hasPermission(module.getPermissions().HOME_LIST_OTHER.getId()))
         {
@@ -361,18 +367,19 @@ public class HomeCommand extends TpPointCommand
             Set<TeleportInvite> invites = this.iManager.getInvites(home.getModel());
             if (!invites.isEmpty())
             {
-                sender.sendMessage(Texts.of(TextColors.GOLD, "  ", home.getName(), ":"));
+                sender.getSource().sendMessage(Texts.of(TextColors.GOLD, "  ", home.getName(), ":"));
                 for (TeleportInvite invite : invites)
                 {
-                    sender.sendMessage(Texts.of("    ", TextColors.DARK_GREEN, um.getUser(invite.getValue(TABLE_INVITE.USERKEY)).getDisplayName()));
+                    sender.getSource().sendMessage(Texts.of("    ", TextColors.DARK_GREEN, um.getById(invite.getValue(
+                        TABLE_INVITE.USERKEY)).get().getUser().getName()));
                 }
             }
         }
     }
 
-    @Restricted(value = User.class, msg = "How about making a phone call to invite someone instead?")
+    @Restricted(value = MultilingualPlayer.class, msg = "How about making a phone call to invite someone instead?")
     @Command(desc = "Invite a user to one of your homes")
-    public void invite(User sender, User player, @Optional String home)
+    public void invite(MultilingualPlayer sender, MultilingualPlayer player, @Optional String home)
     {
         home = home == null ? "home" : home;
         Home h = this.manager.getExact(sender, home);
@@ -396,19 +403,14 @@ public class HomeCommand extends TpPointCommand
             sender.sendTranslated(NEGATIVE, "{user} is already invited to your home!", player);
             return;
         }
-        h.invite(player);
-        if (player.getPlayer().isPresent())
-        {
-            player.sendTranslated(NEUTRAL,
-                                  "{user} invited you to their home. To teleport to it use: /home {name#home} {name}",
-                                  sender, h.getName(), sender.getName());
-        }
+        h.invite(player.getSource());
+        player.sendTranslated(NEUTRAL, "{user} invited you to their home. To teleport to it use: /home {name#home} {name}", sender, h.getName(), sender.getName());
         sender.sendTranslated(POSITIVE, "{user} is now invited to your home {name}", player, h.getName());
     }
 
-    @Restricted(User.class)
+    @Restricted(MultilingualPlayer.class)
     @Command(desc = "Uninvite a player from one of your homes")
-    public void unInvite(User sender, User player, @Optional String home )
+    public void unInvite(MultilingualPlayer sender, MultilingualPlayer player, @Optional String home )
     {
         home = home == null ? "home" : home;
         Home h = this.manager.getExact(sender, home);
@@ -433,15 +435,12 @@ public class HomeCommand extends TpPointCommand
             return;
         }
         h.unInvite(player);
-        if (player.getPlayer().isPresent())
-        {
-            player.sendTranslated(NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.getName());
-        }
+        player.sendTranslated(NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.getName());
         sender.sendTranslated(POSITIVE, "{user} is no longer invited to your home {name}", player, h.getName());
     }
 
     @Command(name = "private", alias = {"makeprivate", "setprivate"}, desc = "Make one of your homes private")
-    public void makePrivate(CommandSender sender, @Optional String home, @Default User owner)
+    public void makePrivate(MultilingualCommandSource sender, @Optional String home, @Default MultilingualPlayer owner)
     {
         if (!owner.equals(sender) && !sender.hasPermission(module.getPermissions().HOME_PRIVATE_OTHER.getId()))
         {
@@ -469,7 +468,7 @@ public class HomeCommand extends TpPointCommand
     }
 
     @Command(name = "public", alias = {"makepublic", "setpublic"}, desc = "Make one of your homes public")
-    public void makePublic(CommandSender sender, @Optional String home, @Default User owner)
+    public void makePublic(MultilingualCommandSource sender, @Optional String home, @Default MultilingualPlayer owner)
     {
         if (!owner.equals(sender) && !sender.hasPermission(module.getPermissions().HOME_PUBLIC_OTHER.getId()))
         {
@@ -498,25 +497,25 @@ public class HomeCommand extends TpPointCommand
 
     @Alias(value = {"clearhomes"})
     @Command(desc = "Clear all homes (of an user)")
-    public CommandResult clear(final CommandContext sender, @Optional final User owner,
+    public CommandResult clear(final CommandContext context, @Optional final MultilingualPlayer owner,
                                @Flag(name = "pub", longName = "public") final boolean isPublic,
                                @Flag(name = "priv", longName = "private") final boolean isPrivate,
                                @Flag(name = "sel", longName = "selection") final boolean selection)
     {
-        if (this.module.getConfig().clearOnlyFromConsole && !(sender.getSource() instanceof ConsoleCommandSender))
+        if (this.module.getConfig().clearOnlyFromConsole && !(context.getSource() instanceof ConsoleSource))
         {
-            sender.sendTranslated(NEGATIVE, "This command has been disabled for ingame use via the configuration");
+            context.sendTranslated(NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return null;
         }
         String type = "";
         if (isPublic)
         {
-            type = i18n.translate(sender.getSource().getLocale(), "public");
+            type = i18n.translate(context.getLocale(), "public");
             type += " ";
         }
         else if (isPrivate)
         {
-            type = i18n.translate(sender.getSource().getLocale(), "private");
+            type = i18n.translate(context.getLocale(), "private");
             type += " ";
         }
         final Location firstPoint;
@@ -525,30 +524,34 @@ public class HomeCommand extends TpPointCommand
         {
             if (selector.isAvailable())
             {
-                sender.sendTranslated(NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
+                context.sendTranslated(NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
                 return null;
             }
-            if (!sender.isSource(User.class))
+            if (!context.isSource(MultilingualPlayer.class))
             {
-                sender.sendTranslated(NEGATIVE, "You have to be in game to use the selection flag");
+                context.sendTranslated(NEGATIVE, "You have to be in game to use the selection flag");
                 return null;
             }
             Selector selector = this.selector.value();
-            Shape shape = selector.getSelection((User)sender.getSource());
+            Shape shape = selector.getSelection((MultilingualPlayer)context.getSource());
             if (!(shape instanceof Cuboid))
             {
-                sender.sendTranslated(NEGATIVE, "Invalid selection!");
+                context.sendTranslated(NEGATIVE, "Invalid selection!");
                 return null;
             }
-            firstPoint = selector.getFirstPoint((User)sender.getSource());
-            secondPoint = selector.getSecondPoint((User)sender.getSource());
+            firstPoint = selector.getFirstPoint((MultilingualPlayer)context.getSource());
+            secondPoint = selector.getSecondPoint((MultilingualPlayer)context.getSource());
             if (owner != null)
             {
-                sender.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes created by {user} in your current selection?", type, owner);
+                context.sendTranslated(NEUTRAL,
+                                      "Are you sure you want to delete all {input#public|private}homes created by {user} in your current selection?",
+                                      type, owner);
             }
             else
             {
-                sender.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes created in your current selection?", type);
+                context.sendTranslated(NEUTRAL,
+                                      "Are you sure you want to delete all {input#public|private}homes created in your current selection?",
+                                      type);
             }
         }
         else
@@ -557,37 +560,42 @@ public class HomeCommand extends TpPointCommand
             secondPoint = null;
             if (owner != null)
             {
-                sender.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes ever created by {user}?", type, owner);
+                context.sendTranslated(NEUTRAL,
+                                      "Are you sure you want to delete all {input#public|private}homes ever created by {user}?",
+                                      type, owner);
             }
             else
             {
-                sender.sendTranslated(NEUTRAL, "Are you sure you want to delete all {input#public|private}homes ever created on this server?", type);
+                context.sendTranslated(NEUTRAL,
+                                      "Are you sure you want to delete all {input#public|private}homes ever created on this server?",
+                                      type);
             }
         }
-        sender.sendTranslated(NEUTRAL, "Confirm with: {text:/confirm} before 30 seconds have passed to delete the homes");
+        context.sendTranslated(NEUTRAL,
+                              "Confirm with: {text:/confirm} before 30 seconds have passed to delete the homes");
         return new ConfirmResult(module, () -> {
             if (selection)
             {
                 manager.massDelete(owner, isPrivate, isPublic, firstPoint, secondPoint);
-                if (sender.hasPositional(0))
+                if (context.hasPositional(0))
                 {
-                    sender.sendTranslated(POSITIVE, "The homes of {user} in the selection are now deleted", owner);
+                    context.sendTranslated(POSITIVE, "The homes of {user} in the selection are now deleted", owner);
                     return;
                 }
-                sender.sendTranslated(POSITIVE, "The homes in the selection are now deleted.");
+                context.sendTranslated(POSITIVE, "The homes in the selection are now deleted.");
                 return;
             }
             manager.massDelete(owner, isPrivate, isPublic);
-            if (sender.hasPositional(0))
+            if (context.hasPositional(0))
             {
-                sender.sendTranslated(POSITIVE, "The homes of {user} are now deleted", owner);
+                context.sendTranslated(POSITIVE, "The homes of {user} are now deleted", owner);
                 return;
             }
-            sender.sendTranslated(POSITIVE, "The homes are now deleted.");
-        }, sender);
+            context.sendTranslated(POSITIVE, "The homes are now deleted.");
+        }, context);
     }
 
-    private void homeInDeletedWorldMessage(CommandSender sender, Home home)
+    private void homeInDeletedWorldMessage(MultilingualCommandSource sender, Home home)
     {
         if (home.isOwnedBy(sender))
         {
@@ -599,7 +607,7 @@ public class HomeCommand extends TpPointCommand
         }
     }
 
-    private void homeNotFoundMessage(CommandSender sender, User user, String name)
+    private void homeNotFoundMessage(MultilingualCommandSource sender, MultilingualPlayer user, String name)
     {
         if (sender.equals(user))
         {

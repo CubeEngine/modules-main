@@ -32,7 +32,7 @@ import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.LockerAttachment;
 import org.cubeengine.service.database.Database;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.jooq.Result;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.PortionTypes;
@@ -109,7 +109,7 @@ public class Lock
     }
 
 
-    public void showCreatedMessage(User user)
+    public void showCreatedMessage(MultilingualPlayer user)
     {
         switch (this.getLockType())
         {
@@ -131,7 +131,7 @@ public class Lock
         }
     }
 
-    public boolean handleAccess(User user, Location soundLocation, Cancellable event)
+    public boolean handleAccess(MultilingualPlayer user, Location soundLocation, Cancellable event)
     {
         if (this.isOwner(user)) return true;
         Boolean keyBookUsed = this.checkForKeyBook(user, soundLocation);
@@ -144,13 +144,13 @@ public class Lock
             module.perms().ACCESS_OTHER.getId());
     }
 
-    public boolean checkForUnlocked(User user)
+    public boolean checkForUnlocked(MultilingualPlayer user)
     {
         LockerAttachment lockerAttachment = user.get(LockerAttachment.class);
         return lockerAttachment != null && lockerAttachment.hasUnlocked(this);
     }
 
-    public void attemptCreatingKeyBook(User user, Boolean third)
+    public void attemptCreatingKeyBook(MultilingualPlayer user, Boolean third)
     {
         if (this.getLockType() == PUBLIC) return; // ignore
         if (!this.manager.module.getConfig().allowKeyBooks)
@@ -162,12 +162,12 @@ public class Lock
         {
             return;
         }
-        ItemStack itemStack = user.asPlayer().getItemInHand().orNull();
+        ItemStack itemStack = user.original().getItemInHand().orNull();
         if (itemStack != null && itemStack.getItem() == ItemTypes.BOOK)
         {
             itemStack.setQuantity(itemStack.getQuantity() - 1);
         }
-        if (user.asPlayer().getItemInHand().transform(ItemStack::getItem).orNull() != ItemTypes.BOOK)
+        if (user.original().getItemInHand().transform(ItemStack::getItem).orNull() != ItemTypes.BOOK)
         {
             user.sendTranslated(NEGATIVE, "Could not create KeyBook! You need to hold a book in your hand in order to do this!");
             return;
@@ -176,10 +176,10 @@ public class Lock
         item.offer(Keys.DISPLAY_NAME, Texts.of(getColorPass() + KeyBook.TITLE + getId()));
         item.offer(Keys.ITEM_LORE, Arrays.asList(user.getTranslation(NEUTRAL, "This book can"), user.getTranslation(
             NEUTRAL, "unlock a magically"), user.getTranslation(NEUTRAL, "locked protection")));
-        user.asPlayer().setItemInHand(item);
+        user.original().setItemInHand(item);
         if (itemStack != null)
         {
-            user.asPlayer().getInventory().offer(itemStack);
+            user.original().getInventory().offer(itemStack);
             if (itemStack.getQuantity() != 0)
             {
                 // TODO drop items in world
@@ -196,7 +196,7 @@ public class Lock
      * @param level the accesslevel
      * @return false when updating or not deleting <p>true when inserting or deleting
      */
-    public boolean setAccess(User modifyUser, boolean add, short level)
+    public boolean setAccess(MultilingualPlayer modifyUser, boolean add, short level)
     {
         AccessListModel model = this.getAccess(modifyUser);
         if (add)
@@ -228,7 +228,7 @@ public class Lock
      * @param user the user modifying
      * @param usersString
      */
-    public void modifyLock(User user, String usersString)
+    public void modifyLock(MultilingualPlayer user, String usersString)
     {
         if (this.isOwner(user) || this.hasAdmin(user) || user.hasPermission(module.perms().CMD_MODIFY_OTHER.getId()))
         {
@@ -249,7 +249,7 @@ public class Lock
                         name = name.substring(1);
                         add = false;
                     }
-                    User modifyUser = this.manager.um.findExactUser(name);
+                    MultilingualPlayer modifyUser = this.manager.um.findExactUser(name);
                     if (modifyUser == null) throw new IllegalArgumentException(); // This is prevented by checking first in the cmd execution
                     short accessType = ACCESS_FULL;
                     if (add && admin)
@@ -310,9 +310,9 @@ public class Lock
      * @param effectLocation
      * @return
      */
-    public Boolean checkForKeyBook(User user, Location effectLocation)
+    public Boolean checkForKeyBook(MultilingualPlayer user, Location effectLocation)
     {
-        KeyBook keyBook = KeyBook.getKeyBook(user.asPlayer().getItemInHand().orNull(), user, this.manager.module);
+        KeyBook keyBook = KeyBook.getKeyBook(user.original().getItemInHand().orNull(), user, this.manager.module);
         if (keyBook != null)
         {
             return keyBook.check(this, effectLocation);
@@ -358,7 +358,7 @@ public class Lock
         return this.locations;
     }
 
-    public void handleBlockDoorUse(Cancellable event, User user, Location<World> clickedDoor)
+    public void handleBlockDoorUse(Cancellable event, MultilingualPlayer user, Location<World> clickedDoor)
     {
         if (this.getLockType() == PUBLIC)
         {
@@ -400,7 +400,7 @@ public class Lock
         this.doorUse(user, clickedDoor);
     }
 
-    private AccessListModel getAccess(User user)
+    private AccessListModel getAccess(MultilingualPlayer user)
     {
         AccessListModel model = db.getDSL().selectFrom(TABLE_ACCESS_LIST).
             where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID)),
@@ -414,7 +414,7 @@ public class Lock
         return model;
     }
 
-    public void handleInventoryOpen(Cancellable event, Inventory protectedInventory, Location soundLocation, User user)
+    public void handleInventoryOpen(Cancellable event, Inventory protectedInventory, Location soundLocation, MultilingualPlayer user)
     {
         if (soundLocation != null && user.hasPermission(module.perms().SHOW_OWNER.getId()))
         {
@@ -480,7 +480,7 @@ public class Lock
         }
     }
 
-    public void handleEntityInteract(Cancellable event, User user)
+    public void handleEntityInteract(Cancellable event, MultilingualPlayer user)
     {
         if (user.hasPermission(module.perms().SHOW_OWNER.getId()))
         {
@@ -528,7 +528,7 @@ public class Lock
         return LockType.forByte(this.model.getValue(TABLE_LOCK.LOCK_TYPE));
     }
 
-    public void handleBlockBreak(BreakBlockEvent.SourcePlayer event, User user)
+    public void handleBlockBreak(BreakBlockEvent.SourcePlayer event, MultilingualPlayer user)
     {
         if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getId()) || user.hasPermission(
             module.perms().BREAK_OTHER.getId()))
@@ -541,7 +541,7 @@ public class Lock
     }
 
 
-    public void handleBlockInteract(Cancellable event, User user)
+    public void handleBlockInteract(Cancellable event, MultilingualPlayer user)
     {
         if (user.hasPermission(module.perms().SHOW_OWNER.getId()))
         {
@@ -557,7 +557,7 @@ public class Lock
         user.sendTranslated(NEGATIVE, "Magic prevents you from interacting with this block!");
     }
 
-    public boolean handleEntityDamage(Cancellable event, User user)
+    public boolean handleEntityDamage(Cancellable event, MultilingualPlayer user)
     {
         if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getId()) || user.hasPermission(
             module.perms().BREAK_OTHER.getId()))
@@ -570,7 +570,7 @@ public class Lock
         return false;
     }
 
-    public void handleEntityDeletion(User user)
+    public void handleEntityDeletion(MultilingualPlayer user)
     {
         this.delete(user);
     }
@@ -580,17 +580,17 @@ public class Lock
      *
      * @param user
      */
-    public void delete(User user)
+    public void delete(MultilingualPlayer user)
     {
         this.manager.removeLock(this, user, true);
     }
 
-    public boolean isOwner(User user)
+    public boolean isOwner(MultilingualPlayer user)
     {
         return this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getEntity().getId());
     }
 
-    public boolean hasAdmin(User user)
+    public boolean hasAdmin(MultilingualPlayer user)
     {
         AccessListModel access = this.getAccess(user);
         return access != null && (access.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN;
@@ -613,13 +613,13 @@ public class Lock
 
     private Map<UUID, Long> lastKeyNotify;
 
-    public void notifyKeyUsage(User user)
+    public void notifyKeyUsage(MultilingualPlayer user)
     {
         if (lastKeyNotify == null)
         {
             this.lastKeyNotify = new HashMap<>();
         }
-        User owner = this.manager.um.getUser(this.model.getValue(TABLE_LOCK.OWNER_ID));
+        MultilingualPlayer owner = this.manager.um.getById(this.model.getValue(TABLE_LOCK.OWNER_ID));
         Long last = this.lastKeyNotify.get(owner.getUniqueId());
         if (last == null || TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - last) > 60) // 60 sec config ?
         {
@@ -630,7 +630,7 @@ public class Lock
 
     private Map<UUID, Long> lastNotify;
 
-    public void notifyUsage(User user)
+    public void notifyUsage(MultilingualPlayer user)
     {
         if (user.hasPermission(module.perms().PREVENT_NOTIFY.getId())) return;
         if (this.hasFlag(ProtectionFlag.NOTIFY_ACCESS))
@@ -643,7 +643,7 @@ public class Lock
             {
                 this.lastNotify = new HashMap<>();
             }
-            User owner = this.manager.um.getUser(this.model.getValue(TABLE_LOCK.OWNER_ID));
+            MultilingualPlayer owner = this.manager.um.getById(this.model.getValue(TABLE_LOCK.OWNER_ID));
             Long last = this.lastNotify.get(owner.getUniqueId());
             if (last == null || TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - last) > 60) // 60 sec config ?
             {
@@ -656,7 +656,7 @@ public class Lock
                 }
                 else
                 {
-                    for (Entity entity : user.asPlayer().getWorld().getEntities())
+                    for (Entity entity : user.original().getWorld().getEntities())
                     {
                         if (entity.getUniqueId().equals(this.getEntityUID()))
                         {
@@ -672,9 +672,9 @@ public class Lock
         }
     }
 
-    public User getOwner()
+    public MultilingualPlayer getOwner()
     {
-        return module.getUserManager().getUser(this.model.getValue(TABLE_LOCK.OWNER_ID));
+        return module.getUserManager().getById(this.model.getValue(TABLE_LOCK.OWNER_ID));
     }
 
     public boolean isPublic()
@@ -687,7 +687,7 @@ public class Lock
         return flag.flagValue == (this.model.getValue(TABLE_LOCK.FLAGS) & flag.flagValue);
     }
 
-    public void showInfo(User user)
+    public void showInfo(MultilingualPlayer user)
     {
         if (this.isOwner(user) || this.hasAdmin(user) || user.hasPermission(module.perms().CMD_INFO_OTHER.getId()))
         {
@@ -731,7 +731,8 @@ public class Lock
                 user.sendTranslated(POSITIVE, "The following users have direct access to this protection");
                 for (AccessListModel listModel : accessors)
                 {
-                    User accessor = module.getUserManager().getUser(listModel.getValue(TABLE_ACCESS_LIST.USER_ID));
+                    MultilingualPlayer accessor = module.getUserManager().getById(listModel.getValue(
+                        TABLE_ACCESS_LIST.USER_ID));
                     if ((listModel.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN)
                     {
                         user.sendMessage("  " + ChatFormat.GREY + "- " + ChatFormat.DARK_GREEN + accessor.getDisplayName() + ChatFormat.GOLD + " [Admin}");
@@ -791,11 +792,11 @@ public class Lock
                 }
             }
         }
-        if (this.manager.module.getConfig().protectWhenOnlyOffline && this.getOwner().asPlayer().isOnline())
+        if (this.manager.module.getConfig().protectWhenOnlyOffline && this.getOwner().original().isOnline())
         {
             user.sendTranslated(NEUTRAL, "The protection is currently not active because its owner is online!");
         }
-        if (this.manager.module.getConfig().protectWhenOnlyOnline && !this.getOwner().asPlayer().isOnline())
+        if (this.manager.module.getConfig().protectWhenOnlyOnline && !this.getOwner().original().isOnline())
         {
             user.sendTranslated(NEUTRAL, "The protection is currently not active because its owner is offline!");
         }
@@ -807,23 +808,23 @@ public class Lock
             where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID))).fetch();
     }
 
-    public void unlock(User user, Location soundLoc, String pass)
+    public void unlock(MultilingualPlayer user, Location soundLoc, String pass)
     {
         if (this.hasPass())
         {
             if (this.checkPass(pass))
             {
                 user.sendTranslated(POSITIVE, "Upon hearing the right passphrase the magic surrounding the container gets thinner and lets you pass!");
-                user.asPlayer().playSound(SoundTypes.PISTON_EXTEND, soundLoc.getPosition(), 1, 2);
-                user.asPlayer().playSound(SoundTypes.PISTON_EXTEND, soundLoc.getPosition(), 1, (float)1.5);
+                user.original().playSound(SoundTypes.PISTON_EXTEND, soundLoc.getPosition(), 1, 2);
+                user.original().playSound(SoundTypes.PISTON_EXTEND, soundLoc.getPosition(), 1, (float)1.5);
                 user.attachOrGet(LockerAttachment.class, this.manager.module).addUnlock(this);
             }
             else
             {
                 user.sendTranslated(NEUTRAL, "Sudden pain makes you realize this was not the right passphrase!");
                 // TODO deal 0 damage is this working?
-                user.asPlayer().playSound(SoundTypes.HURT_FLESH, user.asPlayer().getLocation().getPosition(), 1);
-                user.asPlayer().offer(Keys.INVULNERABILITY_TICKS, 1);
+                user.original().playSound(SoundTypes.HURT_FLESH, user.original().getLocation().getPosition(), 1);
+                user.original().offer(Keys.INVULNERABILITY_TICKS, 1);
             }
         }
         else
@@ -839,7 +840,7 @@ public class Lock
      * @param user
      * @param doorClicked
      */
-    private void doorUse(User user, Location<World> doorClicked)
+    private void doorUse(MultilingualPlayer user, Location<World> doorClicked)
     {
         if (doorClicked.getBlockType() == IRON_DOOR && !manager.module.getConfig().openIronDoorWithClick)
         {
@@ -865,12 +866,12 @@ public class Lock
             if (open)
             {
                 door.offer(Keys.OPEN, false);
-                user.asPlayer().playSound(SoundTypes.DOOR_CLOSE, door.getPosition(), 1);
+                user.original().playSound(SoundTypes.DOOR_CLOSE, door.getPosition(), 1);
             }
             else
             {
                 door.offer(Keys.OPEN, true);
-                user.asPlayer().playSound(SoundTypes.DOOR_OPEN, door.getPosition(), 1);
+                user.original().playSound(SoundTypes.DOOR_OPEN, door.getPosition(), 1);
             }
         }
         if (taskId != null) module.getTaskManager().cancelTask(this.manager.module, taskId);
@@ -918,7 +919,7 @@ public class Lock
         return this.isValidType;
     }
 
-    public void setOwner(User owner)
+    public void setOwner(MultilingualPlayer owner)
     {
         this.model.setValue(TABLE_LOCK.OWNER_ID, owner.getEntity().getId());
         this.model.updateAsync();

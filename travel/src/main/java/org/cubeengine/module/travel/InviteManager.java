@@ -23,12 +23,13 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.cubeengine.service.database.Database;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.module.travel.storage.TeleportInvite;
 import org.cubeengine.module.travel.storage.TeleportPointModel;
 import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.entity.living.player.Player;
 
 import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
 import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
@@ -50,9 +51,9 @@ public class InviteManager
         this.invites = this.dsl.selectFrom(TABLE_INVITE).fetch(); // TODO this can be a big query :S
     }
 
-    public void invite(TeleportPointModel tPP, User user)
+    public void invite(TeleportPointModel tPP, UInteger user)
     {
-        TeleportInvite invite = this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getValue(TABLE_TP_POINT.KEY), user.getEntity().getId());
+        TeleportInvite invite = this.dsl.newRecord(TABLE_INVITE).newInvite(tPP.getValue(TABLE_TP_POINT.KEY), user);
         this.invites.add(invite);
         invite.insertAsync();
     }
@@ -83,12 +84,12 @@ public class InviteManager
      *
      * @return A set of TeleportInvites
      */
-    public Set<TeleportInvite> getInvites(User user)
+    public Set<TeleportInvite> getInvites(Player user)
     {
         Set<TeleportInvite> invites = new HashSet<>();
         for (TeleportInvite invite : this.invites)
         {
-            if (invite.getValue(TABLE_INVITE.USERKEY).equals(user.getEntity().getId()))
+            if (invite.getValue(TABLE_INVITE.USERKEY).equals(um.getByUUID(user.getUniqueId()).getEntity().getId()))
             {
                 invites.add(invite);
             }
@@ -125,10 +126,7 @@ public class InviteManager
     {
         Set<TeleportInvite> invites = getInvites(tPP);
         Set<UInteger> invitedUsers = new HashSet<>();
-        for (UInteger uid : newInvited)
-        {
-            invitedUsers.add(um.getUser(uid).getEntity().getId());
-        }
+        invitedUsers.addAll(newInvited);
         for (TeleportInvite invite : invites)
         {
             if (invitedUsers.contains(invite.getValue(TABLE_INVITE.USERKEY)))

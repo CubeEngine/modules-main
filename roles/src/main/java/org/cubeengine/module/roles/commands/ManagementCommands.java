@@ -25,7 +25,7 @@ import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.world.World;
@@ -81,12 +81,12 @@ public class ManagementCommands extends ContainerCommand
         }
         CommandSender sender = context.getSource();
 
-        if (sender instanceof User)
+        if (sender instanceof MultilingualPlayer)
         {
-            SubjectData data = ((User)sender).asPlayer().getTransientSubjectData();
+            SubjectData data = ((MultilingualPlayer)sender).original().getTransientSubjectData();
             if (data instanceof OptionSubjectData)
             {
-                ((OptionSubjectData)data).setOption(((User)sender).asPlayer().getActiveContexts(), "CubeEngine:roles:active-world", world.getName());
+                ((OptionSubjectData)data).setOption(((MultilingualPlayer)sender).original().getActiveContexts(), "CubeEngine:roles:active-world", world.getName());
             }
             return;
         }

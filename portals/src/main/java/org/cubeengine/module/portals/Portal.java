@@ -23,7 +23,7 @@ import org.cubeengine.module.core.util.Pair;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -66,10 +66,10 @@ public class Portal
     {
         if (this.config.destination == null)
         {
-            if (entity instanceof User)
+            if (entity instanceof MultilingualPlayer)
             {
-                ((User)entity).sendTranslated(NEUTRAL, "This portal {name} has no destination yet!", this.getName());
-                ((User)entity).attachOrGet(PortalsAttachment.class, module).setInPortal(true);
+                ((MultilingualPlayer)entity).sendTranslated(NEUTRAL, "This portal {name} has no destination yet!", this.getName());
+                ((MultilingualPlayer)entity).attachOrGet(PortalsAttachment.class, module).setInPortal(true);
             }
         }
         else

@@ -24,7 +24,6 @@ import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.data.RoleSubjectData;
-import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.command.CommandSource;
@@ -79,7 +78,7 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
         return roleName.substring(roleName.lastIndexOf("|") + 1);
     }
 
-    public boolean canAssignAndRemove(CommandSender source)
+    public boolean canAssignAndRemove(CommandSource source)
     {
         String perm = module.getModularity().provide(PermissionManager.class).getModulePermission(module).getId();
         perm += "." + context.getType() + "." + context.getName();

@@ -87,7 +87,7 @@ public class Travel extends Module
         cm.addCommand(homeCmd);
         WarpCommand warpCmd = new WarpCommand(this, um, wm);
         cm.addCommand(warpCmd);
-        em.registerListener(this, new HomeListener(this, um, wm));
+        em.registerListener(this, new HomeListener(this, um, wm, i18n));
 
         this.permissions = new TravelPerm(this);
     }

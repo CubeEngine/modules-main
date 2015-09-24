@@ -30,7 +30,7 @@ import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.module.locker.storage.LockType;
 import org.cubeengine.module.locker.storage.ProtectionFlag;
 import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
@@ -100,7 +100,7 @@ public class CommandListener
      * @param sender
      * @return true if persist mode is on for given user
      */
-    public boolean persist(User sender)
+    public boolean persist(MultilingualPlayer sender)
     {
         if (doesPersist(sender.getUniqueId()))
         {
@@ -121,7 +121,7 @@ public class CommandListener
         {
             return;
         }
-        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        MultilingualPlayer user = um.getExactUser(event.getSourceEntity().getUniqueId());
         Location<World> location = event.getTargetLocation();
         Triplet<CommandType, String, Boolean> triplet = map.get(user.getUniqueId());
         Lock lock = this.manager.getLockAtLocation(location, user, triplet.getFirst() != INFO);
@@ -158,7 +158,7 @@ public class CommandListener
         event.setCancelled(true);
     }
 
-    private void cmdUsed(User user)
+    private void cmdUsed(MultilingualPlayer user)
     {
         if (doesPersist(user.getUniqueId()))
         {
@@ -170,7 +170,7 @@ public class CommandListener
         }
     }
 
-    private boolean handleInteract1(Triplet<CommandType, String, Boolean> triplet, Lock lock, User user, boolean isHolder, boolean canProtect, Cancellable event)
+    private boolean handleInteract1(Triplet<CommandType, String, Boolean> triplet, Lock lock, MultilingualPlayer user, boolean isHolder, boolean canProtect, Cancellable event)
     {
         if (triplet.getFirst().isCreator())
         {
@@ -224,7 +224,7 @@ public class CommandListener
         {
             return;
         }
-        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        MultilingualPlayer user = um.getExactUser(event.getSourceEntity().getUniqueId());
         try
         {
             Entity target = event.getTargetEntity();
@@ -272,7 +272,7 @@ public class CommandListener
         }
     }
 
-    private void handleInteract2(CommandType first, Lock lock, User user, String second, Boolean third, Location location, Carrier possibleHolder)
+    private void handleInteract2(CommandType first, Lock lock, MultilingualPlayer user, String second, Boolean third, Location location, Carrier possibleHolder)
     {
         switch (first)
         {
@@ -328,7 +328,7 @@ public class CommandListener
             if (lock.isOwner(user) || user.hasPermission(module.perms().CMD_GIVE_OTHER.getId()))
             {
                 // TODO UUID stuff
-                User newOwner = um.getExactUser(second);
+                MultilingualPlayer newOwner = um.getExactUser(second);
                 lock.setOwner(newOwner);
                 user.sendTranslated(NEUTRAL, "{user} is now the owner of this protection.", newOwner);
             }

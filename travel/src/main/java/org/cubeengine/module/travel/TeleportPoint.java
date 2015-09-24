@@ -21,11 +21,13 @@ import java.util.Set;
 import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.module.travel.storage.TeleportPointModel;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.CachedUser;
+import org.cubeengine.service.user.MultilingualCommandSource;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.Location;
 
@@ -74,48 +76,50 @@ public abstract class TeleportPoint
         model.setLocation(location, rotation, wm);
     }
 
-    public User getOwner()
+    public CachedUser getOwner()
     {
-        return um.getUser(model.getValue(TABLE_TP_POINT.OWNER));
+        return um.getById(model.getValue(TABLE_TP_POINT.OWNER)).get();
     }
 
-    public void setOwner(User owner)
+    public void setOwner(MultilingualPlayer owner)
     {
-        this.model.setValue(TABLE_TP_POINT.OWNER, owner.getEntity().getId());
+
+        this.model.setValue(TABLE_TP_POINT.OWNER, um.getByUUID(owner.getSource().getUniqueId()).getEntity().getId());
     }
 
-    public boolean isOwnedBy(CommandSender user)
+    public boolean isOwnedBy(MultilingualCommandSource user)
     {
-        if (user instanceof User)
+        if (user instanceof MultilingualPlayer)
         {
-            return model.getValue(TABLE_TP_POINT.OWNER).equals(((User)user).getEntity().getId());
+            return model.getValue(TABLE_TP_POINT.OWNER).equals(um.getByUUID(((MultilingualPlayer)user).getSource().getUniqueId()).getEntity().getId());
         }
         return false;
     }
 
-    public void invite(User user)
+    public void invite(Player user)
     {
         if (this.invited == null)
         {
             this.invited = iManager.getInvited(model);
         }
-        this.invited.add(user.getEntity().getId());
-        iManager.invite(this.getModel(), user);
+        UInteger id = um.getByUUID(user.getUniqueId()).getEntity().getId();
+        this.invited.add(id);
+        iManager.invite(this.getModel(), id);
     }
 
-    public void unInvite(User user)
+    public void unInvite(MultilingualPlayer user)
     {
         if (this.invited == null)
         {
             this.invited = iManager.getInvited(model);
         }
-        this.invited.remove(user.getEntity().getId());
+        this.invited.remove(um.getByUUID(user.getUniqueId()).getEntity().getId());
         iManager.updateInvited(this.model, this.invited);
     }
 
-    public boolean isInvited(User user)
+    public boolean isInvited(MultilingualPlayer user)
     {
-        return this.getInvited().contains(user.getEntity().getId()) || this.isPublic();
+        return this.getInvited().contains(um.getByUUID(user.getUniqueId()).getEntity().getId()) || this.isPublic();
     }
 
     public void setVisibility(Visibility visibility)
@@ -181,7 +185,7 @@ public abstract class TeleportPoint
         return this.getVisibility() == Visibility.PUBLIC;
     }
 
-    public boolean canAccess(User user)
+    public boolean canAccess(MultilingualPlayer user)
     {
         return this.isPublic() ? user.hasPermission(permission.getId()) : (this.isInvited(user) || this.isOwnedBy(user));
     }

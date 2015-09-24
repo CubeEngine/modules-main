@@ -29,7 +29,7 @@ import de.cubeisland.engine.butler.parametric.Label;
 import de.cubeisland.engine.butler.parametric.Named;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.locker.Locker;
@@ -64,14 +64,14 @@ public class LockerCommands extends ContainerCommand
 
     @Alias(value = "cinfo")
     @Command(desc = "Shows information about a protection")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void info(User context, @Flag boolean persist)
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
+    public void info(MultilingualPlayer context, @Flag boolean persist)
     {
         if (persist)
         {
             this.persist(context);
         }
-        KeyBook keyBook = KeyBook.getKeyBook((context).asPlayer().getItemInHand().orNull(), context, this.module);
+        KeyBook keyBook = KeyBook.getKeyBook((context).original().getItemInHand().orNull(), context, this.module);
         if (keyBook != null)
         {
             Lock lock = this.manager.getLockById(keyBook.lockID);
@@ -85,7 +85,7 @@ public class LockerCommands extends ContainerCommand
                 }
                 else
                 {
-                    for (Entity entity : context.asPlayer().getWorld().getEntities())
+                    for (Entity entity : context.original().getWorld().getEntities())
                     {
                         if (entity.getUniqueId().equals(lock.getEntityUID()))
                         {
@@ -110,8 +110,8 @@ public class LockerCommands extends ContainerCommand
 
     @Alias(value = "cpersist")
     @Command(desc = "persists your last locker command")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void persist(User context)
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
+    public void persist(MultilingualPlayer context)
     {
         if (this.manager.commandListener.persist(context))
         {
@@ -123,8 +123,8 @@ public class LockerCommands extends ContainerCommand
 
     @Alias(value = "cremove")
     @Command(desc = "Shows information about a protection")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void remove(User context, @Flag boolean persist)
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
+    public void remove(MultilingualPlayer context, @Flag boolean persist)
     {
         if (persist)
         {
@@ -136,8 +136,8 @@ public class LockerCommands extends ContainerCommand
 
     @Alias(value = "cunlock")
     @Command(desc = "Unlocks a password protected chest")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void unlock(User context, String password, @Flag boolean persist)
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
+    public void unlock(MultilingualPlayer context, String password, @Flag boolean persist)
     {
         if (persist)
         {
@@ -149,8 +149,8 @@ public class LockerCommands extends ContainerCommand
 
     @Alias(value = "cmodify")
     @Command(desc = "adds or removes player from the accesslist")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void modify(User context, String players, @Flag boolean global, @Flag boolean persist)
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
+    public void modify(MultilingualPlayer context, String players, @Flag boolean global, @Flag boolean persist)
     {
         if (persist)
         {
@@ -167,7 +167,7 @@ public class LockerCommands extends ContainerCommand
             {
                 name = name.substring(1);
             }
-            User user = um.findExactUser(name);
+            MultilingualPlayer user = um.findExactUser(name);
             if (user == null)
             {
                 context.sendTranslated(NEGATIVE, "Player {user} not found!", name);
@@ -187,8 +187,8 @@ public class LockerCommands extends ContainerCommand
 
     @Alias(value = "cgive")
     @Command(desc = "gives a protection to someone else")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void give(User context, User player, @Flag boolean persist)
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
+    public void give(MultilingualPlayer context, MultilingualPlayer player, @Flag boolean persist)
     {
         if (persist)
         {
@@ -199,8 +199,8 @@ public class LockerCommands extends ContainerCommand
 
     @Alias(value = "ckey")
     @Command(desc = "creates a KeyBook or invalidates previous KeyBooks")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void key(User context, @Flag boolean invalidate, @Flag boolean persist)
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
+    public void key(MultilingualPlayer context, @Flag boolean invalidate, @Flag boolean persist)
     {
         if (!this.module.getConfig().allowKeyBooks)
         {
@@ -223,8 +223,8 @@ public class LockerCommands extends ContainerCommand
 
     @Alias(value = "cflag")
     @Command(desc = "Sets or unsets flags")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
-    public void flag(User context,
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
+    public void flag(MultilingualPlayer context,
                      @Named("set") @Complete(FlagCompleter.class) @Label("flags...") String setFlags,
                      @Named("unset") @Complete(FlagCompleter.class) @Label("flags...") String unsetFlags,
                      @Flag boolean persist)

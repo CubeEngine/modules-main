@@ -18,7 +18,7 @@
 package org.cubeengine.module.locker.storage;
 
 import org.cubeengine.service.database.AsyncRecord;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 
 import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
@@ -30,7 +30,7 @@ public class AccessListModel extends AsyncRecord<AccessListModel>
         super(TABLE_ACCESS_LIST);
     }
 
-    public AccessListModel newAccess(LockModel model, User modifyUser)
+    public AccessListModel newAccess(LockModel model, MultilingualPlayer modifyUser)
     {
         this.setValue(TABLE_ACCESS_LIST.LOCK_ID, model.getValue(TABLE_LOCK.ID));
         this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getEntity().getId());
@@ -38,7 +38,7 @@ public class AccessListModel extends AsyncRecord<AccessListModel>
         return this;
     }
 
-    public AccessListModel newGlobalAccess(User sender, User modifyUser, short accessType)
+    public AccessListModel newGlobalAccess(MultilingualPlayer sender, MultilingualPlayer modifyUser, short accessType)
     {
         this.setValue(TABLE_ACCESS_LIST.LOCK_ID, null);
         this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getEntity().getId());

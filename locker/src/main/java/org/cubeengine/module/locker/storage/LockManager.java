@@ -47,7 +47,7 @@ import org.cubeengine.module.locker.commands.CommandListener;
 import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.task.TaskManager;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
 import org.jooq.Result;
@@ -59,7 +59,6 @@ import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.world.ChunkLoadEvent;
 import org.spongepowered.api.event.world.ChunkUnloadEvent;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -285,7 +284,7 @@ public class LockManager
      * @param user the user to get the lock for (can be null)
      * @return the lock or null if there is no lock OR the chunk is not loaded OR the lock is disabled
      */
-    public Lock getLockAtLocation(Location location, User user)
+    public Lock getLockAtLocation(Location location, MultilingualPlayer user)
     {
         return getLockAtLocation(location, user, true);
     }
@@ -297,7 +296,7 @@ public class LockManager
      * @param access whether to access the lock or just get information from it
      * @return the lock or null if there is no lock OR the chunk is not loaded
      */
-    public Lock getLockAtLocation(Location location, User user, boolean access, boolean repairExpand)
+    public Lock getLockAtLocation(Location location, MultilingualPlayer user, boolean access, boolean repairExpand)
     {
         UInteger worldId = wm.getWorldId((World)location.getExtent());
         Lock lock = this.getLocLockMap(worldId).get(getLocationKey(location));
@@ -349,7 +348,7 @@ public class LockManager
         return lock;
     }
 
-    public Lock getLockAtLocation(Location location, User user, boolean access)
+    public Lock getLockAtLocation(Location location, MultilingualPlayer user, boolean access)
     {
         return this.getLockAtLocation(location, user, access, true);
     }
@@ -392,8 +391,8 @@ public class LockManager
     {
         if (lock != null && access)
         {
-            if ((this.module.getConfig().protectWhenOnlyOffline && lock.getOwner().asPlayer().isOnline())
-            || (this.module.getConfig().protectWhenOnlyOnline && !lock.getOwner().asPlayer().isOnline()))
+            if ((this.module.getConfig().protectWhenOnlyOffline && lock.getOwner().original().isOnline())
+            || (this.module.getConfig().protectWhenOnlyOnline && !lock.getOwner().original().isOnline()))
             {
                 return null;
             }
@@ -429,7 +428,7 @@ public class LockManager
      * @param user the user removing the lock (can be null)
      * @param destroyed true if the Lock is already destroyed
      */
-    public void removeLock(Lock lock, User user, boolean destroyed)
+    public void removeLock(Lock lock, MultilingualPlayer user, boolean destroyed)
     {
         if (destroyed || lock.isOwner(user) || user.hasPermission(module.perms().CMD_REMOVE_OTHER.getId()))
         {
@@ -473,7 +472,7 @@ public class LockManager
      * @param createKeyBook whether to attempt to create a keyBook
      * @return the created Lock
      */
-    public CompletableFuture<Lock> createLock(BlockType material, Location<World> block, User user, LockType lockType, String password, boolean createKeyBook)
+    public CompletableFuture<Lock> createLock(BlockType material, Location<World> block, MultilingualPlayer user, LockType lockType, String password, boolean createKeyBook)
     {
         LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
         for (BlockLockerConfiguration blockProtection : this.module.getConfig().blockprotections)
@@ -566,7 +565,7 @@ public class LockManager
      * @param createKeyBook whether to attempt to create a keyBook
      * @return the created Lock
      */
-    public CompletableFuture<Lock> createLock(Entity entity, User user, LockType lockType, String password, boolean createKeyBook)
+    public CompletableFuture<Lock> createLock(Entity entity, MultilingualPlayer user, LockType lockType, String password, boolean createKeyBook)
     {
         LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(entity.getType()), entity.getUniqueId());
         model.createPassword(this, password);
@@ -680,7 +679,7 @@ public class LockManager
         return null;
     }
 
-    public void setGlobalAccess(User sender, String string)
+    public void setGlobalAccess(MultilingualPlayer sender, String string)
     {
         String[] explode = StringUtils.explode(",", string);
         for (String name : explode)
@@ -697,7 +696,7 @@ public class LockManager
                 name = name.substring(1);
                 add = false;
             }
-            User modifyUser = this.um.findExactUser(name);
+            MultilingualPlayer modifyUser = this.um.findExactUser(name);
             if (modifyUser == null) throw new IllegalArgumentException(); // This is prevented by checking first in the cmd execution
             short accessType = ACCESS_FULL;
             if (add && admin)
@@ -737,7 +736,7 @@ public class LockManager
         }
     }
 
-    public CompletableFuture<Integer> purgeLocksFrom(User user)
+    public CompletableFuture<Integer> purgeLocksFrom(MultilingualPlayer user)
     {
         return database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(user.getEntity().getId())));
     }

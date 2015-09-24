@@ -22,7 +22,7 @@ import de.cubeisland.engine.butler.parametric.Command;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.command.CommandContext;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
 import org.spongepowered.api.block.tileentity.TileEntity;
@@ -58,7 +58,7 @@ public class LockerAdminCommands extends ContainerCommand
     }
 
     @Command(desc = "Opens a protected chest by protection id")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
     public void view(CommandContext context, Integer id)
     {
         Lock lock = this.getLockById(context, id);
@@ -72,7 +72,7 @@ public class LockerAdminCommands extends ContainerCommand
                     TileEntity te = lock.getFirstLocation().getTileEntity().orNull();
                     if (te instanceof Carrier)
                     {
-                        ((User)context.getSource()).asPlayer().openInventory(((Carrier)te).getInventory());
+                        ((MultilingualPlayer)context.getSource()).original().openInventory(((Carrier)te).getInventory());
                     }
                 }
                 else
@@ -86,23 +86,23 @@ public class LockerAdminCommands extends ContainerCommand
     }
 
     @Command(desc = "Deletes a protection by its id")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
     public void remove(CommandContext context, Integer id)
     {
         Lock lock = this.getLockById(context, id);
         if (lock == null) return;
-        lock.delete((User)context.getSource());
+        lock.delete((MultilingualPlayer)context.getSource());
     }
 
     @Command(desc = "Teleport to a protection")
-    @Restricted(value = User.class, msg = "This command can only be used in game")
+    @Restricted(value = MultilingualPlayer.class, msg = "This command can only be used in game")
     public void tp(CommandContext context, Integer id)
     {
         Lock lock = this.getLockById(context, id);
         if (lock == null) return;
         if (lock.isBlockLock())
         {
-            ((User)context.getSource()).asPlayer().setLocation(lock.getFirstLocation());
+            ((MultilingualPlayer)context.getSource()).original().setLocation(lock.getFirstLocation());
         }
         else
         {
@@ -111,7 +111,7 @@ public class LockerAdminCommands extends ContainerCommand
     }
 
     @Command(desc = "Deletes all locks of given player")
-    public void purge(CommandContext context, User player)
+    public void purge(CommandContext context, MultilingualPlayer player)
     {
         this.manager.purgeLocksFrom(player);
         context.sendTranslated(POSITIVE, "All locks for {user} are now deleted!", player);

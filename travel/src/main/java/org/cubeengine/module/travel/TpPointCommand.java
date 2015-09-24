@@ -19,8 +19,8 @@ package org.cubeengine.module.travel;
 
 import java.util.Set;
 import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualCommandSource;
+import org.cubeengine.service.user.MultilingualPlayer;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 
@@ -34,7 +34,7 @@ public class TpPointCommand extends ContainerCommand
         iManager = module.getInviteManager();
     }
 
-    protected void showList(CommandSender context, User user, Set<? extends TeleportPoint> points)
+    protected void showList(MultilingualCommandSource context, MultilingualPlayer user, Set<? extends TeleportPoint> points)
     {
         for (TeleportPoint point : points)
         {

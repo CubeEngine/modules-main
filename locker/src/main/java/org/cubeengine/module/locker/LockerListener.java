@@ -18,22 +18,18 @@
 package org.cubeengine.module.locker;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import com.google.common.base.Optional;
-import com.google.common.base.Predicate;
 import org.cubeengine.module.core.util.BlockUtil;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
-import org.cubeengine.module.locker.storage.ProtectionFlag;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTransaction;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.tileentity.Piston;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
@@ -94,7 +90,7 @@ public class LockerListener
     public void onPlayerInteract(InteractBlockEvent.Use.SourcePlayer event)
     {
         if (!this.module.getConfig().protectBlockFromRClick) return;
-        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        MultilingualPlayer user = um.getExactUser(event.getSourceEntity().getUniqueId());
         Location location = event.getTargetLocation();
         Lock lock = this.manager.getLockAtLocation(location, user);
         Location block = event.getTargetLocation();
@@ -131,7 +127,7 @@ public class LockerListener
     {
         if (!this.module.getConfig().protectEntityFromRClick) return;
         Entity entity = event.getTargetEntity();
-        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        MultilingualPlayer user = um.getExactUser(event.getSourceEntity().getUniqueId());
         if (!user.hasPermission(module.perms().DENY_ENTITY.getId()))
         {
             user.sendTranslated(NEGATIVE, "Strong magic prevents you from reaching this entity!");
@@ -177,7 +173,7 @@ public class LockerListener
         }
         Lock lock = this.manager.getLockOfInventory(carried);
         if (lock == null) return;
-        User user = um.getExactUser(event.getViewer().getUniqueId());
+        MultilingualPlayer user = um.getExactUser(event.getViewer().getUniqueId());
         lock.handleInventoryOpen(event, event.getContainer(), loc, user);
     }
 
@@ -192,7 +188,7 @@ public class LockerListener
         // TODO update to this when done https://github.com/SpongePowered/SpongeAPI/pull/712
         if (cause.isPresent() && cause.get().getCause() instanceof Player)
         {
-            User user = um.getExactUser(((Player)cause.get().getCause()).getUniqueId());
+            MultilingualPlayer user = um.getMultilingualPlayer(((Player)cause.get().getCause()).getUniqueId());
             lock.handleEntityDamage(event, user);
         }
         // else other source
@@ -217,7 +213,7 @@ public class LockerListener
 
             if (playerCause.isPresent())
             {
-                User user = um.getExactUser(playerCause.get().getUniqueId());
+                MultilingualPlayer user = um.getMultilingualPlayer(playerCause.get().getUniqueId());
                 if (lock.isOwner(user))
                 {
                     lock.handleEntityDeletion(user);
@@ -237,7 +233,7 @@ public class LockerListener
             if (playerCause.isPresent())
             {
                 Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
-                User user = um.getExactUser(playerCause.get().getUniqueId());
+                MultilingualPlayer user = um.getMultilingualPlayer(playerCause.get().getUniqueId());
                 if (user.hasPermission(module.perms().DENY_HANGING.getId()))
                 {
                     event.setCancelled(true);
@@ -256,13 +252,13 @@ public class LockerListener
         Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
         if (lock == null) return;
         Optional<DamageableData> damageData = entity.get(DamageableData.class);
-        User user = null;
+        MultilingualPlayer user = null;
         if (damageData.isPresent())
         {
             Living living = damageData.get().lastAttacker().get().orNull();
             if (living instanceof Player)
             {
-                user = um.getExactUser(living.getUniqueId());
+                user = um.getMultilingualPlayer(living.getUniqueId());
             }
         }
         lock.handleEntityDeletion(user);
@@ -271,7 +267,7 @@ public class LockerListener
     @Listener(order = Order.EARLY)
     public void onPlace(PlaceBlockEvent.SourcePlayer event)
     {
-        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        MultilingualPlayer user = um.getExactUser(event.getSourceEntity().getUniqueId());
         for (BlockTransaction trans : event.getTransactions())
         {
             BlockSnapshot placed = trans.getFinalReplacement();
@@ -314,7 +310,7 @@ public class LockerListener
             || type == JUNGLE_DOOR || type == ACACIA_DOOR || type == DARK_OAK_DOOR;
     }
 
-    private boolean onPlaceDoor(SourcePlayer event, BlockSnapshot placed, User user)
+    private boolean onPlaceDoor(SourcePlayer event, BlockSnapshot placed, MultilingualPlayer user)
     {
         Location<World> location = placed.getLocation().get();
         BlockState doorState = placed.getState();
@@ -366,7 +362,7 @@ public class LockerListener
         return false;
     }
 
-    private boolean onPlaceChest(PlaceBlockEvent.SourcePlayer event, Location placed, User user)
+    private boolean onPlaceChest(PlaceBlockEvent.SourcePlayer event, Location placed, MultilingualPlayer user)
     {
         Location relativeLoc;
         for (Direction direction : CARDINAL_DIRECTIONS)
@@ -436,7 +432,7 @@ public class LockerListener
     public void onBlockBreak(BreakBlockEvent.SourcePlayer event)
     {
         if (!this.module.getConfig().protectFromBlockBreak) return;
-        User user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        MultilingualPlayer user = um.getExactUser(event.getSourceEntity().getUniqueId());
         for (BlockTransaction trans : event.getTransactions())
         {
             Location<World> location = trans.getOriginal().getLocation().get();
@@ -591,7 +587,7 @@ public class LockerListener
          .filter(entityProtection -> entityProtection.isType(event.getEntity().getType())
              && entityProtection.autoProtect)
          .forEach(entityProtection -> {
-             User user = um.getExactUser((event.getTamer()).getUniqueId());
+             MultilingualPlayer user = um.getExactUser((event.getTamer()).getUniqueId());
              if (this.manager.getLockForEntityUID(event.getEntity().getUniqueId()) == null)
              {
                  this.manager.createLock(event.getEntity(), user, entityProtection.autoProtectType, null, false);

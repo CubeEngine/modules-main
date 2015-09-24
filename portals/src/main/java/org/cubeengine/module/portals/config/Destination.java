@@ -19,7 +19,7 @@ package org.cubeengine.module.portals.config;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.module.portals.Portals;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.module.core.util.WorldLocation;
 import org.cubeengine.service.world.ConfigWorld;
 import org.cubeengine.module.portals.Portal;
@@ -70,9 +70,9 @@ public class Destination
             Portal destPortal = module.getPortal(portal);
             if (destPortal == null)
             {
-                if (entity instanceof User)
+                if (entity instanceof MultilingualPlayer)
                 {
-                    ((User)entity).sendTranslated(NEGATIVE, "Destination portal {input} does not exist!", portal);
+                    ((MultilingualPlayer)entity).sendTranslated(NEGATIVE, "Destination portal {input} does not exist!", portal);
                 }
                 return;
             }

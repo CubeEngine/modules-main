@@ -17,10 +17,14 @@
  */
 package org.cubeengine.module.teleport;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import com.google.common.base.Optional;
 import org.cubeengine.module.core.util.LocationUtil;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserManager;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -40,19 +44,25 @@ public class TeleportListener
 {
     private final Teleport module;
     private UserManager um;
+    private I18n i18n;
 
-    public TeleportListener(Teleport module, UserManager um)
+    private Map<UUID, Transform<World>> deathLocations = new HashMap<>();
+    private Map<UUID, Transform<World>> lastLocations = new HashMap<>();
+    private Map<UUID, UUID> requestCancelTasks = new HashMap<>();
+    private Map<UUID, UUID> tpToRequests = new HashMap<>();
+    private Map<UUID, UUID> tpFromRequests = new HashMap<>();
+
+    public TeleportListener(Teleport module, UserManager um, I18n i18n)
     {
         this.module = module;
         this.um = um;
+        this.i18n = i18n;
     }
 
     @Listener
     public void onTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event)
     {
-        User user = um.getExactUser(event.getTargetEntity().getUniqueId());
-        // TODO limit cause
-        user.attachOrGet(TeleportAttachment.class, module).setLastLocation(event.getFromTransform().getLocation()); // TODO transform
+        lastLocations.put(event.getTargetEntity().getUniqueId(), event.getFromTransform());
     }
 
     @Listener
@@ -62,10 +72,9 @@ public class TeleportListener
         {
             return;
         }
-        User user = um.getExactUser(event.getTargetEntity().getUniqueId());
-        if (user.hasPermission(module.perms().COMMAND_BACK_ONDEATH.getId()))
+        if (((Player)event.getTargetEntity()).hasPermission(module.perms().COMMAND_BACK_ONDEATH.getId()))
         {
-            user.attachOrGet(TeleportAttachment.class, module).setDeathLocation(user.asPlayer().getLocation());
+            deathLocations.put(event.getTargetEntity().getUniqueId(), event.getTargetEntity().getTransform());
         }
     }
 
@@ -83,11 +92,10 @@ public class TeleportListener
             return;
         }
         event.setCancelled(true);
-        if (event instanceof InteractBlockEvent.Attack)
+        if (event instanceof InteractBlockEvent.Primary)
         {
             if (player.hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
             {
-                User user = um.getExactUser(player.getUniqueId());
                 Location<World> loc;
                 if (event.getTargetBlock().getState().getType().isSolidCube())
                 {
@@ -95,7 +103,7 @@ public class TeleportListener
                 }
                 else
                 {
-                    Optional<BlockRayHit<World>> end = BlockRay.from(user.asPlayer()).end();
+                    Optional<BlockRayHit<World>> end = BlockRay.from(player).end();
                     if (!end.isPresent())
                     {
                         return;
@@ -103,28 +111,94 @@ public class TeleportListener
                     loc = end.get().getLocation().add(0.5, 1, 0.5);
                 }
                 player.setLocation(loc);
-                user.sendTranslated(NEUTRAL, "Poof!");
+                i18n.sendTranslated(player, NEUTRAL, "Poof!");
                 event.setCancelled(true);
             }
         }
-        else if (event instanceof InteractBlockEvent.Use)
+        else if (event instanceof InteractBlockEvent.Secondary)
         {
             if (player.hasPermission(module.perms().COMPASS_JUMPTO_RIGHT.getId()))
             {
-                User user = um.getExactUser(player.getUniqueId());
-                Location loc = LocationUtil.getBlockBehindWall(user, this.module.getConfig().navigation.thru.maxRange,
+                Location<World> loc = LocationUtil.getBlockBehindWall(player, this.module.getConfig().navigation.thru.maxRange,
                                                                this.module.getConfig().navigation.thru.maxWallThickness);
                 if (loc == null)
                 {
-                    user.sendTranslated(NEGATIVE, "Nothing to pass through!");
+                    i18n.sendTranslated(player, NEGATIVE, "Nothing to pass through!");
                     return;
                 }
                 loc = loc.add(0, 1, 0);
                 player.setLocation(loc);
-                user.sendTranslated(NEUTRAL, "You passed through a wall");
+                i18n.sendTranslated(player, NEUTRAL, "You passed through a wall");
                 event.setCancelled(true);
             }
         }
         // TODO left click air is not handled OR is it?
+    }
+
+    public Transform<World> getDeathLocation(Player player)
+    {
+        return deathLocations.get(player.getUniqueId());
+    }
+
+    public void setDeathLocation(Player player, Transform<World> loc)
+    {
+        if (loc == null)
+        {
+            deathLocations.remove(player.getUniqueId());
+        }
+        else
+        {
+            deathLocations.put(player.getUniqueId(), loc);
+        }
+    }
+
+    public Transform<World> getLastLocation(Player player)
+    {
+        return lastLocations.get(player.getUniqueId());
+    }
+
+    public void removeRequestTask(Player player)
+    {
+        requestCancelTasks.remove(player.getUniqueId());
+    }
+
+    public void setToRequest(Player player, Player target)
+    {
+        tpToRequests.put(player.getUniqueId(), target.getUniqueId());
+    }
+
+    public void removeFromRequest(Player player)
+    {
+        tpFromRequests.remove(player.getUniqueId());
+    }
+
+    public void removeToRequest(Player player)
+    {
+        tpToRequests.remove(player.getUniqueId());
+    }
+
+    public UUID getRequestTask(Player player)
+    {
+        return requestCancelTasks.get(player.getUniqueId());
+    }
+
+    public void setRequestTask(Player player, UUID taskID)
+    {
+        requestCancelTasks.put(player.getUniqueId(), taskID);
+    }
+
+    public void setFromRequest(Player player, Player target)
+    {
+        tpFromRequests.put(player.getUniqueId(), target.getUniqueId());
+    }
+
+    public UUID getToRequest(Player player)
+    {
+        return tpToRequests.get(player.getUniqueId());
+    }
+
+    public UUID getFromRequest(Player player)
+    {
+        return tpFromRequests.get(player.getUniqueId());
     }
 }

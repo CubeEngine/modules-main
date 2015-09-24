@@ -25,9 +25,10 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Label;
 import org.cubeengine.module.core.util.BlockUtil;
 import org.cubeengine.module.core.util.LocationUtil;
-import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.command.annotation.CommandPermission;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualCommandSource;
+import org.cubeengine.service.user.MultilingualPlayer;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
@@ -46,24 +47,26 @@ import static org.cubeengine.service.i18n.formatter.MessageType.*;
 public class MovementCommands
 {
     private final Teleport module;
+    private TeleportListener tl;
 
-    public MovementCommands(Teleport module)
+    public MovementCommands(Teleport module, TeleportListener tl)
     {
         this.module = module;
+        this.tl = tl;
     }
 
     @Command(desc = "Teleports you X amount of blocks into the air and puts a glass block beneath you.")
-    public void up(User context, Integer height)
+    public void up(MultilingualPlayer context, Integer height)
     {
         if (height < 0)
         {
             context.sendTranslated(NEGATIVE, "Invalid height. The height has to be a whole number greater than 0!");
             return;
         }
-        Location loc = context.asPlayer().getLocation().add(0, height - 1, 0);
-        if (loc.getBlockY() > ((World)loc.getExtent()).getDimension().getBuildHeight()) // Over highest loc
+        Location<World> loc = context.original().getLocation().add(0, height - 1, 0);
+        if (loc.getBlockY() > loc.getExtent().getDimension().getBuildHeight()) // Over highest loc
         {
-            loc.add(0, ((World)loc.getExtent()).getDimension().getBuildHeight() - loc.getY(), 0);
+            loc.add(0, loc.getExtent().getDimension().getBuildHeight() - loc.getY(), 0);
         }
         Location up1 = loc.getRelative(UP);
         if (!(up1.getBlockType() == AIR && up1.getRelative(UP).getBlockType() == AIR))
@@ -75,24 +78,24 @@ public class MovementCommands
         {
             loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS);
         }
-        context.asPlayer().setLocation(loc);
+        context.original().setLocation(loc);
         context.sendTranslated(POSITIVE, "You have just been lifted!");
     }
 
     @Command(desc = "Teleports to the highest point at your position.")
-    @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
-    public void top(User context)
+    @Restricted(value = MultilingualPlayer.class, msg = "Pro Tip: Teleport does not work IRL!")
+    public void top(MultilingualPlayer context)
     {
-        Location loc = BlockUtil.getHighestBlockAt(context.asPlayer().getLocation()).add(.5, 0, .5);
-        context.asPlayer().setLocation(loc);
+        Location<World> loc = BlockUtil.getHighestBlockAt(context.original().getLocation()).add(.5, 0, .5);
+        context.original().setLocation(loc);
         context.sendTranslated(POSITIVE, "You are now on top!");
     }
 
     @Command(desc = "Teleports you to the next safe spot upwards.")
-    @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
-    public void ascend(User context)
+    @Restricted(value = MultilingualPlayer.class, msg = "Pro Tip: Teleport does not work IRL!")
+    public void ascend(MultilingualPlayer context)
     {
-        Location loc = context.asPlayer().getLocation();
+        Location loc = context.original().getLocation();
         Location curLoc = loc.add(0, 2, 0);
         final int maxHeight = ((World)curLoc.getExtent()).getDimension().getBuildHeight();
         //go upwards until hitting solid blocks
@@ -123,15 +126,15 @@ public class MovementCommands
             return;
         }
         loc = loc.add(0, ((World)loc.getExtent()).getDimension().getBuildHeight() - loc.getY() + 1, 0);
-        context.asPlayer().setLocation(loc);
+        context.original().setLocation(loc);
         context.sendTranslated(POSITIVE, "Ascended a level!");
     }
 
     @Command(desc = "Teleports you to the next safe spot downwards.")
-    @Restricted(value = User.class, msg = "Pro Tip: Teleport does not work IRL!")
-    public void descend(User context)
+    @Restricted(value = MultilingualPlayer.class, msg = "Pro Tip: Teleport does not work IRL!")
+    public void descend(MultilingualPlayer context)
     {
-        final Location userLocation = context.asPlayer().getLocation();
+        final Location userLocation = context.original().getLocation();
         Location curLoc = userLocation;
         //go downwards until hitting solid blocks
         while (curLoc.getBlockType() == AIR && curLoc.getBlockY() > 0)
@@ -152,49 +155,49 @@ public class MovementCommands
             return;
         }
         //reached new location
-        context.asPlayer().setLocation(curLoc);
+        context.original().setLocation(curLoc);
         context.sendTranslated(POSITIVE, "Descended a level!");
     }
 
     @Command(alias = {"jump", "j"}, desc = "Jumps to the position you are looking at.")
-    @Restricted(value = User.class, msg = "Jumping in the console is not allowed! Go play outside!")
-    public void jumpTo(User context)
+    @Restricted(value = MultilingualPlayer.class, msg = "Jumping in the console is not allowed! Go play outside!")
+    public void jumpTo(MultilingualPlayer context)
     {
-        Optional<BlockRayHit<World>> end = BlockRay.from(context.asPlayer()).end();
+        Optional<BlockRayHit<World>> end = BlockRay.from(context.original()).end();
         if (!end.isPresent())
         {
             context.sendTranslated(NEGATIVE, "No block in sight!");
             return;
         }
         Location<World> loc = end.get().getLocation().add(0.5, 1, 0.5);
-        context.asPlayer().setLocation(loc);
+        context.original().setLocation(loc);
         context.sendTranslated(POSITIVE, "You just jumped!");
     }
 
     @Command(alias = "thru", desc = "Jumps to the position you are looking at.")
-    @Restricted(value = User.class, msg = "Passing through firewalls in the console is not allowed! Go play outside!")
-    public void through(User context)
+    @Restricted(value = MultilingualPlayer.class, msg = "Passing through firewalls in the console is not allowed! Go play outside!")
+    public void through(MultilingualPlayer context)
     {
-        Location loc = LocationUtil.getBlockBehindWall(context, this.module.getConfig().navigation.thru.maxRange,
+        Location<World> loc = LocationUtil.getBlockBehindWall(context.original(), this.module.getConfig().navigation.thru.maxRange,
                                                                this.module.getConfig().navigation.thru.maxWallThickness);
         if (loc == null)
         {
             context.sendTranslated(NEGATIVE, "Nothing to pass through!");
             return;
         }
-        context.asPlayer().setLocation(loc);
+        context.original().setLocation(loc);
         context.sendTranslated(POSITIVE, "You just passed the wall!");
     }
 
     @Command(desc = "Teleports you to your last location")
     @CommandPermission(checkPermission = false)
-    @Restricted(value = User.class, msg = "Unfortunately teleporting is still not implemented in the game {text:'Life'}!")
-    public void back(User context, @Flag boolean unsafe)
+    @Restricted(value = MultilingualPlayer.class, msg = "Unfortunately teleporting is still not implemented in the game {text:'Life'}!")
+    public void back(MultilingualPlayer context, @Flag boolean unsafe)
     {
         boolean backPerm = context.hasPermission(module.perms().COMMAND_BACK_USE.getId());
         if (context.hasPermission(module.perms().COMMAND_BACK_ONDEATH.getId()))
         {
-            Location loc = context.attachOrGet(TeleportAttachment.class, module).getDeathLocation();
+            Transform<World> loc = tl.getDeathLocation(context.original());
             if (!backPerm && loc == null)
             {
                 context.sendTranslated(NEGATIVE, "No death point found!");
@@ -202,74 +205,63 @@ public class MovementCommands
             }
             if (loc != null)
             {
-                if (!unsafe || context.asPlayer().setLocationSafely(loc))
+                if (!unsafe || context.original().setLocationSafely(loc.getLocation()))
                 {
                     if (unsafe)
                     {
-                        context.asPlayer().setLocation(loc);
+                        context.original().setLocation(loc.getLocation());
                     }
                     context.sendTranslated(POSITIVE, "Teleported to your death point!");
+                    tl.setDeathLocation(context.original(), null); // reset after back
                 }
-                else
-                {
-                    context.attachOrGet(TeleportAttachment.class, module).setDeathLocation(loc);
-                }
+                context.original().setRotation(loc.getRotation());
                 return;
             }
         }
         if (backPerm)
         {
-            Location loc = context.attachOrGet(TeleportAttachment.class, module).getLastLocation();
+            Transform<World> loc = tl.getLastLocation(context.original());
             if (loc == null)
             {
                 context.sendTranslated(NEGATIVE, "You never teleported!");
                 return;
             }
 
-            if (!unsafe || context.asPlayer().setLocationSafely(loc))
+            if (!unsafe || context.original().setLocationSafely(loc.getLocation()))
             {
                 if (unsafe)
                 {
-                    context.asPlayer().setLocation(loc);
+                    context.original().setLocation(loc.getLocation());
                 }
                 context.sendTranslated(POSITIVE, "Teleported to your last location!");
             }
+            context.original().setRotation(loc.getRotation());
             return;
         }
         context.sendTranslated(NEGATIVE, "You are not allowed to teleport back!");
     }
 
     @Command(alias = "put", desc = "Places a player to the position you are looking at.")
-    @Restricted(value = User.class)
-    public void place(User context, User player)
+    @Restricted(value = MultilingualPlayer.class)
+    public void place(MultilingualPlayer context, MultilingualPlayer player)
     {
-        if (!player.getPlayer().isPresent())
-        {
-            context.sendTranslated(NEGATIVE, "You cannot move an offline player!");
-            return;
-        }
-        Optional<BlockRayHit<World>> end = BlockRay.from(context.asPlayer()).end();
+        Optional<BlockRayHit<World>> end = BlockRay.from(context.original()).end();
         if (!end.isPresent())
         {
             context.sendTranslated(NEGATIVE, "No block in sight!");
             return;
         }
-        player.asPlayer().setLocation(end.get().getLocation().add(0.5, 1, 0.5));
+        player.original().setLocation(end.get().getLocation().add(0.5, 1, 0.5));
         context.sendTranslated(POSITIVE, "You just placed {user} where you were looking!", player);
         player.sendTranslated(POSITIVE, "You were placed somewhere!");
     }
 
     @Command(desc = "Swaps you and another players position")
-    public void swap(CommandSender context, User player, @Default @Label("player") User sender)
+    public void swap(MultilingualCommandSource context, MultilingualPlayer player, @Default @Label("player") MultilingualPlayer sender)
     {
-        if (!player.getPlayer().isPresent() || !sender.getPlayer().isPresent())
-        {
-            context.sendTranslated(NEGATIVE, "You cannot move an offline player!");
-            return;
-        }
         if (player.equals(context))
         {
-            if (context instanceof User)
+            if (context instanceof MultilingualPlayer)
             {
                 context.sendTranslated(NEGATIVE, "Swapping positions with yourself!? Are you kidding me?");
                 return;
@@ -277,9 +269,9 @@ public class MovementCommands
             context.sendTranslated(NEUTRAL, "Truly a hero! Trying to swap a users position with himself...");
             return;
         }
-        Location userLoc = player.asPlayer().getLocation();
-        player.asPlayer().setLocation(sender.asPlayer().getLocation());
-        sender.asPlayer().setLocation(userLoc);
+        Location<World> userLoc = player.original().getLocation();
+        player.original().setLocation(sender.original().getLocation());
+        sender.original().setLocation(userLoc);
         if (!context.equals(sender))
         {
             context.sendTranslated(POSITIVE, "Swapped position of {user} and {user}!", player, sender);

@@ -27,9 +27,12 @@ import de.cubeisland.engine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.service.command.CommandContext;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.Broadcaster;
+import org.cubeengine.service.user.MultilingualCommandSource;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -48,31 +51,30 @@ import static org.cubeengine.service.i18n.formatter.MessageType.*;
 public class TeleportCommands
 {
     private final Teleport module;
-    private UserManager um;
+    private Game game;
+    private Broadcaster bc;
+    private TeleportListener tl;
 
-    public TeleportCommands(Teleport module, UserManager um)
+    public TeleportCommands(Teleport module, Game game, Broadcaster bc, TeleportListener tl)
     {
         this.module = module;
-        this.um = um;
+        this.game = game;
+        this.bc = bc;
+        this.tl = tl;
     }
 
     @Command(desc = "Teleport directly to a player.")
-    public void tp(CommandSender context, User player, @Optional User target, @Flag boolean force, @Flag boolean unsafe)
+    public void tp(MultilingualCommandSource context, MultilingualPlayer player, @Optional MultilingualPlayer target, @Flag boolean force, @Flag boolean unsafe)
     {
         if (target == null)
         {
             target = player;
-            if (!(context instanceof User))
+            if (!(context instanceof MultilingualPlayer))
             {
                 context.sendTranslated(NEGATIVE, "You have to provide both players");
                 return;
             }
-            player = (User)context;
-        }
-        if (!target.getPlayer().isPresent())
-        {
-            context.sendTranslated(NEGATIVE, "Teleportation only works with online players!");
-            return;
+            player = (MultilingualPlayer)context;
         }
         force = force && context.hasPermission(module.perms().COMMAND_TP_FORCE.getId());
         if (!context.equals(player) && !context.hasPermission(module.perms().COMMAND_TP_OTHER.getId())) // teleport other persons
@@ -112,24 +114,19 @@ public class TeleportCommands
             context.sendTranslated(NEUTRAL, "You just teleported {user} to {user}... Not very useful right?", player, player);
             return;
         }
-        if (!unsafe || player.getPlayer().get().setLocationSafely(target.asPlayer().getLocation()))
+        if (!unsafe || player.getSource().setLocationSafely(target.original().getLocation()))
         {
             if (unsafe)
             {
-                player.getPlayer().get().setLocation(target.asPlayer().getLocation());
+                player.getSource().setLocation(target.original().getLocation());
             }
             context.sendTranslated(POSITIVE, "You teleported to {user}!", target);
         }
     }
 
     @Command(desc = "Teleports everyone directly to a player.")
-    public void tpall(CommandContext context, User player, @Flag boolean force, @Flag boolean unsafe)
+    public void tpall(CommandContext context, MultilingualPlayer player, @Flag boolean force, @Flag boolean unsafe)
     {
-        if (!player.getPlayer().isPresent())
-        {
-            context.sendTranslated(NEGATIVE, "You cannot teleport to an offline player!");
-            return;
-        }
         force = force && context.getSource().hasPermission(module.perms().COMMAND_TPALL_FORCE.getId());
         if (!force && player.hasPermission(module.perms().TELEPORT_PREVENT_TPTO.getId()))
         {
@@ -137,14 +134,14 @@ public class TeleportCommands
             return;
         }
         ArrayList<String> noTp = new ArrayList<>();
-        for (User p : um.getOnlineUsers())
+        for (Player p : game.getServer().getOnlinePlayers())
         {
             if (!force && p.hasPermission(module.perms().TELEPORT_PREVENT_TP.getId()))
             {
                 noTp.add(p.getName());
                 continue;
             }
-            Location target = player.asPlayer().getLocation();
+            Location target = player.original().getLocation();
             if (unsafe)
             {
                 p.getPlayer().get().setLocation(target);
@@ -154,7 +151,7 @@ public class TeleportCommands
                 noTp.add(p.getName());
             }
         }
-        um.broadcastTranslated(POSITIVE, "Teleporting everyone to {user}", player);
+        bc.broadcastTranslated(POSITIVE, "Teleporting everyone to {user}", player);
         if (!noTp.isEmpty())
         {
             context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
@@ -162,15 +159,10 @@ public class TeleportCommands
     }
 
     @Command(desc = "Teleport a player directly to you.")
-    @Restricted(value = User.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
-    public void tphere(CommandContext context, User player, @Flag boolean force, @Flag boolean unsafe)
+    @Restricted(value = MultilingualPlayer.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
+    public void tphere(CommandContext context, MultilingualPlayer player, @Flag boolean force, @Flag boolean unsafe)
     {
-        User sender = (User)context.getSource();
-        if (!player.getPlayer().isPresent())
-        {
-            context.sendTranslated(NEGATIVE, "You cannot teleport an offline player to you!");
-            return;
-        }
+        MultilingualPlayer sender = (MultilingualPlayer)context.getSource();
         force = force && sender.hasPermission(module.perms().COMMAND_TPHERE_FORCE.getId());
         if ( sender.equals(player))
         {
@@ -183,11 +175,11 @@ public class TeleportCommands
             return;
         }
 
-        if (!unsafe || player.getPlayer().get().setLocationSafely(sender.asPlayer().getLocation()))
+        if (!unsafe || player.getSource().setLocationSafely(sender.original().getLocation()))
         {
             if (unsafe)
             {
-                player.getPlayer().get().setLocation(sender.asPlayer().getLocation());
+                player.getSource().setLocation(sender.original().getLocation());
             }
             context.sendTranslated(POSITIVE, "You teleported {user} to you!", player);
             player.sendTranslated(POSITIVE, "You were teleported to {sender}", sender);
@@ -195,14 +187,14 @@ public class TeleportCommands
     }
 
     @Command(desc = "Teleport every player directly to you.")
-    @Restricted(value = User.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
+    @Restricted(value = MultilingualPlayer.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
     public void tphereall(CommandContext context, @Flag boolean force, @Flag boolean unsafe)
     {
-        User sender = (User)context.getSource();
+        MultilingualPlayer sender = (MultilingualPlayer)context.getSource();
         force = force && context.getSource().hasPermission(module.perms().COMMAND_TPHEREALL_FORCE.getId());
         ArrayList<String> noTp = new ArrayList<>();
-        Location target = sender.asPlayer().getLocation();
-        for (User p : um.getOnlineUsers())
+        Location<World> target = sender.original().getLocation();
+        for (Player p : game.getServer().getOnlinePlayers())
         {
             if (!force && p.hasPermission(module.perms().TELEPORT_PREVENT_TP.getId()))
             {
@@ -219,7 +211,7 @@ public class TeleportCommands
             }
         }
         context.sendTranslated(POSITIVE, "You teleported everyone to you!");
-        um.broadcastTranslated(POSITIVE, "Teleporting everyone to {sender}", sender);
+        bc.broadcastTranslated(POSITIVE, "Teleporting everyone to {sender}", sender);
         if (!noTp.isEmpty())
         {
             context.sendTranslated(NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(
@@ -228,18 +220,18 @@ public class TeleportCommands
     }
 
     @Command(desc = "Direct teleport to a coordinate.")
-    public void tppos(CommandSender context, Integer x, Integer y, Integer z, // TODO optional y coord
+    public void tppos(MultilingualCommandSource context, Integer x, Integer y, Integer z, // TODO optional y coord
                       @Default @Named({"world", "w"}) World world,
-                      @Default @Named({"player", "p"}) User player,
+                      @Default @Named({"player", "p"}) MultilingualPlayer player,
                       @Flag boolean unsafe)
     {
-        Location loc = new Location(world, x, y, z).add(0.5, 0, 0.5);
+        Location<World> loc = new Location(world, x, y, z).add(0.5, 0, 0.5);
         unsafe = unsafe && context.hasPermission(module.perms().COMMAND_TPPOS_UNSAFE.getId());
-        if (!unsafe || player.getPlayer().get().setLocationSafely(loc))
+        if (!unsafe || player.getSource().setLocationSafely(loc))
         {
             if (unsafe)
             {
-                player.getPlayer().get().setLocation(loc);
+                player.getSource().setLocation(loc);
             }
             context.sendTranslated(POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new BlockVector3(x, y, z), world);
         }

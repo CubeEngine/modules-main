@@ -20,8 +20,9 @@ package org.cubeengine.module.travel.storage;
 import javax.persistence.Transient;
 import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.service.database.AsyncRecord;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.WorldManager;
+import org.jooq.types.UInteger;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -37,13 +38,13 @@ public class TeleportPointModel extends AsyncRecord<TeleportPointModel>
         super(TABLE_TP_POINT);
     }
 
-    public TeleportPointModel newTPPoint(Location location, Vector3d rotation, WorldManager wm, String name, User owner, String welcomeMsg, TeleportType type,
+    public TeleportPointModel newTPPoint(Location location, Vector3d rotation, WorldManager wm, String name, UInteger owner, String welcomeMsg, TeleportType type,
                                          Visibility visibility)
     {
         this.setLocation(location, rotation, wm);
 
         this.setValue(TABLE_TP_POINT.NAME, name);
-        this.setValue(TABLE_TP_POINT.OWNER, owner.getEntity().getId());
+        this.setValue(TABLE_TP_POINT.OWNER, owner);
         this.setValue(TABLE_TP_POINT.TYPE, type.value);
         this.setValue(TABLE_TP_POINT.VISIBILITY, visibility.value);
 

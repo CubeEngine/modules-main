@@ -25,7 +25,7 @@ import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.world.World;
@@ -68,9 +68,9 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
     @Override
     public Context getDefault(CommandInvocation invocation)
     {
-        if (invocation.getCommandSource() instanceof User)
+        if (invocation.getCommandSource() instanceof MultilingualPlayer)
         {
-            return new Context("world", ((User)invocation.getCommandSource()).asPlayer().getWorld().getName());
+            return new Context("world", ((MultilingualPlayer)invocation.getCommandSource()).original().getWorld().getName());
         }
         throw new ReaderException("You have to provide a context");
     }

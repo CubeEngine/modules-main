@@ -18,7 +18,7 @@
 package org.cubeengine.module.portals;
 
 import java.util.List;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -50,7 +50,7 @@ public class PortalListener
         {
             if (portal.has(event.getToTransform().getLocation()))
             {
-                User user = um.getExactUser(event.getTargetEntity().getUniqueId());
+                MultilingualPlayer user = um.getMultilingualPlayer(event.getTargetEntity().getUniqueId());
                 PortalsAttachment attachment = user.attachOrGet(PortalsAttachment.class, module);
                 attachment.setInPortal(true);
                 if (attachment.isDebug())
@@ -101,7 +101,7 @@ public class PortalListener
             return;
         }
         List<Portal> portals = module.getPortalsInChunk(event.getToTransform().getLocation());
-        User user = um.getExactUser(event.getTargetEntity().getUniqueId());
+        MultilingualPlayer user = um.getMultilingualPlayer(event.getTargetEntity().getUniqueId());
         PortalsAttachment attachment = user.attachOrGet(PortalsAttachment.class, module);
         if (portals != null)
         {

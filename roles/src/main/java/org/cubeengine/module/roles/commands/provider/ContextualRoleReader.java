@@ -25,7 +25,7 @@ import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
@@ -100,9 +100,9 @@ public class ContextualRoleReader implements ArgumentReader<ContextualRole>, Com
     {
         ArrayList<String> result = new ArrayList<>();
         String token = invocation.consume(1).toLowerCase();
-        if (!token.contains("|") && invocation.getCommandSource() instanceof User)
+        if (!token.contains("|") && invocation.getCommandSource() instanceof MultilingualPlayer)
         {
-            World world = ((User)invocation.getCommandSource()).asPlayer().getWorld();
+            World world = ((MultilingualPlayer)invocation.getCommandSource()).original().getWorld();
             Context context = new Context("world", world.getName());
             for (Subject subject : service.getGroupSubjects().getAllSubjects())
             {

@@ -32,7 +32,7 @@ import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.ConfigWorld;
 import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
@@ -61,10 +61,10 @@ public class PortalCommands extends ContainerCommand
 
     @Alias(value = "mvpc")
     @Command(desc = "Creates a new Portal")
-    @Restricted(value = User.class, msg = "You must be ingame to do this!")
+    @Restricted(value = MultilingualPlayer.class, msg = "You must be ingame to do this!")
     public void create(CommandContext context, String name, @Optional Destination destination)
     {
-        User sender = (User)context.getSource();
+        MultilingualPlayer sender = (MultilingualPlayer)context.getSource();
         if (!(selector.getSelection(sender) instanceof Cuboid))
         {
             context.sendTranslated(NEGATIVE, "Please select a cuboid first!");
@@ -80,7 +80,7 @@ public class PortalCommands extends ContainerCommand
         PortalConfig config = reflector.create(PortalConfig.class);
         config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
         config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
-        config.location.destination = new WorldLocation(sender.asPlayer().getLocation(), sender.asPlayer().getRotation());
+        config.location.destination = new WorldLocation(sender.original().getLocation(), sender.original().getRotation());
         config.owner = sender.getUser().getName();
         config.world = new ConfigWorld(wm, (World)p1.getExtent());
 
@@ -100,10 +100,10 @@ public class PortalCommands extends ContainerCommand
 
     @Alias(value = "mvps")
     @Command(desc = "Selects an existing portal")
-    @Restricted(value = User.class, msg = "You must be ingame to do this!")
+    @Restricted(value = MultilingualPlayer.class, msg = "You must be ingame to do this!")
     public void select(CommandContext context, Portal portal)
     {
-        ((User)context.getSource()).attachOrGet(PortalsAttachment.class, module).setPortal(portal);
+        ((MultilingualPlayer)context.getSource()).attachOrGet(PortalsAttachment.class, module).setPortal(portal);
         context.sendTranslated(POSITIVE, "Portal selected: {name}", portal.getName());
     }
 
@@ -134,10 +134,10 @@ public class PortalCommands extends ContainerCommand
     }
 
     @Command(desc = "Shows debug portal information instead of teleporting")
-    @Restricted(value = User.class, msg = "You must be ingame to do this!")
+    @Restricted(value = MultilingualPlayer.class, msg = "You must be ingame to do this!")
     public void debug(CommandContext context, @Optional OnOff onOff)
     {
-        PortalsAttachment attachment = ((User)context.getSource()).attachOrGet(PortalsAttachment.class, module);
+        PortalsAttachment attachment = ((MultilingualPlayer)context.getSource()).attachOrGet(PortalsAttachment.class, module);
         if (onOff == null)
         {
             attachment.toggleDebug();

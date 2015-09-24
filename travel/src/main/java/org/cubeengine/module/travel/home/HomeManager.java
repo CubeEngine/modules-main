@@ -27,7 +27,7 @@ import org.cubeengine.module.travel.storage.TeleportPointModel.TeleportType;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.world.Location;
@@ -40,7 +40,7 @@ public class HomeManager extends TelePointManager<Home>
 
     public HomeManager(Travel module, InviteManager iManager, Database db, PermissionManager pm, WorldManager wm, UserManager um)
     {
-        super(module, iManager, db);
+        super(module, iManager, db, um);
         this.pm = pm;
         this.wm = wm;
         this.um = um;
@@ -58,13 +58,13 @@ public class HomeManager extends TelePointManager<Home>
     }
 
     @Override
-    public Home create(User owner, String name, Location location, Vector3d rotation, boolean publicVisibility)
+    public Home create(MultilingualPlayer owner, String name, Location location, Vector3d rotation, boolean publicVisibility)
     {
         if (this.has(owner, name))
         {
             throw new IllegalArgumentException("Tried to create duplicate home!");
         }
-        TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT).newTPPoint(location, rotation, wm, name, owner, null, TeleportType.HOME, publicVisibility ? Visibility.PUBLIC : Visibility.PRIVATE);
+        TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT).newTPPoint(location, rotation, wm, name, um.getByUUID(owner.getUniqueId()).getEntityId(), null, TeleportType.HOME, publicVisibility ? Visibility.PUBLIC : Visibility.PRIVATE);
         Home home = new Home(model, this.module, pm, wm, um);
         model.insertAsync().exceptionally(this::handle);
         this.addPoint(home);

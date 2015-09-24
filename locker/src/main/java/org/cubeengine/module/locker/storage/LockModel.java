@@ -21,7 +21,7 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.UUID;
 import org.cubeengine.service.database.AsyncRecord;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.StringUtils;
 
@@ -34,12 +34,12 @@ public class LockModel extends AsyncRecord<LockModel>
         super(TABLE_LOCK);
     }
 
-    public LockModel newLock(User user, LockType lockType, ProtectedType type)
+    public LockModel newLock(MultilingualPlayer user, LockType lockType, ProtectedType type)
     {
         return this.newLock(user, lockType, type, null);
     }
 
-    public LockModel newLock(User user, LockType lockType, ProtectedType type, UUID entityUUID)
+    public LockModel newLock(MultilingualPlayer user, LockType lockType, ProtectedType type, UUID entityUUID)
     {
         this.setValue(TABLE_LOCK.OWNER_ID, user.getEntity().getId());
         this.setValue(TABLE_LOCK.LOCK_TYPE, lockType.id);

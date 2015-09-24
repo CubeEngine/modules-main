@@ -19,7 +19,8 @@ package org.cubeengine.module.travel.home;
 
 import com.google.common.base.Optional;
 import org.cubeengine.module.travel.Travel;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.block.BlockTypes;
@@ -36,18 +37,20 @@ public class HomeListener
     private final Travel module;
     private UserManager um;
     private WorldManager wm;
+    private I18n i18n;
     private final HomeManager homeManager;
 
-    public HomeListener(Travel module, UserManager um, WorldManager wm)
+    public HomeListener(Travel module, UserManager um, WorldManager wm, I18n i18n)
     {
         this.module = module;
         this.um = um;
         this.wm = wm;
+        this.i18n = i18n;
         this.homeManager = module.getHomeManager();
     }
 
     @Listener(order = EARLY)
-    public void rightClickBed(InteractBlockEvent.Use event)
+    public void rightClickBed(InteractBlockEvent.Secondary event)
     {
         Optional<Player> source = event.getCause().first(Player.class);
         if (source.isPresent())
@@ -57,7 +60,7 @@ public class HomeListener
                 return;
             }
             Player player = source.get();
-            User user = um.getExactUser(player.getUniqueId());
+            MultilingualPlayer user = i18n.getMultilingual(player);
             if (player.get(SneakingData.class).isPresent())
             {
                 if (homeManager.has(user, "home"))

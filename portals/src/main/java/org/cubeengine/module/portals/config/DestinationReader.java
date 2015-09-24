@@ -24,7 +24,7 @@ import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.world.World;
 
@@ -46,9 +46,9 @@ public class DestinationReader implements ArgumentReader<Destination>
         String token = invocation.consume(1);
         if ("here".equalsIgnoreCase(token))
         {
-            if ((invocation.getCommandSource() instanceof User))
+            if ((invocation.getCommandSource() instanceof MultilingualPlayer))
             {
-                return new Destination(wm, ((User)invocation.getCommandSource()).asPlayer().getLocation(), ((User)invocation.getCommandSource()).asPlayer().getRotation());
+                return new Destination(wm, ((MultilingualPlayer)invocation.getCommandSource()).original().getLocation(), ((MultilingualPlayer)invocation.getCommandSource()).original().getRotation());
             }
             throw new ReaderException(
                 "The Portal Agency will bring you your portal for just {text:$ 1337} within {input#amount} weeks",

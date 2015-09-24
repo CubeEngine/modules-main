@@ -27,7 +27,7 @@ import org.cubeengine.module.travel.storage.TeleportPointModel.TeleportType;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.world.Location;
@@ -40,7 +40,7 @@ public class WarpManager extends TelePointManager<Warp>
 
     public WarpManager(Travel module, InviteManager iManager, Database db, PermissionManager pm, WorldManager wm, UserManager um)
     {
-        super(module, iManager, db);
+        super(module, iManager, db, um);
         this.pm = pm;
         this.wm = wm;
         this.um = um;
@@ -58,13 +58,13 @@ public class WarpManager extends TelePointManager<Warp>
     }
 
     @Override
-    public Warp create(User owner, String name, Location location, Vector3d rotation, boolean publicVisibility)
+    public Warp create(MultilingualPlayer owner, String name, Location location, Vector3d rotation, boolean publicVisibility)
     {
         if (this.has(owner, name))
         {
             throw new IllegalArgumentException("Tried to create duplicate warp!");
         }
-        TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT).newTPPoint(location, rotation, wm, name, owner, null, TeleportType.WARP, publicVisibility ? Visibility.PUBLIC : Visibility.PRIVATE);
+        TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT).newTPPoint(location, rotation, wm, name, um.getByUUID(owner.getUniqueId()).getEntityId(), null, TeleportType.WARP, publicVisibility ? Visibility.PUBLIC : Visibility.PRIVATE);
         Warp warp = new Warp(model, this.module, pm, wm, um);
         model.insertAsync();
         this.addPoint(warp);
