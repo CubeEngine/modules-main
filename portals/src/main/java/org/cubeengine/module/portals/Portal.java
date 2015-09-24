@@ -22,9 +22,10 @@ import java.util.List;
 import org.cubeengine.module.core.util.Pair;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.portals.config.PortalConfig;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.MultilingualPlayer;
+import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -36,12 +37,14 @@ public class Portal
     private final Portals module;
     private final String name;
     protected final PortalConfig config;
+    private I18n i18n;
 
-    public Portal(Portals module, String name, PortalConfig config)
+    public Portal(Portals module, String name, PortalConfig config, I18n i18n)
     {
         this.module = module;
         this.name = name;
         this.config = config;
+        this.i18n = i18n;
     }
 
     public String getName()
@@ -66,10 +69,10 @@ public class Portal
     {
         if (this.config.destination == null)
         {
-            if (entity instanceof MultilingualPlayer)
+            if (entity instanceof Player)
             {
-                ((MultilingualPlayer)entity).sendTranslated(NEUTRAL, "This portal {name} has no destination yet!", this.getName());
-                ((MultilingualPlayer)entity).attachOrGet(PortalsAttachment.class, module).setInPortal(true);
+                i18n.sendTranslated(((Player)entity), NEUTRAL, "This portal {name} has no destination yet!", this.getName());
+                module.getPortalsAttachment(entity.getUniqueId()).setInPortal(true);
             }
         }
         else
@@ -78,12 +81,12 @@ public class Portal
         }
     }
 
-    public Location getPortalPos()
+    public Location<World> getPortalPos()
     {
         if (this.config.location.destination == null)
         {
             BlockVector3 midpoint = this.config.location.to.midpoint(this.config.location.from);
-            return new Location(this.config.world.getWorld(), midpoint.x + 0.5, midpoint.y, midpoint.z + 0.5);
+            return new Location<World>(this.config.world.getWorld(), midpoint.x + 0.5, midpoint.y, midpoint.z + 0.5);
         }
         return this.config.location.destination.getLocationIn(this.config.world.getWorld()); // TODO rotation
     }
@@ -94,37 +97,37 @@ public class Portal
         this.config.getFile().delete();
     }
 
-    public void showInfo(CommandSender user)
+    public void showInfo(CommandSource user)
     {
-        user.sendTranslated(POSITIVE, "Portal Information for {name#portal}", this.getName());
+        i18n.sendTranslated(user, POSITIVE, "Portal Information for {name#portal}", this.getName());
         if (this.config.safeTeleport)
         {
-            user.sendTranslated(POSITIVE, "This Portal has safe teleport enabled");
+            i18n.sendTranslated(user, POSITIVE, "This Portal has safe teleport enabled");
         }
         if (this.config.teleportNonPlayers)
         {
-            user.sendTranslated(POSITIVE, "This Portal will teleport non-players too");
+            i18n.sendTranslated(user, POSITIVE, "This Portal will teleport non-players too");
         }
-        user.sendTranslated(POSITIVE, "{user} is the owner of this portal", this.config.owner);
-        user.sendTranslated(POSITIVE, "Location: {vector} to {vector} in {name#world}",
+        i18n.sendTranslated(user, POSITIVE, "{user} is the owner of this portal", this.config.owner);
+        i18n.sendTranslated(user, POSITIVE, "Location: {vector} to {vector} in {name#world}",
                             new BlockVector3(this.config.location.from.x, this.config.location.from.y, this.config.location.from.z),
                             new BlockVector3(this.config.location.to.x, this.config.location.to.y, this.config.location.to.z), this.config.world.getName());
         if (this.config.destination == null)
         {
-            user.sendTranslated(POSITIVE, "This portal has no destination yet");
+            i18n.sendTranslated(user, POSITIVE, "This portal has no destination yet");
         }
         else
         {
             switch (config.destination.type)
             {
             case PORTAL:
-                user.sendTranslated(POSITIVE, "This portal teleports to another portal: {name#portal}", config.destination.portal);
+                i18n.sendTranslated(user, POSITIVE, "This portal teleports to another portal: {name#portal}", config.destination.portal);
                 break;
             case WORLD:
-                user.sendTranslated(POSITIVE, "This portal teleports to the spawn of {name#world}", config.destination.world.getName());
+                i18n.sendTranslated(user, POSITIVE, "This portal teleports to the spawn of {name#world}", config.destination.world.getName());
                 break;
             case LOCATION:
-                user.sendTranslated(POSITIVE, "This portal teleports to {vector} in {name#world}",
+                i18n.sendTranslated(user, POSITIVE, "This portal teleports to {vector} in {name#world}",
                     new BlockVector3((int)config.destination.location.x, (int)config.destination.location.y, (int)config.destination.location.z), config.destination.world.getName());
                 break;
             }

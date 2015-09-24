@@ -32,12 +32,14 @@ import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.LockerAttachment;
 import org.cubeengine.service.database.Database;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.MultilingualPlayer;
 import org.jooq.Result;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.block.BreakBlockEvent;
 import org.spongepowered.api.item.ItemTypes;
@@ -65,6 +67,7 @@ public class Lock
     private final Database db;
 
     private UUID taskId = null; // for autoclosing doors
+    private I18n i18n;
 
     /**
      * EntityLock
@@ -72,8 +75,9 @@ public class Lock
      * @param manager
      * @param model
      */
-    public Lock(LockManager manager, LockModel model)
+    public Lock(LockManager manager, LockModel model, I18n i18n)
     {
+        this.i18n = i18n;
         this.db = manager.getDB();
         this.module = manager.module;
         this.manager = manager;
@@ -88,16 +92,16 @@ public class Lock
      * @param model
      * @param lockLocs
      */
-    public Lock(LockManager manager, LockModel model, Result<LockLocationModel> lockLocs)
+    public Lock(LockManager manager, LockModel model, I18n i18n, Result<LockLocationModel> lockLocs)
     {
-        this(manager, model);
+        this(manager, model, i18n);
         this.locations.addAll(lockLocs.stream().map(this::getLocation).collect(toList()));
         this.isValidType = false;
     }
 
-    public Lock(LockManager manager, LockModel model, List<Location<World>> locations)
+    public Lock(LockManager manager, LockModel model, I18n i18n, List<Location<World>> locations)
     {
-        this(manager, model);
+        this(manager, model, i18n);
         this.locations.addAll(locations);
         this.isValidType = false;
     }
@@ -131,7 +135,7 @@ public class Lock
         }
     }
 
-    public boolean handleAccess(MultilingualPlayer user, Location soundLocation, Cancellable event)
+    public boolean handleAccess(Player user, Location soundLocation, Cancellable event)
     {
         if (this.isOwner(user)) return true;
         Boolean keyBookUsed = this.checkForKeyBook(user, soundLocation);
@@ -144,13 +148,13 @@ public class Lock
             module.perms().ACCESS_OTHER.getId());
     }
 
-    public boolean checkForUnlocked(MultilingualPlayer user)
+    public boolean checkForUnlocked(Player user)
     {
         LockerAttachment lockerAttachment = user.get(LockerAttachment.class);
         return lockerAttachment != null && lockerAttachment.hasUnlocked(this);
     }
 
-    public void attemptCreatingKeyBook(MultilingualPlayer user, Boolean third)
+    public void attemptCreatingKeyBook(Player user, Boolean third)
     {
         if (this.getLockType() == PUBLIC) return; // ignore
         if (!this.manager.module.getConfig().allowKeyBooks)
@@ -196,7 +200,7 @@ public class Lock
      * @param level the accesslevel
      * @return false when updating or not deleting <p>true when inserting or deleting
      */
-    public boolean setAccess(MultilingualPlayer modifyUser, boolean add, short level)
+    public boolean setAccess(Player modifyUser, boolean add, short level)
     {
         AccessListModel model = this.getAccess(modifyUser);
         if (add)
@@ -228,7 +232,7 @@ public class Lock
      * @param user the user modifying
      * @param usersString
      */
-    public void modifyLock(MultilingualPlayer user, String usersString)
+    public void modifyLock(Player user, String usersString)
     {
         if (this.isOwner(user) || this.hasAdmin(user) || user.hasPermission(module.perms().CMD_MODIFY_OTHER.getId()))
         {
@@ -310,7 +314,7 @@ public class Lock
      * @param effectLocation
      * @return
      */
-    public Boolean checkForKeyBook(MultilingualPlayer user, Location effectLocation)
+    public Boolean checkForKeyBook(Player user, Location effectLocation)
     {
         KeyBook keyBook = KeyBook.getKeyBook(user.original().getItemInHand().orNull(), user, this.manager.module);
         if (keyBook != null)
@@ -358,7 +362,7 @@ public class Lock
         return this.locations;
     }
 
-    public void handleBlockDoorUse(Cancellable event, MultilingualPlayer user, Location<World> clickedDoor)
+    public void handleBlockDoorUse(Cancellable event, Player user, Location<World> clickedDoor)
     {
         if (this.getLockType() == PUBLIC)
         {
@@ -400,7 +404,7 @@ public class Lock
         this.doorUse(user, clickedDoor);
     }
 
-    private AccessListModel getAccess(MultilingualPlayer user)
+    private AccessListModel getAccess(Player user)
     {
         AccessListModel model = db.getDSL().selectFrom(TABLE_ACCESS_LIST).
             where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID)),
@@ -414,11 +418,11 @@ public class Lock
         return model;
     }
 
-    public void handleInventoryOpen(Cancellable event, Inventory protectedInventory, Location soundLocation, MultilingualPlayer user)
+    public void handleInventoryOpen(Cancellable event, Inventory protectedInventory, Location soundLocation, Player user)
     {
         if (soundLocation != null && user.hasPermission(module.perms().SHOW_OWNER.getId()))
         {
-            user.sendTranslated(NEUTRAL, "This inventory is protected by {user}", this.getOwner());
+            i18n.sendTranslated(user, NEUTRAL, "This inventory is protected by {user}", this.getOwner());
         }
         if (this.handleAccess(user, soundLocation, event) || event.isCancelled()) return;
         boolean in;
@@ -541,7 +545,7 @@ public class Lock
     }
 
 
-    public void handleBlockInteract(Cancellable event, MultilingualPlayer user)
+    public void handleBlockInteract(Cancellable event, Player user)
     {
         if (user.hasPermission(module.perms().SHOW_OWNER.getId()))
         {
@@ -630,7 +634,7 @@ public class Lock
 
     private Map<UUID, Long> lastNotify;
 
-    public void notifyUsage(MultilingualPlayer user)
+    public void notifyUsage(Player user)
     {
         if (user.hasPermission(module.perms().PREVENT_NOTIFY.getId())) return;
         if (this.hasFlag(ProtectionFlag.NOTIFY_ACCESS))
@@ -672,9 +676,9 @@ public class Lock
         }
     }
 
-    public MultilingualPlayer getOwner()
+    public Player getOwner()
     {
-        return module.getUserManager().getById(this.model.getValue(TABLE_LOCK.OWNER_ID));
+        return module.getUserManager().getById(this.model.getValue(TABLE_LOCK.OWNER_ID)).get().getUser();
     }
 
     public boolean isPublic()

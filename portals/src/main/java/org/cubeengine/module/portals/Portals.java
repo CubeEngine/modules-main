@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.WeakHashMap;
 import javax.inject.Inject;
 import com.google.common.base.Optional;
@@ -45,6 +46,7 @@ import org.cubeengine.module.portals.config.DestinationConverter;
 import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
@@ -72,12 +74,15 @@ public class Portals extends Module
     @Inject private Log logger;
     @Inject private Path path;
     @Inject private Game game;
+    @Inject private I18n i18n;
 
     private Path portalsDir;
     private final Map<String, Portal> portals = new HashMap<>();
     private final Map<Long, List<Portal>> chunksWithPortals = new HashMap<>();
     private final WeakHashMap<Portal, List<Entity>> entitesInPortals = new WeakHashMap<>();
     private Map<World, Pair<Integer, Chunk>> randomDestinationSettings = new HashMap<>();
+
+    private Map<UUID, PortalsAttachment> attachments = new HashMap<>();
 
     @Enable
     public void onEnable() throws IOException
@@ -89,11 +94,11 @@ public class Portals extends Module
 
         this.portalsDir = Files.createDirectories(path.resolve("portals"));
 
-        PortalCommands portals = new PortalCommands(this, selector, reflector, wm);
+        PortalCommands portals = new PortalCommands(this, selector, reflector, wm, i18n);
         cm.addCommand(portals);
-        portals.addCommand(new PortalModifyCommand(this, selector, wm, game));
+        portals.addCommand(new PortalModifyCommand(this, selector, wm, game, i18n));
 
-        em.registerListener(this, new PortalListener(this, um));
+        em.registerListener(this, new PortalListener(this, um, i18n));
         this.loadPortals();
         tm.runTimer(this, this::checkForEntitiesInPortals, 5, 5);
     }
@@ -126,7 +131,7 @@ public class Portals extends Module
         {
             PortalConfig load = reflector.load(PortalConfig.class, file.toFile());
             String fileName = file.getFileName().toString();
-            Portal portal = new Portal(this, fileName.substring(0, fileName.lastIndexOf(".yml")), load);
+            Portal portal = new Portal(this, fileName.substring(0, fileName.lastIndexOf(".yml")), load, i18n);
             try
             {
                 this.addPortal(portal);
@@ -233,5 +238,17 @@ public class Portals extends Module
             entitesInPortals.put(portal, entities);
         }
         return entities;
+    }
+
+
+    public PortalsAttachment getPortalsAttachment(UUID uuid)
+    {
+        PortalsAttachment attachment = attachments.get(uuid);
+        if (attachment == null)
+        {
+            attachment = new PortalsAttachment();
+            attachments.put(uuid, attachment);
+        }
+        return attachment;
     }
 }

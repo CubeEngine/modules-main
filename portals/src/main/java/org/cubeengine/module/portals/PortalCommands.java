@@ -32,10 +32,13 @@ import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.ConfigWorld;
 import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -49,69 +52,71 @@ public class PortalCommands extends ContainerCommand
     private Selector selector;
     private Reflector reflector;
     private WorldManager wm;
+    private I18n i18n;
 
-    public PortalCommands(Portals module, Selector selector, Reflector reflector, WorldManager wm)
+    public PortalCommands(Portals module, Selector selector, Reflector reflector, WorldManager wm, I18n i18n)
     {
         super(module);
         this.module = module;
         this.selector = selector;
         this.reflector = reflector;
         this.wm = wm;
+        this.i18n = i18n;
     }
 
     @Alias(value = "mvpc")
     @Command(desc = "Creates a new Portal")
-    @Restricted(value = MultilingualPlayer.class, msg = "You must be ingame to do this!")
-    public void create(CommandContext context, String name, @Optional Destination destination)
+    @Restricted(value = Player.class, msg = "You must be ingame to do this!")
+    public void create(Player context, String name, @Optional Destination destination)
     {
-        MultilingualPlayer sender = (MultilingualPlayer)context.getSource();
-        if (!(selector.getSelection(sender) instanceof Cuboid))
+        if (!(selector.getSelection(context) instanceof Cuboid))
         {
-            context.sendTranslated(NEGATIVE, "Please select a cuboid first!");
+            i18n.sendTranslated(context, NEGATIVE, "Please select a cuboid first!");
             return;
         }
         if (module.getPortal(name) != null)
         {
-            context.sendTranslated(NEGATIVE, "A portal named {input} already exists!", name);
+            i18n.sendTranslated(context, NEGATIVE, "A portal named {input} already exists!", name);
             return;
         }
-        Location p1 = selector.getFirstPoint(sender);
-        Location p2 = selector.getSecondPoint(sender);
+        Location p1 = selector.getFirstPoint(context);
+        Location p2 = selector.getSecondPoint(context);
         PortalConfig config = reflector.create(PortalConfig.class);
         config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
         config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
-        config.location.destination = new WorldLocation(sender.original().getLocation(), sender.original().getRotation());
-        config.owner = sender.getUser().getName();
+        config.location.destination = new WorldLocation(context.getLocation(), context.getRotation());
+        config.owner = context.getName();
         config.world = new ConfigWorld(wm, (World)p1.getExtent());
 
         config.destination = destination;
 
         config.setFile(module.getPortalFile(name));
         config.save();
-        Portal portal = new Portal(module, name, config);
+        Portal portal = new Portal(module, name, config, i18n);
         module.addPortal(portal);
-        sender.attachOrGet(PortalsAttachment.class, module).setPortal(portal);
-        context.sendTranslated(POSITIVE, "Portal {name} created!", portal.getName());
+
+        module.getPortalsAttachment(context.getUniqueId()).setPortal(portal);
+        i18n.sendTranslated(context, POSITIVE, "Portal {name} created!", portal.getName());
         if (destination == null)
         {
-            context.sendTranslated(POSITIVE, "Select a destination using the portal modify destination command");
+            i18n.sendTranslated(context, POSITIVE, "Select a destination using the portal modify destination command");
         }
     }
 
     @Alias(value = "mvps")
     @Command(desc = "Selects an existing portal")
-    @Restricted(value = MultilingualPlayer.class, msg = "You must be ingame to do this!")
-    public void select(CommandContext context, Portal portal)
+    @Restricted(value = Player.class, msg = "You must be ingame to do this!")
+    public void select(Player context, Portal portal)
     {
-        ((MultilingualPlayer)context.getSource()).attachOrGet(PortalsAttachment.class, module).setPortal(portal);
-        context.sendTranslated(POSITIVE, "Portal selected: {name}", portal.getName());
+        module.getPortalsAttachment(context.getUniqueId()).setPortal(portal);
+        i18n.sendTranslated(context, POSITIVE, "Portal selected: {name}", portal.getName());
     }
 
     @Alias(value ="mvpi")
     @Command(desc = "Show info about a portal")
-    public void info(CommandContext context, @Default Portal portal)
+    public void info(CommandSource context, @Default Portal portal)
     {
-        portal.showInfo(context.getSource());
+        portal.showInfo(context);
     }
 
     @Alias(value = "mvpr")
@@ -134,10 +139,10 @@ public class PortalCommands extends ContainerCommand
     }
 
     @Command(desc = "Shows debug portal information instead of teleporting")
-    @Restricted(value = MultilingualPlayer.class, msg = "You must be ingame to do this!")
-    public void debug(CommandContext context, @Optional OnOff onOff)
+    @Restricted(value = Player.class, msg = "You must be ingame to do this!")
+    public void debug(Player context, @Optional OnOff onOff)
     {
-        PortalsAttachment attachment = ((MultilingualPlayer)context.getSource()).attachOrGet(PortalsAttachment.class, module);
+        PortalsAttachment attachment = module.getPortalsAttachment(context.getUniqueId());
         if (onOff == null)
         {
             attachment.toggleDebug();
@@ -155,10 +160,10 @@ public class PortalCommands extends ContainerCommand
         }
         if (attachment.isDebug())
         {
-            context.sendTranslated(POSITIVE, "Portal debug mode ON!");
+            i18n.sendTranslated(context, POSITIVE, "Portal debug mode ON!");
             return;
         }
-        context.sendTranslated(POSITIVE, "Portal debug mode OFF!");
+        i18n.sendTranslated(context, POSITIVE, "Portal debug mode OFF!");
     }
 
     @Alias("mvpl")

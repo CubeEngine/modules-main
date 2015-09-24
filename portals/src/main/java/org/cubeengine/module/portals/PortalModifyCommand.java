@@ -30,9 +30,11 @@ import org.cubeengine.module.portals.config.RandomDestination;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -43,18 +45,18 @@ import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 @Command(name = "modify", desc = "modifies a portal")
 public class PortalModifyCommand extends ContainerCommand
 {
-    private Portals module;
     private Selector selector;
     private WorldManager wm;
     private Game game;
+    private I18n i18n;
 
-    public PortalModifyCommand(Portals module, Selector selector, WorldManager wm, Game game)
+    public PortalModifyCommand(Portals module, Selector selector, WorldManager wm, Game game, I18n i18n)
     {
         super(module);
-        this.module = module;
         this.selector = selector;
         this.wm = wm;
         this.game = game;
+        this.i18n = i18n;
     }
 
     @Command(desc = "Changes the owner of a portal")
@@ -84,21 +86,20 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Changes a portals location")
-    @Restricted(value = MultilingualPlayer.class, msg = "You have to be ingame to do this!")
-    public void location(CommandContext context, @Default Portal portal)
+    @Restricted(value = Player.class, msg = "You have to be ingame to do this!")
+    public void location(Player context, @Default Portal portal)
     {
-        MultilingualPlayer sender = (MultilingualPlayer)context.getSource();
-        if (!(selector.getSelection(sender) instanceof Cuboid))
+        if (!(selector.getSelection(context) instanceof Cuboid))
         {
-            context.sendTranslated(NEGATIVE, "Please select a cuboid first!");
+            i18n.sendTranslated(context, NEGATIVE, "Please select a cuboid first!");
             return;
         }
-        Location p1 = selector.getFirstPoint(sender);
-        Location p2 = selector.getSecondPoint(sender);
+        Location p1 = selector.getFirstPoint(context);
+        Location p2 = selector.getSecondPoint(context);
         portal.config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
         portal.config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
         portal.config.save();
-        context.sendTranslated(POSITIVE, "Portal {name} updated to your current selection!", portal.getName());
+        i18n.sendTranslated(context, POSITIVE, "Portal {name} updated to your current selection!", portal.getName());
     }
 
     @Command(desc = "Modifies the location where a player exits when teleporting a portal")

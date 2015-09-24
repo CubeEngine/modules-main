@@ -17,13 +17,18 @@
  */
 package org.cubeengine.module.portals;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.entity.DisplaceEntityEvent.Teleport.TargetPlayer;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
@@ -31,11 +36,14 @@ public class PortalListener
 {
     private final Portals module;
     private final UserManager um;
+    private I18n i18n;
 
-    public PortalListener(Portals module, UserManager um)
+
+    public PortalListener(Portals module, UserManager um, I18n i18n)
     {
         this.module = module;
         this.um = um;
+        this.i18n = i18n;
     }
 
     @Listener
@@ -50,12 +58,11 @@ public class PortalListener
         {
             if (portal.has(event.getToTransform().getLocation()))
             {
-                MultilingualPlayer user = um.getMultilingualPlayer(event.getTargetEntity().getUniqueId());
-                PortalsAttachment attachment = user.attachOrGet(PortalsAttachment.class, module);
+                PortalsAttachment attachment = module.getPortalsAttachment(event.getTargetEntity().getUniqueId());
                 attachment.setInPortal(true);
                 if (attachment.isDebug())
                 {
-                    user.sendTranslated(POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Teleported into portal: {name}", portal.getName());
+                    i18n.sendTranslated(event.getTargetEntity(), POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Teleported into portal: {name}", portal.getName());
                 }
                 return;
             }
@@ -101,8 +108,8 @@ public class PortalListener
             return;
         }
         List<Portal> portals = module.getPortalsInChunk(event.getToTransform().getLocation());
-        MultilingualPlayer user = um.getMultilingualPlayer(event.getTargetEntity().getUniqueId());
-        PortalsAttachment attachment = user.attachOrGet(PortalsAttachment.class, module);
+        Player player = event.getTargetEntity();
+        PortalsAttachment attachment = module.getPortalsAttachment(player.getUniqueId());
         if (portals != null)
         {
             for (Portal portal : portals)
@@ -113,18 +120,18 @@ public class PortalListener
                     {
                         if (attachment.isInPortal())
                         {
-                            user.sendTranslated(POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Move in portal: {name}", portal.getName());
+                            i18n.sendTranslated(player, POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Move in portal: {name}", portal.getName());
                         }
                         else
                         {
-                            user.sendTranslated(POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Entered portal: {name}", portal.getName());
-                            portal.showInfo(user);
+                            i18n.sendTranslated(player, POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Entered portal: {name}", portal.getName());
+                            portal.showInfo(player);
                             attachment.setInPortal(true);
                         }
                     }
                     else if (!attachment.isInPortal())
                     {
-                        portal.teleport(event.getTargetEntity());
+                        portal.teleport(player);
                     }
                     return;
                 }

@@ -17,9 +17,7 @@
  */
 package org.cubeengine.module.portals;
 
-import org.cubeengine.service.user.UserAttachment;
-
-public class PortalsAttachment extends UserAttachment
+public class PortalsAttachment
 {
     private boolean isInPortal = false;
     private Portal portal;

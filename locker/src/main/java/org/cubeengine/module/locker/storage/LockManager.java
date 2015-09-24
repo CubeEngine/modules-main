@@ -46,6 +46,7 @@ import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.commands.CommandListener;
 import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.service.database.Database;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
@@ -59,8 +60,7 @@ import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.event.world.ChunkLoadEvent;
-import org.spongepowered.api.event.world.ChunkUnloadEvent;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.Direction;
@@ -90,6 +90,7 @@ public class LockManager
     protected WorldManager wm;
     protected UserManager um;
     protected TaskManager tm;
+    private I18n i18n;
     private final StringMatcher stringMatcher;
     protected Log logger;
 
@@ -106,13 +107,14 @@ public class LockManager
     private final ExecutorService executor;
     private Future<?> future = null;
 
-    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, WorldManager wm, UserManager um, TaskManager tm)
+    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, WorldManager wm, UserManager um, TaskManager tm, I18n i18n)
     {
         this.stringMatcher = stringMatcher;
         this.database = database;
         this.wm = wm;
         this.um = um;
         this.tm = tm;
+        this.i18n = i18n;
         logger = module.getProvided(Log.class);
         this.module = module;
         executor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));
@@ -284,7 +286,7 @@ public class LockManager
      * @param user the user to get the lock for (can be null)
      * @return the lock or null if there is no lock OR the chunk is not loaded OR the lock is disabled
      */
-    public Lock getLockAtLocation(Location location, MultilingualPlayer user)
+    public Lock getLockAtLocation(Location location, Player user)
     {
         return getLockAtLocation(location, user, true);
     }
@@ -296,7 +298,7 @@ public class LockManager
      * @param access whether to access the lock or just get information from it
      * @return the lock or null if there is no lock OR the chunk is not loaded
      */
-    public Lock getLockAtLocation(Location location, MultilingualPlayer user, boolean access, boolean repairExpand)
+    public Lock getLockAtLocation(Location location, Player user, boolean access, boolean repairExpand)
     {
         UInteger worldId = wm.getWorldId((World)location.getExtent());
         Lock lock = this.getLocLockMap(worldId).get(getLocationKey(location));
@@ -315,16 +317,16 @@ public class LockManager
                             this.extendLock(lock, relative);
                             if (user != null)
                             {
-                                user.sendTranslated(POSITIVE, "Protection repaired & expanded!");
+                                i18n.sendTranslated(user, POSITIVE, "Protection repaired & expanded!");
                             }
                         }
                         else
                         {
                             if (user != null)
                             {
-                                user.sendTranslated(CRITICAL,
+                                i18n.sendTranslated(user, CRITICAL,
                                                     "Broken protection detected! Try /cremove on nearby blocks!");
-                                user.sendTranslated(NEUTRAL,
+                                i18n.sendTranslated(user, NEUTRAL,
                                                     "If this message keeps coming please contact an administrator!");
                             }
                         }
@@ -348,7 +350,7 @@ public class LockManager
         return lock;
     }
 
-    public Lock getLockAtLocation(Location location, MultilingualPlayer user, boolean access)
+    public Lock getLockAtLocation(Location location, Player user, boolean access)
     {
         return this.getLockAtLocation(location, user, access, true);
     }
