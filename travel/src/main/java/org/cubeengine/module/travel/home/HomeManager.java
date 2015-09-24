@@ -27,9 +27,9 @@ import org.cubeengine.module.travel.storage.TeleportPointModel.TeleportType;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 
 public class HomeManager extends TelePointManager<Home>
@@ -58,7 +58,7 @@ public class HomeManager extends TelePointManager<Home>
     }
 
     @Override
-    public Home create(MultilingualPlayer owner, String name, Location location, Vector3d rotation, boolean publicVisibility)
+    public Home create(Player owner, String name, Location location, Vector3d rotation, boolean publicVisibility)
     {
         if (this.has(owner, name))
         {

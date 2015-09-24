@@ -31,7 +31,8 @@ import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.user.MultilingualPlayer;
+import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
@@ -42,34 +43,33 @@ import static org.cubeengine.service.i18n.formatter.MessageType.*;
 @Command(name = "user", desc = "Manage users")
 public class UserInformationCommands extends ContainerCommand
 {
-    public UserInformationCommands(Roles module)
+    private I18n i18n;
+
+    public UserInformationCommands(Roles module, I18n i18n)
     {
         super(module);
+        this.i18n = i18n;
     }
 
     @Alias(value = "listuroles")
     @Command(desc = "Lists roles of a user [in context]")
-    public void list(CommandContext cContext, @Default MultilingualPlayer player, @Named("in") @Default Context context)
+    public void list(CommandContext cContext, @Default Player player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
-        List<Subject> parents = player.original().getSubjectData().getParents(contexts);
+        List<Subject> parents = player.getSubjectData().getParents(contexts);
 
         cContext.sendTranslated(NEUTRAL, "Roles of {user} in {context}:", player, context);
-        for (Subject parent : parents)
-        {
-            if (parent instanceof RoleSubject)
-            {
-                cContext.sendMessage(String.format(RoleCommands.LISTELEM_VALUE, context.getName().isEmpty() ? context.getType() : context.getName(), ((RoleSubject)parent).getName()));
-            }
-        }
+        parents.stream().filter(parent -> parent instanceof RoleSubject)
+               .forEach(parent -> cContext.sendMessage(
+                   String.format(RoleCommands.LISTELEM_VALUE, context.getName().isEmpty() ? context.getType() : context.getName(), ((RoleSubject)parent).getName())));
     }
 
     @Alias(value = "checkuperm")
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in context]")
-    public void checkpermission(CommandContext cContext, @Default MultilingualPlayer player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
+    public void checkpermission(CommandContext cContext, @Default Player player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
-        Tristate value = player.original().getPermissionValue(contexts, permission);
+        Tristate value = player.getPermissionValue(contexts, permission);
         // TODO search registered permission
         if (value == Tristate.TRUE)
         {
@@ -95,10 +95,10 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "listuperm")
     @Command(alias = "listperm", desc = "List permission assigned to a user [in context]")
-    public void listpermission(CommandContext cContext, @Default MultilingualPlayer player, @Named("in") @Default Context context, @Flag boolean all)
+    public void listpermission(CommandContext cContext, @Default Player player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
-        Map<String, Boolean> permissions = player.original().getSubjectData().getPermissions(contexts);
+        Map<String, Boolean> permissions = player.getSubjectData().getPermissions(contexts);
         if (all)
         {
             // TODO recursive
@@ -122,10 +122,10 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "checkumeta")
     @Command(alias = {"checkdata", "checkmeta"}, desc = "Checks for metadata of a user [in context]")
-    public void checkmetadata(CommandContext cContext, @Default MultilingualPlayer player, String metadatakey, @Named("in") @Default Context context)
+    public void checkmetadata(CommandContext cContext, @Default Player player, String metadatakey, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
-        String value = ((OptionSubjectData)player.original().getSubjectData()).getOptions(contexts).get(metadatakey);
+        String value = ((OptionSubjectData)player.getSubjectData()).getOptions(contexts).get(metadatakey);
         if (value == null)
         {
             cContext.sendTranslated(NEUTRAL, "{input#key} is not set for {user} in {context}.", metadatakey, player, context);
@@ -139,10 +139,10 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "listumeta")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists assigned metadata from a user [in context]")
-    public void listmetadata(CommandContext cContext, @Default MultilingualPlayer player, @Named("in") @Default Context context, @Flag boolean all)
+    public void listmetadata(CommandContext cContext, @Default Player player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
-        Map<String, String> options = ((OptionSubjectData)player.original().getSubjectData()).getOptions(contexts);
+        Map<String, String> options = ((OptionSubjectData)player.getSubjectData()).getOptions(contexts);
         if (all)
         {
             // TODO recursive

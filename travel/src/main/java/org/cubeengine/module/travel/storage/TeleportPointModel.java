@@ -20,7 +20,6 @@ package org.cubeengine.module.travel.storage;
 import javax.persistence.Transient;
 import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.service.database.AsyncRecord;
-import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.WorldManager;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.world.Location;

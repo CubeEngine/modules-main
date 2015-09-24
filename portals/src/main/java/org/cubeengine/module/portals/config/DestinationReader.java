@@ -24,20 +24,23 @@ import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
 import de.cubeisland.engine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
-import org.cubeengine.service.user.MultilingualPlayer;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
 public class DestinationReader implements ArgumentReader<Destination>
 {
     private final Portals module;
     private final WorldManager wm;
+    private I18n i18n;
     private final Random random = new Random();
 
-    public DestinationReader(Portals module, WorldManager wm)
+    public DestinationReader(Portals module, WorldManager wm, I18n i18n)
     {
         this.module = module;
         this.wm = wm;
+        this.i18n = i18n;
     }
 
     @Override
@@ -46,9 +49,9 @@ public class DestinationReader implements ArgumentReader<Destination>
         String token = invocation.consume(1);
         if ("here".equalsIgnoreCase(token))
         {
-            if ((invocation.getCommandSource() instanceof MultilingualPlayer))
+            if ((invocation.getCommandSource() instanceof Player))
             {
-                return new Destination(wm, ((MultilingualPlayer)invocation.getCommandSource()).original().getLocation(), ((MultilingualPlayer)invocation.getCommandSource()).original().getRotation());
+                return new Destination(wm, ((Player)invocation.getCommandSource()).getLocation(), ((Player)invocation.getCommandSource()).getRotation(), i18n);
             }
             throw new ReaderException(
                 "The Portal Agency will bring you your portal for just {text:$ 1337} within {input#amount} weeks",

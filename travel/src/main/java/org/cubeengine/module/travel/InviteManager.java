@@ -23,7 +23,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import org.cubeengine.service.database.Database;
-import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.module.travel.storage.TeleportInvite;
 import org.cubeengine.module.travel.storage.TeleportPointModel;

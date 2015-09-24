@@ -33,7 +33,6 @@ import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.ConfigWorld;
 import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;

@@ -146,8 +146,8 @@ public class Roles extends Module
 
         UserManagementCommands cmdUsers = new UserManagementCommands(this, service);
         cmdRoles.addCommand(cmdUsers);
-        cm.addCommands(cmdUsers, this, new UserInformationCommands(this));
-        cmdRoles.addCommand(new ManagementCommands(this, service));
+        cm.addCommands(cmdUsers, this, new UserInformationCommands(this, i18n));
+        cmdRoles.addCommand(new ManagementCommands(this, service, i18n));
     }
 
     @Disable

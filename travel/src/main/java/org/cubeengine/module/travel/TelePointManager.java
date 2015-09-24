@@ -28,12 +28,12 @@ import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.module.core.util.math.Cuboid;
 import org.cubeengine.module.core.util.math.Vector3;
 import org.cubeengine.service.database.Database;
-import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.travel.storage.TeleportPointModel;
 import org.cubeengine.service.user.UserManager;
 import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 
 import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
@@ -80,7 +80,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
      * @param name
      * @return
      */
-    public T findOne(MultilingualPlayer user, String name)
+    public T findOne(Player user, String name)
     {
         Map<String, T> map = this.points.get(name);
         if (map == null)
@@ -121,13 +121,13 @@ public abstract class TelePointManager<T extends TeleportPoint>
         return match;
     }
 
-    public T getExact(MultilingualPlayer user, String name)
+    public T getExact(Player user, String name)
     {
         Map<String, T> map = this.points.get(name);
         return map == null ? null : map.get(user.getName().toLowerCase());
     }
 
-    public boolean has(MultilingualPlayer user, String name)
+    public boolean has(Player user, String name)
     {
         Map<String, T> map = this.points.get(name);
         if (map != null)
@@ -143,13 +143,14 @@ public abstract class TelePointManager<T extends TeleportPoint>
         return false;
     }
 
-    public int getCount(MultilingualPlayer user)
+    public int getCount(Player user)
     {
 
-        return dsl.fetchCount(dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.OWNER.eq(um.getByUUID(user.getUniqueId()).getEntity().getId())));
+        return dsl.fetchCount(dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.OWNER.eq(um.getByUUID(
+            user.getUniqueId()).getEntity().getId())));
     }
 
-    public abstract T create(MultilingualPlayer owner, String name, Location location, Vector3d rotation, boolean publicVisibility);
+    public abstract T create(Player owner, String name, Location location, Vector3d rotation, boolean publicVisibility);
 
     public void delete(T point)
     {
@@ -187,7 +188,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
         return set;
     }
 
-    public Set<T> list(MultilingualPlayer user, boolean owned, boolean publics, boolean invited)
+    public Set<T> list(Player user, boolean owned, boolean publics, boolean invited)
     {
         if (!owned && !publics && !invited)
         {
@@ -203,7 +204,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
         return set;
     }
 
-    public Set<T> find(MultilingualPlayer user, String token, boolean owned, boolean publics, boolean invited)
+    public Set<T> find(Player user, String token, boolean owned, boolean publics, boolean invited)
     {
         if (!owned && !publics && !invited)
         {
@@ -219,7 +220,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
         return set;
     }
 
-    private Set<T> findIn(MultilingualPlayer user, boolean owned, boolean publics, boolean invited, Map<String, T> map)
+    private Set<T> findIn(Player user, boolean owned, boolean publics, boolean invited, Map<String, T> map)
     {
         Set<T> set = new LinkedHashSet<>();
         for (T value : map.values())
@@ -248,7 +249,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
         }
     }
 
-    public void massDelete(MultilingualPlayer user, boolean privates, boolean publics)
+    public void massDelete(Player user, boolean privates, boolean publics)
     {
         if (user == null)
         {
@@ -273,7 +274,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
         }
     }
 
-    public void massDelete(MultilingualPlayer user, boolean priv, boolean pub, Location firstPoint, Location secondPoint)
+    public void massDelete(Player user, boolean priv, boolean pub, Location firstPoint, Location secondPoint)
     {
         Set<T> points = (user == null) ? this.list(priv, pub) : this.list(user, true, false, false);
         Cuboid cuboid = new Cuboid(new Vector3(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ()), new Vector3(

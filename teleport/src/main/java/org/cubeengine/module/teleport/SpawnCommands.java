@@ -27,13 +27,12 @@ import de.cubeisland.engine.butler.parametric.Flag;
 import de.cubeisland.engine.butler.parametric.Optional;
 import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.core.util.math.BlockVector3;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.Broadcaster;
-import org.cubeengine.service.user.MultilingualCommandSource;
-import org.cubeengine.service.user.MultilingualPlayer;
-import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldSetSpawnEvent;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -53,39 +52,41 @@ public class SpawnCommands
     private Game game;
     private Broadcaster bc;
     private TeleportListener tl;
+    private I18n i18n;
 
-    public SpawnCommands(Teleport basics, EventManager em, Game game, Broadcaster bc, TeleportListener tl)
+    public SpawnCommands(Teleport basics, EventManager em, Game game, Broadcaster bc, TeleportListener tl, I18n i18n)
     {
         this.module = basics;
         this.em = em;
         this.game = game;
         this.bc = bc;
         this.tl = tl;
+        this.i18n = i18n;
     }
 
     @Command(desc = "Changes the global respawnpoint")
-    public void setSpawn(MultilingualCommandSource context, @Default World world, @Optional Integer x, @Optional Integer y, @Optional Integer z)
+    public void setSpawn(CommandSource context, @Default World world, @Optional Integer x, @Optional Integer y, @Optional Integer z)
     {
         Vector3d direction = null;
         if (z == null)
         {
-            if (!(context instanceof MultilingualPlayer))
+            if (!(context instanceof Player))
             {
                 throw new TooFewArgumentsException();
             }
-            final Location loc = ((MultilingualPlayer)context).original().getLocation();
+            final Location loc = ((Player)context).getLocation();
             x = loc.getBlockX();
             y = loc.getBlockY();
             z = loc.getBlockZ();
-            direction = ((MultilingualPlayer)context).original().getRotation();
+            direction = ((Player)context).getRotation();
         }
         em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location(world, x, y, z), direction));
         world.getWorldStorage().getWorldProperties().setSpawnPosition(new Vector3i(x, y, z));
-        context.sendTranslated(POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new BlockVector3(x, y, z));
+        i18n.sendTranslated(context, POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new BlockVector3(x, y, z));
     }
 
     @Command(desc = "Teleports all players to spawn")
-    public void spawnAll(MultilingualCommandSource context, World world, @Flag boolean force)
+    public void spawnAll(CommandSource context, World world, @Flag boolean force)
     {
         Location<World> loc = world.getSpawnLocation().add(0.5, 0, 0.5);
         for (Player aPlayer : game.getServer().getOnlinePlayers())
@@ -100,39 +101,39 @@ public class SpawnCommands
     }
 
     @Command(desc = "Teleports a player to spawn")
-    public void spawn(MultilingualCommandSource context, @Default MultilingualPlayer player, @Optional World world, @Flag boolean force)
+    public void spawn(CommandSource context, @Default Player player, @Optional World world, @Flag boolean force)
     {
         world = world == null ? module.getConfig().getMainWorld() : world;
         if (world == null)
         {
-            world = player.original().getWorld();
+            world = player.getWorld();
         }
-        force = force && context.hasPermission(module.perms().CMD_SPAWN_FORCE.getId()) || context.getSource().equals( player.getSource());
+        force = force && context.hasPermission(module.perms().CMD_SPAWN_FORCE.getId()) || context.equals( player);
         if (!force && player.hasPermission(module.perms().CMD_SPAWN_PREVENT.getId()))
         {
-            context.sendTranslated(NEGATIVE, "You are not allowed to spawn {user}!", player);
+            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to spawn {user}!", player);
             return;
         }
-        final Location spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
-        Vector3d rotation = player.original().getRotation();
-        player.getSource().setLocation(spawnLocation);
-        player.original().setRotation(rotation);
-        context.sendTranslated(POSITIVE, "You are now standing at the spawn in {world}!", world);
+        final Location<World> spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
+        Vector3d rotation = player.getRotation();
+        player.setLocation(spawnLocation);
+        player.setRotation(rotation);
+        i18n.sendTranslated(context, POSITIVE, "You are now standing at the spawn in {world}!", world);
     }
 
     @Command(desc = "Teleports you to the spawn of given world")
-    @Restricted(value = MultilingualPlayer.class, msg = "Pro Tip: Teleport does not work IRL!")
-    public void tpworld(MultilingualPlayer context, World world)
+    @Restricted(value = Player.class, msg = "Pro Tip: Teleport does not work IRL!")
+    public void tpworld(Player context, World world)
     {
-        final Location spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
+        final Location<World> spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
         if (!context.hasPermission(module.permsTpWorld().getPermission(world.getName()).getId()))
         {
-            context.sendTranslated(NEGATIVE, "You are not allowed to teleport to this world!");
+            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to teleport to this world!");
             return;
         }
-        Vector3d rotation = context.original().getRotation();
-        context.getSource().setLocation(spawnLocation);
-        context.sendTranslated(POSITIVE, "Teleported to the spawn of world {world}!", world);
-        context.original().setRotation(rotation);
+        Vector3d rotation = context.getRotation();
+        context.setLocation(spawnLocation);
+        i18n.sendTranslated(context, POSITIVE, "Teleported to the spawn of world {world}!", world);
+        context.setRotation(rotation);
     }
 }

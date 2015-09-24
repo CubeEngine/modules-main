@@ -19,12 +19,13 @@ package org.cubeengine.module.portals.config;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.module.portals.Portals;
-import org.cubeengine.service.user.MultilingualPlayer;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.module.core.util.WorldLocation;
 import org.cubeengine.service.world.ConfigWorld;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -37,9 +38,11 @@ public class Destination
     public ConfigWorld world;
     public WorldLocation location;
     public String portal;
+    private I18n i18n;
 
-    public Destination(WorldManager wm, Location location, Vector3d direction)
+    public Destination(WorldManager wm, Location location, Vector3d direction, I18n i18n)
     {
+        this.i18n = i18n;
         this.location = new WorldLocation(location, direction);
         this.world = new ConfigWorld(wm, (World)location.getExtent());
         this.type = Type.LOCATION;
@@ -70,9 +73,9 @@ public class Destination
             Portal destPortal = module.getPortal(portal);
             if (destPortal == null)
             {
-                if (entity instanceof MultilingualPlayer)
+                if (entity instanceof Player)
                 {
-                    ((MultilingualPlayer)entity).sendTranslated(NEGATIVE, "Destination portal {input} does not exist!", portal);
+                    i18n.sendTranslated(((Player)entity), NEGATIVE, "Destination portal {input} does not exist!", portal);
                 }
                 return;
             }

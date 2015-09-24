@@ -90,7 +90,7 @@ public class Portals extends Module
         reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(wm), Destination.class);
         ProviderManager rManager = cm.getProviderManager();
         rManager.register(this, new PortalReader(this), Portal.class);
-        rManager.register(this, new DestinationReader(this, wm), Destination.class);
+        rManager.register(this, new DestinationReader(this, wm, i18n), Destination.class);
 
         this.portalsDir = Files.createDirectories(path.resolve("portals"));
 

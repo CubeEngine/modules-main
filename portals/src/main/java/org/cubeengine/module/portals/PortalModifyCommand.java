@@ -31,7 +31,6 @@ import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
@@ -60,9 +59,9 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Changes the owner of a portal")
-    public void owner(CommandContext context, MultilingualPlayer owner, @Default Portal portal)
+    public void owner(CommandContext context, Player owner, @Default Portal portal)
     {
-        portal.config.owner = owner.original().getName();
+        portal.config.owner = owner.getName();
         portal.config.save();
         context.sendTranslated(POSITIVE, "{user} is now the owner of {name#portal}!", owner, portal.getName());
     }
@@ -103,18 +102,18 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Modifies the location where a player exits when teleporting a portal")
-    @Restricted(value = MultilingualPlayer.class, msg = "You have to be ingame to do this!")
+    @Restricted(value = Player.class, msg = "You have to be ingame to do this!")
     public void exit(CommandContext context, @Default Portal portal)
     {
-        MultilingualPlayer sender = (MultilingualPlayer)context.getSource();
-        Location location = sender.original().getLocation();
+        Player sender = (Player)context.getSource();
+        Location location = sender.getLocation();
         if (portal.config.world.getWorld() != location.getExtent())
         {
             // TODO range check? range in config
             context.sendTranslated(NEGATIVE, "A portals exit cannot be in an other world than its location!");
             return;
         }
-        portal.config.location.destination = new WorldLocation(location, sender.original().getRotation());
+        portal.config.location.destination = new WorldLocation(location, sender.getRotation());
         portal.config.save();
         context.sendTranslated(POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
     }

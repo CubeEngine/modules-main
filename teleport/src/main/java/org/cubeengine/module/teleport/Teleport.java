@@ -67,9 +67,9 @@ public class Teleport extends Module
         TeleportListener tl = new TeleportListener(this, um, i18n);
         em.registerListener(this, tl);
 
-        cm.addCommands(cm, this, new MovementCommands(this, tl));
-        cm.addCommands(cm, this, new SpawnCommands(this, em, game, bc, tl));
-        cm.addCommands(cm, this, new TeleportCommands(this, game, bc, tl));
+        cm.addCommands(cm, this, new MovementCommands(this, tl, i18n));
+        cm.addCommands(cm, this, new SpawnCommands(this, em, game, bc, tl, i18n));
+        cm.addCommands(cm, this, new TeleportCommands(this, game, bc, tl, i18n));
         cm.addCommands(cm, this, new TeleportRequestCommands(this, tm, um, tl, game, i18n));
 
         // TODO load after roles, if OptionSubjects available => per role spawn?

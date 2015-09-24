@@ -19,22 +19,25 @@ package org.cubeengine.module.travel;
 
 import java.util.Set;
 import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.user.MultilingualCommandSource;
-import org.cubeengine.service.user.MultilingualPlayer;
+import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.util.command.CommandSource;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 
 public class TpPointCommand extends ContainerCommand
 {
     protected InviteManager iManager;
+    private I18n i18n;
 
-    public TpPointCommand(Travel module)
+    public TpPointCommand(Travel module, I18n i18n)
     {
         super(module);
+        this.i18n = i18n;
         iManager = module.getInviteManager();
     }
 
-    protected void showList(MultilingualCommandSource context, MultilingualPlayer user, Set<? extends TeleportPoint> points)
+    protected void showList(CommandSource context, Player user, Set<? extends TeleportPoint> points)
     {
         for (TeleportPoint point : points)
         {
@@ -42,22 +45,22 @@ public class TpPointCommand extends ContainerCommand
             {
                 if (user != null && point.isOwnedBy(user))
                 {
-                    context.sendTranslated(NEUTRAL, "  {tppoint} ({text:public})", point);
+                    i18n.sendTranslated(context, NEUTRAL, "  {tppoint} ({text:public})", point);
                 }
                 else
                 {
-                    context.sendTranslated(NEUTRAL, "  {user}:{tppoint} ({text:public})", point.getOwnerName(), point);
+                    i18n.sendTranslated(context, NEUTRAL, "  {user}:{tppoint} ({text:public})", point.getOwnerName(), point);
                 }
             }
             else
             {
                 if (user != null && point.isOwnedBy(user))
                 {
-                    context.sendTranslated(NEUTRAL, "  {tppoint} ({text:private})", point);
+                    i18n.sendTranslated(context, NEUTRAL, "  {tppoint} ({text:private})", point);
                 }
                 else
                 {
-                    context.sendTranslated(NEUTRAL, "  {user}:{tppoint} ({text:private})", point.getOwnerName(), point);
+                    i18n.sendTranslated(context, NEUTRAL, "  {user}:{tppoint} ({text:private})", point.getOwnerName(), point);
                 }
             }
         }

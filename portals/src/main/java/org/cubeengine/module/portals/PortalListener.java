@@ -17,18 +17,13 @@
  */
 package org.cubeengine.module.portals;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
-import org.spongepowered.api.event.entity.DisplaceEntityEvent.Teleport.TargetPlayer;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 

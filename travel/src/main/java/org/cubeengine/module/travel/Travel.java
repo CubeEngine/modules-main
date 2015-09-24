@@ -85,7 +85,7 @@ public class Travel extends Module
 
         HomeCommand homeCmd = new HomeCommand(this, selector, i18n, um, wm);
         cm.addCommand(homeCmd);
-        WarpCommand warpCmd = new WarpCommand(this, um, wm);
+        WarpCommand warpCmd = new WarpCommand(this, um, wm, i18n);
         cm.addCommand(warpCmd);
         em.registerListener(this, new HomeListener(this, um, wm, i18n));
 

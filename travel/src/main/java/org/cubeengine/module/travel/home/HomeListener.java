@@ -20,7 +20,6 @@ package org.cubeengine.module.travel.home;
 import com.google.common.base.Optional;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.MultilingualPlayer;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.block.BlockTypes;
@@ -60,30 +59,29 @@ public class HomeListener
                 return;
             }
             Player player = source.get();
-            MultilingualPlayer user = i18n.getMultilingual(player);
             if (player.get(SneakingData.class).isPresent())
             {
-                if (homeManager.has(user, "home"))
+                if (homeManager.has(player, "home"))
                 {
-                    Home home = homeManager.findOne(user, "home");
+                    Home home = homeManager.findOne(player, "home");
                     if (player.getLocation().equals(home.getLocation()))
                     {
                         return;
                     }
                     home.setLocation(player.getLocation(), player.getRotation(), wm);
                     home.update();
-                    user.sendTranslated(POSITIVE, "Your home has been set!");
+                    i18n.sendTranslated(player, POSITIVE, "Your home has been set!");
                 }
                 else
                 {
-                    if (this.homeManager.getCount(user) == this.module.getConfig().homes.max)
+                    if (this.homeManager.getCount(player) == this.module.getConfig().homes.max)
                     {
-                        user.sendTranslated(CRITICAL, "You have reached your maximum number of homes!");
-                        user.sendTranslated(NEGATIVE, "You have to delete a home to make a new one");
+                        i18n.sendTranslated(player, CRITICAL, "You have reached your maximum number of homes!");
+                        i18n.sendTranslated(player, NEGATIVE, "You have to delete a home to make a new one");
                         return;
                     }
-                    homeManager.create(user, "home", player.getLocation(), player.getRotation(), false);
-                    user.sendTranslated(POSITIVE, "Your home has been created!");
+                    homeManager.create(player, "home", player.getLocation(), player.getRotation(), false);
+                    i18n.sendTranslated(player, POSITIVE, "Your home has been created!");
                 }
                 event.setCancelled(true);
             }

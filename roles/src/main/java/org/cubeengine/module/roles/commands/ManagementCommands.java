@@ -23,11 +23,12 @@ import de.cubeisland.engine.butler.parametric.Optional;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.service.command.CommandContext;
-import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.user.MultilingualPlayer;
+import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
+import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
@@ -38,12 +39,14 @@ public class ManagementCommands extends ContainerCommand
 {
     private Roles module;
     private RolesPermissionService service;
+    private I18n i18n;
 
-    public ManagementCommands(Roles module, RolesPermissionService service)
+    public ManagementCommands(Roles module, RolesPermissionService service, I18n i18n)
     {
         super(module);
         this.module = module;
         this.service = service;
+        this.i18n = i18n;
     }
 
     @Alias(value = "manload")
@@ -69,24 +72,30 @@ public class ManagementCommands extends ContainerCommand
     public static World curWorldOfConsole = null;
 
     @Command(desc = "Sets or resets the current default world")
-    public void defaultworld(CommandContext context, @Optional World world)
+    public void defaultworld(CommandSource source, @Optional World world)
     {
         if (world == null)
         {
-            context.sendTranslated(NEUTRAL, "Current world for roles resetted!");
+            i18n.sendTranslated(source, NEUTRAL, "Current world for roles resetted!");
         }
         else
         {
-            context.sendTranslated(POSITIVE, "All your roles commands will now have {world} as default world!", world);
+            i18n.sendTranslated(source, POSITIVE, "All your roles commands will now have {world} as default world!", world);
         }
-        CommandSender sender = context.getSource();
 
-        if (sender instanceof MultilingualPlayer)
+        if (source instanceof Player)
         {
-            SubjectData data = ((MultilingualPlayer)sender).original().getTransientSubjectData();
+            SubjectData data = source.getTransientSubjectData();
             if (data instanceof OptionSubjectData)
             {
-                ((OptionSubjectData)data).setOption(((MultilingualPlayer)sender).original().getActiveContexts(), "CubeEngine:roles:active-world", world.getName());
+                if (world == null)
+                {
+                    // TODO remove? ((OptionSubjectData)data).setOption(source.getActiveContexts(), "CubeEngine:roles:active-world", null);
+                }
+                else
+                {
+                    ((OptionSubjectData)data).setOption(source.getActiveContexts(), "CubeEngine:roles:active-world", world.getName());
+                }
             }
             return;
         }
