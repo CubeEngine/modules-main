@@ -18,11 +18,11 @@
 package org.cubeengine.module.teleport;
 
 import com.google.common.base.Optional;
-import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Label;
+import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.module.core.util.BlockUtil;
 import org.cubeengine.module.core.util.LocationUtil;
 import org.cubeengine.service.command.annotation.CommandPermission;

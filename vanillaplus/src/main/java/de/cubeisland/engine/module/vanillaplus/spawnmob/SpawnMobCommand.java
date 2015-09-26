@@ -18,9 +18,9 @@
 package de.cubeisland.engine.module.vanillaplus.spawnmob;
 
 import com.flowpowered.math.vector.Vector3d;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Label;
-import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Label;
+import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.user.User;
 import de.cubeisland.engine.module.vanillaplus.VanillaPlus;

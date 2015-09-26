@@ -18,15 +18,15 @@
 package org.cubeengine.module.locker.commands;
 
 import java.util.List;
-import de.cubeisland.engine.butler.CommandInvocation;
-import de.cubeisland.engine.butler.alias.Alias;
-import de.cubeisland.engine.butler.completer.Completer;
-import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Complete;
-import de.cubeisland.engine.butler.parametric.Label;
-import de.cubeisland.engine.butler.parametric.Named;
+import org.cubeengine.butler.CommandInvocation;
+import org.cubeengine.butler.alias.Alias;
+import org.cubeengine.butler.completer.Completer;
+import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Complete;
+import org.cubeengine.butler.parametric.Label;
+import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.user.MultilingualPlayer;

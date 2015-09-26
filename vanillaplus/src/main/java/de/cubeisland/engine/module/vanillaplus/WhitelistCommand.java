@@ -18,8 +18,8 @@
 package de.cubeisland.engine.module.vanillaplus;
 
 import de.cubeisland.engine.butler.CommandInvocation;
-import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parametric.Command;
+import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.command.sender.ConsoleCommandSender;

@@ -19,9 +19,9 @@ package org.cubeengine.module.portals.config;
 
 import java.util.Random;
 import com.google.common.base.Optional;
-import de.cubeisland.engine.butler.CommandInvocation;
-import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
-import de.cubeisland.engine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.CommandInvocation;
+import org.cubeengine.butler.parameter.reader.ArgumentReader;
+import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
 import org.cubeengine.service.i18n.I18n;

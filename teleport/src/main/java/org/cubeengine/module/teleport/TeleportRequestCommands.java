@@ -19,8 +19,8 @@ package org.cubeengine.module.teleport;
 
 import java.util.UUID;
 import com.google.common.base.Optional;
-import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parametric.Command;
+import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.UserManager;

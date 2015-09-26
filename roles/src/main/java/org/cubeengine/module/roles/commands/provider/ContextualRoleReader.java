@@ -19,10 +19,10 @@ package org.cubeengine.module.roles.commands.provider;
 
 import java.util.ArrayList;
 import java.util.List;
-import de.cubeisland.engine.butler.CommandInvocation;
-import de.cubeisland.engine.butler.completer.Completer;
-import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
-import de.cubeisland.engine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.CommandInvocation;
+import org.cubeengine.butler.completer.Completer;
+import org.cubeengine.butler.parameter.reader.ArgumentReader;
+import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.service.world.WorldManager;

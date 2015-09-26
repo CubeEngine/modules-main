@@ -18,13 +18,13 @@
 package org.cubeengine.module.roles.commands;
 
 import java.util.Set;
-import de.cubeisland.engine.butler.alias.Alias;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Complete;
-import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Label;
-import de.cubeisland.engine.butler.parametric.Named;
-import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.butler.alias.Alias;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Complete;
+import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Label;
+import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.butler.parametric.Optional;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.node.StringNode;

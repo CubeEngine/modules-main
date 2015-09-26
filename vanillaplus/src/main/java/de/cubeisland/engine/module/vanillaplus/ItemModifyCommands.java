@@ -18,12 +18,12 @@
 package de.cubeisland.engine.module.vanillaplus;
 
 import java.util.ArrayList;
-import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Greed;
-import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Greed;
+import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.service.user.User;
 import org.spongepowered.api.data.manipulator.DisplayNameData;
 import org.spongepowered.api.data.manipulator.SkullData;
@@ -37,7 +37,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
-import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
+import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.service.command.readers.EnchantmentReader.getPossibleEnchantments;
 import static org.spongepowered.api.item.ItemTypes.SKULL;
 

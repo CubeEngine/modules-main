@@ -17,9 +17,9 @@
  */
 package de.cubeisland.engine.module.vanillaplus;
 
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.user.User;

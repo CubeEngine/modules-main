@@ -18,12 +18,12 @@
 package org.cubeengine.module.teleport;
 
 import java.util.ArrayList;
-import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Named;
-import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.service.i18n.I18n;

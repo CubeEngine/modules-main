@@ -17,11 +17,11 @@
  */
 package org.cubeengine.module.portals;
 
-import de.cubeisland.engine.butler.alias.Alias;
-import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Desc;
+import org.cubeengine.butler.alias.Alias;
+import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Desc;
 import org.cubeengine.module.core.util.WorldLocation;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.core.util.math.shape.Cuboid;

@@ -19,7 +19,7 @@ package org.cubeengine.module.roles.commands;
 
 import java.util.Collections;
 import java.util.Set;
-import de.cubeisland.engine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.service.command.ContainerCommand;
 import org.spongepowered.api.service.permission.context.Context;

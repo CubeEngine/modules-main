@@ -17,10 +17,10 @@
  */
 package org.cubeengine.module.portals;
 
-import de.cubeisland.engine.butler.CommandInvocation;
-import de.cubeisland.engine.butler.parameter.reader.ArgumentReader;
-import de.cubeisland.engine.butler.parameter.reader.DefaultValue;
-import de.cubeisland.engine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.CommandInvocation;
+import org.cubeengine.butler.parameter.reader.ArgumentReader;
+import org.cubeengine.butler.parameter.reader.DefaultValue;
+import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.spongepowered.api.entity.living.player.Player;
 
 public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal>

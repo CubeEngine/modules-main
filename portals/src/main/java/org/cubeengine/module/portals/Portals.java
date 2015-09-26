@@ -31,7 +31,7 @@ import java.util.UUID;
 import java.util.WeakHashMap;
 import javax.inject.Inject;
 import com.google.common.base.Optional;
-import de.cubeisland.engine.butler.ProviderManager;
+import org.cubeengine.butler.ProviderManager;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;

@@ -18,16 +18,16 @@
 package org.cubeengine.module.travel.warp;
 
 import java.util.Set;
-import de.cubeisland.engine.butler.CommandInvocation;
-import de.cubeisland.engine.butler.alias.Alias;
-import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Greed;
-import de.cubeisland.engine.butler.parametric.Label;
-import de.cubeisland.engine.butler.parametric.Named;
-import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.butler.CommandInvocation;
+import org.cubeengine.butler.alias.Alias;
+import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Greed;
+import org.cubeengine.butler.parametric.Label;
+import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.travel.TpPointCommand;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.storage.TeleportInvite;
@@ -45,7 +45,7 @@ import org.spongepowered.api.util.command.source.ConsoleSource;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
+import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.module.core.util.ChatFormat.DARK_GREEN;
 import static org.cubeengine.module.core.util.ChatFormat.YELLOW;
 import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;

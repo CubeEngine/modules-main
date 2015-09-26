@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import de.cubeisland.engine.butler.parameter.IncorrectUsageException;
+import org.cubeengine.butler.parameter.IncorrectUsageException;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.module.core.util.StringUtils;
 import de.cubeisland.engine.module.core.util.matcher.Match;

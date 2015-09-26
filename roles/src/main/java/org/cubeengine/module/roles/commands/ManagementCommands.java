@@ -17,9 +17,9 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import de.cubeisland.engine.butler.alias.Alias;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.butler.alias.Alias;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.service.command.CommandContext;

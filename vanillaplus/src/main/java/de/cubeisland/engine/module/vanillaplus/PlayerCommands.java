@@ -19,12 +19,12 @@ package de.cubeisland.engine.module.vanillaplus;
 
 import java.util.ArrayList;
 import java.util.List;
-import de.cubeisland.engine.butler.filter.Restricted;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Greed;
-import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Greed;
+import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.CommandSender;
@@ -34,7 +34,7 @@ import org.spongepowered.api.entity.player.gamemode.GameMode;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
 import org.spongepowered.api.text.Text;
 
-import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
+import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;

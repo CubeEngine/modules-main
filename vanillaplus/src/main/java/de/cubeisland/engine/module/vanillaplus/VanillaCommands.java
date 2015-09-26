@@ -21,13 +21,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import de.cubeisland.engine.butler.alias.Alias;
-import de.cubeisland.engine.butler.parameter.TooFewArgumentsException;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Greed;
-import de.cubeisland.engine.butler.parametric.Named;
-import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.butler.alias.Alias;
+import org.cubeengine.butler.parameter.TooFewArgumentsException;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Greed;
+import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.butler.parametric.Optional;
 import de.cubeisland.engine.modularity.core.Module;
 
 import org.cubeengine.module.core.module.ModuleCommands;
@@ -45,7 +45,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
-import static de.cubeisland.engine.butler.parameter.Parameter.INFINITE;
+import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 public class VanillaCommands

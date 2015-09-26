@@ -19,9 +19,9 @@ package de.cubeisland.engine.module.basics.command.moderation;
 
 import java.util.HashSet;
 import java.util.Set;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Optional;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Optional;
 import de.cubeisland.engine.module.basics.Basics;
 import org.cubeengine.module.core.util.math.Vector3;
 import org.cubeengine.module.core.util.math.shape.Sphere;

@@ -18,12 +18,12 @@
 package org.cubeengine.module.roles.commands;
 
 import java.util.Set;
-import de.cubeisland.engine.butler.alias.Alias;
-import de.cubeisland.engine.butler.parametric.Command;
-import de.cubeisland.engine.butler.parametric.Complete;
-import de.cubeisland.engine.butler.parametric.Default;
-import de.cubeisland.engine.butler.parametric.Flag;
-import de.cubeisland.engine.butler.parametric.Named;
+import org.cubeengine.butler.alias.Alias;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Complete;
+import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.commands.provider.ContextualRole;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
