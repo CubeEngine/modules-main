@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.data.BaseSubjectData;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -156,7 +156,7 @@ public abstract class BaseSubject<T extends OptionSubjectData> implements Option
                 }
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
 
@@ -204,7 +204,7 @@ public abstract class BaseSubject<T extends OptionSubjectData> implements Option
             // else UNDEFINED OR TRUE
 
             // Seach for explicit parents...
-            PermissionDescription perm = service.getDescription(permission).orNull();
+            PermissionDescription perm = service.getDescription(permission).orElse(null);
             if (perm != null)
             {
                 List<String> explicits = stream(service.getSubjects(SUBJECTS_ROLE_TEMPLATE).getAllSubjects().spliterator(), false)

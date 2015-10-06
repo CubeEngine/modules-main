@@ -20,10 +20,15 @@ package org.cubeengine.module.teleport;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.cubeengine.module.core.util.LocationUtil;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserManager;
+import org.spongepowered.api.block.trait.BlockTrait;
+import org.spongepowered.api.block.trait.BooleanTraits;
+import org.spongepowered.api.block.trait.EnumTraits;
+import org.spongepowered.api.data.property.AbstractProperty;
+import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -38,6 +43,7 @@ import org.spongepowered.api.world.World;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.spongepowered.api.data.property.block.MatterProperty.Matter.SOLID;
 import static org.spongepowered.api.item.ItemTypes.COMPASS;
 
 public class TeleportListener
@@ -87,7 +93,7 @@ public class TeleportListener
             return;
         }
         Player player = source.get();
-        if (source.get().getItemInHand().transform(ItemStack::getItem).orNull() != COMPASS)
+        if (source.get().getItemInHand().map(ItemStack::getItem).orElse(null) != COMPASS)
         {
             return;
         }
@@ -97,7 +103,7 @@ public class TeleportListener
             if (player.hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
             {
                 Location<World> loc;
-                if (event.getTargetBlock().getState().getType().isSolidCube())
+                if (event.getTargetBlock().getState().getType().getProperty(MatterProperty.class).map(AbstractProperty::getValue).orElse(null) == SOLID)
                 {
                     loc = event.getTargetBlock().getLocation().get().add(0.5, 1, 0.5);
                 }

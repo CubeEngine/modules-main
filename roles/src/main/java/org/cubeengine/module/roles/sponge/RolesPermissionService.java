@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.sponge.collection.BasicSubjectCollection;
@@ -134,7 +134,7 @@ public class RolesPermissionService implements PermissionService
     @Override
     public Optional<PermissionDescription> getDescription(String permission)
     {
-        return Optional.fromNullable(descriptionMap.get(permission));
+        return Optional.ofNullable(descriptionMap.get(permission));
     }
 
     @Override

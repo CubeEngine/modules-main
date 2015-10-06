@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.data.UserSubjectData;
 import org.spongepowered.api.Game;
@@ -74,7 +74,7 @@ public class UserSubject extends BaseSubject<UserSubjectData>
     @Override
     public Optional<CommandSource> getCommandSource()
     {
-        return getUser().getPlayer().transform(e -> (CommandSource)e);
+        return getUser().getPlayer().map(CommandSource.class::cast);
     }
 
     public User getUser()
@@ -82,7 +82,7 @@ public class UserSubject extends BaseSubject<UserSubjectData>
         if (user == null)
         {
             Optional<Player> player = game.getServer().getPlayer(uuid);
-            user = player.transform(p->(User)p).orNull();
+            user = player.map(User.class::cast).orElse(null);
             // TODO not implemented game.getServiceManager().provideUnchecked(UserStorage.class).get(uuid);
             // TODO create user if not exists
         }

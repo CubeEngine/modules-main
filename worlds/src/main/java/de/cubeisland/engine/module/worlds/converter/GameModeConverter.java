@@ -21,14 +21,23 @@ import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
-import org.bukkit.GameMode;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 
 public class GameModeConverter extends SimpleConverter<GameMode>
 {
+    private final Game game;
+
+    public GameModeConverter(Game game)
+    {
+        this.game = game;
+    }
+
+
     @Override
     public Node toNode(GameMode object) throws ConversionException
     {
-        return new StringNode(object.name());
+        return new StringNode(object.getId());
     }
 
     @Override
@@ -36,7 +45,7 @@ public class GameModeConverter extends SimpleConverter<GameMode>
     {
         try
         {
-            return GameMode.valueOf(node.asText());
+            return game.getRegistry().getType(GameMode.class, node.asText()).get();
         }
         catch (IllegalArgumentException e)
         {

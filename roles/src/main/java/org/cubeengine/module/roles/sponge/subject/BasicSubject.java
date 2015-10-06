@@ -19,7 +19,7 @@ package org.cubeengine.module.roles.sponge.subject;
 
 import java.util.Collections;
 import java.util.Set;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.data.BaseSubjectData;
 import org.spongepowered.api.Game;
@@ -57,7 +57,7 @@ public class BasicSubject extends BaseSubject<BaseSubjectData>
         {
 
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

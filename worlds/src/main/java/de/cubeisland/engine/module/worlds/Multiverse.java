@@ -236,7 +236,7 @@ public class Multiverse
         }
     }
 
-    @Subscribe
+    @Listener
     public void onWorldLoad(WorldLoadEvent event)
     {
         Universe from = this.getUniverseFrom(event.getWorld());
@@ -258,7 +258,7 @@ public class Multiverse
         }
     }
 
-    @Subscribe
+    @Listener
     public void onSetSpawn(WorldSetSpawnEvent event)
     {
         WorldConfig worldConfig = this.getWorldConfig(event.getWorld());
@@ -267,7 +267,7 @@ public class Multiverse
         worldConfig.save();
     }
 
-    @Subscribe
+    @Listener
     public void onWorldChange(PlayerChangeWorldEvent event)
     {
         Player player = event.getUser();
@@ -309,7 +309,7 @@ public class Multiverse
         }
     }
 
-    @Subscribe
+    @Listener
     public void onTeleport(EntityTeleportEvent event)
     {
         if (!(event.getEntity() instanceof Player))
@@ -334,7 +334,7 @@ public class Multiverse
 
 
     // TODO handle different Netherportal / Endportal behaviour
-    @Subscribe
+    @Listener
     public void onPortalEnter(EntityEnterPortalEvent event)
     {
         Universe universe = getUniverseFrom(event.getEntity().getWorld());
@@ -342,13 +342,13 @@ public class Multiverse
         //universe.handleEndTarget()
     }
 
-    @Subscribe
+    @Listener
     public void onPortalExit(EntityExitPortalEvent event)
     {
     }
 
 
-    @Subscribe
+    @Listener
     public void onUniverseChange(EntityTeleportEvent event) // TODO instead PortalEvent?
     {
         Location oldLoc = event.getOldLocation();
@@ -385,7 +385,7 @@ public class Multiverse
         }
     }
 
-    @Subscribe(order = Order.EARLY)
+    @Listener(order = Order.EARLY)
     public void onJoin(PlayerJoinEvent event)
     {
         if (this.config.adjustFirstSpawn && !event.getUser().get(Keys.FIRST_DATE_PLAYED).isPresent())
@@ -400,7 +400,7 @@ public class Multiverse
     }
 
 
-    @Subscribe
+    @Listener
     public void onQuit(PlayerQuitEvent event)
     {
         Universe universe = this.getUniverseFrom(event.getUser().getWorld());
@@ -408,7 +408,7 @@ public class Multiverse
         this.savePlayer(event.getUser());
     }
 
-    @Subscribe
+    @Listener
     public void onRespawn(PlayerRespawnEvent event)
     {
         World world = lastDeath.remove(event.getUser().getUniqueId());
@@ -420,13 +420,13 @@ public class Multiverse
         event.setNewRespawnLocation(universe.getRespawnLocation(world, event.isBedSpawn(), event.getRespawnLocation()));
     }
 
-    @Subscribe
+    @Listener
     public void onDeath(PlayerDeathEvent event)
     {
         lastDeath.put(event.getEntity().getUniqueId(), event.getEntity().getWorld());
     }
 
-    @Subscribe
+    @Listener
     public void onBedLeave(final PlayerLeaveBedEvent event)
     {
         if (!event.wasSpawnSet())

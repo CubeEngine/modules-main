@@ -17,7 +17,7 @@
  */
 package org.cubeengine.module.travel.home;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserManager;

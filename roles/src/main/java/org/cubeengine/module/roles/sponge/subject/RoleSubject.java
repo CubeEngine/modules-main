@@ -18,7 +18,7 @@
 package org.cubeengine.module.roles.sponge.subject;
 
 import java.util.Set;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.RoleConfig;
@@ -57,7 +57,7 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
     @Override
     public Optional<CommandSource> getCommandSource()
     {
-        return Optional.absent();
+        return Optional.empty();
     }
 
     @Override

@@ -21,14 +21,22 @@ import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
-import org.bukkit.Difficulty;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.world.difficulty.Difficulty;
 
 public class DiffcultyConverter extends SimpleConverter<Difficulty>
 {
+    private final Game game;
+
+    public DiffcultyConverter(Game game)
+    {
+        this.game = game;
+    }
+
     @Override
     public Node toNode(Difficulty object) throws ConversionException
     {
-        return new StringNode(object.name());
+        return new StringNode(object.getId());
     }
 
     @Override
@@ -36,7 +44,7 @@ public class DiffcultyConverter extends SimpleConverter<Difficulty>
     {
         try
         {
-            return Difficulty.valueOf(node.asText());
+            return game.getRegistry().getType(Difficulty.class, node.asText()).get();
         }
         catch (IllegalArgumentException e)
         {

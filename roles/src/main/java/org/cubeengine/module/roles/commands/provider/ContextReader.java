@@ -18,7 +18,7 @@
 package org.cubeengine.module.roles.commands.provider;
 
 import java.util.List;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;

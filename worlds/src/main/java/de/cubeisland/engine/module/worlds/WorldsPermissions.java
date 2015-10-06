@@ -17,8 +17,8 @@
  */
 package de.cubeisland.engine.module.worlds;
 
-import de.cubeisland.engine.service.permission.Permission;
 import org.cubeengine.service.permission.PermissionContainer;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 @SuppressWarnings("all")
 public class WorldsPermissions extends PermissionContainer<Worlds>
@@ -26,10 +26,9 @@ public class WorldsPermissions extends PermissionContainer<Worlds>
     public WorldsPermissions(Worlds module)
     {
         super(module);
-        this.registerAllPermissions();
     }
 
-    public final Permission KEEP_GAMEMODE = getBasePerm().child("keep-gamemode");
-    public final Permission KEEP_FLYMODE = getBasePerm().child("keep-flymode");
-    public final Permission REMOVE_WORLDFOLDER = getBasePerm().child("remove-worldfolder");
+    public final PermissionDescription KEEP_GAMEMODE = register("keep-gamemode", "Keeps the gamemode in between worlds", null);
+    public final PermissionDescription KEEP_FLYMODE = register("keep-flymode", "Keeps the flymode in between worlds", null);
+    public final PermissionDescription REMOVE_WORLDFOLDER = register("remove-worldfolder", "Allows deleting the world folder", null);
 }

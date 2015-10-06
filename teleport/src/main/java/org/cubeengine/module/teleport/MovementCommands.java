@@ -17,7 +17,7 @@
  */
 package org.cubeengine.module.teleport;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
