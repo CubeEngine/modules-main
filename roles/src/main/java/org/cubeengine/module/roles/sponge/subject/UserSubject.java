@@ -32,6 +32,7 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
+import org.spongepowered.api.service.user.UserStorage;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.util.command.CommandSource;
 
@@ -82,9 +83,7 @@ public class UserSubject extends BaseSubject<UserSubjectData>
         if (user == null)
         {
             Optional<Player> player = game.getServer().getPlayer(uuid);
-            user = player.map(User.class::cast).orElse(null);
-            // TODO not implemented game.getServiceManager().provideUnchecked(UserStorage.class).get(uuid);
-            // TODO create user if not exists
+            user = player.map(User.class::cast).orElse(game.getServiceManager().provideUnchecked(UserStorage.class).get(uuid).orElse(null));
         }
         return user;
     }

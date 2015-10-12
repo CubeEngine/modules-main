@@ -23,9 +23,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ThreadFactory;
 import javax.inject.Inject;
 import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.logscribe.LogFactory;
+import de.cubeisland.engine.logscribe.target.file.AsyncFileTarget;
 import de.cubeisland.engine.modularity.core.LifeCycle;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
@@ -34,6 +37,7 @@ import de.cubeisland.engine.modularity.core.Modularity;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.ValueProvider;
 import de.cubeisland.engine.modularity.core.marker.Setup;
+import org.cubeengine.module.core.sponge.CoreModule;
 import org.cubeengine.module.roles.commands.ManagementCommands;
 import org.cubeengine.module.roles.commands.UserManagementCommands;
 import org.cubeengine.module.roles.commands.provider.DefaultPermissionValueProvider;
@@ -56,6 +60,7 @@ import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.PermissionTreeConverter;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.PriorityConverter;
+import org.cubeengine.service.logging.LoggingUtil;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
@@ -71,6 +76,10 @@ import org.cubeengine.service.database.Database;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.UserManager;
 import de.cubeisland.engine.reflect.Reflector;
+
+import static org.cubeengine.service.logging.LoggingUtil.getCycler;
+import static org.cubeengine.service.logging.LoggingUtil.getFileFormat;
+import static org.cubeengine.service.logging.LoggingUtil.getLogFile;
 
 @ModuleInfo(name = "Roles", description = "Manages permissions of players and roles")
 public class Roles extends Module
@@ -90,18 +99,27 @@ public class Roles extends Module
     @Inject private Game game;
     @Inject private I18n i18n;
     @Inject private PermissionManager manager;
+
+    @Inject private LogFactory factory;
+    @Inject private ThreadFactory threadFactory;
+
     private RolesPermissionService service;
+
+    private Log permLogger;
 
 
     @Setup
     public void onSetup()
     {
+        this.permLogger = factory.getLog(CoreModule.class, "Permissions");
+        this.permLogger.addTarget(new AsyncFileTarget(getLogFile(fm, "Permissions"), getFileFormat(false, false), false, getCycler(), threadFactory));
+
         ConverterManager cManager = reflector.getDefaultConverterManager();
         cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);
         cManager.registerConverter(new PriorityConverter(), Priority.class);
         this.config = fm.loadConfig(this, RolesConfig.class);
 
-        service = new RolesPermissionService(this, reflector, config, game, db, wm, manager);
+        service = new RolesPermissionService(this, reflector, config, game, db, wm, manager, permLogger);
 
         ValueProvider<SettableInvocationHandler> provider = new InvocationHandlerProvider(new SettableInvocationHandler());
         getModularity().registerProvider(SettableInvocationHandler.class, provider);

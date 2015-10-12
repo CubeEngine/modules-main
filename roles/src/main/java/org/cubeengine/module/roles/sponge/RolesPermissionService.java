@@ -26,6 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.Optional;
+
+import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.sponge.collection.BasicSubjectCollection;
@@ -56,21 +58,25 @@ public class RolesPermissionService implements PermissionService
     private Game game;
     private Database db;
     private RolesConfig config;
+    private Log logger;
 
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<String, PermissionDescription>();
     private Collection<PermissionDescription> descriptions;
 
-    public RolesPermissionService(Roles module, Reflector reflector, RolesConfig config, Game game, Database db, WorldManager wm, PermissionManager manager)
+    public RolesPermissionService(Roles module, Reflector reflector, RolesConfig config, Game game, Database db, WorldManager wm, PermissionManager manager, Log permLogger)
     {
         this.game = game;
         this.db = db;
         this.config = config;
+        logger = permLogger;
         defaultData = new DefaultSubjectData(this, config);
         collections.put(SUBJECTS_USER, new UserCollection(this, game));
         collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, manager, reflector, wm));
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM, game));
         collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE, game));
     }
+
+
 
     @Override
     public UserCollection getUserSubjects()
@@ -154,7 +160,7 @@ public class RolesPermissionService implements PermissionService
 
         descriptionMap.put(desc.getId().toLowerCase(), desc);
         descriptions = null;
-        System.out.print(" #PERM#  " + desc.getId().toLowerCase() + "\n");
+        logger.info(desc.getId().toLowerCase());
         return desc;
     }
 }
