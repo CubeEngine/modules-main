@@ -34,6 +34,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadFactory;
+import java.util.stream.IntStream;
+import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.module.core.sponge.EventManager;
@@ -48,11 +50,13 @@ import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.task.TaskManager;
-import org.cubeengine.service.user.MultilingualPlayer;
+import org.cubeengine.service.user.CachedUser;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
+import org.jooq.Condition;
 import org.jooq.Result;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
@@ -61,6 +65,9 @@ import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.world.chunk.LoadChunkEvent;
+import org.spongepowered.api.event.world.chunk.UnloadChunkEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.Direction;
@@ -68,6 +75,8 @@ import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import static java.util.concurrent.CompletableFuture.allOf;
+import static java.util.stream.Collectors.toList;
 import static org.cubeengine.module.core.util.BlockUtil.CARDINAL_DIRECTIONS;
 import static org.cubeengine.module.core.util.LocationUtil.getChunkKey;
 import static org.cubeengine.module.core.util.LocationUtil.getLocationKey;
@@ -75,8 +84,8 @@ import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_ALL;
 import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_FULL;
 import static org.cubeengine.module.locker.storage.ProtectedType.getProtectedType;
 import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
+import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
-import static java.util.concurrent.CompletableFuture.allOf;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.data.type.PortionTypes.BOTTOM;
@@ -84,6 +93,7 @@ import static org.spongepowered.api.data.type.PortionTypes.TOP;
 
 public class LockManager
 {
+    public static final int VIEWDISTANCE_DEFAULT = 10;
     protected final Locker module;
 
     private Database database;
@@ -91,6 +101,7 @@ public class LockManager
     protected UserManager um;
     protected TaskManager tm;
     private I18n i18n;
+    private Game game;
     private final StringMatcher stringMatcher;
     protected Log logger;
 
@@ -101,13 +112,15 @@ public class LockManager
     private final Map<UUID, Lock> loadedEntityLocks = new HashMap<>();
     private final Map<Long, Lock> locksById = new HashMap<>();
 
+    private final Map<UUID, Set<Long>> unlocked = new HashMap<>();
+
     public final MessageDigest messageDigest;
 
     private final Queue<Chunk> queuedChunks = new ConcurrentLinkedQueue<>();
     private final ExecutorService executor;
     private Future<?> future = null;
 
-    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, WorldManager wm, UserManager um, TaskManager tm, I18n i18n)
+    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, WorldManager wm, UserManager um, TaskManager tm, I18n i18n, Game game)
     {
         this.stringMatcher = stringMatcher;
         this.database = database;
@@ -115,6 +128,7 @@ public class LockManager
         this.um = um;
         this.tm = tm;
         this.i18n = i18n;
+        this.game = game;
         logger = module.getProvided(Log.class);
         this.module = module;
         executor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));
@@ -153,10 +167,10 @@ public class LockManager
         }, 5, 5);
     }
 
-    @Subscribe
-    private void onChunkLoad(ChunkLoadEvent event)
+    @Listener
+    private void onChunkLoad(LoadChunkEvent event)
     {
-        queueChunk(event.getChunk());
+        queueChunk(event.getTargetChunk());
     }
 
     private boolean queueChunk(Chunk chunk)
@@ -172,19 +186,33 @@ public class LockManager
         }
         Chunk chunk = queuedChunks.poll();
         UInteger world_id = this.wm.getWorldId(chunk.getWorld());
+
+        Vector3i chunkSize = game.getServer().getChunkLayout().getChunkSize();
+
+        // TODO get view-distance if available / default to 10
+        int viewDistance = 10;
+
+        Vector3i position = chunk.getPosition(
+                                             );
+        int chunkX = position.getX() / chunkSize.getX();
+        int chunkZ = position.getZ() / chunkSize.getZ();
+
+        Condition condChunkX = TABLE_LOCK_LOCATION.CHUNKX.in(IntStream.range(chunkX, chunkX + viewDistance).mapToObj(Integer.class::cast).collect(toList()));
+        Condition condChunkZ = TABLE_LOCK_LOCATION.CHUNKZ.in(IntStream.range(chunkZ, chunkZ + viewDistance).mapToObj(Integer.class::cast).collect(toList()));
+
         Result<LockModel> models = this.database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.in(
-            this.database.getDSL().select(TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID).from(
-                TableLockLocations.TABLE_LOCK_LOCATION).where(
-                TableLockLocations.TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id), TableLockLocations.TABLE_LOCK_LOCATION.CHUNKX.eq(chunk.getPosition().getX()),
-                TableLockLocations.TABLE_LOCK_LOCATION.CHUNKZ.eq(chunk.getPosition().getZ())))).fetch();
+            this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID).from(
+                TABLE_LOCK_LOCATION).where(
+                TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id),
+                condChunkX, condChunkZ))).fetch();
         Map<UInteger, Result<LockLocationModel>> locations = LockManager.
-            this.database.getDSL().selectFrom(TableLockLocations.TABLE_LOCK_LOCATION).where(
-            TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID.in(
-            models.getValues(TABLE_LOCK.ID))).fetch().intoGroups(TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID);
+            this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION).where(
+            TABLE_LOCK_LOCATION.LOCK_ID.in(
+            models.getValues(TABLE_LOCK.ID))).fetch().intoGroups(TABLE_LOCK_LOCATION.LOCK_ID);
         for (LockModel model : models)
         {
             Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
-            addLoadedLocationLock(new Lock(LockManager.this, model, lockLoc));
+            addLoadedLocationLock(new Lock(this, model, i18n, lockLoc, game));
         }
         if (!queuedChunks.isEmpty())
         {
@@ -194,6 +222,7 @@ public class LockManager
 
     private void addLoadedLocationLock(Lock lock)
     {
+        int viewDistance = VIEWDISTANCE_DEFAULT;
         this.locksById.put(lock.getId(), lock);
         UInteger worldId = null;
         for (Location loc : lock.getLocations())
@@ -203,7 +232,7 @@ public class LockManager
                 worldId = wm.getWorldId((World)loc.getExtent());
             }
             Map<Long, Set<Lock>> locksInChunkMap = this.getChunkLocksMap(worldId);
-            long chunkKey = getChunkKey(loc);
+            long chunkKey = getChunkKey(loc.getBlockX() / viewDistance, loc.getBlockZ() / viewDistance);
             Set<Lock> locks = locksInChunkMap.get(chunkKey);
             if (locks == null)
             {
@@ -237,13 +266,36 @@ public class LockManager
         return locksAtLocMap;
     }
 
-    @Subscribe
-    private void onChunkUnload(ChunkUnloadEvent event)
+    @Listener
+    private void onChunkUnload(UnloadChunkEvent event)
     {
-        queuedChunks.remove(event.getChunk());
-        UInteger worldId = wm.getWorldId(event.getChunk().getWorld());
-        Set<Lock> remove = this.getChunkLocksMap(worldId).remove(getChunkKey(event.getChunk().getPosition().getX(),
-                                                                             event.getChunk().getPosition().getZ()));
+        Chunk chunk = event.getTargetChunk();
+        queuedChunks.remove(chunk);
+
+        Vector3i chunkSize = game.getServer().getChunkLayout().getChunkSize();
+
+        // TODO get view-distance if available / default to 10
+        int viewDistance = VIEWDISTANCE_DEFAULT;
+
+        Vector3i position = chunk.getPosition();
+        int chunkX = position.getX() / chunkSize.getX();
+        int chunkZ = position.getZ() / chunkSize.getZ();
+
+        IntStream xCoords = IntStream.range(chunkX, chunkX + viewDistance).map(x -> x * 16);
+        IntStream zCoords = IntStream.range(chunkZ, chunkZ + viewDistance).map(z -> z * 16);
+
+        boolean allChunksUnloaded = xCoords.mapToObj(Integer.class::cast)
+               .flatMap(x -> zCoords.mapToObj(z -> chunk.getWorld().getChunk(x, 0, z).isPresent()))
+               .noneMatch(e -> e);
+
+        if (!allChunksUnloaded)
+        {
+            return;
+        }
+
+        UInteger worldId = wm.getWorldId(chunk.getWorld());
+        Set<Lock> remove = this.getChunkLocksMap(worldId).remove(getChunkKey(chunkX / viewDistance,
+                                                                             chunkZ / viewDistance));
         if (remove == null) return; // nothing to remove
         Map<Long, Lock> locLockMap = this.getLocLockMap(worldId);
         for (Lock lock : remove) // remove from chunks
@@ -256,7 +308,6 @@ public class LockManager
                 Chunk c2 = ((World)location.getExtent()).getChunk(location.getBlockPosition()).get();
                 if (c2 != c1) // different chunks
                 {
-                    Chunk chunk = event.getChunk();
                     if ((!c1.isLoaded() && c2 == chunk)
                         ||(!c2.isLoaded() && c1 == chunk))
                     {
@@ -286,7 +337,7 @@ public class LockManager
      * @param user the user to get the lock for (can be null)
      * @return the lock or null if there is no lock OR the chunk is not loaded OR the lock is disabled
      */
-    public Lock getLockAtLocation(Location location, Player user)
+    public Lock getLockAtLocation(Location<World> location, Player user)
     {
         return getLockAtLocation(location, user, true);
     }
@@ -298,9 +349,9 @@ public class LockManager
      * @param access whether to access the lock or just get information from it
      * @return the lock or null if there is no lock OR the chunk is not loaded
      */
-    public Lock getLockAtLocation(Location location, Player user, boolean access, boolean repairExpand)
+    public Lock getLockAtLocation(Location<World> location, Player user, boolean access, boolean repairExpand)
     {
-        UInteger worldId = wm.getWorldId((World)location.getExtent());
+        UInteger worldId = wm.getWorldId(location.getExtent());
         Lock lock = this.getLocLockMap(worldId).get(getLocationKey(location));
         if (repairExpand && lock != null && lock.isSingleBlockLock())
         {
@@ -342,7 +393,7 @@ public class LockManager
                 lock.delete(user);
                 if (user != null)
                 {
-                    user.sendTranslated(NEUTRAL, "Deleted invalid BlockProtection!");
+                    i18n.sendTranslated(user, NEUTRAL, "Deleted invalid BlockProtection!");
                 }
             }
             return this.handleLockAccess(lock, access);
@@ -382,7 +433,7 @@ public class LockManager
                                                                       TABLE_LOCK.ENTITY_UID_MOST.eq(uniqueId.getMostSignificantBits())).fetchOne();
             if (model != null)
             {
-                lock = new Lock(this, model);
+                lock = new Lock(this, model, i18n, game);
                 this.loadedEntityLocks.put(uniqueId, lock);
             }
         }
@@ -393,8 +444,8 @@ public class LockManager
     {
         if (lock != null && access)
         {
-            if ((this.module.getConfig().protectWhenOnlyOffline && lock.getOwner().original().isOnline())
-            || (this.module.getConfig().protectWhenOnlyOnline && !lock.getOwner().original().isOnline()))
+            if ((this.module.getConfig().protectWhenOnlyOffline && lock.getOwner().isOnline())
+            || (this.module.getConfig().protectWhenOnlyOnline && !lock.getOwner().isOnline()))
             {
                 return null;
             }
@@ -416,9 +467,9 @@ public class LockManager
             throw new IllegalStateException("Cannot extend Lock onto another!");
         }
         lock.locations.add(location);
-        LockLocationModel model = database.getDSL().newRecord(TableLockLocations.TABLE_LOCK_LOCATION).newLocation(lock.model, location, wm);
+        LockLocationModel model = database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location, wm);
         model.insertAsync();
-        UInteger worldId = wm.getWorldId(((World)location.getExtent()));
+        UInteger worldId = wm.getWorldId(location.getExtent());
         this.getLocLockMap(worldId).put(getLocationKey(location), lock);
     }
 
@@ -430,7 +481,7 @@ public class LockManager
      * @param user the user removing the lock (can be null)
      * @param destroyed true if the Lock is already destroyed
      */
-    public void removeLock(Lock lock, MultilingualPlayer user, boolean destroyed)
+    public void removeLock(Lock lock, Player user, boolean destroyed)
     {
         if (destroyed || lock.isOwner(user) || user.hasPermission(module.perms().CMD_REMOVE_OTHER.getId()))
         {
@@ -456,11 +507,11 @@ public class LockManager
             }
             if (user != null)
             {
-                user.sendTranslated(POSITIVE, "Removed Lock!");
+                i18n.sendTranslated(user, POSITIVE, "Removed Lock!");
             }
             return;
         }
-        user.sendTranslated(NEGATIVE, "This protection is not yours!");
+        i18n.sendTranslated(user, NEGATIVE, "This protection is not yours!");
     }
 
     /**
@@ -474,9 +525,10 @@ public class LockManager
      * @param createKeyBook whether to attempt to create a keyBook
      * @return the created Lock
      */
-    public CompletableFuture<Lock> createLock(BlockType material, Location<World> block, MultilingualPlayer user, LockType lockType, String password, boolean createKeyBook)
+    public CompletableFuture<Lock> createLock(BlockType material, Location<World> block, Player user, LockType lockType, String password, boolean createKeyBook)
     {
-        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
+
+        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(module.getUserManager().getByUUID(user.getUniqueId()), lockType, getProtectedType(material));
         for (BlockLockerConfiguration blockProtection : this.module.getConfig().blockprotections)
         {
             if (blockProtection.isType(material))
@@ -532,7 +584,7 @@ public class LockManager
                 direction = BlockUtil.getOtherDoorDirection(direction, hinge);
                 Location<World> blockOther = block.getRelative(direction);
                 Location<World> relativeOther = relative.getRelative(direction);
-                if (portion.equals(block.get(Keys.PORTION_TYPE).orNull())
+                if (portion.equals(block.get(Keys.PORTION_TYPE).orElse(null))
                     && blockOther.getBlockType().equals(relativeOther.getBlockType()))
                 {
                     locations.add(blockOther);
@@ -547,9 +599,9 @@ public class LockManager
 
         return model.createPassword(this, password).insertAsync()
                     .thenCompose(m -> allOf(locations.parallelStream().map(loc -> database.getDSL().newRecord(
-                        TableLockLocations.TABLE_LOCK_LOCATION).newLocation(model, loc, wm)).map(AsyncRecord::insertAsync).toArray(
+                        TABLE_LOCK_LOCATION).newLocation(model, loc, wm)).map(AsyncRecord::insertAsync).toArray(
                         CompletableFuture[]::new)).thenApply((v) -> {
-                        Lock lock = new Lock(this, model, locations);
+                        Lock lock = new Lock(this, model, i18n, locations, game);
                         this.addLoadedLocationLock(lock);
                         lock.showCreatedMessage(user);
                         lock.attemptCreatingKeyBook(user, createKeyBook);
@@ -567,12 +619,13 @@ public class LockManager
      * @param createKeyBook whether to attempt to create a keyBook
      * @return the created Lock
      */
-    public CompletableFuture<Lock> createLock(Entity entity, MultilingualPlayer user, LockType lockType, String password, boolean createKeyBook)
+    public CompletableFuture<Lock> createLock(Entity entity, Player user, LockType lockType, String password, boolean createKeyBook)
     {
-        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(entity.getType()), entity.getUniqueId());
+
+        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(module.getUserManager().getByUUID(user.getUniqueId()), lockType, getProtectedType(entity.getType()), entity.getUniqueId());
         model.createPassword(this, password);
         return model.insertAsync().thenApply(m -> {
-            Lock lock = new Lock(this, model);
+            Lock lock = new Lock(this, model, i18n, game);
             this.loadedEntityLocks.put(entity.getUniqueId(), lock);
             this.locksById.put(lock.getId(), lock);
             lock.showCreatedMessage(user);
@@ -641,7 +694,7 @@ public class LockManager
      */
     public Lock getLockOfInventory(CarriedInventory<?> inventory)
     {
-        Carrier holder = inventory.getCarrier().orNull();
+        Carrier holder = inventory.getCarrier().orElse(null);
         if (holder instanceof Entity)
         {
             return this.getLockForEntityUID(((Entity)holder).getUniqueId());
@@ -669,19 +722,19 @@ public class LockManager
         LockModel lockModel = database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.eq(UInteger.valueOf(lockID))).fetchOne();
         if (lockModel != null)
         {
-            Result<LockLocationModel> fetch = database.getDSL().selectFrom(TableLockLocations.TABLE_LOCK_LOCATION)
-                                                      .where(TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID.eq(lockModel.getValue(TABLE_LOCK.ID)))
+            Result<LockLocationModel> fetch = database.getDSL().selectFrom(TABLE_LOCK_LOCATION)
+                                                      .where(TABLE_LOCK_LOCATION.LOCK_ID.eq(lockModel.getValue(TABLE_LOCK.ID)))
                                                       .fetch();
             if (fetch.isEmpty())
             {
-                return new Lock(this, lockModel);
+                return new Lock(this, lockModel, i18n, game);
             }
-            return new Lock(this, lockModel, fetch);
+            return new Lock(this, lockModel, i18n, fetch, game);
         }
         return null;
     }
 
-    public void setGlobalAccess(MultilingualPlayer sender, String string)
+    public void setGlobalAccess(Player sender, String string)
     {
         String[] explode = StringUtils.explode(",", string);
         for (String name : explode)
@@ -698,7 +751,8 @@ public class LockManager
                 name = name.substring(1);
                 add = false;
             }
-            MultilingualPlayer modifyUser = this.um.findExactUser(name);
+            CachedUser modifyUser = um.getByUUID(um.getByName(name).get().getUniqueId());
+            CachedUser senderUser = um.getByUUID(sender.getUniqueId());
             if (modifyUser == null) throw new IllegalArgumentException(); // This is prevented by checking first in the cmd execution
             short accessType = ACCESS_FULL;
             if (add && admin)
@@ -707,44 +761,65 @@ public class LockManager
             }
             AccessListModel accessListModel = database.getDSL().selectFrom(TABLE_ACCESS_LIST).where(
                 TABLE_ACCESS_LIST.USER_ID.eq(modifyUser.getEntity().getId()),
-                TABLE_ACCESS_LIST.OWNER_ID.eq(sender.getEntity().getId())).fetchOne();
+                TABLE_ACCESS_LIST.OWNER_ID.eq(senderUser.getEntity().getId())).fetchOne();
             if (add)
             {
                 if (accessListModel == null)
                 {
-                    accessListModel = database.getDSL().newRecord(TABLE_ACCESS_LIST).newGlobalAccess(sender, modifyUser, accessType);
+                    accessListModel = database.getDSL().newRecord(TABLE_ACCESS_LIST).newGlobalAccess(senderUser, modifyUser, accessType);
                     accessListModel.insertAsync();
-                    sender.sendTranslated(POSITIVE, "Global access for {user} set!", modifyUser);
+                    i18n.sendTranslated(sender, POSITIVE, "Global access for {user} set!", modifyUser);
                 }
                 else
                 {
                     accessListModel.setValue(TABLE_ACCESS_LIST.LEVEL, accessType);
                     accessListModel.updateAsync();
-                    sender.sendTranslated(POSITIVE, "Updated global access level for {user}!", modifyUser);
+                    i18n.sendTranslated(sender, POSITIVE, "Updated global access level for {user}!", modifyUser);
                 }
             }
             else
             {
                 if (accessListModel == null)
                 {
-                    sender.sendTranslated(NEUTRAL, "{user} had no global access!", modifyUser);
+                    i18n.sendTranslated(sender, NEUTRAL, "{user} had no global access!", modifyUser);
                 }
                 else
                 {
                     accessListModel.deleteAsync();
-                    sender.sendTranslated(POSITIVE, "Removed global access from {user}", modifyUser);
+                    i18n.sendTranslated(sender, POSITIVE, "Removed global access from {user}", modifyUser);
                 }
             }
         }
     }
 
-    public CompletableFuture<Integer> purgeLocksFrom(MultilingualPlayer user)
+    public CompletableFuture<Integer> purgeLocksFrom(Player user)
     {
-        return database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(user.getEntity().getId())));
+        return database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(um.getByUUID(user.getUniqueId()).getEntityId())));
     }
 
     public Database getDB()
     {
         return database;
+    }
+
+    public boolean hasUnlocked(Player user, Lock lock)
+    {
+        return getUnlocks(user).contains(lock.getId());
+    }
+
+    private Set<Long> getUnlocks(Player user)
+    {
+        Set<Long> unlocks = unlocked.get(user.getUniqueId());
+        if (unlocks == null)
+        {
+            unlocks = new HashSet<>();
+            unlocked.put(user.getUniqueId(), unlocks);
+        }
+        return unlocks;
+    }
+
+    public void addUnlock(Player user, Lock lock)
+    {
+        getUnlocks(user).add(lock.getId());
     }
 }

@@ -25,6 +25,7 @@ import org.cubeengine.module.locker.Locker;
 import org.cubeengine.service.user.MultilingualPlayer;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Texts;
@@ -41,12 +42,12 @@ public class KeyBook
 {
     public static final String TITLE = ChatFormat.RESET.toString() + ChatFormat.GOLD + "KeyBook " + ChatFormat.DARK_GREY + "#";
     public ItemStack item;
-    public final MultilingualPlayer currentHolder;
+    public final Player currentHolder;
     private final Locker module;
     public final long lockID;
     private final String keyBookName;
 
-    private KeyBook(ItemStack item, MultilingualPlayer currentHolder, Locker module)
+    private KeyBook(ItemStack item, Player currentHolder, Locker module)
     {
         this.item = item;
         this.currentHolder = currentHolder;
@@ -55,7 +56,7 @@ public class KeyBook
         lockID = Long.valueOf(keyBookName.substring(keyBookName.indexOf('#') + 1, keyBookName.length()));
     }
 
-    public static KeyBook getKeyBook(ItemStack item, MultilingualPlayer currentHolder, Locker module)
+    public static KeyBook getKeyBook(ItemStack item, Player currentHolder, Locker module)
     {
         if (item.getItem() == ItemTypes.ENCHANTED_BOOK
             && item.get(DISPLAY_NAME).transform(Texts::toPlain).transform(s -> s.contains(TITLE)).or(false))

@@ -37,6 +37,7 @@ import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Human;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -69,17 +70,17 @@ public class CommandListener
         this.stringMatcher = stringMatcher;
     }
 
-    public void setCommandType(CommandSender sender, CommandType commandType, String s, boolean b)
+    public void setCommandType(Player sender, CommandType commandType, String s, boolean b)
     {
         this.setCommandType0(sender, commandType, s, b);
     }
 
-    public void setCommandType(CommandSender sender, CommandType commandType, String s)
+    public void setCommandType(Player sender, CommandType commandType, String s)
     {
         this.setCommandType0(sender, commandType, s, false);
     }
 
-    private void setCommandType0(CommandSender sender, CommandType commandType, String s, boolean b)
+    private void setCommandType0(Player sender, CommandType commandType, String s, boolean b)
     {
         map.put(sender.getUniqueId(), new Triplet<>(commandType, s, b));
         if (this.doesPersist(sender.getUniqueId()))
@@ -100,7 +101,7 @@ public class CommandListener
      * @param sender
      * @return true if persist mode is on for given user
      */
-    public boolean persist(MultilingualPlayer sender)
+    public boolean persist(Player sender)
     {
         if (doesPersist(sender.getUniqueId()))
         {
@@ -121,7 +122,7 @@ public class CommandListener
         {
             return;
         }
-        MultilingualPlayer user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        Player user = um.getExactUser(event.getSourceEntity().getUniqueId());
         Location<World> location = event.getTargetLocation();
         Triplet<CommandType, String, Boolean> triplet = map.get(user.getUniqueId());
         Lock lock = this.manager.getLockAtLocation(location, user, triplet.getFirst() != INFO);
@@ -158,7 +159,7 @@ public class CommandListener
         event.setCancelled(true);
     }
 
-    private void cmdUsed(MultilingualPlayer user)
+    private void cmdUsed(Player user)
     {
         if (doesPersist(user.getUniqueId()))
         {
@@ -170,7 +171,7 @@ public class CommandListener
         }
     }
 
-    private boolean handleInteract1(Triplet<CommandType, String, Boolean> triplet, Lock lock, MultilingualPlayer user, boolean isHolder, boolean canProtect, Cancellable event)
+    private boolean handleInteract1(Triplet<CommandType, String, Boolean> triplet, Lock lock, Player user, boolean isHolder, boolean canProtect, Cancellable event)
     {
         if (triplet.getFirst().isCreator())
         {
@@ -224,7 +225,7 @@ public class CommandListener
         {
             return;
         }
-        MultilingualPlayer user = um.getExactUser(event.getSourceEntity().getUniqueId());
+        Player user = um.getExactUser(event.getSourceEntity().getUniqueId());
         try
         {
             Entity target = event.getTargetEntity();
@@ -272,7 +273,7 @@ public class CommandListener
         }
     }
 
-    private void handleInteract2(CommandType first, Lock lock, MultilingualPlayer user, String second, Boolean third, Location location, Carrier possibleHolder)
+    private void handleInteract2(CommandType first, Lock lock, Player user, String second, Boolean third, Location location, Carrier possibleHolder)
     {
         switch (first)
         {
@@ -328,7 +329,7 @@ public class CommandListener
             if (lock.isOwner(user) || user.hasPermission(module.perms().CMD_GIVE_OTHER.getId()))
             {
                 // TODO UUID stuff
-                MultilingualPlayer newOwner = um.getExactUser(second);
+                Player newOwner = um.getExactUser(second);
                 lock.setOwner(newOwner);
                 user.sendTranslated(NEUTRAL, "{user} is now the owner of this protection.", newOwner);
             }

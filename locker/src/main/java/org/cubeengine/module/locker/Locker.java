@@ -40,6 +40,7 @@ import org.cubeengine.module.core.util.matcher.MaterialMatcher;
 import org.cubeengine.module.core.util.matcher.StringMatcher;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.database.Database;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.UserManager;
 import de.cubeisland.engine.reflect.Reflector;
@@ -74,6 +75,7 @@ public class Locker extends Module
     @Inject private Game game;
     @Inject private TaskManager tm;
     @Inject private WorldManager wm;
+    @Inject private I18n i18n;
 
 
     @Enable
@@ -86,13 +88,13 @@ public class Locker extends Module
         db.registerTable(TableLocks.class);
         db.registerTable(TableLockLocations.class);
         db.registerTable(TableAccessList.class);
-        manager = new LockManager(this, em, sm, db, wm, um, tm);
+        manager = new LockManager(this, em, sm, db, wm, um, tm, i18n, game);
         LockerCommands lockerCmd = new LockerCommands(this, manager, um);
         cm.addCommand(lockerCmd);
         lockerCmd.addCommand(new LockerCreateCommands(this, manager));
         lockerCmd.addCommand(new LockerAdminCommands(this, manager));
         perms = new LockerPerm(this, lockerCmd);
-        listener = new LockerListener(this, manager, um);
+        listener = new LockerListener(this, manager, um, i18n);
         em.registerListener(this, listener);
     }
 
