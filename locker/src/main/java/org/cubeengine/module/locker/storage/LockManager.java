@@ -46,6 +46,7 @@ import org.cubeengine.module.locker.BlockLockerConfiguration;
 import org.cubeengine.module.locker.EntityLockerConfiguration;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.commands.CommandListener;
+import org.cubeengine.module.locker.commands.PlayerAccess;
 import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.i18n.I18n;
@@ -140,7 +141,7 @@ public class LockManager
         {
             throw new RuntimeException("SHA-1 hash algorithm not available!");
         }
-        this.commandListener = new CommandListener(module, this, um, logger, this.stringMatcher);
+        this.commandListener = new CommandListener(module, this, um, logger, this.stringMatcher, i18n);
         em.registerListener(module, this.commandListener);
         em.registerListener(module, this);
     }
@@ -331,28 +332,17 @@ public class LockManager
     }
 
     /**
-     * Returns the Lock at given location if the lock there is active
-     *
-     * @param location the location of the lock
-     * @param user the user to get the lock for (can be null)
-     * @return the lock or null if there is no lock OR the chunk is not loaded OR the lock is disabled
-     */
-    public Lock getLockAtLocation(Location<World> location, Player user)
-    {
-        return getLockAtLocation(location, user, true);
-    }
-
-    /**
      * Returns the Lock at given Location
      *
      * @param location the location of the lock
-     * @param access whether to access the lock or just get information from it
      * @return the lock or null if there is no lock OR the chunk is not loaded
      */
-    public Lock getLockAtLocation(Location<World> location, Player user, boolean access, boolean repairExpand)
+    public Lock getLockAtLocation(Location<World> location, Player user)
     {
         UInteger worldId = wm.getWorldId(location.getExtent());
         Lock lock = this.getLocLockMap(worldId).get(getLocationKey(location));
+        // TODO repairing Locks still needed?
+        /*
         if (repairExpand && lock != null && lock.isSingleBlockLock())
         {
             Location block = lock.getFirstLocation();
@@ -363,7 +353,7 @@ public class LockManager
                     Location relative = block.getRelative(cardinalDirection);
                     if (relative.getBlockType() == block.getBlockType())
                     {
-                        if (this.getLockAtLocation(relative,null, false,false)== null)
+                        if (this.getLockAtLocation(relative, null) == null)
                         {
                             this.extendLock(lock, relative);
                             if (user != null)
@@ -386,45 +376,30 @@ public class LockManager
                 }
             }
         }
-        if (lock != null && access)
+        */
+        if (lock == null)
         {
-            if (!lock.validateTypeAt(location))
+            return null;
+        }
+        if (!lock.validateTypeAt(location)) // TODO don't validate each time maybe?
+        {
+            lock.delete(user);
+            if (user != null)
             {
-                lock.delete(user);
-                if (user != null)
-                {
-                    i18n.sendTranslated(user, NEUTRAL, "Deleted invalid BlockProtection!");
-                }
+                i18n.sendTranslated(user, NEUTRAL, "Deleted invalid BlockProtection!");
             }
-            return this.handleLockAccess(lock, access);
         }
         return lock;
     }
 
-    public Lock getLockAtLocation(Location location, Player user, boolean access)
-    {
-        return this.getLockAtLocation(location, user, access, true);
-    }
 
     /**
      * Returns the Lock for given entityUID
      *
      * @param uniqueId the entities unique id
-     * @return the entity-lock or null if there is no lock OR the lock is disabled
-     */
-    public Lock getLockForEntityUID(UUID uniqueId)
-    {
-        return this.getLockForEntityUID(uniqueId, true);
-    }
-
-    /**
-     * Returns the Lock for given entityUID
-     *
-     * @param uniqueId the entities unique id
-     * @param access whether to access the lock or just get information from it
      * @return the entity-lock or null if there is no lock
      */
-    public Lock getLockForEntityUID(UUID uniqueId, boolean access)
+    public Lock getLockForEntityUID(UUID uniqueId)
     {
         Lock lock = this.loadedEntityLocks.get(uniqueId);
         if (lock == null)
@@ -437,22 +412,27 @@ public class LockManager
                 this.loadedEntityLocks.put(uniqueId, lock);
             }
         }
-        return this.handleLockAccess(lock, access);
-    }
-
-    private Lock handleLockAccess(Lock lock, boolean access)
-    {
-        if (lock != null && access)
-        {
-            if ((this.module.getConfig().protectWhenOnlyOffline && lock.getOwner().isOnline())
-            || (this.module.getConfig().protectWhenOnlyOnline && !lock.getOwner().isOnline()))
-            {
-                return null;
-            }
-            lock.model.setValue(TABLE_LOCK.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
-        }
         return lock;
     }
+
+    /*
+    private Lock handleLockAccess(Lock lock, boolean access)
+    {
+        if (lock == null)
+        {
+            return lock;
+        }
+        // TODO move protection logic
+        if ((this.module.getConfig().protectWhenOnlyOffline && lock.getOwner().isOnline())
+        || (this.module.getConfig().protectWhenOnlyOnline && !lock.getOwner().isOnline()))
+        {
+            return null;
+        }
+        // TODO move timestamp logic -> Lock.updateAccess
+        lock.model.setValue(TABLE_LOCK.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
+        return lock;
+    }
+    */
 
     /**
      * Extends a location lock onto an other location
@@ -462,7 +442,7 @@ public class LockManager
      */
     public void extendLock(Lock lock, Location<World> location)
     {
-        if (this.getLockAtLocation(location, null, false, false) != null)
+        if (this.getLockAtLocation(location, null) != null)
         {
             throw new IllegalStateException("Cannot extend Lock onto another!");
         }
@@ -517,7 +497,6 @@ public class LockManager
     /**
      * Creates a new Lock at given Location
      *
-     * @param material the material at given location (can missmatch if block is just getting placed)
      * @param block the location to create the lock for
      * @param user the user creating the lock
      * @param lockType the lockType
@@ -525,9 +504,9 @@ public class LockManager
      * @param createKeyBook whether to attempt to create a keyBook
      * @return the created Lock
      */
-    public CompletableFuture<Lock> createLock(BlockType material, Location<World> block, Player user, LockType lockType, String password, boolean createKeyBook)
+    public CompletableFuture<Lock> createLock(Location<World> block, Player user, LockType lockType, String password, boolean createKeyBook)
     {
-
+        BlockType material = block.getBlockType();
         LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(module.getUserManager().getByUUID(user.getUniqueId()), lockType, getProtectedType(material));
         for (BlockLockerConfiguration blockProtection : this.module.getConfig().blockprotections)
         {
@@ -734,61 +713,46 @@ public class LockManager
         return null;
     }
 
-    public void setGlobalAccess(Player sender, String string)
+    public void setGlobalAccess(Player sender, List<PlayerAccess> list)
     {
-        String[] explode = StringUtils.explode(",", string);
-        for (String name : explode)
+        CachedUser senderUser = um.getByUUID(sender.getUniqueId());
+        for (PlayerAccess access : list)
         {
-            boolean add = true;
-            boolean admin = false;
-            if (name.startsWith("@"))
-            {
-                name = name.substring(1);
-                admin = true;
-            }
-            if (name.startsWith("-"))
-            {
-                name = name.substring(1);
-                add = false;
-            }
-            CachedUser modifyUser = um.getByUUID(um.getByName(name).get().getUniqueId());
-            CachedUser senderUser = um.getByUUID(sender.getUniqueId());
-            if (modifyUser == null) throw new IllegalArgumentException(); // This is prevented by checking first in the cmd execution
+            CachedUser accessUser = um.getByUUID(access.user.getUniqueId());
+
             short accessType = ACCESS_FULL;
-            if (add && admin)
+            if (access.add && access.admin)
             {
                 accessType = ACCESS_ALL; // with AdminAccess
             }
             AccessListModel accessListModel = database.getDSL().selectFrom(TABLE_ACCESS_LIST).where(
-                TABLE_ACCESS_LIST.USER_ID.eq(modifyUser.getEntity().getId()),
-                TABLE_ACCESS_LIST.OWNER_ID.eq(senderUser.getEntity().getId())).fetchOne();
-            if (add)
+                    TABLE_ACCESS_LIST.USER_ID.eq(accessUser.getEntity().getId()),
+                    TABLE_ACCESS_LIST.OWNER_ID.eq(senderUser.getEntity().getId())).fetchOne();
+            if (access.add)
             {
                 if (accessListModel == null)
                 {
-                    accessListModel = database.getDSL().newRecord(TABLE_ACCESS_LIST).newGlobalAccess(senderUser, modifyUser, accessType);
+                    accessListModel = database.getDSL().newRecord(TABLE_ACCESS_LIST).newGlobalAccess(senderUser, accessUser, accessType);
                     accessListModel.insertAsync();
-                    i18n.sendTranslated(sender, POSITIVE, "Global access for {user} set!", modifyUser);
+                    i18n.sendTranslated(sender, POSITIVE, "Global access for {user} set!", access.user);
                 }
                 else
                 {
                     accessListModel.setValue(TABLE_ACCESS_LIST.LEVEL, accessType);
                     accessListModel.updateAsync();
-                    i18n.sendTranslated(sender, POSITIVE, "Updated global access level for {user}!", modifyUser);
+                    i18n.sendTranslated(sender, POSITIVE, "Updated global access level for {user}!", access.user);
                 }
+            }
+            else if (accessListModel == null)
+            {
+                i18n.sendTranslated(sender, NEUTRAL, "{user} had no global access!", access.user);
             }
             else
             {
-                if (accessListModel == null)
-                {
-                    i18n.sendTranslated(sender, NEUTRAL, "{user} had no global access!", modifyUser);
-                }
-                else
-                {
-                    accessListModel.deleteAsync();
-                    i18n.sendTranslated(sender, POSITIVE, "Removed global access from {user}", modifyUser);
-                }
+                accessListModel.deleteAsync();
+                i18n.sendTranslated(sender, POSITIVE, "Removed global access from {user}", access.user);
             }
+
         }
     }
 

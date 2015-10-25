@@ -24,7 +24,6 @@ import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.service.user.CachedUser;
-import org.spongepowered.api.entity.living.player.Player;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 

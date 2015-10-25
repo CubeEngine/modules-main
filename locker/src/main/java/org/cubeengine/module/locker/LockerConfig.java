@@ -21,7 +21,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Transient;
-import org.cubeengine.module.locker.storage.ProtectionFlag;
 import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
@@ -30,9 +29,10 @@ import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.entity.EntityTypes;
 
 import static org.cubeengine.module.locker.storage.LockType.PRIVATE;
-import static org.spongepowered.api.entity.EntityTypes.ITEM_FRAME;
-import static org.spongepowered.api.entity.EntityTypes.LEASH_HITCH;
-import static org.spongepowered.api.entity.EntityTypes.PAINTING;
+import static org.cubeengine.module.locker.storage.ProtectionFlag.*;
+import static org.cubeengine.module.locker.storage.ProtectionFlag.BLOCK_REDSTONE;
+import static org.spongepowered.api.block.BlockTypes.*;
+import static org.spongepowered.api.entity.EntityTypes.*;
 
 @SuppressWarnings("all")
 public class LockerConfig extends ReflectedYaml
@@ -125,32 +125,27 @@ public class LockerConfig extends ReflectedYaml
         if (blockprotections == null || blockprotections.isEmpty())
         {
             blockprotections = new ArrayList<>();
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.CHEST).autoProtect(PRIVATE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.TRAPPED_CHEST).autoProtect(PRIVATE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.FURNACE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.LIT_FURNACE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.BREWING_STAND));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.DISPENSER).defaultFlags(
-                ProtectionFlag.BLOCK_REDSTONE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.DROPPER).defaultFlags(
-                ProtectionFlag.BLOCK_REDSTONE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.STANDING_SIGN));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.WALL_SIGN));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.WOODEN_DOOR).defaultFlags(
-                ProtectionFlag.BLOCK_REDSTONE, ProtectionFlag.AUTOCLOSE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.IRON_DOOR));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.TRAPDOOR).defaultFlags(
-                ProtectionFlag.BLOCK_REDSTONE, ProtectionFlag.AUTOCLOSE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.FENCE_GATE).defaultFlags(
-                ProtectionFlag.AUTOCLOSE));
-            blockprotections.add(new BlockLockerConfiguration(BlockTypes.HOPPER).defaultFlags(ProtectionFlag.HOPPER_IN, ProtectionFlag.HOPPER_OUT));
+            blockprotections.add(new BlockLockerConfiguration(CHEST).autoProtect(PRIVATE));
+            blockprotections.add(new BlockLockerConfiguration(TRAPPED_CHEST).autoProtect(PRIVATE));
+            blockprotections.add(new BlockLockerConfiguration(FURNACE));
+            blockprotections.add(new BlockLockerConfiguration(LIT_FURNACE));
+            blockprotections.add(new BlockLockerConfiguration(BREWING_STAND));
+            blockprotections.add(new BlockLockerConfiguration(DISPENSER).defaultFlags(BLOCK_REDSTONE));
+            blockprotections.add(new BlockLockerConfiguration(DROPPER).defaultFlags(BLOCK_REDSTONE));
+            blockprotections.add(new BlockLockerConfiguration(STANDING_SIGN));
+            blockprotections.add(new BlockLockerConfiguration(WALL_SIGN));
+            blockprotections.add(new BlockLockerConfiguration(WOODEN_DOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
+            blockprotections.add(new BlockLockerConfiguration(IRON_DOOR));
+            blockprotections.add(new BlockLockerConfiguration(TRAPDOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
+            blockprotections.add(new BlockLockerConfiguration(FENCE_GATE).defaultFlags(AUTOCLOSE));
+            blockprotections.add(new BlockLockerConfiguration(HOPPER).defaultFlags(HOPPER_IN, HOPPER_OUT));
         }
         if (protEntityEnable && (entityProtections == null || entityProtections.isEmpty()))
         {
             entityProtections = new ArrayList<>();
-            entityProtections.add(new EntityLockerConfiguration(EntityTypes.HORSE).autoProtect(PRIVATE));
-            entityProtections.add(new EntityLockerConfiguration(EntityTypes.CHESTED_MINECART));
-            entityProtections.add(new EntityLockerConfiguration(EntityTypes.HOPPER_MINECART));
+            entityProtections.add(new EntityLockerConfiguration(HORSE).autoProtect(PRIVATE));
+            entityProtections.add(new EntityLockerConfiguration(CHESTED_MINECART));
+            entityProtections.add(new EntityLockerConfiguration(HOPPER_MINECART));
         }
 
         if (this.protectWhenOnlyOffline && this.protectWhenOnlyOnline)

@@ -45,7 +45,7 @@ public enum LockType
         }
     }
 
-    private LockType(int id, ProtectedType... supportedTypes)
+    LockType(int id, ProtectedType... supportedTypes)
     {
         this.id = (byte)id;
         this.supportedTypes = Arrays.asList(supportedTypes);

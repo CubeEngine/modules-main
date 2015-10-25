@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.core.util.matcher.StringMatcher;
 
@@ -70,7 +71,7 @@ public enum ProtectionFlag
     public final short flagValue;
     public final String flagname;
 
-    private ProtectionFlag(String flagname, int flag)
+    ProtectionFlag(String flagname, int flag)
     {
         this.flagname = flagname;
         this.flagValue = (short)flag;
@@ -93,14 +94,7 @@ public enum ProtectionFlag
     public static List<String> getTabCompleteList(String token, String subToken)
     {
         List<String> previousTokens = Arrays.asList(StringUtils.explode(",", token));
-        List<String> matchedFlags = new ArrayList<>();
-        for (String flag : flags.keySet())
-        {
-            if (startsWithIgnoreCase(flag, subToken))
-            {
-                matchedFlags.add(flag);
-            }
-        }
+        List<String> matchedFlags = flags.keySet().stream().filter(flag -> startsWithIgnoreCase(flag,subToken)).collect(toList());
         matchedFlags.removeAll(previousTokens); // do not duplicate!
         return matchedFlags.stream().map(flag -> token + flag.replaceFirst(subToken, "")).collect(toList());
     }

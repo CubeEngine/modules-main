@@ -17,18 +17,11 @@
  */
 package org.cubeengine.module.locker.storage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.core.util.InventoryGuardFactory;
-import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.locker.Locker;
+import org.cubeengine.module.locker.commands.PlayerAccess;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.CachedUser;
@@ -51,11 +44,15 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import java.sql.Timestamp;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.stream.Collectors.toList;
 import static org.cubeengine.module.locker.storage.AccessListModel.*;
 import static org.cubeengine.module.locker.storage.LockType.PUBLIC;
 import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
-import static java.util.stream.Collectors.toList;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
 import static org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK;
@@ -183,10 +180,10 @@ public class Lock
         ItemStack item = module.getGame().getRegistry().createItemBuilder().itemType(ENCHANTED_BOOK).quantity(1).build();
         item.offer(Keys.DISPLAY_NAME, Texts.of(getColorPass() + KeyBook.TITLE + getId()));
         item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(user, NEUTRAL, "This book can"),
-                                                 i18n.getTranslation(user, NEUTRAL, "unlock a magically"),
-                                                 i18n.getTranslation(user, NEUTRAL, "locked protection")));
+                i18n.getTranslation(user, NEUTRAL, "unlock a magically"),
+                i18n.getTranslation(user, NEUTRAL, "locked protection")));
         user.setItemInHand(item);
-        if (itemStack != null)
+        if (itemStack != null && itemStack.getQuantity() != 0)
         {
             user.getInventory().offer(itemStack);
             if (itemStack.getQuantity() != 0)
@@ -236,9 +233,9 @@ public class Lock
      * Sets multiple acceslevels
      *
      * @param user the user modifying
-     * @param usersString
+     * @param list
      */
-    public void modifyLock(Player user, String usersString)
+    public void modifyLock(Player user, List<PlayerAccess> list)
     {
         if (!this.isOwner(user) && !this.hasAdmin(user) && !user.hasPermission(module.perms().CMD_MODIFY_OTHER.getId()))
         {
@@ -250,69 +247,39 @@ public class Lock
             i18n.sendTranslated(user, NEUTRAL, "This protection is public and so is accessible to everyone");
             return;
         }
-        String[] explode = StringUtils.explode(",", usersString); // TODO custom reader also for all other occurences of user with - or @ in front
-        for (String name : explode)
+        for (PlayerAccess access : list)
         {
-            boolean add = true;
-            boolean admin = false;
-            if (name.startsWith("@"))
-            {
-                name = name.substring(1);
-                admin = true;
-            }
-            if (name.startsWith("-"))
-            {
-                name = name.substring(1);
-                add = false;
-            }
-            User modifyUser = this.manager.um.getByName(name).orElse(null);
-            if (modifyUser == null)
-            {
-                throw new IllegalArgumentException(); // This is prevented by checking first in the cmd execution
-            }
             short accessType = ACCESS_FULL;
-            if (add && admin)
+            if (access.add && access.admin)
             {
                 accessType = ACCESS_ALL; // with AdminAccess
             }
-            if (this.setAccess(modifyUser, add, accessType))
+            if (this.setAccess(access.user, access.add, accessType))
             {
-                if (add)
+                if (!access.add)
                 {
-                    if (admin)
-                    {
-                        i18n.sendTranslated(user, POSITIVE, "Granted {user} admin access to this protection!",
-                                            modifyUser);
-                    }
-                    else
-                    {
-                        i18n.sendTranslated(user, POSITIVE, "Granted {user} access to this protection!",
-                                            modifyUser);
-                    }
+                    i18n.sendTranslated(user, POSITIVE, "Removed {user}'s access to this protection!", access.user);
+                }
+                else if (access.admin)
+                {
+                    i18n.sendTranslated(user, POSITIVE, "Granted {user} admin access to this protection!", access.user);
                 }
                 else
                 {
-                    i18n.sendTranslated(user, POSITIVE, "Removed {user}'s access to this protection!", modifyUser);
+                    i18n.sendTranslated(user, POSITIVE, "Granted {user} access to this protection!", access.user);
                 }
+            }
+            else if (!access.add)
+            {
+                i18n.sendTranslated(user, POSITIVE, "{user} had no access to this protection!", access.user);
+            }
+            else if (access.admin)
+            {
+                i18n.sendTranslated(user, POSITIVE, "Updated {user}'s access to admin access!", access.user);
             }
             else
             {
-                if (add)
-                {
-                    if (admin)
-                    {
-                        i18n.sendTranslated(user, POSITIVE, "Updated {user}'s access to admin access!", modifyUser);
-                    }
-                    else
-                    {
-                        i18n.sendTranslated(user, POSITIVE, "Updated {user}'s access to normal access!",
-                                            modifyUser);
-                    }
-                }
-                else
-                {
-                    i18n.sendTranslated(user, POSITIVE, "{user} had no access to this protection!", modifyUser);
-                }
+                i18n.sendTranslated(user, POSITIVE, "Updated {user}'s access to normal access!", access.user);
             }
         }
     }
@@ -328,7 +295,7 @@ public class Lock
      */
     public Boolean checkForKeyBook(Player user, Location effectLocation)
     {
-        KeyBook keyBook = KeyBook.getKeyBook(user.getItemInHand().orElse(null), user, this.manager.module);
+        KeyBook keyBook = KeyBook.getKeyBook(user.getItemInHand().orElse(null), user, this.manager.module, i18n);
         if (keyBook != null)
         {
             return keyBook.check(this, effectLocation);
@@ -499,6 +466,7 @@ public class Lock
             inventoryGuardFactory.submitInventory(this.manager.module, false);
 
             this.notifyUsage(user);
+            updateAccess();
         }
     }
 
@@ -580,7 +548,7 @@ public class Lock
         i18n.sendTranslated(user, NEGATIVE, "Magic prevents you from interacting with this block!");
     }
 
-    public boolean handleEntityDamage(Cancellable event, Player user)
+    public boolean handleEntityDamage(Player user)
     {
         UInteger userId = module.getUserManager().getByUUID(user.getUniqueId()).getEntityId();
         if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(userId)
@@ -589,7 +557,8 @@ public class Lock
             i18n.sendTranslated(user, NEUTRAL, "The magic surrounding this entity quivers as you hit it!");
             return true;
         }
-        event.setCancelled(true); // private & no access
+
+        // private & no access
         i18n.sendTranslated(user, NEGATIVE, "Magic repelled your attempts to hit this entity!");
         return false;
     }
@@ -840,7 +809,7 @@ public class Lock
             where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID))).fetch();
     }
 
-    public void unlock(Player user, Location soundLoc, String pass)
+    public void unlock(Player user, Location<World> soundLoc, String pass)
     {
         if (this.hasPass())
         {
@@ -953,7 +922,7 @@ public class Lock
         return this.isValidType;
     }
 
-    public void setOwner(Player owner)
+    public void setOwner(User owner)
     {
         this.model.setValue(TABLE_LOCK.OWNER_ID, module.getUserManager().getByUUID(owner.getUniqueId()).getEntityId());
         this.model.updateAsync();
@@ -973,5 +942,11 @@ public class Lock
     public UUID getEntityUID()
     {
         return this.model.getUUID();
+    }
+
+    public void updateAccess()
+    {
+        model.setValue(TABLE_LOCK.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
+        model.updateAsync();
     }
 }

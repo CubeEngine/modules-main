@@ -69,10 +69,10 @@ public class LockerAdminCommands extends ContainerCommand
             case ENTITY_CONTAINER_LIVING:
                 if (lock.isBlockLock())
                 {
-                    TileEntity te = lock.getFirstLocation().getTileEntity().orNull();
+                    TileEntity te = lock.getFirstLocation().getTileEntity().orElse(null);
                     if (te instanceof Carrier)
                     {
-                        ((Player)context.getSource()).original().openInventory(((Carrier)te).getInventory());
+                        ((Player)context.getSource()).openInventory(((Carrier)te).getInventory());
                     }
                 }
                 else
@@ -102,7 +102,7 @@ public class LockerAdminCommands extends ContainerCommand
         if (lock == null) return;
         if (lock.isBlockLock())
         {
-            ((Player)context.getSource()).original().setLocation(lock.getFirstLocation());
+            ((Player)context.getSource()).setLocation(lock.getFirstLocation());
         }
         else
         {
