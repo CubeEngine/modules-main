@@ -18,6 +18,8 @@
 package org.cubeengine.module.locker.storage;
 
 import java.util.Arrays;
+import java.util.Optional;
+
 import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.core.util.ChatFormat;
@@ -58,14 +60,18 @@ public class KeyBook
         lockID = Long.valueOf(keyBookName.substring(keyBookName.indexOf('#') + 1, keyBookName.length()));
     }
 
-    public static KeyBook getKeyBook(ItemStack item, Player currentHolder, Locker module, I18n i18n)
+    public static KeyBook getKeyBook(Optional<ItemStack> item, Player currentHolder, Locker module, I18n i18n)
     {
-        if (item.getItem() == ItemTypes.ENCHANTED_BOOK
-            && item.get(DISPLAY_NAME).map(Texts::toPlain).map(s -> s.contains(TITLE)).orElse(false))
+        if (!item.isPresent())
+        {
+            return null;
+        }
+        if (item.get().getItem() == ItemTypes.ENCHANTED_BOOK
+            && item.get().get(DISPLAY_NAME).map(Texts::toPlain).map(s -> s.contains(TITLE)).orElse(false))
         {
             try
             {
-                return new KeyBook(item, currentHolder, module, i18n);
+                return new KeyBook(item.get(), currentHolder, module, i18n);
             }
             catch (NumberFormatException|IndexOutOfBoundsException ignore)
             {}

@@ -53,7 +53,7 @@ public class LockerCreateCommands extends ContainerCommand
         this.i18n = i18n;
     }
 
-    private void setCreateProtection(Player sender, LockAction lockAction, boolean createKeyBook)
+    private void setCreateProtection(Player sender, LockAction.LockCreateAction lockAction, boolean createKeyBook)
     {
         this.manager.commandListener.submitLockAction(sender, lockAction);
         if (createKeyBook)

@@ -24,11 +24,7 @@ import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Complete;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.butler.parametric.*;
 import org.cubeengine.module.core.util.matcher.StringMatcher;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.module.core.util.StringUtils;
@@ -85,7 +81,7 @@ public class LockerCommands extends ContainerCommand
         {
             this.persist(context);
         }
-        KeyBook keyBook = KeyBook.getKeyBook((context).getItemInHand().orElse(null), context, this.module, i18n);
+        KeyBook keyBook = KeyBook.getKeyBook((context).getItemInHand(), context, this.module, i18n);
         if (keyBook != null)
         {
             Lock lock = this.manager.getLockById(keyBook.lockID);
@@ -164,7 +160,7 @@ public class LockerCommands extends ContainerCommand
     @Alias(value = "cmodify")
     @Command(desc = "adds or removes player from the accesslist")
     @Restricted(value = Player.class, msg = "This command can only be used in game")
-    public void modify(Player context, List<PlayerAccess> players, @Flag boolean global, @Flag boolean persist)
+    public void modify(Player context, @Type(PlayerAccess.class) List<PlayerAccess> players, @Flag boolean global, @Flag boolean persist)
     {
         if (persist)
         {

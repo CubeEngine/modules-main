@@ -123,7 +123,11 @@ public class CommandListener
         if (lockAction != null)
         {
             Lock lock = this.manager.getLockAtLocation(location, player);
-            lockAction.apply(lock, location, null);
+            if (lock != null || lockAction instanceof LockAction.LockCreateAction)
+            {
+                lockAction.apply(lock, location, null);
+            }
+            // else no lock to modify
             cmdUsed(player);
             event.setCancelled(true);
         }

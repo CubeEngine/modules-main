@@ -45,7 +45,7 @@ public class PlayerAccess
             boolean admin = token.startsWith("@");
             boolean add = !token.startsWith("-");
 
-            token = admin || add ? token.substring(1) : token;
+            token = admin || !add ? token.substring(1) : token;
 
             User user = game.getServer().getPlayer(token)
                     .map(User.class::cast)
@@ -56,6 +56,7 @@ public class PlayerAccess
             {
                 throw new IllegalArgumentException("User not found");
             }
+            invocation.consume(1);
 
             return new PlayerAccess(user, admin, add);
         }

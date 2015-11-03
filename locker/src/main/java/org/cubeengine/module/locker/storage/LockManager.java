@@ -584,6 +584,7 @@ public class LockManager
                         this.addLoadedLocationLock(lock);
                         lock.showCreatedMessage(user);
                         lock.attemptCreatingKeyBook(user, createKeyBook);
+                        System.out.print("\n\n!!!!!INSERT!!!!!\n\n");
                         return lock;
                     }));
     }

@@ -8,4 +8,6 @@ import org.spongepowered.api.world.World;
 interface LockAction
 {
     void apply(Lock lock, Location<World> location, Entity entity);
+
+    interface LockCreateAction extends LockAction {}
 }

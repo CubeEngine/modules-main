@@ -295,7 +295,7 @@ public class Lock
      */
     public Boolean checkForKeyBook(Player user, Location effectLocation)
     {
-        KeyBook keyBook = KeyBook.getKeyBook(user.getItemInHand().orElse(null), user, this.manager.module, i18n);
+        KeyBook keyBook = KeyBook.getKeyBook(user.getItemInHand(), user, this.manager.module, i18n);
         if (keyBook != null)
         {
             return keyBook.check(this, effectLocation);
@@ -737,17 +737,17 @@ public class Lock
                     User accessor = module.getUserManager().getById(listModel.getValue(TABLE_ACCESS_LIST.USER_ID)).get().getUser();
                     if ((listModel.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN)
                     {
-                        user.sendMessage(Texts.of(format, accessor.getName(), GOLD, " [Admin}"));
+                        user.sendMessage(Texts.of(format, GREEN, accessor.getName(), GOLD, " [Admin]"));
                     }
                     else
                     {
-                        user.sendMessage(Texts.of(format, accessor.getName()));
+                        user.sendMessage(Texts.of(format, GREEN, accessor.getName()));
                     }
                 }
             }
             if (!this.locations.isEmpty())
             {
-                i18n.sendTranslated(user, POSITIVE, "This protections covers {amount} blocks!", this.locations.size());
+                i18n.sendTranslatedN(user, POSITIVE, locations.size(), "This protection covers a single block!", "This protections covers {amount} blocks!", locations.size());
             }
         }
         else

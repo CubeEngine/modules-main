@@ -200,7 +200,7 @@ public class LockerListener
     }
 
     @Listener
-    public void onEntityDeath(DestructEntityEvent event)
+    public void onEntityDeath(DamageEntityEvent event)
     {
         // TODO cancelling here ONLY cancels the MessageSink part
         Optional<Player> playerCause = event.getCause().first(Player.class);
@@ -415,12 +415,12 @@ public class LockerListener
 
         for (Transaction<BlockSnapshot> trans : event.getTransactions())
         {
-            Location<World> location = trans.getDefaultReplacement().getLocation().get();
+            Location<World> location = trans.getDefault().getLocation().get();
             Lock lock = manager.getLockAtLocation(location, null);
             if (lock != null && lock.hasFlag(BLOCK_REDSTONE)
-                && trans.getDefaultReplacement().getState().get(POWERED).get())
+                && trans.getDefault().getState().get(POWERED).get())
             {
-                trans.setCustom(trans.getDefaultReplacement().with(POWERED, false).get());
+                trans.setCustom(trans.getDefault().with(POWERED, false).get());
             }
         }
     }
