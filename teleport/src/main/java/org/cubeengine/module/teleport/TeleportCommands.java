@@ -223,7 +223,7 @@ public class TeleportCommands
                       @Default @Named({"player", "p"}) Player player,
                       @Flag boolean unsafe)
     {
-        Location<World> loc = new Location(world, x, y, z).add(0.5, 0, 0.5);
+        Location<World> loc = new Location<>(world, x, y, z).add(0.5, 0, 0.5);
         unsafe = unsafe && context.hasPermission(module.perms().COMMAND_TPPOS_UNSAFE.getId());
         if (!unsafe || player.setLocationSafely(loc))
         {

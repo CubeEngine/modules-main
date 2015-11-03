@@ -57,9 +57,9 @@ public class UserManagementCommands extends ContainerCommand
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [-temp]")
     public void assign(CommandContext context,
                        @Default Player player,
-                       ContextualRole role, // TODO RoleCompleter & Reader
+                       ContextualRole role,
                        @Flag boolean temp)
-    {
+    {// TODO RoleCompleter & Reader
         // TODO RoleReader String identifier = role.contains("|") ? "role:" + role : "role:world|" + world.getName() + "|" + role;
         String ctx = role.contextType + "|" + role.contextName;
         if (!service.getGroupSubjects().hasRegistered(role.getIdentifier()))
