@@ -19,28 +19,17 @@ package org.cubeengine.module.locker.storage;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.ThreadFactory;
+import java.util.*;
+import java.util.concurrent.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.core.util.BlockUtil;
-import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.module.core.util.Profiler;
 import org.cubeengine.module.core.util.matcher.StringMatcher;
 import org.cubeengine.module.locker.BlockLockerConfiguration;
 import org.cubeengine.module.locker.EntityLockerConfiguration;
@@ -96,8 +85,8 @@ public class LockManager
 {
     public static final int VIEWDISTANCE_DEFAULT = 10;
     protected final Locker module;
-
     private Database database;
+
     protected WorldManager wm;
     protected UserManager um;
     protected TaskManager tm;
@@ -105,21 +94,26 @@ public class LockManager
     private Game game;
     private final StringMatcher stringMatcher;
     protected Log logger;
-
     public final CommandListener commandListener;
 
-    private final Map<UInteger, Map<Long, Lock>> loadedLocks = new HashMap<>();
-    private final Map<UInteger, Map<Long, Set<Lock>>> loadedLocksInChunk = new HashMap<>();
-    private final Map<UUID, Lock> loadedEntityLocks = new HashMap<>();
-    private final Map<Long, Lock> locksById = new HashMap<>();
+    private final Map<UInteger, Map<Long, Lock>> loadedLocks = new HashMap<>(); // World -> LocationKey -> Lock
 
-    private final Map<UUID, Set<Long>> unlocked = new HashMap<>();
+    private final Map<UInteger, Map<Long, Set<Lock>>> loadedLocksInChunk = new HashMap<>(); // World -> ChunkKey -> Lock
+    private final Map<UUID, Lock> loadedEntityLocks = new HashMap<>(); // EntityID -> Lock
+    private final Map<UInteger, Lock> locksById = new HashMap<>(); // All Locks - LockID -> Lock
+    private final Map<UUID, Set<UInteger>> unlocked = new HashMap<>();
 
     public final MessageDigest messageDigest;
 
-    private final Queue<Chunk> queuedChunks = new ConcurrentLinkedQueue<>();
-    private final ExecutorService executor;
-    private Future<?> future = null;
+    private final Set<Long> loadedChunks = new CopyOnWriteArraySet<>();
+
+    private final Queue<Chunk> loadChunks = new ConcurrentLinkedQueue<>();
+    private final ExecutorService loadExecutor;
+    private Future<?> loadFuture = null;
+
+    private final Queue<Chunk> unloadChunks = new ConcurrentLinkedQueue<>();
+    private final ExecutorService unloadExecutor;
+    private Future<?> unloadFuture = null;
 
     public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, WorldManager wm, UserManager um, TaskManager tm, I18n i18n, Game game)
     {
@@ -132,7 +126,8 @@ public class LockManager
         this.game = game;
         logger = module.getProvided(Log.class);
         this.module = module;
-        executor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));
+        loadExecutor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));
+        unloadExecutor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));
         try
         {
             messageDigest = MessageDigest.getInstance("SHA-1");
@@ -144,11 +139,11 @@ public class LockManager
         this.commandListener = new CommandListener(module, this, um, logger, this.stringMatcher, i18n);
         em.registerListener(module, this.commandListener);
         em.registerListener(module, this);
+
+        onEnable();
     }
 
-
-    @Enable
-    public void onEnable()
+    private void onEnable()
     {
         for (World world : wm.getWorlds())
         {
@@ -160,52 +155,81 @@ public class LockManager
         this.loadLocksInChunks();
         logger.info("Finished loading locks");
 
-        tm.runTimer(module, () -> {
-            if (!queuedChunks.isEmpty() && (future == null || future.isDone()))
-            {
-                future = executor.submit(this::loadLocksInChunks);
-            }
-        }, 5, 5);
+        tm.runTimer(module, this::doLoadChunks, 5, 5); // 5 Ticks
+        tm.runTimer(module, this::doUnloadChunks, 100, 100); // 100 Ticks - 5 seconds
+    }
+
+    private void doUnloadChunks()
+    {
+        if (!unloadChunks.isEmpty() && (unloadFuture == null || unloadFuture.isDone()))
+        {
+            unloadFuture = unloadExecutor.submit(this::unloadLocksInChunk);
+        }
+    }
+
+    private void doLoadChunks()
+    {
+        if (!loadChunks.isEmpty() && (loadFuture == null || loadFuture.isDone()))
+        {
+            loadFuture = loadExecutor.submit(this::loadLocksInChunks);
+        }
     }
 
     @Listener
-    private void onChunkLoad(LoadChunkEvent event)
+    public void onChunkLoad(LoadChunkEvent event)
     {
-        queueChunk(event.getTargetChunk());
+        Chunk chunk = event.getTargetChunk();
+        queueChunk(chunk);
     }
 
-    private boolean queueChunk(Chunk chunk)
+    private void queueChunk(Chunk chunk)
     {
-        return this.queuedChunks.add(chunk);
+        if (loadedChunks.contains(getChunkKey(chunk.getPosition().getX(), chunk.getPosition().getZ())))
+        {
+            return; // Chunk already loaded
+        }
+        loadChunks.add(chunk);
+        unloadChunks.remove(chunk);
+    }
+
+    @Listener
+    public void onChunkUnload(UnloadChunkEvent event)
+    {
+        Chunk chunk = event.getTargetChunk();
+        if (loadChunks.remove(chunk)) // remove from load queue
+        {
+            return; // if in load queue unloading is unnecessary
+        }
+        unloadChunks.add(chunk);
     }
 
     private void loadLocksInChunks()
     {
-        if (queuedChunks.isEmpty())
+        if (loadChunks.isEmpty())
         {
             return;
         }
-        Chunk chunk = queuedChunks.poll();
-        UInteger world_id = this.wm.getWorldId(chunk.getWorld());
 
-        Vector3i chunkSize = game.getServer().getChunkLayout().getChunkSize();
+        Chunk chunk = loadChunks.poll();
+        UInteger world_id = this.wm.getWorldId(chunk.getWorld());
 
         // TODO get view-distance if available / default to 10
         int viewDistance = 10;
 
-        Vector3i position = chunk.getPosition(
-                                             );
-        int chunkX = position.getX() / chunkSize.getX();
-        int chunkZ = position.getZ() / chunkSize.getZ();
+        Vector3i position = chunk.getPosition();
+        int chunkX = position.getX();
+        int chunkZ = position.getZ();
 
-        Condition condChunkX = TABLE_LOCK_LOCATION.CHUNKX.in(IntStream.range(chunkX, chunkX + viewDistance).mapToObj(Integer.class::cast).collect(toList()));
-        Condition condChunkZ = TABLE_LOCK_LOCATION.CHUNKZ.in(IntStream.range(chunkZ, chunkZ + viewDistance).mapToObj(Integer.class::cast).collect(toList()));
+        List<Integer> xPos = IntStream.range(chunkX - viewDistance, chunkX + viewDistance).mapToObj(Integer.class::cast).collect(toList());
+        List<Integer> zPos = IntStream.range(chunkZ - viewDistance, chunkZ + viewDistance).mapToObj(Integer.class::cast).collect(toList());
+
+        Condition condChunkX = TABLE_LOCK_LOCATION.CHUNKX.in(xPos);
+        Condition condChunkZ = TABLE_LOCK_LOCATION.CHUNKZ.in(zPos);
+        Condition condNotLoaded = TABLE_LOCK_LOCATION.LOCK_ID.notIn(locksById.keySet());
 
         Result<LockModel> models = this.database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.in(
-            this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID).from(
-                TABLE_LOCK_LOCATION).where(
-                TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id),
-                condChunkX, condChunkZ))).fetch();
+                this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID).from(
+                        TABLE_LOCK_LOCATION).where(TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id), condChunkX, condChunkZ, condNotLoaded))).fetch();
         Map<UInteger, Result<LockLocationModel>> locations = LockManager.
             this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION).where(
             TABLE_LOCK_LOCATION.LOCK_ID.in(
@@ -213,13 +237,22 @@ public class LockManager
         for (LockModel model : models)
         {
             Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
-            addLoadedLocationLock(new Lock(this, model, i18n, lockLoc, game));
+            Lock lock = new Lock(this, model, i18n, lockLoc, game);
+            addLoadedLocationLock(lock);
+            System.out.print("Lock loaded at: " + lock.getFirstLocation().getPosition() + "\n");
         }
-        if (!queuedChunks.isEmpty())
+
+        for (Integer xPo : xPos)
         {
-            future = executor.submit(this::loadLocksInChunks);
+            loadedChunks.addAll(zPos.stream().map(zPo -> getChunkKey(xPo, zPo)).collect(Collectors.toList()));
+        }
+
+        if (!loadChunks.isEmpty())
+        {
+            loadFuture = loadExecutor.submit(this::loadLocksInChunks);
         }
     }
+
 
     private void addLoadedLocationLock(Lock lock)
     {
@@ -267,67 +300,51 @@ public class LockManager
         return locksAtLocMap;
     }
 
-    @Listener
-    private void onChunkUnload(UnloadChunkEvent event)
+    private void unloadLocksInChunk()
     {
-        Chunk chunk = event.getTargetChunk();
-        queuedChunks.remove(chunk);
-
-        Vector3i chunkSize = game.getServer().getChunkLayout().getChunkSize();
-
-        // TODO get view-distance if available / default to 10
-        int viewDistance = VIEWDISTANCE_DEFAULT;
-
-        Vector3i position = chunk.getPosition();
-        int chunkX = position.getX() / chunkSize.getX();
-        int chunkZ = position.getZ() / chunkSize.getZ();
-
-        IntStream xCoords = IntStream.range(chunkX, chunkX + viewDistance).map(x -> x * 16);
-        IntStream zCoords = IntStream.range(chunkZ, chunkZ + viewDistance).map(z -> z * 16);
-
-        boolean allChunksUnloaded = xCoords.mapToObj(Integer.class::cast)
-               .flatMap(x -> zCoords.mapToObj(z -> chunk.getWorld().getChunk(x, 0, z).isPresent()))
-               .noneMatch(e -> e);
-
-        if (!allChunksUnloaded)
+        try
         {
-            return;
-        }
-
-        UInteger worldId = wm.getWorldId(chunk.getWorld());
-        Set<Lock> remove = this.getChunkLocksMap(worldId).remove(getChunkKey(chunkX / viewDistance,
-                                                                             chunkZ / viewDistance));
-        if (remove == null) return; // nothing to remove
-        Map<Long, Lock> locLockMap = this.getLocLockMap(worldId);
-        for (Lock lock : remove) // remove from chunks
-        {
-            Location firstLoc = lock.getFirstLocation();
-            this.locksById.remove(lock.getId());
-            Chunk c1 = ((World)firstLoc.getExtent()).getChunk(firstLoc.getBlockPosition()).get();
-            for (Location location : lock.getLocations())
+            if (unloadChunks.isEmpty())
             {
-                Chunk c2 = ((World)location.getExtent()).getChunk(location.getBlockPosition()).get();
-                if (c2 != c1) // different chunks
+                return;
+            }
+            Chunk chunk = unloadChunks.poll();
+            if (chunk.isLoaded())  // its loaded?
+            {
+                return;
+            }
+            int x = chunk.getPosition().getX();
+            int z = chunk.getPosition().getZ();
+            World world = chunk.getWorld();
+            if (world.getChunk(x - 1, 0, z - 1).isPresent() ||
+                world.getChunk(x - 1, 0, z + 1).isPresent() ||
+                world.getChunk(x + 1, 0, z - 1).isPresent() ||
+                world.getChunk(x + 1, 0, z + 1).isPresent())
+            {
+                return; // Do not unload if any neighbour chunk is loaded
+            }
+
+            UInteger worldId = wm.getWorldId(chunk.getWorld());
+            Set<Lock> removed = this.getChunkLocksMap(worldId).remove(getChunkKey(x, z));
+            if (removed == null) return; // nothing to remove
+            Map<Long, Lock> locLockMap = this.getLocLockMap(worldId);
+            for (Lock lock : removed) // remove from chunks
+            {
+                System.out.print("Lock unloaded at: " + lock.getFirstLocation().getPosition() + "\n");
+                this.locksById.remove(lock.getId());
+                for (Location loc : lock.getLocations())
                 {
-                    if ((!c1.isLoaded() && c2 == chunk)
-                        ||(!c2.isLoaded() && c1 == chunk))
-                    {
-                        // Both chunks will be unloaded remove both loc
-                        for (Location loc : lock.getLocations())
-                        {
-                            locLockMap.remove(getLocationKey(loc));
-                        }
-                        lock.model.updateAsync();
-                    }
-                    // else the other chunk is still loaded -> do not remove!
-                    return;
+                    locLockMap.remove(getLocationKey(loc));
                 }
+                lock.model.updateAsync(); // updates if changed (last_access timestamp)
             }
-            for (Location loc : lock.getLocations())
+        }
+        finally
+        {
+            if (!unloadChunks.isEmpty())
             {
-                locLockMap.remove(getLocationKey(loc));
+                unloadFuture = unloadExecutor.submit(this::loadLocksInChunks);
             }
-            lock.model.updateAsync(); // updates if changed (last_access timestamp)
         }
     }
 
@@ -584,7 +601,6 @@ public class LockManager
                         this.addLoadedLocationLock(lock);
                         lock.showCreatedMessage(user);
                         lock.attemptCreatingKeyBook(user, createKeyBook);
-                        System.out.print("\n\n!!!!!INSERT!!!!!\n\n");
                         return lock;
                     }));
     }
@@ -692,14 +708,14 @@ public class LockManager
      * @param lockID the locks id
      * @return a copy of the Lock with given id
      */
-    public Lock getLockById(long lockID)
+    public Lock getLockById(UInteger lockID)
     {
         Lock lock = this.locksById.get(lockID);
         if (lock != null)
         {
             return lock;
         }
-        LockModel lockModel = database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.eq(UInteger.valueOf(lockID))).fetchOne();
+        LockModel lockModel = database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.eq(lockID)).fetchOne();
         if (lockModel != null)
         {
             Result<LockLocationModel> fetch = database.getDSL().selectFrom(TABLE_LOCK_LOCATION)
@@ -772,9 +788,9 @@ public class LockManager
         return getUnlocks(user).contains(lock.getId());
     }
 
-    private Set<Long> getUnlocks(Player user)
+    private Set<UInteger> getUnlocks(Player user)
     {
-        Set<Long> unlocks = unlocked.get(user.getUniqueId());
+        Set<UInteger> unlocks = unlocked.get(user.getUniqueId());
         if (unlocks == null)
         {
             unlocks = new HashSet<>();

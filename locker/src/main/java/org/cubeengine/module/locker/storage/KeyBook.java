@@ -25,11 +25,13 @@ import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.service.i18n.I18n;
+import org.jooq.types.UInteger;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -47,7 +49,7 @@ public class KeyBook
     public final Player holder;
     private final Locker module;
     private I18n i18n;
-    public final long lockID;
+    public final UInteger lockID;
     private final String keyBookName;
 
     private KeyBook(ItemStack item, Player holder, Locker module, I18n i18n)
@@ -57,7 +59,7 @@ public class KeyBook
         this.module = module;
         this.i18n = i18n;
         keyBookName = item.get(DISPLAY_NAME).map(Texts::toPlain).orElse("");
-        lockID = Long.valueOf(keyBookName.substring(keyBookName.indexOf('#') + 1, keyBookName.length()));
+        lockID = UInteger.valueOf(Long.valueOf(keyBookName.substring(keyBookName.indexOf('#') + 1, keyBookName.length())));
     }
 
     public static KeyBook getKeyBook(Optional<ItemStack> item, Player currentHolder, Locker module, I18n i18n)
@@ -129,7 +131,7 @@ public class KeyBook
                                             i18n.getTranslation(holder, NEUTRAL, "used up. It"),
                                             i18n.getTranslation(holder, NEUTRAL, "won't let you"),
                                             i18n.getTranslation(holder, NEUTRAL, "open any containers!")));
-        item = module.getGame().getRegistry().createItemBuilder().fromItemStack(item).itemType(PAPER).build();
+        item = module.getGame().getRegistry().createBuilder(ItemStackBuilder.class).fromItemStack(item).itemType(PAPER).build();
         holder.setItemInHand(item);
     }
 

@@ -24,6 +24,7 @@ import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
+import org.jooq.types.UInteger;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -49,7 +50,7 @@ public class LockerAdminCommands extends ContainerCommand
             context.sendTranslated(NEGATIVE, "{input} is not a valid id!", context.get(0));
             return null;
         }
-        Lock lockById = this.manager.getLockById(id);
+        Lock lockById = this.manager.getLockById(UInteger.valueOf(id));
         if (lockById == null)
         {
             context.sendTranslated(NEGATIVE, "There is no protection with the id {integer}", id);

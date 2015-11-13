@@ -39,6 +39,7 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.world.Location;
@@ -177,7 +178,7 @@ public class Lock
             i18n.sendTranslated(user, NEGATIVE, "Could not create KeyBook! You need to hold a book in your hand in order to do this!");
             return;
         }
-        ItemStack item = module.getGame().getRegistry().createItemBuilder().itemType(ENCHANTED_BOOK).quantity(1).build();
+        ItemStack item = module.getGame().getRegistry().createBuilder(ItemStackBuilder.class).itemType(ENCHANTED_BOOK).quantity(1).build();
         item.offer(Keys.DISPLAY_NAME, Texts.of(getColorPass() + KeyBook.TITLE + getId()));
         item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(user, NEUTRAL, "This book can"),
                 i18n.getTranslation(user, NEUTRAL, "unlock a magically"),
@@ -595,9 +596,9 @@ public class Lock
         return this.model.getColorPass();
     }
 
-    public Long getId()
+    public UInteger getId()
     {
-        return this.model.getValue(TABLE_LOCK.ID).longValue();
+        return this.model.getValue(TABLE_LOCK.ID);
     }
 
     public boolean hasPass()

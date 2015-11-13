@@ -48,10 +48,9 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifierBuilder;
 import org.spongepowered.api.event.cause.entity.damage.DamageModifierTypes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
-import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.TameEntityEvent;
-import org.spongepowered.api.event.inventory.InteractInventoryEvent;
+import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -112,6 +111,7 @@ public class LockerListener
             if (lock == null) return;
             lock.handleInventoryOpen(event, null, null, player.get());
         }
+        /* TODO wait for Sponge Impl
         else if (block.supports(Keys.OPEN))
         {
             if (!player.get().hasPermission(module.perms().DENY_DOOR.getId()))
@@ -122,7 +122,7 @@ public class LockerListener
             }
             if (lock == null) return;
             lock.handleBlockDoorUse(event, player.get(), block);
-        }
+        }*/
         else if (lock != null)// other interact e.g. repeater
         {
             lock.handleBlockInteract(event, player.get());
@@ -224,9 +224,11 @@ public class LockerListener
 
             if (module.getConfig().protectVehicleFromEnvironmental)
             {
-                event.setCancelled(true);
+                event.setBaseDamage(0);
+                // TODO cancel? event.setCancelled(true);
             }
-            event.setCancelled(true);
+            event.setBaseDamage(0);
+            // TODO cancel? event.setCancelled(true);
             return;
         }
         if (entity instanceof Hanging) // leash / itemframe / image
@@ -238,7 +240,8 @@ public class LockerListener
                 Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
                 if (player.hasPermission(module.perms().DENY_HANGING.getId()))
                 {
-                    event.setCancelled(true);
+                    event.setBaseDamage(0);
+                    // TODO cancel? event.setCancelled(true);
                     return;
                 }
                 if (lock == null) return;
@@ -248,7 +251,8 @@ public class LockerListener
                 }
                 else
                 {
-                    event.setCancelled(true);
+                    event.setBaseDamage(0);
+                    // TODO cancel?  event.setCancelled(true);
                 }
             }
             return;
@@ -483,7 +487,6 @@ public class LockerListener
                     hangings.addAll(chunk.getEntities().stream()
                                          .filter(entity -> entity instanceof Hanging)
                                          .map(entity -> (Hanging)entity).collect(toList()));
-
                 }
                 Location entityLoc;
                 for (Hanging hanging : hangings)
