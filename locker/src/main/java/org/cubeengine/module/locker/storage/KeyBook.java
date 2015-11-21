@@ -18,6 +18,7 @@
 package org.cubeengine.module.locker.storage;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import com.flowpowered.math.vector.Vector3d;
@@ -27,6 +28,7 @@ import org.cubeengine.module.locker.data.LockerData;
 import org.cubeengine.service.i18n.I18n;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
@@ -36,6 +38,7 @@ import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.data.key.Keys.DISPLAY_NAME;
 import static org.spongepowered.api.data.key.Keys.ITEM_LORE;
@@ -50,17 +53,23 @@ public class KeyBook
     private final Locker module;
     private I18n i18n;
     public final UInteger lockID;
+    private final byte[] pass;
     private final Text display;
 
-    private KeyBook(ItemStack item, Player holder, Locker module, I18n i18n)
+    public KeyBook(ItemStack item, LockerData lockerData, Player holder, Locker module, I18n i18n)
     {
         this.item = item;
         this.holder = holder;
         this.module = module;
         this.i18n = i18n;
         display = item.get(DISPLAY_NAME).get();
-        String plain = Texts.toPlain(display);
-        lockID = UInteger.valueOf(Long.valueOf(plain.substring(plain.indexOf('#') + 1, plain.length())));
+        lockID = UInteger.valueOf(lockerData.get(LockerData.LOCK_ID).get());
+        List<Byte> pass = lockerData.get(LockerData.LOCK_PASS).get();
+        this.pass = new byte[pass.size()];
+        for (int i = 0; i < pass.size(); i++)
+        {
+            this.pass[i] = pass.get(i);
+        }
     }
 
     public static KeyBook getKeyBook(Optional<ItemStack> item, Player currentHolder, Locker module, I18n i18n)
@@ -69,25 +78,26 @@ public class KeyBook
         {
             return null;
         }
-        Optional<LockerData> lockerData = item.get().get(LockerData.class);
-        if (lockerData.isPresent())
-        {
-            System.out.print("Found Book for Lock #" + lockerData.get().get(LockerData.LOCK_ID) + "\n");
-            return null;
-        }
-        else if(true)
-        {
-            return null;
-        }
+
         if (item.get().getItem() == ItemTypes.ENCHANTED_BOOK
             && item.get().get(DISPLAY_NAME).map(Texts::toPlain).map(s -> s.contains(Texts.toPlain(TITLE))).orElse(false))
         {
-            try
+            Optional<LockerData> lockerData = item.get().get(LockerData.class);
+            if (lockerData.isPresent())
             {
-                return new KeyBook(item.get(), currentHolder, module, i18n);
+                return new KeyBook(item.get(), lockerData.get(), currentHolder, module, i18n);
             }
-            catch (NumberFormatException|IndexOutOfBoundsException ignore)
-            {}
+            else
+            {
+                // TODO remove once the above works
+                for (DataManipulator<?, ?> data : item.get().getContainers())
+                {
+                    if (data instanceof LockerData)
+                    {
+                        return new KeyBook(item.get(), ((LockerData) data), currentHolder, module, i18n);
+                    }
+                }
+            }
         }
         return null;
     }
@@ -141,7 +151,7 @@ public class KeyBook
 
     public boolean isValidFor(Lock lock)
     {
-        boolean b = display.getChildren().get(0).equals(lock.getColorPass());
+        boolean b = Arrays.equals(pass, lock.model.getValue(TABLE_LOCK.PASSWORD));
         if (!b)
         {
             this.module.getProvided(Log.class).debug("Invalid KeyBook detected! {}|{}", lock.getColorPass(), display);
