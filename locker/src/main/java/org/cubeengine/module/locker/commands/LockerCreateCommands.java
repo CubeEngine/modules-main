@@ -116,7 +116,7 @@ public class LockerCreateCommands extends ContainerCommand
 
     private boolean canProtectCarrier(Player context, LockType lockType, boolean isCarrier)
     {
-        if (!isCarrier && lockType == LockType.DONATION || lockType == LockType.FREE || lockType == LockType.GUARDED)
+        if (!isCarrier && (lockType == LockType.DONATION || lockType == LockType.FREE || lockType == LockType.GUARDED))
         {
             i18n.sendTranslated(context, NEUTRAL, "You can only apply guarded, donation and free protections to inventory holders!");
             return true;

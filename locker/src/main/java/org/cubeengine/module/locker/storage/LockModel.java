@@ -24,11 +24,16 @@ import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.service.user.CachedUser;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextBuilder;
+import org.spongepowered.api.text.Texts;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 
 public class LockModel extends AsyncRecord<LockModel>
 {
+    private Text colorPass = null;
+
     public LockModel()
     {
         super(TABLE_LOCK);
@@ -57,29 +62,31 @@ public class LockModel extends AsyncRecord<LockModel>
 
     private UUID uuid = null;
 
-    public String getColorPass()
+    public Text getColorPass()
     {
-        StringBuilder builder = new StringBuilder();
-        String stringPass;
-        byte[] pass = this.getValue(TABLE_LOCK.PASSWORD);
-        if (pass.length != 4)
+        if (this.colorPass == null)
         {
-            for (byte b : pass)
+            TextBuilder builder = Texts.builder();
+
+            byte[] pass = this.getValue(TABLE_LOCK.PASSWORD);
+
+            if (pass.length != 4)
             {
-                builder.append(String.format("%02X", b));
+                for (byte b : pass)
+                {
+                    builder.append(Texts.of(ChatFormat.getByChar(String.format("%02X", b).toCharArray()[0]).getColor(), ""));
+                }
             }
-            stringPass = builder.toString();
-            builder = new StringBuilder();
+            else
+            {
+                for (char c : new String(pass).toCharArray())
+                {
+                    builder.append(Texts.of(ChatFormat.getByChar(c).getColor(), ""));
+                }
+            }
+            this.colorPass = builder.build();
         }
-        else
-        {
-            stringPass = new String(pass);
-        }
-        for (char c : stringPass.toCharArray())
-        {
-            builder.append("&").append(c);
-        }
-        return ChatFormat.parseFormats(builder.toString());
+        return this.colorPass;
     }
 
     public UUID getUUID()

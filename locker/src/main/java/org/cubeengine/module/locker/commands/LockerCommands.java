@@ -114,7 +114,9 @@ public class LockerCommands extends ContainerCommand
             }
             return;
         }
-        manager.commandListener.submitLockAction(context, (lock, loc, entity) -> lock.showInfo(context));
+        manager.commandListener.submitLockAction(context, (lock, loc, entity) -> {
+            lock.showInfo(context);
+        });
         i18n.sendTranslated(context, POSITIVE, "Right click to show protection-info");
     }
 

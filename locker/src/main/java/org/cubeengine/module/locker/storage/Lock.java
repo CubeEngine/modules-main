@@ -22,6 +22,7 @@ import org.cubeengine.module.core.util.InventoryGuardFactory;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.commands.PlayerAccess;
+import org.cubeengine.module.locker.data.LockerData;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.CachedUser;
@@ -39,9 +40,10 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.ItemStackBuilder;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.TextMessageException;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -178,11 +180,12 @@ public class Lock
             i18n.sendTranslated(user, NEGATIVE, "Could not create KeyBook! You need to hold a book in your hand in order to do this!");
             return;
         }
-        ItemStack item = module.getGame().getRegistry().createBuilder(ItemStackBuilder.class).itemType(ENCHANTED_BOOK).quantity(1).build();
-        item.offer(Keys.DISPLAY_NAME, Texts.of(getColorPass() + KeyBook.TITLE + getId()));
+        ItemStack item = module.getGame().getRegistry().createBuilder(ItemStack.Builder.class).itemType(ENCHANTED_BOOK).quantity(1).build();
+        item.offer(Keys.DISPLAY_NAME, getColorPass().builder().append(KeyBook.TITLE).append(Texts.of(TextColors.DARK_GRAY, getId())).build());
         item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(user, NEUTRAL, "This book can"),
                 i18n.getTranslation(user, NEUTRAL, "unlock a magically"),
                 i18n.getTranslation(user, NEUTRAL, "locked protection")));
+        item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCK.PASSWORD)));
         user.setItemInHand(item);
         if (itemStack != null && itemStack.getQuantity() != 0)
         {
@@ -591,9 +594,9 @@ public class Lock
         return access != null && (access.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN;
     }
 
-    public String getColorPass()
+    public Text getColorPass()
     {
-        return this.model.getColorPass();
+        return model.getColorPass();
     }
 
     public UInteger getId()
@@ -695,7 +698,7 @@ public class Lock
         if (this.isOwner(user) || this.hasAdmin(user) || user.hasPermission(module.perms().CMD_INFO_OTHER.getId()))
         {
             user.sendMessage(Texts.of());
-            i18n.sendTranslated(user, POSITIVE, "Protection: #{integer#id} Type: {input#type} by {user}", this.getId(), this.getLockType().name(), this.getOwner());
+            i18n.sendTranslated(user, POSITIVE, "Protection: #{integer#id} Type: {input#type} by {user}", this.getId().longValue(), this.getLockType().name(), this.getOwner());
             i18n.sendTranslated(user, POSITIVE, "protects {input#type} since {input#time}", this.getProtectedType().name(), this.model.getValue(TABLE_LOCK.CREATED).toString());
             i18n.sendTranslated(user, POSITIVE, "last access was {input#time}", this.model.getValue(TABLE_LOCK.LAST_ACCESS).toString());
             if (this.hasPass())

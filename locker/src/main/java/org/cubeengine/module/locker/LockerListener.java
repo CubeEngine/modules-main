@@ -111,7 +111,6 @@ public class LockerListener
             if (lock == null) return;
             lock.handleInventoryOpen(event, null, null, player.get());
         }
-        /* TODO wait for Sponge Impl
         else if (block.supports(Keys.OPEN))
         {
             if (!player.get().hasPermission(module.perms().DENY_DOOR.getId()))
@@ -122,7 +121,7 @@ public class LockerListener
             }
             if (lock == null) return;
             lock.handleBlockDoorUse(event, player.get(), block);
-        }*/
+        }
         else if (lock != null)// other interact e.g. repeater
         {
             lock.handleBlockInteract(event, player.get());
@@ -279,6 +278,10 @@ public class LockerListener
     {
         Optional<Player> playerCause = event.getCause().first(Player.class);
         if (!playerCause.isPresent())
+        {
+            return;
+        }
+        if (playerCause.get().get(Keys.IS_SNEAKING).orElse(false))
         {
             return;
         }
@@ -615,8 +618,7 @@ public class LockerListener
                  .forEach(entityProtection -> {
                      if (this.manager.getLockForEntityUID(entity.getUniqueId()) == null)
                      {
-                         this.manager.createLock(entity, playerCause.get(), entityProtection.autoProtectType, null,
-                                                 false);
+                         this.manager.createLock(entity, playerCause.get(), entityProtection.autoProtectType, null, false);
                      }
                  });
         }

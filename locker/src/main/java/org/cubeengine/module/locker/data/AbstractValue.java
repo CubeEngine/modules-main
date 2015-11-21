@@ -15,16 +15,31 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.locker.commands;
+package org.cubeengine.module.locker.data;
 
-import org.cubeengine.module.locker.storage.Lock;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.mutable.Value;
 
-interface LockAction
+import java.util.function.Function;
+
+public abstract class AbstractValue<E> extends AbstractBaseValue<E> implements Value<E>
 {
-    void apply(Lock lock, Location<World> location, Entity entity);
+    public AbstractValue(Key<? extends BaseValue<E>> key, E actualValue, E defaultValue)
+    {
+        super(key, actualValue, defaultValue);
+    }
 
-    interface LockCreateAction extends LockAction {}
+    @Override
+    public Value<E> set(E value)
+    {
+        this.actualValue = value;
+        return this;
+    }
+
+    @Override
+    public Value<E> transform(Function<E, E> function) {
+        this.actualValue = function.apply(this.actualValue);
+        return this;
+    }
 }

@@ -253,7 +253,6 @@ public class LockManager
         }
     }
 
-
     private void addLoadedLocationLock(Lock lock)
     {
         int viewDistance = VIEWDISTANCE_DEFAULT;
@@ -343,7 +342,7 @@ public class LockManager
         {
             if (!unloadChunks.isEmpty())
             {
-                unloadFuture = unloadExecutor.submit(this::loadLocksInChunks);
+                unloadFuture = unloadExecutor.submit(this::unloadLocksInChunk);
             }
         }
     }

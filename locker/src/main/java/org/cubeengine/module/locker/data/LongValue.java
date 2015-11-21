@@ -15,16 +15,22 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.locker.commands;
+package org.cubeengine.module.locker.data;
 
-import org.cubeengine.module.locker.storage.Lock;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.immutable.ImmutableValue;
 
-interface LockAction
+public class LongValue extends AbstractValue<Long> implements BaseValue<Long>
 {
-    void apply(Lock lock, Location<World> location, Entity entity);
+    public LongValue(Key<? extends BaseValue<Long>> key, Long actualValue)
+    {
+        super(key, actualValue, 0L);
+    }
 
-    interface LockCreateAction extends LockAction {}
+    @Override
+    public ImmutableValue<Long> asImmutable()
+    {
+        return new ImmutableLongValue(getKey(), actualValue);
+    }
 }
