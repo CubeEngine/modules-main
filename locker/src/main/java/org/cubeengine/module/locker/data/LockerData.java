@@ -22,6 +22,7 @@ import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
@@ -32,40 +33,8 @@ import java.util.*;
 
 public class LockerData implements DataManipulator<LockerData, ImmutableLockerData>
 {
-    public static Key<LongValue> LOCK_ID = new Key<LongValue>()
-    {
-        DataQuery query = new DataQuery("CubeEngine", "Locker", "LockID");
-        @Override
-        @SuppressWarnings("unchecked")
-        public Class<LongValue> getValueClass()
-        {
-            return LongValue.class;
-        }
-
-        @Override
-        public DataQuery getQuery()
-        {
-            return query;
-        }
-    };
-
-    public static Key<ListValue<Byte>> LOCK_PASS = new Key<ListValue<Byte>>()
-    {
-        ListValue<Byte> lockpass;
-        DataQuery query = new DataQuery("CubeEngine", "Locker", "LockPass");
-        @Override
-        @SuppressWarnings("unchecked")
-        public Class<ListValue<Byte>> getValueClass()
-        {
-            return (Class<ListValue<Byte>>) lockpass.getClass();
-        }
-
-        @Override
-        public DataQuery getQuery()
-        {
-            return query;
-        }
-    };
+    public static Key<LongValue> LOCK_ID = KeyFactory.makeSingleKey(Long.class, LongValue.class, new DataQuery("LockID"));
+    public static Key<ListValue<Byte>> LOCK_PASS = KeyFactory.makeListKey(Byte.class, new DataQuery("LockPass"));
 
     private long lockID;
     private byte[] pass;
@@ -79,6 +48,7 @@ public class LockerData implements DataManipulator<LockerData, ImmutableLockerDa
     @Override
     public Optional<LockerData> fill(DataHolder dataHolder, MergeFunction overlap)
     {
+        // TODO don't ignore MergeFunction
         Optional<Long> lockID = dataHolder.get(LOCK_ID);
         if (lockID.isPresent())
         {

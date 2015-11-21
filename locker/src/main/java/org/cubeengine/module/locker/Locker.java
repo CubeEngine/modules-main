@@ -30,6 +30,9 @@ import org.cubeengine.module.locker.commands.LockerAdminCommands;
 import org.cubeengine.module.locker.commands.LockerCommands;
 import org.cubeengine.module.locker.commands.LockerCreateCommands;
 import org.cubeengine.module.locker.commands.PlayerAccess;
+import org.cubeengine.module.locker.data.ImmutableLockerData;
+import org.cubeengine.module.locker.data.LockerData;
+import org.cubeengine.module.locker.data.LockerDataBuilder;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.module.locker.storage.TableAccessList;
 import org.cubeengine.module.locker.storage.TableLockLocations;
@@ -47,6 +50,7 @@ import org.cubeengine.service.user.UserManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 
 @ModuleInfo(name = "Locker", description = "Puts a Lock on your stuff")
 public class Locker extends Module
@@ -78,6 +82,11 @@ public class Locker extends Module
     @Inject private WorldManager wm;
     @Inject private I18n i18n;
 
+    @Inject
+    public Locker(Game game)
+    {
+        game.getRegistry().getManipulatorRegistry().register(LockerData.class, ImmutableLockerData.class, new LockerDataBuilder());
+    }
 
     @Enable
     public void onEnable()

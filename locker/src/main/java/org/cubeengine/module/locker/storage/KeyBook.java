@@ -23,6 +23,7 @@ import java.util.Optional;
 import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.locker.Locker;
+import org.cubeengine.module.locker.data.LockerData;
 import org.cubeengine.service.i18n.I18n;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.data.key.Keys;
@@ -65,6 +66,16 @@ public class KeyBook
     public static KeyBook getKeyBook(Optional<ItemStack> item, Player currentHolder, Locker module, I18n i18n)
     {
         if (!item.isPresent())
+        {
+            return null;
+        }
+        Optional<LockerData> lockerData = item.get().get(LockerData.class);
+        if (lockerData.isPresent())
+        {
+            System.out.print("Found Book for Lock #" + lockerData.get().get(LockerData.LOCK_ID) + "\n");
+            return null;
+        }
+        else if(true)
         {
             return null;
         }
