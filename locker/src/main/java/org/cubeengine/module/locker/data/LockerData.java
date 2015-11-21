@@ -48,21 +48,30 @@ public class LockerData implements DataManipulator<LockerData, ImmutableLockerDa
     @Override
     public Optional<LockerData> fill(DataHolder dataHolder, MergeFunction overlap)
     {
-        // TODO don't ignore MergeFunction
         Optional<Long> lockID = dataHolder.get(LOCK_ID);
         if (lockID.isPresent())
         {
-            this.lockID = lockID.get();
-            this.pass = null;
+            LockerData data = this.copy();
+            data.lockID = lockID.get();
+            data.pass = null;
             Optional<List<Byte>> pass = dataHolder.get(LOCK_PASS);
             if (pass.isPresent())
             {
-                this.pass = new byte[pass.get().size()];
+                data.pass = new byte[pass.get().size()];
                 for (int i = 0; i < pass.get().size(); i++)
                 {
-                    this.pass[i] = pass.get().get(i);
+                    data.pass[i] = pass.get().get(i);
                 }
             }
+
+            data = overlap.merge(this, data);
+
+            if (data != this)
+            {
+                this.lockID = data.lockID;
+                this.pass = data.pass;
+            }
+
             return Optional.of(this);
         }
         return Optional.empty();

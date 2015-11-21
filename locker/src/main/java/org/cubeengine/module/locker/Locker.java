@@ -50,7 +50,6 @@ import org.cubeengine.service.user.UserManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 
 @ModuleInfo(name = "Locker", description = "Puts a Lock on your stuff")
 public class Locker extends Module
