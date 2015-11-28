@@ -25,7 +25,7 @@ import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
-import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
@@ -34,12 +34,12 @@ import org.spongepowered.api.world.World;
 public class ContextualRoleReader implements ArgumentReader<ContextualRole>, Completer
 {
     private RolesPermissionService service;
-    private WorldManager wm;
+    private Game game;
 
-    public ContextualRoleReader(RolesPermissionService service, WorldManager wm)
+    public ContextualRoleReader(RolesPermissionService service, Game game)
     {
         this.service = service;
-        this.wm = wm;
+        this.game = game;
     }
 
     @Override
@@ -62,7 +62,7 @@ public class ContextualRoleReader implements ArgumentReader<ContextualRole>, Com
                 role.contextName = "";
                 role.roleName = split[1];
             }
-            else if (wm.getWorld(split[0]).isPresent())
+            else if (game.getServer().getWorld(split[0]).isPresent())
             {
                 role.contextType = "world";
                 role.contextName = split[0];

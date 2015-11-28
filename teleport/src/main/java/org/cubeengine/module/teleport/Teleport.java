@@ -31,7 +31,6 @@ import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.Broadcaster;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
-import org.spongepowered.api.Game;
 
 /**
  * /setworldspawn 	Sets the world spawn.
@@ -48,7 +47,7 @@ public class Teleport extends Module
     @Inject private FileManager fm;
     @Inject private WorldManager wm;
     @Inject private PermissionManager pm;
-    @Inject private Game game;
+    @Inject private org.spongepowered.api.Game game;
     @Inject private Broadcaster bc;
     @Inject private I18n i18n;
 
@@ -62,7 +61,7 @@ public class Teleport extends Module
         config = fm.loadConfig(this, TeleportConfiguration.class);
 
         permissions = new TeleportPerm(this);
-        tpWorld = new TpWorldPermissions(this, permissions, wm, pm); // per world permissions
+        tpWorld = new TpWorldPermissions(this, permissions, game, pm); // per world permissions
 
         TeleportListener tl = new TeleportListener(this, um, i18n);
         em.registerListener(this, tl);

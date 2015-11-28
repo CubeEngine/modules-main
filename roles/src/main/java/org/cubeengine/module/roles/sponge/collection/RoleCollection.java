@@ -29,8 +29,8 @@ import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.world.World;
@@ -47,7 +47,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
     private PermissionManager manager;
     private Reflector reflector;
 
-    public RoleCollection(Roles module, RolesPermissionService service, PermissionManager manager, Reflector reflector, WorldManager wm)
+    public RoleCollection(Roles module, RolesPermissionService service, PermissionManager manager, Reflector reflector, Game game)
     {
         super(SUBJECTS_GROUP);
         this.module = module;
@@ -86,7 +86,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 
                     if ("world".equals(ctxType.getFileName().toString()))
                     {
-                        wm.getWorlds().stream().map(World::getName)
+                        game.getServer().getWorlds().stream().map(World::getName)
                           .forEach(world -> {
                               if (!mirrors.containsKey(readMirror(world)) && !Files.exists(ctxType.resolve(world)))
                               {

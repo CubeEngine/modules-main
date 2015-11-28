@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.cubeengine.service.permission.PermissionContainer;
 import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.World;
 
@@ -35,12 +35,12 @@ public class TpWorldPermissions extends PermissionContainer<Teleport>
     private TeleportPerm perm;
     private PermissionManager pm;
 
-    public TpWorldPermissions(Teleport module, TeleportPerm perm, WorldManager wm, PermissionManager pm)
+    public TpWorldPermissions(Teleport module, TeleportPerm perm, Game game, PermissionManager pm)
     {
         super(module);
         this.perm = perm;
         this.pm = pm;
-        for (final World world : wm.getWorlds())
+        for (final World world : game.getServer().getWorlds())
         {
             initWorldPermission(world.getName());
         }

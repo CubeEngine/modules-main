@@ -60,10 +60,8 @@ import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.PermissionTreeConverter;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.PriorityConverter;
-import org.cubeengine.service.logging.LoggingUtil;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.world.WorldManager;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.context.Context;
@@ -96,7 +94,7 @@ public class Roles extends Module
     @Inject private FileManager fm;
     @Inject private WorldManager wm;
     @Inject private PermissionManager pm;
-    @Inject private Game game;
+    @Inject private org.spongepowered.api.Game game;
     @Inject private I18n i18n;
     @Inject private PermissionManager manager;
 
@@ -151,8 +149,8 @@ public class Roles extends Module
         db.registerTable(TablePerm.class);
         db.registerTable(TableOption.class);
 
-        cm.getProviderManager().register(this, new ContextReader(service, wm), Context.class);
-        cm.getProviderManager().register(this, new ContextualRoleReader(service, wm), ContextualRole.class);
+        cm.getProviderManager().register(this, new ContextReader(service, game), Context.class);
+        cm.getProviderManager().register(this, new ContextualRoleReader(service, game), ContextualRole.class);
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
         cm.getProviderManager().register(this, new PermissionCompleter(service));
 

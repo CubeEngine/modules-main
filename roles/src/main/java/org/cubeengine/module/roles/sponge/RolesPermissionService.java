@@ -38,7 +38,6 @@ import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.world.WorldManager;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;
@@ -55,7 +54,7 @@ public class RolesPermissionService implements PermissionService
     private final List<ContextCalculator> calculators = new CopyOnWriteArrayList<>();
 
     private final DefaultSubjectData defaultData;
-    private Game game;
+    private org.spongepowered.api.Game game;
     private Database db;
     private RolesConfig config;
     private Log logger;
@@ -63,7 +62,7 @@ public class RolesPermissionService implements PermissionService
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<String, PermissionDescription>();
     private Collection<PermissionDescription> descriptions;
 
-    public RolesPermissionService(Roles module, Reflector reflector, RolesConfig config, Game game, Database db, WorldManager wm, PermissionManager manager, Log permLogger)
+    public RolesPermissionService(Roles module, Reflector reflector, RolesConfig config, org.spongepowered.api.Game game, Database db, WorldManager wm, PermissionManager manager, Log permLogger)
     {
         this.game = game;
         this.db = db;
@@ -71,7 +70,7 @@ public class RolesPermissionService implements PermissionService
         logger = permLogger;
         defaultData = new DefaultSubjectData(this, config);
         collections.put(SUBJECTS_USER, new UserCollection(this, game));
-        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, manager, reflector, wm));
+        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, manager, reflector, game));
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM, game));
         collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE, game));
     }

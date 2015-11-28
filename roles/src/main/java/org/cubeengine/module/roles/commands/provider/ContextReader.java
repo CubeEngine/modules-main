@@ -25,7 +25,7 @@ import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.DefaultValue;
 import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.world.World;
@@ -34,11 +34,11 @@ import static java.util.stream.Collectors.toList;
 
 public class ContextReader implements ArgumentReader<Context>, Completer, DefaultValue<Context>
 {
-    private WorldManager wm;
+    private Game game;
 
-    public ContextReader(RolesPermissionService service, WorldManager wm)
+    public ContextReader(RolesPermissionService service, Game game)
     {
-        this.wm = wm;
+        this.game = game;
     }
 
     @Override
@@ -56,7 +56,7 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
             {
                 return new Context("global", "");
             }
-            Optional<World> world = wm.getWorld(token);
+            Optional<World> world = game.getServer().getWorld(token);
             if (world.isPresent())
             {
                 return new Context("world", token.toLowerCase());
@@ -79,12 +79,12 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
     public List<String> getSuggestions(CommandInvocation invocation)
     {
         String token = invocation.currentToken();
-        List<String> list = wm.getWorlds().stream().map(World::getName).filter(n -> n.toLowerCase().startsWith(
+        List<String> list = game.getServer().getWorlds().stream().map(World::getName).filter(n -> n.toLowerCase().startsWith(
             token.toLowerCase())).collect(toList());
-        list.addAll(wm.getWorlds().stream()
-                      .filter(world -> world.getName().startsWith(token))
-                      .map(World::getName)
-                      .collect(toList()));
+        list.addAll(game.getServer().getWorlds().stream()
+                .filter(world -> world.getName().startsWith(token))
+                .map(World::getName)
+                .collect(toList()));
         if ("global".startsWith(token.toLowerCase()))
         {
             list.add("global");
