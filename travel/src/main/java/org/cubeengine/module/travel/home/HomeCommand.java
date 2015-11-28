@@ -45,6 +45,7 @@ import org.cubeengine.module.core.util.math.Cuboid;
 import org.cubeengine.module.core.util.math.shape.Shape;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Texts;
@@ -114,13 +115,13 @@ public class HomeCommand extends TpPointCommand
                 throw new PermissionDeniedException(module.getPermissions().HOME_TP_OTHER);
             }
         }
-        Location<World> location = h.getLocation();
+        Transform<World> location = h.getTransform();
         if (location == null)
         {
             homeInDeletedWorldMessage(sender, h);
             return;
         }
-        sender.setLocation(location);
+        sender.setTransform(location);
         if (h.getWelcomeMsg() != null)
         {
             sender.sendMessage(Texts.of(h.getWelcomeMsg()));
@@ -159,7 +160,7 @@ public class HomeCommand extends TpPointCommand
             context.sendTranslated(NEGATIVE, "The home already exists! You can move it with {text:/home move}");
             return;
         }
-        Home home = this.manager.create(sender, name, sender.getLocation(), sender.getRotation(), isPublic);
+        Home home = this.manager.create(sender, name, sender.getTransform(), isPublic);
         context.sendTranslated(POSITIVE, "Your home {name} has been created!", home.getName());
     }
 
@@ -216,7 +217,7 @@ public class HomeCommand extends TpPointCommand
                 throw new PermissionDeniedException(module.getPermissions().HOME_MOVE_OTHER);
             }
         }
-        home.setLocation(sender.getLocation(), sender.getRotation(), wm);
+        home.setLocation(sender.getTransform());
         home.update();
         if (home.isOwnedBy(sender))
         {

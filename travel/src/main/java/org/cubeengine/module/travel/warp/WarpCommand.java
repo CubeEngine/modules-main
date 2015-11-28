@@ -38,11 +38,11 @@ import org.cubeengine.service.confirm.ConfirmResult;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.util.command.source.ConsoleSource;
-import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
@@ -95,13 +95,13 @@ public class WarpCommand extends TpPointCommand
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_TP_OTHER);
         }
-        Location<World> location = w.getLocation();
+        Transform<World> location = w.getTransform();
         if (location == null)
         {
             warpInDeletedWorldMessage(sender, w);
             return;
         }
-        sender.setLocation(location);
+        sender.setTransform(location);
         if (w.getWelcomeMsg() != null)
         {
             sender.sendMessage(Texts.of(w.getWelcomeMsg()));
@@ -141,7 +141,7 @@ public class WarpCommand extends TpPointCommand
             i18n.sendTranslated(sender, NEGATIVE, "The warp already exists! You can move it with {text:/warp move}");
             return;
         }
-        Warp warp = manager.create(sender, name, sender.getLocation(), sender.getRotation(), !priv);
+        Warp warp = manager.create(sender, name, sender.getTransform(), !priv);
         i18n.sendTranslated(sender, POSITIVE, "Your warp {name} has been created!", warp.getName());
     }
 
@@ -193,7 +193,7 @@ public class WarpCommand extends TpPointCommand
         {
             throw new PermissionDeniedException(module.getPermissions().WARP_MOVE_OTHER);
         }
-        w.setLocation(sender.getLocation(), sender.getRotation(), wm);
+        w.setLocation(sender.getTransform());
         w.update();
         if (w.isOwnedBy(sender))
         {

@@ -33,8 +33,10 @@ import org.cubeengine.module.travel.storage.TeleportPointModel;
 import org.cubeengine.service.user.UserManager;
 import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
 
@@ -150,7 +152,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
             user.getUniqueId()).getEntity().getId())));
     }
 
-    public abstract T create(Player owner, String name, Location location, Vector3d rotation, boolean publicVisibility);
+    public abstract T create(Player owner, String name, Transform<World> location, boolean publicVisibility);
 
     public void delete(T point)
     {
@@ -281,8 +283,8 @@ public abstract class TelePointManager<T extends TeleportPoint>
             secondPoint.getX(), secondPoint.getY(), secondPoint.getZ()));
         for (T point : points)
         {
-            Vector3d chp = point.getLocation().getPosition();
-            if (point.getLocation().getExtent().equals(firstPoint.getExtent()) && cuboid.contains(new Vector3(chp.getX(), chp.getY(), chp.getZ())))
+            Vector3d chp = point.getTransform().getPosition();
+            if (point.getTransform().getExtent().equals(firstPoint.getExtent()) && cuboid.contains(new Vector3(chp.getX(), chp.getY(), chp.getZ())))
             {
                 if (priv && !point.isPublic())
                 {

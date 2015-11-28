@@ -64,11 +64,11 @@ public class HomeListener
                 if (homeManager.has(player, "home"))
                 {
                     Home home = homeManager.findOne(player, "home");
-                    if (player.getLocation().equals(home.getLocation()))
+                    if (player.getLocation().equals(home.getTransform()))
                     {
                         return;
                     }
-                    home.setLocation(player.getLocation(), player.getRotation(), wm);
+                    home.setLocation(player.getTransform());
                     home.update();
                     i18n.sendTranslated(player, POSITIVE, "Your home has been set!");
                 }
@@ -80,7 +80,7 @@ public class HomeListener
                         i18n.sendTranslated(player, NEGATIVE, "You have to delete a home to make a new one");
                         return;
                     }
-                    homeManager.create(player, "home", player.getLocation(), player.getRotation(), false);
+                    homeManager.create(player, "home", player.getTransform(), false);
                     i18n.sendTranslated(player, POSITIVE, "Your home has been created!");
                 }
                 event.setCancelled(true);

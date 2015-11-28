@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.travel.home;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.module.travel.InviteManager;
 import org.cubeengine.module.travel.TelePointManager;
 import org.cubeengine.module.travel.Travel;
@@ -29,8 +28,13 @@ import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
+import static org.cubeengine.module.travel.storage.TeleportPointModel.TeleportType.HOME;
+import static org.cubeengine.module.travel.storage.TeleportPointModel.Visibility.PRIVATE;
+import static org.cubeengine.module.travel.storage.TeleportPointModel.Visibility.PUBLIC;
 
 public class HomeManager extends TelePointManager<Home>
 {
@@ -50,7 +54,7 @@ public class HomeManager extends TelePointManager<Home>
     public void load()
     {
         for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TableTeleportPoint.TABLE_TP_POINT).where(
-            TableTeleportPoint.TABLE_TP_POINT.TYPE.eq(TeleportType.HOME.value)).fetch())
+            TableTeleportPoint.TABLE_TP_POINT.TYPE.eq(HOME.value)).fetch())
         {
             this.addPoint(new Home(teleportPoint, this.module, pm, wm, um));
         }
@@ -58,13 +62,14 @@ public class HomeManager extends TelePointManager<Home>
     }
 
     @Override
-    public Home create(Player owner, String name, Location location, Vector3d rotation, boolean publicVisibility)
+    public Home create(Player owner, String name, Transform<World> transform, boolean publicVisibility)
     {
         if (this.has(owner, name))
         {
             throw new IllegalArgumentException("Tried to create duplicate home!");
         }
-        TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT).newTPPoint(location, rotation, wm, name, um.getByUUID(owner.getUniqueId()).getEntityId(), null, TeleportType.HOME, publicVisibility ? Visibility.PUBLIC : Visibility.PRIVATE);
+        TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT)
+                .newTPPoint(transform, wm, name, um.getByUUID(owner.getUniqueId()).getEntityId(), null, HOME, publicVisibility ? PUBLIC : PRIVATE);
         Home home = new Home(model, this.module, pm, wm, um);
         model.insertAsync().exceptionally(this::handle);
         this.addPoint(home);

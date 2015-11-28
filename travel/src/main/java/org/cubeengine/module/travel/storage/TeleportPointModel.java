@@ -18,10 +18,12 @@
 package org.cubeengine.module.travel.storage;
 
 import javax.persistence.Transient;
+
 import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.service.world.WorldManager;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -30,17 +32,17 @@ import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_P
 public class TeleportPointModel extends AsyncRecord<TeleportPointModel>
 {
     @Transient
-    private transient Location location;
+    private transient Transform<World> transform;
 
     public TeleportPointModel()
     {
         super(TABLE_TP_POINT);
     }
 
-    public TeleportPointModel newTPPoint(Location location, Vector3d rotation, WorldManager wm, String name, UInteger owner, String welcomeMsg, TeleportType type,
+    public TeleportPointModel newTPPoint(Transform<World> transform, WorldManager wm, String name, UInteger owner, String welcomeMsg, TeleportType type,
                                          Visibility visibility)
     {
-        this.setLocation(location, rotation, wm);
+        this.setTransform(transform, wm);
 
         this.setValue(TABLE_TP_POINT.NAME, name);
         this.setValue(TABLE_TP_POINT.OWNER, owner);
@@ -53,32 +55,26 @@ public class TeleportPointModel extends AsyncRecord<TeleportPointModel>
         return this;
     }
 
-    public Location getLocation(WorldManager wm)
+    public Transform<World> getLocation(WorldManager wm)
     {
-        if (this.location == null)
+        if (this.transform == null)
         {
-            this.location = new Location(wm.getWorld(getValue(TABLE_TP_POINT.WORLD)),
-                                         getValue(TABLE_TP_POINT.X),
-                                         getValue(TABLE_TP_POINT.Y),
-                                         getValue(TABLE_TP_POINT.Z));
-            // TODO rotation
-            //getValue(TABLE_TP_POINT.YAW).floatValue(),
-            //getValue(TABLE_TP_POINT.PITCH).floatValue()
+            this.transform = new Transform<>(wm.getWorld(getValue(TABLE_TP_POINT.WORLD)),
+                    new Vector3d(getValue(TABLE_TP_POINT.X), getValue(TABLE_TP_POINT.Y), getValue(TABLE_TP_POINT.Z)),
+                    new Vector3d(getValue(TABLE_TP_POINT.PITCH), getValue(TABLE_TP_POINT.YAW), 0d));
         }
-        return this.location;
+        return this.transform;
     }
 
-    public void setLocation(Location location, Vector3d rotation, WorldManager wm)
+    public void setTransform(Transform<World> transform, WorldManager wm)
     {
-        this.location = location;
-        this.setValue(TABLE_TP_POINT.WORLD, wm.getWorldId((World)location.getExtent()));
-        this.setValue(TABLE_TP_POINT.X, location.getX());
-        this.setValue(TABLE_TP_POINT.Y, location.getY());
-        this.setValue(TABLE_TP_POINT.Z, location.getZ());
-
-        // TODO rotation
-        this.setValue(TABLE_TP_POINT.YAW, 0d);
-        this.setValue(TABLE_TP_POINT.PITCH, 0d);
+        this.transform = transform;
+        this.setValue(TABLE_TP_POINT.WORLD, wm.getWorldId(this.transform.getExtent()));
+        this.setValue(TABLE_TP_POINT.X, this.transform.getLocation().getX());
+        this.setValue(TABLE_TP_POINT.Y, this.transform.getLocation().getY());
+        this.setValue(TABLE_TP_POINT.Z, this.transform.getLocation().getZ());
+        this.setValue(TABLE_TP_POINT.YAW, this.transform.getYaw());
+        this.setValue(TABLE_TP_POINT.PITCH, this.transform.getPitch());
     }
 
     public enum TeleportType

@@ -25,6 +25,7 @@ import org.cubeengine.service.user.CachedUser;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.util.command.CommandSource;
@@ -60,9 +61,9 @@ public abstract class TeleportPoint
         model.updateAsync();
     }
 
-    public Location<World> getLocation()
+    public Transform<World> getTransform()
     {
-        Location<World> location = model.getLocation(wm);
+        Transform<World> location = model.getLocation(wm);
         if (location.getExtent() == null)
         {
             module.getLog().warn("Tried to get location from TeleportPoint in deleted world!");
@@ -71,9 +72,9 @@ public abstract class TeleportPoint
         return location;
     }
 
-    public void setLocation(Location location, Vector3d rotation, WorldManager wm)
+    public void setLocation(Transform<World> transform)
     {
-        model.setLocation(location, rotation, wm);
+        model.setTransform(transform, wm);
     }
 
     public CachedUser getOwner()
