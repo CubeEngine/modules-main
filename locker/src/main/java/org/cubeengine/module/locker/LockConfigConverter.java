@@ -31,11 +31,11 @@ import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.locker.storage.LockType;
 import org.cubeengine.module.locker.storage.ProtectionFlag;
 
-public abstract class LockerSubConfigConverter<C extends LockerSubConfig<C, ?>> extends SimpleConverter<C>
+public abstract class LockConfigConverter<C extends LockConfig<C, ?>> extends SimpleConverter<C>
 {
     private Log logger;
 
-    public LockerSubConfigConverter(Log logger)
+    public LockConfigConverter(Log logger)
     {
         this.logger = logger;
     }

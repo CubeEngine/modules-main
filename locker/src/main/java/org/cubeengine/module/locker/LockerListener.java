@@ -39,15 +39,17 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.hanging.Hanging;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.vehicle.Boat;
+import org.spongepowered.api.entity.vehicle.minecart.Minecart;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.MoveBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.entity.damage.DamageModifierBuilder;
-import org.spongepowered.api.event.cause.entity.damage.DamageModifierTypes;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.TameEntityEvent;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
@@ -102,18 +104,18 @@ public class LockerListener
         Lock lock = this.manager.getLockAtLocation(block, player.get());
         if (block.getTileEntity().orElse(null) instanceof Carrier)
         {
-            if (!player.get().hasPermission(module.perms().DENY_CONTAINER.getId()))
+            if (!player.get().hasPermission(module.perms().ALLOW_CONTAINER.getId()))
             {
                 i18n.sendTranslated(player.get(), NEGATIVE, "Strong magic prevents you from accessing any inventory!");
                 event.setCancelled(true);
                 return;
             }
             if (lock == null) return;
-            lock.handleInventoryOpen(event, null, null, player.get());
+            lock.handleInventoryOpen(event, null, block, player.get());
         }
         else if (block.supports(Keys.OPEN))
         {
-            if (!player.get().hasPermission(module.perms().DENY_DOOR.getId()))
+            if (!player.get().hasPermission(module.perms().ALLOW_DOOR.getId()))
             {
                 i18n.sendTranslated(player.get(), NEGATIVE, "Strong magic prevents you from accessing any door!");
                 event.setCancelled(true);
@@ -122,7 +124,7 @@ public class LockerListener
             if (lock == null) return;
             lock.handleBlockDoorUse(event, player.get(), block);
         }
-        else if (lock != null)// other interact e.g. repeater
+        else if (lock != null) // other interact e.g. repeater
         {
             lock.handleBlockInteract(event, player.get());
         }
@@ -134,7 +136,7 @@ public class LockerListener
         if (!this.module.getConfig().protectEntityFromRClick) return;
         Entity entity = event.getTargetEntity();
         Optional<Player> player = event.getCause().first(Player.class);
-        if (!player.get().hasPermission(module.perms().DENY_ENTITY.getId()))
+        if (!player.get().hasPermission(module.perms().ALLOW_ENTITY.getId()))
         {
             i18n.sendTranslated(player.get(), NEGATIVE, "Strong magic prevents you from reaching this entity!");
             event.setCancelled(true);
@@ -162,7 +164,7 @@ public class LockerListener
             return;
         }
         Object carrier = ((CarriedInventory) event.getTargetInventory()).getCarrier().get();
-        Location loc = null;
+        Location<World> loc = null;
         if (carrier instanceof TileEntityCarrier)
         {
             loc = ((TileEntityCarrier) carrier).getLocation();
@@ -179,98 +181,110 @@ public class LockerListener
     @Listener
     public void onEntityDamageEntity(DamageEntityEvent event)
     {
-        if (!this.module.getConfig().protectEntityFromDamage) return;
-        Entity entity = event.getTargetEntity();
-        Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
-        if (lock == null) return;
-        Optional<Player> playerCause = event.getCause().first(Player.class);
-        if (playerCause.isPresent())
+        Entity target = event.getTargetEntity();
+        Optional<EntityDamageSource> playerCause = event.getCause().first(EntityDamageSource.class);
+        if (target instanceof Living)
         {
-            lock.handleEntityDamage(playerCause.get());
-            event.setBaseDamage(0); // TODO is this canceling all damage?
-            event.setDamage(DamageModifierBuilder.builder().type(DamageModifierTypes.ARMOR).cause(Cause.of(module)).build(), i -> 0d); // TODO or do i need this?
+            if (handleLiving(target, playerCause.map(EntityDamageSource::getSource)
+                    .map(e -> e instanceof Player ? Player.class.cast(e) : null)
+                    .orElse(null)))
+            {
+                event.setCancelled(true);
+            }
         }
-        // else other source
-        if (module.getConfig().protectEntityFromEnvironementalDamage)
+        else
         {
-            event.setBaseDamage(0); // TODO is this canceling all damage?
-            event.setDamage(DamageModifierBuilder.builder().type(DamageModifierTypes.ARMOR).cause(Cause.of(module)).build(), i -> 0d); // TODO or do i need this?
+            // TODO implement me
         }
     }
 
     @Listener
-    public void onEntityDeath(DamageEntityEvent event)
+    public void onEntityAttack(InteractEntityEvent.Primary event)
     {
-        // TODO cancelling here ONLY cancels the MessageSink part
-        Optional<Player> playerCause = event.getCause().first(Player.class);
-        Entity entity = event.getTargetEntity();
-        if (entity.supports(Keys.VEHICLE))
+        Entity target = event.getTargetEntity();
+        if (target instanceof Living)
         {
-            if (!this.module.getConfig().protectVehicleFromBreak) return;
-
-            Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
-            if (lock == null) return;
-            if (playerCause.isPresent())
-            {
-                Player player = playerCause.get();
-
-                if (lock.isOwner(player))
-                {
-                    lock.handleEntityDeletion(player);
-                    return;
-                }
-            }
-
-            if (module.getConfig().protectVehicleFromEnvironmental)
-            {
-                event.setBaseDamage(0);
-                // TODO cancel? event.setCancelled(true);
-            }
-            event.setBaseDamage(0);
-            // TODO cancel? event.setCancelled(true);
             return;
         }
-        if (entity instanceof Hanging) // leash / itemframe / image
+        Cause causes = event.getCause();
+        Optional<Player> playerCause = causes.first(Player.class);
+
+        if (target instanceof Boat || target instanceof Minecart) // Is Vehicle?
         {
-            if (playerCause.isPresent())
+            if (handleVehicle(target, playerCause.orElse(null)))
             {
-                Player player = playerCause.get();
-
-                Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
-                if (player.hasPermission(module.perms().DENY_HANGING.getId()))
-                {
-                    event.setBaseDamage(0);
-                    // TODO cancel? event.setCancelled(true);
-                    return;
-                }
-                if (lock == null) return;
-                if (lock.handleEntityDamage(player))
-                {
-                    lock.delete(player);
-                }
-                else
-                {
-                    event.setBaseDamage(0);
-                    // TODO cancel?  event.setCancelled(true);
-                }
+                event.setCancelled(true);
             }
-            return;
         }
+        else if (target instanceof Hanging) // Is Hanging?
+        {
+            if (handleHanging(target, playerCause.orElse(null)))
+            {
+                event.setCancelled(true);
+            }
+        }
+        else // TODO other ?
+        {
 
-        // no need to check if allowed to kill as this would have caused an DamageEvent before / this is only to cleanup database
-        Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
+        }
+    }
+
+    private boolean handleLiving(Entity target, Player player)
+    {
+        if (!this.module.getConfig().protectEntityFromDamage) return false;
+        Lock lock = this.manager.getLockForEntityUID(target.getUniqueId());
+        if (lock == null) return false; // No Lock here
+        if (player != null)
+        {
+            return !lock.handleEntityDamage(player);
+        }
+        // else other source
+        return module.getConfig().protectEntityFromEnvironementalDamage;
+    }
+
+    private boolean handleHanging(Entity target, Player playerCause) // Lead / ItemFrame / Image
+    {
+        if (playerCause != null)
+        {
+            if (playerCause.hasPermission(module.perms().ALLOW_HANGING.getId()))
+            {
+                return false;
+            }
+            Lock lock = this.manager.getLockForEntityUID(target.getUniqueId());
+            if (lock == null) return false; // No Lock here
+            return !lock.handleEntityDamage(playerCause);
+        }
+        return false;
+    }
+
+    private boolean handleVehicle(Entity target, Player playerCause) // Minecart / Boat
+    {
+        if (!this.module.getConfig().protectVehicleFromBreak) // Protect vehicles at all?
+        {
+            return false;
+        }
+        Lock lock = this.manager.getLockForEntityUID(target.getUniqueId());
+        if (lock == null) return false; // No Lock here
+        if (playerCause != null)
+        {
+            return !(lock.isOwner(playerCause) || playerCause.hasPermission(module.perms().BREAK_OTHER.getId())); // Allow when owner or has permission
+        }
+        return module.getConfig().protectVehicleFromEnvironmental;
+    }
+
+    @Listener
+    public void onEntityDeath(DestructEntityEvent event) // Cleanup Locks in case Entity dies
+    {
+        Entity target = event.getTargetEntity();
+        Lock lock = this.manager.getLockForEntityUID(target.getUniqueId());
         if (lock == null) return;
-        Optional<DamageableData> damageData = entity.get(DamageableData.class);
-        Player user = null;
-        if (damageData.isPresent())
-        {
-            Living living = damageData.get().lastAttacker().get().orElse(null);
-            if (living instanceof Player)
-            {
-                user = ((Player)living);
-            }
-        }
-        lock.handleEntityDeletion(user);
+
+        Player user = event.getCause().first(Player.class)
+                .orElse(target.get(DamageableData.class)
+                        .map(d -> d.lastAttacker().get().orElse(null))
+                        .map(e -> e instanceof Player ? Player.class.cast(e) : null)
+                        .orElse(null));
+        lock.handleEntityDeletion(user); // Delete Lock and notify user that destroyed Lock
     }
 
     @Listener(order = Order.EARLY)
@@ -309,7 +323,7 @@ public class LockerListener
             {
                 return;
             }
-            for (BlockLockerConfiguration blockprotection : this.module.getConfig().blockprotections)
+            for (BlockLockConfig blockprotection : this.module.getConfig().blockprotections)
             {
                 if (blockprotection.isType(type))
                 {

@@ -26,23 +26,33 @@ import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
+import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
 import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.data.value.mutable.Value;
 
 import java.util.*;
 
 public class LockerData implements DataManipulator<LockerData, ImmutableLockerData>
 {
-    public static Key<LongValue> LOCK_ID = KeyFactory.makeSingleKey(Long.class, LongValue.class, new DataQuery("LockID"));
+    public static Key<Value<Long>> LOCK_ID = KeyFactory.makeSingleKey(Long.class, Value.class, new DataQuery("LockID"));
     public static Key<ListValue<Byte>> LOCK_PASS = KeyFactory.makeListKey(Byte.class, new DataQuery("LockPass"));
 
     private long lockID;
     private byte[] pass;
+    private ValueFactory valueFactory;
 
-    public LockerData(long lockID, byte[] pass)
+    public LockerData(long lockID, byte[] pass, ValueFactory valueFactory)
     {
         this.lockID = lockID;
         this.pass = pass;
+        this.valueFactory = valueFactory;
+
+    }
+
+    public LockerData(ValueFactory valueFactory)
+    {
+        this(0, null, valueFactory);
     }
 
     @Override
@@ -120,13 +130,13 @@ public class LockerData implements DataManipulator<LockerData, ImmutableLockerDa
     @Override
     public LockerData copy()
     {
-        return new LockerData(lockID, pass);
+        return new LockerData(lockID, pass, valueFactory);
     }
 
     @Override
     public ImmutableLockerData asImmutable()
     {
-        return new ImmutableLockerData(lockID, pass);
+        return new ImmutableLockerData(lockID, pass, valueFactory);
     }
 
     @Override
@@ -172,13 +182,14 @@ public class LockerData implements DataManipulator<LockerData, ImmutableLockerDa
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <E, V extends BaseValue<E>> Optional<V> getValue(Key<V> key)
     {
         if (supports(key))
         {
             if (LOCK_ID.equals(key))
             {
-                return Optional.ofNullable((V) new LongValue(LOCK_ID, lockID));
+                return Optional.ofNullable((V) valueFactory.createValue(LOCK_ID, lockID));
             }
             else if (LOCK_PASS.equals(key))
             {
@@ -187,7 +198,8 @@ public class LockerData implements DataManipulator<LockerData, ImmutableLockerDa
                     return Optional.empty();
                 }
                 List<Byte> list = passAsList();
-                return Optional.of(((V) new ByteListValue(LOCK_PASS, list)));
+
+                return Optional.of((V) valueFactory.createListValue(LOCK_PASS, list));
             }
         }
         return Optional.empty();
@@ -219,11 +231,12 @@ public class LockerData implements DataManipulator<LockerData, ImmutableLockerDa
     public Set<ImmutableValue<?>> getValues()
     {
         HashSet<ImmutableValue<?>> set = new HashSet<>();
-        set.add(new ImmutableLongValue(LOCK_ID, lockID));
+        set.add(valueFactory.createValue(LOCK_ID, lockID).asImmutable());
         if (pass != null)
         {
-            set.add(new ImmutableByteListValue(LOCK_PASS, passAsList()));
+            set.add((ImmutableValue<?>)valueFactory.createListValue(LOCK_PASS, passAsList()));
         }
         return set;
     }
+
 }

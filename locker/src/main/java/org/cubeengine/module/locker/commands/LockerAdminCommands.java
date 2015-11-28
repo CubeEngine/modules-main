@@ -27,6 +27,7 @@ import org.cubeengine.module.locker.storage.Lock;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Carrier;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
@@ -112,7 +113,7 @@ public class LockerAdminCommands extends ContainerCommand
     }
 
     @Command(desc = "Deletes all locks of given player")
-    public void purge(CommandContext context, Player player)
+    public void purge(CommandContext context, User player)
     {
         this.manager.purgeLocksFrom(player);
         context.sendTranslated(POSITIVE, "All locks for {user} are now deleted!", player);

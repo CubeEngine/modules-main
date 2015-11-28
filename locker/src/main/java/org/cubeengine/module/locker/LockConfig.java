@@ -23,7 +23,7 @@ import org.cubeengine.module.locker.storage.LockType;
 import org.cubeengine.module.locker.storage.ProtectedType;
 import org.cubeengine.module.locker.storage.ProtectionFlag;
 
-public abstract class LockerSubConfig<This extends LockerSubConfig,T>
+public abstract class LockConfig<This extends LockConfig,T>
 {
     protected final ProtectedType protectedType;
     protected boolean autoProtect = false;
@@ -32,7 +32,7 @@ public abstract class LockerSubConfig<This extends LockerSubConfig,T>
     protected boolean enable = true;
     protected T type;
 
-    public LockerSubConfig(ProtectedType protectedType)
+    public LockConfig(ProtectedType protectedType)
     {
         this.protectedType = protectedType;
     }

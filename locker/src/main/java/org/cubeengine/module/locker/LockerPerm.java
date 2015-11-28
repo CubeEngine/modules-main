@@ -29,11 +29,10 @@ public class LockerPerm extends PermissionContainer<Locker>
         super(module);
     }
 
-    // TODO invert deny permissions
-    public final PermissionDescription DENY_CONTAINER = register("deny.container", "", null);
-    public final PermissionDescription DENY_DOOR = register("deny.door", "", null);
-    public final PermissionDescription DENY_ENTITY = register("deny.entity", "", null);
-    public final PermissionDescription DENY_HANGING = register("deny.hanging", "", null);
+    public final PermissionDescription ALLOW_CONTAINER = register("allow.container", "", null); // TODO use perm
+    public final PermissionDescription ALLOW_DOOR = register("allow.door", "", null); // TODO use perm
+    public final PermissionDescription ALLOW_ENTITY = register("allow.entity", "", null);
+    public final PermissionDescription ALLOW_HANGING = register("allow.hanging", "", null);
 
     public final PermissionDescription SHOW_OWNER = register("show-owner", "", null);
     public final PermissionDescription BREAK_OTHER = register("break-other", "", null);

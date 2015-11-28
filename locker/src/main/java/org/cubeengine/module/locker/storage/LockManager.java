@@ -29,10 +29,9 @@ import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.core.util.BlockUtil;
-import org.cubeengine.module.core.util.Profiler;
 import org.cubeengine.module.core.util.matcher.StringMatcher;
-import org.cubeengine.module.locker.BlockLockerConfiguration;
-import org.cubeengine.module.locker.EntityLockerConfiguration;
+import org.cubeengine.module.locker.BlockLockConfig;
+import org.cubeengine.module.locker.EntityLockConfig;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.commands.CommandListener;
 import org.cubeengine.module.locker.commands.PlayerAccess;
@@ -43,10 +42,10 @@ import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.CachedUser;
 import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.WorldManager;
+import org.jooq.Batch;
 import org.jooq.Condition;
 import org.jooq.Result;
 import org.jooq.types.UInteger;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
@@ -55,6 +54,7 @@ import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.world.chunk.LoadChunkEvent;
 import org.spongepowered.api.event.world.chunk.UnloadChunkEvent;
@@ -91,21 +91,23 @@ public class LockManager
     protected UserManager um;
     protected TaskManager tm;
     private I18n i18n;
-    private Game game;
+    private org.spongepowered.api.Game game;
     private final StringMatcher stringMatcher;
     protected Log logger;
     public final CommandListener commandListener;
 
     private final Map<UInteger, Map<Long, Lock>> loadedLocks = new HashMap<>(); // World -> LocationKey -> Lock
-
     private final Map<UInteger, Map<Long, Set<Lock>>> loadedLocksInChunk = new HashMap<>(); // World -> ChunkKey -> Lock
     private final Map<UUID, Lock> loadedEntityLocks = new HashMap<>(); // EntityID -> Lock
     private final Map<UInteger, Lock> locksById = new HashMap<>(); // All Locks - LockID -> Lock
+
     private final Map<UUID, Set<UInteger>> unlocked = new HashMap<>();
 
     public final MessageDigest messageDigest;
 
     private final Set<Long> loadedChunks = new CopyOnWriteArraySet<>();
+
+    private boolean blockAsync = true;
 
     private final Queue<Chunk> loadChunks = new ConcurrentLinkedQueue<>();
     private final ExecutorService loadExecutor;
@@ -115,7 +117,7 @@ public class LockManager
     private final ExecutorService unloadExecutor;
     private Future<?> unloadFuture = null;
 
-    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, WorldManager wm, UserManager um, TaskManager tm, I18n i18n, Game game)
+    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, WorldManager wm, UserManager um, TaskManager tm, I18n i18n, org.spongepowered.api.Game game)
     {
         this.stringMatcher = stringMatcher;
         this.database = database;
@@ -145,15 +147,7 @@ public class LockManager
 
     private void onEnable()
     {
-        for (World world : wm.getWorlds())
-        {
-            for (Chunk chunk : world.getLoadedChunks())
-            {
-                this.queueChunk(chunk);
-            }
-        }
-        this.loadLocksInChunks();
-        logger.info("Finished loading locks");
+        reloadLocks();
 
         tm.runTimer(module, this::doLoadChunks, 5, 5); // 5 Ticks
         tm.runTimer(module, this::doUnloadChunks, 100, 100); // 100 Ticks - 5 seconds
@@ -161,7 +155,7 @@ public class LockManager
 
     private void doUnloadChunks()
     {
-        if (!unloadChunks.isEmpty() && (unloadFuture == null || unloadFuture.isDone()))
+        if (!blockAsync && !unloadChunks.isEmpty() && (unloadFuture == null || unloadFuture.isDone()))
         {
             unloadFuture = unloadExecutor.submit(this::unloadLocksInChunk);
         }
@@ -169,7 +163,7 @@ public class LockManager
 
     private void doLoadChunks()
     {
-        if (!loadChunks.isEmpty() && (loadFuture == null || loadFuture.isDone()))
+        if (!blockAsync && !loadChunks.isEmpty() && (loadFuture == null || loadFuture.isDone()))
         {
             loadFuture = loadExecutor.submit(this::loadLocksInChunks);
         }
@@ -247,7 +241,7 @@ public class LockManager
             loadedChunks.addAll(zPos.stream().map(zPo -> getChunkKey(xPo, zPo)).collect(Collectors.toList()));
         }
 
-        if (!loadChunks.isEmpty())
+        if (!blockAsync && !loadChunks.isEmpty())
         {
             loadFuture = loadExecutor.submit(this::loadLocksInChunks);
         }
@@ -340,7 +334,7 @@ public class LockManager
         }
         finally
         {
-            if (!unloadChunks.isEmpty())
+            if (!blockAsync && !unloadChunks.isEmpty())
             {
                 unloadFuture = unloadExecutor.submit(this::unloadLocksInChunk);
             }
@@ -524,7 +518,7 @@ public class LockManager
     {
         BlockType material = block.getBlockType();
         LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(module.getUserManager().getByUUID(user.getUniqueId()), lockType, getProtectedType(material));
-        for (BlockLockerConfiguration blockProtection : this.module.getConfig().blockprotections)
+        for (BlockLockConfig blockProtection : this.module.getConfig().blockprotections)
         {
             if (blockProtection.isType(material))
             {
@@ -625,7 +619,7 @@ public class LockManager
             this.locksById.put(lock.getId(), lock);
             lock.showCreatedMessage(user);
             lock.attemptCreatingKeyBook(user, createKeyBook);
-            for (EntityLockerConfiguration entityProtection : this.module.getConfig().entityProtections)
+            for (EntityLockConfig entityProtection : this.module.getConfig().entityProtections)
             {
                 if (entityProtection.isType(entity.getType()))
                 {
@@ -644,7 +638,7 @@ public class LockManager
 
     public boolean canProtect(BlockType type)
     {
-        for (BlockLockerConfiguration blockprotection : this.module.getConfig().blockprotections)
+        for (BlockLockConfig blockprotection : this.module.getConfig().blockprotections)
         {
             if (blockprotection.isType(type))
             {
@@ -656,7 +650,7 @@ public class LockManager
 
     public boolean canProtect(EntityType type)
     {
-        for (EntityLockerConfiguration entityProtection : this.module.getConfig().entityProtections)
+        for (EntityLockConfig entityProtection : this.module.getConfig().entityProtections)
         {
             if (entityProtection.isType(type))
             {
@@ -668,17 +662,15 @@ public class LockManager
 
     public void saveAll()
     {
-        for (Lock lock : this.loadedEntityLocks.values())
-        {
-            lock.model.updateAsync();
-        }
-        for (Map<Long, Lock> lockMap : this.loadedLocks.values())
-        {
-            for (Lock lock : lockMap.values())
-            {
-                lock.model.updateAsync();
-            }
-        }
+        List<LockModel> collect = Stream.concat(loadedEntityLocks.values().stream(),
+                loadedLocks.values().stream().flatMap(longLockMap -> longLockMap.values().stream()))
+                .map(l -> l.model)
+                .filter(m -> m.changed())
+                .collect(toList());
+
+        Batch batch = database.getDSL().batchStore(collect);
+
+        batch.execute(); // TODO async me
     }
 
     /**
@@ -772,9 +764,45 @@ public class LockManager
         }
     }
 
-    public CompletableFuture<Integer> purgeLocksFrom(Player user)
+    public void reloadLocks()
     {
-        return database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(um.getByUUID(user.getUniqueId()).getEntityId())));
+        blockAsync = true;
+
+        loadedLocks.clear();
+        loadedLocksInChunk.clear();
+        loadedEntityLocks.clear();
+        locksById.clear();
+
+        unlocked.clear();
+        loadChunks.clear();
+        unloadChunks.clear();
+
+        loadedChunks.clear();
+
+        for (World world : game.getServer().getWorlds())
+        {
+            for (Chunk chunk : world.getLoadedChunks())
+            {
+                this.queueChunk(chunk);
+            }
+        }
+
+        blockAsync = false;
+        this.loadLocksInChunks();
+        logger.info("Finished loading locks");
+    }
+
+    public CompletableFuture<Integer> purgeLocksFrom(User user)
+    {
+        logger.info("Purging Locks from {}", user.getName());
+        CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(um.getByUUID(user.getUniqueId()).getEntityId())));
+        future.thenAccept(integer -> {
+            if (integer != 0)
+            {
+                reloadLocks();
+            }
+        });
+        return future;
     }
 
     public Database getDB()

@@ -106,9 +106,12 @@ public class KeyBook
     {
         if (!lock.getId().equals(lockID)) // Id matches ?
         {
-            i18n.sendTranslated(holder, NEUTRAL, "You try to open the container with your KeyBook but nothing happens!");
-            holder.playSound(BLAZE_HIT, effectLocation.getPosition(), 1, 1);
-            holder.playSound(BLAZE_HIT, effectLocation.getPosition(), 1, (float)0.8);
+            if (!lock.isOwner(holder))
+            {
+                i18n.sendTranslated(holder, NEUTRAL, "You try to open the container with your KeyBook but nothing happens!");
+                holder.playSound(BLAZE_HIT, effectLocation.getPosition(), 1, 1);
+                holder.playSound(BLAZE_HIT, effectLocation.getPosition(), 1, (float)0.8);
+            }
             return false;
         }
         if (!this.isValidFor(lock))
@@ -129,7 +132,10 @@ public class KeyBook
         }
         if (effectLocation != null)
         {
-            i18n.sendTranslated(holder, POSITIVE, "As you approach with your KeyBook the magic lock disappears!");
+            if (!lock.isOwner(holder))
+            {
+                i18n.sendTranslated(holder, POSITIVE, "As you approach with your KeyBook the magic lock disappears!");
+            }
             holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
             holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, (float) 1.5);
             lock.notifyKeyUsage(holder);

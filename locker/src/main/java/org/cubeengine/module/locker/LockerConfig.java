@@ -25,8 +25,6 @@ import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.entity.EntityTypes;
 
 import static org.cubeengine.module.locker.storage.LockType.PRIVATE;
 import static org.cubeengine.module.locker.storage.ProtectionFlag.*;
@@ -103,7 +101,7 @@ public class LockerConfig extends ReflectedYaml
                  "use the auto-protect option to automatically create a protection when placing the block\n" +
                  "additionally you can set default flags which will also be automatically applied")
     @Name("protections.blocks")
-    public List<BlockLockerConfiguration> blockprotections;
+    public List<BlockLockConfig> blockprotections;
 
     @Comment("Set this to false if you wish to disable EntityProtection completely")
     @Name("protections.entities-enable")
@@ -112,7 +110,7 @@ public class LockerConfig extends ReflectedYaml
     @Comment("A list of all entities that can be protected with Locker\n" +
                  "auto-protect only applies onto entities that can be tamed")
     @Name("protections.entities")
-    public List<EntityLockerConfiguration> entityProtections;
+    public List<EntityLockConfig> entityProtections;
 
     @Comment("Worlds to disable auto-protect in")
     public List<ConfigWorld> disableAutoProtect = new ArrayList<>();
@@ -125,27 +123,27 @@ public class LockerConfig extends ReflectedYaml
         if (blockprotections == null || blockprotections.isEmpty())
         {
             blockprotections = new ArrayList<>();
-            blockprotections.add(new BlockLockerConfiguration(CHEST).autoProtect(PRIVATE));
-            blockprotections.add(new BlockLockerConfiguration(TRAPPED_CHEST).autoProtect(PRIVATE));
-            blockprotections.add(new BlockLockerConfiguration(FURNACE));
-            blockprotections.add(new BlockLockerConfiguration(LIT_FURNACE));
-            blockprotections.add(new BlockLockerConfiguration(BREWING_STAND));
-            blockprotections.add(new BlockLockerConfiguration(DISPENSER).defaultFlags(BLOCK_REDSTONE));
-            blockprotections.add(new BlockLockerConfiguration(DROPPER).defaultFlags(BLOCK_REDSTONE));
-            blockprotections.add(new BlockLockerConfiguration(STANDING_SIGN));
-            blockprotections.add(new BlockLockerConfiguration(WALL_SIGN));
-            blockprotections.add(new BlockLockerConfiguration(WOODEN_DOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
-            blockprotections.add(new BlockLockerConfiguration(IRON_DOOR));
-            blockprotections.add(new BlockLockerConfiguration(TRAPDOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
-            blockprotections.add(new BlockLockerConfiguration(FENCE_GATE).defaultFlags(AUTOCLOSE));
-            blockprotections.add(new BlockLockerConfiguration(HOPPER).defaultFlags(HOPPER_IN, HOPPER_OUT));
+            blockprotections.add(new BlockLockConfig(CHEST).autoProtect(PRIVATE));
+            blockprotections.add(new BlockLockConfig(TRAPPED_CHEST).autoProtect(PRIVATE));
+            blockprotections.add(new BlockLockConfig(FURNACE));
+            blockprotections.add(new BlockLockConfig(LIT_FURNACE));
+            blockprotections.add(new BlockLockConfig(BREWING_STAND));
+            blockprotections.add(new BlockLockConfig(DISPENSER).defaultFlags(BLOCK_REDSTONE));
+            blockprotections.add(new BlockLockConfig(DROPPER).defaultFlags(BLOCK_REDSTONE));
+            blockprotections.add(new BlockLockConfig(STANDING_SIGN));
+            blockprotections.add(new BlockLockConfig(WALL_SIGN));
+            blockprotections.add(new BlockLockConfig(WOODEN_DOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(IRON_DOOR));
+            blockprotections.add(new BlockLockConfig(TRAPDOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(FENCE_GATE).defaultFlags(AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(HOPPER).defaultFlags(HOPPER_IN, HOPPER_OUT));
         }
         if (protEntityEnable && (entityProtections == null || entityProtections.isEmpty()))
         {
             entityProtections = new ArrayList<>();
-            entityProtections.add(new EntityLockerConfiguration(HORSE).autoProtect(PRIVATE));
-            entityProtections.add(new EntityLockerConfiguration(CHESTED_MINECART));
-            entityProtections.add(new EntityLockerConfiguration(HOPPER_MINECART));
+            entityProtections.add(new EntityLockConfig(HORSE).autoProtect(PRIVATE));
+            entityProtections.add(new EntityLockConfig(CHESTED_MINECART));
+            entityProtections.add(new EntityLockConfig(HOPPER_MINECART));
         }
 
         if (this.protectWhenOnlyOffline && this.protectWhenOnlyOnline)
@@ -162,7 +160,7 @@ public class LockerConfig extends ReflectedYaml
     {
         if (detachableEntityCount == -1)
         {
-            for (EntityLockerConfiguration entityProtection : entityProtections)
+            for (EntityLockConfig entityProtection : entityProtections)
             {
                 if (entityProtection.type.equals(LEASH_HITCH)
                     || entityProtection.type.equals(PAINTING)

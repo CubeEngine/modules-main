@@ -19,16 +19,24 @@ package org.cubeengine.module.locker;
 
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.logscribe.Log;
-import org.cubeengine.module.core.util.matcher.EntityMatcher;
+import org.cubeengine.module.core.util.matcher.MaterialMatcher;
 import org.cubeengine.module.locker.storage.ProtectedType;
-import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.block.BlockType;
 
-public class EntityLockerConfiguration extends LockerSubConfig<EntityLockerConfiguration, EntityType>
+/**
+ * Example:
+ * B_DOOR:
+ *   auto-protect: PRIVATE
+ *   flags:
+ *      - BLOCK_REDSTONE
+ *      - AUTOCLOSE
+ */
+public class BlockLockConfig extends LockConfig<BlockLockConfig, BlockType>
 {
-    public EntityLockerConfiguration(EntityType entityType)
+    public BlockLockConfig(BlockType material)
     {
-        super(ProtectedType.getProtectedType(entityType));
-        this.type = entityType;
+        super(ProtectedType.getProtectedType(material));
+        this.type = material;
     }
 
     public String getTitle()
@@ -36,24 +44,24 @@ public class EntityLockerConfiguration extends LockerSubConfig<EntityLockerConfi
         return type.getId();
     }
 
-    public static class EntityLockerConfigConverter extends LockerSubConfigConverter<EntityLockerConfiguration>
+    public static class BlockLockerConfigConverter extends LockConfigConverter<BlockLockConfig>
     {
-        private EntityMatcher em;
+        private MaterialMatcher mm;
 
-        public EntityLockerConfigConverter(Log logger, EntityMatcher em)
+        public BlockLockerConfigConverter(Log logger, MaterialMatcher mm)
         {
             super(logger);
-            this.em = em;
+            this.mm = mm;
         }
 
-        protected EntityLockerConfiguration fromString(String s) throws ConversionException
+        protected BlockLockConfig fromString(String s) throws ConversionException
         {
-            EntityType entityType = em.any(s);
-            if (entityType == null)
+            BlockType material = mm.block(s);
+            if (material == null)
             {
-                throw ConversionException.of(this, s, "Invalid EntityType!");
+                throw ConversionException.of(this, s, "Invalid BlockType!");
             }
-            return new EntityLockerConfiguration(entityType);
+            return new BlockLockConfig(material);
         }
     }
 }

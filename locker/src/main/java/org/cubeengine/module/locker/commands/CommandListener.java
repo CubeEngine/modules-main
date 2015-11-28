@@ -135,9 +135,9 @@ public class CommandListener
 
     private boolean isPlayerInteract(Optional<Player> playerCause)
     {
-        return !playerCause.isPresent() &&
-            playerCause.get().get(Keys.IS_SNEAKING).get() ||
-            !lockActions.keySet().contains(playerCause.get().getUniqueId());
+        return playerCause.isPresent() &&
+                (playerCause.get().get(Keys.IS_SNEAKING).get() ||
+            !lockActions.keySet().contains(playerCause.get().getUniqueId()));
     }
 
     private void cmdUsed(Player user)

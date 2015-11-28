@@ -33,10 +33,13 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -142,8 +145,8 @@ public class Lock
 
     public boolean handleAccess(Player user, Location soundLocation, Cancellable event)
     {
-        if (this.isOwner(user)) return true;
         Boolean keyBookUsed = this.checkForKeyBook(user, soundLocation);
+        if (this.isOwner(user)) return true;
         if (keyBookUsed != null && !keyBookUsed)
         {
             event.setCancelled(true);
@@ -158,42 +161,46 @@ public class Lock
         return manager.hasUnlocked(user, this);
     }
 
-    public void attemptCreatingKeyBook(Player user, Boolean third)
+    public void attemptCreatingKeyBook(Player player, Boolean third)
     {
         if (this.getLockType() == PUBLIC) return; // ignore
         if (!this.manager.module.getConfig().allowKeyBooks)
         {
-            i18n.sendTranslated(user, POSITIVE, "KeyBooks are not enabled!");
+            i18n.sendTranslated(player, POSITIVE, "KeyBooks are not enabled!");
             return;
         }
         if (!third)
         {
             return;
         }
-        ItemStack itemStack = user.getItemInHand().orElse(null);
+        ItemStack itemStack = player.getItemInHand().orElse(null);
         if (itemStack != null && itemStack.getItem() == ItemTypes.BOOK)
         {
             itemStack.setQuantity(itemStack.getQuantity() - 1);
         }
-        if (user.getItemInHand().map(ItemStack::getItem).orElse(null) != ItemTypes.BOOK)
+        if (player.getItemInHand().map(ItemStack::getItem).orElse(null) != ItemTypes.BOOK)
         {
-            i18n.sendTranslated(user, NEGATIVE, "Could not create KeyBook! You need to hold a book in your hand in order to do this!");
+            i18n.sendTranslated(player, NEGATIVE, "Could not create KeyBook! You need to hold a book in your hand in order to do this!");
             return;
         }
         ItemStack item = module.getGame().getRegistry().createBuilder(ItemStack.Builder.class).itemType(ENCHANTED_BOOK).quantity(1).build();
         item.offer(Keys.DISPLAY_NAME, getColorPass().builder().append(KeyBook.TITLE).append(Texts.of(TextColors.DARK_GRAY, getId())).build());
-        item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(user, NEUTRAL, "This book can"),
-                i18n.getTranslation(user, NEUTRAL, "unlock a magically"),
-                i18n.getTranslation(user, NEUTRAL, "locked protection")));
-        item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCK.PASSWORD)));
-        user.setItemInHand(item);
+        item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(player, NEUTRAL, "This book can"),
+                i18n.getTranslation(player, NEUTRAL, "unlock a magically"),
+                i18n.getTranslation(player, NEUTRAL, "locked protection")));
+        item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCK.PASSWORD), game.getRegistry().getValueFactory()));
+        player.setItemInHand(item);
         if (itemStack != null && itemStack.getQuantity() != 0)
         {
-            user.getInventory().offer(itemStack);
+            player.getInventory().offer(itemStack); // TODO check response
             if (itemStack.getQuantity() != 0)
             {
-                // TODO drop items in world
-                //((World)location.getExtent()).dropItem(location, stack);
+                Location<World> loc = player.getLocation();
+                Optional<Entity> entity = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
+                entity.ifPresent(e -> {
+                    e.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
+                    loc.getExtent().spawnEntity(e, Cause.of(player));
+                });
             }
         }
     }
@@ -407,7 +414,7 @@ public class Lock
         return model;
     }
 
-    public void handleInventoryOpen(Cancellable event, Inventory protectedInventory, Location soundLocation, Player user)
+    public void handleInventoryOpen(Cancellable event, Inventory protectedInventory, Location<World> soundLocation, Player user)
     {
         if (soundLocation != null && user.hasPermission(module.perms().SHOW_OWNER.getId()))
         {
@@ -434,8 +441,7 @@ public class Lock
                 out = true;
         }
         AccessListModel access = this.getAccess(user);
-        if (access == null && this.getLockType() == LockType.PRIVATE && !user.hasPermission(
-            module.perms().ACCESS_OTHER.getId()))
+        if (access == null && this.getLockType() == LockType.PRIVATE && !user.hasPermission(module.perms().ACCESS_OTHER.getId()))
         {
             event.setCancelled(true); // private & no access
             if (user.hasPermission(module.perms().SHOW_OWNER.getId()))
@@ -618,6 +624,10 @@ public class Lock
             this.lastKeyNotify = new HashMap<>();
         }
         User owner = this.manager.um.getById(this.model.getValue(TABLE_LOCK.OWNER_ID)).get().getUser();
+        if (owner.equals(user))
+        {
+            return;
+        }
         Long last = this.lastKeyNotify.get(owner.getUniqueId());
         if (last == null || TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - last) > 60) // 60 sec config ?
         {

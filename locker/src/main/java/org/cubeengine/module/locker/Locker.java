@@ -24,8 +24,8 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.Module;
-import org.cubeengine.module.locker.BlockLockerConfiguration.BlockLockerConfigConverter;
-import org.cubeengine.module.locker.EntityLockerConfiguration.EntityLockerConfigConverter;
+import org.cubeengine.module.locker.BlockLockConfig.BlockLockerConfigConverter;
+import org.cubeengine.module.locker.EntityLockConfig.EntityLockerConfigConverter;
 import org.cubeengine.module.locker.commands.LockerAdminCommands;
 import org.cubeengine.module.locker.commands.LockerCommands;
 import org.cubeengine.module.locker.commands.LockerCreateCommands;
@@ -84,7 +84,8 @@ public class Locker extends Module
     @Inject
     public Locker(Game game)
     {
-        game.getRegistry().getManipulatorRegistry().register(LockerData.class, ImmutableLockerData.class, new LockerDataBuilder());
+        game.getManipulatorRegistry().register(LockerData.class, ImmutableLockerData.class,
+                                                    new LockerDataBuilder(game.getRegistry().getValueFactory()));
     }
 
     @Enable
@@ -93,8 +94,8 @@ public class Locker extends Module
         cm.getProviderManager().register(this, new PlayerAccess.PlayerAccessReader(game), PlayerAccess.class);
 
         ConverterManager cManager = reflector.getDefaultConverterManager();
-        cManager.registerConverter(new BlockLockerConfigConverter(logger, mm), BlockLockerConfiguration.class);
-        cManager.registerConverter(new EntityLockerConfigConverter(logger, entityMatcher), EntityLockerConfiguration.class);
+        cManager.registerConverter(new BlockLockerConfigConverter(logger, mm), BlockLockConfig.class);
+        cManager.registerConverter(new EntityLockerConfigConverter(logger, entityMatcher), EntityLockConfig.class);
         this.config = fm.loadConfig(this, LockerConfig.class);
         db.registerTable(TableLocks.class);
         db.registerTable(TableLockLocations.class);
@@ -120,6 +121,7 @@ public class Locker extends Module
     public void reload()
     {
         // TODO add possibility in modularity
+        // full reload is impossible because of Sponge not allowing registration of DataBuilders after bootup
         /*
         this.onDisable();
         this.config = this.loadConfig(LockerConfig.class);
