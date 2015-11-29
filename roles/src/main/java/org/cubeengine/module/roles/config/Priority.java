@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.roles.config;
 
-
 import java.util.HashMap;
 import java.util.Map;
 

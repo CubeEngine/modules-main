@@ -18,6 +18,7 @@
 package org.cubeengine.module.roles.sponge.collection;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +29,7 @@ import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
+import org.cubeengine.module.roles.sponge.subject.UserSubject;
 import org.cubeengine.service.permission.PermissionManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.Game;
@@ -41,7 +43,6 @@ import static org.spongepowered.api.service.permission.PermissionService.SUBJECT
 public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 {
     private final Map<String, String> mirrors;
-    private final Map<String, RoleSubject> subjects = new ConcurrentHashMap<>();
     private Roles module;
     private RolesPermissionService service;
     private PermissionManager manager;
@@ -154,7 +155,9 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         config.roleName = name;
         config.setFile(path.resolve(name + ".yml").toFile());
         config.reload();
-        return new RoleSubject(module, service, config, new Context(ctxType, ctxName));
+        RoleSubject subject = new RoleSubject(module, service, config, new Context(ctxType, ctxName));
+        subjects.put(subject.getIdentifier(), subject);
+        return subject;
     }
 
     @Override
@@ -175,9 +178,42 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         return false;
     }
 
-    public void delete(RoleSubject r)
+    public boolean delete(RoleSubject r, boolean force)
     {
-        // TODO delete
+        // TODO maybe async this whole thing
+
+        // remove role from files
+        for (RoleSubject roleSubject : subjects.values())
+        {
+            if (roleSubject.isChildOf(r))
+            {
+                if (!force)
+                {
+                    return false; // prevent deletion when still in use
+                }
+                roleSubject.getSubjectData().removeParent(r.getActiveContexts(), r);
+            }
+        }
+
+        for (UserSubject userSubject : service.getUserSubjects().subjects.values())
+        {
+            if (userSubject.isChildOf(r.getActiveContexts(), r))
+            {
+                if (!force)
+                {
+                    return false; // prevent deletion when still in use
+                }
+                userSubject.getSubjectData().removeParent(r.getActiveContexts(), r);
+            }
+        }
+
+        // TODO remove defaultrole status
+
+        subjects.values().remove(r);
+        r.getSubjectData().delete(); // delete file
+
+        // TODO reload/calculate perms ; is this needed ?
+        return true;
     }
 
     public void reload()

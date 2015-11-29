@@ -19,12 +19,7 @@ package org.cubeengine.module.roles.commands;
 
 import java.util.Set;
 import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Complete;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.butler.parametric.*;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.node.StringNode;
@@ -219,11 +214,15 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = "deleteRole")
     @Command(desc = "Deletes a role")
-    public void delete(CommandContext context, ContextualRole role)
+    public void delete(CommandContext context, ContextualRole role, @Flag boolean force)
     {
         RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
-        service.getGroupSubjects().delete(r);
-        context.sendTranslated(POSITIVE, "Deleted the role {role} in {context}!", r, role.getContext());
+        if (service.getGroupSubjects().delete(r, force))
+        {
+            context.sendTranslated(POSITIVE, "Deleted the role {role} in {context}!", r, role.getContext());
+            return;
+        }
+        context.sendTranslated(NEGATIVE, "Role is still in use! Use the -force flag to delete the role and all occurrences", r, role.getContext());
     }
 
     @Command(alias = {"toggledefault", "toggledef"}, desc = "Toggles whether given role is a default role")

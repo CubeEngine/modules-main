@@ -19,8 +19,16 @@ package org.cubeengine.module.roles.exception;
 
 public class CircularRoleDependencyException extends RuntimeException
 {
-    public CircularRoleDependencyException(String string)
+    private int depth;
+
+    public CircularRoleDependencyException(String message, int depth)
     {
-        super(string);
+        super(message + " " + depth);
+        this.depth = depth;
+    }
+
+    public int getDepth()
+    {
+        return depth;
     }
 }

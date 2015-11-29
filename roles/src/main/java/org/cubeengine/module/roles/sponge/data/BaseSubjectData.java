@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.cubeengine.module.roles.commands.RoleCommands;
+import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
@@ -146,7 +147,26 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public boolean addParent(Set<Context> contexts, Subject parent)
     {
+        checkForCircularDependency(contexts, parent, 0);
+        if (parents.get(contexts).contains(parent))
+        {
+            return false;
+        }
         return unCache(operate(contexts, parents, l -> l.add(parent)), contexts, parents.keySet());
+    }
+
+    protected void checkForCircularDependency(Set<Context> contexts, Subject parent, int depth)
+    {
+        if (this == parent.getSubjectData())
+        {
+            throw new CircularRoleDependencyException("at", depth); // TODO translatable / show parameter
+            // add exceptionhandler to cmd lib?
+        }
+        depth++;
+        for (Subject parentParents : parent.getParents(contexts))
+        {
+            checkForCircularDependency(contexts, parentParents, depth);
+        }
     }
 
     @Override

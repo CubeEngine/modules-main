@@ -39,7 +39,6 @@ import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
-
 @Command(name = "user", desc = "Manage users")
 public class UserInformationCommands extends ContainerCommand
 {

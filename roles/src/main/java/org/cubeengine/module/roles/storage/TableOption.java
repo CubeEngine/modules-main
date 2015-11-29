@@ -29,10 +29,8 @@ import static org.jooq.impl.SQLDataType.VARCHAR;
 public class TableOption extends Table<UserOption>
 {
     public static TableOption TABLE_META;
-    public final TableField<UserOption, UUID> USER = createField("userId", SQLDataType.UUID.length(255).nullable(false),
-                                                                 this);
-    public final TableField<UserOption, String> CONTEXT = createField("worldId", VARCHAR.length(255).nullable(false),
-                                                                      this);
+    public final TableField<UserOption, UUID> USER = createField("userId", SQLDataType.UUID.length(255).nullable(false), this);
+    public final TableField<UserOption, String> CONTEXT = createField("worldId", VARCHAR.length(255).nullable(false), this);
     public final TableField<UserOption, String> KEY = createField("key", VARCHAR.length(255).nullable(false), this);
     public final TableField<UserOption, String> VALUE = createField("value", VARCHAR.length(255).nullable(false), this);
 

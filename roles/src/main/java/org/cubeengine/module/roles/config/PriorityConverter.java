@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.roles.config;
 
-
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.Node;

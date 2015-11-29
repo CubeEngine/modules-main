@@ -34,10 +34,12 @@ import static java.util.stream.Collectors.toList;
 
 public class ContextReader implements ArgumentReader<Context>, Completer, DefaultValue<Context>
 {
+    private RolesPermissionService service;
     private Game game;
 
     public ContextReader(RolesPermissionService service, Game game)
     {
+        this.service = service;
         this.game = game;
     }
 
@@ -45,24 +47,35 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
     public Context read(Class type, CommandInvocation invocation) throws ReaderException
     {
         String token = invocation.consume(1);
+        String checkToken = token.toLowerCase();
+        if ("global".equalsIgnoreCase(token))
+        {
+            return new Context("global", "");
+        }
         if (token.contains("|"))
         {
-            // TODO implement me
-            // then look in mirrors for other contexts
+            String[] parts = token.split("\\|", 2);
+            if (!parts[0].equals("world"))
+            {
+                return new Context(parts[0], parts[1]);
+            }
+            if (!isValidWorld(parts[1]))
+            {
+                throw new ReaderException("Unknown context: {}", token);
+                // TODO look in mirrors for other contexts
+            }
+            checkToken = parts[1];
         }
-        else // world or global
+        if (isValidWorld(checkToken)) // try for world
         {
-            if ("global".equalsIgnoreCase(token))
-            {
-                return new Context("global", "");
-            }
-            Optional<World> world = game.getServer().getWorld(token);
-            if (world.isPresent())
-            {
-                return new Context("world", token.toLowerCase());
-            }
+            return new Context("world", checkToken);
         }
         throw new ReaderException("Unknown context: {}", token);
+    }
+
+    private boolean isValidWorld(String token)
+    {
+        return game.getServer().getWorld(token).isPresent();
     }
 
     @Override
@@ -79,19 +92,25 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
     public List<String> getSuggestions(CommandInvocation invocation)
     {
         String token = invocation.currentToken();
-        List<String> list = game.getServer().getWorlds().stream().map(World::getName).filter(n -> n.toLowerCase().startsWith(
-            token.toLowerCase())).collect(toList());
-        list.addAll(game.getServer().getWorlds().stream()
-                .filter(world -> world.getName().startsWith(token))
+        List<String> list = game.getServer().getWorlds().stream()
                 .map(World::getName)
-                .collect(toList()));
+                .filter(n -> n.toLowerCase().startsWith(token.toLowerCase()))
+                .collect(toList());
         if ("global".startsWith(token.toLowerCase()))
         {
             list.add("global");
         }
 
+        if (token.equals("world") || token.toLowerCase().startsWith("world|"))
+        {
+            String subToken = token.equals("world") ? "" : token.substring(6);
+            list.addAll(game.getServer().getWorlds().stream()
+                    .map(World::getName)
+                    .filter(n -> n.toLowerCase().startsWith(subToken.toLowerCase()))
+                    .map(n -> "world|" + n)
+                    .collect(toList()));
+        }
         // TODO last ctx from mirror
-        // TODO show world|<...> only if starting with world|
         return list;
     }
 }

@@ -41,6 +41,7 @@ import org.cubeengine.module.core.sponge.CoreModule;
 import org.cubeengine.module.roles.commands.ManagementCommands;
 import org.cubeengine.module.roles.commands.UserManagementCommands;
 import org.cubeengine.module.roles.commands.provider.DefaultPermissionValueProvider;
+import org.cubeengine.module.roles.exception.RolesExceptionHandler;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.module.core.sponge.EventManager;
@@ -87,13 +88,10 @@ public class Roles extends Module
     @Inject private Reflector reflector;
     @Inject private Database db;
     @Inject private Log logger;
-    @Inject private UserManager um;
     @Inject private CommandManager cm;
     @Inject private EventManager em;
-    @Inject private TaskManager tm;
     @Inject private FileManager fm;
     @Inject private WorldManager wm;
-    @Inject private PermissionManager pm;
     @Inject private org.spongepowered.api.Game game;
     @Inject private I18n i18n;
     @Inject private PermissionManager manager;
@@ -105,10 +103,10 @@ public class Roles extends Module
 
     private Log permLogger;
 
-
     @Setup
     public void onSetup()
     {
+        cm.getProviderManager().getExceptionHandler().addHandler(new RolesExceptionHandler(i18n));
         this.permLogger = factory.getLog(CoreModule.class, "Permissions");
         this.permLogger.addTarget(new AsyncFileTarget(getLogFile(fm, "Permissions"), getFileFormat(false, false), false, getCycler(), threadFactory));
 

@@ -216,4 +216,16 @@ public class RoleSubjectData extends CachingSubjectData
         config.reload();
         super.reload();
     }
+
+    public void delete()
+    {
+        try
+        {
+            Files.delete(config.getFile().toPath());
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException(e);
+        }
+   }
 }
