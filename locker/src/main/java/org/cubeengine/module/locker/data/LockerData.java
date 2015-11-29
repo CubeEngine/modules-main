@@ -47,7 +47,6 @@ public class LockerData implements DataManipulator<LockerData, ImmutableLockerDa
         this.lockID = lockID;
         this.pass = pass;
         this.valueFactory = valueFactory;
-
     }
 
     public LockerData(ValueFactory valueFactory)

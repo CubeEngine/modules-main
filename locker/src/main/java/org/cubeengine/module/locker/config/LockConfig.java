@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.locker;
+package org.cubeengine.module.locker.config;
 
 import java.util.Arrays;
 import java.util.List;
@@ -66,5 +66,15 @@ public abstract class LockConfig<This extends LockConfig,T>
             result |= defaultFlag.flagValue;
         }
         return result;
+    }
+
+    public boolean isAutoProtect()
+    {
+        return autoProtect;
+    }
+
+    public LockType getAutoProtect()
+    {
+        return autoProtectType;
     }
 }

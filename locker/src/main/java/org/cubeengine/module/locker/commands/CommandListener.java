@@ -17,55 +17,41 @@
  */
 package org.cubeengine.module.locker.commands;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import de.cubeisland.engine.logscribe.Log;
-import org.cubeengine.module.core.util.Triplet;
-import org.cubeengine.module.core.util.matcher.StringMatcher;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.module.locker.storage.LockType;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserManager;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
-import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.module.locker.commands.CommandListener.CommandType.*;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 
 public class CommandListener
 {
     private final Map<UUID, LockAction> lockActions = new HashMap<>();
     private final Map<UUID, Long> persist = new HashMap<>();
 
-    private final Locker module;
     private final LockManager manager;
-    private UserManager um;
-    private Log logger;
-    private StringMatcher stringMatcher;
     private I18n i18n;
 
-    public CommandListener(Locker module, LockManager manager, UserManager um, Log logger, StringMatcher stringMatcher, I18n i18n)
+    public CommandListener(LockManager manager, I18n i18n)
     {
-        this.module = module;
         this.manager = manager;
-        this.um = um;
-        this.logger = logger;
-        this.stringMatcher = stringMatcher;
         this.i18n = i18n;
     }
 

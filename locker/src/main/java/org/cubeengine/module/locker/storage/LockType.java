@@ -36,7 +36,6 @@ public enum LockType
     public final byte id;
     public final Collection<ProtectedType> supportedTypes;
 
-
     static
     {
         for (LockType lockType : LockType.values())

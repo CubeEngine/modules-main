@@ -63,7 +63,7 @@ public class LockerCommands extends ContainerCommand
     private StringMatcher sm;
     private I18n i18n;
 
-    public LockerCommands(Locker module, LockManager manager, UserManager um, I18n i18n, StringMatcher sm)
+    public LockerCommands(Locker module, LockManager manager, I18n i18n, StringMatcher sm)
     {
         super(module);
         this.module = module;

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.locker;
+package org.cubeengine.module.locker.config;
 
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.logscribe.Log;

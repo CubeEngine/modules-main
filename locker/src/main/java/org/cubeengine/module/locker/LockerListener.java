@@ -21,10 +21,10 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import org.cubeengine.module.core.util.BlockUtil;
+import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.UserManager;
 import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -76,16 +76,14 @@ import static org.spongepowered.api.util.Direction.*;
 public class LockerListener
 {
     private final LockManager manager;
-    private UserManager um;
     private I18n i18n;
     private Game game;
     private final Locker module;
 
-    public LockerListener(Locker module, LockManager manager, UserManager um, I18n i18n, Game game)
+    public LockerListener(Locker module, LockManager manager, I18n i18n, Game game)
     {
         this.module = module;
         this.manager = manager;
-        this.um = um;
         this.i18n = i18n;
         this.game = game;
     }
@@ -327,8 +325,8 @@ public class LockerListener
             {
                 if (blockprotection.isType(type))
                 {
-                    if (!blockprotection.autoProtect) return;
-                    this.manager.createLock(placed.getLocation().get(), playerCause.get(), blockprotection.autoProtectType, null, false);
+                    if (!blockprotection.isAutoProtect()) return;
+                    this.manager.createLock(placed.getLocation().get(), playerCause.get(), blockprotection.getAutoProtect(), null, false);
                     return;
                 }
             }
@@ -628,11 +626,11 @@ public class LockerListener
         if (playerCause.isPresent())
         {
             this.module.getConfig().entityProtections.stream()
-                 .filter(entityProtection -> entityProtection.isType(entity.getType()) && entityProtection.autoProtect)
+                 .filter(entityProtection -> entityProtection.isType(entity.getType()) && entityProtection.isAutoProtect())
                  .forEach(entityProtection -> {
                      if (this.manager.getLockForEntityUID(entity.getUniqueId()) == null)
                      {
-                         this.manager.createLock(entity, playerCause.get(), entityProtection.autoProtectType, null, false);
+                         this.manager.createLock(entity, playerCause.get(), entityProtection.getAutoProtect(), null, false);
                      }
                  });
         }

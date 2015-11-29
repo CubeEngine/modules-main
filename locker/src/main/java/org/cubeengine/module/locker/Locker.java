@@ -24,8 +24,10 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.Module;
-import org.cubeengine.module.locker.BlockLockConfig.BlockLockerConfigConverter;
-import org.cubeengine.module.locker.EntityLockConfig.EntityLockerConfigConverter;
+import org.cubeengine.module.locker.config.BlockLockConfig;
+import org.cubeengine.module.locker.config.BlockLockConfig.BlockLockerConfigConverter;
+import org.cubeengine.module.locker.config.EntityLockConfig;
+import org.cubeengine.module.locker.config.EntityLockConfig.EntityLockerConfigConverter;
 import org.cubeengine.module.locker.commands.LockerAdminCommands;
 import org.cubeengine.module.locker.commands.LockerCommands;
 import org.cubeengine.module.locker.commands.LockerCreateCommands;
@@ -57,7 +59,6 @@ public class Locker extends Module
     private LockerConfig config;
     private LockManager manager;
     private LockerListener listener;
-
 
     public LockerPerm perms()
     {
@@ -101,12 +102,12 @@ public class Locker extends Module
         db.registerTable(TableLockLocations.class);
         db.registerTable(TableAccessList.class);
         manager = new LockManager(this, em, sm, db, wm, um, tm, i18n, game);
-        LockerCommands lockerCmd = new LockerCommands(this, manager, um, i18n, sm);
+        LockerCommands lockerCmd = new LockerCommands(this, manager, i18n, sm);
         cm.addCommand(lockerCmd);
         lockerCmd.addCommand(new LockerCreateCommands(this, manager, i18n));
         lockerCmd.addCommand(new LockerAdminCommands(this, manager));
         perms = new LockerPerm(this, lockerCmd);
-        listener = new LockerListener(this, manager, um, i18n, game);
+        listener = new LockerListener(this, manager, i18n, game);
         em.registerListener(this, listener);
     }
 

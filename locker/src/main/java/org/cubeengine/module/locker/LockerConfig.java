@@ -21,6 +21,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Transient;
+
+import org.cubeengine.module.locker.config.BlockLockConfig;
+import org.cubeengine.module.locker.config.EntityLockConfig;
 import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
@@ -162,9 +165,9 @@ public class LockerConfig extends ReflectedYaml
         {
             for (EntityLockConfig entityProtection : entityProtections)
             {
-                if (entityProtection.type.equals(LEASH_HITCH)
-                    || entityProtection.type.equals(PAINTING)
-                    || entityProtection.type.equals(ITEM_FRAME))
+                if (entityProtection.isType(LEASH_HITCH)
+                    || entityProtection.isType(PAINTING)
+                    || entityProtection.isType(ITEM_FRAME))
                 {
                     detachableEntityCount++;
                 }

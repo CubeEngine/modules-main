@@ -30,8 +30,8 @@ import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.core.util.BlockUtil;
 import org.cubeengine.module.core.util.matcher.StringMatcher;
-import org.cubeengine.module.locker.BlockLockConfig;
-import org.cubeengine.module.locker.EntityLockConfig;
+import org.cubeengine.module.locker.config.BlockLockConfig;
+import org.cubeengine.module.locker.config.EntityLockConfig;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.commands.CommandListener;
 import org.cubeengine.module.locker.commands.PlayerAccess;
@@ -138,7 +138,7 @@ public class LockManager
         {
             throw new RuntimeException("SHA-1 hash algorithm not available!");
         }
-        this.commandListener = new CommandListener(module, this, um, logger, this.stringMatcher, i18n);
+        this.commandListener = new CommandListener(this, i18n);
         em.registerListener(module, this.commandListener);
         em.registerListener(module, this);
 
