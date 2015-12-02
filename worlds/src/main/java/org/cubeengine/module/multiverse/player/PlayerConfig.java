@@ -15,16 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.worlds.config;
+package org.cubeengine.module.multiverse.player;
 
-import de.cubeisland.engine.reflect.annotations.Comment;
+import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 
 @SuppressWarnings("all")
-public class WorldsConfig extends ReflectedYaml
+public class PlayerConfig extends ReflectedYaml
 {
-    @Comment("The main universe")
-    public String mainUniverse;
-    @Comment("When joining the server for the first time teleport the player to the spawn of the main world in the main universe")
-    public boolean adjustFirstSpawn = false;
+    public ConfigWorld lastWorld;
+    public String lastName;
 }

@@ -15,20 +15,27 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.worlds;
+package org.cubeengine.module.worlds;
 
-import org.cubeengine.service.permission.PermissionContainer;
-import org.spongepowered.api.service.permission.PermissionDescription;
+import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
+import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.modularity.core.marker.Enable;
+import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.Game;
 
-@SuppressWarnings("all")
-public class WorldsPermissions extends PermissionContainer<Worlds>
+import javax.inject.Inject;
+
+@ModuleInfo(name = "Worlds", description = "easy lightweight worldmanagement")
+public class Worlds extends Module
 {
-    public WorldsPermissions(Worlds module)
-    {
-        super(module);
-    }
+    @Inject private CommandManager cm;
+    @Inject private Game game;
+    @Inject private I18n i18n;
 
-    public final PermissionDescription KEEP_GAMEMODE = register("keep-gamemode", "Keeps the gamemode in between worlds", null);
-    public final PermissionDescription KEEP_FLYMODE = register("keep-flymode", "Keeps the flymode in between worlds", null);
-    public final PermissionDescription REMOVE_WORLDFOLDER = register("remove-worldfolder", "Allows deleting the world folder", null);
+    @Enable
+    public void onLoad()
+    {
+        this.cm.addCommand(new WorldsCommands(this, i18n, game));
+    }
 }

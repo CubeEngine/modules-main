@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.worlds.player;
+package org.cubeengine.module.multiverse.player;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -23,12 +23,15 @@ import java.util.Collection;
 import de.cubeisland.engine.module.core.CubeEngine;
 import de.cubeisland.engine.reflect.codec.nbt.ReflectedNBT;
 import org.bukkit.Bukkit;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.player.Player;
 import org.bukkit.inventory.Inventory;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.potion.PotionEffect;
 
 public class PlayerDataConfig extends ReflectedNBT
 {

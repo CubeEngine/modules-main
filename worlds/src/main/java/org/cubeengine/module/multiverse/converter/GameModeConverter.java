@@ -15,28 +15,37 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.worlds.converter;
+package org.cubeengine.module.multiverse.converter;
 
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
-import org.bukkit.World.Environment;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 
-public class EnvironmentConverter extends SimpleConverter<Environment>
+public class GameModeConverter extends SimpleConverter<GameMode>
 {
-    @Override
-    public Node toNode(Environment object) throws ConversionException
+    private final Game game;
+
+    public GameModeConverter(Game game)
     {
-        return new StringNode(object.name());
+        this.game = game;
+    }
+
+
+    @Override
+    public Node toNode(GameMode object) throws ConversionException
+    {
+        return new StringNode(object.getId());
     }
 
     @Override
-    public Environment fromNode(Node node) throws ConversionException
+    public GameMode fromNode(Node node) throws ConversionException
     {
         try
         {
-            return Environment.valueOf(node.asText());
+            return game.getRegistry().getType(GameMode.class, node.asText()).get();
         }
         catch (IllegalArgumentException e)
         {

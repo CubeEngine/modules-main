@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.worlds.converter;
+package org.cubeengine.module.multiverse.converter;
 
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.SimpleConverter;
@@ -34,7 +34,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.ItemStack;
 
 public class InventoryConverter extends SimpleConverter<Inventory>
 {

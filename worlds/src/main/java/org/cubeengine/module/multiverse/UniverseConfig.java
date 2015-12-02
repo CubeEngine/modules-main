@@ -15,19 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.worlds.config;
+package org.cubeengine.module.multiverse;
 
 import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.bukkit.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+
+import java.util.List;
 
 @SuppressWarnings("all")
 public class UniverseConfig extends ReflectedYaml
 {
     @Comment("The main world in this universe")
     public ConfigWorld mainWorld;
+
+    @Comment("The worlds in this universe")
+    public List<ConfigWorld> worlds;
 
     @Comment({"Players will keep their gamemode when changing worlds in this universe",
              "You should set this to false if players cannot change their gamemode in this universe"})
