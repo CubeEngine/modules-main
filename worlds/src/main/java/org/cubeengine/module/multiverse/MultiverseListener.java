@@ -209,7 +209,7 @@ public class MultiverseListener
             Vector3d vector3d = event.getUser().get(Keys.RESPAWN_LOCATIONS).get().get(event.getEntity().getWorld().getUniqueId());
             event.setSpawnLocation();
             // Wait until spawn is set & reset it
-            final Location spawnLocation = event.getUser().getOrCreate(RespawnLocationData.class).get().getRespawnLocation()
+            final Location spawnLocation = event.getUser().getOrCreate(RespawnLocationData.class).get().getRespawnLocation();
             tm.runTaskDelayed(module, () -> event.getUser().offer(event.getUser().getOrCreate(RespawnLocationData.class).get().setRespawnLocation(spawnLocation)), 1);
         }
     }

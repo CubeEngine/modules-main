@@ -24,7 +24,7 @@ import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorage;
+import org.spongepowered.api.service.user.UserStorageService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -66,7 +66,7 @@ public class PlayerAccess
 
             User user = game.getServer().getPlayer(token)
                     .map(User.class::cast)
-                    .orElse(game.getServiceManager().provideUnchecked(UserStorage.class).get(token)
+                    .orElse(game.getServiceManager().provideUnchecked(UserStorageService.class).get(token)
                             .orElse(null));
 
             if (user == null)

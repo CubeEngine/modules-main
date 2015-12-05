@@ -26,7 +26,7 @@ import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.data.RoleSubjectData;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandSource;
 
 import static java.util.Collections.singleton;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;

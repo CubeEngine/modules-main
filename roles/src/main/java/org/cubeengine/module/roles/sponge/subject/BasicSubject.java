@@ -26,7 +26,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandSource;
 
 public class BasicSubject extends BaseSubject<BaseSubjectData>
 {

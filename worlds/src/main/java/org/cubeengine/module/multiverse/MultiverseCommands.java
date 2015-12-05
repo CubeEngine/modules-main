@@ -10,7 +10,7 @@ import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.command.CommandSource;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.World;
 
 import java.io.IOException;
