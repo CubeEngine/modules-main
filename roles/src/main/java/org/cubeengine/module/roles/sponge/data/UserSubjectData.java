@@ -17,30 +17,30 @@
  */
 package org.cubeengine.module.roles.sponge.data;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.UUID;
+import org.cubeengine.module.roles.data.PermissionData;
+import org.cubeengine.module.roles.data.IPermissionData;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.collection.RoleCollection;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
-import org.cubeengine.module.roles.storage.UserRole;
-import org.cubeengine.module.roles.commands.RoleCommands;
-import org.cubeengine.module.roles.storage.TableOption;
-import org.cubeengine.module.roles.storage.TablePerm;
-import org.cubeengine.module.roles.storage.TableRole;
-import org.cubeengine.service.database.Database;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.user.UserStorageService;
+
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 public class UserSubjectData extends CachingSubjectData
 {
-    private final Database db;
     private final UUID uuid;
     private RoleCollection roleCollection;
 
     public UserSubjectData(RolesPermissionService service, UUID uuid)
     {
         this.roleCollection = service.getGroupSubjects();
-        this.db = service.getDB();
         this.uuid = uuid;
     }
 
@@ -54,13 +54,16 @@ public class UserSubjectData extends CachingSubjectData
     {
         for (Context context : c)
         {
-            Set<Context> set = RoleCommands.toSet(context);
-            if (!options.containsKey(set))
+            String contextString = stringify(context) + "\n";
+            if (!options.containsKey(context))
             {
-                options.put(set, new RecordBackedMap<>(db, TableOption.TABLE_META,
-                                                       TableOption.TABLE_META.KEY, TableOption.TABLE_META.VALUE,
-                                                       TableOption.TABLE_META.USER, uuid,
-                                                       TableOption.TABLE_META.CONTEXT, stringify(context)));
+                UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
+                Map<String, String> opts = storage.get(uuid).get().get(IPermissionData.OPTIONS)
+                        .orElse(Collections.emptyMap());
+                opts = opts.entrySet().stream()
+                        .filter(e -> !e.getKey().startsWith(contextString))
+                        .collect(toMap(e -> e.getKey().split("\\n")[1], Map.Entry::getValue));
+                options.put(context, opts);
             }
         }
     }
@@ -70,13 +73,16 @@ public class UserSubjectData extends CachingSubjectData
     {
         for (Context context : c)
         {
-            Set<Context> set = RoleCommands.toSet(context);
-            if (!permissions.containsKey(set))
+            String contextString = stringify(context) + "\n";
+            if (!permissions.containsKey(context))
             {
-                permissions.put(set, new RecordBackedMap<>(db, TablePerm.TABLE_PERM,
-                                                           TablePerm.TABLE_PERM.PERM, TablePerm.TABLE_PERM.ISSET,
-                                                           TablePerm.TABLE_PERM.USER, uuid,
-                                                           TablePerm.TABLE_PERM.CONTEXT, stringify(context)));
+                UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
+                Map<String, Boolean> perms = storage.get(uuid).get().get(IPermissionData.PERMISSIONS)
+                        .orElse(Collections.emptyMap());
+                perms = perms.entrySet().stream()
+                        .filter(e -> !e.getKey().startsWith(contextString))
+                        .collect(toMap(e -> e.getKey().split("\\n")[1], Map.Entry::getValue));
+                permissions.put(context, perms);
             }
         }
     }
@@ -86,21 +92,27 @@ public class UserSubjectData extends CachingSubjectData
     {
         for (Context context : c)
         {
-            Set<Context> set = RoleCommands.toSet(context);
-            if (!parents.containsKey(set))
+            String contextString = stringify(context) + "\n";
+            if (!parents.containsKey(context))
             {
-                RecordBackedList<UserRole> list = new RecordBackedList<>(roleCollection, db,
-                                                                         TableRole.TABLE_ROLE, TableRole.TABLE_ROLE.ROLE,
-                                                                         TableRole.TABLE_ROLE.USER, uuid,
-                                                                         TableRole.TABLE_ROLE.CONTEXT, stringify(context));
-                Collections.sort(list, (o1, o2) -> {
-                    if (o1 instanceof RoleSubject && o2 instanceof RoleSubject)
-                    {
-                        return ((RoleSubject)o1).compareTo((RoleSubject)o2);
-                    }
-                    return 1;
-                });
-                parents.put(set, list);
+                UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
+                List<String> parentList = storage.get(uuid).get().get(IPermissionData.PARENTS)
+                        .orElse(Collections.emptyList());
+                List<Subject> list = parentList.stream()
+                        .filter(p -> p.startsWith(contextString))
+                        .map(p -> p.split("\\n")[1])
+                        .map(roleCollection::get)
+                        .sorted((o1, o2) -> {
+                            if (o1 != null && o2 != null)
+                            {
+                                return o1.compareTo(o2);
+                            }
+                            return 1;
+                        })
+                        .map(Subject.class::cast)
+                        .collect(toList());
+
+                parents.put(context, list);
             }
         }
     }
@@ -110,17 +122,65 @@ public class UserSubjectData extends CachingSubjectData
     {
         if (changed)
         {
-            permissions.values().stream()
-                       .filter(map -> map instanceof RecordBackedMap)
-                       .map(map -> (RecordBackedMap)map)
-                       .forEach(RecordBackedMap::save);
-            options.values().stream().filter(map -> map instanceof RecordBackedMap)
-                       .map(map -> (RecordBackedMap)map)
-                       .forEach(RecordBackedMap::save);
-            parents.values().stream().filter(map -> map instanceof RecordBackedList)
-                       .map(map -> (RecordBackedList)map)
-                       .forEach(RecordBackedList::save);
+            UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
+
+            List<String> parents = this.parents.entrySet().stream().flatMap(e -> {
+                String context = stringify(e.getKey()) + "\n";
+                List<String> list = new ArrayList<>();
+                for (Subject subject : e.getValue())
+                {
+                    if (!(subject instanceof RoleSubject))
+                    {
+                        // TODO WARN: Subject that is not a role will not be persisted
+                        continue;
+                    }
+                    list.add(context + subject.getIdentifier().substring(5));
+                }
+                return list.stream();
+            }).collect(toList());
+
+            Map<String, Boolean> permissions = this.permissions.entrySet().stream().flatMap(e -> {
+                String context = stringify(e.getKey()) + "\n";
+                return e.getValue().entrySet().stream()
+                        .collect(toMap(
+                                ee -> context + ee.getKey(),
+                                Map.Entry::getValue
+                        )).entrySet().stream();
+            }).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            Map<String, String> options = this.options.entrySet().stream().flatMap(e -> {
+                String context = stringify(e.getKey())+ "\n";
+                return e.getValue().entrySet().stream()
+                        .collect(toMap(
+                                ee -> context + ee.getKey(),
+                                Map.Entry::getValue
+                        )).entrySet().stream();
+            }).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            User user = storage.get(uuid).get();
+            user.offer(new PermissionData(parents, permissions, options));
+
+            // TODO remove once saving data on user is implemented
+            user.getPlayer().ifPresent(p -> p.offer(new PermissionData(parents, permissions, options)));
         }
         return changed;
+    }
+
+    @Override
+    protected void cacheParents()
+    {
+        // TODO cache all the things
+    }
+
+    @Override
+    protected void cachePermissions()
+    {
+        // TODO cache all the things
+    }
+
+    @Override
+    protected void cacheOptions()
+    {
+        // TODO cache all the things
     }
 }

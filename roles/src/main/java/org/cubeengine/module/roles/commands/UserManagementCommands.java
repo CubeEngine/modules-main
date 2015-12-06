@@ -32,6 +32,7 @@ import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.context.Context;
@@ -56,7 +57,7 @@ public class UserManagementCommands extends ContainerCommand
     @Alias({"manuadd", "assignurole", "addurole", "giveurole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [-temp]")
     public void assign(CommandContext context,
-                       @Default Player player,
+                       @Default User player,
                        ContextualRole role,
                        @Flag boolean temp)
     {// TODO RoleCompleter & Reader

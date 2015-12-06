@@ -26,85 +26,18 @@ import org.spongepowered.api.util.Tristate;
 
 public abstract class CachingSubjectData extends BaseSubjectData
 {
-    protected abstract void cacheOptions(Set<Context> c);
-    protected abstract void cachePermissions(Set<Context> c);
     protected abstract void cacheParents(Set<Context> c);
+    protected abstract void cacheParents();
+    protected abstract void cachePermissions(Set<Context> c);
+    protected abstract void cachePermissions();
+    protected abstract void cacheOptions(Set<Context> c);
+    protected abstract void cacheOptions();
     public abstract boolean save(boolean changed);
-
-    @Override
-    public Map<Set<Context>, Map<String, String>> getAllOptions()
-    {
-        cacheOptions(getContexts());
-        return super.getAllOptions();
-    }
-
-    @Override
-    public Map<String, String> getOptions(Set<Context> contexts)
-    {
-        cacheOptions(contexts);
-        return super.getOptions(contexts);
-    }
-
-    @Override
-    public boolean setOption(Set<Context> contexts, String key, String value)
-    {
-        cacheOptions(contexts);
-        return save(super.setOption(contexts, key, value));
-    }
-
-    @Override
-    public boolean clearOptions(Set<Context> contexts)
-    {
-        cacheOptions(contexts);
-        return save(super.clearOptions(contexts));
-    }
-
-    @Override
-    public boolean clearOptions()
-    {
-        cacheOptions(getContexts());
-        return save(super.clearOptions());
-    }
-
-    @Override
-    public Map<Set<Context>, Map<String, Boolean>> getAllPermissions()
-    {
-        cachePermissions(getContexts());
-        return super.getAllPermissions();
-    }
-
-    @Override
-    public Map<String, Boolean> getPermissions(Set<Context> contexts)
-    {
-        cachePermissions(contexts);
-        return super.getPermissions(contexts);
-    }
-
-    @Override
-    public boolean setPermission(Set<Context> contexts, String permission, Tristate value)
-    {
-        cachePermissions(contexts);
-        return save(super.setPermission(contexts, permission, value));
-    }
-
-    @Override
-    public boolean clearPermissions()
-    {
-        cachePermissions(getContexts());
-        return save(super.clearPermissions());
-    }
-
-    @Override
-    public boolean clearPermissions(Set<Context> contexts)
-    {
-        cachePermissions(contexts);
-        return save(super.clearPermissions(contexts));
-    }
 
     @Override
     public Map<Set<Context>, List<Subject>> getAllParents()
     {
-        cacheParents(getContexts());
+        cacheParents();
         return super.getAllParents();
     }
 
@@ -132,7 +65,7 @@ public abstract class CachingSubjectData extends BaseSubjectData
     @Override
     public boolean clearParents()
     {
-        cacheParents(getContexts());
+        cacheParents();
         return save(super.clearParents());
     }
 
@@ -143,6 +76,75 @@ public abstract class CachingSubjectData extends BaseSubjectData
         return save(super.clearParents(contexts));
     }
 
+    @Override
+    public Map<Set<Context>, Map<String, Boolean>> getAllPermissions()
+    {
+        cachePermissions();
+        return super.getAllPermissions();
+    }
+
+    @Override
+    public Map<String, Boolean> getPermissions(Set<Context> contexts)
+    {
+        cachePermissions(contexts);
+        return super.getPermissions(contexts);
+    }
+
+    @Override
+    public boolean setPermission(Set<Context> contexts, String permission, Tristate value)
+    {
+        cachePermissions(contexts);
+        return save(super.setPermission(contexts, permission, value));
+    }
+
+    @Override
+    public boolean clearPermissions()
+    {
+        cachePermissions();
+        return save(super.clearPermissions());
+    }
+
+    @Override
+    public boolean clearPermissions(Set<Context> contexts)
+    {
+        cachePermissions(contexts);
+        return save(super.clearPermissions(contexts));
+    }
+
+    @Override
+    public Map<Set<Context>, Map<String, String>> getAllOptions()
+    {
+        cacheOptions();
+        return super.getAllOptions();
+    }
+
+    @Override
+    public Map<String, String> getOptions(Set<Context> contexts)
+    {
+        cacheOptions(contexts);
+        return super.getOptions(contexts);
+    }
+
+    @Override
+    public boolean setOption(Set<Context> contexts, String key, String value)
+    {
+        cacheOptions(contexts);
+        return save(super.setOption(contexts, key, value));
+    }
+
+    @Override
+    public boolean clearOptions(Set<Context> contexts)
+    {
+        cacheOptions(contexts);
+        return save(super.clearOptions(contexts));
+    }
+
+    @Override
+    public boolean clearOptions()
+    {
+        cacheOptions();
+        return save(super.clearOptions());
+    }
 
     public void reload()
     {

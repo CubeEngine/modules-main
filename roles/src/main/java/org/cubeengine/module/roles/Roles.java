@@ -41,6 +41,9 @@ import org.cubeengine.module.core.sponge.CoreModule;
 import org.cubeengine.module.roles.commands.ManagementCommands;
 import org.cubeengine.module.roles.commands.UserManagementCommands;
 import org.cubeengine.module.roles.commands.provider.DefaultPermissionValueProvider;
+import org.cubeengine.module.roles.data.ImmutablePermissionData;
+import org.cubeengine.module.roles.data.PermissionData;
+import org.cubeengine.module.roles.data.PermissionDataBuilder;
 import org.cubeengine.module.roles.exception.RolesExceptionHandler;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.i18n.I18n;
@@ -68,12 +71,7 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.util.Tristate;
-import org.cubeengine.module.roles.storage.TableOption;
-import org.cubeengine.module.roles.storage.TablePerm;
-import org.cubeengine.module.roles.storage.TableRole;
 import org.cubeengine.service.database.Database;
-import org.cubeengine.service.task.TaskManager;
-import org.cubeengine.service.user.UserManager;
 import de.cubeisland.engine.reflect.Reflector;
 
 import static org.cubeengine.service.logging.LoggingUtil.getCycler;
@@ -106,6 +104,8 @@ public class Roles extends Module
     @Setup
     public void onSetup()
     {
+        game.getManipulatorRegistry().register(PermissionData.class, ImmutablePermissionData.class, new PermissionDataBuilder());
+
         cm.getProviderManager().getExceptionHandler().addHandler(new RolesExceptionHandler(i18n));
         this.permLogger = factory.getLog(CoreModule.class, "Permissions");
         this.permLogger.addTarget(new AsyncFileTarget(getLogFile(fm, "Permissions"), getFileFormat(false, false), false, getCycler(), threadFactory));
@@ -115,7 +115,7 @@ public class Roles extends Module
         cManager.registerConverter(new PriorityConverter(), Priority.class);
         this.config = fm.loadConfig(this, RolesConfig.class);
 
-        service = new RolesPermissionService(this, reflector, config, game, db, wm, manager, permLogger);
+        service = new RolesPermissionService(this, reflector, config, game, manager, permLogger);
 
         ValueProvider<SettableInvocationHandler> provider = new InvocationHandlerProvider(new SettableInvocationHandler());
         getModularity().registerProvider(SettableInvocationHandler.class, provider);
@@ -128,7 +128,7 @@ public class Roles extends Module
             PermissionService proxy = (PermissionService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{PermissionService.class}, handler);
             try
             {
-                game.getServiceManager().setProvider(game.getPluginManager().getPlugin("CubeEngine").get().getInstance(), PermissionService.class, proxy);
+                game.getServiceManager().setProvider(game.getPluginManager().getPlugin("CubeEngine").get().getInstance().get(), PermissionService.class, proxy);
             }
             catch (ProviderExistsException e)
             {
@@ -142,10 +142,6 @@ public class Roles extends Module
     {
         i18n.getCompositor().registerFormatter(new ContextFormatter());
         i18n.getCompositor().registerFormatter(new RoleFormatter());
-
-        db.registerTable(TableRole.class);
-        db.registerTable(TablePerm.class);
-        db.registerTable(TableOption.class);
 
         cm.getProviderManager().register(this, new ContextReader(service, game), Context.class);
         cm.getProviderManager().register(this, new ContextualRoleReader(service, game), ContextualRole.class);

@@ -37,31 +37,29 @@ public class RoleSubjectData extends CachingSubjectData
 {
     private final RoleConfig config;
     private Context context;
-    private final Set<Context> contexts;
     private final RoleCollection collection;
 
-    public RoleSubjectData(RolesPermissionService service, RoleConfig config, Context context)
+    public RoleSubjectData(RoleCollection roleCollection, RoleConfig config, Context context)
     {
         this.config = config;
         this.context = context;
-        this.contexts = context == null ? GLOBAL_CONTEXT : singleton(context);
-        this.collection = service.getGroupSubjects();
+        this.collection = roleCollection;
     }
 
     @Override
     protected void cacheOptions(Set<Context> c)
     {
         c.stream()
-         .filter(ctx -> toSet(ctx).equals(getContexts()) && !options.containsKey(getContexts()))
-         .forEach(ctx -> options.put(getContexts(), config.metadata));
+         .filter(ctx -> ctx.equals(context) && !options.containsKey(context))
+         .forEach(ctx -> options.put(context, config.metadata));
     }
 
     @Override
     protected void cachePermissions(Set<Context> c)
     {
         c.stream()
-         .filter(ctx -> toSet(ctx).equals(getContexts()) && !permissions.containsKey(getContexts()))
-         .forEach(ctx -> permissions.put(getContexts(), config.perms.getPermissions()));
+         .filter(ctx -> ctx.equals(context) && !permissions.containsKey(context))
+         .forEach(ctx -> permissions.put(context, config.perms.getPermissions()));
     }
 
     @Override
@@ -69,7 +67,7 @@ public class RoleSubjectData extends CachingSubjectData
     {
         for (Context ctx : c)
         {
-            if (toSet(ctx).equals(getContexts()) && !parents.containsKey(getContexts()))
+            if (ctx.equals(context) && !parents.containsKey(context))
             {
                 List<RoleSubject> parents = new ArrayList<>();
                 for (String parent : config.parents)
@@ -81,7 +79,7 @@ public class RoleSubjectData extends CachingSubjectData
                     parents.add(collection.get("role:" + parent));
                 }
                 Collections.sort(parents);
-                this.parents.put(contexts, new ArrayList<>(parents));
+                this.parents.put(context, new ArrayList<>(parents));
             }
         }
     }
@@ -91,7 +89,7 @@ public class RoleSubjectData extends CachingSubjectData
     {
         if (changed)
         {
-            List<Subject> list = parents.get(contexts);
+            List<Subject> list = parents.get(context);
             if (list != null)
             {
                 config.parents.clear();
@@ -124,9 +122,21 @@ public class RoleSubjectData extends CachingSubjectData
     }
 
     @Override
-    public Set<Context> getContexts()
+    protected void cacheParents()
     {
-        return contexts;
+        cacheParents(toSet(context));
+    }
+
+    @Override
+    protected void cachePermissions()
+    {
+        cachePermissions(toSet(context));
+    }
+
+    @Override
+    protected void cacheOptions()
+    {
+        cacheOptions(toSet(context));
     }
 
     /* TODO rename and delete

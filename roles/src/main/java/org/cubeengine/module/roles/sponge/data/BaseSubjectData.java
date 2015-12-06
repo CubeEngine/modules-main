@@ -17,14 +17,10 @@
  */
 package org.cubeengine.module.roles.sponge.data;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+
 import org.cubeengine.module.roles.commands.RoleCommands;
 import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
 import org.spongepowered.api.service.permission.Subject;
@@ -34,19 +30,22 @@ import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
 
 /**
  * The Base for Roles OptionSubjectData without persistence
  */
 public class BaseSubjectData implements OptionSubjectData
 {
-    protected final Map<Set<Context>, Map<String, String>> options = new ConcurrentHashMap<>();
-    protected final Map<Set<Context>, Map<String, Boolean>> permissions = new ConcurrentHashMap<>();
-    protected final Map<Set<Context>, List<Subject>> parents = new ConcurrentHashMap<>();
+    protected final Map<Context, Map<String, String>> options = new ConcurrentHashMap<>();
+    protected final Map<Context, Map<String, Boolean>> permissions = new ConcurrentHashMap<>();
+    protected final Map<Context, List<Subject>> parents = new ConcurrentHashMap<>();
 
     @Override
     public Map<Set<Context>, Map<String, String>> getAllOptions()
     {
+        Map<Set<Context>, Map<String, String>> options = this.options.entrySet().stream()
+                .collect(Collectors.toMap(e -> toSet(e.getKey()), Map.Entry::getValue));
         return unmodifiableMap(options);
     }
 
@@ -72,13 +71,13 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public boolean setOption(Set<Context> contexts, String key, String value)
     {
-        return unCache(operate(contexts, options, map -> map.put(key, value)), contexts, options.keySet());
+        return operate(contexts, options, map -> map.put(key, value));
     }
 
     @Override
     public boolean clearOptions(Set<Context> contexts)
     {
-        return unCache(operate(contexts, options, Map::clear), contexts, options.keySet());
+        return operate(contexts, options, Map::clear);
     }
 
     @Override
@@ -99,13 +98,16 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public Map<Set<Context>, Map<String, Boolean>> getAllPermissions()
     {
+        Map<Set<Context>, Map<String, Boolean>> permissions = this.permissions.entrySet().stream()
+                .collect(Collectors.toMap(e -> toSet(e.getKey()), Map.Entry::getValue));
+
         return unmodifiableMap(permissions);
     }
 
     @Override
     public boolean setPermission(Set<Context> contexts, String permission, Tristate value)
     {
-        return unCache(operate(contexts, permissions, map -> {
+        return operate(contexts, permissions, map -> {
             if (value == Tristate.UNDEFINED)
             {
                 map.remove(permission);
@@ -114,13 +116,13 @@ public class BaseSubjectData implements OptionSubjectData
             {
                 map.put(permission, value.asBoolean());
             }
-        }), contexts, permissions.keySet());
+        });
     }
 
     @Override
     public boolean clearPermissions(Set<Context> contexts)
     {
-        return unCache(operate(contexts, permissions, Map::clear), contexts, permissions.keySet());
+        return operate(contexts, permissions, Map::clear);
     }
 
     @Override
@@ -141,6 +143,9 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public Map<Set<Context>, List<Subject>> getAllParents()
     {
+        Map<Set<Context>, List<Subject>> parents = this.parents.entrySet().stream()
+                .collect(Collectors.toMap(e -> toSet(e.getKey()), Map.Entry::getValue));
+
         return unmodifiableMap(parents);
     }
 
@@ -148,11 +153,19 @@ public class BaseSubjectData implements OptionSubjectData
     public boolean addParent(Set<Context> contexts, Subject parent)
     {
         checkForCircularDependency(contexts, parent, 0);
-        if (parents.get(contexts).contains(parent))
+
+        for (Context context : contexts)
         {
-            return false;
+            if (parents.containsKey(context))
+            {
+                if (parents.get(context).contains(parent))
+                {
+                    return false;
+                }
+            }
         }
-        return unCache(operate(contexts, parents, l -> l.add(parent)), contexts, parents.keySet());
+
+        return operate(contexts, parents, l -> l.add(parent));
     }
 
     protected void checkForCircularDependency(Set<Context> contexts, Subject parent, int depth)
@@ -172,7 +185,7 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public boolean removeParent(Set<Context> contexts, Subject parent)
     {
-        return unCache(operate(contexts, parents, l -> l.remove(parent)), contexts, parents.keySet());
+        return operate(contexts, parents, l -> l.remove(parent));
     }
 
     @Override
@@ -185,23 +198,7 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public boolean clearParents(Set<Context> contexts)
     {
-        return unCache(operate(contexts, parents, List::clear), contexts, parents.keySet());
-    }
-
-    private boolean unCache(boolean changed, Set<Context> contexts, Set<Set<Context>> keySet)
-    {
-        if (changed)
-        {
-            for (Iterator<Set<Context>> it = keySet.iterator(); it.hasNext(); )
-            {
-                final Set<Context> set = it.next();
-                if (set.size() > 1 && !Collections.disjoint(set, contexts))
-                {
-                    it.remove();
-                }
-            }
-        }
-        return changed;
+        return operate(contexts, parents, List::clear);
     }
 
     @FunctionalInterface
@@ -210,12 +207,12 @@ public class BaseSubjectData implements OptionSubjectData
         void operate(T mapOrList);
     }
 
-    private <T> boolean operate(Set<Context> contexts, Map<Set<Context>, T> all, Operator<T> operator)
+    private <T> boolean operate(Set<Context> contexts, Map<Context, T> all, Operator<T> operator)
     {
         boolean changed = false;
         for (Context context : contexts)
         {
-            T map = all.get(RoleCommands.toSet(context));
+            T map = all.get(context);
             if (map != null)
             {
                 operator.operate(map);
@@ -231,26 +228,16 @@ public class BaseSubjectData implements OptionSubjectData
         void operate(T mapOrList, T other);
     }
 
-    private <T> T accumulate(Set<Context> contexts, Map<Set<Context>, T> all, T result, Accumulator<T> accumulator)
+    private <T> T accumulate(Set<Context> contexts, Map<Context, T> all, T result, Accumulator<T> accumulator)
     {
-        if (all.containsKey(contexts))
-        {
-            return all.get(contexts);
-        }
         for (Context context : contexts)
         {
-            T other = all.get(RoleCommands.toSet(context));
+            T other = all.get(context);
             if (other != null)
             {
                 accumulator.operate(result, other);
             }
         }
-        all.put(contexts, result);
         return result;
-    }
-
-    public Set<Context> getContexts()
-    {
-        return GLOBAL_CONTEXT;
     }
 }

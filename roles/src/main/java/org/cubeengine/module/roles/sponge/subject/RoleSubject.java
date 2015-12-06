@@ -23,15 +23,17 @@ import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
+import org.cubeengine.module.roles.sponge.collection.RoleCollection;
 import org.cubeengine.module.roles.sponge.data.RoleSubjectData;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.permission.context.Contextual;
 
 import static java.util.Collections.singleton;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
-public class RoleSubject extends BaseSubject<RoleSubjectData> implements Comparable<RoleSubject>
+public class RoleSubject extends BaseSubject<RoleSubjectData> implements Comparable<RoleSubject>, Contextual
 {
     public static final String SEPARATOR = "|";
     private final String roleName;
@@ -39,9 +41,9 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
     private Roles module;
     private Context context;
 
-    public RoleSubject(Roles module, RolesPermissionService service, RoleConfig config, Context context)
+    public RoleSubject(Roles module, RolesPermissionService service, RoleCollection collection, RoleConfig config, Context context)
     {
-        super(service.getGroupSubjects(), service, new RoleSubjectData(service, config, context));
+        super(collection, service, new RoleSubjectData(collection, config, context));
         this.module = module;
         this.context = context;
         this.contexts = "global".equals(context.getType()) ? GLOBAL_CONTEXT : singleton(context);
@@ -94,5 +96,11 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
     {
         getSubjectData().getConfig().priority = Priority.getByValue(value);
         getSubjectData().getConfig().save(); // TODO async
+    }
+
+    @Override
+    public Context getContext()
+    {
+        return this.context;
     }
 }

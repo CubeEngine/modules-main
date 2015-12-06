@@ -18,13 +18,12 @@
 package org.cubeengine.module.roles.sponge.collection;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
@@ -117,7 +116,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         config.setFile(file);
         config.reload();
         Context context = new Context(ctxType, ctxName);
-        return new RoleSubject(module, service, config, context);
+        return new RoleSubject(module, service, this, config, context);
     }
 
 
@@ -155,7 +154,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         config.roleName = name;
         config.setFile(path.resolve(name + ".yml").toFile());
         config.reload();
-        RoleSubject subject = new RoleSubject(module, service, config, new Context(ctxType, ctxName));
+        RoleSubject subject = new RoleSubject(module, service, this, config, new Context(ctxType, ctxName));
         subjects.put(subject.getIdentifier(), subject);
         return subject;
     }

@@ -38,6 +38,7 @@ import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;
@@ -54,18 +55,16 @@ public class RolesPermissionService implements PermissionService
     private final List<ContextCalculator> calculators = new CopyOnWriteArrayList<>();
 
     private final DefaultSubjectData defaultData;
-    private org.spongepowered.api.Game game;
-    private Database db;
+    private Game game;
     private RolesConfig config;
     private Log logger;
 
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<String, PermissionDescription>();
     private Collection<PermissionDescription> descriptions;
 
-    public RolesPermissionService(Roles module, Reflector reflector, RolesConfig config, org.spongepowered.api.Game game, Database db, WorldManager wm, PermissionManager manager, Log permLogger)
+    public RolesPermissionService(Roles module, Reflector reflector, RolesConfig config, Game game, PermissionManager manager, Log permLogger)
     {
         this.game = game;
-        this.db = db;
         this.config = config;
         logger = permLogger;
         defaultData = new DefaultSubjectData(this, config);
@@ -74,8 +73,6 @@ public class RolesPermissionService implements PermissionService
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM, game));
         collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE, game));
     }
-
-
 
     @Override
     public UserCollection getUserSubjects()
@@ -116,11 +113,6 @@ public class RolesPermissionService implements PermissionService
     public List<ContextCalculator> getContextCalculators()
     {
         return this.calculators;
-    }
-
-    public Database getDB()
-    {
-        return db;
     }
 
     public RolesConfig getConfig()

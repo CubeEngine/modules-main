@@ -1,0 +1,66 @@
+package org.cubeengine.module.roles.data;
+
+import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.key.KeyFactory;
+import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.data.value.mutable.MapValue;
+
+import java.util.List;
+import java.util.Map;
+
+public interface IPermissionData
+{
+    Key<ListValue<String>> PARENTS = KeyFactory.makeListKey(String.class, new DataQuery("parents"));
+    Key<MapValue<String, Boolean>> PERMISSIONS = KeyFactory.makeMapKey(String.class, Boolean.class, new DataQuery("permissions"));
+    Key<MapValue<String, String>> OPTIONS = KeyFactory.makeMapKey(String.class, String.class, new DataQuery("options"));
+
+    List<String> getParents();
+    Map<String, Boolean> getPermissions();
+    Map<String, String> getOptions();
+
+    static <E extends IPermissionData> int compareTo(E o1, E o2)
+    {
+        int compare = Integer.compare(o1.getParents().size(), o2.getParents().size());
+        if (compare != 0)
+        {
+            return compare;
+        }
+        for (int i = 0; i < o1.getParents().size(); i++)
+        {
+            compare = o1.getParents().get(i).compareTo(o2.getParents().get(i));
+            if (compare != 0)
+            {
+                return compare;
+            }
+        }
+
+        compare = Integer.compare(o1.getPermissions().size(), o2.getPermissions().size());
+        if (compare != 0)
+        {
+            return compare;
+        }
+
+        compare = Boolean.compare(o1.getPermissions().entrySet().containsAll(o2.getPermissions().entrySet()),
+                o2.getPermissions().entrySet().containsAll(o1.getPermissions().entrySet()));
+        if (compare != 0)
+        {
+            return compare;
+        }
+
+        compare = Integer.compare(o1.getOptions().size(), o2.getOptions().size());
+        if (compare != 0)
+        {
+            return compare;
+        }
+
+        compare = Boolean.compare(o1.getOptions().entrySet().containsAll(o2.getOptions().entrySet()),
+                o2.getOptions().entrySet().containsAll(o1.getOptions().entrySet()));
+        if (compare != 0)
+        {
+            return compare;
+        }
+
+        return 0;
+    }
+}
