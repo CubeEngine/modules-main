@@ -184,7 +184,7 @@ public class Lock
             return;
         }
         ItemStack item = module.getGame().getRegistry().createBuilder(ItemStack.Builder.class).itemType(ENCHANTED_BOOK).quantity(1).build();
-        item.offer(Keys.DISPLAY_NAME, getColorPass().builder().append(KeyBook.TITLE).append(Texts.of(TextColors.DARK_GRAY, getId())).build());
+        item.offer(Keys.DISPLAY_NAME, KeyBook.TITLE.builder().append(Texts.of(TextColors.DARK_GRAY, getId())).build());
         item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(player, NEUTRAL, "This book can"),
                 i18n.getTranslation(player, NEUTRAL, "unlock a magically"),
                 i18n.getTranslation(player, NEUTRAL, "locked protection")));
@@ -598,11 +598,6 @@ public class Lock
     {
         AccessListModel access = this.getAccess(user);
         return access != null && (access.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN;
-    }
-
-    public Text getColorPass()
-    {
-        return model.getColorPass();
     }
 
     public UInteger getId()

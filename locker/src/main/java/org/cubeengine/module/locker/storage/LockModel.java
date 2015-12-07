@@ -62,33 +62,6 @@ public class LockModel extends AsyncRecord<LockModel>
 
     private UUID uuid = null;
 
-    public Text getColorPass()
-    {
-        if (this.colorPass == null)
-        {
-            TextBuilder builder = Texts.builder();
-
-            byte[] pass = this.getValue(TABLE_LOCK.PASSWORD);
-
-            if (pass.length != 4)
-            {
-                for (byte b : pass)
-                {
-                    builder.append(Texts.of(ChatFormat.getByChar(String.format("%02X", b).toCharArray()[0]).getColor(), ""));
-                }
-            }
-            else
-            {
-                for (char c : new String(pass).toCharArray())
-                {
-                    builder.append(Texts.of(ChatFormat.getByChar(c).getColor(), ""));
-                }
-            }
-            this.colorPass = builder.build();
-        }
-        return this.colorPass;
-    }
-
     public UUID getUUID()
     {
         if (this.uuid == null)
