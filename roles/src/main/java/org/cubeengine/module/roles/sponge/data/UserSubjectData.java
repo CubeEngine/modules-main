@@ -23,6 +23,8 @@ import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.collection.RoleCollection;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.manipulator.DataManipulator;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
@@ -57,9 +59,10 @@ public class UserSubjectData extends CachingSubjectData
             String contextString = stringify(context) + "\n";
             if (!options.containsKey(context))
             {
-                UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
-                Map<String, String> opts = storage.get(uuid).get().get(IPermissionData.OPTIONS)
-                        .orElse(Collections.emptyMap());
+                Map<String, String> opts = getData()
+                    .map(PermissionData::getOptions)
+                    .orElse(Collections.emptyMap());
+
                 opts = opts.entrySet().stream()
                         .filter(e -> !e.getKey().startsWith(contextString))
                         .collect(toMap(e -> e.getKey().split("\\n")[1], Map.Entry::getValue));
@@ -76,15 +79,39 @@ public class UserSubjectData extends CachingSubjectData
             String contextString = stringify(context) + "\n";
             if (!permissions.containsKey(context))
             {
-                UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
-                Map<String, Boolean> perms = storage.get(uuid).get().get(IPermissionData.PERMISSIONS)
-                        .orElse(Collections.emptyMap());
+                Map<String, Boolean> perms = getData()
+                    .map(PermissionData::getPermissions)
+                    .orElse(Collections.emptyMap());
+
                 perms = perms.entrySet().stream()
                         .filter(e -> !e.getKey().startsWith(contextString))
                         .collect(toMap(e -> e.getKey().split("\\n")[1], Map.Entry::getValue));
                 permissions.put(context, perms);
             }
         }
+    }
+
+
+    private Optional<PermissionData> getData()
+    {
+        UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
+        User player = storage.get(uuid).get()
+            .getPlayer().get(); // TODO wait for User Data impl
+
+        Optional<PermissionData> permData = player.get(PermissionData.class);
+        if (permData.isPresent())
+        {
+            return permData;
+        }
+        // TODO remove once the above works
+        for (DataManipulator<?, ?> data : player.getContainers())
+        {
+            if (data instanceof PermissionData)
+            {
+                return Optional.of((PermissionData) data);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override
@@ -95,9 +122,9 @@ public class UserSubjectData extends CachingSubjectData
             String contextString = stringify(context) + "\n";
             if (!parents.containsKey(context))
             {
-                UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
-                List<String> parentList = storage.get(uuid).get().get(IPermissionData.PARENTS)
-                        .orElse(Collections.emptyList());
+                List<String> parentList = getData()
+                    .map(PermissionData::getParents)
+                    .orElse(Collections.emptyList());
                 List<Subject> list = parentList.stream()
                         .filter(p -> p.startsWith(contextString))
                         .map(p -> p.split("\\n")[1])
@@ -161,7 +188,7 @@ public class UserSubjectData extends CachingSubjectData
             user.offer(new PermissionData(parents, permissions, options));
 
             // TODO remove once saving data on user is implemented
-            user.getPlayer().ifPresent(p -> p.offer(new PermissionData(parents, permissions, options)));
+            user.getPlayer().get().offer(new PermissionData(parents, permissions, options));
         }
         return changed;
     }

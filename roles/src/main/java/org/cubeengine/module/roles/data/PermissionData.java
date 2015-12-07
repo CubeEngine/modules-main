@@ -168,6 +168,19 @@ public class PermissionData extends AbstractData<PermissionData, ImmutablePermis
     @Override
     public DataContainer toContainer()
     {
-        return new MemoryDataContainer().set(PARENTS, parents).set(PERMISSIONS, permissions).set(OPTIONS, options);
+        DataContainer result = new MemoryDataContainer();
+        if (parents != null)
+        {
+            result.set(PARENTS, parents);
+        }
+        if (permissions != null)
+        {
+            result.set(PERMISSIONS, permissions);
+        }
+        if (options != null)
+        {
+            result.set(OPTIONS, options);
+        }
+        return result;
     }
 }

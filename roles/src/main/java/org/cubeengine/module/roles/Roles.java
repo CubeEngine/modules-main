@@ -104,7 +104,7 @@ public class Roles extends Module
     @Setup
     public void onSetup()
     {
-        game.getManipulatorRegistry().register(PermissionData.class, ImmutablePermissionData.class, new PermissionDataBuilder());
+        game.getDataManager().register(PermissionData.class, ImmutablePermissionData.class, new PermissionDataBuilder());
 
         cm.getProviderManager().getExceptionHandler().addHandler(new RolesExceptionHandler(i18n));
         this.permLogger = factory.getLog(CoreModule.class, "Permissions");
