@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.travel.home;
 
-import java.util.Optional;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserManager;
@@ -25,6 +24,7 @@ import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
@@ -49,42 +49,37 @@ public class HomeListener
     }
 
     @Listener(order = EARLY)
-    public void rightClickBed(InteractBlockEvent.Secondary event)
+    public void rightClickBed(InteractBlockEvent.Secondary event, @First Player player)
     {
-        Optional<Player> source = event.getCause().first(Player.class);
-        if (source.isPresent())
+        if (event.getTargetBlock().getState().getType() != BlockTypes.BED)
         {
-            if (event.getTargetBlock().getState().getType() != BlockTypes.BED)
+            return;
+        }
+        if (player.get(SneakingData.class).isPresent())
+        {
+            if (homeManager.has(player, "home"))
             {
-                return;
+                Home home = homeManager.findOne(player, "home");
+                if (player.getLocation().equals(home.getTransform()))
+                {
+                    return;
+                }
+                home.setLocation(player.getTransform());
+                home.update();
+                i18n.sendTranslated(player, POSITIVE, "Your home has been set!");
             }
-            Player player = source.get();
-            if (player.get(SneakingData.class).isPresent())
+            else
             {
-                if (homeManager.has(player, "home"))
+                if (this.homeManager.getCount(player) == this.module.getConfig().homes.max)
                 {
-                    Home home = homeManager.findOne(player, "home");
-                    if (player.getLocation().equals(home.getTransform()))
-                    {
-                        return;
-                    }
-                    home.setLocation(player.getTransform());
-                    home.update();
-                    i18n.sendTranslated(player, POSITIVE, "Your home has been set!");
+                    i18n.sendTranslated(player, CRITICAL, "You have reached your maximum number of homes!");
+                    i18n.sendTranslated(player, NEGATIVE, "You have to delete a home to make a new one");
+                    return;
                 }
-                else
-                {
-                    if (this.homeManager.getCount(player) == this.module.getConfig().homes.max)
-                    {
-                        i18n.sendTranslated(player, CRITICAL, "You have reached your maximum number of homes!");
-                        i18n.sendTranslated(player, NEGATIVE, "You have to delete a home to make a new one");
-                        return;
-                    }
-                    homeManager.create(player, "home", player.getTransform(), false);
-                    i18n.sendTranslated(player, POSITIVE, "Your home has been created!");
-                }
-                event.setCancelled(true);
+                homeManager.create(player, "home", player.getTransform(), false);
+                i18n.sendTranslated(player, POSITIVE, "Your home has been created!");
             }
+            event.setCancelled(true);
         }
     }
 }

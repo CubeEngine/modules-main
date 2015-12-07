@@ -17,16 +17,9 @@
  */
 package org.cubeengine.module.teleport;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-import java.util.Optional;
 import org.cubeengine.module.core.util.LocationUtil;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserManager;
-import org.spongepowered.api.block.trait.BlockTrait;
-import org.spongepowered.api.block.trait.BooleanTraits;
-import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.Transform;
@@ -35,11 +28,17 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
@@ -85,15 +84,9 @@ public class TeleportListener
     }
 
     @Listener
-    public void onClick(InteractBlockEvent event)
+    public void onClick(InteractBlockEvent event, @First Player player)
     {
-        Optional<Player> source = event.getCause().first(Player.class);
-        if (!source.isPresent())
-        {
-            return;
-        }
-        Player player = source.get();
-        if (source.get().getItemInHand().map(ItemStack::getItem).orElse(null) != COMPASS)
+        if (player.getItemInHand().map(ItemStack::getItem).orElse(null) != COMPASS)
         {
             return;
         }

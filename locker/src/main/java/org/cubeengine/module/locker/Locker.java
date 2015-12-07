@@ -85,7 +85,7 @@ public class Locker extends Module
     @Inject
     public Locker(Game game)
     {
-        game.getManipulatorRegistry().register(LockerData.class, ImmutableLockerData.class,
+        game.getDataManager().register(LockerData.class, ImmutableLockerData.class,
                                                     new LockerDataBuilder(game.getRegistry().getValueFactory()));
     }
 

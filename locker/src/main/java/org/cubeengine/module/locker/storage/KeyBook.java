@@ -160,7 +160,7 @@ public class KeyBook
         boolean b = Arrays.equals(pass, lock.model.getValue(TABLE_LOCK.PASSWORD));
         if (!b)
         {
-            this.module.getProvided(Log.class).debug("Invalid KeyBook detected! {}|{}", lock.getColorPass(), display);
+            this.module.getProvided(Log.class).debug("Invalid KeyBook detected! {}", display);
         }
         return b;
     }

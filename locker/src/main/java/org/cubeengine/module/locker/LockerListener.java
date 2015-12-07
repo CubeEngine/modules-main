@@ -52,6 +52,7 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.TameEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -89,74 +90,67 @@ public class LockerListener
     }
 
     @Listener
-    public void onPlayerInteract(InteractBlockEvent.Secondary event)
+    public void onPlayerInteract(InteractBlockEvent.Secondary event, @First Player player)
     {
         if (!this.module.getConfig().protectBlockFromRClick) return;
 
-        Optional<Player> player = event.getCause().first(Player.class);
-        if (!player.isPresent())
-        {
-            return;
-        }
         Location<World> block = event.getTargetBlock().getLocation().get();
-        Lock lock = this.manager.getLockAtLocation(block, player.get());
+        Lock lock = this.manager.getLockAtLocation(block, player);
         if (block.getTileEntity().orElse(null) instanceof Carrier)
         {
-            if (!player.get().hasPermission(module.perms().ALLOW_CONTAINER.getId()))
+            if (!player.hasPermission(module.perms().ALLOW_CONTAINER.getId()))
             {
-                i18n.sendTranslated(player.get(), NEGATIVE, "Strong magic prevents you from accessing any inventory!");
+                i18n.sendTranslated(player, NEGATIVE, "Strong magic prevents you from accessing any inventory!");
                 event.setCancelled(true);
                 return;
             }
             if (lock == null) return;
-            lock.handleInventoryOpen(event, null, block, player.get());
+            lock.handleInventoryOpen(event, null, block, player);
         }
         else if (block.supports(Keys.OPEN))
         {
-            if (!player.get().hasPermission(module.perms().ALLOW_DOOR.getId()))
+            if (!player.hasPermission(module.perms().ALLOW_DOOR.getId()))
             {
-                i18n.sendTranslated(player.get(), NEGATIVE, "Strong magic prevents you from accessing any door!");
+                i18n.sendTranslated(player, NEGATIVE, "Strong magic prevents you from accessing any door!");
                 event.setCancelled(true);
                 return;
             }
             if (lock == null) return;
-            lock.handleBlockDoorUse(event, player.get(), block);
+            lock.handleBlockDoorUse(event, player, block);
         }
         else if (lock != null) // other interact e.g. repeater
         {
-            lock.handleBlockInteract(event, player.get());
+            lock.handleBlockInteract(event, player);
         }
     }
 
     @Listener
-    public void onPlayerInteractEntity(InteractEntityEvent event)
+    public void onPlayerInteractEntity(InteractEntityEvent event, @First Player player)
     {
         if (!this.module.getConfig().protectEntityFromRClick) return;
         Entity entity = event.getTargetEntity();
-        Optional<Player> player = event.getCause().first(Player.class);
-        if (!player.get().hasPermission(module.perms().ALLOW_ENTITY.getId()))
+        if (!player.hasPermission(module.perms().ALLOW_ENTITY.getId()))
         {
-            i18n.sendTranslated(player.get(), NEGATIVE, "Strong magic prevents you from reaching this entity!");
+            i18n.sendTranslated(player, NEGATIVE, "Strong magic prevents you from reaching this entity!");
             event.setCancelled(true);
             return;
         }
         Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
         if (lock == null) return;
-        if (entity instanceof Carrier || (entity.getType() == HORSE && player.get().get(Keys.IS_SNEAKING).get()))
+        if (entity instanceof Carrier || (entity.getType() == HORSE && player.get(Keys.IS_SNEAKING).get()))
         {
-            lock.handleInventoryOpen(event, null, null, player.get());
+            lock.handleInventoryOpen(event, null, null, player);
         }
         else
         {
-            lock.handleEntityInteract(event, player.get());
+            lock.handleEntityInteract(event, player);
         }
     }
 
     @Listener
-    public void onInventoryOpen(InteractInventoryEvent.Open event)
+    public void onInventoryOpen(InteractInventoryEvent.Open event, @First Player player)
     {
-        Optional<Player> playerCause = event.getCause().first(Player.class);
-        if (!playerCause.isPresent() || !(event.getTargetInventory() instanceof CarriedInventory)
+        if (!(event.getTargetInventory() instanceof CarriedInventory)
          || !((CarriedInventory) event.getTargetInventory()).getCarrier().isPresent())
         {
             return;
@@ -173,19 +167,22 @@ public class LockerListener
         }
         Lock lock = this.manager.getLockOfInventory(((CarriedInventory) event.getTargetInventory()));
         if (lock == null) return;
-        lock.handleInventoryOpen(event, event.getTargetInventory(), loc, playerCause.get());
+        lock.handleInventoryOpen(event, event.getTargetInventory(), loc, player);
     }
 
     @Listener
-    public void onEntityDamageEntity(DamageEntityEvent event)
+    public void onEntityDamageEntity(DamageEntityEvent event, @First EntityDamageSource source)
     {
         Entity target = event.getTargetEntity();
-        Optional<EntityDamageSource> playerCause = event.getCause().first(EntityDamageSource.class);
+        Player player = null;
+        if (source.getSource() instanceof Player)
+        {
+            player = ((Player) source.getSource());
+        }
+
         if (target instanceof Living)
         {
-            if (handleLiving(target, playerCause.map(EntityDamageSource::getSource)
-                    .map(e -> e instanceof Player ? Player.class.cast(e) : null)
-                    .orElse(null)))
+            if (handleLiving(target, player))
             {
                 event.setCancelled(true);
             }
@@ -460,29 +457,24 @@ public class LockerListener
     }
 
     @Listener
-    public void onBlockBreak(ChangeBlockEvent.Break event)
+    public void onBlockBreak(ChangeBlockEvent.Break event, @First Player player)
     {
         if (!this.module.getConfig().protectFromBlockBreak) return;
-        Optional<Player> playerCause = event.getCause().first(Player.class);
-        if (!playerCause.isPresent())
-        {
-            return;
-        }
         for (Transaction<BlockSnapshot> trans : event.getTransactions())
         {
             Location<World> location = trans.getOriginal().getLocation().get();
             Lock lock = manager.getLockAtLocation(location, null);
             if (lock != null)
             {
-                lock.handleBlockBreak(event, playerCause.get());
+                lock.handleBlockBreak(event, player);
             }
 
             for (Location<World> block : BlockUtil.getDetachableBlocks(location))
             {
-                lock = this.manager.getLockAtLocation(block, playerCause.get());
+                lock = this.manager.getLockAtLocation(block, player);
                 if (lock != null)
                 {
-                    lock.handleBlockBreak(event, playerCause.get());
+                    lock.handleBlockBreak(event, player);
                     return;
                 }
             }
@@ -512,7 +504,7 @@ public class LockerListener
                         lock = this.manager.getLockForEntityUID(hanging.getUniqueId());
                         if (lock != null)
                         {
-                            lock.handleBlockBreak(event, playerCause.get());
+                            lock.handleBlockBreak(event, player);
                         }
                     }
                 }
@@ -612,7 +604,7 @@ public class LockerListener
     }
 
     @Listener
-    public void onTame(TameEntityEvent event)
+    public void onTame(TameEntityEvent event, @First Player player)
     {
         Entity entity = event.getTargetEntity();
         for (ConfigWorld world : module.getConfig().disableAutoProtect)
@@ -622,17 +614,13 @@ public class LockerListener
                 return;
             }
         }
-        Optional<Player> playerCause = event.getCause().first(Player.class);
-        if (playerCause.isPresent())
-        {
-            this.module.getConfig().entityProtections.stream()
-                 .filter(entityProtection -> entityProtection.isType(entity.getType()) && entityProtection.isAutoProtect())
-                 .forEach(entityProtection -> {
-                     if (this.manager.getLockForEntityUID(entity.getUniqueId()) == null)
-                     {
-                         this.manager.createLock(entity, playerCause.get(), entityProtection.getAutoProtect(), null, false);
-                     }
-                 });
-        }
+        this.module.getConfig().entityProtections.stream()
+                .filter(entityProtection -> entityProtection.isType(entity.getType()) && entityProtection.isAutoProtect())
+                .forEach(entityProtection -> {
+                    if (this.manager.getLockForEntityUID(entity.getUniqueId()) == null)
+                    {
+                        this.manager.createLock(entity, player, entityProtection.getAutoProtect(), null, false);
+                    }
+                });
     }
 }

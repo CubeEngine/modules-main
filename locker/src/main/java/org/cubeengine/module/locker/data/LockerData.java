@@ -233,7 +233,7 @@ public class LockerData implements DataManipulator<LockerData, ImmutableLockerDa
         set.add(valueFactory.createValue(LOCK_ID, lockID).asImmutable());
         if (pass != null)
         {
-            set.add((ImmutableValue<?>)valueFactory.createListValue(LOCK_PASS, passAsList()));
+            set.add(valueFactory.createListValue(LOCK_PASS, passAsList()).asImmutable());
         }
         return set;
     }

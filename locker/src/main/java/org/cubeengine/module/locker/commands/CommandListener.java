@@ -17,19 +17,17 @@
  */
 package org.cubeengine.module.locker.commands;
 
-import de.cubeisland.engine.logscribe.Log;
-import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.module.locker.storage.LockType;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -94,14 +92,12 @@ public class CommandListener
     }
 
     @Listener
-    public void onRightClickBlock(InteractBlockEvent.Secondary event)
+    public void onRightClickBlock(InteractBlockEvent.Secondary event, @First Player player)
     {
-        Optional<Player> playerCause = event.getCause().first(Player.class);
-        if (isPlayerInteract(playerCause))
+        if (isPlayerInteract(player))
         {
             return;
         }
-        Player player = playerCause.get();
 
         Location<World> location = event.getTargetBlock().getLocation().get();
 
@@ -119,11 +115,10 @@ public class CommandListener
         }
     }
 
-    private boolean isPlayerInteract(Optional<Player> playerCause)
+    private boolean isPlayerInteract(Player player)
     {
-        return playerCause.isPresent() &&
-                (playerCause.get().get(Keys.IS_SNEAKING).get() ||
-            !lockActions.keySet().contains(playerCause.get().getUniqueId()));
+        return (player.get(Keys.IS_SNEAKING).get() ||
+                !lockActions.keySet().contains(player.getUniqueId()));
     }
 
     private void cmdUsed(Player user)
@@ -139,14 +134,13 @@ public class CommandListener
     }
 
     @Listener
-    public void onRightClickEntity(InteractEntityEvent.Secondary event)
+    public void onRightClickEntity(InteractEntityEvent.Secondary event, @First Player player)
     {
-        Optional<Player> playerCause = event.getCause().first(Player.class);
-        if (isPlayerInteract(playerCause))
+        if (isPlayerInteract(player))
         {
             return;
         }
-        LockAction lockAction = lockActions.get(playerCause.get().getUniqueId());
+        LockAction lockAction = lockActions.get(player.getUniqueId());
 
         if (lockAction != null)
         {
@@ -157,7 +151,7 @@ public class CommandListener
 
             lockAction.apply(lock, location, target);
 
-            cmdUsed(playerCause.get());
+            cmdUsed(player);
             event.setCancelled(true);
         }
     }
