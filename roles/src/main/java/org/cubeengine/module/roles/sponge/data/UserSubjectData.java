@@ -126,18 +126,19 @@ public class UserSubjectData extends CachingSubjectData
                     .map(PermissionData::getParents)
                     .orElse(Collections.emptyList());
                 List<Subject> list = parentList.stream()
-                        .filter(p -> p.startsWith(contextString))
-                        .map(p -> p.split("\\n")[1])
-                        .map(roleCollection::get)
-                        .sorted((o1, o2) -> {
-                            if (o1 != null && o2 != null)
-                            {
-                                return o1.compareTo(o2);
-                            }
-                            return 1;
-                        })
-                        .map(Subject.class::cast)
-                        .collect(toList());
+                       .filter(p -> p.startsWith(contextString))
+                       .map(p -> p.split("\\n")[1])
+                       .map(r -> "role:" + r)
+                       .map(roleCollection::get)
+                       .sorted((o1, o2) -> {
+                           if (o1 != null && o2 != null)
+                           {
+                               return o1.compareTo(o2);
+                           }
+                           return 1;
+                       })
+                       .map(Subject.class::cast)
+                       .collect(toList());
 
                 parents.put(context, list);
             }
