@@ -37,6 +37,8 @@
     <module>mail</module>
     <module>kickban</module>
     <module>vanillaplus</module>
+    <module>multiverse</module>
+    <module>worldcontrol</module>
   </modules>
 
   <build>
