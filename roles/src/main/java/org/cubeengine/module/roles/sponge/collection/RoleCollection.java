@@ -86,8 +86,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 
                     if ("world".equals(ctxType.getFileName().toString()))
                     {
-                        game.getServer().getWorlds().stream().map(World::getName)
-                          .forEach(world -> {
+                        game.getServer().getWorlds().stream().map(World::getName).forEach(world -> {
                               if (!mirrors.containsKey(readMirror(world)) && !Files.exists(ctxType.resolve(world)))
                               {
                                   try
