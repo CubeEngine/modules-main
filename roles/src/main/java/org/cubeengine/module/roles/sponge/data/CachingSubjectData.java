@@ -20,12 +20,19 @@ package org.cubeengine.module.roles.sponge.data;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 
 public abstract class CachingSubjectData extends BaseSubjectData
 {
+    public CachingSubjectData(RolesPermissionService service)
+    {
+        super(service);
+    }
+
     protected abstract void cacheParents(Set<Context> c);
     protected abstract void cacheParents();
     protected abstract void cachePermissions(Set<Context> c);

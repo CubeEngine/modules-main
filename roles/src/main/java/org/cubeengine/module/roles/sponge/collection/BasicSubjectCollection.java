@@ -35,7 +35,7 @@ public class BasicSubjectCollection  extends BaseSubjectCollection<OptionSubject
     }
 
     @Override
-    protected OptionSubject getNew(String identifier)
+    protected OptionSubject createSubject(String identifier)
     {
         return new BasicSubject(identifier, this, service, game);
     }

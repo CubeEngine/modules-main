@@ -42,7 +42,7 @@ import static org.spongepowered.api.service.permission.PermissionService.SUBJECT
 public abstract class BaseSubject<T extends OptionSubjectData> implements OptionSubject
 {
     public static final String PERMISSION_TEMPLATE_PREFIX = "permission:";
-    private BaseSubjectData transientData = new BaseSubjectData();
+    private BaseSubjectData transientData;
     private final SubjectCollection collection;
     protected RolesPermissionService service;
     private T data;
@@ -52,6 +52,7 @@ public abstract class BaseSubject<T extends OptionSubjectData> implements Option
         this.collection = collection;
         this.service = service;
         this.data = data;
+        this.transientData = new BaseSubjectData(service);
     }
 
     @Override

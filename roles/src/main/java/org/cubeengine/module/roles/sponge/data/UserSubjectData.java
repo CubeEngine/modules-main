@@ -18,13 +18,12 @@
 package org.cubeengine.module.roles.sponge.data;
 
 import org.cubeengine.module.roles.data.PermissionData;
-import org.cubeengine.module.roles.data.IPermissionData;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.collection.RoleCollection;
+import org.cubeengine.module.roles.sponge.collection.UserCollection;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.DataManipulator;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
@@ -38,11 +37,10 @@ import static java.util.stream.Collectors.toMap;
 public class UserSubjectData extends CachingSubjectData
 {
     private final UUID uuid;
-    private RoleCollection roleCollection;
 
     public UserSubjectData(RolesPermissionService service, UUID uuid)
     {
-        this.roleCollection = service.getGroupSubjects();
+        super(service);
         this.uuid = uuid;
     }
 
@@ -56,7 +54,8 @@ public class UserSubjectData extends CachingSubjectData
     {
         for (Context context : c)
         {
-            String contextString = stringify(context) + "\n";
+            context = userCollection.getDirectMirror(context);
+            String contextString = stringify(context) + "#";
             if (!options.containsKey(context))
             {
                 Map<String, String> opts = getData()
@@ -64,8 +63,9 @@ public class UserSubjectData extends CachingSubjectData
                     .orElse(Collections.emptyMap());
 
                 opts = opts.entrySet().stream()
-                        .filter(e -> !e.getKey().startsWith(contextString))
-                        .collect(toMap(e -> e.getKey().split("\\n")[1], Map.Entry::getValue));
+                        .filter(e -> e.getKey().startsWith(contextString))
+                        .collect(toMap(e -> e.getKey().split("#")[1], Map.Entry::getValue));
+
                 options.put(context, opts);
             }
         }
@@ -76,7 +76,8 @@ public class UserSubjectData extends CachingSubjectData
     {
         for (Context context : c)
         {
-            String contextString = stringify(context) + "\n";
+            context = userCollection.getDirectMirror(context);
+            String contextString = stringify(context) + "#";
             if (!permissions.containsKey(context))
             {
                 Map<String, Boolean> perms = getData()
@@ -84,13 +85,13 @@ public class UserSubjectData extends CachingSubjectData
                     .orElse(Collections.emptyMap());
 
                 perms = perms.entrySet().stream()
-                        .filter(e -> !e.getKey().startsWith(contextString))
-                        .collect(toMap(e -> e.getKey().split("\\n")[1], Map.Entry::getValue));
+                        .filter(e -> e.getKey().startsWith(contextString))
+                        .collect(toMap(e -> e.getKey().split("#")[1], Map.Entry::getValue));
+
                 permissions.put(context, perms);
             }
         }
     }
-
 
     private Optional<PermissionData> getData()
     {
@@ -119,7 +120,8 @@ public class UserSubjectData extends CachingSubjectData
     {
         for (Context context : c)
         {
-            String contextString = stringify(context) + "\n";
+            context = userCollection.getAssignMirror(context);
+            String contextString = stringify(context) + "#";
             if (!parents.containsKey(context))
             {
                 List<String> parentList = getData()
@@ -127,7 +129,7 @@ public class UserSubjectData extends CachingSubjectData
                     .orElse(Collections.emptyList());
                 List<Subject> list = parentList.stream()
                        .filter(p -> p.startsWith(contextString))
-                       .map(p -> p.split("\\n")[1])
+                       .map(p -> p.split("#")[1])
                        .map(r -> "role:" + r)
                        .map(roleCollection::get)
                        .sorted((o1, o2) -> {
@@ -139,7 +141,6 @@ public class UserSubjectData extends CachingSubjectData
                        })
                        .map(Subject.class::cast)
                        .collect(toList());
-
                 parents.put(context, list);
             }
         }
@@ -153,7 +154,7 @@ public class UserSubjectData extends CachingSubjectData
             UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
 
             List<String> parents = this.parents.entrySet().stream().flatMap(e -> {
-                String context = stringify(e.getKey()) + "\n";
+                String context = stringify(e.getKey()) + "#";
                 List<String> list = new ArrayList<>();
                 for (Subject subject : e.getValue())
                 {
@@ -168,7 +169,7 @@ public class UserSubjectData extends CachingSubjectData
             }).collect(toList());
 
             Map<String, Boolean> permissions = this.permissions.entrySet().stream().flatMap(e -> {
-                String context = stringify(e.getKey()) + "\n";
+                String context = stringify(e.getKey()) + "#";
                 return e.getValue().entrySet().stream()
                         .collect(toMap(
                                 ee -> context + ee.getKey(),
@@ -177,7 +178,7 @@ public class UserSubjectData extends CachingSubjectData
             }).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
 
             Map<String, String> options = this.options.entrySet().stream().flatMap(e -> {
-                String context = stringify(e.getKey())+ "\n";
+                String context = stringify(e.getKey())+ "#";
                 return e.getValue().entrySet().stream()
                         .collect(toMap(
                                 ee -> context + ee.getKey(),
@@ -210,5 +211,19 @@ public class UserSubjectData extends CachingSubjectData
     protected void cacheOptions()
     {
         // TODO cache all the things
+    }
+
+    @Override
+    protected Context getMirror(Context context, Object result)
+    {
+        if (result instanceof List)
+        {
+            context = userCollection.getAssignMirror(context);
+        }
+        else if (result instanceof Map)
+        {
+            context = userCollection.getDirectMirror(context);
+        }
+        return context;
     }
 }

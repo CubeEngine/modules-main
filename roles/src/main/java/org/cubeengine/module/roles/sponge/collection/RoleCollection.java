@@ -29,76 +29,80 @@ import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.module.roles.sponge.subject.UserSubject;
-import org.cubeengine.service.permission.PermissionManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
+import static java.nio.file.Files.createDirectories;
+import static java.nio.file.Files.isDirectory;
+import static java.nio.file.Files.newDirectoryStream;
+import static org.cubeengine.module.roles.sponge.subject.RoleSubject.SEPARATOR;
 import static org.cubeengine.service.filesystem.FileExtensionFilter.YAML;
 import static org.spongepowered.api.service.permission.PermissionService.SUBJECTS_GROUP;
 
 public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 {
-    private final Map<String, String> mirrors;
+    private final Path modulePath;
+    private final Server server;
+    private Map<Context, Context> mirrors;
     private Roles module;
     private RolesPermissionService service;
-    private PermissionManager manager;
     private Reflector reflector;
 
-    public RoleCollection(Roles module, RolesPermissionService service, PermissionManager manager, Reflector reflector, Game game)
+    public RoleCollection(Roles module, RolesPermissionService service, Reflector reflector, Game game)
     {
         super(SUBJECTS_GROUP);
         this.module = module;
         this.service = service;
-        this.manager = manager;
         this.reflector = reflector;
+        this.server = game.getServer();
+        this.modulePath = module.getProvided(Path.class);
+    }
 
-        mirrors = readMirrors(service.getConfig().mirrors.roles);
-        // TODO add missing selfreferencing mirrors
-
-        Path modulePath = module.getProvided(Path.class);
+    private void loadRoles()
+    {
+        this.subjects.clear();
         try
         {
-            Files.createDirectories(modulePath.resolve("global"));
-            Files.createDirectories(modulePath.resolve("world"));
-            for (Path ctxType : Files.newDirectoryStream(modulePath))
+            createDirectories(modulePath.resolve("global"));
+            createDirectories(modulePath.resolve(Context.WORLD_KEY));
+            for (Path ctxType : newDirectoryStream(modulePath, p -> isDirectory(p)))
             {
-                if (Files.isDirectory(ctxType)) // ContextType
+                String ctxTypeName = ctxType.getFileName().toString();
+                for (Path ctxName : newDirectoryStream(ctxType, p -> Files.isDirectory(p) || (Files.isRegularFile(p) && p.toString().endsWith(YAML.getExtention()))))
                 {
-                    for (Path ctxName : Files.newDirectoryStream(ctxType))
+                    if (isDirectory(ctxName))
                     {
-                        if (Files.isDirectory(ctxName))
+                        for (Path file : newDirectoryStream(ctxName, YAML))
                         {
-                            for (Path file : Files.newDirectoryStream(ctxName, YAML))
-                            {
-                                RoleSubject subject = getRoleSubject(service, reflector, ctxType.getFileName().toString(), ctxName.getFileName().toString(), file.toFile());
-                                subjects.put(subject.getIdentifier(), subject);
-                            }
-                        }
-                        else
-                        {
-                            RoleSubject subject = getRoleSubject(service, reflector, ctxType.getFileName().toString(), "", ctxName.toFile());
-                            subjects.put(subject.getIdentifier(), subject);
+                            newSubject(ctxTypeName, ctxName.getFileName().toString(), file.toFile());
                         }
                     }
-
-                    if ("world".equals(ctxType.getFileName().toString()))
+                    else // YAML
                     {
-                        game.getServer().getWorlds().stream().map(World::getName).forEach(world -> {
-                              if (!mirrors.containsKey(readMirror(world)) && !Files.exists(ctxType.resolve(world)))
-                              {
-                                  try
-                                  {
-                                      Files.createDirectories(ctxType.resolve(world));
-                                  }
-                                  catch (IOException e)
-                                  {
-                                      throw new IllegalStateException(e);
-                                  }
-                              }
-                          });
+                        newSubject(ctxTypeName, "", ctxName.toFile());
+                    }
+                }
+
+                if (Context.WORLD_KEY.equals(ctxTypeName))
+                {
+                    for (WorldProperties prop : server.getAllWorldProperties())
+                    {
+                        String world = prop.getWorldName();
+                        if (!mirrors.containsKey(readMirror(world)) && !Files.exists(ctxType.resolve(world)))
+                        {
+                            try
+                            {
+                                createDirectories(ctxType.resolve(world));
+                            }
+                            catch (IOException e)
+                            {
+                                throw new IllegalStateException(e);
+                            }
+                        }
                     }
                 }
             }
@@ -109,18 +113,31 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         }
     }
 
-    private RoleSubject getRoleSubject(RolesPermissionService service, Reflector reflector, String ctxType, String ctxName, File file)
+    private void loadMirrors()
+    {
+        mirrors = readMirrors(service.getConfig().mirrors.roles);
+    }
+
+    private void newSubject(String ctxType, String ctxName, File file)
     {
         RoleConfig config = reflector.create(RoleConfig.class);
         config.setFile(file);
         config.reload();
-        Context context = new Context(ctxType, ctxName);
-        return new RoleSubject(module, service, this, config, context);
+        addSubject(module, service, config, ctxType, ctxName);
     }
 
+    private RoleSubject addSubject(Roles module, RolesPermissionService service, RoleConfig config, String ctxType, String ctxName)
+    {
+        RoleSubject subject = new RoleSubject(module, service, this, config, new Context(ctxType, ctxName));
+        subjects.put(subject.getIdentifier(), subject);
+        mirrors.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(subject.getContext()))
+                .forEach(entry -> subjects.put(subject.getIdentifier(entry.getKey()), subject));
+        return subject;
+    }
 
     @Override
-    protected RoleSubject getNew(String identifier)
+    protected RoleSubject createSubject(String identifier)
     {
         if (!identifier.startsWith("role:"))
         {
@@ -153,9 +170,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         config.roleName = name;
         config.setFile(path.resolve(name + ".yml").toFile());
         config.reload();
-        RoleSubject subject = new RoleSubject(module, service, this, config, new Context(ctxType, ctxName));
-        subjects.put(subject.getIdentifier(), subject);
-        return subject;
+        return addSubject(module, service, config, ctxType, ctxName);
     }
 
     @Override
@@ -216,9 +231,12 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 
     public void reload()
     {
-        for (RoleSubject subject : subjects.values())
-        {
-            subject.getSubjectData().reload();
-        }
+        loadMirrors();
+        loadRoles();
+    }
+
+    public Context getMirror(Context context)
+    {
+        return mirrors.getOrDefault(context, context);
     }
 }

@@ -43,11 +43,16 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
 
     public RoleSubject(Roles module, RolesPermissionService service, RoleCollection collection, RoleConfig config, Context context)
     {
-        super(collection, service, new RoleSubjectData(collection, config, context));
+        super(collection, service, new RoleSubjectData(service, config, context));
         this.module = module;
         this.context = context;
         this.contexts = "global".equals(context.getType()) ? GLOBAL_CONTEXT : singleton(context);
         this.roleName = "role:" + context.getKey() + SEPARATOR +  (context.getName().isEmpty() ? "" : context.getName() + SEPARATOR) + config.roleName;
+    }
+
+    public String getIdentifier(Context context)
+    {
+        return "role:" + context.getKey() + SEPARATOR + (context.getName().isEmpty() ? "" : context.getName() + SEPARATOR) + getSubjectData().getConfig().roleName;
     }
 
     @Override
@@ -103,4 +108,6 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
     {
         return this.context;
     }
+
+
 }

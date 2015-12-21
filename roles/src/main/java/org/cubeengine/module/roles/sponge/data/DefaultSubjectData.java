@@ -20,6 +20,7 @@ package org.cubeengine.module.roles.sponge.data;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.cubeengine.module.roles.RolesConfig;
+import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.context.Context;
 
@@ -27,8 +28,9 @@ import static java.util.Collections.singleton;
 
 public class DefaultSubjectData extends BaseSubjectData
 {
-    public DefaultSubjectData(PermissionService service, RolesConfig config)
+    public DefaultSubjectData(RolesPermissionService service, RolesConfig config)
     {
+        super(service);
         for (Entry<String, Set<String>> entry : config.defaultRoles.entrySet())
         {
             String name = entry.getKey();

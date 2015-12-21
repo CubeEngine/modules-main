@@ -35,7 +35,7 @@ public class BasicSubject extends BaseSubject<BaseSubjectData>
 
     public BasicSubject(String identifier, SubjectCollection collection, RolesPermissionService service, Game game)
     {
-        super(collection, service, new BaseSubjectData());
+        super(collection, service, new BaseSubjectData(service));
         this.identifier = identifier;
         this.game = game;
     }

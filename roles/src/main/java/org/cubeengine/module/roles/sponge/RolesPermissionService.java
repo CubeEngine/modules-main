@@ -35,9 +35,7 @@ import org.cubeengine.module.roles.sponge.collection.RoleCollection;
 import org.cubeengine.module.roles.sponge.collection.UserCollection;
 import org.cubeengine.module.roles.sponge.data.DefaultSubjectData;
 import de.cubeisland.engine.reflect.Reflector;
-import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -69,7 +67,8 @@ public class RolesPermissionService implements PermissionService
         logger = permLogger;
         defaultData = new DefaultSubjectData(this, config);
         collections.put(SUBJECTS_USER, new UserCollection(this, game));
-        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, manager, reflector, game));
+        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, reflector, game));
+        getGroupSubjects().reload();
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM, game));
         collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE, game));
     }

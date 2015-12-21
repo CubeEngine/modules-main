@@ -25,41 +25,40 @@ import java.util.List;
 import java.util.Set;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.module.roles.sponge.collection.RoleCollection;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 
 import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
-import static java.util.Collections.singleton;
 
 public class RoleSubjectData extends CachingSubjectData
 {
     private final RoleConfig config;
-    private Context context;
-    private final RoleCollection collection;
+    private Context roleContext;
 
-    public RoleSubjectData(RoleCollection roleCollection, RoleConfig config, Context context)
+    public RoleSubjectData(RolesPermissionService service, RoleConfig config, Context context)
     {
+        super(service);
         this.config = config;
-        this.context = context;
-        this.collection = roleCollection;
+        this.roleContext = context;
     }
 
     @Override
     protected void cacheOptions(Set<Context> c)
     {
         c.stream()
-         .filter(ctx -> ctx.equals(context) && !options.containsKey(context))
-         .forEach(ctx -> options.put(context, config.metadata));
+         .map(roleCollection::getMirror)
+         .filter(ctx -> ctx.equals(roleContext) && !options.containsKey(roleContext))
+         .forEach(ctx -> options.put(roleContext, config.metadata));
     }
 
     @Override
     protected void cachePermissions(Set<Context> c)
     {
         c.stream()
-         .filter(ctx -> ctx.equals(context) && !permissions.containsKey(context))
-         .forEach(ctx -> permissions.put(context, config.perms.getPermissions()));
+         .map(roleCollection::getMirror)
+         .filter(ctx -> ctx.equals(roleContext) && !permissions.containsKey(roleContext))
+         .forEach(ctx -> permissions.put(roleContext, config.perms.getPermissions()));
     }
 
     @Override
@@ -67,21 +66,28 @@ public class RoleSubjectData extends CachingSubjectData
     {
         for (Context ctx : c)
         {
-            if (ctx.equals(context) && !parents.containsKey(context))
+            ctx = roleCollection.getMirror(ctx);
+            if (ctx.equals(roleContext) && !parents.containsKey(roleContext))
             {
                 List<RoleSubject> parents = new ArrayList<>();
                 for (String parent : config.parents)
                 {
                     if (!parent.contains(RoleSubject.SEPARATOR))
                     {
-                        parent = context.getKey() + RoleSubject.SEPARATOR + context.getValue() + RoleSubject.SEPARATOR + parent;
+                        parent = roleContext.getKey() + RoleSubject.SEPARATOR + roleContext.getValue() + RoleSubject.SEPARATOR + parent;
                     }
-                    parents.add(collection.get("role:" + parent));
+                    parents.add(roleCollection.get("role:" + parent));
                 }
                 Collections.sort(parents);
-                this.parents.put(context, new ArrayList<>(parents));
+                this.parents.put(roleContext, new ArrayList<>(parents));
             }
         }
+    }
+
+    @Override
+    protected Context getMirror(Context context, Object result)
+    {
+        return roleCollection.getMirror(context);
     }
 
     @Override
@@ -89,7 +95,7 @@ public class RoleSubjectData extends CachingSubjectData
     {
         if (changed)
         {
-            List<Subject> list = parents.get(context);
+            List<Subject> list = parents.get(roleContext);
             if (list != null)
             {
                 config.parents.clear();
@@ -124,19 +130,19 @@ public class RoleSubjectData extends CachingSubjectData
     @Override
     protected void cacheParents()
     {
-        cacheParents(toSet(context));
+        cacheParents(toSet(roleContext));
     }
 
     @Override
     protected void cachePermissions()
     {
-        cachePermissions(toSet(context));
+        cachePermissions(toSet(roleContext));
     }
 
     @Override
     protected void cacheOptions()
     {
-        cacheOptions(toSet(context));
+        cacheOptions(toSet(roleContext));
     }
 
     /* TODO rename and delete

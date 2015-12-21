@@ -67,28 +67,30 @@ public abstract class BaseSubjectCollection<T extends OptionSubject> implements 
         return Collections.unmodifiableMap(result);
     }
 
-    protected final String readMirror(String source)
+    protected final Context readMirror(String source)
     {
         if (!source.contains(SEPARATOR))
         {
             if (!"global".equals(source))
             {
-                return "world" + SEPARATOR + source;
+                return new Context(Context.WORLD_KEY, source);
             }
         }
-        return source;
+        String[] split = source.split("\\|");
+        return new Context(split[0], split[1]);
     }
 
-    protected final Map<String, String> readMirrors(Map<String, List<String>> config)
+    protected final Map<Context, Context> readMirrors(Map<String, List<String>> config)
     {
-        Map<String, String> mirrors = new HashMap<>();
+        Map<Context, Context> mirrors = new HashMap<>();
         for (Entry<String, List<String>> roleMirror : config.entrySet())
         {
-            String source = readMirror(roleMirror.getKey());
+            Context source = readMirror(roleMirror.getKey());
             for (String mirrored : roleMirror.getValue())
             {
                 mirrors.put(readMirror(mirrored), source);
             }
+            mirrors.put(source, source); // self-referencing mirror
         }
         return mirrors;
     }
@@ -108,7 +110,7 @@ public abstract class BaseSubjectCollection<T extends OptionSubject> implements 
         T subject = subjects.get(identifier);
         if (subject == null)
         {
-            subject = getNew(identifier);
+            subject = createSubject(identifier);
             subjects.put(identifier, subject);
         }
         return subject;
@@ -126,5 +128,5 @@ public abstract class BaseSubjectCollection<T extends OptionSubject> implements 
         return new ArrayList<>(subjects.values());
     }
 
-    protected abstract T getNew(String identifier);
+    protected abstract T createSubject(String identifier);
 }

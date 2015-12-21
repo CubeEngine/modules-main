@@ -23,6 +23,9 @@ import java.util.stream.Collectors;
 
 import org.cubeengine.module.roles.commands.RoleCommands;
 import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
+import org.cubeengine.module.roles.sponge.RolesPermissionService;
+import org.cubeengine.module.roles.sponge.collection.RoleCollection;
+import org.cubeengine.module.roles.sponge.collection.UserCollection;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
@@ -40,6 +43,15 @@ public class BaseSubjectData implements OptionSubjectData
     protected final Map<Context, Map<String, String>> options = new ConcurrentHashMap<>();
     protected final Map<Context, Map<String, Boolean>> permissions = new ConcurrentHashMap<>();
     protected final Map<Context, List<Subject>> parents = new ConcurrentHashMap<>();
+
+    protected final UserCollection userCollection;
+    protected final RoleCollection roleCollection;
+
+    public BaseSubjectData(RolesPermissionService service)
+    {
+        userCollection = service.getUserSubjects();
+        roleCollection = service.getGroupSubjects();
+    }
 
     @Override
     public Map<Set<Context>, Map<String, String>> getAllOptions()
@@ -232,6 +244,7 @@ public class BaseSubjectData implements OptionSubjectData
     {
         for (Context context : contexts)
         {
+            context = getMirror(context, result); // only for role-data
             T other = all.get(context);
             if (other != null)
             {
@@ -239,5 +252,10 @@ public class BaseSubjectData implements OptionSubjectData
             }
         }
         return result;
+    }
+
+    protected Context getMirror(Context context, Object result)
+    {
+        return context;
     }
 }

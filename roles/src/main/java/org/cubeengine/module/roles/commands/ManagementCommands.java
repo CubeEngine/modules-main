@@ -55,6 +55,7 @@ public class ManagementCommands extends ContainerCommand
     {
         module.getConfiguration().reload();
         service.getGroupSubjects().reload();
+        service.getUserSubjects().reload();
         // TODO remove cached data
         context.sendTranslated(POSITIVE, "{text:Roles} reload complete!");
     }
