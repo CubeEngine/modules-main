@@ -37,7 +37,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldBuilder;
+import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -73,7 +73,7 @@ public class WorldsCommands extends ContainerCommand
     @Command(desc = "Creates a new world")
     public void create(CommandSource context,
                        String name,
-                       @Named({"dimension", "dim"}) DimensionType environment,
+                       @Named({"dimension", "dim"}) DimensionType dimension,
                        @Named("seed") String seed,
                        @Named({"generatortype", "generator", "type"}) GeneratorType type,
                        @Named({"structure", "struct"}) Boolean generateStructures,
@@ -107,8 +107,7 @@ public class WorldsCommands extends ContainerCommand
             i18n.sendTranslated(context, POSITIVE, "Old world moved to {name#folder}", newName);
         }
 
-        WorldBuilder builder = game.getRegistry().createBuilder(WorldBuilder.class);
-
+        WorldCreationSettings.Builder builder = WorldCreationSettings.builder();
         // TODO check nulls
 
         builder.name(name);
@@ -121,17 +120,13 @@ public class WorldsCommands extends ContainerCommand
             builder.seed(seed.hashCode());
         }
         builder.generator(type);
-        builder.dimensionType(environment);
+        builder.dimension(dimension);
         builder.usesMapFeatures(generateStructures);
         builder.gameMode(gamemode);
-        world = builder.build();
-        if (world.isPresent())
+        Optional<WorldProperties> properties = game.getServer().createWorldProperties(builder.build());
+        if (properties.isPresent())
         {
-            world.get().getProperties().setDifficulty(difficulty);
-            if (noload)
-            {
-                server.unloadWorld(world.get());
-            }
+            properties.get().setDifficulty(difficulty);
             i18n.sendTranslated(context, POSITIVE, "World successfully created!");
             return;
         }
