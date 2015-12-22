@@ -19,6 +19,7 @@ package org.cubeengine.module.worlds;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.module.core.util.math.BlockVector3;
@@ -73,12 +74,12 @@ public class WorldsCommands extends ContainerCommand
     @Command(desc = "Creates a new world")
     public void create(CommandSource context,
                        String name,
-                       @Named({"dimension", "dim"}) DimensionType dimension,
+                       @Default @Named({"dimension", "dim"}) DimensionType dimension,
                        @Named("seed") String seed,
-                       @Named({"generatortype", "generator", "type"}) GeneratorType type,
+                       @Default @Named({"generatortype", "generator", "type"}) GeneratorType type,
                        @Named({"structure", "struct"}) Boolean generateStructures,
-                       @Named({"gamemode", "mode"}) GameMode gamemode,
-                       @Named({"difficulty", "diff"}) Difficulty difficulty,
+                       @Default @Named({"gamemode", "mode"}) GameMode gamemode,
+                       @Default @Named({"difficulty", "diff"}) Difficulty difficulty,
                        @Flag boolean recreate,
                        @Flag boolean noload)
     {
@@ -112,16 +113,21 @@ public class WorldsCommands extends ContainerCommand
 
         builder.name(name);
         builder.loadsOnStartup(!noload);
-        try
+        if (seed != null)
         {
-            builder.seed(Long.parseLong(seed));
-        } catch (NumberFormatException ignore)
-        {
-            builder.seed(seed.hashCode());
+            try
+            {
+                builder.seed(Long.parseLong(seed));
+            }
+            catch (NumberFormatException ignore)
+            {
+                builder.seed(seed.hashCode());
+            }
         }
+
         builder.generator(type);
         builder.dimension(dimension);
-        builder.usesMapFeatures(generateStructures);
+        builder.usesMapFeatures(generateStructures != null && generateStructures);
         builder.gameMode(gamemode);
         Optional<WorldProperties> properties = game.getServer().createWorldProperties(builder.build());
         if (properties.isPresent())
