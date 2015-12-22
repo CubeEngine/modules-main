@@ -25,7 +25,7 @@ import org.spongepowered.api.util.Tristate;
 
 public class PermissionTree
 {
-    private final Map<String, Boolean> permissions = new TreeMap<>();
+    private Map<String, Boolean> permissions = new TreeMap<>();
 
     private void loadFromMap(Map<String, ?> map, String path)
     {
@@ -85,12 +85,9 @@ public class PermissionTree
         return this.permissions;
     }
 
-    public Tristate setPermission(String perm, Tristate set)
+    public PermissionTree setPermissions(Map<String, Boolean> permissions)
     {
-        if (set == Tristate.UNDEFINED)
-        {
-            return Tristate.fromBoolean(this.permissions.remove(perm));
-        }
-        return Tristate.fromBoolean(this.permissions.put(perm, set == Tristate.TRUE));
+        this.permissions = new TreeMap<>(permissions);
+        return this;
     }
 }

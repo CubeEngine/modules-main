@@ -42,22 +42,10 @@ public class RolesConfig extends ReflectedYaml
                  "      - guest_in_the_end")
     public Map<String, Set<String>> defaultRoles = new HashMap<>();
 
-
     @Comment("Example for a mirror:\n" +
-        "  world: \n" +
-        "    - world_the_end\n" +
-        "    - world_nether")
-    public Mirrors mirrors;
-
-    public static class Mirrors implements Section
-    {
-        @Comment("The roles to mirror")
-        public Map<String, List<String>> roles = new HashMap<>();
-
-        @Comment("The role assignments to mirror")
-        public Map<String, List<String>> assigned = new HashMap<>();
-
-        @Comment("The direct assignments to mirror")
-        public Map<String, List<String>> direct = new HashMap<>();
-    }
+            "  world|world: \n" +
+            "    - world|world_the_end\n" +
+            "    - world|world_nether\n" +
+            "The context-type world can be omitted")
+    public Map<String, List<String>> mirrors = new HashMap<>();
 }

@@ -21,7 +21,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import org.cubeengine.module.roles.commands.RoleCommands;
 import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.collection.RoleCollection;
@@ -30,6 +29,8 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
+
+import javax.inject.Provider;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
@@ -44,13 +45,40 @@ public class BaseSubjectData implements OptionSubjectData
     protected final Map<Context, Map<String, Boolean>> permissions = new ConcurrentHashMap<>();
     protected final Map<Context, List<Subject>> parents = new ConcurrentHashMap<>();
 
+    public static final Context GLOBAL = new Context("global", "");
+
     protected final UserCollection userCollection;
     protected final RoleCollection roleCollection;
+    protected final RolesPermissionService service;
 
     public BaseSubjectData(RolesPermissionService service)
     {
+        this.service = service;
         userCollection = service.getUserSubjects();
         roleCollection = service.getGroupSubjects();
+    }
+
+    public static String stringify(Context c)
+    {
+        return c.getName().isEmpty() ? c.getType() : c.getType().equals(Context.WORLD_KEY) ? c.getName() : c.getType() + "|" + c.getName();
+    }
+
+    public static Context asContext(String string)
+    {
+        String[] context = string.split("\\|");
+        if (context.length == 1)
+        {
+            if (context[0].equals("global"))
+            {
+                return new Context(context[0], "");
+            }
+            return new Context(Context.WORLD_KEY, context[0]);
+        }
+        if (context.length == 2)
+        {
+            return new Context(context[0], context[1]);
+        }
+        throw new IllegalStateException("Invalid context " + string);
     }
 
     @Override
@@ -73,7 +101,6 @@ public class BaseSubjectData implements OptionSubjectData
         return unmodifiableMap(accumulate(contexts, permissions, new HashMap<>(), Map::putAll));
     }
 
-
     @Override
     public List<Subject> getParents(Set<Context> contexts)
     {
@@ -83,7 +110,7 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public boolean setOption(Set<Context> contexts, String key, String value)
     {
-        return operate(contexts, options, map -> map.put(key, value));
+        return operate(contexts, options, map -> map.put(key, value), HashMap::new);
     }
 
     @Override
@@ -128,7 +155,7 @@ public class BaseSubjectData implements OptionSubjectData
             {
                 map.put(permission, value.asBoolean());
             }
-        });
+        }, HashMap::new);
     }
 
     @Override
@@ -177,7 +204,7 @@ public class BaseSubjectData implements OptionSubjectData
             }
         }
 
-        return operate(contexts, parents, l -> l.add(parent));
+        return operate(contexts, parents, l -> l.add(parent), ArrayList::new);
     }
 
     protected void checkForCircularDependency(Set<Context> contexts, Subject parent, int depth)
@@ -221,15 +248,26 @@ public class BaseSubjectData implements OptionSubjectData
 
     private <T> boolean operate(Set<Context> contexts, Map<Context, T> all, Operator<T> operator)
     {
+        return operate(contexts, all, operator, () -> null);
+    }
+
+    private <T> boolean operate(Set<Context> contexts, Map<Context, T> all, Operator<T> operator, Provider<T> provider)
+    {
         boolean changed = false;
         for (Context context : contexts)
         {
-            T map = all.get(context);
-            if (map != null)
+            T val = all.get(context);
+            if (val == null)
             {
-                operator.operate(map);
+                val = provider.get();
+                all.put(context, val);
+            }
+            if (val != null)
+            {
+                operator.operate(val);
                 changed = true;
             }
+
         }
         return changed;
     }
@@ -242,9 +280,18 @@ public class BaseSubjectData implements OptionSubjectData
 
     private <T> T accumulate(Set<Context> contexts, Map<Context, T> all, T result, Accumulator<T> accumulator)
     {
+        if (contexts.isEmpty())
+        {
+            T other = all.get(GLOBAL);
+            if (other != null)
+            {
+                accumulator.operate(result, other);
+            }
+        }
+
         for (Context context : contexts)
         {
-            context = getMirror(context, result); // only for role-data
+            context = service.getMirror(context);
             T other = all.get(context);
             if (other != null)
             {
@@ -252,10 +299,5 @@ public class BaseSubjectData implements OptionSubjectData
             }
         }
         return result;
-    }
-
-    protected Context getMirror(Context context, Object result)
-    {
-        return context;
     }
 }

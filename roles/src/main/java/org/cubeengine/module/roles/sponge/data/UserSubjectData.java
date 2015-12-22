@@ -19,8 +19,6 @@ package org.cubeengine.module.roles.sponge.data;
 
 import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.module.roles.sponge.collection.RoleCollection;
-import org.cubeengine.module.roles.sponge.collection.UserCollection;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -44,17 +42,12 @@ public class UserSubjectData extends CachingSubjectData
         this.uuid = uuid;
     }
 
-    private String stringify(Context c)
-    {
-        return c.getType() + "|" + c.getValue();
-    }
-
     @Override
     protected void cacheOptions(Set<Context> c)
     {
         for (Context context : c)
         {
-            context = userCollection.getDirectMirror(context);
+            context = service.getMirror(context);
             String contextString = stringify(context) + "#";
             if (!options.containsKey(context))
             {
@@ -76,7 +69,7 @@ public class UserSubjectData extends CachingSubjectData
     {
         for (Context context : c)
         {
-            context = userCollection.getDirectMirror(context);
+            context = service.getMirror(context);
             String contextString = stringify(context) + "#";
             if (!permissions.containsKey(context))
             {
@@ -120,7 +113,7 @@ public class UserSubjectData extends CachingSubjectData
     {
         for (Context context : c)
         {
-            context = userCollection.getAssignMirror(context);
+            context = service.getMirror(context);
             String contextString = stringify(context) + "#";
             if (!parents.containsKey(context))
             {
@@ -211,19 +204,5 @@ public class UserSubjectData extends CachingSubjectData
     protected void cacheOptions()
     {
         // TODO cache all the things
-    }
-
-    @Override
-    protected Context getMirror(Context context, Object result)
-    {
-        if (result instanceof List)
-        {
-            context = userCollection.getAssignMirror(context);
-        }
-        else if (result instanceof Map)
-        {
-            context = userCollection.getDirectMirror(context);
-        }
-        return context;
     }
 }

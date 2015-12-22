@@ -25,7 +25,6 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.module.roles.Roles;
-import org.cubeengine.module.roles.commands.provider.ContextualRole;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
@@ -40,6 +39,7 @@ import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.module.roles.commands.RoleCommands.LISTELEM;
+import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 @Alias("manuser")
@@ -56,78 +56,65 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias({"manuadd", "assignurole", "addurole", "giveurole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [-temp]")
-    public void assign(CommandContext context,
+    public void assign(CommandContext cContext,
                        @Default User player,
-                       ContextualRole role,
-                       @Flag boolean temp)
-    {// TODO RoleCompleter & Reader
-        // TODO RoleReader String identifier = role.contains("|") ? "role:" + role : "role:world|" + world.getName() + "|" + role;
-        String ctx = role.contextType + "|" + role.contextName;
-        if (!service.getGroupSubjects().hasRegistered(role.getIdentifier()))
+                       RoleSubject role,
+                       @Flag boolean temp,
+                       @Named("in") @Default Context context)
+    {
+        // TODO RoleCompleter & Reader
+        if (!role.canAssignAndRemove(cContext.getSource(), context))
         {
-            context.sendTranslated(NEUTRAL, "Could not find the role {name} in {input#context}.", role.roleName, ctx);
+            cContext.sendTranslated(NEGATIVE, "You are not allowed to assign the role {role} in {input#context}!", role, context);
             return;
         }
-        RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
-        if (!r.canAssignAndRemove(context.getSource()))
-        {
-            context.sendTranslated(NEGATIVE, "You are not allowed to assign the role {role} in {input#context}!", r, ctx);
-            return;
-        }
-        Set<Context> contexts = RoleCommands.toSet(role.getContext());
+        Set<Context> contexts = toSet(context);
         if (temp)
         {
             if (!player.getPlayer().isPresent())
             {
-                context.sendTranslated(NEGATIVE, "You cannot assign a temporary role to a offline player!");
+                cContext.sendTranslated(NEGATIVE, "You cannot assign a temporary role to a offline player!");
                 return;
             }
-            if (player.getTransientSubjectData().addParent(contexts, r))
+            if (player.getTransientSubjectData().addParent(contexts, role))
             {
-                context.sendTranslated(POSITIVE, "Added the role {role} temporarily to {user} in {input#context}.", r, player, ctx);
+                cContext.sendTranslated(POSITIVE, "Added the role {role} temporarily to {user} in {input#context}.", role, player, context);
                 return;
             }
-            context.sendTranslated(NEUTRAL, "{user} already had the role {role} in {input#context}.", player, r, ctx);
+            cContext.sendTranslated(NEUTRAL, "{user} already had the role {role} in {input#context}.", player, role, context);
             return;
         }
-        if (player.getSubjectData().addParent(contexts, r))
+        if (player.getSubjectData().addParent(contexts, role))
         {
-            context.sendTranslated(POSITIVE, "Added the role {role} to {user} in {input#context}.", r, player, ctx);
+            cContext.sendTranslated(POSITIVE, "Added the role {role} to {user} in {input#context}.", role, player, context);
             return;
         }
-        context.sendTranslated(NEUTRAL, "{user} already has the role {role} in {input#context}.", player, r, ctx);
+        cContext.sendTranslated(NEUTRAL, "{user} already has the role {role} in {input#context}.", player, role, context);
     }
 
     @Alias(value = {"remurole", "manudel"})
     @Command(desc = "Removes a role from the player")
-    public void remove(CommandContext context, @Default Player player, ContextualRole role)
+    public void remove(CommandContext cContext, @Default Player player, RoleSubject role, @Named("in") @Default Context context)
     {
-        String ctx = role.contextType + "|" + role.contextName;
-        if (!service.getGroupSubjects().hasRegistered(role.getIdentifier()))
+        if (!role.canAssignAndRemove(cContext.getSource(), context))
         {
-            context.sendTranslated(NEUTRAL, "Could not find the role {name} in {input#context}.", role, ctx);
+            cContext.sendTranslated(NEGATIVE, "You are not allowedR to remove the role {role} in {input#context}!", role, context);
             return;
         }
-        RoleSubject r = service.getGroupSubjects().get(role.getIdentifier());
-        if (!r.canAssignAndRemove(context.getSource()))
+        Set<Context> contexts = toSet(context);
+        if (player.getSubjectData().removeParent(contexts, role))
         {
-            context.sendTranslated(NEGATIVE, "You are not allowedR to remove the role {role} in {input#context}!", r, ctx);
+            cContext.sendTranslated(POSITIVE, "Removed the role {role} from {user} in {input#context}.", role, player, context);
             return;
         }
-        Set<Context> contexts = RoleCommands.toSet(role.getContext());
-        if (player.getSubjectData().removeParent(contexts, r))
-        {
-            context.sendTranslated(POSITIVE, "Removed the role {role} from {user} in {input#context}.", r, player, ctx);
-            return;
-        }
-        context.sendTranslated(NEUTRAL, "{user} did not have the role {role} in {input#context}.", player, r, ctx);
+        cContext.sendTranslated(NEUTRAL, "{user} did not have the role {role} in {input#context}.", player, role, context);
     }
 
     @Alias(value = {"clearurole", "manuclear"})
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in context]")
     public void clear(CommandContext cContext, @Default Player player, @Named("in") @Default Context context) // TODO reader for context
     {
-        Set<Context> contexts = RoleCommands.toSet(context);
+        Set<Context> contexts = toSet(context);
         player.getSubjectData().clearParents(contexts);
         cContext.sendTranslated(NEUTRAL, "Cleared the roles of {user} in {ctx}.", player, context);
         SubjectData defaultData = service.getDefaultData();
@@ -146,7 +133,7 @@ public class UserManagementCommands extends ContainerCommand
     @Command(alias = "setperm", desc = "Sets a permission for this user [in context]")
     public void setpermission(CommandContext cContext, @Default Player player, @Complete(PermissionCompleter.class) String permission, @Default Tristate value, @Named("in") @Default Context context)
     {
-        Set<Context> contexts = RoleCommands.toSet(context);
+        Set<Context> contexts = toSet(context);
         if (value == Tristate.UNDEFINED)
         {
             resetpermission(cContext, player, permission, context);
@@ -171,7 +158,7 @@ public class UserManagementCommands extends ContainerCommand
     @Command(alias = "resetperm", desc = "Resets a permission for this user [in context]")
     public void resetpermission(CommandContext cContext, @Default Player player, String permission, @Named("in") @Default Context context)
     {
-        Set<Context> contexts = RoleCommands.toSet(context);
+        Set<Context> contexts = toSet(context);
         if (player.getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED))
         {
             cContext.sendTranslated(NEUTRAL, "Permission {input} of {user} resetted!", permission, player);
@@ -185,7 +172,7 @@ public class UserManagementCommands extends ContainerCommand
     @Command(alias = {"setdata", "setmeta"}, desc = "Sets metadata for this user [in context]")
     public void setmetadata(CommandContext cContext, @Default Player player, String metaKey, String metaValue, @Named("in") @Default Context context)
     {
-        Set<Context> contexts = RoleCommands.toSet(context);
+        Set<Context> contexts = toSet(context);
         if (((OptionSubjectData)player.getSubjectData()).setOption(contexts, metaKey, metaValue))
         {
             cContext.sendTranslated(POSITIVE, "Metadata {input#key} of {user} set to {input#value}!", metaKey,
@@ -198,7 +185,7 @@ public class UserManagementCommands extends ContainerCommand
     @Command(alias = {"resetdata", "resetmeta", "deletedata", "deletemetadata", "deletemeta"}, desc = "Resets metadata for this user [in context]")
     public void resetmetadata(CommandContext cContext, @Default Player player, String metaKey, @Named("in") @Default Context context)
     {
-        Set<Context> contexts = RoleCommands.toSet(context);
+        Set<Context> contexts = toSet(context);
         if (((OptionSubjectData)player.getSubjectData()).setOption(contexts, metaKey, null))
         {
             cContext.sendTranslated(NEUTRAL, "Metadata {input#key} of {user} removed!", metaKey, player);
@@ -210,7 +197,7 @@ public class UserManagementCommands extends ContainerCommand
     @Command(alias = {"cleardata", "clearmeta"}, desc = "Resets metadata for this user [in context]")
     public void clearMetaData(CommandContext cContext, @Default Player player, @Named("in") @Default Context context)
     {
-        Set<Context> contexts = RoleCommands.toSet(context);
+        Set<Context> contexts = toSet(context);
         if (((OptionSubjectData)player.getSubjectData()).clearOptions(contexts))
         {
             cContext.sendTranslated(NEUTRAL, "Metadata of {user} cleared!", player);

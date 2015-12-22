@@ -18,13 +18,13 @@
 package org.cubeengine.module.roles.config;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+
+import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.spongepowered.api.util.Tristate;
 
 @SuppressWarnings("all")
 public class RoleConfig extends ReflectedYaml
@@ -36,28 +36,33 @@ public class RoleConfig extends ReflectedYaml
     @Comment("Use these as priority or just numbers\n"
         + "ABSULTEZERO(-273) < MINIMUM(0) < LOWEST(125) < LOWER(250) < LOW(375) < NORMAL(500) < HIGH(675) < HIGHER(750) < HIGHEST(1000) < OVER9000(9001)")
     public Priority priority = Priority.ABSULTEZERO;
-    @Name("permissions")
-    @Comment("The permission\n" +
-                 "permission nodes can be assigned individually e.g.:\n" +
-                 " - cubeengine.roles.command.assign\n" +
-                 "or grouped into a tree (this will be done automatically) like this:\n" +
-                 " - cubeengine.roles:\n" +
-                 "     - command.assign\n" +
-                 "     - world.world:\n" +
-                 "         - guest\n" +
-                 "         - member\n" +
-                 "Use - directly in front of a permission to revoke that permission e.g.:\n" +
-                 " - -cubeengine.roles.command.assign")
-    public PermissionTree perms = new PermissionTree();
-    @Name("parents")
-    @Comment("The roles this role will inherit from.\n"
-        + "Any priority of parents will be ignored!")
-    public Set<String> parents = new HashSet<>();
-    @Name("metadata")
-    @Comment("The metadata such as prefix or suffix e.g.:\n" +
-                 "metadata: \n" +
-                 "  prefix: '&7Guest'")
-    public Map<String, String> metadata = new LinkedHashMap<>();
+
+    @Comment("The settings for this role grouped by context\n" +
+            "context type and name are separated by |\n" +
+            "the world context is the default context and its type can be omitted\n" +
+            "for global context use global without separator\n" +
+            "\n" +
+            "permission nodes can be assigned individually e.g.:\n" +
+            "   - cubeengine.roles.command.assign\n" +
+            "or grouped into a tree (this will be done automatically) like this:\n" +
+            " - cubeengine.roles:\n" +
+            "     - command.assign\n" +
+            "     - world.world:\n" +
+            "         - guest\n" +
+            "         - member\n" +
+            "Use - directly in front of a permission to revoke that permission e.g.:\n" +
+            " - -cubeengine.roles.command.assign\n" +
+            "\n" +
+            "parents are the roles this one will inherit from\n" +
+            "\n" +
+            "options can contain any String Key-Value data e.g.:\n" +
+            "  prefix: '&7Guest'")
+    public Map<String, ContextSetting> settings = new HashMap<>();
+    {
+        {
+            settings.put("global", new ContextSetting());
+        }
+    }
 
     @Override
     public void onLoaded(File loadFrom) {
@@ -65,13 +70,30 @@ public class RoleConfig extends ReflectedYaml
         {
             this.priority = Priority.ABSULTEZERO;
         }
-        if (this.parents == null)
+        if (settings.isEmpty())
         {
-            this.parents = new HashSet<>();
+            ContextSetting setting = new ContextSetting();
+            settings.put("global", setting);
+            setting.options.put("key", "value");
+            setting.permissions.getPermissions().put("no.perm", false);
         }
-        if (this.metadata == null)
+        for (ContextSetting setting : settings.values())
         {
-            this.metadata = new LinkedHashMap<>();
+            if (setting.parents == null)
+            {
+                setting.parents = new HashSet<>();
+            }
+            if (setting.options == null)
+            {
+                setting.options = new LinkedHashMap<>();
+            }
         }
+    }
+
+    public static class ContextSetting implements Section
+    {
+        public PermissionTree permissions = new PermissionTree();
+        public Set<String> parents = new HashSet<>();
+        public Map<String, String> options = new LinkedHashMap<>();
     }
 }

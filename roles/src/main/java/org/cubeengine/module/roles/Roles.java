@@ -45,13 +45,13 @@ import org.cubeengine.module.roles.data.ImmutablePermissionData;
 import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.data.PermissionDataBuilder;
 import org.cubeengine.module.roles.exception.RolesExceptionHandler;
+import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.roles.commands.provider.ContextFormatter;
 import org.cubeengine.module.roles.commands.provider.ContextReader;
-import org.cubeengine.module.roles.commands.provider.ContextualRole;
-import org.cubeengine.module.roles.commands.provider.ContextualRoleReader;
+import org.cubeengine.module.roles.commands.provider.RoleReader;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.commands.provider.RoleFormatter;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
@@ -144,7 +144,7 @@ public class Roles extends Module
         i18n.getCompositor().registerFormatter(new RoleFormatter());
 
         cm.getProviderManager().register(this, new ContextReader(service, game), Context.class);
-        cm.getProviderManager().register(this, new ContextualRoleReader(service, game), ContextualRole.class);
+        cm.getProviderManager().register(this, new RoleReader(service), RoleSubject.class);
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
         cm.getProviderManager().register(this, new PermissionCompleter(service));
 

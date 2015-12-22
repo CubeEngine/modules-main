@@ -67,34 +67,6 @@ public abstract class BaseSubjectCollection<T extends OptionSubject> implements 
         return Collections.unmodifiableMap(result);
     }
 
-    protected final Context readMirror(String source)
-    {
-        if (!source.contains(SEPARATOR))
-        {
-            if (!"global".equals(source))
-            {
-                return new Context(Context.WORLD_KEY, source);
-            }
-        }
-        String[] split = source.split("\\|");
-        return new Context(split[0], split[1]);
-    }
-
-    protected final Map<Context, Context> readMirrors(Map<String, List<String>> config)
-    {
-        Map<Context, Context> mirrors = new HashMap<>();
-        for (Entry<String, List<String>> roleMirror : config.entrySet())
-        {
-            Context source = readMirror(roleMirror.getKey());
-            for (String mirrored : roleMirror.getValue())
-            {
-                mirrors.put(readMirror(mirrored), source);
-            }
-            mirrors.put(source, source); // self-referencing mirror
-        }
-        return mirrors;
-    }
-
     private void collectPerm(Subject subject, String permission, Set<Context> contexts, Map<Subject, Boolean> result)
     {
         Tristate state = subject.getPermissionValue(contexts, permission);

@@ -17,48 +17,36 @@
  */
 package org.cubeengine.module.roles.sponge.collection;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Map;
-
+import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.module.roles.sponge.subject.UserSubject;
-import de.cubeisland.engine.reflect.Reflector;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.Server;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.world.storage.WorldProperties;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
 
 import static java.nio.file.Files.createDirectories;
-import static java.nio.file.Files.isDirectory;
 import static java.nio.file.Files.newDirectoryStream;
-import static org.cubeengine.module.roles.sponge.subject.RoleSubject.SEPARATOR;
 import static org.cubeengine.service.filesystem.FileExtensionFilter.YAML;
 import static org.spongepowered.api.service.permission.PermissionService.SUBJECTS_GROUP;
 
 public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 {
     private final Path modulePath;
-    private final Server server;
-    private Map<Context, Context> mirrors;
     private Roles module;
     private RolesPermissionService service;
     private Reflector reflector;
 
-    public RoleCollection(Roles module, RolesPermissionService service, Reflector reflector, Game game)
+    public RoleCollection(Roles module, RolesPermissionService service, Reflector reflector)
     {
         super(SUBJECTS_GROUP);
         this.module = module;
         this.service = service;
         this.reflector = reflector;
-        this.server = game.getServer();
         this.modulePath = module.getProvided(Path.class);
     }
 
@@ -67,44 +55,13 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         this.subjects.clear();
         try
         {
-            createDirectories(modulePath.resolve("global"));
-            createDirectories(modulePath.resolve(Context.WORLD_KEY));
-            for (Path ctxType : newDirectoryStream(modulePath, p -> isDirectory(p)))
+            createDirectories(modulePath.resolve("roles"));
+            for (Path configFile : newDirectoryStream(modulePath.resolve("roles"), YAML))
             {
-                String ctxTypeName = ctxType.getFileName().toString();
-                for (Path ctxName : newDirectoryStream(ctxType, p -> Files.isDirectory(p) || (Files.isRegularFile(p) && p.toString().endsWith(YAML.getExtention()))))
-                {
-                    if (isDirectory(ctxName))
-                    {
-                        for (Path file : newDirectoryStream(ctxName, YAML))
-                        {
-                            newSubject(ctxTypeName, ctxName.getFileName().toString(), file.toFile());
-                        }
-                    }
-                    else // YAML
-                    {
-                        newSubject(ctxTypeName, "", ctxName.toFile());
-                    }
-                }
-
-                if (Context.WORLD_KEY.equals(ctxTypeName))
-                {
-                    for (WorldProperties prop : server.getAllWorldProperties())
-                    {
-                        String world = prop.getWorldName();
-                        if (!mirrors.containsKey(readMirror(world)) && !Files.exists(ctxType.resolve(world)))
-                        {
-                            try
-                            {
-                                createDirectories(ctxType.resolve(world));
-                            }
-                            catch (IOException e)
-                            {
-                                throw new IllegalStateException(e);
-                            }
-                        }
-                    }
-                }
+                RoleConfig config = reflector.create(RoleConfig.class);
+                config.setFile(configFile.toFile());
+                config.reload(true); // and re-save
+                addSubject(module, service, config);
             }
         }
         catch (IOException e)
@@ -113,26 +70,10 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         }
     }
 
-    private void loadMirrors()
+    private RoleSubject addSubject(Roles module, RolesPermissionService service, RoleConfig config)
     {
-        mirrors = readMirrors(service.getConfig().mirrors.roles);
-    }
-
-    private void newSubject(String ctxType, String ctxName, File file)
-    {
-        RoleConfig config = reflector.create(RoleConfig.class);
-        config.setFile(file);
-        config.reload();
-        addSubject(module, service, config, ctxType, ctxName);
-    }
-
-    private RoleSubject addSubject(Roles module, RolesPermissionService service, RoleConfig config, String ctxType, String ctxName)
-    {
-        RoleSubject subject = new RoleSubject(module, service, this, config, new Context(ctxType, ctxName));
+        RoleSubject subject = new RoleSubject(module, service, this, config);
         subjects.put(subject.getIdentifier(), subject);
-        mirrors.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(subject.getContext()))
-                .forEach(entry -> subjects.put(subject.getIdentifier(entry.getKey()), subject));
         return subject;
     }
 
@@ -141,36 +82,15 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
     {
         if (!identifier.startsWith("role:"))
         {
-            // must be <ctxType>|<ctxName>|<roleName>
             throw new IllegalArgumentException("Provided identifier is not a role: " + identifier);
         }
         String name = identifier.substring(5);
-        String[] split = name.split("\\|");
-        String ctxType = split[0];
-        String ctxName = "";
-        if (split.length == 3)
-        {
-            ctxName = split[1];
-            name = split[2];
-        }
-        else if (split.length == 2)
-        {
-            name = split[1];
-        }
-        else
-        {
-            throw new IllegalArgumentException("Provided identifier has an invalid context: " + identifier);
-        }
-        Path path = module.getProvided(Path.class).resolve(ctxType);
-        if (!ctxName.isEmpty())
-        {
-            path = path.resolve(ctxName);
-        }
+
         RoleConfig config = reflector.create(RoleConfig.class);
         config.roleName = name;
-        config.setFile(path.resolve(name + ".yml").toFile());
+        config.setFile(modulePath.resolve("roles").resolve(name + YAML.getExtention()).toFile());
         config.reload();
-        return addSubject(module, service, config, ctxType, ctxName);
+        return addSubject(module, service, config);
     }
 
     @Override
@@ -231,12 +151,6 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 
     public void reload()
     {
-        loadMirrors();
         loadRoles();
-    }
-
-    public Context getMirror(Context context)
-    {
-        return mirrors.getOrDefault(context, context);
     }
 }

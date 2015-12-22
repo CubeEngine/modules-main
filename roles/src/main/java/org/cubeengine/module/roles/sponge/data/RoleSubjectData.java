@@ -19,75 +19,43 @@ package org.cubeengine.module.roles.sponge.data;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+
+import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.context.Context;
 
-import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
+import static java.util.stream.Collectors.toList;
 
 public class RoleSubjectData extends CachingSubjectData
 {
     private final RoleConfig config;
-    private Context roleContext;
 
-    public RoleSubjectData(RolesPermissionService service, RoleConfig config, Context context)
+    public RoleSubjectData(RolesPermissionService service, RoleConfig config)
     {
         super(service);
         this.config = config;
-        this.roleContext = context;
     }
 
     @Override
     protected void cacheOptions(Set<Context> c)
     {
-        c.stream()
-         .map(roleCollection::getMirror)
-         .filter(ctx -> ctx.equals(roleContext) && !options.containsKey(roleContext))
-         .forEach(ctx -> options.put(roleContext, config.metadata));
+        cacheOptions();
     }
 
     @Override
     protected void cachePermissions(Set<Context> c)
     {
-        c.stream()
-         .map(roleCollection::getMirror)
-         .filter(ctx -> ctx.equals(roleContext) && !permissions.containsKey(roleContext))
-         .forEach(ctx -> permissions.put(roleContext, config.perms.getPermissions()));
+        cachePermissions();
     }
 
     @Override
     protected void cacheParents(Set<Context> c)
     {
-        for (Context ctx : c)
-        {
-            ctx = roleCollection.getMirror(ctx);
-            if (ctx.equals(roleContext) && !parents.containsKey(roleContext))
-            {
-                List<RoleSubject> parents = new ArrayList<>();
-                for (String parent : config.parents)
-                {
-                    if (!parent.contains(RoleSubject.SEPARATOR))
-                    {
-                        parent = roleContext.getKey() + RoleSubject.SEPARATOR + roleContext.getValue() + RoleSubject.SEPARATOR + parent;
-                    }
-                    parents.add(roleCollection.get("role:" + parent));
-                }
-                Collections.sort(parents);
-                this.parents.put(roleContext, new ArrayList<>(parents));
-            }
-        }
-    }
-
-    @Override
-    protected Context getMirror(Context context, Object result)
-    {
-        return roleCollection.getMirror(context);
+        cacheParents();
     }
 
     @Override
@@ -95,20 +63,28 @@ public class RoleSubjectData extends CachingSubjectData
     {
         if (changed)
         {
-            List<Subject> list = parents.get(roleContext);
-            if (list != null)
+            config.settings = new HashMap<>();
+            for (Map.Entry<Context, List<Subject>> entry : parents.entrySet())
             {
-                config.parents.clear();
-                for (Subject subject : list)
-                {
-                    if (!(subject instanceof RoleSubject))
-                    {
-                        // TODO WARN: Subject that is not a role will not be persisted
-                        continue;
-                    }
-                    config.parents.add(subject.getIdentifier().substring(5));
-                }
+                List<String> collect = entry.getValue().stream()
+                        .filter(s -> s instanceof RoleSubject) // TODO WARN: Subject that is not a role will not be persisted
+                        .map(RoleSubject.class::cast)
+                        .map(RoleSubject::getName)
+                        .collect(toList());
+
+                getContextSetting(entry.getKey()).parents.addAll(collect);
             }
+
+            for (Map.Entry<Context, Map<String, Boolean>> entry : permissions.entrySet())
+            {
+                getContextSetting(entry.getKey()).permissions = new PermissionTree().setPermissions(entry.getValue());
+            }
+
+            for (Map.Entry<Context, Map<String, String>> entry : options.entrySet())
+            {
+                getContextSetting(entry.getKey()).options = entry.getValue();
+            }
+
             try
             {
                 Files.createDirectories(config.getFile().toPath().getParent());
@@ -122,6 +98,18 @@ public class RoleSubjectData extends CachingSubjectData
         return changed;
     }
 
+    private RoleConfig.ContextSetting getContextSetting(Context context)
+    {
+        String contextString = stringify(context);
+        RoleConfig.ContextSetting setting = config.settings.get(contextString);
+        if (setting == null)
+        {
+            setting = new RoleConfig.ContextSetting();
+            config.settings.put(contextString, setting);
+        }
+        return setting;
+    }
+
     public RoleConfig getConfig()
     {
         return config;
@@ -130,19 +118,39 @@ public class RoleSubjectData extends CachingSubjectData
     @Override
     protected void cacheParents()
     {
-        cacheParents(toSet(roleContext));
+        if (parents.isEmpty()) // not cached
+        {
+            for (Map.Entry<String, RoleConfig.ContextSetting> entry : config.settings.entrySet())
+            {
+                List<RoleSubject> collect = entry.getValue().parents.stream().map(n -> "role:" + n).map(roleCollection::get).collect(toList());
+                Collections.sort(collect);
+                parents.put(asContext(entry.getKey()), new ArrayList<>(collect));
+            }
+        }
     }
 
     @Override
     protected void cachePermissions()
     {
-        cachePermissions(toSet(roleContext));
+        if (permissions.isEmpty()) // not cached
+        {
+            for (Map.Entry<String, RoleConfig.ContextSetting> entry : config.settings.entrySet())
+            {
+                permissions.put(asContext(entry.getKey()), entry.getValue().permissions.getPermissions());
+            }
+        }
     }
 
     @Override
     protected void cacheOptions()
     {
-        cacheOptions(toSet(roleContext));
+        if (options.isEmpty()) // not cached
+        {
+            for (Map.Entry<String, RoleConfig.ContextSetting> entry : config.settings.entrySet())
+            {
+                options.put(asContext(entry.getKey()), entry.getValue().options);
+            }
+        }
     }
 
     /* TODO rename and delete

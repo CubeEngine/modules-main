@@ -33,32 +33,28 @@ import org.spongepowered.api.service.permission.context.Contextual;
 import static java.util.Collections.singleton;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
-public class RoleSubject extends BaseSubject<RoleSubjectData> implements Comparable<RoleSubject>, Contextual
+public class RoleSubject extends BaseSubject<RoleSubjectData> implements Comparable<RoleSubject>
 {
     public static final String SEPARATOR = "|";
-    private final String roleName;
-    private final Set<Context> contexts;
+    private final String identifier;
     private Roles module;
-    private Context context;
 
-    public RoleSubject(Roles module, RolesPermissionService service, RoleCollection collection, RoleConfig config, Context context)
+    public RoleSubject(Roles module, RolesPermissionService service, RoleCollection collection, RoleConfig config)
     {
-        super(collection, service, new RoleSubjectData(service, config, context));
+        super(collection, service, new RoleSubjectData(service, config));
         this.module = module;
-        this.context = context;
-        this.contexts = "global".equals(context.getType()) ? GLOBAL_CONTEXT : singleton(context);
-        this.roleName = "role:" + context.getKey() + SEPARATOR +  (context.getName().isEmpty() ? "" : context.getName() + SEPARATOR) + config.roleName;
-    }
-
-    public String getIdentifier(Context context)
-    {
-        return "role:" + context.getKey() + SEPARATOR + (context.getName().isEmpty() ? "" : context.getName() + SEPARATOR) + getSubjectData().getConfig().roleName;
+        this.identifier = "role:" + config.roleName;
     }
 
     @Override
     public String getIdentifier()
     {
-        return roleName;
+        return identifier;
+    }
+
+    public String getName()
+    {
+        return getSubjectData().getConfig().roleName;
     }
 
     @Override
@@ -70,7 +66,7 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
     @Override
     public Set<Context> getActiveContexts()
     {
-        return contexts;
+        return GLOBAL_CONTEXT;
     }
 
     @Override
@@ -80,20 +76,15 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
         return -Integer.compare(getSubjectData().getConfig().priority.value, o.getSubjectData().getConfig().priority.value);
     }
 
-    public String getName()
-    {
-        return roleName.substring(roleName.lastIndexOf("|") + 1);
-    }
-
-    public boolean canAssignAndRemove(CommandSource source)
+    public boolean canAssignAndRemove(CommandSource source, Context context)
     {
         String perm = module.getModularity().provide(PermissionManager.class).getModulePermission(module).getId();
         perm += "." + context.getType() + "." + context.getName();
-        if (!perm.endsWith("."))
+        if (!perm.endsWith(".")) // in case of global (or no context name)
         {
             perm += ".";
         }
-        perm += roleName;
+        perm += identifier;
         return source.hasPermission(perm);
     }
 
@@ -103,11 +94,8 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
         getSubjectData().getConfig().save(); // TODO async
     }
 
-    @Override
-    public Context getContext()
+    public Priority prio()
     {
-        return this.context;
+        return getSubjectData().getConfig().priority;
     }
-
-
 }

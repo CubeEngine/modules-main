@@ -17,15 +17,10 @@
  */
 package org.cubeengine.module.roles.sponge;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.Optional;
 
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.roles.Roles;
@@ -42,9 +37,11 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.util.Tristate;
 
+import static org.cubeengine.module.roles.sponge.subject.RoleSubject.SEPARATOR;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 public class RolesPermissionService implements PermissionService
@@ -53,6 +50,7 @@ public class RolesPermissionService implements PermissionService
     private final List<ContextCalculator> calculators = new CopyOnWriteArrayList<>();
 
     private final DefaultSubjectData defaultData;
+    private final Map<Context, Context> mirrors;
     private Game game;
     private RolesConfig config;
     private Log logger;
@@ -67,10 +65,12 @@ public class RolesPermissionService implements PermissionService
         logger = permLogger;
         defaultData = new DefaultSubjectData(this, config);
         collections.put(SUBJECTS_USER, new UserCollection(this, game));
-        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, reflector, game));
+        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, reflector));
         getGroupSubjects().reload();
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM, game));
         collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE, game));
+
+        mirrors = readMirrors(config.mirrors); // TODO reload on relaod
     }
 
     @Override
@@ -153,4 +153,38 @@ public class RolesPermissionService implements PermissionService
         logger.info(desc.getId().toLowerCase());
         return desc;
     }
+
+    protected final Context readMirror(String source)
+    {
+        if (!source.contains(SEPARATOR))
+        {
+            if (!"global".equals(source))
+            {
+                return new Context(Context.WORLD_KEY, source);
+            }
+        }
+        String[] split = source.split("\\|");
+        return new Context(split[0], split[1]);
+    }
+
+    protected final Map<Context, Context> readMirrors(Map<String, List<String>> config)
+    {
+        Map<Context, Context> mirrors = new HashMap<>();
+        for (Map.Entry<String, List<String>> roleMirror : config.entrySet())
+        {
+            Context source = readMirror(roleMirror.getKey());
+            for (String mirrored : roleMirror.getValue())
+            {
+                mirrors.put(readMirror(mirrored), source);
+            }
+            mirrors.put(source, source); // self-referencing mirror
+        }
+        return mirrors;
+    }
+
+    public Context getMirror(Context context)
+    {
+        return mirrors.getOrDefault(context, context);
+    }
+
 }

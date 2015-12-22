@@ -31,9 +31,6 @@ import static java.util.stream.Collectors.toList;
 
 public class UserCollection extends BaseSubjectCollection<UserSubject>
 {
-    private Map<Context, Context> assignedMirrors;
-    private Map<Context, Context> directMirrors;
-
     private RolesPermissionService service;
     private Game game;
 
@@ -42,15 +39,6 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
         super(PermissionService.SUBJECTS_USER);
         this.service = service;
         this.game = game;
-        loadMirrors();
-        // TODO add missing selfreferencing mirrors
-        // TODO use mirrors when resolving context
-    }
-
-    private void loadMirrors()
-    {
-        assignedMirrors = readMirrors(service.getConfig().mirrors.assigned);
-        directMirrors = readMirrors(service.getConfig().mirrors.direct);
     }
 
     @Override
@@ -83,17 +71,6 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
 
     public void reload()
     {
-        loadMirrors();
         this.subjects.clear();
-    }
-
-    public Context getAssignMirror(Context context)
-    {
-        return assignedMirrors.getOrDefault(context, context);
-    }
-
-    public Context getDirectMirror(Context context)
-    {
-        return directMirrors.getOrDefault(context, context);
     }
 }
