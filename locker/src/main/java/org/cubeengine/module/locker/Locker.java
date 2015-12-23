@@ -53,12 +53,13 @@ import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
 
+// TODO protect lines of redstone
+
 @ModuleInfo(name = "Locker", description = "Puts a Lock on your stuff")
 public class Locker extends Module
 {
     private LockerConfig config;
     private LockManager manager;
-    private LockerListener listener;
 
     public LockerPerm perms()
     {
@@ -107,8 +108,8 @@ public class Locker extends Module
         lockerCmd.addCommand(new LockerCreateCommands(this, manager, i18n));
         lockerCmd.addCommand(new LockerAdminCommands(this, manager));
         perms = new LockerPerm(this, lockerCmd);
-        listener = new LockerListener(this, manager, i18n, game);
-        em.registerListener(this, listener);
+        em.registerListener(this, new LockerListener(this, manager, i18n));
+        em.registerListener(this, new LockerBlockListener(this, manager, i18n, game));
     }
 
     @Disable

@@ -29,15 +29,15 @@ public class LockerPerm extends PermissionContainer<Locker>
         super(module);
     }
 
-    public final PermissionDescription ALLOW_CONTAINER = register("allow.container", "", null); // TODO use perm
-    public final PermissionDescription ALLOW_DOOR = register("allow.door", "", null); // TODO use perm
+    public final PermissionDescription ALLOW_CONTAINER = register("allow.container", "", null);
+    public final PermissionDescription ALLOW_DOOR = register("allow.door", "", null);
     public final PermissionDescription ALLOW_ENTITY = register("allow.entity", "", null);
     public final PermissionDescription ALLOW_HANGING = register("allow.hanging", "", null);
 
     public final PermissionDescription SHOW_OWNER = register("show-owner", "", null);
     public final PermissionDescription BREAK_OTHER = register("break-other", "", null);
     public final PermissionDescription ACCESS_OTHER = register("access-other", "", null);
-    public final PermissionDescription EXPAND_OTHER = register("break-other", "", null);
+    public final PermissionDescription EXPAND_OTHER = register("expand-other", "", null);
 
     public final PermissionDescription PREVENT_NOTIFY = register("prevent-notify", "", null);
 

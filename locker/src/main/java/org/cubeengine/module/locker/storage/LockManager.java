@@ -138,7 +138,7 @@ public class LockManager
         {
             throw new RuntimeException("SHA-1 hash algorithm not available!");
         }
-        this.commandListener = new CommandListener(this, i18n);
+        this.commandListener = new CommandListener(module, this, i18n);
         em.registerListener(module, this.commandListener);
         em.registerListener(module, this);
 
@@ -554,7 +554,7 @@ public class LockManager
         {
             locations.add(block); // Original Block
             // Find upper/lower door part
-            PortionType portion = block.get(Keys.PORTION_TYPE).get();
+            PortionType portion = block.get(Keys.PORTION_TYPE).orElse(null);
             Location<World> relative = null;
             if (portion == BOTTOM)
             {
@@ -563,6 +563,18 @@ public class LockManager
             else if (portion == TOP)
             {
                 relative = block.getRelative(Direction.DOWN);
+            }
+            else // TODO PortionType is not working!?
+            {
+                relative = block.getRelative(Direction.DOWN);
+                if (relative.getBlockType() != block.getBlockType())
+                {
+                    relative = block.getRelative(Direction.UP);
+                    if (relative.getBlockType() != block.getBlockType())
+                    {
+                        throw new IllegalStateException("Other door half is missing");
+                    }
+                }
             }
             if (relative != null && relative.getBlockType() == material)
             {
@@ -573,7 +585,7 @@ public class LockManager
                 direction = BlockUtil.getOtherDoorDirection(direction, hinge);
                 Location<World> blockOther = block.getRelative(direction);
                 Location<World> relativeOther = relative.getRelative(direction);
-                if (portion.equals(block.get(Keys.PORTION_TYPE).orElse(null))
+                if (portion != null && portion.equals(block.get(Keys.PORTION_TYPE).orElse(null)) // TODO null portion
                     && blockOther.getBlockType().equals(relativeOther.getBlockType()))
                 {
                     locations.add(blockOther);

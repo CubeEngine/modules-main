@@ -17,16 +17,19 @@
  */
 package org.cubeengine.module.locker.commands;
 
+import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.module.locker.storage.LockType;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.entity.TameEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -44,11 +47,13 @@ public class CommandListener
     private final Map<UUID, LockAction> lockActions = new HashMap<>();
     private final Map<UUID, Long> persist = new HashMap<>();
 
+    private Locker module;
     private final LockManager manager;
     private I18n i18n;
 
-    public CommandListener(LockManager manager, I18n i18n)
+    public CommandListener(Locker module, LockManager manager, I18n i18n)
     {
+        this.module = module;
         this.manager = manager;
         this.i18n = i18n;
     }
@@ -189,5 +194,27 @@ public class CommandListener
         {
             return lockType != null;
         }
+    }
+
+
+    @Listener
+    public void onTame(TameEntityEvent event, @First Player player)
+    {
+        Entity entity = event.getTargetEntity();
+        for (ConfigWorld world : module.getConfig().disableAutoProtect)
+        {
+            if (entity.getWorld().equals(world.getWorld()))
+            {
+                return;
+            }
+        }
+        module.getConfig().entityProtections.stream()
+                .filter(entityProtection -> entityProtection.isType(entity.getType()) && entityProtection.isAutoProtect())
+                .forEach(entityProtection -> {
+                    if (this.manager.getLockForEntityUID(entity.getUniqueId()) == null)
+                    {
+                        this.manager.createLock(entity, player, entityProtection.getAutoProtect(), null, false);
+                    }
+                });
     }
 }
