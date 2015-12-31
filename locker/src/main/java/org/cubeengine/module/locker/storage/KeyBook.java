@@ -34,7 +34,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
@@ -47,7 +46,7 @@ import static org.spongepowered.api.item.ItemTypes.PAPER;
 
 public class KeyBook
 {
-    public static final Text TITLE = Texts.of(TextColors.RESET, TextColors.GOLD, "Keybook ", TextColors.DARK_GRAY, "#");
+    public static final Text TITLE = Text.of(TextColors.RESET, TextColors.GOLD, "Keybook ", TextColors.DARK_GRAY, "#");
     public ItemStack item;
     public final Player holder;
     private final Locker module;
@@ -80,7 +79,7 @@ public class KeyBook
         }
 
         if (item.get().getItem() == ItemTypes.ENCHANTED_BOOK
-            && item.get().get(DISPLAY_NAME).map(Texts::toPlain).map(s -> s.contains(Texts.toPlain(TITLE))).orElse(false))
+            && item.get().get(DISPLAY_NAME).map(Text::toPlain).map(s -> s.contains(TITLE.toPlain())).orElse(false))
         {
             Optional<LockerData> lockerData = item.get().get(LockerData.class);
             if (lockerData.isPresent())
@@ -145,7 +144,7 @@ public class KeyBook
 
     public void invalidate()
     {
-        item.offer(DISPLAY_NAME, Texts.of(TextColors.DARK_RED, "Broken KeyBook"));
+        item.offer(DISPLAY_NAME, Text.of(TextColors.DARK_RED, "Broken KeyBook"));
         item.offer(ITEM_LORE, Arrays.asList(i18n.getTranslation(holder, NEUTRAL, "This KeyBook"),
                                             i18n.getTranslation(holder, NEUTRAL, "looks old and"),
                                             i18n.getTranslation(holder, NEUTRAL, "used up. It"),

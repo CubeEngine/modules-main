@@ -21,8 +21,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.context.Context;
 
 import static java.util.Collections.singleton;
 

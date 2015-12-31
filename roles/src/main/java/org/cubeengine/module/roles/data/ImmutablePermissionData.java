@@ -123,4 +123,10 @@ public class ImmutablePermissionData extends AbstractImmutableData<ImmutablePerm
     {
         return new MemoryDataContainer().set(PARENTS, parents).set(PERMISSIONS, permissions).set(OPTIONS, options);
     }
+
+    @Override
+    public int getContentVersion()
+    {
+        return 1;
+    }
 }

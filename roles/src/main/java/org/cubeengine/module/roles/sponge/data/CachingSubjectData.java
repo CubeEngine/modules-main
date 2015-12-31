@@ -22,8 +22,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 
 public abstract class CachingSubjectData extends BaseSubjectData

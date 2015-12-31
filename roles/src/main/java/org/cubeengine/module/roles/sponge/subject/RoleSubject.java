@@ -17,8 +17,6 @@
  */
 package org.cubeengine.module.roles.sponge.subject;
 
-import java.util.Set;
-import java.util.Optional;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.RoleConfig;
@@ -26,11 +24,12 @@ import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.collection.RoleCollection;
 import org.cubeengine.module.roles.sponge.data.RoleSubjectData;
 import org.cubeengine.service.permission.PermissionManager;
-import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.permission.context.Contextual;
+import org.spongepowered.api.service.context.Context;
 
-import static java.util.Collections.singleton;
+import java.util.Optional;
+import java.util.Set;
+
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 public class RoleSubject extends BaseSubject<RoleSubjectData> implements Comparable<RoleSubject>

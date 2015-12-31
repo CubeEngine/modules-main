@@ -23,9 +23,9 @@ import java.util.Optional;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.data.BaseSubjectData;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.command.CommandSource;
 
 public class BasicSubject extends BaseSubject<BaseSubjectData>

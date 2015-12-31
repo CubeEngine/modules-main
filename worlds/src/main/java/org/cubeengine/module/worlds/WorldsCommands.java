@@ -32,7 +32,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.DimensionType;
@@ -326,10 +325,10 @@ public class WorldsCommands extends ContainerCommand
             return;
         }
         i18n.sendTranslated(context, POSITIVE, "The following players are in {world}", world);
-        Text s = Texts.of(TextColors.YELLOW, " -", TextColors.GOLD);
+        Text s = Text.of(TextColors.YELLOW, " -", TextColors.GOLD);
         for (Entity player : players)
         {
-            context.sendMessage(Texts.of(s, ((Player) player).getName()));
+            context.sendMessage(Text.of(s, ((Player) player).getName()));
         }
     }
 }

@@ -33,14 +33,12 @@ import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Human;
 import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
@@ -261,10 +259,10 @@ public class LockerCommands extends ContainerCommand
         {
             i18n.sendTranslated(context, NEUTRAL, "You need to define which flags to {text:set} or {text:unset}!");
             i18n.sendTranslated(context, NEUTRAL, "The following flags are available:");
-            Text format = Texts.of("  ", TextColors.GRAY, "-", TextColors.GOLD);
+            Text format = Text.of("  ", TextColors.GRAY, "-", TextColors.GOLD);
             for (String flag : ProtectionFlag.getNames())
             {
-                context.sendMessage(Texts.of(format, flag));
+                context.sendMessage(Text.of(format, flag));
             }
             i18n.sendTranslated(context, NEUTRAL, "You can also unset {text:all}");
             return;

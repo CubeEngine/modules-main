@@ -44,7 +44,6 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.TextMessageException;
 import org.spongepowered.api.world.Location;
@@ -184,7 +183,7 @@ public class Lock
             return;
         }
         ItemStack item = module.getGame().getRegistry().createBuilder(ItemStack.Builder.class).itemType(ENCHANTED_BOOK).quantity(1).build();
-        item.offer(Keys.DISPLAY_NAME, KeyBook.TITLE.builder().append(Texts.of(TextColors.DARK_GRAY, getId())).build());
+        item.offer(Keys.DISPLAY_NAME, KeyBook.TITLE.toBuilder().append(Text.of(TextColors.DARK_GRAY, getId())).build());
         item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(player, NEUTRAL, "This book can"),
                 i18n.getTranslation(player, NEUTRAL, "unlock a magically"),
                 i18n.getTranslation(player, NEUTRAL, "locked protection")));
@@ -702,7 +701,7 @@ public class Lock
     {
         if (this.isOwner(user) || this.hasAdmin(user) || user.hasPermission(module.perms().CMD_INFO_OTHER.getId()))
         {
-            user.sendMessage(Texts.of());
+            user.sendMessage(Text.of());
             i18n.sendTranslated(user, POSITIVE, "Protection: #{integer#id} Type: {input#type} by {user}", this.getId().longValue(), this.getLockType().name(), this.getOwner());
             i18n.sendTranslated(user, POSITIVE, "protects {input#type} since {input#time}", this.getProtectedType().name(), this.model.getValue(TABLE_LOCK.CREATED).toString());
             i18n.sendTranslated(user, POSITIVE, "last access was {input#time}", this.model.getValue(TABLE_LOCK.LAST_ACCESS).toString());
@@ -730,27 +729,27 @@ public class Lock
             if (!flags.isEmpty())
             {
                 i18n.sendTranslated(user, POSITIVE, "The following flags are set:");
-                Text format = Texts.of(" ", GRAY, "- ", YELLOW);
+                Text format = Text.of(" ", GRAY, "- ", YELLOW);
                 for (String flag : flags)
                 {
-                    user.sendMessage(Texts.of(format, flag));
+                    user.sendMessage(Text.of(format, flag));
                 }
             }
             List<AccessListModel> accessors = this.getAccessors();
             if (!accessors.isEmpty())
             {
                 i18n.sendTranslated(user, POSITIVE, "The following users have direct access to this protection");
-                Text format = Texts.of(" ", GRAY, "- ", DARK_GREEN);
+                Text format = Text.of(" ", GRAY, "- ", DARK_GREEN);
                 for (AccessListModel listModel : accessors)
                 {
                     User accessor = module.getUserManager().getById(listModel.getValue(TABLE_ACCESS_LIST.USER_ID)).get().getUser();
                     if ((listModel.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN)
                     {
-                        user.sendMessage(Texts.of(format, GREEN, accessor.getName(), GOLD, " [Admin]"));
+                        user.sendMessage(Text.of(format, GREEN, accessor.getName(), GOLD, " [Admin]"));
                     }
                     else
                     {
-                        user.sendMessage(Texts.of(format, GREEN, accessor.getName()));
+                        user.sendMessage(Text.of(format, GREEN, accessor.getName()));
                     }
                 }
             }

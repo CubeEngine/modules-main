@@ -168,4 +168,10 @@ public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLo
         }
         return set;
     }
+
+    @Override
+    public int getContentVersion()
+    {
+        return 1;
+    }
 }

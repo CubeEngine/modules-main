@@ -18,7 +18,6 @@
 package org.cubeengine.module.roles.commands.provider;
 
 import java.util.List;
-import java.util.Optional;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
@@ -27,7 +26,7 @@ import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.World;
 
 import static java.util.stream.Collectors.toList;

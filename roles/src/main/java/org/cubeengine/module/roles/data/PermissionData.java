@@ -183,4 +183,10 @@ public class PermissionData extends AbstractData<PermissionData, ImmutablePermis
         }
         return result;
     }
+
+    @Override
+    public int getContentVersion()
+    {
+        return 1;
+    }
 }

@@ -22,7 +22,7 @@ import java.util.Set;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.service.command.ContainerCommand;
-import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.context.Context;
 
 import static org.cubeengine.module.core.util.ChatFormat.GOLD;
 import static org.cubeengine.module.core.util.ChatFormat.WHITE;

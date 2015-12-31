@@ -25,8 +25,8 @@ import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.context.Context;
 
 import static java.util.stream.Collectors.toList;
 

@@ -41,8 +41,8 @@ import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Texts;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
@@ -104,7 +104,7 @@ public class WarpCommand extends TpPointCommand
         sender.setTransform(location);
         if (w.getWelcomeMsg() != null)
         {
-            sender.sendMessage(Texts.of(w.getWelcomeMsg()));
+            sender.sendMessage(Text.of(w.getWelcomeMsg()));
             return;
         }
         if (w.isOwnedBy(sender))
@@ -176,7 +176,7 @@ public class WarpCommand extends TpPointCommand
             i18n.sendTranslated(sender, POSITIVE, "The welcome message for the warp {name} of {user} is now set to:",
                                    w.getName(), owner);
         }
-        sender.sendMessage(Texts.of(w.getWelcomeMsg()));
+        sender.sendMessage(Text.of(w.getWelcomeMsg()));
     }
 
     @Restricted(Player.class)

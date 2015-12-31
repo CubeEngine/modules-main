@@ -33,12 +33,12 @@ import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.context.Context;
-import org.spongepowered.api.service.permission.context.ContextCalculator;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.module.roles.sponge.subject.RoleSubject.SEPARATOR;

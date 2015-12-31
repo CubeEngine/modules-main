@@ -30,8 +30,8 @@ import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.util.Tristate;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 

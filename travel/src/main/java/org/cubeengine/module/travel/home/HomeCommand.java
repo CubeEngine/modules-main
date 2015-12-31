@@ -49,7 +49,7 @@ import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionDescription;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.Location;
@@ -124,7 +124,7 @@ public class HomeCommand extends TpPointCommand
         sender.setTransform(location);
         if (h.getWelcomeMsg() != null)
         {
-            sender.sendMessage(Texts.of(h.getWelcomeMsg()));
+            sender.sendMessage(Text.of(h.getWelcomeMsg()));
             return;
         }
         if (h.isOwnedBy(sender))
@@ -195,7 +195,7 @@ public class HomeCommand extends TpPointCommand
             i18n.sendTranslated(sender, POSITIVE, "The welcome message for the home {name} of {user} is now set to:",
                                    h.getName(), owner);
         }
-        sender.sendMessage(Texts.of(h.getWelcomeMsg()));
+        sender.sendMessage(Text.of(h.getWelcomeMsg()));
     }
 
     @Restricted(value = Player.class, msg = "I am calling the moving company right now!")
@@ -298,7 +298,7 @@ public class HomeCommand extends TpPointCommand
             PermissionDescription otherPerm = module.getPermissions().HOME_LIST_OTHER;
             if (!sender.hasPermission(otherPerm.getId()))
             {
-                throw new PermissionDeniedException(new RawPermission(otherPerm.getId(), Texts.toPlain(otherPerm.getDescription())));
+                throw new PermissionDeniedException(new RawPermission(otherPerm.getId(), otherPerm.getDescription().toPlain()));
             }
         }
         Set<Home> homes = this.manager.list(owner, owned, isPublic, invited);
@@ -369,11 +369,11 @@ public class HomeCommand extends TpPointCommand
             Set<TeleportInvite> invites = this.iManager.getInvites(home.getModel());
             if (!invites.isEmpty())
             {
-                sender.sendMessage(Texts.of(TextColors.GOLD, "  ", home.getName(), ":"));
+                sender.sendMessage(Text.of(TextColors.GOLD, "  ", home.getName(), ":"));
                 for (TeleportInvite invite : invites)
                 {
-                    sender.sendMessage(Texts.of("    ", TextColors.DARK_GREEN, um.getById(invite.getValue(
-                        TABLE_INVITE.USERKEY)).get().getUser().getName()));
+                    sender.sendMessage(Text.of("    ", TextColors.DARK_GREEN, um.getById(invite.getValue(
+                            TABLE_INVITE.USERKEY)).get().getUser().getName()));
                 }
             }
         }

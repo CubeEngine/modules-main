@@ -25,8 +25,8 @@ import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.collection.RoleCollection;
 import org.cubeengine.module.roles.sponge.collection.UserCollection;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
 

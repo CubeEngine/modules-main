@@ -20,7 +20,7 @@ package org.cubeengine.module.roles.commands.provider;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.parser.component.Text;
-import org.spongepowered.api.service.permission.context.Context;
+import org.spongepowered.api.service.context.Context;
 
 public class ContextFormatter extends AbstractFormatter<Context>
 {

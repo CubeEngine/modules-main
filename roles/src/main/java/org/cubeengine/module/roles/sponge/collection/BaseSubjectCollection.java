@@ -17,21 +17,19 @@
  */
 package org.cubeengine.module.roles.sponge.collection;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.context.Context;
 import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.util.Tristate;
 
-import static org.cubeengine.module.roles.sponge.subject.RoleSubject.SEPARATOR;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
 import static org.spongepowered.api.util.Tristate.UNDEFINED;
 
 public abstract class BaseSubjectCollection<T extends OptionSubject> implements SubjectCollection

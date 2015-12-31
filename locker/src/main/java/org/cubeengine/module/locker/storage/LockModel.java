@@ -21,12 +21,9 @@ import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.UUID;
 import org.cubeengine.service.database.AsyncRecord;
-import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.service.user.CachedUser;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 

@@ -238,4 +238,9 @@ public class LockerData implements DataManipulator<LockerData, ImmutableLockerDa
         return set;
     }
 
+    @Override
+    public int getContentVersion()
+    {
+        return 1;
+    }
 }
