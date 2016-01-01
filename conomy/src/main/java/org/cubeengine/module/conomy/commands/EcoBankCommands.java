@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.conomy.commands;
+package org.cubeengine.module.conomy.commands;
 
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.user.User;
-import de.cubeisland.engine.module.conomy.Conomy;
+import org.cubeengine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;
 import org.cubeengine.service.user.UserManager;

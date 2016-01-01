@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.conomy.commands;
+package org.cubeengine.module.conomy.commands;
 
 import de.cubeisland.engine.butler.CommandInvocation;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;

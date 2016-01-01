@@ -15,27 +15,29 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.conomy;
+package org.cubeengine.module.conomy;
 
-import org.cubeengine.dirigent.parser.component.MessageComponent;
-import org.cubeengine.dirigent.parser.component.Text;
-import org.cubeengine.dirigent.parser.formatter.AbstractFormatter;
-import org.cubeengine.dirigent.parser.formatter.Context;
-import de.cubeisland.engine.module.conomy.account.ConomyManager;
+import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.formatter.AbstractFormatter;
+import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.service.i18n.formatter.component.TextComponent;
+import org.spongepowered.api.service.economy.EconomyService;
 
-public class CurrencyFormatter extends AbstractFormatter<Double>
+import java.math.BigDecimal;
+
+public class CurrencyFormatter extends AbstractFormatter<BigDecimal>
 {
-    private ConomyManager manager;
+    private EconomyService service;
 
-    public CurrencyFormatter(ConomyManager manager)
+    public CurrencyFormatter(EconomyService service)
     {
         super("currency");
-        this.manager = manager;
+        this.service = service;
     }
 
     @Override
-    public MessageComponent format(Double object, Context context)
+    protected Component format(BigDecimal arg, Context context)
     {
-        return new Text(manager.format(object));
+        return new TextComponent(service.getDefaultCurrency().format(arg));
     }
 }

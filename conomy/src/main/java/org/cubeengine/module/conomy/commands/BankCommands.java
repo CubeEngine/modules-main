@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.conomy.commands;
+package org.cubeengine.module.conomy.commands;
 
 import java.util.Set;
 import org.cubeengine.butler.alias.Alias;
@@ -30,7 +30,7 @@ import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.user.User;
 import org.cubeengine.module.core.util.ChatFormat;
-import de.cubeisland.engine.module.conomy.Conomy;
+import org.cubeengine.module.conomy.Conomy;
 import de.cubeisland.engine.module.conomy.account.Account;
 import de.cubeisland.engine.module.conomy.account.BankAccount;
 import de.cubeisland.engine.module.conomy.account.ConomyManager;

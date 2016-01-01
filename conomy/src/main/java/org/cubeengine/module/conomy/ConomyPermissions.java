@@ -15,9 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.conomy;
+package org.cubeengine.module.conomy;
 
 import de.cubeisland.engine.service.permission.Permission;
+import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.service.permission.PermissionContainer;
 
 @SuppressWarnings("all")
