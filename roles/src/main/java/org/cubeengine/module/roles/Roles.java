@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadFactory;
 import javax.inject.Inject;
 import de.cubeisland.engine.converter.ConverterManager;
@@ -66,7 +67,6 @@ import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.PriorityConverter;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.world.WorldManager;
-import org.spongepowered.api.service.ProviderExistsException;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -123,16 +123,18 @@ public class Roles extends Module
         SettableInvocationHandler handler = getProvided(SettableInvocationHandler.class).with(service);
         handler.meta.forEach(service::registerContextCalculator); // read contextcalculators
 
-        if (!game.getServiceManager().provide(PermissionService.class).isPresent())
+        Optional<PermissionService> previous = game.getServiceManager().provide(PermissionService.class);
+
+        PermissionService proxy = (PermissionService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{PermissionService.class}, handler);
+
+        Object plugin = game.getPluginManager().getPlugin("CubeEngine").get().getInstance().get();
+
+        game.getServiceManager().setProvider(plugin, PermissionService.class, proxy);
+        if (previous.isPresent())
         {
-            PermissionService proxy = (PermissionService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{PermissionService.class}, handler);
-            try
+            if (!previous.get().getClass().getName().equals(RolesPermissionService.class.getName()))
             {
-                game.getServiceManager().setProvider(game.getPluginManager().getPlugin("CubeEngine").get().getInstance().get(), PermissionService.class, proxy);
-            }
-            catch (ProviderExistsException e)
-            {
-                throw new IllegalStateException(e);
+                logger.info("Replaced existing Permission Service: {}", previous.get().getClass().getName());
             }
         }
     }
