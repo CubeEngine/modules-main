@@ -17,45 +17,55 @@
  */
 package org.cubeengine.module.conomy.commands;
 
+import org.cubeengine.butler.CommandInvocation;
+import org.cubeengine.butler.alias.Alias;
+import org.cubeengine.butler.parametric.*;
+import org.cubeengine.module.conomy.ConfigCurrency;
+import org.cubeengine.module.conomy.Conomy;
+import org.cubeengine.module.conomy.ConomyService;
+import org.cubeengine.module.conomy.UserAccount;
+import org.cubeengine.module.conomy.storage.BalanceModel;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.command.annotation.ParameterPermission;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.user.UserList;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.service.economy.Currency;
+import org.spongepowered.api.service.economy.account.Account;
+import org.spongepowered.api.service.economy.transaction.TransferResult;
+import org.spongepowered.api.service.pagination.PaginationBuilder;
+import org.spongepowered.api.service.pagination.PaginationService;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import de.cubeisland.engine.butler.CommandInvocation;
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.command.CommandContext;
-import org.cubeengine.service.user.User;
-import org.cubeengine.service.user.UserList;
-import org.cubeengine.module.core.util.ChatFormat;
-import org.cubeengine.module.conomy.Conomy;
-import de.cubeisland.engine.module.conomy.account.Account;
-import de.cubeisland.engine.module.conomy.account.ConomyManager;
-import de.cubeisland.engine.module.conomy.account.UserAccount;
-import de.cubeisland.engine.module.conomy.account.storage.AccountModel;
-import org.cubeengine.service.user.UserManager;
+import java.util.Map;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
-import static de.cubeisland.engine.module.conomy.account.storage.TableAccount.TABLE_ACCOUNT;
+import static org.spongepowered.api.text.format.TextColors.GOLD;
 
 @Command(name = "money", desc = "Manage your money")
 public class MoneyCommand extends ContainerCommand
 {
+    // TODO add in context to commands
     private final Conomy module;
-    private UserManager um;
-    private final ConomyManager manager;
+    private ConomyService service;
+    private I18n i18n;
 
-    public MoneyCommand(Conomy module, UserManager um)
+    public MoneyCommand(Conomy module, ConomyService conomy, I18n i18n)
     {
         super(module);
         this.module = module;
-        this.um = um;
-        this.manager = module.getManager();
+        this.service = conomy;
+        this.i18n = i18n;
     }
 
     @Override
@@ -66,46 +76,49 @@ public class MoneyCommand extends ContainerCommand
 
     private UserAccount getUserAccount(User user)
     {
-        return this.manager.getUserAccount(user, this.module.getConfig().autocreateUserAcc);
+        return service.createAccount(user.getUniqueId())
+                .filter(a -> a instanceof UserAccount)
+                .map(UserAccount.class::cast).orElse(null);
     }
 
     @Alias(value = {"balance", "moneybalance", "pmoney"})
     @Command(desc = "Shows your balance")
-    public void balance(CommandContext context, @Optional User player, @Flag boolean force)
+    public void balance(CommandSource context,
+                        @Default User player,
+                        @ParameterPermission @Flag(longName = "showhidden", name = "f") boolean showHidden)
+    // TODO message when no user found "If you are out of money, better go work than typing silly commands in the console."
     {
-        if (player == null)
-        {
-            if (!(context.getSource() instanceof User))
-            {
-                context.sendTranslated(NEGATIVE,
-                                       "If you are out of money, better go work than typing silly commands in the console.");
-                return;
-            }
-            player = (User)context.getSource();
-        }
-        boolean showHidden = force && module.perms().USER_SHOWHIDDEN.isAuthorized(context.getSource());
-
         UserAccount account = this.getUserAccount(player);
-        if (account != null)
+        if (account == null ||  (account.isHidden()
+                                    && !showHidden
+                                    && !account.getIdentifier().equals(context.getIdentifier())))
         {
-            if (!account.isHidden() || showHidden || account.getName().equalsIgnoreCase(player.getName()))
-            {
-                context.sendTranslated(POSITIVE, "{user}'s Balance: {currency}", player, account.balance());
-                return;
-            }
+            i18n.sendTranslated(context, NEGATIVE, "No account found for {user}!", player);
+            return;
         }
-        context.sendTranslated(NEGATIVE, "No account found for {user}!", player);
+
+        Map<Currency, BigDecimal> balances = account.getBalances();
+        if (balances.isEmpty())
+        {
+            i18n.sendTranslated(context, NEGATIVE, "No Balance for {user} found!", player);
+            return;
+        }
+        i18n.sendTranslated(context, POSITIVE, "{user}'s Balance:", player);
+        for (Map.Entry<Currency, BigDecimal> entry : balances.entrySet())
+        {
+            context.sendMessage(Text.of(" - ", GOLD, entry.getKey().format(entry.getValue())));
+        }
     }
 
     @Alias(value = {"toplist", "balancetop", "topmoney"})
     @Command(desc = "Shows the players with the highest balance.")
-    public void top(CommandContext context, @Optional @Label("[fromRank-]toRank") String range,
-                    @Flag(longName = "showhidden", name = "f") boolean force)
+    public void top(CommandSource context,
+                    @Optional @Label("[fromRank-]toRank") String range,
+                    @ParameterPermission @Flag(longName = "showhidden", name = "f") boolean showHidden)
     {
-        boolean showHidden = force && module.perms().USER_SHOWHIDDEN.isAuthorized(context.getSource());
         int fromRank = 1;
         int toRank = 10;
-        if (context.hasPositional(0))
+        if (range != null)
         {
             try
             {
@@ -118,117 +131,120 @@ public class MoneyCommand extends ContainerCommand
             }
             catch (NumberFormatException e)
             {
-                context.sendTranslated(NEGATIVE, "Invalid rank!");
+                i18n.sendTranslated(context, NEGATIVE, "Invalid rank!");
                 return;
             }
         }
-        Collection<AccountModel> models = this.manager.getTopAccounts(true, false, fromRank, toRank, showHidden);
+        Collection<BalanceModel> models = this.service.getTopBalance(true, false, fromRank, toRank, showHidden);
         int i = fromRank;
+
+
+        PaginationBuilder pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder();
+        pagination.paddingString("-");
         if (fromRank == 1)
         {
-            context.sendTranslated(POSITIVE, "Top Balance ({amount})", models.size());
+            pagination.title(i18n.getTranslation(context, POSITIVE, "Top Balance ({amount})", models.size()));
         }
         else
         {
-            context.sendTranslated(POSITIVE, "Top Balance from {integer} to {integer}", fromRank,
-                                   fromRank + models.size() - 1);
+            pagination.title(i18n.getTranslation(context, POSITIVE, "Top Balance from {integer} to {integer}",
+                    fromRank, fromRank + models.size() - 1));
         }
-        for (AccountModel account : models)
+        List<Text> texts = new ArrayList<>();
+        for (BalanceModel balance : models)
         {
-            context.sendMessage("" + i++ + ChatFormat.WHITE + "- " + ChatFormat.DARK_GREEN +
-                                    um.getUser(account.getValue(TABLE_ACCOUNT.USER_ID)).getName() +
-                                    ChatFormat.WHITE + ": " + ChatFormat.GOLD + (manager.format(
-                (double)account.getValue(TABLE_ACCOUNT.VALUE) / manager.fractionalDigitsFactor())));
+            Account account = service.getAccount(balance.getAccountID()).get();
+            ConfigCurrency currency = service.getCurrency(balance.getCurrency());
+            texts.add(Text.of(i++, TextColors.WHITE, " - ",
+                    TextColors.DARK_GREEN, account.getDisplayName(),
+                    TextColors.WHITE, ":",
+                    GOLD, currency.format(currency.fromLong(balance.getBalance()))));
         }
+        pagination.contents(texts);
+        pagination.sendTo(context);
     }
 
     @Alias(value = "pay")
     @Command(alias = "give", desc = "Transfer the given amount to another account.")
-    public void pay(CommandContext context, @Label("*|<players>") UserList users, Double amount,
-                    @Named("as") User player, @Flag boolean force)
+    public void pay(CommandSource context, @Label("*|<players>") UserList users, Double amount,
+                    @Named("as") User player)
     {
         if (amount < 0)
         {
-            context.sendTranslated(NEGATIVE, "What are you trying to do?");
+            i18n.sendTranslated(context, NEGATIVE, "What are you trying to do?");
             return;
         }
         boolean asSomeOneElse = false;
         if (player != null)
         {
-            if (!module.perms().COMMAND_PAY_ASOTHER.isAuthorized(context.getSource()))
+            if (!context.hasPermission(module.perms().COMMAND_PAY_ASOTHER.getId()))
             {
-                context.sendTranslated(NEGATIVE, "You are not allowed to pay money as someone else!");
+                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to pay money as someone else!");
                 return;
             }
             asSomeOneElse = true;
         }
         else
         {
-            if (!(context.getSource() instanceof User))
+            if (!(context instanceof User))
             {
-                context.sendTranslated(NEGATIVE, "Please specify a player to use their account.");
+                i18n.sendTranslated(context, NEGATIVE, "Please specify a player to use their account.");
                 return;
             }
-            player = (User)context.getSource();
+            player = (User)context;
         }
-        Account source = this.manager.getUserAccount(player, false);
+        UserAccount source = getUserAccount(player);
         if (source == null)
         {
             if (asSomeOneElse)
             {
-                context.sendTranslated(NEGATIVE, "{user} does not have an account!", player);
+                i18n.sendTranslated(context, NEGATIVE, "{user} does not have an account!", player);
             }
             else
             {
-                context.sendTranslated(NEGATIVE, "You do not have an account!");
+                i18n.sendTranslated(context, NEGATIVE, "You do not have an account!");
             }
             return;
         }
-        List<User> list = new ArrayList<>();
-        if (users.isAll())
+
+        for (User user : users.list())
         {
-            list.addAll(um.getOnlineUsers());
-        }
-        else
-        {
-            list.addAll(users.list());
-        }
-        for (User user : list)
-        {
-            Account target = this.manager.getUserAccount(user, false);
+            Account target = getUserAccount(user);
             if (target == null)
             {
-                context.sendTranslated(NEGATIVE, "{user} does not have an account!", user);
+                i18n.sendTranslated(context, NEGATIVE, "{user} does not have an account!", user);
                 continue;
             }
-            if (!source.has(amount) && !force && module.perms().COMMAND_MONEY_PAY_FORCE.isAuthorized(context.getSource()))
+            TransferResult result = source.transfer(target, service.getDefaultCurrency(), new BigDecimal(amount), Cause.of(NamedCause.source(context)));
+            switch (result.getResult())
             {
-                if (asSomeOneElse)
-                {
-                    context.sendTranslated(NEGATIVE, "{user} cannot afford {currency}!", player.getName(), amount);
-                }
-                else
-                {
-                    context.sendTranslated(NEGATIVE, "You cannot afford {currency}!", amount);
-                }
-                return;
-            }
-
-            if (this.manager.transaction(source, target, amount, false))
-            {
-                if (asSomeOneElse)
-                {
-                    context.sendTranslated(POSITIVE, "{currency} transferred from {user}'s to {user}'s account!", amount, player, user);
-                }
-                else
-                {
-                    context.sendTranslated(POSITIVE, "{currency} transferred to {user}'s account!", amount, user);
-                }
-                user.sendTranslated(POSITIVE, "{user} just paid you {currency}!", player, amount);
-            }
-            else
-            {
-                context.sendTranslated(NEGATIVE, "The Transaction was not successful!");
+                case SUCCESS:
+                    if (asSomeOneElse)
+                    {
+                        i18n.sendTranslated(context, POSITIVE, "{currency} transferred from {user}'s to {user}'s account!", amount, player, user);
+                    }
+                    else
+                    {
+                        i18n.sendTranslated(context, POSITIVE, "{currency} transferred to {user}'s account!", amount, user);
+                    }
+                    if (user.isOnline())
+                    {
+                        i18n.sendTranslated(user.getPlayer().get(), POSITIVE, "{user} just paid you {currency}!", player, amount);
+                    }
+                    break;
+                case ACCOUNT_NO_FUNDS:
+                    if (asSomeOneElse)
+                    {
+                        i18n.sendTranslated(context, NEGATIVE, "{user} cannot afford {currency}!", player.getName(), amount);
+                    }
+                    else
+                    {
+                        i18n.sendTranslated(context, NEGATIVE, "You cannot afford {currency}!", amount);
+                    }
+                    break;
+                default:
+                    i18n.sendTranslated(context, NEGATIVE, "The Transaction was not successful!");
+                    break;
             }
         }
     }

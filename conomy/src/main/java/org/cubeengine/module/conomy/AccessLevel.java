@@ -17,27 +17,11 @@
  */
 package org.cubeengine.module.conomy;
 
-import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.formatter.AbstractFormatter;
-import org.cubeengine.dirigent.formatter.Context;
-import org.cubeengine.service.i18n.formatter.component.TextComponent;
-import org.spongepowered.api.service.economy.EconomyService;
-
-import java.math.BigDecimal;
-
-public class CurrencyFormatter extends AbstractFormatter<BigDecimal>
+public interface AccessLevel
 {
-    private EconomyService service;
-
-    public CurrencyFormatter(EconomyService service)
-    {
-        super("currency");
-        this.service = service;
-    }
-
-    @Override
-    protected Component format(BigDecimal arg, Context context)
-    {
-        return new TextComponent(service.getDefaultCurrency().format(arg));
-    }
+    int NONE = 0;
+    int SEE = 1;
+    int DEPOSIT = 2;
+    int WITHDRAW = 3;
+    int MANAGE = 4;
 }

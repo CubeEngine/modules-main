@@ -47,20 +47,11 @@ public abstract class BaseAccount implements Account
     // member;admin;owner
     // deposit;withdraw;manage
     // permission based? <- may be too slow when getting all users /w perm for it
-    // ce.conomy.access.<id>.depoosit
-    // ce.conomy.access.<id>.withdraw
-    // ce.conomy.access.<id>.manage
+    // ce.conomy.access.depoosit.<id>
+    // ce.conomy.access.withdraw.<id>
+    // ce.conomy.access.manage.<id>
     // when useracc do not check for permission
 
-    /* TODO top-accs
-     public Collection<AccountModel> getTopAccounts(boolean user, boolean bank, int fromRank, int toRank,
-                                                   boolean showHidden)
-     return this.dsl.selectFrom(TABLE_ACCOUNT).
-            where(DSL.condition("((mask & 1) = 0 OR ((mask & 1) = 1) = " + showHidden + ")")).
-                           and(DSL.condition("(name IS NULL) = " + user + " OR " + "(user_id IS NULL) = " + bank)).
-                           orderBy(TABLE_ACCOUNT.VALUE.desc()).limit(fromRank - 1, toRank - fromRank + 1).
-                           fetch();
-     */
 
     // TODO parse currency // TODO filter currency Names / Symbols http://git.cubeisland.de/cubeengine/cubeengine/issues/250
     // rename bank / player(on name change)
@@ -145,9 +136,9 @@ public abstract class BaseAccount implements Account
         if (model.isPresent())
         {
             model.get().setBalance(cur.toLong(amount));
-            return new Result(this, currency, amount, contexts, SUCCESS, DEPOSIT, cause); // TODO TransactionType?
+            return new Result(this, currency, amount, contexts, SUCCESS, TRANSFER, cause); // TODO TransactionType?
         }
-        return new Result(this, currency, amount, contexts, CONTEXT_MISMATCH, DEPOSIT, cause);  // TODO TransactionType?
+        return new Result(this, currency, amount, contexts, CONTEXT_MISMATCH, TRANSFER, cause);  // TODO TransactionType?
     }
 
     @Override
@@ -226,5 +217,15 @@ public abstract class BaseAccount implements Account
     public Set<Context> getActiveContexts()
     {
         return service.getActiveContexts(this);
+    }
+
+    public boolean isHidden()
+    {
+        return account.isHidden();
+    }
+
+    public void setHidden(boolean b)
+    {
+        account.setHidden(b);
     }
 }

@@ -23,6 +23,7 @@ import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 
 import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.module.conomy.commands.*;
 import org.cubeengine.module.conomy.storage.TableAccount;
 import org.cubeengine.module.conomy.storage.TableBalance;
 import org.cubeengine.service.command.CommandManager;
@@ -53,28 +54,33 @@ public class Conomy extends Module
     @Inject private Reflector reflector;
     @Inject private Game game;
 
+    private ConomyPermissions perms;
+    private ConomyService service;
+
     @Enable
     public void onEnable()
     {
         db.registerTable(TableAccount.class);
         db.registerTable(TableBalance.class);
 
-        ConomyService service = new ConomyService(fm.loadConfig(this, ConomyConfiguration.class), modulePath.resolve("currencies"), db, reflector);
+        service = new ConomyService(this, fm.loadConfig(this, ConomyConfiguration.class), modulePath.resolve("currencies"), db, reflector);
         Object plugin = game.getPluginManager().getPlugin("CubeEngine").get().getInstance().get();
         game.getServiceManager().setProvider(plugin, EconomyService.class, service);
 
-        i18n.getCompositor().registerFormatter(new CurrencyFormatter(manager));
-
-        cm.addCommand(new MoneyCommand(this, um));
-        EcoCommands ecoCommands = new EcoCommands(this, um);
+        cm.addCommand(new MoneyCommand(this, service, i18n));
+        EcoCommand ecoCommands = new EcoCommand(this, service, i18n);
         cm.addCommand(ecoCommands);
+        ecoCommands.addCommand(new EcoBankCommand(this, service, i18n));
 
-        cm.getProviderManager().register(this, new BankReader(this.manager, i18n), BankAccount.class);
-        cm.addCommand(new BankCommands(this, um));
-        ecoCommands.addCommand(new EcoBankCommands(this, um));
+        cm.getProviderManager().register(this, new BankReader(service, i18n), BankAccount.class);
+        BankCommand bankCommand = new BankCommand(this, service, i18n);
+        cm.addCommand(bankCommand);
+        bankCommand.addCommand(new BankManageCommand(this, service, i18n));
 
         // TODO logging transactions / can be done via events
         // TODO logging new accounts not! workaround set start value using transaction
+
+        perms = new ConomyPermissions(this);
 
         // we're doing this via permissions
     }
@@ -82,5 +88,10 @@ public class Conomy extends Module
     public ConomyConfiguration getConfig()
     {
         return this.config;
+    }
+
+    public ConomyPermissions perms()
+    {
+        return perms;
     }
 }

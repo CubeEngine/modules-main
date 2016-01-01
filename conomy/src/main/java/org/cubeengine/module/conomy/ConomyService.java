@@ -17,10 +17,17 @@
  */
 package org.cubeengine.module.conomy;
 
+import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.conomy.storage.AccountModel;
+import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.filesystem.FileExtensionFilter;
+import org.jooq.Condition;
+import org.jooq.Record4;
+import org.jooq.SelectConditionStep;
+import org.jooq.SelectJoinStep;
+import org.jooq.impl.DSL;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
@@ -30,32 +37,34 @@ import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.account.VirtualAccount;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.service.user.UserStorageService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
+import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;
 
 public class ConomyService implements EconomyService
 {
-    // TODO missing mass operations
-    // - get all Accounts of Type
-    // - set all Accounts to val
-    // - add/remove to/from all Accounts
-
-    private Currency defaultCurrency;
+    private ConfigCurrency defaultCurrency;
     private List<ContextCalculator<Account>> contextCalculators = new ArrayList<>();
 
     private Map<UUID, UserAccount> userAccounts = new HashMap<>();
     private Map<String, BankAccount> bankAccounts = new HashMap<>();
-    private Map<String, Currency> currencies = new HashMap<>();
+    private Map<String, ConfigCurrency> currencies = new HashMap<>();
+    private Conomy module;
     private Database db;
 
-    public ConomyService(ConomyConfiguration config, Path path, Database db, Reflector reflector)
+    public ConomyService(Conomy module, ConomyConfiguration config, Path path, Database db, Reflector reflector)
     {
+        this.module = module;
         this.db = db;
         try
         {
@@ -207,5 +216,114 @@ public class ConomyService implements EconomyService
             calculator.accumulateContexts(baseAccount, contexts);
         }
         return contexts;
+    }
+
+    public Collection<BalanceModel> getTopBalance(boolean user, boolean bank, int fromRank, int toRank, boolean showHidden)
+    {
+        SelectJoinStep<Record4<String, String, String, Long>> from = db.getDSL()
+                .select(TABLE_BALANCE.ACCOUNT_ID, TABLE_BALANCE.CURRENCY, TABLE_BALANCE.CONTEXT, TABLE_BALANCE.BALANCE)
+                .from(TABLE_BALANCE.join(TABLE_ACCOUNT).on(TABLE_BALANCE.ACCOUNT_ID.eq(TABLE_ACCOUNT.ID)));
+        Condition userCond = TABLE_ACCOUNT.MASK.bitAnd(((byte) 4)).eq(((byte) 4));
+        Condition bankCond = TABLE_ACCOUNT.MASK.bitAnd(((byte) 4)).eq(((byte) 0));
+        SelectConditionStep<Record4<String, String, String, Long>> where;
+        if (!user && !bank)
+        {
+            throw new IllegalArgumentException();
+        }
+        if (user)
+        {
+            where = from.where(userCond);
+        }
+        else if (bank)
+        {
+            where = from.where(bankCond);
+        }
+        else
+        {
+            where = from.where(DSL.condition(true));
+        }
+
+        if (!showHidden)
+        {
+            where = where.and(TABLE_ACCOUNT.MASK.bitAnd((byte) 1).eq((byte) 0));
+        }
+        return where.orderBy(TABLE_BALANCE.BALANCE.desc()).limit(fromRank - 1, toRank - fromRank + 1).fetchInto(BalanceModel.class);
+    }
+
+    public ConfigCurrency getCurrency(String currency)
+    {
+        return this.currencies.get(currency);
+    }
+
+    public List<BankAccount> getBanks(Subject user, int level)
+    {
+        SubjectData data = user.getSubjectData();
+        if (!(data instanceof OptionSubjectData))
+        {
+            return Collections.emptyList();
+        }
+        Map<String, String> options = ((OptionSubjectData) data).getOptions(user.getActiveContexts());
+
+        List<String> manage = new ArrayList<>();
+        List<String> withdraw = new ArrayList<>();
+        List<String> deposit = new ArrayList<>();
+        List<String> see = new ArrayList<>();
+        options.entrySet().stream()
+                .filter(e -> e.getKey().startsWith("conomy.bank.access-level"))
+                .forEach(e ->
+                {
+                    String key = e.getKey().substring("conomy.bank.access-level".length());
+                    switch (e.getValue())
+                    {
+                        case "0":
+                            break;
+                        case "1":
+                            see.add(key);
+                            break;
+                        case "2":
+                            deposit.add(key);
+                            break;
+                        case "3":
+                            withdraw.add(key);
+                            break;
+                        case "4":
+                            manage.add(key);
+                            break;
+                        default:
+                            module.getProvided(Log.class).warn("Invalid value for option: {} -> {}", e.getKey(), e.getValue());
+                            break;
+                    }
+                });
+        if (level <= AccessLevel.WITHDRAW)
+        {
+            manage.addAll(withdraw);
+        }
+        if (level <= AccessLevel.DEPOSIT)
+        {
+            manage.addAll(deposit);
+        }
+        if (level <= AccessLevel.SEE)
+        {
+            manage.addAll(see);
+        }
+
+        List<BankAccount> collect = manage.stream().map(this::getAccount)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .filter(a -> a instanceof BankAccount)
+                .map(BankAccount.class::cast)
+                .collect(Collectors.toList());
+
+        if (level == AccessLevel.SEE && user.hasPermission(module.perms().ACCESS_SEE.getId()))
+        {
+            collect.addAll(getBankAccounts());
+        }
+        return collect;
+    }
+
+    private Collection<BankAccount> getBankAccounts()
+    {
+        // TODO load all banks
+        return this.bankAccounts.values();
     }
 }
