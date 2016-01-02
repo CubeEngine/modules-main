@@ -35,8 +35,8 @@ import java.util.*;
 
 public class LockerData implements DataManipulator<LockerData, ImmutableLockerData>
 {
-    public static Key<Value<Long>> LOCK_ID = KeyFactory.makeSingleKey(Long.class, Value.class, new DataQuery("LockID"));
-    public static Key<ListValue<Byte>> LOCK_PASS = KeyFactory.makeListKey(Byte.class, new DataQuery("LockPass"));
+    public static Key<Value<Long>> LOCK_ID = KeyFactory.makeSingleKey(Long.class, Value.class, DataQuery.of("LockID"));
+    public static Key<ListValue<Byte>> LOCK_PASS = KeyFactory.makeListKey(Byte.class, DataQuery.of("LockPass"));
 
     private long lockID;
     private byte[] pass;
