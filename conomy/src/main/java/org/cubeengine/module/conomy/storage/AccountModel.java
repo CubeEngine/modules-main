@@ -54,7 +54,7 @@ public class AccountModel extends AsyncRecord<AccountModel>
         return (this.getValue(TABLE_ACCOUNT.MASK) & 4) == 4;
     }
 
-    public boolean needsInvite()
+    public boolean isInvite()
     {
         return (this.getValue(TABLE_ACCOUNT.MASK) & 2) == 2;
     }
@@ -64,7 +64,7 @@ public class AccountModel extends AsyncRecord<AccountModel>
         return (this.getValue(TABLE_ACCOUNT.MASK) & 1) == 1;
     }
 
-    public void setNeedsInvite(boolean set)
+    public void setInvite(boolean set)
     {
         byte mask = this.getValue(TABLE_ACCOUNT.MASK);
         if (set)

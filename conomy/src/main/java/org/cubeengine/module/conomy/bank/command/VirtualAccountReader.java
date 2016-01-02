@@ -15,14 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.conomy.commands;
+package org.cubeengine.module.conomy.bank.command;
 
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.DefaultValue;
 import org.cubeengine.butler.parameter.reader.ReaderException;
-import org.cubeengine.module.conomy.BankAccount;
-import org.cubeengine.module.conomy.ConomyService;
+import org.cubeengine.module.conomy.AccessLevel;
+import org.cubeengine.module.conomy.BaseAccount;
+import org.cubeengine.module.conomy.bank.BankConomyService;
 import org.cubeengine.service.command.TranslatedReaderException;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.entity.living.player.User;
@@ -33,22 +34,22 @@ import java.util.Optional;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 
-public class BankReader implements ArgumentReader<BankAccount>, DefaultValue<BankAccount>
+public class VirtualAccountReader implements ArgumentReader<BaseAccount.Virtual>, DefaultValue<BaseAccount.Virtual>
 {
-    private final ConomyService service;
+    private final BankConomyService service;
     private final I18n i18n;
 
-    public BankReader(ConomyService service, I18n i18n)
+    public VirtualAccountReader(BankConomyService service, I18n i18n)
     {
         this.service = service;
         this.i18n = i18n;
     }
 
     @Override
-    public BankAccount read(Class type, CommandInvocation invocation) throws ReaderException
+    public BaseAccount.Virtual read(Class type, CommandInvocation invocation) throws ReaderException
     {
         String arg = invocation.consume(1);
-        Optional<BankAccount> target = service.getAccount(arg).filter(a -> a instanceof BankAccount).map(BankAccount.class::cast);
+        Optional<BaseAccount.Virtual> target = service.getAccount(arg).filter(a -> a instanceof BaseAccount.Virtual).map(BaseAccount.Virtual.class::cast);
         if (!target.isPresent())
         {
             throw new TranslatedReaderException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE, "There is no bank account named {input#name}!", arg));
@@ -57,12 +58,12 @@ public class BankReader implements ArgumentReader<BankAccount>, DefaultValue<Ban
     }
 
     @Override
-    public BankAccount getDefault(CommandInvocation invocation)
+    public BaseAccount.Virtual getDefault(CommandInvocation invocation)
     {
         if (invocation.getCommandSource() instanceof User)
         {
             User user = (User) invocation.getCommandSource();
-            List<BankAccount> banks = service.getBanks(user);
+            List<BaseAccount.Virtual> banks = service.getBanks(user, AccessLevel.SEE);
             if (banks.isEmpty())
             {
                 throw new TranslatedReaderException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,

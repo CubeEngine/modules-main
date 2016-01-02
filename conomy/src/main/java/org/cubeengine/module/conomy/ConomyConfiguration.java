@@ -40,4 +40,6 @@ public class ConomyConfiguration extends ReflectedYaml
     @Comment("The default currency name\n" +
             "This is the configs filename without extension")
     public String defaultCurrency = "main";
+
+    public boolean enableBanks = false;
 }

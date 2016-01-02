@@ -15,15 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.conomy.commands;
+package org.cubeengine.module.conomy.command;
 
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.*;
+import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.ConfigCurrency;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyService;
-import org.cubeengine.module.conomy.UserAccount;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.command.annotation.ParameterPermission;
@@ -74,11 +74,11 @@ public class MoneyCommand extends ContainerCommand
         return this.getCommand("balance").execute(invocation);
     }
 
-    private UserAccount getUserAccount(User user)
+    private BaseAccount.Unique getUserAccount(User user)
     {
         return service.createAccount(user.getUniqueId())
-                .filter(a -> a instanceof UserAccount)
-                .map(UserAccount.class::cast).orElse(null);
+                .filter(a -> a instanceof BaseAccount.Unique)
+                .map(BaseAccount.Unique.class::cast).orElse(null);
     }
 
     @Alias(value = {"balance", "moneybalance", "pmoney"})
@@ -88,7 +88,7 @@ public class MoneyCommand extends ContainerCommand
                         @ParameterPermission @Flag(longName = "showhidden", name = "f") boolean showHidden)
     // TODO message when no user found "If you are out of money, better go work than typing silly commands in the console."
     {
-        UserAccount account = this.getUserAccount(player);
+        BaseAccount.Unique account = this.getUserAccount(player);
         if (account == null ||  (account.isHidden()
                                     && !showHidden
                                     && !account.getIdentifier().equals(context.getIdentifier())))
@@ -166,14 +166,14 @@ public class MoneyCommand extends ContainerCommand
 
     @Alias(value = "pay")
     @Command(alias = "give", desc = "Transfer the given amount to another account.")
-    public void pay(CommandSource context, @Label("*|<players>") UserList users, Double amount,
-                    @Named("as") User player)
+    public void pay(CommandSource context, @Label("*|<players>") UserList users, Double amount, @Named("as") User player)
     {
         if (amount < 0)
         {
             i18n.sendTranslated(context, NEGATIVE, "What are you trying to do?");
             return;
         }
+
         boolean asSomeOneElse = false;
         if (player != null)
         {
@@ -193,7 +193,7 @@ public class MoneyCommand extends ContainerCommand
             }
             player = (User)context;
         }
-        UserAccount source = getUserAccount(player);
+        BaseAccount.Unique source = getUserAccount(player);
         if (source == null)
         {
             if (asSomeOneElse)
@@ -215,7 +215,7 @@ public class MoneyCommand extends ContainerCommand
                 i18n.sendTranslated(context, NEGATIVE, "{user} does not have an account!", user);
                 continue;
             }
-            TransferResult result = source.transfer(target, service.getDefaultCurrency(), new BigDecimal(amount), Cause.of(NamedCause.source(context)));
+            TransferResult result = source.transfer(target, service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
             switch (result.getResult())
             {
                 case SUCCESS:
@@ -247,5 +247,10 @@ public class MoneyCommand extends ContainerCommand
                     break;
             }
         }
+    }
+
+    private Cause causeOf(CommandSource context)
+    {
+        return Cause.of(NamedCause.source(context));
     }
 }

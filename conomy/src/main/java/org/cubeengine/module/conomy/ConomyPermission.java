@@ -17,30 +17,18 @@
  */
 package org.cubeengine.module.conomy;
 
-import org.cubeengine.module.conomy.storage.AccountModel;
-import org.cubeengine.service.database.Database;
-import org.spongepowered.api.service.economy.account.VirtualAccount;
-import org.spongepowered.api.text.Text;
+import org.cubeengine.service.permission.PermissionContainer;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
-public class BankAccount extends BaseAccount implements VirtualAccount
+@SuppressWarnings("all")
+public class ConomyPermission extends PermissionContainer<Conomy>
 {
-    private String name;
-
-    public BankAccount(String name, ConomyService service, AccountModel account, Database db)
+    public ConomyPermission(Conomy module)
     {
-        super(service, account, db);
-        this.name = name;
+        super(module);
     }
 
-    @Override
-    public Text getDisplayName()
-    {
-        return Text.of(name);
-    }
-
-    @Override
-    public String getIdentifier()
-    {
-        return name;
-    }
+    private final PermissionDescription ALLOWUNDERMIN = register("account.user.allow-under-min", "", null);
+    private final PermissionDescription COMMAND = register("command", "", null);
+    public final PermissionDescription COMMAND_PAY_ASOTHER = register("money.pay.as-other", "Allows transfering money from anothers players account", COMMAND);
 }

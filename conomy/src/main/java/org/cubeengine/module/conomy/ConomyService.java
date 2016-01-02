@@ -17,18 +17,22 @@
  */
 package org.cubeengine.module.conomy;
 
-import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.module.conomy.command.EcoCommand;
+import org.cubeengine.module.conomy.command.MoneyCommand;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
+import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.filesystem.FileExtensionFilter;
+import org.cubeengine.service.i18n.I18n;
 import org.jooq.Condition;
 import org.jooq.Record4;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
@@ -37,16 +41,12 @@ import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.account.VirtualAccount;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.service.user.UserStorageService;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
 import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;
@@ -56,11 +56,10 @@ public class ConomyService implements EconomyService
     private ConfigCurrency defaultCurrency;
     private List<ContextCalculator<Account>> contextCalculators = new ArrayList<>();
 
-    private Map<UUID, UserAccount> userAccounts = new HashMap<>();
-    private Map<String, BankAccount> bankAccounts = new HashMap<>();
+    protected Map<String, Account> accounts = new HashMap<>();
     private Map<String, ConfigCurrency> currencies = new HashMap<>();
-    private Conomy module;
-    private Database db;
+    protected Conomy module;
+    protected Database db;
 
     public ConomyService(Conomy module, ConomyConfiguration config, Path path, Database db, Reflector reflector)
     {
@@ -113,94 +112,77 @@ public class ConomyService implements EconomyService
     @Override
     public Optional<UniqueAccount> getAccount(UUID uuid)
     {
-        Optional<User> user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid);
-        if (user.isPresent())
+        Account account = accounts.get(uuid.toString());
+        if (account instanceof UniqueAccount)
         {
-            UserAccount userAccount = userAccounts.get(uuid);
-            if (userAccount == null)
-            {
-                userAccount = loadAccount(uuid, user.get(), false);
-            }
-            return Optional.ofNullable(userAccount);
+            return Optional.of(((UniqueAccount) account));
         }
+        if (account == null)
+        {
+            return loadAccount(uuid, false);
+        }
+        // else not UniqueAccount under uuid
         return Optional.empty();
     }
 
     @Override
     public Optional<UniqueAccount> createAccount(UUID uuid)
     {
-        Optional<User> user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid);
-        if (user.isPresent())
-        {
-            Optional<UniqueAccount> account = getAccount(uuid);
-            return account.isPresent() ? account : Optional.ofNullable(loadAccount(uuid, user.get(), true));
-        }
-        return Optional.empty();
+        Optional<UniqueAccount> account = getAccount(uuid);
+        return account.isPresent() ? account : loadAccount(uuid, true);
     }
 
-    private UserAccount loadAccount(UUID uuid, User user, boolean create)
+    protected Optional<UniqueAccount> loadAccount(UUID uuid, boolean create)
     {
-        AccountModel model = db.getDSL().selectFrom(TABLE_ACCOUNT).where(TABLE_ACCOUNT.ID.eq(uuid.toString())).fetchOne();
-        if (model == null)
+        AccountModel model = loadModel(uuid.toString());
+        if (model == null || !model.isUUID())
         {
+            if (model != null)
+            {
+                model.deleteAsync();
+            }
             if (!create)
             {
-                return null;
+                return Optional.empty();
             }
-            model = db.getDSL().newRecord(TABLE_ACCOUNT).newAccount(uuid, user.getName(), false, false);
-            model.storeAsync();
+            model = createModel(uuid);
         }
-        UserAccount acc = new UserAccount(user, this, model, db);
-        this.userAccounts.put(uuid, acc);
-        return acc;
+        UniqueAccount acc = new BaseAccount.Unique(this, model, db);
+        accounts.put(uuid.toString(), acc);
+        return Optional.of(acc);
+    }
+
+    private AccountModel createModel(UUID uuid)
+    {
+        Optional<User> user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid);
+        AccountModel model = db.getDSL().newRecord(TABLE_ACCOUNT).newAccount(uuid, user.map(User::getName).orElse(uuid.toString()), false, false);
+        model.storeAsync();
+        return model;
+    }
+
+    protected AccountModel loadModel(String id)
+    {
+        return db.getDSL().selectFrom(TABLE_ACCOUNT).where(TABLE_ACCOUNT.ID.eq(id)).fetchOne();
     }
 
     @Override
-    public Optional<Account> getAccount(String s)
+    public Optional<Account> getAccount(String identifier)
     {
-        BankAccount bankAccount = bankAccounts.get(s);
-        if (bankAccount != null)
+        try
         {
-            return Optional.of(bankAccount);
+            return getAccount(UUID.fromString(identifier)).map(Account.class::cast);
         }
-        return Optional.ofNullable(loadAccount(s, false));
+        catch (IllegalArgumentException e)
+        {
+            return Optional.empty();
+        }
     }
 
     @Override
     public Optional<VirtualAccount> createVirtualAccount(String s)
     {
-        Optional<Account> account = getAccount(s);
-        return account.isPresent() ? Optional.of(((VirtualAccount) account.get()))
-                                   : Optional.ofNullable(((VirtualAccount) loadAccount(s, true)));
+        return Optional.empty();
     }
-
-    private BaseAccount loadAccount(String name, boolean create)
-    {
-        AccountModel model = db.getDSL().selectFrom(TABLE_ACCOUNT).where(TABLE_ACCOUNT.ID.eq(name)).fetchOne();
-        if (model == null)
-        {
-            if (!create)
-            {
-                return null;
-            }
-            model = db.getDSL().newRecord(TABLE_ACCOUNT).newAccount(name, false, false);
-            model.storeAsync();
-        }
-        if (model.isUUID())
-        {
-            Optional<User> user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(model.getUUID().get());
-            if (user.isPresent())
-            {
-                UserAccount acc = new UserAccount(user.get(), this, model, db);
-                this.userAccounts.put(model.getUUID().get(), acc);
-                return acc;
-            }
-        }
-        BankAccount acc = new BankAccount(name, this, model, db);
-        this.bankAccounts.put(name, acc);
-        return acc;
-    }
-
 
     @Override
     public void registerContextCalculator(ContextCalculator<Account> contextCalculator)
@@ -255,75 +237,11 @@ public class ConomyService implements EconomyService
         return this.currencies.get(currency);
     }
 
-    public List<BankAccount> getBanks(Subject user, int level)
+    public void registerCommands(CommandManager cm, I18n i18n)
     {
-        SubjectData data = user.getSubjectData();
-        if (!(data instanceof OptionSubjectData))
-        {
-            return Collections.emptyList();
-        }
-        Map<String, String> options = ((OptionSubjectData) data).getOptions(user.getActiveContexts());
-
-        List<String> manage = new ArrayList<>();
-        List<String> withdraw = new ArrayList<>();
-        List<String> deposit = new ArrayList<>();
-        List<String> see = new ArrayList<>();
-        options.entrySet().stream()
-                .filter(e -> e.getKey().startsWith("conomy.bank.access-level"))
-                .forEach(e ->
-                {
-                    String key = e.getKey().substring("conomy.bank.access-level".length());
-                    switch (e.getValue())
-                    {
-                        case "0":
-                            break;
-                        case "1":
-                            see.add(key);
-                            break;
-                        case "2":
-                            deposit.add(key);
-                            break;
-                        case "3":
-                            withdraw.add(key);
-                            break;
-                        case "4":
-                            manage.add(key);
-                            break;
-                        default:
-                            module.getProvided(Log.class).warn("Invalid value for option: {} -> {}", e.getKey(), e.getValue());
-                            break;
-                    }
-                });
-        if (level <= AccessLevel.WITHDRAW)
-        {
-            manage.addAll(withdraw);
-        }
-        if (level <= AccessLevel.DEPOSIT)
-        {
-            manage.addAll(deposit);
-        }
-        if (level <= AccessLevel.SEE)
-        {
-            manage.addAll(see);
-        }
-
-        List<BankAccount> collect = manage.stream().map(this::getAccount)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .filter(a -> a instanceof BankAccount)
-                .map(BankAccount.class::cast)
-                .collect(Collectors.toList());
-
-        if (level == AccessLevel.SEE && user.hasPermission(module.perms().ACCESS_SEE.getId()))
-        {
-            collect.addAll(getBankAccounts());
-        }
-        return collect;
+        cm.addCommand(new MoneyCommand(module, this, i18n));
+        cm.addCommand(new EcoCommand(module, this, i18n));
     }
 
-    private Collection<BankAccount> getBankAccounts()
-    {
-        // TODO load all banks
-        return this.bankAccounts.values();
-    }
+
 }

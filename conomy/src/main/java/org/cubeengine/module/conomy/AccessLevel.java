@@ -17,11 +17,14 @@
  */
 package org.cubeengine.module.conomy;
 
-public interface AccessLevel
+public enum AccessLevel
 {
-    int NONE = 0;
-    int SEE = 1;
-    int DEPOSIT = 2;
-    int WITHDRAW = 3;
-    int MANAGE = 4;
+    NONE(0), SEE(1), DEPOSIT(2), WITHDRAW(3), MANAGE(4);
+
+    public final int value;
+
+    AccessLevel(int value)
+    {
+        this.value = value;
+    }
 }

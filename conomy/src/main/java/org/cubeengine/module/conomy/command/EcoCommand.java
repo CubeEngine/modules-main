@@ -15,13 +15,13 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.conomy.commands;
+package org.cubeengine.module.conomy.command;
 
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Label;
+import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyService;
-import org.cubeengine.module.conomy.UserAccount;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserList;
@@ -84,11 +84,11 @@ public class EcoCommand extends ContainerCommand
         }
     }
 
-    private UserAccount getAccount(CommandSource context, User user)
+    private BaseAccount.Unique getAccount(CommandSource context, User user)
     {
-        UserAccount target = service.createAccount(user.getUniqueId())
-                .filter(a -> a instanceof UserAccount)
-                .map(UserAccount.class::cast).orElse(null);
+        BaseAccount.Unique target = service.createAccount(user.getUniqueId())
+                .filter(a -> a instanceof BaseAccount.Unique)
+                .map(BaseAccount.Unique.class::cast).orElse(null);
         if (target == null)
         {
             i18n.sendTranslated(context, NEGATIVE, "{user} does not have an account!", user);
@@ -190,7 +190,7 @@ public class EcoCommand extends ContainerCommand
     {
         for (User user : users.list())
         {
-            UserAccount target = getAccount(context, user);
+            BaseAccount.Unique target = getAccount(context, user);
             if (target != null)
             {
                 if (target.isHidden())
@@ -211,7 +211,7 @@ public class EcoCommand extends ContainerCommand
     {
         for (User user : users.list())
         {
-            UserAccount target = getAccount(context, user);
+            BaseAccount.Unique target = getAccount(context, user);
             if (target != null)
             {
                 if (target.isHidden())

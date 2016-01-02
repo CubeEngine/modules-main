@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.conomy;
 
+import org.cubeengine.module.conomy.bank.BankConomyService;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.service.database.Database;
@@ -24,14 +25,13 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
+import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
+import org.spongepowered.api.text.Text;
 
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.toMap;
 import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;
@@ -43,29 +43,24 @@ import static org.spongepowered.api.service.economy.transaction.TransactionTypes
 
 public abstract class BaseAccount implements Account
 {
-    // TODO bank-account access
-    // member;admin;owner
-    // deposit;withdraw;manage
-    // permission based? <- may be too slow when getting all users /w perm for it
-    // ce.conomy.access.depoosit.<id>
-    // ce.conomy.access.withdraw.<id>
-    // ce.conomy.access.manage.<id>
-    // when useracc do not check for permission
-
-
     // TODO parse currency // TODO filter currency Names / Symbols http://git.cubeisland.de/cubeengine/cubeengine/issues/250
     // rename bank / player(on name change)
 
     private ConomyService service;
-    private AccountModel account;
+    protected AccountModel account;
     private Database db;
     private Map<Currency, Map<Context, BalanceModel>> balance = new HashMap<>();
+
+    private final Text display;
+    private final String id;
 
     public BaseAccount(ConomyService service, AccountModel account, Database db)
     {
         this.service = service;
         this.account = account;
         this.db = db;
+        this.display = Text.of(account.getName());
+        this.id = account.getID();
     }
 
     private Optional<BalanceModel> getModel(ConfigCurrency currency, Set<Context> ctxs)
@@ -227,5 +222,57 @@ public abstract class BaseAccount implements Account
     public void setHidden(boolean b)
     {
         account.setHidden(b);
+    }
+
+    @Override
+    public Text getDisplayName()
+    {
+        return display;
+    }
+
+    @Override
+    public String getIdentifier()
+    {
+        return id;
+    }
+
+    public static class Unique extends BaseAccount implements UniqueAccount
+    {
+        private final UUID uuid;
+
+        public Unique(ConomyService service, AccountModel account, Database db)
+        {
+            super(service, account, db);
+            this.uuid = account.getUUID().get();
+        }
+
+        @Override
+        public UUID getUUID()
+        {
+            return uuid;
+        }
+    }
+
+    public static class Virtual extends BaseAccount implements Account
+    {
+        public Virtual(BankConomyService service, AccountModel model, Database db)
+        {
+            super(service, model, db);
+        }
+
+
+        public boolean isInvite()
+        {
+            return account.isInvite();
+        }
+
+        public void setInvite(boolean invite)
+        {
+            if (!invite)
+            {
+                account.setHidden(false);
+            }
+            account.setInvite(invite);
+        }
     }
 }
