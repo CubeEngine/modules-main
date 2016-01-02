@@ -28,9 +28,9 @@ import java.util.Map;
 
 public interface IPermissionData
 {
-    Key<ListValue<String>> PARENTS = KeyFactory.makeListKey(String.class, new DataQuery("parents"));
-    Key<MapValue<String, Boolean>> PERMISSIONS = KeyFactory.makeMapKey(String.class, Boolean.class, new DataQuery("permissions"));
-    Key<MapValue<String, String>> OPTIONS = KeyFactory.makeMapKey(String.class, String.class, new DataQuery("options"));
+    Key<ListValue<String>> PARENTS = KeyFactory.makeListKey(String.class, DataQuery.of("parents"));
+    Key<MapValue<String, Boolean>> PERMISSIONS = KeyFactory.makeMapKey(String.class, Boolean.class, DataQuery.of("permissions"));
+    Key<MapValue<String, String>> OPTIONS = KeyFactory.makeMapKey(String.class, String.class, DataQuery.of("options"));
 
     List<String> getParents();
     Map<String, Boolean> getPermissions();
