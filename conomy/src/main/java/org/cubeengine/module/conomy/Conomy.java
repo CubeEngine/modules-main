@@ -35,6 +35,8 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.service.economy.EconomyService;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ThreadFactory;
 
@@ -65,13 +67,22 @@ public class Conomy extends Module
         db.registerTable(TableBalance.class);
 
         ConomyConfiguration config = fm.loadConfig(this, ConomyConfiguration.class);
+        Path curencyPath = modulePath.resolve("currencies");
+        try
+        {
+            Files.createDirectories(curencyPath);
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException(e);
+        }
         if (config.enableBanks)
         {
-            service = new BankConomyService(this, config, modulePath.resolve("currencies"), db, reflector);
+            service = new BankConomyService(this, config, curencyPath, db, reflector);
         }
         else
         {
-            service = new ConomyService(this, config, modulePath.resolve("currencies"), db, reflector);
+            service = new ConomyService(this, config, curencyPath, db, reflector);
         }
         Object plugin = game.getPluginManager().getPlugin("CubeEngine").get().getInstance().get();
         game.getServiceManager().setProvider(plugin, EconomyService.class, service);

@@ -23,6 +23,8 @@ import org.cubeengine.service.database.Table;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 
+import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
+
 public class TableBalance extends Table<BalanceModel>
 {
     public static TableBalance TABLE_BALANCE;
@@ -34,8 +36,9 @@ public class TableBalance extends Table<BalanceModel>
     public TableBalance(String prefix, Database database)
     {
         super(prefix + "conomy_balance", new Version(1), database);
-        this.addUniqueKey(ACCOUNT_ID, CURRENCY, CONTEXT);
+        this.setPrimaryKey(ACCOUNT_ID, CURRENCY, CONTEXT);
         this.addFields(ACCOUNT_ID, CURRENCY, CONTEXT, BALANCE);
+        this.addForeignKey(TABLE_ACCOUNT.getPrimaryKey(), ACCOUNT_ID);
         TABLE_BALANCE = this;
     }
 

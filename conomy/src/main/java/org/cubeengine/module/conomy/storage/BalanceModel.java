@@ -51,7 +51,7 @@ public class BalanceModel extends AsyncRecord<BalanceModel>
     public void setBalance(Long amount)
     {
         setValue(TABLE_BALANCE.BALANCE, amount);
-        this.storeAsync();
+        this.store();
     }
 
     public String getAccountID()

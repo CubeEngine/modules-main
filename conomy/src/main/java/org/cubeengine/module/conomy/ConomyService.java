@@ -32,7 +32,6 @@ import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
@@ -82,7 +81,7 @@ public class ConomyService implements EconomyService
         {
             CurrencyConfiguration defConfig = reflector.load(CurrencyConfiguration.class, path.resolve(config.defaultCurrency + ".yml").toFile());
             defaultCurrency = new ConfigCurrency(defConfig);
-            currencies.put(config.defaultCurrency, defaultCurrency);
+            currencies.put(defaultCurrency.getID(), defaultCurrency);
         }
 
         /* TODO LOGGER
@@ -156,7 +155,7 @@ public class ConomyService implements EconomyService
     {
         Optional<User> user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid);
         AccountModel model = db.getDSL().newRecord(TABLE_ACCOUNT).newAccount(uuid, user.map(User::getName).orElse(uuid.toString()), false, false);
-        model.storeAsync();
+        model.store();
         return model;
     }
 
@@ -242,6 +241,4 @@ public class ConomyService implements EconomyService
         cm.addCommand(new MoneyCommand(module, this, i18n));
         cm.addCommand(new EcoCommand(module, this, i18n));
     }
-
-
 }

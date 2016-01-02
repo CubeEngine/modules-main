@@ -29,6 +29,7 @@ import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
+import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
@@ -133,12 +134,19 @@ public class BankManageCommand extends ContainerCommand
     @Command(desc = "Deletes a bank")
     public void delete(CommandSource context, BaseAccount.Virtual bank)
     {
+        if (true)
+        {
+            // TODO
+            context.sendMessage(Text.of("NOT IMPLEMENTED YET"));
+            return;
+        }
+
         if (!service.hasAccess(bank, AccessLevel.MANAGE, context))
         {
             // TODO msg not allowed
             return;
         }
-        bank.delete(); // TODO withdraw all money?
+        //bank.delete(); // TODO withdraw all money?
         i18n.sendTranslated(context, POSITIVE, "You deleted the bank {txt#bank}!", bank.getDisplayName());
     }
 

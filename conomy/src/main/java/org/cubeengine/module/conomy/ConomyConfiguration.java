@@ -27,13 +27,6 @@ import java.util.*;
 @SuppressWarnings("all")
 public class ConomyConfiguration extends ReflectedYaml
 {
-    @Comment("Automatically creates the UserAccount when trying to access it")
-    @Name("default.user.auto-create-account")
-    public boolean autocreateUserAcc = true;
-
-    @Name("default.bank.need-invite")
-    public boolean bankNeedInvite = false;
-
     @Name("enable-logging")
     public boolean enableLogging = true;
 

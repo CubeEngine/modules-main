@@ -28,14 +28,14 @@ public class TableAccount extends Table<AccountModel>
     public static TableAccount TABLE_ACCOUNT;
     public final TableField<AccountModel, String> ID = createField("id", SQLDataType.VARCHAR.length(64), this);
     public final TableField<AccountModel, String> NAME = createField("name", SQLDataType.VARCHAR.length(64), this);
-    public final TableField<AccountModel, Long> VALUE = createField("value", SQLDataType.BIGINT.nullable(false), this);
     public final TableField<AccountModel, Byte> MASK = createField("mask", SQLDataType.TINYINT, this);
 
     public TableAccount(String prefix, Database database)
     {
         super(prefix + "conomy_account", new Version(1), database);
+        this.setPrimaryKey(ID);
         this.addUniqueKey(ID);
-        this.addFields(ID, NAME, VALUE, MASK);
+        this.addFields(ID, NAME, MASK);
         TABLE_ACCOUNT = this;
     }
 

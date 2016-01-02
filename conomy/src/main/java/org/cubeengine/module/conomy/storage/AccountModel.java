@@ -111,4 +111,11 @@ public class AccountModel extends AsyncRecord<AccountModel>
     {
         return getValue(TABLE_ACCOUNT.NAME);
     }
+
+    public boolean setName(String newName)
+    {
+        setValue(TABLE_ACCOUNT.NAME, newName);
+        // TODO check if name exists
+        return true;
+    }
 }

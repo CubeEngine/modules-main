@@ -26,6 +26,7 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
+import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
 import org.spongepowered.api.text.Text;
@@ -66,6 +67,11 @@ public abstract class BaseAccount implements Account
     private Optional<BalanceModel> getModel(ConfigCurrency currency, Set<Context> ctxs)
     {
         Map<Context, BalanceModel> balances = this.balance.get(currency);
+        if (balances == null)
+        {
+            balances = new HashMap<>();
+            balance.put(currency, balances);
+        }
         Optional<Context> relevantCtx = currency.getRelevantContext(ctxs);
         if (!relevantCtx.isPresent())
         {
@@ -74,9 +80,15 @@ public abstract class BaseAccount implements Account
         BalanceModel balanceModel = balances.get(relevantCtx.get());
         if (balanceModel == null)
         {
-            balanceModel = db.getDSL().newRecord(TABLE_BALANCE).newBalance(account, currency, relevantCtx.get(), getDefaultBalance(currency));
-            balanceModel.storeAsync();
-            balances.put(relevantCtx.get(), balanceModel);
+            balanceModel = db.getDSL().selectFrom(TABLE_BALANCE).where(TABLE_BALANCE.ACCOUNT_ID.eq(account.getID()))
+                    .and(TABLE_BALANCE.CONTEXT.eq(relevantCtx.get().getType() + "|" + relevantCtx.get().getName()))
+                    .and(TABLE_BALANCE.CURRENCY.eq(currency.getID())).fetchOne();
+            if (balanceModel == null)
+            {
+                balanceModel = db.getDSL().newRecord(TABLE_BALANCE).newBalance(account, currency, relevantCtx.get(), getDefaultBalance(currency));
+                balanceModel.store();
+                balances.put(relevantCtx.get(), balanceModel);
+            }
         }
 
         return Optional.of(balanceModel);
@@ -185,6 +197,10 @@ public abstract class BaseAccount implements Account
     @Override
     public TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts)
     {
+        if (this == to)
+        {
+            return new Result.Transfer(this, to, currency, amount, contexts, ResultType.SUCCESS, TRANSFER, cause);
+        }
         // TODO disallow user -> bank if not at least member of bank
         // TODO disallow bank -> user if cause is not admin?
         // TODO check for visibility of account for causer
@@ -273,6 +289,11 @@ public abstract class BaseAccount implements Account
                 account.setHidden(false);
             }
             account.setInvite(invite);
+        }
+
+        public boolean rename(String newName)
+        {
+            return account.setName(newName);
         }
     }
 }

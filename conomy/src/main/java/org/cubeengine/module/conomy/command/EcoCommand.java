@@ -216,12 +216,12 @@ public class EcoCommand extends ContainerCommand
             {
                 if (target.isHidden())
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "{user}'s account was not hidden!", user);
+                    target.setHidden(false);
+                    i18n.sendTranslated(context, POSITIVE, "{user}'s account is no longer hidden!", user);
                 }
                 else
                 {
-                    target.setHidden(false);
-                    i18n.sendTranslated(context, POSITIVE, "{user}'s account is no longer hidden!", user);
+                    i18n.sendTranslated(context, NEUTRAL, "{user}'s account was not hidden!", user);
                 }
             }
         }

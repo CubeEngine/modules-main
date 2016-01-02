@@ -50,7 +50,9 @@ import java.util.Map;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
 import static org.spongepowered.api.text.format.TextColors.GOLD;
+import static org.spongepowered.api.text.format.TextColors.WHITE;
 
 @Command(name = "money", desc = "Manage your money")
 public class MoneyCommand extends ContainerCommand
@@ -155,9 +157,8 @@ public class MoneyCommand extends ContainerCommand
         {
             Account account = service.getAccount(balance.getAccountID()).get();
             ConfigCurrency currency = service.getCurrency(balance.getCurrency());
-            texts.add(Text.of(i++, TextColors.WHITE, " - ",
-                    TextColors.DARK_GREEN, account.getDisplayName(),
-                    TextColors.WHITE, ":",
+            texts.add(Text.of(i++, WHITE, " - ",
+                    DARK_GREEN, account.getDisplayName(), WHITE, ": ",
                     GOLD, currency.format(currency.fromLong(balance.getBalance()))));
         }
         pagination.contents(texts);
@@ -215,31 +216,33 @@ public class MoneyCommand extends ContainerCommand
                 i18n.sendTranslated(context, NEGATIVE, "{user} does not have an account!", user);
                 continue;
             }
-            TransferResult result = source.transfer(target, service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
+            Currency cur = service.getDefaultCurrency();
+            TransferResult result = source.transfer(target, cur, new BigDecimal(amount), causeOf(context));
+            Text formatAmount = cur.format(result.getAmount());
             switch (result.getResult())
             {
                 case SUCCESS:
                     if (asSomeOneElse)
                     {
-                        i18n.sendTranslated(context, POSITIVE, "{currency} transferred from {user}'s to {user}'s account!", amount, player, user);
+                        i18n.sendTranslated(context, POSITIVE, "{txt#amount} transferred from {user}'s to {user}'s account!", formatAmount, player, user);
                     }
                     else
                     {
-                        i18n.sendTranslated(context, POSITIVE, "{currency} transferred to {user}'s account!", amount, user);
+                        i18n.sendTranslated(context, POSITIVE, "{txt#amount} transferred to {user}'s account!", formatAmount, user);
                     }
                     if (user.isOnline())
                     {
-                        i18n.sendTranslated(user.getPlayer().get(), POSITIVE, "{user} just paid you {currency}!", player, amount);
+                        i18n.sendTranslated(user.getPlayer().get(), POSITIVE, "{user} just paid you {txt#amount}!", player, formatAmount);
                     }
                     break;
                 case ACCOUNT_NO_FUNDS:
                     if (asSomeOneElse)
                     {
-                        i18n.sendTranslated(context, NEGATIVE, "{user} cannot afford {currency}!", player.getName(), amount);
+                        i18n.sendTranslated(context, NEGATIVE, "{user} cannot afford {txt#amount}!", player.getName(), formatAmount);
                     }
                     else
                     {
-                        i18n.sendTranslated(context, NEGATIVE, "You cannot afford {currency}!", amount);
+                        i18n.sendTranslated(context, NEGATIVE, "You cannot afford {txt#amount}!", formatAmount);
                     }
                     break;
                 default:

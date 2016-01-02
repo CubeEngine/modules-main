@@ -76,7 +76,7 @@ public class BankConomyService extends ConomyService
     private AccountModel createModel(String name)
     {
         AccountModel model = db.getDSL().newRecord(TABLE_ACCOUNT).newAccount(name, false, false);
-        model.storeAsync();
+        model.store();
         return model;
     }
 
