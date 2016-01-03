@@ -121,7 +121,20 @@ public class ImmutablePermissionData extends AbstractImmutableData<ImmutablePerm
     @Override
     public DataContainer toContainer()
     {
-        return new MemoryDataContainer().set(PARENTS, parents).set(PERMISSIONS, permissions).set(OPTIONS, options);
+        DataContainer result = new MemoryDataContainer();
+        if (parents != null)
+        {
+            result.set(PARENTS, parents);
+        }
+        if (permissions != null)
+        {
+            result.set(PERMISSIONS, IPermissionData.replaceKeys(permissions, ".", ":"));
+        }
+        if (options != null)
+        {
+            result.set(OPTIONS, IPermissionData.replaceKeys(options, ".", ":"));
+        }
+        return result;
     }
 
     @Override

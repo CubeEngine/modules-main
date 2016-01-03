@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
@@ -50,6 +51,9 @@ public class PermissionDataBuilder implements DataManipulatorBuilder<PermissionD
         Optional<List<String>> parents = container.getStringList(PARENTS.getQuery());
         Optional<Map<String, Boolean>> permissions = ((Optional<Map<String, Boolean>>) container.getMap(PERMISSIONS.getQuery()));
         Optional<Map<String, String>> options = ((Optional<Map<String, String>>) container.getMap(OPTIONS.getQuery()));
+
+        permissions = replaceKeys(permissions, ":", ".");
+        options = replaceKeys(options, ":", ".");
 
         if (parents.isPresent() || permissions.isPresent() || options.isPresent())
         {

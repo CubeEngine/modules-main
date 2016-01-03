@@ -25,6 +25,9 @@ import org.spongepowered.api.data.value.mutable.MapValue;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
+import static java.util.stream.Collectors.toMap;
 
 public interface IPermissionData
 {
@@ -79,5 +82,15 @@ public interface IPermissionData
         }
 
         return 0;
+    }
+
+    static <T> Optional<Map<String, T>> replaceKeys(Optional<Map<String, T>> opt, String orig, String repl)
+    {
+        return opt.map(m -> replaceKeys(m, orig, repl));
+    }
+
+    static <T> Map<String, T> replaceKeys(Map<String, T> map, String orig, String repl)
+    {
+        return map.entrySet().stream().collect(toMap(e -> e.getKey().replace(orig, repl), Map.Entry::getValue));
     }
 }

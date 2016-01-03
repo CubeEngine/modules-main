@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static java.util.stream.Collectors.toMap;
+
 public class PermissionData extends AbstractData<PermissionData, ImmutablePermissionData> implements IPermissionData
 {
     private List<String> parents;
@@ -140,8 +142,8 @@ public class PermissionData extends AbstractData<PermissionData, ImmutablePermis
         if (parents.isPresent() || permissions.isPresent() || options.isPresent())
         {
             this.parents = parents.orElse(null);
-            this.permissions = permissions.orElse(null);
-            this.options = options.orElse(null);
+            this.permissions = IPermissionData.replaceKeys(permissions, ":", ".").orElse(null);
+            this.options = IPermissionData.replaceKeys(options, ":", ".").orElse(null);
             return Optional.of(this);
         }
         return Optional.empty();
@@ -175,7 +177,8 @@ public class PermissionData extends AbstractData<PermissionData, ImmutablePermis
         }
         if (permissions != null)
         {
-            result.set(PERMISSIONS, permissions);
+            Map<String, Boolean> perms = permissions.entrySet().stream().collect(toMap(e -> e.getKey().replace(".", ":"), Map.Entry::getValue));
+            result.set(PERMISSIONS, perms);
         }
         if (options != null)
         {
