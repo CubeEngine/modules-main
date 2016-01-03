@@ -33,6 +33,7 @@ import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
@@ -52,7 +53,7 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "listuroles")
     @Command(desc = "Lists roles of a user [in context]")
-    public void list(CommandContext cContext, @Default Player player, @Named("in") @Default Context context)
+    public void list(CommandContext cContext, @Default User player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         List<Subject> parents = player.getSubjectData().getParents(contexts);
@@ -65,7 +66,7 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "checkuperm")
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in context]")
-    public void checkpermission(CommandContext cContext, @Default Player player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
+    public void checkpermission(CommandContext cContext, @Default User player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         Tristate value = player.getPermissionValue(contexts, permission);
@@ -94,7 +95,7 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "listuperm")
     @Command(alias = "listperm", desc = "List permission assigned to a user [in context]")
-    public void listpermission(CommandContext cContext, @Default Player player, @Named("in") @Default Context context, @Flag boolean all)
+    public void listpermission(CommandContext cContext, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         Map<String, Boolean> permissions = player.getSubjectData().getPermissions(contexts);
@@ -121,7 +122,7 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "checkumeta")
     @Command(alias = {"checkdata", "checkmeta"}, desc = "Checks for metadata of a user [in context]")
-    public void checkmetadata(CommandContext cContext, @Default Player player, String metadatakey, @Named("in") @Default Context context)
+    public void checkmetadata(CommandContext cContext, @Default User player, String metadatakey, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         String value = ((OptionSubjectData)player.getSubjectData()).getOptions(contexts).get(metadatakey);
@@ -138,7 +139,7 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "listumeta")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists assigned metadata from a user [in context]")
-    public void listmetadata(CommandContext cContext, @Default Player player, @Named("in") @Default Context context, @Flag boolean all)
+    public void listmetadata(CommandContext cContext, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         Map<String, String> options = ((OptionSubjectData)player.getSubjectData()).getOptions(contexts);

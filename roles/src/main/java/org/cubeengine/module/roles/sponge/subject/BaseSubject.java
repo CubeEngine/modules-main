@@ -181,13 +181,14 @@ public abstract class BaseSubject<T extends OptionSubjectData> implements Option
         {
             List<String> implicits = new ArrayList<>();
 
+            String perm = permission;
             // Search for implicit parents first...
-            int lastDot = permission.lastIndexOf(".");
+            int lastDot = perm.lastIndexOf(".");
             while (lastDot != -1)
             {
-                permission = permission.substring(0, lastDot);
-                implicits.add(permission);
-                lastDot = permission.lastIndexOf(".");
+                perm = perm.substring(0, lastDot);
+                implicits.add(perm);
+                lastDot = perm.lastIndexOf(".");
             }
             Tristate value = Tristate.UNDEFINED;
             for (String parent : implicits)
@@ -205,13 +206,14 @@ public abstract class BaseSubject<T extends OptionSubjectData> implements Option
             // else UNDEFINED OR TRUE
 
             // Seach for explicit parents...
-            PermissionDescription perm = service.getDescription(permission).orElse(null);
-            if (perm != null)
+            PermissionDescription permDesc = service.getDescription(permission).orElse(null);
+            if (permDesc != null)
             {
                 List<String> explicits = stream(service.getSubjects(SUBJECTS_ROLE_TEMPLATE).getAllSubjects().spliterator(), false)
                     .filter(s -> s.getSubjectData() != data)
                     .filter(s -> s.getIdentifier().startsWith(PERMISSION_TEMPLATE_PREFIX))
                     .map(s -> s.getIdentifier().substring(PERMISSION_TEMPLATE_PREFIX.length()))
+                    .filter(i -> i.equals(permission))
                     .collect(toList());
 
                 for (String parent : explicits)
