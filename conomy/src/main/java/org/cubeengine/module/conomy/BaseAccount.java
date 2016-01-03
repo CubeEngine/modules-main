@@ -36,6 +36,7 @@ import java.util.*;
 
 import static java.util.stream.Collectors.toMap;
 import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;
+import static org.spongepowered.api.service.economy.transaction.ResultType.ACCOUNT_NO_FUNDS;
 import static org.spongepowered.api.service.economy.transaction.ResultType.CONTEXT_MISMATCH;
 import static org.spongepowered.api.service.economy.transaction.ResultType.SUCCESS;
 import static org.spongepowered.api.service.economy.transaction.TransactionTypes.DEPOSIT;
@@ -187,8 +188,14 @@ public abstract class BaseAccount implements Account
         Optional<BalanceModel> model = getModel(cur, contexts);
         if (model.isPresent())
         {
-            model.get().setBalance(model.get().getBalance() - cur.toLong(amount));
-            // TODO check min
+            long newBalance = model.get().getBalance() - cur.toLong(amount);
+            long min = cur.toLong(cur.getMin(this));
+
+            if (newBalance < min)
+            {
+                return new Result(this, currency, amount, contexts, ACCOUNT_NO_FUNDS, WITHDRAW, cause);
+            }
+            model.get().setBalance(newBalance);
             return new Result(this, currency, amount, contexts, SUCCESS, WITHDRAW, cause);
         }
         return new Result(this, currency, amount, contexts, CONTEXT_MISMATCH, WITHDRAW, cause);

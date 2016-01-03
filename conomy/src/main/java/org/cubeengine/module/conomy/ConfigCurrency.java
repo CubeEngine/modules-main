@@ -126,4 +126,13 @@ public class ConfigCurrency implements Currency
         }
         return new BigDecimal(this.config.defaultBankBalance);
     }
+
+    public BigDecimal getMin(BaseAccount baseAccount)
+    {
+        if (baseAccount instanceof UniqueAccount)
+        {
+            return new BigDecimal(config.minimumBalance);
+        }
+        return new BigDecimal(config.minimumBankBalance);
+    }
 }
