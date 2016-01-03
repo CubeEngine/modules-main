@@ -66,6 +66,8 @@ public class Conomy extends Module
         db.registerTable(TableAccount.class);
         db.registerTable(TableBalance.class);
 
+        i18n.getCompositor().registerFormatter(new BaseAccountFormatter());
+
         ConomyConfiguration config = fm.loadConfig(this, ConomyConfiguration.class);
         Path curencyPath = modulePath.resolve("currencies");
         try
@@ -79,6 +81,7 @@ public class Conomy extends Module
         if (config.enableBanks)
         {
             service = new BankConomyService(this, config, curencyPath, db, reflector);
+            bankPerms = new BankPermission(this);
         }
         else
         {
@@ -88,7 +91,6 @@ public class Conomy extends Module
         game.getServiceManager().setProvider(plugin, EconomyService.class, service);
 
         service.registerCommands(cm, i18n);
-
 
         // TODO logging transactions / can be done via events
         // TODO logging new accounts not! workaround set start value using transaction

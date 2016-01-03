@@ -300,6 +300,7 @@ public abstract class BaseAccount implements Account
 
         public boolean rename(String newName)
         {
+            // TODO check for name
             return account.setName(newName);
         }
     }

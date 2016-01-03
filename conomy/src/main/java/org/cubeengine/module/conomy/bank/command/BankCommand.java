@@ -73,10 +73,10 @@ public class BankCommand extends ContainerCommand
 
         if (balances.isEmpty())
         {
-            i18n.sendTranslated(context, NEGATIVE, "No Balance for bank {txt} found!", bank.getDisplayName());
+            i18n.sendTranslated(context, NEGATIVE, "No Balance for bank {account} found!", bank);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "Bank {txt} Balance:", bank.getDisplayName());
+        i18n.sendTranslated(context, POSITIVE, "Bank {account} Balance:", bank);
         for (Map.Entry<Currency, BigDecimal> entry : balances.entrySet())
         {
             context.sendMessage(Text.of(" - ", GOLD, entry.getKey().format(entry.getValue())));
@@ -110,8 +110,8 @@ public class BankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Currency cur = result.getCurrency();
-                i18n.sendTranslated(context, POSITIVE, "Deposited {txt#amount} into {txt#bank}! New Balance: {txt#balance}",
-                        cur.format(result.getAmount()), bank.getDisplayName(), cur.format(bank.getBalance(cur)));
+                i18n.sendTranslated(context, POSITIVE, "Deposited {txt#amount} into {account}! New Balance: {txt#balance}",
+                        cur.format(result.getAmount()), bank, cur.format(bank.getBalance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
                 i18n.sendTranslated(context, NEGATIVE, "You cannot afford to spend that much!");
@@ -143,8 +143,8 @@ public class BankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Currency cur = result.getCurrency();
-                i18n.sendTranslated(context, POSITIVE, "Withdrawn {txt#amount} from {txt#bank}! New Balance: {txt#balance}",
-                        cur.format(result.getAmount()), bank.getDisplayName(), cur.format(bank.getBalance(cur)));
+                i18n.sendTranslated(context, POSITIVE, "Withdrawn {txt#amount} from {account}! New Balance: {txt#balance}",
+                        cur.format(result.getAmount()), bank, cur.format(bank.getBalance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
                 i18n.sendTranslated(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
@@ -176,8 +176,8 @@ public class BankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Currency cur = result.getCurrency();
-                i18n.sendTranslated(context, POSITIVE, "Transferred {txt#amount} from {txt#bank} to {txt#bank} New Balance: {txt#balance}",
-                        cur.format(result.getAmount()), bank.getDisplayName(), otherBank.getDisplayName(), cur.format(bank.getBalance(cur)));
+                i18n.sendTranslated(context, POSITIVE, "Transferred {txt#amount} from {account} to {account} New Balance: {txt#balance}",
+                        cur.format(result.getAmount()), bank, otherBank, cur.format(bank.getBalance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
                 i18n.sendTranslated(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
@@ -189,28 +189,21 @@ public class BankCommand extends ContainerCommand
     }
 
     @Command(desc = "Pays given amount of money as bank to a user account")
-    public void payUser(CommandSource context, BaseAccount.Virtual bank, User user, Double amount)
+    public void payUser(CommandSource context, BaseAccount.Virtual bank, BaseAccount.Unique user, Double amount)
     {
-        Optional<UniqueAccount> account = service.createAccount(user.getUniqueId());
-        if (!account.isPresent())
-        {
-            i18n.sendTranslated(context, NEGATIVE, "{user} has no account!", user);
-            return;
-        }
-
         if (!service.hasAccess(bank, AccessLevel.WITHDRAW, context))
         {
             i18n.sendTranslated(context, NEGATIVE, "You are not allowed to make transaction from that bank!");
             return;
         }
 
-        TransferResult result = bank.transfer(account.get(), service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
+        TransferResult result = bank.transfer(user, service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
         switch (result.getResult())
         {
             case SUCCESS:
                 Currency cur = result.getCurrency();
-                i18n.sendTranslated(context, POSITIVE, "Transferred {txt#amount} from {txt#bank} to {user}! New Balance: {txt#balance}",
-                        cur.format(result.getAmount()), bank.getDisplayName(), user, cur.format(bank.getBalance(cur)));
+                i18n.sendTranslated(context, POSITIVE, "Transferred {txt#amount} from {account} to {account#user}! New Balance: {txt#balance}",
+                        cur.format(result.getAmount()), bank, user, cur.format(bank.getBalance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
                 i18n.sendTranslated(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
@@ -260,7 +253,7 @@ public class BankCommand extends ContainerCommand
     @Command(desc = "Shows bank information")
     public void info(CommandSource context, BaseAccount.Virtual bank)
     {
-        i18n.sendTranslated(context, POSITIVE, "Bank Information for {txt}:", bank.getDisplayName());
+        i18n.sendTranslated(context, POSITIVE, "Bank Information for {account}:", bank);
         i18n.sendTranslated(context, POSITIVE, "Current Balance: {txt}", service.getDefaultCurrency().format(bank.getBalance(service.getDefaultCurrency())));
 
         this.listaccess(context, bank);
@@ -274,7 +267,7 @@ public class BankCommand extends ContainerCommand
     @Command(desc = "Lists the access levels for a bank")
     public void listaccess(CommandSource context, @Default BaseAccount.Virtual bank)
     {
-        i18n.sendTranslated(context, POSITIVE, "Access Levels for {txt#bank}:", bank.getDisplayName());
+        i18n.sendTranslated(context, POSITIVE, "Access Levels for {account}:", bank);
 
         // TODO global access levels
         // Everyone can SEE(hidden) DEPOSIT(needInvite)

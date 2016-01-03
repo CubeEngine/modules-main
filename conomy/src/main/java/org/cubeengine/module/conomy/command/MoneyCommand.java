@@ -40,7 +40,6 @@ import org.spongepowered.api.service.economy.transaction.TransferResult;
 import org.spongepowered.api.service.pagination.PaginationBuilder;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -85,27 +84,16 @@ public class MoneyCommand extends ContainerCommand
 
     @Alias(value = {"balance", "moneybalance", "pmoney"})
     @Command(desc = "Shows your balance")
-    public void balance(CommandSource context,
-                        @Default User player,
-                        @ParameterPermission @Flag(longName = "showhidden", name = "f") boolean showHidden)
+    public void balance(CommandSource context, @Default BaseAccount.Unique account)
     // TODO message when no user found "If you are out of money, better go work than typing silly commands in the console."
     {
-        BaseAccount.Unique account = this.getUserAccount(player);
-        if (account == null ||  (account.isHidden()
-                                    && !showHidden
-                                    && !account.getIdentifier().equals(context.getIdentifier())))
-        {
-            i18n.sendTranslated(context, NEGATIVE, "No account found for {user}!", player);
-            return;
-        }
-
         Map<Currency, BigDecimal> balances = account.getBalances();
         if (balances.isEmpty())
         {
-            i18n.sendTranslated(context, NEGATIVE, "No Balance for {user} found!", player);
+            i18n.sendTranslated(context, NEGATIVE, "No Balance for {account} found!", account);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "{user}'s Balance:", player);
+        i18n.sendTranslated(context, POSITIVE, "{account}'s Balance:", account);
         for (Map.Entry<Currency, BigDecimal> entry : balances.entrySet())
         {
             context.sendMessage(Text.of(" - ", GOLD, entry.getKey().format(entry.getValue())));
@@ -114,9 +102,7 @@ public class MoneyCommand extends ContainerCommand
 
     @Alias(value = {"toplist", "balancetop", "topmoney"})
     @Command(desc = "Shows the players with the highest balance.")
-    public void top(CommandSource context,
-                    @Optional @Label("[fromRank-]toRank") String range,
-                    @ParameterPermission @Flag(longName = "showhidden", name = "f") boolean showHidden)
+    public void top(CommandSource context, @Optional @Label("[fromRank-]toRank") String range)
     {
         int fromRank = 1;
         int toRank = 10;
@@ -137,7 +123,8 @@ public class MoneyCommand extends ContainerCommand
                 return;
             }
         }
-        Collection<BalanceModel> models = this.service.getTopBalance(true, false, fromRank, toRank, showHidden);
+        Collection<BalanceModel> models = this.service.getTopBalance(true, false, fromRank, toRank,
+                context.hasPermission(module.perms().ACCESS_SEE.getId()));
         int i = fromRank;
 
 
@@ -167,7 +154,7 @@ public class MoneyCommand extends ContainerCommand
 
     @Alias(value = "pay")
     @Command(alias = "give", desc = "Transfer the given amount to another account.")
-    public void pay(CommandSource context, @Label("*|<players>") UserList users, Double amount, @Named("as") User player)
+    public void pay(CommandSource context, @Label("*|<players>") UserList users, Double amount, @Default @Named("as") BaseAccount.Unique source)
     {
         if (amount < 0)
         {
@@ -176,40 +163,23 @@ public class MoneyCommand extends ContainerCommand
         }
 
         boolean asSomeOneElse = false;
-        if (player != null)
+        if (!source.getIdentifier().equals(context.getIdentifier()))
         {
-            if (!context.hasPermission(module.perms().COMMAND_PAY_ASOTHER.getId()))
+            if (!context.hasPermission(module.perms().ACCESS_WITHDRAW.getId()))
             {
                 i18n.sendTranslated(context, NEGATIVE, "You are not allowed to pay money as someone else!");
                 return;
             }
             asSomeOneElse = true;
         }
-        else
-        {
-            if (!(context instanceof User))
-            {
-                i18n.sendTranslated(context, NEGATIVE, "Please specify a player to use their account.");
-                return;
-            }
-            player = (User)context;
-        }
-        BaseAccount.Unique source = getUserAccount(player);
-        if (source == null)
-        {
-            if (asSomeOneElse)
-            {
-                i18n.sendTranslated(context, NEGATIVE, "{user} does not have an account!", player);
-            }
-            else
-            {
-                i18n.sendTranslated(context, NEGATIVE, "You do not have an account!");
-            }
-            return;
-        }
 
         for (User user : users.list())
         {
+            if (user.equals(source))
+            {
+                i18n.sendTranslated(context, NEGATIVE, "Source and target are the same!", user);
+                continue;
+            }
             Account target = getUserAccount(user);
             if (target == null)
             {
@@ -224,7 +194,7 @@ public class MoneyCommand extends ContainerCommand
                 case SUCCESS:
                     if (asSomeOneElse)
                     {
-                        i18n.sendTranslated(context, POSITIVE, "{txt#amount} transferred from {user}'s to {user}'s account!", formatAmount, player, user);
+                        i18n.sendTranslated(context, POSITIVE, "{txt#amount} transferred from {account}'s to {user}'s account!", formatAmount, source, user);
                     }
                     else
                     {
@@ -232,13 +202,13 @@ public class MoneyCommand extends ContainerCommand
                     }
                     if (user.isOnline())
                     {
-                        i18n.sendTranslated(user.getPlayer().get(), POSITIVE, "{user} just paid you {txt#amount}!", player, formatAmount);
+                        i18n.sendTranslated(user.getPlayer().get(), POSITIVE, "{account} just paid you {txt#amount}!", source, formatAmount);
                     }
                     break;
                 case ACCOUNT_NO_FUNDS:
                     if (asSomeOneElse)
                     {
-                        i18n.sendTranslated(context, NEGATIVE, "{user} cannot afford {txt#amount}!", player.getName(), formatAmount);
+                        i18n.sendTranslated(context, NEGATIVE, "{account} cannot afford {txt#amount}!", source, formatAmount);
                     }
                     else
                     {
@@ -252,7 +222,7 @@ public class MoneyCommand extends ContainerCommand
         }
     }
 
-    private Cause causeOf(CommandSource context)
+    private static Cause causeOf(CommandSource context)
     {
         return Cause.of(NamedCause.source(context));
     }

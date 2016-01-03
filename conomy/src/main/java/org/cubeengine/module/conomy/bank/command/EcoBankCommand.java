@@ -59,12 +59,12 @@ public class EcoBankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Text formatAmount = result.getCurrency().format(result.getAmount());
-                i18n.sendTranslated(context, POSITIVE, "You gave {txt#amount} to the bank {txt#bank}!",
-                        formatAmount, bank.getDisplayName());
+                i18n.sendTranslated(context, POSITIVE, "You gave {txt#amount} to the bank {account}!",
+                        formatAmount, bank);
                 Sponge.getServer().getOnlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
-                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} granted {input#amount} to your bank {input#bank}!",
-                                onlineUser, bank.getDisplayName(), formatAmount));
+                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} granted {input#amount} to your bank {account}!",
+                                onlineUser, formatAmount, bank));
                 break;
             default:
                 i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
@@ -80,12 +80,12 @@ public class EcoBankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Text formatAmount = result.getCurrency().format(result.getAmount());
-                i18n.sendTranslated(context, POSITIVE, "You took {input#amount} from the bank {input#bank}!",
-                        formatAmount, bank.getDisplayName());
+                i18n.sendTranslated(context, POSITIVE, "You took {input#amount} from the bank {account}!",
+                        formatAmount, bank);
                 Sponge.getServer().getOnlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
-                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} charged your bank {input#bank} for {input#amount}!",
-                                onlineUser, bank.getDisplayName(), formatAmount));
+                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} charged your bank {account} for {input#amount}!",
+                                onlineUser, bank, formatAmount));
                 break;
             default:
                 i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
@@ -102,12 +102,12 @@ public class EcoBankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Text formatAmount = result.getCurrency().format(result.getAmount());
-                i18n.sendTranslated(context, POSITIVE, "The account of the bank {txt#bank} got reset to {txt#balance}!",
-                        bank.getDisplayName(), formatAmount);
+                i18n.sendTranslated(context, POSITIVE, "The account of the bank {account} got reset to {txt#balance}!",
+                        bank, formatAmount);
                 Sponge.getServer().getOnlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
-                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} reset the money of your bank {txt#bank} to {txt#balance}!",
-                                onlineUser, bank.getDisplayName(), formatAmount));
+                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} reset the money of your bank {account} to {txt#balance}!",
+                                onlineUser, bank, formatAmount));
                 break;
             default:
                 i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
@@ -124,12 +124,12 @@ public class EcoBankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Text formatAmount = result.getCurrency().format(result.getAmount());
-                i18n.sendTranslated(context, POSITIVE, "The money of bank account {txt#bank} got set to {txt#balance}!",
-                        bank.getDisplayName(), formatAmount);
+                i18n.sendTranslated(context, POSITIVE, "The money of bank account {account} got set to {txt#balance}!",
+                        bank, formatAmount);
                 Sponge.getServer().getOnlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
-                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} set the money of your bank {txt#bank} to {txt#balance}!",
-                                onlineUser, bank.getDisplayName(), formatAmount));
+                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} set the money of your bank {account} to {txt#balance}!",
+                                onlineUser, bank, formatAmount));
                 break;
             default:
                 i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
@@ -142,11 +142,11 @@ public class EcoBankCommand extends ContainerCommand
     {
         if (bank.isHidden())
         {
-            i18n.sendTranslated(context, POSITIVE, "The bank {txt#bank} is already hidden!", bank.getDisplayName());
+            i18n.sendTranslated(context, POSITIVE, "The bank {account} is already hidden!", bank);
             return;
         }
         bank.setHidden(true);
-        i18n.sendTranslated(context, POSITIVE, "The bank {txt#bank} is now hidden!", bank.getDisplayName());
+        i18n.sendTranslated(context, POSITIVE, "The bank {account} is now hidden!", bank);
     }
 
     @Command(desc = "Unhides the account of given banks")
@@ -154,14 +154,14 @@ public class EcoBankCommand extends ContainerCommand
     {
         if (!bank.isHidden())
         {
-            i18n.sendTranslated(context, POSITIVE, "The bank {txt#bank} was not hidden!", bank.getDisplayName());
+            i18n.sendTranslated(context, POSITIVE, "The bank {account} was not hidden!", bank);
             return;
         }
         bank.setHidden(false);
-        i18n.sendTranslated(context, POSITIVE, "The bank {txt#bank} is no longer hidden!", bank.getDisplayName());
+        i18n.sendTranslated(context, POSITIVE, "The bank {account} is no longer hidden!", bank);
     }
 
-    private Cause causeOf(CommandSource context)
+    private static Cause causeOf(CommandSource context)
     {
         return Cause.of(NamedCause.source(context));
     }

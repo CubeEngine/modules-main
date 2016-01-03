@@ -20,6 +20,7 @@ package org.cubeengine.module.conomy;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.conomy.command.EcoCommand;
 import org.cubeengine.module.conomy.command.MoneyCommand;
+import org.cubeengine.module.conomy.command.UniqueAccountReader;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.service.command.CommandManager;
@@ -238,6 +239,7 @@ public class ConomyService implements EconomyService
 
     public void registerCommands(CommandManager cm, I18n i18n)
     {
+        cm.getProviderManager().register(module, new UniqueAccountReader(module, this, i18n), BaseAccount.Unique.class);
         cm.addCommand(new MoneyCommand(module, this, i18n));
         cm.addCommand(new EcoCommand(module, this, i18n));
     }

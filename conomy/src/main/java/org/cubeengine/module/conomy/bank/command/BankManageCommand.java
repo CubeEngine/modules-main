@@ -60,51 +60,51 @@ public class BankManageCommand extends ContainerCommand
             case NONE:
                 if (context.equals(player))
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "Revoked all access to {txt}", bank.getDisplayName());
+                    i18n.sendTranslated(context, NEUTRAL, "Revoked all access to {account}", bank);
                 }
                 else
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "Revoked all access from {user} to {txt}", player, bank.getDisplayName());
+                    i18n.sendTranslated(context, NEUTRAL, "Revoked all access from {user} to {account}", player, bank);
                 }
                 break;
             case SEE:
                 if (context.equals(player))
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "Granted seeing {txt}", bank.getDisplayName());
+                    i18n.sendTranslated(context, NEUTRAL, "Granted seeing {account}", bank);
                 }
                 else
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "Granted seeing {txt} to {user}", bank.getDisplayName(), player);
+                    i18n.sendTranslated(context, NEUTRAL, "Granted seeing {account} to {user}", bank, player);
                 }
                 break;
             case DEPOSIT:
                 if (context.equals(player))
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "Granted deposit access to {txt}", bank.getDisplayName());
+                    i18n.sendTranslated(context, NEUTRAL, "Granted deposit access to {account}", bank);
                 }
                 else
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "Granted deposit access to {user} to {txt}", player, bank.getDisplayName());
+                    i18n.sendTranslated(context, NEUTRAL, "Granted deposit access to {user} to {account}", player, bank);
                 }
                 break;
             case WITHDRAW:
                 if (context.equals(player))
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "Granted withdraw access to {txt}", bank.getDisplayName());
+                    i18n.sendTranslated(context, NEUTRAL, "Granted withdraw access to {account}", bank);
                 }
                 else
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "Granted withdraw access to {user} to {txt}", player, bank.getDisplayName());
+                    i18n.sendTranslated(context, NEUTRAL, "Granted withdraw access to {user} to {account}", player, bank);
                 }
                 break;
             case MANAGE:
                 if (context.equals(player))
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "Granted full access to {txt}", bank.getDisplayName());
+                    i18n.sendTranslated(context, NEUTRAL, "Granted full access to {account}", bank);
                 }
                 else
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "Granted full  access from {user} to {txt}", player, bank.getDisplayName());
+                    i18n.sendTranslated(context, NEUTRAL, "Granted full  access from {user} to {account}", player, bank);
                 }
                 break;
         }
@@ -123,7 +123,7 @@ public class BankManageCommand extends ContainerCommand
         BaseAccount.Virtual bank = service.createVirtualAccount(name).map(BaseAccount.Virtual.class::cast).get();
         bank.setHidden(hidden);
         bank.setInvite(invite);
-        i18n.sendTranslated(context, POSITIVE, "Created new Bank {txt#bank}!", bank.getDisplayName());
+        i18n.sendTranslated(context, POSITIVE, "Created new Bank {account}!", bank);
         if (context instanceof User)
         {
             access(context, ((User) context), AccessLevel.MANAGE, bank);
@@ -147,7 +147,7 @@ public class BankManageCommand extends ContainerCommand
             return;
         }
         //bank.delete(); // TODO withdraw all money?
-        i18n.sendTranslated(context, POSITIVE, "You deleted the bank {txt#bank}!", bank.getDisplayName());
+        i18n.sendTranslated(context, POSITIVE, "You deleted the bank {account}!", bank);
     }
 
     @Command(desc = "Renames a bank")

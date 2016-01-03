@@ -29,6 +29,8 @@ public class ConomyPermission extends PermissionContainer<Conomy>
     }
 
     private final PermissionDescription ALLOWUNDERMIN = register("account.user.allow-under-min", "", null);
-    private final PermissionDescription COMMAND = register("command", "", null);
-    public final PermissionDescription COMMAND_PAY_ASOTHER = register("money.pay.as-other", "Allows transfering money from anothers players account", COMMAND);
+
+    private final PermissionDescription ACCESS = register("access.other.player", "Grants full access to all player accounts", null);
+    public final PermissionDescription ACCESS_WITHDRAW = register("withdraw", "Allows transfering money from anothers players account", ACCESS);
+    public final PermissionDescription ACCESS_SEE = register("seehidden", "Allows seeing hidden player accounts", ACCESS, ACCESS_WITHDRAW);
 }
