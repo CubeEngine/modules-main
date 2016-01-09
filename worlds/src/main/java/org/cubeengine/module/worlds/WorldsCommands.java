@@ -76,7 +76,7 @@ public class WorldsCommands extends ContainerCommand
                        @Default @Named({"dimension", "dim"}) DimensionType dimension,
                        @Named("seed") String seed,
                        @Default @Named({"generatortype", "generator", "type"}) GeneratorType type,
-                       @Named({"structure", "struct"}) Boolean generateStructures,
+                       @Default @Named({"structure", "struct"}) boolean generateStructures,
                        @Default @Named({"gamemode", "mode"}) GameMode gamemode,
                        @Default @Named({"difficulty", "diff"}) Difficulty difficulty,
                        @Flag boolean recreate,
@@ -126,7 +126,7 @@ public class WorldsCommands extends ContainerCommand
 
         builder.generator(type);
         builder.dimension(dimension);
-        builder.usesMapFeatures(generateStructures != null && generateStructures);
+        builder.usesMapFeatures(generateStructures);
         builder.gameMode(gamemode);
         Optional<WorldProperties> properties = game.getServer().createWorldProperties(builder.build());
         if (properties.isPresent())
@@ -218,7 +218,7 @@ public class WorldsCommands extends ContainerCommand
         i18n.sendTranslated(context, NEGATIVE, "Could not unload {world}", world);
     }
 
-    @Command(desc = "Remove a world")
+    @Command(desc = "Remove a world", alias = "delete")
     public void remove(CommandSource context, String world, @Flag @ParameterPermission(value = "remove-worldfolder", desc = "Allows deleting the world folder") boolean folder)
     {
         Optional<World> w = server.getWorld(world);
