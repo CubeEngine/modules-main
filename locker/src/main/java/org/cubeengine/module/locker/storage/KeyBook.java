@@ -86,17 +86,6 @@ public class KeyBook
             {
                 return new KeyBook(item.get(), lockerData.get(), currentHolder, module, i18n);
             }
-            else
-            {
-                // TODO remove once the above works
-                for (DataManipulator<?, ?> data : item.get().getContainers())
-                {
-                    if (data instanceof LockerData)
-                    {
-                        return new KeyBook(item.get(), ((LockerData) data), currentHolder, module, i18n);
-                    }
-                }
-            }
         }
         return null;
     }

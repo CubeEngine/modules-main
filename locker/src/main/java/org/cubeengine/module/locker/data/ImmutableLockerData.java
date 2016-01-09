@@ -31,6 +31,7 @@ import java.util.*;
 import static org.cubeengine.module.locker.data.LockerData.LOCK_ID;
 import static org.cubeengine.module.locker.data.LockerData.LOCK_PASS;
 
+// TODO extend AbstractImmutableData
 public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLockerData, LockerData>
 {
     private final long lockID;
