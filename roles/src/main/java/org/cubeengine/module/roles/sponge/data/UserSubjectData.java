@@ -97,14 +97,6 @@ public class UserSubjectData extends CachingSubjectData
         {
             return permData;
         }
-        // TODO remove once the above works
-        for (DataManipulator<?, ?> data : player.getContainers())
-        {
-            if (data instanceof PermissionData)
-            {
-                return Optional.of((PermissionData) data);
-            }
-        }
         return Optional.empty();
     }
 
