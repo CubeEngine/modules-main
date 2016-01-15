@@ -40,9 +40,11 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.TextMessageException;
@@ -191,7 +193,8 @@ public class Lock
         player.setItemInHand(item);
         if (itemStack != null && itemStack.getQuantity() != 0)
         {
-            player.getInventory().offer(itemStack); // TODO check response
+            InventoryTransactionResult result = player.getInventory().offer(itemStack);// TODO check response
+            System.out.println(result.getType());
             if (itemStack.getQuantity() != 0)
             {
                 Location<World> loc = player.getLocation();
@@ -833,9 +836,7 @@ public class Lock
             else
             {
                 i18n.sendTranslated(user, NEUTRAL, "Sudden pain makes you realize this was not the right passphrase!");
-                // TODO deal 0 damage is this working?
-                user.playSound(SoundTypes.HURT_FLESH, user.getLocation().getPosition(), 1);
-                user.offer(Keys.INVULNERABILITY_TICKS, 1);
+                user.damage(1, DamageSources.MAGIC, Cause.of(user));
             }
         }
         else

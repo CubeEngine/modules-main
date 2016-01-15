@@ -31,6 +31,8 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -111,8 +113,7 @@ public class KeyBook
 
             final Vector3d userDirection = holder.getRotation();
 
-            // TODO damaging player working? /w effects see Lock for effects playing manually
-            holder.offer(Keys.HEALTH, holder.getHealthData().health().get() - 1);
+            holder.damage(0, DamageSources.MAGIC, Cause.of(item));
             VelocityData velocity = holder.getOrCreate(VelocityData.class).get();
             velocity.velocity().set(userDirection.mul(-3));
             holder.offer(velocity);
