@@ -28,6 +28,7 @@ import org.cubeengine.service.command.annotation.ParameterPermission;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
@@ -196,16 +197,14 @@ public class WorldsCommands extends ContainerCommand
         World evacuation = server.getWorld(defWorld.get().getWorldName()).get();
         if (evacuation == world)
         {
-            world.getEntities(entity -> entity instanceof Player).stream().map(Player.class::cast).forEach(p -> {
-                // TODO translation object before?
-                Text reason = i18n.getTranslation(p, NEGATIVE, "Main world unloading. Flee!");
-
-                p.kick(reason);
-            });
+            world.getEntities(entity -> entity instanceof Player).stream()
+                    .map(Player.class::cast)
+                    .forEach(p -> p.kick(i18n.getTranslation(p, NEGATIVE, "Main world unloading. Flee!")));
         }
         else
         {
-            world.getEntities(entity -> entity instanceof Player).stream().map(Player.class::cast)
+            world.getEntities(entity -> entity instanceof Player).stream()
+                    .map(Player.class::cast)
                     .forEach(p -> p.setLocationSafely(evacuation.getSpawnLocation()));
         }
 
@@ -248,8 +247,6 @@ public class WorldsCommands extends ContainerCommand
             worldProperties.get().setEnabled(false);
             i18n.sendTranslated(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
         }
-        // TODO remove configs for the world
-        // TODO remove configs
     }
 
     @Command(desc = "Lists all worlds")
@@ -281,8 +278,8 @@ public class WorldsCommands extends ContainerCommand
             }
         }
     }
-    // list / list worlds that you can enter
 
+    // list / list worlds that you can enter
     @Command(desc = "Show info about a world")
     public void info(CommandSource context, String world)
     {

@@ -14,8 +14,8 @@ import org.cubeengine.module.multiverse.converter.PotionEffectConverter;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.potion.PotionEffect;
 
 import javax.inject.Inject;
 import java.io.IOException;

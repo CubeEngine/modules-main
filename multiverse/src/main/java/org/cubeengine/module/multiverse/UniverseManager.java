@@ -17,66 +17,17 @@
  */
 package org.cubeengine.module.multiverse;
 
+import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.service.world.ConfigWorld;
+import org.spongepowered.api.Game;
+import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Map.Entry;
-
-import com.flowpowered.math.vector.Vector3d;
-import de.cubeisland.engine.converter.ConverterManager;
-import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.reflect.codec.nbt.NBTCodec;
-import org.cubeengine.module.core.sponge.EventManager;
-import org.cubeengine.module.multiverse.converter.InventoryConverter;
-import org.cubeengine.module.multiverse.converter.PotionEffectConverter;
-import org.cubeengine.module.worlds.Worlds;
-import org.cubeengine.module.multiverse.player.PlayerDataConfig;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.User;
-import org.cubeengine.module.core.util.WorldLocation;
-import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldManager;
-import org.cubeengine.service.world.WorldSetSpawnEvent;
-import org.cubeengine.module.worlds.WorldConfig;
-import org.cubeengine.module.worlds.config.WorldsConfig;
-import org.cubeengine.module.multiverse.player.PlayerConfig;
-import de.cubeisland.engine.reflect.Reflector;
-
-import static org.cubeengine.service.filesystem.FileExtensionFilter.YAML;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.spongepowered.api.world.DimensionTypes.END;
-import static org.spongepowered.api.world.DimensionTypes.NETHER;
-import static org.spongepowered.api.world.DimensionTypes.OVERWORLD;
-
-import org.spongepowered.api.Game;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.entity.RespawnLocationData;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.EntityEnterPortalEvent;
-import org.spongepowered.api.event.entity.EntityExitPortalEvent;
-import org.spongepowered.api.event.entity.EntityTeleportEvent;
-import org.spongepowered.api.event.entity.player.PlayerChangeWorldEvent;
-import org.spongepowered.api.event.entity.player.PlayerDeathEvent;
-import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
-import org.spongepowered.api.event.entity.player.PlayerLeaveBedEvent;
-import org.spongepowered.api.event.entity.player.PlayerQuitEvent;
-import org.spongepowered.api.event.entity.player.PlayerRespawnEvent;
-import org.spongepowered.api.event.world.WorldLoadEvent;
-import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.potion.PotionEffect;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.world.DimensionType;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.storage.WorldProperties;
 
 /**
  * Holds multiple parallel universes

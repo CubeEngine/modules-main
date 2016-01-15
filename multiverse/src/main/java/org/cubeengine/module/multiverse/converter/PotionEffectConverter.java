@@ -17,19 +17,14 @@
  */
 package org.cubeengine.module.multiverse.converter;
 
-import java.util.HashMap;
-import java.util.Map;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.ConverterManager;
-import de.cubeisland.engine.converter.converter.SingleClassConverter;
-import de.cubeisland.engine.converter.node.ByteNode;
-import de.cubeisland.engine.converter.node.IntNode;
-import de.cubeisland.engine.converter.node.MapNode;
-import de.cubeisland.engine.converter.node.Node;
-import de.cubeisland.engine.converter.node.NullNode;
-import de.cubeisland.engine.converter.node.StringNode;
-import org.spongepowered.api.potion.PotionEffect;
-import org.spongepowered.api.potion.PotionEffectType;
+import de.cubeisland.engine.converter.node.*;
+import org.spongepowered.api.effect.potion.PotionEffect;
+import org.spongepowered.api.effect.potion.PotionEffectType;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class PotionEffectConverter extends SingleClassConverter<PotionEffect>
 {
