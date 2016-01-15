@@ -37,6 +37,8 @@ import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
@@ -72,7 +74,7 @@ public class RoleInformationCommands extends ContainerCommand
         cContext.sendTranslated(POSITIVE, "The following roles are available:");
         for (Subject r : roles)
         {
-            cContext.sendMessage(String.format(RoleCommands.LISTELEM, r instanceof RoleSubject ? ((RoleSubject)r).getName() : r.getIdentifier()));
+            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, r instanceof RoleSubject ? ((RoleSubject) r).getName() : r.getIdentifier()));
         }
     }
 
@@ -132,10 +134,12 @@ public class RoleInformationCommands extends ContainerCommand
         {
             if (perm.getValue())
             {
-                cContext.sendMessage(String.format(RoleCommands.LISTELEM_VALUE, perm.getKey(), trueString));
+                cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, perm.getKey(),
+                        TextColors.WHITE, ": ", TextColors.GOLD, trueString));
                 continue;
             }
-            cContext.sendMessage(String.format(RoleCommands.LISTELEM_VALUE, perm.getKey(), falseString));
+            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, perm.getKey(),
+                    TextColors.WHITE, ": ", TextColors.GOLD, falseString));
         }
     }
 
@@ -160,9 +164,10 @@ public class RoleInformationCommands extends ContainerCommand
         {
             cContext.sendTranslated(POSITIVE, "(Including inherited metadata)");
         }
-        for (Entry<String, String> data : options.entrySet())
+        for (Entry<String, String> entry : options.entrySet())
         {
-            cContext.sendMessage(String.format(RoleCommands.LISTELEM_VALUE, data.getKey(), data.getValue()));
+            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, entry.getKey(),
+                    TextColors.WHITE, ": ", TextColors.GOLD, entry.getValue()));
         }
     }
 
@@ -180,7 +185,7 @@ public class RoleInformationCommands extends ContainerCommand
         ctx.sendTranslated(NEUTRAL, "The role {role} in {context} has following parent roles:", role, context);
         for (Subject parent : parents)
         {
-            ctx.sendMessage(String.format(RoleCommands.LISTELEM, parent instanceof RoleSubject ? ((RoleSubject) parent).getName() : parent.getIdentifier()));
+            ctx.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, parent instanceof RoleSubject ? ((RoleSubject) parent).getName() : parent.getIdentifier()));
         }
     }
 
@@ -203,7 +208,7 @@ public class RoleInformationCommands extends ContainerCommand
         cContext.sendTranslated(POSITIVE, "The following roles are default roles in {context}!", context);
         for (Subject role : parents)
         {
-            cContext.sendMessage(String.format(RoleCommands.LISTELEM, role instanceof RoleSubject ? ((RoleSubject)role).getName() : role.getIdentifier()));
+            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, role instanceof RoleSubject ? ((RoleSubject) role).getName() : role.getIdentifier()));
         }
     }
 }

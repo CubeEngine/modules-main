@@ -43,6 +43,7 @@ public class PermissionData extends AbstractData<PermissionData, ImmutablePermis
         this.parents = parents;
         this.permissions = permissions;
         this.options = options;
+        registerGettersAndSetters();
     }
 
     @Override

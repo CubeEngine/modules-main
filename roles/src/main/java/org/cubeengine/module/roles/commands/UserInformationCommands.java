@@ -37,6 +37,8 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
@@ -60,9 +62,10 @@ public class UserInformationCommands extends ContainerCommand
 
         cContext.sendTranslated(NEUTRAL, "Roles of {user} in {context}:", player, context);
         parents.stream().filter(parent -> parent instanceof RoleSubject)
-               .forEach(parent -> cContext.sendMessage(
-                   String.format(RoleCommands.LISTELEM_VALUE, context.getName().isEmpty() ? context.getType() : context.getName(), ((RoleSubject)parent).getName())));
+               .forEach(parent -> cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, context.getName().isEmpty() ? context.getType() : context.getName(),
+                               TextColors.WHITE, ": ", TextColors.GOLD, ((RoleSubject)parent).getName())));
     }
+
 
     @Alias(value = "checkuperm")
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in context]")
@@ -116,7 +119,8 @@ public class UserInformationCommands extends ContainerCommand
         cContext.sendTranslated(NEUTRAL, "Permissions of {user} in {context}:", player, context);
         for (Map.Entry<String, Boolean> entry : permissions.entrySet())
         {
-            cContext.sendMessage(String.format(RoleCommands.LISTELEM_VALUE, entry.getKey(), entry.getValue()));
+            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, entry.getKey(),
+                    TextColors.WHITE, ": ", TextColors.GOLD, entry.getValue()));
         }
     }
 
@@ -150,7 +154,8 @@ public class UserInformationCommands extends ContainerCommand
         cContext.sendTranslated(NEUTRAL, "Metadata of {user} in {context}:", player, context);
         for (Map.Entry<String, String> entry : options.entrySet())
         {
-            cContext.sendMessage(String.format(RoleCommands.LISTELEM_VALUE, entry.getKey(), entry.getValue()));
+            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, entry.getKey(),
+                    TextColors.WHITE, ": ", TextColors.GOLD, entry.getValue()));
         }
     }
 }

@@ -32,9 +32,6 @@ import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEX
 @Command(name = "roles", desc = "Manages the roles")
 public class RoleCommands extends ContainerCommand
 {
-    protected final static String LISTELEM = "- " + YELLOW + "%s";
-    protected final static String LISTELEM_VALUE = "- " + YELLOW + "%s" + WHITE + ": " + GOLD + "%s";
-
     public RoleCommands(Roles module)
     {
         super(module);

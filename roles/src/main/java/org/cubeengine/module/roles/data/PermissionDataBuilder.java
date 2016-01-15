@@ -57,7 +57,7 @@ public class PermissionDataBuilder implements DataManipulatorBuilder<PermissionD
 
         if (parents.isPresent() || permissions.isPresent() || options.isPresent())
         {
-            return Optional.of(new PermissionData(parents.orElse(null), permissions.orElse(null), options.orElse(null)));
+            return Optional.of(new PermissionData(parents.orElse(new ArrayList<>()), permissions.orElse(new HashMap<>()), options.orElse(new HashMap<>())));
         }
         return Optional.empty();
     }

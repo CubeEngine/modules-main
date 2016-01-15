@@ -36,9 +36,10 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
-import static org.cubeengine.module.roles.commands.RoleCommands.LISTELEM;
 import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
@@ -124,7 +125,7 @@ public class UserManagementCommands extends ContainerCommand
             for (Subject subject : defaultData.getParents(contexts))
             {
                 player.getTransientSubjectData().addParent(contexts, subject);
-                cContext.sendMessage(String.format(LISTELEM, subject instanceof RoleSubject ? ((RoleSubject)subject).getName() : subject.getIdentifier()));
+                cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, subject instanceof RoleSubject ? ((RoleSubject) subject).getName() : subject.getIdentifier()));
             }
         }
     }
