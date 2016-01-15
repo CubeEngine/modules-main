@@ -20,25 +20,28 @@ package org.cubeengine.module.teleport;
 import org.cubeengine.module.core.util.LocationUtil;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserManager;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Predicate;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
@@ -84,54 +87,72 @@ public class TeleportListener
     }
 
     @Listener
-    public void onClick(InteractBlockEvent event, @First Player player)
+    // TODO @Include(value = {InteractBlockEvent.Primary.class, InteractEntityEvent.Primary.class})
+    public void onPrimary(InteractEvent event, @First Player player)
     {
-        if (player.getItemInHand().map(ItemStack::getItem).orElse(null) != COMPASS)
+        if (!(event instanceof InteractBlockEvent.Primary))
+        {
+            // TODO remove when include works as intended
+            return;
+        }
+        if (player.getItemInHand().map(ItemStack::getItem).orElse(null) != COMPASS
+                || !player.hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
         {
             return;
         }
+
+        Iterator<BlockRayHit<World>> it = BlockRay.from(player).iterator();
+        Optional<BlockRayHit<World>> end = Optional.empty();
+        while (it.hasNext())
+        {
+            BlockRayHit<World> hit = it.next();
+            BlockType blockType = hit.getExtent().getBlockType(hit.getBlockX(), hit.getBlockY(), hit.getBlockZ());
+            if (blockType.getProperty(MatterProperty.class).map(AbstractProperty::getValue).orElse(null) == SOLID)
+            {
+                end = Optional.of(hit);
+                break;
+            }
+        }
+        if (!end.isPresent())
+        {
+            return;
+        }
+        Location<World> loc = end.get().getLocation();
+        while (loc.getBlockType().getProperty(MatterProperty.class).map(AbstractProperty::getValue).orElse(null) == SOLID)
+        {
+            loc = loc.add(0, 1, 0);
+        }
+        loc = loc.add(0.5, 0.5, 0.5); // middle of block + a bit higher for fences
+        player.setLocation(loc);
+        i18n.sendTranslated(player, NEUTRAL, "Poof!");
         event.setCancelled(true);
-        if (event instanceof InteractBlockEvent.Primary)
+    }
+
+    @Listener
+    // TODO @Include(value = {InteractBlockEvent.Secondary.class, InteractEntityEvent.Secondary.class})
+    public void onSecondary(InteractEvent event, @First Player player)
+    {
+        if (!(event instanceof InteractBlockEvent.Secondary))
         {
-            if (player.hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
-            {
-                Location<World> loc;
-                if (event.getTargetBlock().getState().getType().getProperty(MatterProperty.class).map(AbstractProperty::getValue).orElse(null) == SOLID)
-                {
-                    loc = event.getTargetBlock().getLocation().get().add(0.5, 1, 0.5);
-                }
-                else
-                {
-                    Optional<BlockRayHit<World>> end = BlockRay.from(player).end();
-                    if (!end.isPresent())
-                    {
-                        return;
-                    }
-                    loc = end.get().getLocation().add(0.5, 1, 0.5);
-                }
-                player.setLocation(loc);
-                i18n.sendTranslated(player, NEUTRAL, "Poof!");
-                event.setCancelled(true);
-            }
+            // TODO remove when include works as intended
+            return;
         }
-        else if (event instanceof InteractBlockEvent.Secondary)
+        if (player.getItemInHand().map(ItemStack::getItem).orElse(null) != COMPASS
+                || !player.hasPermission(module.perms().COMPASS_JUMPTO_RIGHT.getId()))
         {
-            if (player.hasPermission(module.perms().COMPASS_JUMPTO_RIGHT.getId()))
-            {
-                Location<World> loc = LocationUtil.getBlockBehindWall(player, this.module.getConfig().navigation.thru.maxRange,
-                                                               this.module.getConfig().navigation.thru.maxWallThickness);
-                if (loc == null)
-                {
-                    i18n.sendTranslated(player, NEGATIVE, "Nothing to pass through!");
-                    return;
-                }
-                loc = loc.add(0, 1, 0);
-                player.setLocation(loc);
-                i18n.sendTranslated(player, NEUTRAL, "You passed through a wall");
-                event.setCancelled(true);
-            }
+            return;
         }
-        // TODO left click air is not handled OR is it?
+
+        Optional<Location<World>> end = LocationUtil.getBlockBehindWall(player, module.getConfig().navigation.thru.maxRange, module.getConfig().navigation.thru.maxWallThickness);
+        if (!end.isPresent())
+        {
+            i18n.sendTranslated(player, NEGATIVE, "Nothing to pass through!");
+            return;
+        }
+
+        player.setLocation(end.get().add(0.5, 0, 0.5));
+        i18n.sendTranslated(player, NEUTRAL, "You passed through a wall");
+        event.setCancelled(true);
     }
 
     public Transform<World> getDeathLocation(Player player)

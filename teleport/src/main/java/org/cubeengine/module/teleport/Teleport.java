@@ -70,8 +70,6 @@ public class Teleport extends Module
         cm.addCommands(cm, this, new SpawnCommands(this, em, game, bc, tl, i18n));
         cm.addCommands(cm, this, new TeleportCommands(this, game, bc, tl, i18n));
         cm.addCommands(cm, this, new TeleportRequestCommands(this, tm, um, tl, game, i18n));
-
-        // TODO load after roles, if OptionSubjects available => per role spawn?
     }
 
     @Disable

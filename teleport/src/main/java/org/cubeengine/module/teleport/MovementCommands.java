@@ -181,14 +181,14 @@ public class MovementCommands
     @Restricted(value = Player.class, msg = "Passing through firewalls in the console is not allowed! Go play outside!")
     public void through(Player context)
     {
-        Location<World> loc = LocationUtil.getBlockBehindWall(context, this.module.getConfig().navigation.thru.maxRange,
+        Optional<Location<World>> loc = LocationUtil.getBlockBehindWall(context, this.module.getConfig().navigation.thru.maxRange,
                                                                this.module.getConfig().navigation.thru.maxWallThickness);
-        if (loc == null)
+        if (!loc.isPresent())
         {
             i18n.sendTranslated(context, NEGATIVE, "Nothing to pass through!");
             return;
         }
-        context.setLocation(loc);
+        context.setLocation(loc.get());
         i18n.sendTranslated(context, POSITIVE, "You just passed the wall!");
     }
 

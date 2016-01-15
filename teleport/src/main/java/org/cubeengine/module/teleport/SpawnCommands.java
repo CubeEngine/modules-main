@@ -103,6 +103,8 @@ public class SpawnCommands
     @Command(desc = "Teleports a player to spawn")
     public void spawn(CommandSource context, @Default Player player, @Optional World world, @Flag boolean force)
     {
+        // TODO if OptionSubjects available => per role spawn?
+
         world = world == null ? module.getConfig().getMainWorld() : world;
         if (world == null)
         {
