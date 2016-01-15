@@ -154,7 +154,7 @@ public class LockerCommands extends ContainerCommand
     @Alias(value = "cmodify")
     @Command(desc = "adds or removes player from the accesslist")
     @Restricted(value = Player.class, msg = "This command can only be used in game")
-    public void modify(Player context, @Type(PlayerAccess.class) List<PlayerAccess> players, @Flag boolean global, @Flag boolean persist)
+    public void modify(Player context, List<PlayerAccess> players, @Flag boolean global, @Flag boolean persist)
     {
         if (persist)
         {
