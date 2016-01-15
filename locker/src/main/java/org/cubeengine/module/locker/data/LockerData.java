@@ -48,6 +48,7 @@ public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
         this.lockID = lockID;
         this.pass = pass;
         this.valueFactory = valueFactory;
+        registerGettersAndSetters();
     }
 
     @Override
