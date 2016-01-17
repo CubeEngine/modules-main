@@ -40,17 +40,15 @@ import org.cubeengine.module.locker.storage.TableAccessList;
 import org.cubeengine.module.locker.storage.TableLockLocations;
 import org.cubeengine.module.locker.storage.TableLocks;
 import org.cubeengine.service.filesystem.FileManager;
-import org.cubeengine.module.core.sponge.EventManager;
-import org.cubeengine.module.core.util.matcher.EntityMatcher;
-import org.cubeengine.module.core.util.matcher.MaterialMatcher;
-import org.cubeengine.module.core.util.matcher.StringMatcher;
+import org.cubeengine.service.event.EventManager;
+import org.cubeengine.service.matcher.EntityMatcher;
+import org.cubeengine.service.matcher.MaterialMatcher;
+import org.cubeengine.service.matcher.StringMatcher;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.task.TaskManager;
-import org.cubeengine.service.user.UserManager;
 import de.cubeisland.engine.reflect.Reflector;
-import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
 
 // TODO protect lines of redstone
@@ -73,14 +71,12 @@ public class Locker extends Module
     @Inject private Database db;
     @Inject private CommandManager cm;
     @Inject private EventManager em;
-    @Inject private UserManager um;
     @Inject private MaterialMatcher mm;
     @Inject private Log logger;
     @Inject private StringMatcher sm;
     @Inject private EntityMatcher entityMatcher;
     @Inject private Game game;
     @Inject private TaskManager tm;
-    @Inject private WorldManager wm;
     @Inject private I18n i18n;
 
     @Inject
@@ -102,7 +98,7 @@ public class Locker extends Module
         db.registerTable(TableLocks.class);
         db.registerTable(TableLockLocations.class);
         db.registerTable(TableAccessList.class);
-        manager = new LockManager(this, em, sm, db, wm, um, tm, i18n, game);
+        manager = new LockManager(this, em, sm, db, tm, i18n, game);
         LockerCommands lockerCmd = new LockerCommands(this, manager, i18n, sm);
         cm.addCommand(lockerCmd);
         lockerCmd.addCommand(new LockerCreateCommands(this, manager, i18n));
@@ -148,11 +144,6 @@ public class Locker extends Module
     public Game getGame()
     {
         return game;
-    }
-
-    public UserManager getUserManager()
-    {
-        return um;
     }
 
     public TaskManager getTaskManager()

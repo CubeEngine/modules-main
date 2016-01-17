@@ -18,18 +18,17 @@
 package org.cubeengine.module.travel;
 
 import java.util.Set;
-import com.flowpowered.math.vector.Vector3d;
+import java.util.UUID;
 import org.cubeengine.module.travel.storage.TeleportPointModel;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
-import org.cubeengine.service.user.CachedUser;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
@@ -37,21 +36,17 @@ import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_P
 public abstract class TeleportPoint
 {
     protected final TeleportPointModel model;
-    private WorldManager wm;
-    private UserManager um;
     protected final Travel module;
     protected final InviteManager iManager;
 
     protected PermissionDescription permission;
-    protected Set<UInteger> invited;
+    protected Set<UUID> invited;
 
     protected String ownerName = null;
 
-    public TeleportPoint(TeleportPointModel model, Travel module, WorldManager wm, UserManager um)
+    public TeleportPoint(TeleportPointModel model, Travel module)
     {
         this.model = model;
-        this.wm = wm;
-        this.um = um;
         this.iManager = module.getInviteManager();
         this.module = module;
     }
@@ -63,7 +58,7 @@ public abstract class TeleportPoint
 
     public Transform<World> getTransform()
     {
-        Transform<World> location = model.getLocation(wm);
+        Transform<World> location = model.getLocation();
         if (location.getExtent() == null)
         {
             module.getLog().warn("Tried to get location from TeleportPoint in deleted world!");
@@ -74,26 +69,24 @@ public abstract class TeleportPoint
 
     public void setLocation(Transform<World> transform)
     {
-        model.setTransform(transform, wm);
+        model.setTransform(transform);
     }
 
-    public CachedUser getOwner()
+    public User getOwner()
     {
-        return um.getById(model.getValue(TABLE_TP_POINT.OWNER)).get();
+        return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(model.getValue(TABLE_TP_POINT.OWNER)).get();
     }
 
     public void setOwner(Player owner)
     {
-
-        this.model.setValue(TABLE_TP_POINT.OWNER, um.getByUUID(owner.getUniqueId()).getEntity().getId());
+        this.model.setValue(TABLE_TP_POINT.OWNER, owner.getUniqueId());
     }
 
     public boolean isOwnedBy(CommandSource user)
     {
         if (user instanceof Player)
         {
-            return model.getValue(TABLE_TP_POINT.OWNER).equals(um.getByUUID(
-                ((Player)user).getUniqueId()).getEntity().getId());
+            return model.getValue(TABLE_TP_POINT.OWNER).equals(((Player)user).getUniqueId());
         }
         return false;
     }
@@ -104,9 +97,8 @@ public abstract class TeleportPoint
         {
             this.invited = iManager.getInvited(model);
         }
-        UInteger id = um.getByUUID(user.getUniqueId()).getEntity().getId();
-        this.invited.add(id);
-        iManager.invite(this.getModel(), id);
+        this.invited.add(user.getUniqueId());
+        iManager.invite(this.getModel(), user.getUniqueId());
     }
 
     public void unInvite(Player user)
@@ -115,13 +107,13 @@ public abstract class TeleportPoint
         {
             this.invited = iManager.getInvited(model);
         }
-        this.invited.remove(um.getByUUID(user.getUniqueId()).getEntity().getId());
+        this.invited.remove(user.getUniqueId());
         iManager.updateInvited(this.model, this.invited);
     }
 
     public boolean isInvited(Player user)
     {
-        return this.getInvited().contains(um.getByUUID(user.getUniqueId()).getEntity().getId()) || this.isPublic();
+        return this.getInvited().contains(user.getUniqueId()) || this.isPublic();
     }
 
     public void setVisibility(Visibility visibility)
@@ -134,7 +126,7 @@ public abstract class TeleportPoint
         return Visibility.valueOf(model.getValue(TABLE_TP_POINT.VISIBILITY));
     }
 
-    public Set<UInteger> getInvited()
+    public Set<UUID> getInvited()
     {
         if (this.invited == null)
         {
@@ -152,7 +144,7 @@ public abstract class TeleportPoint
     {
         if (this.ownerName == null)
         {
-            this.ownerName = um.getUserName(model.getValue(TABLE_TP_POINT.OWNER));
+            this.ownerName = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(model.getValue(TABLE_TP_POINT.OWNER)).get().getName();
         }
         return this.ownerName;
     }

@@ -43,12 +43,12 @@ import org.cubeengine.service.Selector;
 import org.cubeengine.service.confirm.ConfirmResult;
 import org.cubeengine.module.core.util.math.Cuboid;
 import org.cubeengine.module.core.util.math.shape.Shape;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.command.CommandSource;
@@ -67,17 +67,13 @@ public class HomeCommand extends TpPointCommand
     private final Travel module;
     private Maybe<Selector> selector;
     private I18n i18n;
-    private UserManager um;
-    private WorldManager wm;
 
-    public HomeCommand(Travel module, Maybe<Selector> selector, I18n i18n, UserManager um, WorldManager wm)
+    public HomeCommand(Travel module, Maybe<Selector> selector, I18n i18n)
     {
         super(module, i18n);
         this.module = module;
         this.selector = selector;
         this.i18n = i18n;
-        this.um = um;
-        this.wm = wm;
         this.manager = module.getHomeManager();
     }
 
@@ -372,8 +368,8 @@ public class HomeCommand extends TpPointCommand
                 sender.sendMessage(Text.of(TextColors.GOLD, "  ", home.getName(), ":"));
                 for (TeleportInvite invite : invites)
                 {
-                    sender.sendMessage(Text.of("    ", TextColors.DARK_GREEN, um.getById(invite.getValue(
-                            TABLE_INVITE.USERKEY)).get().getUser().getName()));
+                    String name = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(invite.getValue(TABLE_INVITE.USERKEY)).get().getName();
+                    sender.sendMessage(Text.of("    ", TextColors.DARK_GREEN, name));
                 }
             }
         }

@@ -22,7 +22,7 @@ import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.*;
-import org.cubeengine.module.core.util.matcher.StringMatcher;
+import org.cubeengine.service.matcher.StringMatcher;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.KeyBook;

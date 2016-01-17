@@ -1,24 +1,16 @@
 package org.cubeengine.module.multiverse;
 
-import de.cubeisland.engine.modularity.core.Module;
+import java.util.Iterator;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.module.worldcontrol.WorldConfig;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
-import java.io.IOException;
-import java.util.Iterator;
-
-import static org.cubeengine.service.filesystem.FileExtensionFilter.PO;
-import static org.cubeengine.service.filesystem.FileExtensionFilter.YAML;
-import static org.cubeengine.service.i18n.formatter.MessageType.CRITICAL;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 

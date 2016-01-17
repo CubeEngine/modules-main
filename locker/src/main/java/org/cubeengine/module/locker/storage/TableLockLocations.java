@@ -17,13 +17,14 @@
  */
 package org.cubeengine.module.locker.storage;
 
+import java.util.UUID;
 import org.cubeengine.service.database.AutoIncrementTable;
 import org.cubeengine.module.core.util.Version;
 import org.cubeengine.service.database.Database;
 import org.jooq.TableField;
+import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
-import static org.cubeengine.service.world.TableWorld.TABLE_WORLD;
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static org.jooq.impl.SQLDataType.INTEGER;
 
@@ -31,7 +32,7 @@ public class TableLockLocations extends AutoIncrementTable<LockLocationModel, UI
 {
     public static TableLockLocations TABLE_LOCK_LOCATION;
     public final TableField<LockLocationModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
-    public final TableField<LockLocationModel, UInteger> WORLD_ID = createField("world_id", U_INTEGER.nullable(false),this);
+    public final TableField<LockLocationModel, UUID> WORLD_ID = createField("world_id", SQLDataType.UUID.length(36).nullable(false), this);
     public final TableField<LockLocationModel, Integer> X = createField("x", INTEGER.nullable(false), this);
     public final TableField<LockLocationModel, Integer> Y = createField("y", INTEGER.nullable(false), this);
     public final TableField<LockLocationModel, Integer> Z = createField("z", INTEGER.nullable(false), this);
@@ -45,7 +46,6 @@ public class TableLockLocations extends AutoIncrementTable<LockLocationModel, UI
         this.setAIKey(ID);
         this.addIndex(CHUNKX, CHUNKZ);
         this.addUniqueKey(WORLD_ID, X, Y, Z);
-        this.addForeignKey(TABLE_WORLD.getPrimaryKey(), WORLD_ID);
         this.addForeignKey(TABLE_LOCK.getPrimaryKey(), LOCK_ID);
         this.addFields(ID, WORLD_ID, X, Y, Z, CHUNKX, CHUNKZ, LOCK_ID);
         TABLE_LOCK_LOCATION = this;

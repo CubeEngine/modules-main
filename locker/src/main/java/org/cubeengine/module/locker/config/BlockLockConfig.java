@@ -19,7 +19,7 @@ package org.cubeengine.module.locker.config;
 
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.logscribe.Log;
-import org.cubeengine.module.core.util.matcher.MaterialMatcher;
+import org.cubeengine.service.matcher.MaterialMatcher;
 import org.cubeengine.module.locker.storage.ProtectedType;
 import org.spongepowered.api.block.BlockType;
 

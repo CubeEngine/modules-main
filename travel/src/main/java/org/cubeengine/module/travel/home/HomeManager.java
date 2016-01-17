@@ -22,12 +22,8 @@ import org.cubeengine.module.travel.TelePointManager;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.storage.TableTeleportPoint;
 import org.cubeengine.module.travel.storage.TeleportPointModel;
-import org.cubeengine.module.travel.storage.TeleportPointModel.TeleportType;
-import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
@@ -39,15 +35,11 @@ import static org.cubeengine.module.travel.storage.TeleportPointModel.Visibility
 public class HomeManager extends TelePointManager<Home>
 {
     private PermissionManager pm;
-    private WorldManager wm;
-    private UserManager um;
 
-    public HomeManager(Travel module, InviteManager iManager, Database db, PermissionManager pm, WorldManager wm, UserManager um)
+    public HomeManager(Travel module, InviteManager iManager, Database db, PermissionManager pm)
     {
-        super(module, iManager, db, um);
+        super(module, iManager, db);
         this.pm = pm;
-        this.wm = wm;
-        this.um = um;
     }
 
     @Override
@@ -56,7 +48,7 @@ public class HomeManager extends TelePointManager<Home>
         for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TableTeleportPoint.TABLE_TP_POINT).where(
             TableTeleportPoint.TABLE_TP_POINT.TYPE.eq(HOME.value)).fetch())
         {
-            this.addPoint(new Home(teleportPoint, this.module, pm, wm, um));
+            this.addPoint(new Home(teleportPoint, this.module, pm));
         }
         module.getLog().info("{} Homes loaded", this.getCount());
     }
@@ -69,8 +61,8 @@ public class HomeManager extends TelePointManager<Home>
             throw new IllegalArgumentException("Tried to create duplicate home!");
         }
         TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT)
-                .newTPPoint(transform, wm, name, um.getByUUID(owner.getUniqueId()).getEntityId(), null, HOME, publicVisibility ? PUBLIC : PRIVATE);
-        Home home = new Home(model, this.module, pm, wm, um);
+                .newTPPoint(transform, name, owner.getUniqueId(), null, HOME, publicVisibility ? PUBLIC : PRIVATE);
+        Home home = new Home(model, this.module, pm);
         model.insertAsync().exceptionally(this::handle);
         this.addPoint(home);
         return home;

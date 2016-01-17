@@ -26,8 +26,6 @@ import org.cubeengine.module.travel.storage.TeleportPointModel.TeleportType;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
@@ -35,15 +33,11 @@ import org.spongepowered.api.world.World;
 public class WarpManager extends TelePointManager<Warp>
 {
     private PermissionManager pm;
-    private WorldManager wm;
-    private UserManager um;
 
-    public WarpManager(Travel module, InviteManager iManager, Database db, PermissionManager pm, WorldManager wm, UserManager um)
+    public WarpManager(Travel module, InviteManager iManager, Database db, PermissionManager pm)
     {
-        super(module, iManager, db, um);
+        super(module, iManager, db);
         this.pm = pm;
-        this.wm = wm;
-        this.um = um;
     }
 
     @Override
@@ -52,7 +46,7 @@ public class WarpManager extends TelePointManager<Warp>
         for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TableTeleportPoint.TABLE_TP_POINT).where(
             TableTeleportPoint.TABLE_TP_POINT.TYPE.eq(TeleportType.WARP.value)).fetch())
         {
-            this.addPoint(new Warp(teleportPoint, this.module, pm, wm, um));
+            this.addPoint(new Warp(teleportPoint, this.module, pm));
         }
         module.getLog().info("{} Homes loaded", this.getCount());
     }
@@ -64,8 +58,8 @@ public class WarpManager extends TelePointManager<Warp>
         {
             throw new IllegalArgumentException("Tried to create duplicate warp!");
         }
-        TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT).newTPPoint(transform, wm, name, um.getByUUID(owner.getUniqueId()).getEntityId(), null, TeleportType.WARP, publicVisibility ? Visibility.PUBLIC : Visibility.PRIVATE);
-        Warp warp = new Warp(model, this.module, pm, wm, um);
+        TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT).newTPPoint(transform, name, owner.getUniqueId(), null, TeleportType.WARP, publicVisibility ? Visibility.PUBLIC : Visibility.PRIVATE);
+        Warp warp = new Warp(model, this.module, pm);
         model.insertAsync();
         this.addPoint(warp);
         return warp;

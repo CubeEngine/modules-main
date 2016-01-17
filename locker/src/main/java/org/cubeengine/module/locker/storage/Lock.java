@@ -18,23 +18,22 @@
 package org.cubeengine.module.locker.storage;
 
 import de.cubeisland.engine.logscribe.Log;
-import org.cubeengine.module.core.util.InventoryGuardFactory;
+import org.cubeengine.service.inventoryguard.InventoryGuardFactory;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.commands.PlayerAccess;
 import org.cubeengine.module.locker.data.LockerData;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.CachedUser;
 import org.jooq.Result;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
@@ -45,9 +44,9 @@ import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.TextMessageException;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -59,6 +58,7 @@ import static java.util.stream.Collectors.toList;
 import static org.cubeengine.module.locker.storage.AccessListModel.*;
 import static org.cubeengine.module.locker.storage.LockType.PUBLIC;
 import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
+import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
@@ -222,8 +222,7 @@ public class Lock
         {
             if (model == null)
             {
-                CachedUser user = module.getUserManager().getByUUID(modifyUser.getUniqueId());
-                model = db.getDSL().newRecord(TABLE_ACCESS_LIST).newAccess(this.model, user);
+                model = db.getDSL().newRecord(TABLE_ACCESS_LIST).newAccess(this.model, modifyUser);
                 model.setValue(TABLE_ACCESS_LIST.LEVEL, level);
                 model.insertAsync();
             }
@@ -329,9 +328,8 @@ public class Lock
 
     private Location<World> getLocation(LockLocationModel model)
     {
-        return new Location<>(this.manager.wm.getWorld(model.getValue(TableLockLocations.TABLE_LOCK_LOCATION.WORLD_ID)), model.getValue(
-            TableLockLocations.TABLE_LOCK_LOCATION.X), model.getValue(TableLockLocations.TABLE_LOCK_LOCATION.Y), model.getValue(
-            TableLockLocations.TABLE_LOCK_LOCATION.Z));
+        Optional<World> world = Sponge.getServer().getWorld(model.getValue(TABLE_LOCK_LOCATION.WORLD_ID));
+        return new Location<>(world.get(), model.getValue(TABLE_LOCK_LOCATION.X), model.getValue(TABLE_LOCK_LOCATION.Y), model.getValue(TABLE_LOCK_LOCATION.Z));
     }
 
     public boolean isBlockLock()
@@ -368,8 +366,7 @@ public class Lock
         }
         if (event.isCancelled()) return;
 
-        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(module.getUserManager().getByUUID(
-            user.getUniqueId()).getEntityId())) return; // Its the owner
+        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getUniqueId())) return; // Its the owner
         switch (this.getLockType())
         {
             case PRIVATE: // block changes
@@ -400,17 +397,15 @@ public class Lock
 
     private AccessListModel getAccess(User user)
     {
-        UInteger userId = module.getUserManager().getByUUID(user.getUniqueId()).getEntityId();
-
         AccessListModel model = db.getDSL().selectFrom(TABLE_ACCESS_LIST).
             where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID)),
-                  TABLE_ACCESS_LIST.USER_ID.eq(userId)).fetchOne();
+                  TABLE_ACCESS_LIST.USER_ID.eq(user.getUniqueId())).fetchOne();
         if (model == null)
         {
 
 
             model = db.getDSL().selectFrom(TABLE_ACCESS_LIST).
-                where(TABLE_ACCESS_LIST.USER_ID.eq(userId),
+                where(TABLE_ACCESS_LIST.USER_ID.eq(user.getUniqueId()),
                       TABLE_ACCESS_LIST.OWNER_ID.eq(this.model.getValue(TABLE_LOCK.OWNER_ID))).fetchOne();
         }
         return model;
@@ -532,8 +527,7 @@ public class Lock
 
     public void handleBlockBreak(ChangeBlockEvent.Break event, Player user)
     {
-        UInteger userId = module.getUserManager().getByUUID(user.getUniqueId()).getEntityId();
-        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(userId)
+        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getUniqueId())
             || user.hasPermission(module.perms().BREAK_OTHER.getId()))
         {
             this.delete(user);
@@ -562,8 +556,7 @@ public class Lock
 
     public boolean handleEntityDamage(Player user)
     {
-        UInteger userId = module.getUserManager().getByUUID(user.getUniqueId()).getEntityId();
-        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(userId)
+        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getUniqueId())
             || user.hasPermission(module.perms().BREAK_OTHER.getId()))
         {
             i18n.sendTranslated(user, NEUTRAL, "The magic surrounding this entity quivers as you hit it!");
@@ -592,8 +585,7 @@ public class Lock
 
     public boolean isOwner(Player user)
     {
-        UInteger userId = module.getUserManager().getByUUID(user.getUniqueId()).getEntityId();
-        return this.model.getValue(TABLE_LOCK.OWNER_ID).equals(userId);
+        return this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getUniqueId());
     }
 
     public boolean hasAdmin(Player user)
@@ -620,7 +612,7 @@ public class Lock
         {
             this.lastKeyNotify = new HashMap<>();
         }
-        User owner = this.manager.um.getById(this.model.getValue(TABLE_LOCK.OWNER_ID)).get().getUser();
+        User owner = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(model.getValue(TABLE_LOCK.OWNER_ID)).get();
         if (owner.equals(user))
         {
             return;
@@ -651,7 +643,8 @@ public class Lock
             {
                 this.lastNotify = new HashMap<>();
             }
-            User owner = this.manager.um.getById(this.model.getValue(TABLE_LOCK.OWNER_ID)).get().getUser();
+            User owner = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(this.model.getValue(
+                TABLE_LOCK.OWNER_ID)).get();
             Long last = this.lastNotify.get(owner.getUniqueId());
             if (last == null || TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - last) > 60) // 60 sec config ?
             {
@@ -687,7 +680,7 @@ public class Lock
 
     public User getOwner()
     {
-        return module.getUserManager().getById(model.getValue(TABLE_LOCK.OWNER_ID)).get().getUser();
+        return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(this.model.getValue(TABLE_LOCK.OWNER_ID)).get();
     }
 
     public boolean isPublic()
@@ -745,7 +738,7 @@ public class Lock
                 Text format = Text.of(" ", GRAY, "- ", DARK_GREEN);
                 for (AccessListModel listModel : accessors)
                 {
-                    User accessor = module.getUserManager().getById(listModel.getValue(TABLE_ACCESS_LIST.USER_ID)).get().getUser();
+                    User accessor = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(listModel.getValue(TABLE_ACCESS_LIST.USER_ID)).get();
                     if ((listModel.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN)
                     {
                         user.sendMessage(Text.of(format, GREEN, accessor.getName(), GOLD, " [Admin]"));
@@ -933,7 +926,7 @@ public class Lock
 
     public void setOwner(User owner)
     {
-        this.model.setValue(TABLE_LOCK.OWNER_ID, module.getUserManager().getByUUID(owner.getUniqueId()).getEntityId());
+        this.model.setValue(TABLE_LOCK.OWNER_ID, owner.getUniqueId());
         this.model.updateAsync();
     }
 

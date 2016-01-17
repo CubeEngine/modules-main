@@ -19,8 +19,6 @@ package org.cubeengine.module.travel.home;
 
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
 import org.spongepowered.api.entity.living.player.Player;
@@ -34,16 +32,12 @@ import static org.spongepowered.api.event.Order.EARLY;
 public class HomeListener
 {
     private final Travel module;
-    private UserManager um;
-    private WorldManager wm;
     private I18n i18n;
     private final HomeManager homeManager;
 
-    public HomeListener(Travel module, UserManager um, WorldManager wm, I18n i18n)
+    public HomeListener(Travel module, I18n i18n)
     {
         this.module = module;
-        this.um = um;
-        this.wm = wm;
         this.i18n = i18n;
         this.homeManager = module.getHomeManager();
     }

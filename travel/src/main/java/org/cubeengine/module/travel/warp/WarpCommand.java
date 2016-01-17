@@ -36,12 +36,12 @@ import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.exception.PermissionDeniedException;
 import org.cubeengine.service.confirm.ConfirmResult;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
@@ -56,17 +56,13 @@ import static org.cubeengine.service.i18n.formatter.MessageType.*;
 public class WarpCommand extends TpPointCommand
 {
     private final Travel module;
-    private UserManager um;
-    private WorldManager wm;
     private I18n i18n;
     private final WarpManager manager;
 
-    public WarpCommand(Travel module, UserManager um, WorldManager wm, I18n i18n)
+    public WarpCommand(Travel module, I18n i18n)
     {
         super(module, i18n);
         this.module = module;
-        this.um = um;
-        this.wm = wm;
         this.i18n = i18n;
         this.manager = module.getWarpManager();
     }
@@ -345,7 +341,8 @@ public class WarpCommand extends TpPointCommand
                 sender.sendMessage(YELLOW + "  " + w.getName() + ":");
                 for (TeleportInvite invite : invites)
                 {
-                    sender.sendMessage("    " + DARK_GREEN + um.getById(invite.getValue(TABLE_INVITE.USERKEY)).get().getUser().getName());
+                    String name = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(invite.getValue(TABLE_INVITE.USERKEY)).get().getName();
+                    sender.sendMessage("    " + DARK_GREEN + name);
                 }
             }
         }

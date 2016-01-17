@@ -19,7 +19,6 @@ package org.cubeengine.module.teleport;
 
 import org.cubeengine.module.core.util.LocationUtil;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.AbstractProperty;
@@ -51,7 +50,6 @@ import static org.spongepowered.api.item.ItemTypes.COMPASS;
 public class TeleportListener
 {
     private final Teleport module;
-    private UserManager um;
     private I18n i18n;
 
     private Map<UUID, Transform<World>> deathLocations = new HashMap<>();
@@ -60,10 +58,9 @@ public class TeleportListener
     private Map<UUID, UUID> tpToRequests = new HashMap<>();
     private Map<UUID, UUID> tpFromRequests = new HashMap<>();
 
-    public TeleportListener(Teleport module, UserManager um, I18n i18n)
+    public TeleportListener(Teleport module, I18n i18n)
     {
         this.module = module;
-        this.um = um;
         this.i18n = i18n;
     }
 

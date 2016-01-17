@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.travel.storage;
 
+import java.util.UUID;
 import org.cubeengine.service.database.AsyncRecord;
 import org.jooq.types.UInteger;
 
@@ -29,7 +30,7 @@ public class TeleportInvite extends AsyncRecord<TeleportInvite>
         super(TABLE_INVITE);
     }
 
-    public TeleportInvite newInvite(UInteger teleportPoint, UInteger userKey)
+    public TeleportInvite newInvite(UInteger teleportPoint, UUID userKey)
     {
         this.setValue(TABLE_INVITE.TELEPORTPOINT, teleportPoint);
         this.setValue(TABLE_INVITE.USERKEY, userKey);

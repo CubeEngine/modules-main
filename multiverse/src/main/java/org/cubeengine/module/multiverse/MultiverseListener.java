@@ -1,7 +1,7 @@
 package org.cubeengine.module.multiverse;
 
 import com.flowpowered.math.vector.Vector3d;
-import org.cubeengine.module.core.util.WorldLocation;
+import org.cubeengine.service.world.WorldLocation;
 import org.cubeengine.module.multiverse.player.PlayerConfig;
 import org.cubeengine.module.multiverse.player.PlayerDataConfig;
 import org.cubeengine.service.world.ConfigWorld;

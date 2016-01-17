@@ -18,13 +18,14 @@
 package org.cubeengine.module.locker.storage;
 
 import java.sql.Timestamp;
+import java.util.UUID;
 import org.cubeengine.module.core.util.Version;
 import org.cubeengine.service.database.AutoIncrementTable;
 import org.cubeengine.service.database.Database;
 import org.jooq.TableField;
+import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
-import static org.cubeengine.service.user.TableUser.TABLE_USER;
 import static org.jooq.impl.SQLDataType.*;
 import static org.jooq.util.mysql.MySQLDataType.DATETIME;
 
@@ -32,7 +33,7 @@ public class TableLocks extends AutoIncrementTable<LockModel, UInteger>
 {
     public static TableLocks TABLE_LOCK;
     public final TableField<LockModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
-    public final TableField<LockModel, UInteger> OWNER_ID = createField("owner_id", U_INTEGER.nullable(false), this);
+    public final TableField<LockModel, UUID> OWNER_ID = createField("owner_id", SQLDataType.UUID.length(36).nullable(false), this);
     /**
      * Flags see {@link ProtectionFlag}
      */
@@ -58,7 +59,6 @@ public class TableLocks extends AutoIncrementTable<LockModel, UInteger>
         super(prefix + "locks", new Version(1), db);
         this.setAIKey(ID);
         this.addUniqueKey(ENTITY_UID_LEAST, ENTITY_UID_MOST);
-        this.addForeignKey(TABLE_USER.getPrimaryKey(), OWNER_ID);
         this.addFields(ID, OWNER_ID, FLAGS, PROTECTED_TYPE, LOCK_TYPE, PASSWORD, ENTITY_UID_LEAST, ENTITY_UID_MOST,
                        LAST_ACCESS, CREATED);
         TABLE_LOCK = this;

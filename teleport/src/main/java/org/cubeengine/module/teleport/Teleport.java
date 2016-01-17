@@ -23,14 +23,12 @@ import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import org.cubeengine.service.filesystem.FileManager;
-import org.cubeengine.module.core.sponge.EventManager;
+import org.cubeengine.service.event.EventManager;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.Broadcaster;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
 
 /**
  * /setworldspawn 	Sets the world spawn.
@@ -42,10 +40,8 @@ public class Teleport extends Module
 {
     @Inject private CommandManager cm;
     @Inject private EventManager em;
-    @Inject private UserManager um;
     @Inject private TaskManager tm;
     @Inject private FileManager fm;
-    @Inject private WorldManager wm;
     @Inject private PermissionManager pm;
     @Inject private org.spongepowered.api.Game game;
     @Inject private Broadcaster bc;
@@ -63,13 +59,13 @@ public class Teleport extends Module
         permissions = new TeleportPerm(this);
         tpWorld = new TpWorldPermissions(this, permissions, game, pm); // per world permissions
 
-        TeleportListener tl = new TeleportListener(this, um, i18n);
+        TeleportListener tl = new TeleportListener(this, i18n);
         em.registerListener(this, tl);
 
         cm.addCommands(cm, this, new MovementCommands(this, tl, i18n));
         cm.addCommands(cm, this, new SpawnCommands(this, em, game, bc, tl, i18n));
         cm.addCommands(cm, this, new TeleportCommands(this, game, bc, tl, i18n));
-        cm.addCommands(cm, this, new TeleportRequestCommands(this, tm, um, tl, game, i18n));
+        cm.addCommands(cm, this, new TeleportRequestCommands(this, tm, tl, game, i18n));
     }
 
     @Disable

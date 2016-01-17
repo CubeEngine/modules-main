@@ -27,9 +27,9 @@ import java.util.stream.Stream;
 
 import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.logscribe.Log;
-import org.cubeengine.module.core.sponge.EventManager;
+import org.cubeengine.service.event.EventManager;
 import org.cubeengine.module.core.util.BlockUtil;
-import org.cubeengine.module.core.util.matcher.StringMatcher;
+import org.cubeengine.service.matcher.StringMatcher;
 import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.config.EntityLockConfig;
 import org.cubeengine.module.locker.Locker;
@@ -39,13 +39,11 @@ import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.task.TaskManager;
-import org.cubeengine.service.user.CachedUser;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
 import org.jooq.Batch;
 import org.jooq.Condition;
 import org.jooq.Result;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
@@ -87,8 +85,6 @@ public class LockManager
     protected final Locker module;
     private Database database;
 
-    protected WorldManager wm;
-    protected UserManager um;
     protected TaskManager tm;
     private I18n i18n;
     private org.spongepowered.api.Game game;
@@ -96,8 +92,8 @@ public class LockManager
     protected Log logger;
     public final CommandListener commandListener;
 
-    private final Map<UInteger, Map<Long, Lock>> loadedLocks = new HashMap<>(); // World -> LocationKey -> Lock
-    private final Map<UInteger, Map<Long, Set<Lock>>> loadedLocksInChunk = new HashMap<>(); // World -> ChunkKey -> Lock
+    private final Map<UUID, Map<Long, Lock>> loadedLocks = new HashMap<>(); // World -> LocationKey -> Lock
+    private final Map<UUID, Map<Long, Set<Lock>>> loadedLocksInChunk = new HashMap<>(); // World -> ChunkKey -> Lock
     private final Map<UUID, Lock> loadedEntityLocks = new HashMap<>(); // EntityID -> Lock
     private final Map<UInteger, Lock> locksById = new HashMap<>(); // All Locks - LockID -> Lock
 
@@ -117,12 +113,11 @@ public class LockManager
     private final ExecutorService unloadExecutor;
     private Future<?> unloadFuture = null;
 
-    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, WorldManager wm, UserManager um, TaskManager tm, I18n i18n, org.spongepowered.api.Game game)
+    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, TaskManager tm,
+                       I18n i18n, Game game)
     {
         this.stringMatcher = stringMatcher;
         this.database = database;
-        this.wm = wm;
-        this.um = um;
         this.tm = tm;
         this.i18n = i18n;
         this.game = game;
@@ -205,7 +200,6 @@ public class LockManager
         }
 
         Chunk chunk = loadChunks.poll();
-        UInteger world_id = this.wm.getWorldId(chunk.getWorld());
 
         // TODO get view-distance if available / default to 10
         int viewDistance = 10;
@@ -223,7 +217,7 @@ public class LockManager
 
         Result<LockModel> models = this.database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.in(
                 this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID).from(
-                        TABLE_LOCK_LOCATION).where(TABLE_LOCK_LOCATION.WORLD_ID.eq(world_id), condChunkX, condChunkZ, condNotLoaded))).fetch();
+                        TABLE_LOCK_LOCATION).where(TABLE_LOCK_LOCATION.WORLD_ID.eq(chunk.getWorld().getUniqueId()), condChunkX, condChunkZ, condNotLoaded))).fetch();
         Map<UInteger, Result<LockLocationModel>> locations = LockManager.
             this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION).where(
             TABLE_LOCK_LOCATION.LOCK_ID.in(
@@ -251,14 +245,9 @@ public class LockManager
     {
         int viewDistance = VIEWDISTANCE_DEFAULT;
         this.locksById.put(lock.getId(), lock);
-        UInteger worldId = null;
         for (Location loc : lock.getLocations())
         {
-            if (worldId == null)
-            {
-                worldId = wm.getWorldId((World)loc.getExtent());
-            }
-            Map<Long, Set<Lock>> locksInChunkMap = this.getChunkLocksMap(worldId);
+            Map<Long, Set<Lock>> locksInChunkMap = this.getChunkLocksMap(loc.getExtent().getUniqueId());
             long chunkKey = getChunkKey(loc.getBlockX() / viewDistance, loc.getBlockZ() / viewDistance);
             Set<Lock> locks = locksInChunkMap.get(chunkKey);
             if (locks == null)
@@ -267,11 +256,11 @@ public class LockManager
                 locksInChunkMap.put(chunkKey, locks);
             }
             locks.add(lock);
-            this.getLocLockMap(worldId).put(getLocationKey(loc), lock);
+            this.getLocLockMap(loc.getExtent().getUniqueId()).put(getLocationKey(loc), lock);
         }
     }
 
-    private Map<Long, Set<Lock>> getChunkLocksMap(UInteger worldId)
+    private Map<Long, Set<Lock>> getChunkLocksMap(UUID worldId)
     {
         Map<Long, Set<Lock>> locksInChunkMap = this.loadedLocksInChunk.get(worldId);
         if (locksInChunkMap == null)
@@ -282,7 +271,7 @@ public class LockManager
         return locksInChunkMap;
     }
 
-    private Map<Long, Lock> getLocLockMap(UInteger worldId)
+    private Map<Long, Lock> getLocLockMap(UUID worldId)
     {
         Map<Long, Lock> locksAtLocMap = this.loadedLocks.get(worldId);
         if (locksAtLocMap == null)
@@ -317,10 +306,9 @@ public class LockManager
                 return; // Do not unload if any neighbour chunk is loaded
             }
 
-            UInteger worldId = wm.getWorldId(chunk.getWorld());
-            Set<Lock> removed = this.getChunkLocksMap(worldId).remove(getChunkKey(x, z));
+            Set<Lock> removed = this.getChunkLocksMap(chunk.getWorld().getUniqueId()).remove(getChunkKey(x, z));
             if (removed == null) return; // nothing to remove
-            Map<Long, Lock> locLockMap = this.getLocLockMap(worldId);
+            Map<Long, Lock> locLockMap = this.getLocLockMap(chunk.getWorld().getUniqueId());
             for (Lock lock : removed) // remove from chunks
             {
                 System.out.print("Lock unloaded at: " + lock.getFirstLocation().getPosition() + "\n");
@@ -349,8 +337,7 @@ public class LockManager
      */
     public Lock getLockAtLocation(Location<World> location, Player user)
     {
-        UInteger worldId = wm.getWorldId(location.getExtent());
-        Lock lock = this.getLocLockMap(worldId).get(getLocationKey(location));
+        Lock lock = this.getLocLockMap(location.getExtent().getUniqueId()).get(getLocationKey(location));
         // TODO repairing Locks still needed?
         /*
         if (repairExpand && lock != null && lock.isSingleBlockLock())
@@ -457,10 +444,9 @@ public class LockManager
             throw new IllegalStateException("Cannot extend Lock onto another!");
         }
         lock.locations.add(location);
-        LockLocationModel model = database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location, wm);
+        LockLocationModel model = database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location);
         model.insertAsync();
-        UInteger worldId = wm.getWorldId(location.getExtent());
-        this.getLocLockMap(worldId).put(getLocationKey(location), lock);
+        this.getLocLockMap(location.getExtent().getUniqueId()).put(getLocationKey(location), lock);
     }
 
     /**
@@ -482,9 +468,8 @@ public class LockManager
                 for (Location location : lock.getLocations())
                 {
                     long chunkKey = getChunkKey(location);
-                    UInteger worldId = wm.getWorldId(((World)location.getExtent()));
-                    this.getLocLockMap(worldId).remove(getLocationKey(location));
-                    Set<Lock> locks = this.getChunkLocksMap(worldId).get(chunkKey);
+                    this.getLocLockMap(location.getExtent().getUniqueId()).remove(getLocationKey(location));
+                    Set<Lock> locks = this.getChunkLocksMap(location.getExtent().getUniqueId()).get(chunkKey);
                     if (locks != null)
                     {
                         locks.remove(lock);
@@ -517,7 +502,7 @@ public class LockManager
     public CompletableFuture<Lock> createLock(Location<World> block, Player user, LockType lockType, String password, boolean createKeyBook)
     {
         BlockType material = block.getBlockType();
-        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(module.getUserManager().getByUUID(user.getUniqueId()), lockType, getProtectedType(material));
+        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
         for (BlockLockConfig blockProtection : this.module.getConfig().blockprotections)
         {
             if (blockProtection.isType(material))
@@ -600,7 +585,7 @@ public class LockManager
 
         return model.createPassword(this, password).insertAsync()
                     .thenCompose(m -> allOf(locations.parallelStream().map(loc -> database.getDSL().newRecord(
-                        TABLE_LOCK_LOCATION).newLocation(model, loc, wm)).map(AsyncRecord::insertAsync).toArray(
+                        TABLE_LOCK_LOCATION).newLocation(model, loc)).map(AsyncRecord::insertAsync).toArray(
                         CompletableFuture[]::new)).thenApply((v) -> {
                         Lock lock = new Lock(this, model, i18n, locations, game);
                         this.addLoadedLocationLock(lock);
@@ -623,7 +608,7 @@ public class LockManager
     public CompletableFuture<Lock> createLock(Entity entity, Player user, LockType lockType, String password, boolean createKeyBook)
     {
 
-        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(module.getUserManager().getByUUID(user.getUniqueId()), lockType, getProtectedType(entity.getType()), entity.getUniqueId());
+        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(entity.getType()), entity.getUniqueId());
         model.createPassword(this, password);
         return model.insertAsync().thenApply(m -> {
             Lock lock = new Lock(this, model, i18n, game);
@@ -735,24 +720,21 @@ public class LockManager
 
     public void setGlobalAccess(Player sender, List<PlayerAccess> list)
     {
-        CachedUser senderUser = um.getByUUID(sender.getUniqueId());
         for (PlayerAccess access : list)
         {
-            CachedUser accessUser = um.getByUUID(access.user.getUniqueId());
-
             short accessType = ACCESS_FULL;
             if (access.add && access.admin)
             {
                 accessType = ACCESS_ALL; // with AdminAccess
             }
             AccessListModel accessListModel = database.getDSL().selectFrom(TABLE_ACCESS_LIST).where(
-                    TABLE_ACCESS_LIST.USER_ID.eq(accessUser.getEntity().getId()),
-                    TABLE_ACCESS_LIST.OWNER_ID.eq(senderUser.getEntity().getId())).fetchOne();
+                    TABLE_ACCESS_LIST.USER_ID.eq(access.user.getUniqueId()),
+                    TABLE_ACCESS_LIST.OWNER_ID.eq(sender.getUniqueId())).fetchOne();
             if (access.add)
             {
                 if (accessListModel == null)
                 {
-                    accessListModel = database.getDSL().newRecord(TABLE_ACCESS_LIST).newGlobalAccess(senderUser, accessUser, accessType);
+                    accessListModel = database.getDSL().newRecord(TABLE_ACCESS_LIST).newGlobalAccess(sender, access.user, accessType);
                     accessListModel.insertAsync();
                     i18n.sendTranslated(sender, POSITIVE, "Global access for {user} set!", access.user);
                 }
@@ -807,7 +789,8 @@ public class LockManager
     public CompletableFuture<Integer> purgeLocksFrom(User user)
     {
         logger.info("Purging Locks from {}", user.getName());
-        CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(um.getByUUID(user.getUniqueId()).getEntityId())));
+        CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(
+            user.getUniqueId())));
         future.thenAccept(integer -> {
             if (integer != 0)
             {

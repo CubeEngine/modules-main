@@ -23,17 +23,15 @@ import org.cubeengine.module.travel.storage.TableTeleportPoint;
 import org.cubeengine.module.travel.storage.TeleportPointModel;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
 import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 public class Warp extends TeleportPoint
 {
     private PermissionManager pm;
 
-    public Warp(TeleportPointModel teleportPoint, Travel module, PermissionManager pm, WorldManager wm, UserManager um)
+    public Warp(TeleportPointModel teleportPoint, Travel module, PermissionManager pm)
     {
-        super(teleportPoint, module, wm, um);
+        super(teleportPoint, module);
         this.pm = pm;
         if (teleportPoint.getValue(TableTeleportPoint.TABLE_TP_POINT.VISIBILITY) == Visibility.PUBLIC.value)
         {

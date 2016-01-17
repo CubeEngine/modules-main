@@ -17,17 +17,17 @@
  */
 package org.cubeengine.module.travel.storage;
 
+import java.util.Optional;
+import java.util.UUID;
 import javax.persistence.Transient;
 
 import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.service.database.AsyncRecord;
-import org.cubeengine.service.world.WorldManager;
-import org.jooq.types.UInteger;
 import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.module.travel.storage.TableTeleportPoint.TABLE_TP_POINT;
+import static org.spongepowered.api.Sponge.getGame;
 
 public class TeleportPointModel extends AsyncRecord<TeleportPointModel>
 {
@@ -39,37 +39,37 @@ public class TeleportPointModel extends AsyncRecord<TeleportPointModel>
         super(TABLE_TP_POINT);
     }
 
-    public TeleportPointModel newTPPoint(Transform<World> transform, WorldManager wm, String name, UInteger owner, String welcomeMsg, TeleportType type,
-                                         Visibility visibility)
+    public TeleportPointModel newTPPoint(Transform<World> transform, String name, UUID owner, String welcomeMsg,
+                                         TeleportType type, Visibility visibility)
     {
-        this.setTransform(transform, wm);
+        this.setTransform(transform);
 
         this.setValue(TABLE_TP_POINT.NAME, name);
         this.setValue(TABLE_TP_POINT.OWNER, owner);
         this.setValue(TABLE_TP_POINT.TYPE, type.value);
         this.setValue(TABLE_TP_POINT.VISIBILITY, visibility.value);
 
-
         this.setValue(TABLE_TP_POINT.WELCOMEMSG, welcomeMsg);
 
         return this;
     }
 
-    public Transform<World> getLocation(WorldManager wm)
+    public Transform<World> getLocation()
     {
         if (this.transform == null)
         {
-            this.transform = new Transform<>(wm.getWorld(getValue(TABLE_TP_POINT.WORLD)),
+            Optional<World> world = getGame().getServer().getWorld(getValue(TABLE_TP_POINT.WORLD));
+            this.transform = new Transform<>(world.get(),
                     new Vector3d(getValue(TABLE_TP_POINT.X), getValue(TABLE_TP_POINT.Y), getValue(TABLE_TP_POINT.Z)),
                     new Vector3d(getValue(TABLE_TP_POINT.PITCH), getValue(TABLE_TP_POINT.YAW), 0d));
         }
         return this.transform;
     }
 
-    public void setTransform(Transform<World> transform, WorldManager wm)
+    public void setTransform(Transform<World> transform)
     {
         this.transform = transform;
-        this.setValue(TABLE_TP_POINT.WORLD, wm.getWorldId(this.transform.getExtent()));
+        this.setValue(TABLE_TP_POINT.WORLD, this.transform.getExtent().getUniqueId());
         this.setValue(TABLE_TP_POINT.X, this.transform.getLocation().getX());
         this.setValue(TABLE_TP_POINT.Y, this.transform.getLocation().getY());
         this.setValue(TABLE_TP_POINT.Z, this.transform.getLocation().getZ());

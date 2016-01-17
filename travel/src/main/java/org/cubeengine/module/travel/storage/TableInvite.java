@@ -17,25 +17,24 @@
  */
 package org.cubeengine.module.travel.storage;
 
+import java.util.UUID;
 import org.cubeengine.module.core.util.Version;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.database.Table;
 import org.jooq.TableField;
+import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
-
-import static org.cubeengine.service.user.TableUser.TABLE_USER;
 
 public class TableInvite extends Table<TeleportInvite>
 {
     public static TableInvite TABLE_INVITE;
     public final TableField<TeleportInvite, UInteger> TELEPORTPOINT = createField("teleportpoint", U_INTEGER.nullable(false), this);
-    public final TableField<TeleportInvite, UInteger> USERKEY = createField("userkey", U_INTEGER.nullable(false), this);
+    public final TableField<TeleportInvite, UUID> USERKEY = createField("userkey", SQLDataType.UUID.length(36).nullable(false), this);
 
     public TableInvite(String prefix, Database db)
     {
         super(prefix + "teleportinvites", new Version(1), db);
         this.setPrimaryKey(USERKEY, TELEPORTPOINT);
-        this.addForeignKey(TABLE_USER.getPrimaryKey(), USERKEY);
         this.addForeignKey(TableTeleportPoint.TABLE_TP_POINT.getPrimaryKey(), TELEPORTPOINT);
         this.addFields(TELEPORTPOINT, USERKEY);
         TABLE_INVITE = this;

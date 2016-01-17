@@ -8,7 +8,7 @@ import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.reflect.Reflector;
 import de.cubeisland.engine.reflect.codec.nbt.NBTCodec;
-import org.cubeengine.module.core.sponge.EventManager;
+import org.cubeengine.service.event.EventManager;
 import org.cubeengine.module.multiverse.converter.InventoryConverter;
 import org.cubeengine.module.multiverse.converter.PotionEffectConverter;
 import org.cubeengine.service.command.CommandManager;

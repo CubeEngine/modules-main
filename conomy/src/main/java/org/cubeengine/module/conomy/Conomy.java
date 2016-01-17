@@ -30,7 +30,6 @@ import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.economy.EconomyService;
 
@@ -51,7 +50,6 @@ public class Conomy extends Module
     @Inject private ThreadFactory tf;
     @Inject private LogFactory lf;
     @Inject private FileManager fm;
-    @Inject private UserManager um;
     @Inject private Path modulePath;
     @Inject private Reflector reflector;
     @Inject private Game game;

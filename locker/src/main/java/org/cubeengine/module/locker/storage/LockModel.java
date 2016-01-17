@@ -22,7 +22,7 @@ import java.sql.Timestamp;
 import java.util.UUID;
 import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.module.core.util.StringUtils;
-import org.cubeengine.service.user.CachedUser;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
@@ -36,14 +36,14 @@ public class LockModel extends AsyncRecord<LockModel>
         super(TABLE_LOCK);
     }
 
-    public LockModel newLock(CachedUser user, LockType lockType, ProtectedType type)
+    public LockModel newLock(User user, LockType lockType, ProtectedType type)
     {
         return this.newLock(user, lockType, type, null);
     }
 
-    public LockModel newLock(CachedUser user, LockType lockType, ProtectedType type, UUID entityUUID)
+    public LockModel newLock(User user, LockType lockType, ProtectedType type, UUID entityUUID)
     {
-        this.setValue(TABLE_LOCK.OWNER_ID, user.getEntity().getId());
+        this.setValue(TABLE_LOCK.OWNER_ID, user.getUniqueId());
         this.setValue(TABLE_LOCK.LOCK_TYPE, lockType.id);
         this.setValue(TABLE_LOCK.FLAGS, (short)0); // none
         this.setValue(TABLE_LOCK.PROTECTED_TYPE, type.id);

@@ -17,13 +17,14 @@
  */
 package org.cubeengine.module.locker.storage;
 
+import java.util.UUID;
 import org.cubeengine.module.core.util.Version;
 import org.cubeengine.service.database.AutoIncrementTable;
 import org.cubeengine.service.database.Database;
 import org.jooq.TableField;
+import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
-import static org.cubeengine.service.user.TableUser.TABLE_USER;
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static org.jooq.impl.SQLDataType.SMALLINT;
 
@@ -31,11 +32,11 @@ public class TableAccessList extends AutoIncrementTable<AccessListModel, UIntege
 {
     public static TableAccessList TABLE_ACCESS_LIST;
     public final TableField<AccessListModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
-    public final TableField<AccessListModel, UInteger> USER_ID = createField("user_id", U_INTEGER.nullable(false),this);
+    public final TableField<AccessListModel, UUID> USER_ID = createField("user_id", SQLDataType.UUID.length(36).nullable(false), this);
     public final TableField<AccessListModel, UInteger> LOCK_ID = createField("lock_id", U_INTEGER, this);
     // BitMask granting the user access to a protection (this is NOT restricting) (if ACCESS_PUT is not set on a donation chest it does not matter)
     public final TableField<AccessListModel, Short> LEVEL = createField("level", SMALLINT.nullable(false),this);
-    public final TableField<AccessListModel, UInteger> OWNER_ID = createField("owner_id", U_INTEGER, this);
+    public final TableField<AccessListModel, UUID> OWNER_ID = createField("owner_id", SQLDataType.UUID.length(36), this);
 
     public TableAccessList(String prefix, Database db)
     {
@@ -43,9 +44,7 @@ public class TableAccessList extends AutoIncrementTable<AccessListModel, UIntege
         this.setAIKey(ID);
         this.addUniqueKey(USER_ID, LOCK_ID);
         this.addUniqueKey(USER_ID, OWNER_ID);
-        this.addForeignKey(TABLE_USER.getPrimaryKey(), USER_ID);
         this.addForeignKey(TABLE_LOCK.getPrimaryKey(), LOCK_ID);
-        this.addForeignKey(TABLE_USER.getPrimaryKey(), OWNER_ID);
         this.addFields(ID, USER_ID, LOCK_ID, LEVEL, OWNER_ID);
         TABLE_ACCESS_LIST = this;
     }

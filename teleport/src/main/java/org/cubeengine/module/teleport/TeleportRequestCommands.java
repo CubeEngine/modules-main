@@ -23,7 +23,6 @@ import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.task.TaskManager;
-import org.cubeengine.service.user.UserManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -40,16 +39,14 @@ public class TeleportRequestCommands
 {
     private final Teleport module;
     private TaskManager taskManager;
-    private UserManager um;
     private TeleportListener tl;
     private Game game;
     private I18n i18n;
 
-    public TeleportRequestCommands(Teleport module, TaskManager taskManager, UserManager um, TeleportListener tl, Game game, I18n i18n)
+    public TeleportRequestCommands(Teleport module, TaskManager taskManager, TeleportListener tl, Game game, I18n i18n)
     {
         this.module = module;
         this.taskManager = taskManager;
-        this.um = um;
         this.tl = tl;
         this.game = game;
         this.i18n = i18n;

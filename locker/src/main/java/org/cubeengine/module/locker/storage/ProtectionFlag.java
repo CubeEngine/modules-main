@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.cubeengine.module.core.util.StringUtils;
-import org.cubeengine.module.core.util.matcher.StringMatcher;
+import org.cubeengine.service.matcher.StringMatcher;
 
 import static org.cubeengine.module.core.util.StringUtils.startsWithIgnoreCase;
 import static java.util.stream.Collectors.toList;

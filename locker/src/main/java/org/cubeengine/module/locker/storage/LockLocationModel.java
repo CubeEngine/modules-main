@@ -18,9 +18,7 @@
 package org.cubeengine.module.locker.storage;
 
 import org.cubeengine.service.database.AsyncRecord;
-import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 
@@ -31,16 +29,16 @@ public class LockLocationModel extends AsyncRecord<LockLocationModel>
         super(TableLockLocations.TABLE_LOCK_LOCATION);
     }
 
-    public LockLocationModel newLocation(LockModel model, Location location, WorldManager wm)
+    public LockLocationModel newLocation(LockModel model, Location location)
     {
-        this.setLocation(location, wm);
+        this.setLocation(location);
         this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID, model.getValue(TABLE_LOCK.ID));
         return this;
     }
 
-    private void setLocation(Location location, WorldManager wm)
+    private void setLocation(Location location)
     {
-        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.WORLD_ID, wm.getWorldId(((World)location.getExtent())));
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.WORLD_ID, location.getExtent().getUniqueId());
         this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.X, location.getBlockX());
         this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.Y, location.getBlockY());
         this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.Z, location.getBlockZ());

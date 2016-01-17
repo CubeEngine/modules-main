@@ -30,7 +30,6 @@ import org.cubeengine.module.core.util.math.Vector3;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.travel.storage.TeleportPointModel;
-import org.cubeengine.service.user.UserManager;
 import org.jooq.DSLContext;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.entity.Transform;
@@ -46,11 +45,9 @@ public abstract class TelePointManager<T extends TeleportPoint>
     protected final DSLContext dsl;
     protected final InviteManager iManager;
     protected final Map<String, Map<String, T>> points = new HashMap<>();
-    private UserManager um;
 
-    public TelePointManager(Travel module, InviteManager iManager, Database db, UserManager um)
+    public TelePointManager(Travel module, InviteManager iManager, Database db)
     {
-        this.um = um;
         this.dsl = db.getDSL();
         this.module = module;
         this.iManager = iManager;
@@ -148,8 +145,7 @@ public abstract class TelePointManager<T extends TeleportPoint>
     public int getCount(Player user)
     {
 
-        return dsl.fetchCount(dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.OWNER.eq(um.getByUUID(
-            user.getUniqueId()).getEntity().getId())));
+        return dsl.fetchCount(dsl.selectFrom(TABLE_TP_POINT).where(TABLE_TP_POINT.OWNER.eq(user.getUniqueId())));
     }
 
     public abstract T create(Player owner, String name, Transform<World> location, boolean publicVisibility);

@@ -18,7 +18,7 @@
 package org.cubeengine.module.locker.storage;
 
 import org.cubeengine.service.database.AsyncRecord;
-import org.cubeengine.service.user.CachedUser;
+import org.spongepowered.api.entity.living.player.User;
 
 import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
@@ -30,20 +30,20 @@ public class AccessListModel extends AsyncRecord<AccessListModel>
         super(TABLE_ACCESS_LIST);
     }
 
-    public AccessListModel newAccess(LockModel model, CachedUser modifyUser)
+    public AccessListModel newAccess(LockModel model, User modifyUser)
     {
         this.setValue(TABLE_ACCESS_LIST.LOCK_ID, model.getValue(TABLE_LOCK.ID));
-        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getEntity().getId());
+        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getUniqueId());
         this.setValue(TABLE_ACCESS_LIST.LEVEL, ACCESS_FULL);
         return this;
     }
 
-    public AccessListModel newGlobalAccess(CachedUser sender, CachedUser modifyUser, short accessType)
+    public AccessListModel newGlobalAccess(User sender, User modifyUser, short accessType)
     {
         this.setValue(TABLE_ACCESS_LIST.LOCK_ID, null);
-        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getEntity().getId());
+        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getUniqueId());
         this.setValue(TABLE_ACCESS_LIST.LEVEL, accessType);
-        this.setValue(TABLE_ACCESS_LIST.OWNER_ID, sender.getEntity().getId());
+        this.setValue(TABLE_ACCESS_LIST.OWNER_ID, sender.getUniqueId());
         return this;
     }
 

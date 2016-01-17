@@ -27,14 +27,12 @@ import de.cubeisland.engine.modularity.core.Maybe;
 import de.cubeisland.engine.modularity.core.Module;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.module.core.sponge.EventManager;
+import org.cubeengine.service.event.EventManager;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.module.core.util.Profiler;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
 import org.cubeengine.module.travel.home.HomeCommand;
 import org.cubeengine.module.travel.home.HomeListener;
 import org.cubeengine.module.travel.home.HomeManager;
@@ -57,11 +55,9 @@ public class Travel extends Module
     @Inject private FileManager fm;
     @Inject private Database db;
     @Inject private Log logger;
-    @Inject private UserManager um;
     @Inject private CommandManager cm;
     @Inject private EventManager em;
     @Inject private PermissionManager pm;
-    @Inject private WorldManager wm;
     @Inject private Maybe<Selector> selector;
     @Inject private I18n i18n;
 
@@ -76,18 +72,18 @@ public class Travel extends Module
 
         Profiler.startProfiling("travelEnable");
         logger.trace("Loading TeleportPoints...");
-        this.inviteManager = new InviteManager(db, this, um);
-        this.homeManager = new HomeManager(this, this.inviteManager, db, pm, wm, um);
+        this.inviteManager = new InviteManager(db, this);
+        this.homeManager = new HomeManager(this, this.inviteManager, db, pm);
         this.homeManager.load();
-        this.warpManager = new WarpManager(this, this.inviteManager, db, pm, wm, um);
+        this.warpManager = new WarpManager(this, this.inviteManager, db, pm);
         this.warpManager.load();
         logger.trace("Loaded TeleportPoints in {} ms", Profiler.endProfiling("travelEnable", TimeUnit.MILLISECONDS));
 
-        HomeCommand homeCmd = new HomeCommand(this, selector, i18n, um, wm);
+        HomeCommand homeCmd = new HomeCommand(this, selector, i18n);
         cm.addCommand(homeCmd);
-        WarpCommand warpCmd = new WarpCommand(this, um, wm, i18n);
+        WarpCommand warpCmd = new WarpCommand(this, i18n);
         cm.addCommand(warpCmd);
-        em.registerListener(this, new HomeListener(this, um, wm, i18n));
+        em.registerListener(this, new HomeListener(this, i18n));
 
         this.permissions = new TravelPerm(this);
     }
