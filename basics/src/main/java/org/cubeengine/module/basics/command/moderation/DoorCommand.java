@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.moderation;
+package org.cubeengine.module.basics.command.moderation;
 
 import java.util.HashSet;
 import java.util.Set;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Optional;
-import de.cubeisland.engine.module.basics.Basics;
+import org.cubeengine.module.basics.Basics;
 import org.cubeengine.module.core.util.math.Vector3;
 import org.cubeengine.module.core.util.math.shape.Sphere;
 import org.cubeengine.service.command.CommandSender;

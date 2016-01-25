@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.general;
+package org.cubeengine.module.basics.command.general;
 
 import java.util.UUID;
 import com.google.common.base.Optional;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
+import org.cubeengine.module.basics.Basics;
+import org.cubeengine.module.basics.BasicsAttachment;
 import de.cubeisland.engine.module.basics.BasicsUser;
 import de.cubeisland.engine.module.basics.storage.BasicsUserEntity;
 import de.cubeisland.engine.module.roles.RoleAppliedEvent;
@@ -30,7 +30,6 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.entity.GameModeData;
 import org.spongepowered.api.data.manipulator.entity.InvulnerabilityData;
 import org.spongepowered.api.data.manipulator.entity.TameableData;
-import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 import org.spongepowered.api.event.entity.player.PlayerPlaceBlockEvent;
 import org.spongepowered.api.item.inventory.ItemStack;

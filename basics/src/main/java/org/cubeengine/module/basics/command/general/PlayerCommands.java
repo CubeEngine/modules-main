@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.general;
+package org.cubeengine.module.basics.command.general;
 
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -27,8 +27,8 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
+import org.cubeengine.module.basics.Basics;
+import org.cubeengine.module.basics.BasicsAttachment;
 import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.TimeUtil;

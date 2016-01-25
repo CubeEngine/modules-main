@@ -15,23 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics;
+package org.cubeengine.module.basics;
 
 import javax.inject.Inject;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.module.fixes.FixListener;
-import de.cubeisland.engine.module.basics.command.general.GeneralsListener;
-import de.cubeisland.engine.module.basics.command.general.InformationCommands;
+import org.cubeengine.module.fixes.FixListener;
+import org.cubeengine.module.basics.command.general.GeneralsListener;
+import org.cubeengine.module.basics.command.general.InformationCommands;
 import de.cubeisland.engine.module.basics.command.general.LagTimer;
 import de.cubeisland.engine.module.basics.command.general.ListCommand;
-import de.cubeisland.engine.module.basics.command.general.PlayerCommands;
+import org.cubeengine.module.basics.command.general.PlayerCommands;
 import de.cubeisland.engine.module.basics.command.general.RolesListCommand;
-import de.cubeisland.engine.module.basics.command.moderation.DoorCommand;
-import de.cubeisland.engine.module.basics.command.moderation.InventoryCommands;
-import de.cubeisland.engine.module.basics.command.moderation.ItemCommands;
-import de.cubeisland.engine.module.basics.command.moderation.PaintingListener;
+import org.cubeengine.module.basics.command.moderation.DoorCommand;
+import org.cubeengine.module.basics.command.moderation.InventoryCommands;
+import org.cubeengine.module.basics.command.moderation.ItemCommands;
+import org.cubeengine.module.basics.command.moderation.PaintingListener;
 import de.cubeisland.engine.module.basics.command.moderation.WeatherTimeCommands;
 import de.cubeisland.engine.module.vanillaplus.removal.RemovalCommands;
 import de.cubeisland.engine.module.vanillaplus.SpawnMobCommand;

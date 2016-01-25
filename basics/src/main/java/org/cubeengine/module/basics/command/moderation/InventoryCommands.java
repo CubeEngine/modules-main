@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.moderation;
+package org.cubeengine.module.basics.command.moderation;
 
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
@@ -23,8 +23,8 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.user.User;
 import org.cubeengine.module.core.util.InventoryGuardFactory;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
+import org.cubeengine.module.basics.Basics;
+import org.cubeengine.module.basics.BasicsAttachment;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 

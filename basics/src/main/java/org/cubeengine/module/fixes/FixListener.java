@@ -15,13 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.fixes;
+package org.cubeengine.module.fixes;
 
-import de.cubeisland.engine.module.basics.Basics;
+import org.cubeengine.module.basics.Basics;
 import org.spongepowered.api.data.manipulator.entity.FlyingData;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
-import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.entity.player.PlayerQuitEvent;
 import org.spongepowered.api.event.inventory.InventoryClickEvent;

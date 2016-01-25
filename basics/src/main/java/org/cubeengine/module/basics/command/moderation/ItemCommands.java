@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.moderation;
+package org.cubeengine.module.basics.command.moderation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,8 +31,8 @@ import de.cubeisland.engine.service.command.result.paginated.PaginatedResult;
 import org.cubeengine.service.paginate.PaginatedResult;
 import org.cubeengine.service.user.User;
 import de.cubeisland.engine.module.core.util.matcher.Match;
-import de.cubeisland.engine.module.basics.Basics;
-import de.cubeisland.engine.module.basics.BasicsAttachment;
+import org.cubeengine.module.basics.Basics;
+import org.cubeengine.module.basics.BasicsAttachment;
 import org.bukkit.enchantments.Enchantment;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;

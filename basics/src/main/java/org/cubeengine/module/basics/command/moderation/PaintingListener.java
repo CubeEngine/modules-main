@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package de.cubeisland.engine.module.basics.command.moderation;
+package org.cubeengine.module.basics.command.moderation;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -23,14 +23,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import org.cubeengine.service.user.User;
-import de.cubeisland.engine.module.basics.Basics;
+import org.cubeengine.module.basics.Basics;
 import org.cubeengine.service.user.UserManager;
 
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.hanging.Painting;
 import org.spongepowered.api.event.Order;
-import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
