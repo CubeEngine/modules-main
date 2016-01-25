@@ -19,12 +19,15 @@ package org.cubeengine.module.multiverse.converter;
 
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.ConverterManager;
+import de.cubeisland.engine.converter.converter.SingleClassConverter;
 import de.cubeisland.engine.converter.node.*;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class PotionEffectConverter extends SingleClassConverter<PotionEffect>
 {
@@ -54,14 +57,18 @@ public class PotionEffectConverter extends SingleClassConverter<PotionEffect>
             Node ambient = ((MapNode)node).get("ambient");
             if (amplifier instanceof IntNode && duration instanceof IntNode && type instanceof StringNode && ambient instanceof ByteNode)
             {
-                PotionEffectType byName = PotionEffectType.getByName(type.asText());
-                if (byName != null)
+                Optional<PotionEffectType> byName = Sponge.getRegistry().getType(PotionEffectType.class, type.asText());
+
+                if (byName.isPresent())
                 {
-                    return new PotionEffect(byName, ((IntNode)duration).getValue(), ((IntNode)amplifier).getValue(), ((ByteNode)ambient).getValue() == 1);
+                    return PotionEffect.builder().potionType(byName.get())
+                                .duration(((IntNode)duration).getValue())
+                                .amplifier(((IntNode)amplifier).getValue())
+                                .ambience(((ByteNode)ambient).getValue() == 1).build();
                 }
                 else
                 {
-                    throw ConversionException.of(this, node, "Unknown PotionEffectType " + type.asText());
+                    throw ConversionException.of(this, node, "Unknown PotionEffectType " + byName.get().getName());
                 }
             }
         }

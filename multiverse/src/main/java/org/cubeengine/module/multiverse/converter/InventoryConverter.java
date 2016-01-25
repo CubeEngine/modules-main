@@ -25,9 +25,11 @@ import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.ShortNode;
 import de.cubeisland.engine.converter.node.StringNode;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.inventory.entity.HumanInventory;
 
 public class InventoryConverter extends SimpleConverter<Inventory>
 {

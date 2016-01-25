@@ -19,8 +19,10 @@ package org.cubeengine.module.multiverse;
 
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
@@ -50,14 +52,14 @@ public class UniverseManager
     private final Path dirUniverses;
     private final Path dirErrors;
 
-    private final Permission universeRootPerm;
+    private final PermissionDescription universeRootPerm;
 
-    public UniverseManager(Multiverse module, Path modulePath, Log logger, Reflector reflector) throws IOException
+    public UniverseManager(Multiverse module, Path modulePath, Log logger, Reflector reflector, PermissionManager pm) throws IOException
     {
         this.module = module;
         this.logger = logger;
         this.reflector = reflector;
-        this.universeRootPerm = module.getProvided(Permission.class).childWildcard("universe");
+        this.universeRootPerm = pm.register(module, "universe", "", null);
 
         this.dirPlayers = modulePath.resolve("players"); // config for last world
         Files.createDirectories(this.dirPlayers);
@@ -122,7 +124,7 @@ public class UniverseManager
         return uConfig;
     }
 
-    public Permission getUniverseRootPerm()
+    public PermissionDescription getUniverseRootPerm()
     {
         return universeRootPerm;
     }

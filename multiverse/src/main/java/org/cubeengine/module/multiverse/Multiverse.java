@@ -13,9 +13,11 @@ import org.cubeengine.module.multiverse.converter.InventoryConverter;
 import org.cubeengine.module.multiverse.converter.PotionEffectConverter;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -44,6 +46,7 @@ public class Multiverse extends Module
     @Inject private EventManager em;
     @Inject private I18n i18n;
     @Inject private Reflector reflector;
+    @Inject private PermissionManager pm;
 
     @Enable
     public void onEnable() throws IOException
@@ -58,7 +61,7 @@ public class Multiverse extends Module
         manager.registerConverter(new InventoryConverter(game), Inventory.class);
         manager.registerConverter(new PotionEffectConverter(), PotionEffect.class);
 
-        UniverseManager um = new UniverseManager(this, getProvided(Path.class), getProvided(Log.class), reflector);
+        UniverseManager um = new UniverseManager(this, getProvided(Path.class), getProvided(Log.class), reflector, pm);
         cm.addCommand(new MultiverseCommands(this, um, i18n, game));
         em.registerListener(this, new MultiverseListener());
 
