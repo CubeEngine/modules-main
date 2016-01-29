@@ -25,13 +25,16 @@ import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Maybe;
 import de.cubeisland.engine.modularity.core.Module;
+import org.cubeengine.service.database.ModuleTables;
 import org.cubeengine.service.filesystem.FileManager;
+import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.event.EventManager;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.module.core.util.Profiler;
 import org.cubeengine.service.database.Database;
+import org.cubeengine.service.permission.ModulePermissions;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.module.travel.home.HomeCommand;
 import org.cubeengine.module.travel.home.HomeListener;
@@ -42,17 +45,16 @@ import org.cubeengine.module.travel.warp.WarpCommand;
 import org.cubeengine.module.travel.warp.WarpManager;
 
 @ModuleInfo(name = "Travel", description = "Travel anywhere")
+@ModuleTables({TableTeleportPoint.class, TableInvite.class})
 public class Travel extends Module
 {
-    private TravelConfig config;
+    @ModuleConfig private TravelConfig config;
+    @ModulePermissions private TravelPerm permissions;
 
     private InviteManager inviteManager;
     private HomeManager homeManager;
     private WarpManager warpManager;
 
-    private TravelPerm permissions;
-
-    @Inject private FileManager fm;
     @Inject private Database db;
     @Inject private Log logger;
     @Inject private CommandManager cm;
@@ -64,10 +66,6 @@ public class Travel extends Module
     @Enable
     public void onEnable()
     {
-        this.config = fm.loadConfig(this, TravelConfig.class);
-        db.registerTable(TableTeleportPoint.class);
-        db.registerTable(TableInvite.class);
-
         i18n.getCompositor().registerFormatter(new TpPointFormatter(i18n));
 
         Profiler.startProfiling("travelEnable");
@@ -84,16 +82,6 @@ public class Travel extends Module
         WarpCommand warpCmd = new WarpCommand(this, i18n);
         cm.addCommand(warpCmd);
         em.registerListener(this, new HomeListener(this, i18n));
-
-        this.permissions = new TravelPerm(this);
-    }
-
-    @Disable
-    public void onDisable()
-    {
-        cm.removeCommands(this);
-        em.removeListeners(this);
-        pm.cleanup(this);
     }
 
     public TravelConfig getConfig()

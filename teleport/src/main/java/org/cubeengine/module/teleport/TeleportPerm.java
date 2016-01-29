@@ -22,8 +22,6 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 
 public class TeleportPerm extends PermissionContainer<Teleport>
 {
-
-
     public TeleportPerm(Teleport module)
     {
         super(module);

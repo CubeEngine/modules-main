@@ -39,14 +39,17 @@ import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.module.locker.storage.TableAccessList;
 import org.cubeengine.module.locker.storage.TableLockLocations;
 import org.cubeengine.module.locker.storage.TableLocks;
+import org.cubeengine.service.database.ModuleTables;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.event.EventManager;
+import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.matcher.EntityMatcher;
 import org.cubeengine.service.matcher.MaterialMatcher;
 import org.cubeengine.service.matcher.StringMatcher;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.permission.ModulePermissions;
 import org.cubeengine.service.task.TaskManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.Game;
@@ -54,50 +57,43 @@ import org.spongepowered.api.Game;
 // TODO protect lines of redstone
 
 @ModuleInfo(name = "Locker", description = "Puts a Lock on your stuff")
+@ModuleTables({TableLocks.class, TableLockLocations.class, TableAccessList.class})
 public class Locker extends Module
 {
-    private LockerConfig config;
-    private LockManager manager;
-
-    public LockerPerm perms()
-    {
-        return perms;
-    }
-
+    @ModuleConfig private LockerConfig config;
     private LockerPerm perms;
 
-    @Inject private Reflector reflector;
-    @Inject private FileManager fm;
+    private LockManager manager;
+    private Log logger;
+
     @Inject private Database db;
     @Inject private CommandManager cm;
     @Inject private EventManager em;
-    @Inject private MaterialMatcher mm;
-    @Inject private Log logger;
+
     @Inject private StringMatcher sm;
-    @Inject private EntityMatcher entityMatcher;
+
     @Inject private Game game;
     @Inject private TaskManager tm;
     @Inject private I18n i18n;
 
     @Inject
-    public Locker(Game game)
+    public Locker(Game game, Reflector reflector, EntityMatcher entityMatcher, Log logger, MaterialMatcher mm)
     {
+        this.logger = logger;
         game.getDataManager().register(LockerData.class, ImmutableLockerData.class,
                                                     new LockerDataBuilder(game.getRegistry().getValueFactory()));
+
+        ConverterManager cManager = reflector.getDefaultConverterManager();
+        cManager.registerConverter(new BlockLockerConfigConverter(logger, mm), BlockLockConfig.class);
+        cManager.registerConverter(new EntityLockerConfigConverter(logger, entityMatcher), EntityLockConfig.class);
     }
+
 
     @Enable
     public void onEnable()
     {
         cm.getProviderManager().register(this, new PlayerAccess.PlayerAccessReader(game), PlayerAccess.class);
 
-        ConverterManager cManager = reflector.getDefaultConverterManager();
-        cManager.registerConverter(new BlockLockerConfigConverter(logger, mm), BlockLockConfig.class);
-        cManager.registerConverter(new EntityLockerConfigConverter(logger, entityMatcher), EntityLockConfig.class);
-        this.config = fm.loadConfig(this, LockerConfig.class);
-        db.registerTable(TableLocks.class);
-        db.registerTable(TableLockLocations.class);
-        db.registerTable(TableAccessList.class);
         manager = new LockManager(this, em, sm, db, tm, i18n, game);
         LockerCommands lockerCmd = new LockerCommands(this, manager, i18n, sm);
         cm.addCommand(lockerCmd);
@@ -111,8 +107,6 @@ public class Locker extends Module
     @Disable
     public void onDisable()
     {
-        em.removeListeners(this);
-        cm.removeCommands(this);
         this.manager.saveAll();
     }
 
@@ -150,6 +144,12 @@ public class Locker extends Module
     {
         return tm;
     }
+
+    public LockerPerm perms()
+    {
+        return perms;
+    }
+
 
     /*
     Features:

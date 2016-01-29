@@ -28,8 +28,11 @@ import org.cubeengine.module.conomy.storage.TableAccount;
 import org.cubeengine.module.conomy.storage.TableBalance;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.database.Database;
+import org.cubeengine.service.database.ModuleTables;
 import org.cubeengine.service.filesystem.FileManager;
+import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.permission.ModulePermissions;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.economy.EconomyService;
 
@@ -40,33 +43,29 @@ import java.nio.file.Path;
 import java.util.concurrent.ThreadFactory;
 
 @ModuleInfo(name = "Conomy", description = "Economy API and basic commands")
+@ModuleTables({TableAccount.class, TableBalance.class})
 public class Conomy extends Module
 {
-    private ConomyConfiguration config;
+    @ModuleConfig private ConomyConfiguration config;
+    @ModulePermissions private ConomyPermission perms;
 
     @Inject private Database db;
     @Inject private I18n i18n;
     @Inject private CommandManager cm;
     @Inject private ThreadFactory tf;
     @Inject private LogFactory lf;
-    @Inject private FileManager fm;
     @Inject private Path modulePath;
     @Inject private Reflector reflector;
     @Inject private Game game;
 
-    private ConomyPermission perms;
     private BankPermission bankPerms;
     private ConomyService service;
 
     @Enable
     public void onEnable()
     {
-        db.registerTable(TableAccount.class);
-        db.registerTable(TableBalance.class);
-
         i18n.getCompositor().registerFormatter(new BaseAccountFormatter());
 
-        ConomyConfiguration config = fm.loadConfig(this, ConomyConfiguration.class);
         Path curencyPath = modulePath.resolve("currencies");
         try
         {
@@ -92,8 +91,6 @@ public class Conomy extends Module
 
         // TODO logging transactions / can be done via events
         // TODO logging new accounts not! workaround set start value using transaction
-
-        perms = new ConomyPermission(this);
 
         // we're doing this via permissions
     }

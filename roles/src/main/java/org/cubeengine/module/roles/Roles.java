@@ -48,6 +48,7 @@ import org.cubeengine.module.roles.data.PermissionDataBuilder;
 import org.cubeengine.module.roles.exception.RolesExceptionHandler;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.service.filesystem.FileManager;
+import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.event.EventManager;
 import org.cubeengine.module.roles.commands.provider.ContextFormatter;
@@ -66,6 +67,7 @@ import org.cubeengine.module.roles.config.PermissionTreeConverter;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.PriorityConverter;
 import org.cubeengine.service.permission.PermissionManager;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -83,12 +85,10 @@ public class Roles extends Module
     private RolesConfig config;
 
     @Inject private Reflector reflector;
-    @Inject private Database db;
     @Inject private Log logger;
     @Inject private CommandManager cm;
-    @Inject private EventManager em;
     @Inject private FileManager fm;
-    @Inject private org.spongepowered.api.Game game;
+    @Inject private Game game;
     @Inject private I18n i18n;
     @Inject private PermissionManager manager;
 
@@ -111,6 +111,7 @@ public class Roles extends Module
         ConverterManager cManager = reflector.getDefaultConverterManager();
         cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);
         cManager.registerConverter(new PriorityConverter(), Priority.class);
+
         this.config = fm.loadConfig(this, RolesConfig.class);
 
         service = new RolesPermissionService(this, reflector, config, game, manager, permLogger);
@@ -163,8 +164,6 @@ public class Roles extends Module
     @Disable
     public void onDisable()
     {
-        cm.removeCommands(this);
-        em.removeListeners(this);
         getProvided(SettableInvocationHandler.class).with(null).and(service.getContextCalculators());
     }
 

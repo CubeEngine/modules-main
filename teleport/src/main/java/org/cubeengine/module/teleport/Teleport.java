@@ -18,14 +18,14 @@
 package org.cubeengine.module.teleport;
 
 import javax.inject.Inject;
-import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.event.EventManager;
 import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.permission.ModulePermissions;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.Broadcaster;
@@ -41,23 +41,19 @@ public class Teleport extends Module
     @Inject private CommandManager cm;
     @Inject private EventManager em;
     @Inject private TaskManager tm;
-    @Inject private FileManager fm;
     @Inject private PermissionManager pm;
     @Inject private org.spongepowered.api.Game game;
     @Inject private Broadcaster bc;
     @Inject private I18n i18n;
 
-    private TeleportPerm permissions;
+    @ModulePermissions private TeleportPerm perms;
+    @ModuleConfig private TeleportConfiguration config;
     private TpWorldPermissions tpWorld;
-    private TeleportConfiguration config;
 
     @Enable
     public void onEnable()
     {
-        config = fm.loadConfig(this, TeleportConfiguration.class);
-
-        permissions = new TeleportPerm(this);
-        tpWorld = new TpWorldPermissions(this, permissions, game, pm); // per world permissions
+        tpWorld = new TpWorldPermissions(this, perms, game, pm); // per world permissions
 
         TeleportListener tl = new TeleportListener(this, i18n);
         em.registerListener(this, tl);
@@ -68,17 +64,9 @@ public class Teleport extends Module
         cm.addCommands(cm, this, new TeleportRequestCommands(this, tm, tl, game, i18n));
     }
 
-    @Disable
-    public void onDisable()
-    {
-        cm.removeCommands(this);
-        em.removeListeners(this);
-        pm.cleanup(this);
-    }
-
     public TeleportPerm perms()
     {
-        return this.permissions;
+        return this.perms;
     }
 
     public TpWorldPermissions permsTpWorld()

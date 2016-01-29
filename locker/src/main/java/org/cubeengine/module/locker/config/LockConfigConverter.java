@@ -110,6 +110,7 @@ public abstract class LockConfigConverter<C extends LockConfig<C, ?>> extends Si
                         }
                         else
                         {
+                            // TODO containers that can be redstoneactivated
                             logger.warn("[Locker] Unsupported flag for protectedType! {}: {}", configuration.protectedType.name(), flag.name());
                         }
                     }

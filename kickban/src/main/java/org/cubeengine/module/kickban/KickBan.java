@@ -24,7 +24,9 @@ import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.filesystem.FileManager;
+import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.permission.ModulePermissions;
 import org.cubeengine.service.user.Broadcaster;
 import org.spongepowered.api.Game;
 
@@ -45,22 +47,14 @@ public class KickBan extends Module
     @Inject private Game game;
     @Inject private FileManager fm;
     @Inject private I18n i18n;
-    private KickBanPerms perms;
-    private KickBanConfig config;
+    @ModulePermissions private KickBanPerms perms;
+    @ModuleConfig private KickBanConfig config;
 
 
     @Enable
     public void onEnable()
     {
-        this.perms = new KickBanPerms(this);
         cm.addCommands(this, new KickBanCommands(this, bc, game, i18n));
-        config = fm.loadConfig(this, KickBanConfig.class);
-    }
-
-    @Disable
-    public void onDisable()
-    {
-        cm.removeCommands(this);
     }
 
     public KickBanPerms perms()
