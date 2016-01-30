@@ -96,11 +96,11 @@ public class WeatherCommands
         WorldProperties worldProp = world.getProperties();
         if (worldProp.isThundering() != noThunder && worldProp.isRaining() != sunny) // weather is not changing
         {
-            context.sendTranslated(POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather.name());
+            i18n.sendTranslated(context, POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather.name());
         }
         else
         {
-            context.sendTranslated(POSITIVE, "Changed weather in {world} to {input#weather}!", world, weather.name());
+            i18n.sendTranslated(context, POSITIVE, "Changed weather in {world} to {input#weather}!", world, weather.name());
         }
         worldProp.setRaining(!sunny);
         worldProp.setThundering(!noThunder);
@@ -117,7 +117,7 @@ public class WeatherCommands
     {
         if (!player.isOnline())
         {
-            context.sendTranslated(NEGATIVE, "{user} is not online!", player);
+            i18n.sendTranslated(context, NEGATIVE, "{user} is not online!", player);
             return;
         }
         switch (weather)
@@ -126,36 +126,36 @@ public class WeatherCommands
                 player.setPlayerWeather(Weathers.CLEAR);
                 if (context.getSource().equals(player))
                 {
-                    context.sendTranslated(POSITIVE, "Your weather is now clear!");
+                    i18n.sendTranslated(context, POSITIVE, "Your weather is now clear!");
                 }
                 else
                 {
                     player.sendTranslated(POSITIVE, "Your weather is now clear!");
-                    context.sendTranslated(POSITIVE, "{user}s weather is now clear!", player);
+                    i18n.sendTranslated(context, POSITIVE, "{user}s weather is now clear!", player);
                 }
                 return;
             case DOWNFALL:
                 player.setPlayerWeather(Weathers.RAIN);
                 if (context.getSource().equals(player))
                 {
-                    context.sendTranslated(POSITIVE, "Your weather is now not clear!");
+                    i18n.sendTranslated(context, POSITIVE, "Your weather is now not clear!");
                 }
                 else
                 {
                     player.sendTranslated(POSITIVE, "Your weather is now not clear!");
-                    context.sendTranslated(POSITIVE, "{user}s weather is now not clear!", player);
+                    i18n.sendTranslated(context, POSITIVE, "{user}s weather is now not clear!", player);
                 }
                 return;
             case RESET:
                 player.resetPlayerWeather();
                 if (context.getSource().equals(player))
                 {
-                    context.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
+                    i18n.sendTranslated(context, POSITIVE, "Your weather is now reset to server weather!");
                 }
                 else
                 {
                     player.sendTranslated(POSITIVE, "Your weather is now reset to server weather!");
-                    context.sendTranslated(POSITIVE, "{user}s weather is now reset to server weather!", player);
+                    i18n.sendTranslated(context, POSITIVE, "{user}s weather is now reset to server weather!", player);
                 }
                 return;
         }

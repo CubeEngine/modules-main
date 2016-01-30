@@ -86,7 +86,7 @@ public class SpawnMob
         }
         if (entityType == null)
         {
-            context.sendTranslated(NEGATIVE, "Unknown mob-type: {input#entityname} not found!", entityName);
+            i18n.sendTranslated(context, NEGATIVE, "Unknown mob-type: {input#entityname} not found!", entityName);
             return null;
         }
         Entity[] spawnedMobs = new Entity[amount];

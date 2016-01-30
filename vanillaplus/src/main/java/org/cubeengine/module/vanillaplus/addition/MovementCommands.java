@@ -16,7 +16,7 @@ public class MovementCommands
         {
             if (!context.hasPermission(module.perms().COMMAND_WALKSPEED_OTHER))
             {
-                context.sendTranslated(NEGATIVE, "You are not allowed to change the walk speed of an other player!");
+                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to change the walk speed of an other player!");
                 return;
             }
             other = true;
@@ -24,7 +24,7 @@ public class MovementCommands
 
         if (!player.getUser().isOnline())
         {
-            context.sendTranslated(NEGATIVE, "{user} is offline!", player.getName());
+            i18n.sendTranslated(context, NEGATIVE, "{user} is offline!", player.getName());
             return;
         }
         if (speed >= 0 && speed <= 10)
@@ -45,13 +45,13 @@ public class MovementCommands
     public void fly(CommandSender context, @Optional Float flyspeed, @Default @Named("player") User player)
     {
         // new cmd system does not provide a way for defaultProvider to give custom messages
-        //context.sendTranslated(NEUTRAL, "{text:ProTip}: If your server flies away it will go offline.");
-        //context.sendTranslated(NEUTRAL, "So... Stopping the Server in {text:3..:color=RED}");
+        //i18n.sendTranslated(context, NEUTRAL, "{text:ProTip}: If your server flies away it will go offline.");
+        //i18n.sendTranslated(context, NEUTRAL, "So... Stopping the Server in {text:3..:color=RED}");
 
         // PermissionChecks
         if (!context.equals(player) && !context.hasPermission(module.perms().COMMAND_FLY_OTHER))
         {
-            context.sendTranslated(NEGATIVE, "You are not allowed to change the fly mode of other player!");
+            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to change the fly mode of other player!");
             return;
         }
         //I Believe I Can Fly ...
@@ -63,16 +63,16 @@ public class MovementCommands
                 player.sendTranslated(POSITIVE, "You can now fly at {decimal#speed:2}!", flyspeed);
                 if (!player.equals(context))
                 {
-                    context.sendTranslated(POSITIVE, "{player} can now fly at {decimal#speed:2}!", player, flyspeed);
+                    i18n.sendTranslated(context, POSITIVE, "{player} can now fly at {decimal#speed:2}!", player, flyspeed);
                 }
             }
             else
             {
                 if (flyspeed > 9000)
                 {
-                    context.sendTranslated(NEUTRAL, "It's over 9000!");
+                    i18n.sendTranslated(context, NEUTRAL, "It's over 9000!");
                 }
-                context.sendTranslated(NEGATIVE, "FlySpeed has to be a Number between {text:0} and {text:10}!");
+                i18n.sendTranslated(context, NEGATIVE, "FlySpeed has to be a Number between {text:0} and {text:10}!");
             }
             player.asPlayer().offer(Keys.CAN_FLY, true);
             player.asPlayer().offer(Keys.FLYING, true);
@@ -85,14 +85,14 @@ public class MovementCommands
             player.sendTranslated(POSITIVE, "You can now fly!");
             if (!player.equals(context))
             {
-                context.sendTranslated(POSITIVE, "{player} can now fly!", player);
+                i18n.sendTranslated(context, POSITIVE, "{player} can now fly!", player);
             }
             return;
         }
         player.sendTranslated(NEUTRAL, "You cannot fly anymore!");
         if (!player.equals(context))
         {
-            context.sendTranslated(POSITIVE, "{player} cannot fly anymore!", player);
+            i18n.sendTranslated(context, POSITIVE, "{player} cannot fly anymore!", player);
         }
     }
 }

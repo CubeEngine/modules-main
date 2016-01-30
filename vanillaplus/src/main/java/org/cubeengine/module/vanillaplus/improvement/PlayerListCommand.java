@@ -97,12 +97,12 @@ public class PlayerListCommand
 
         if (users.isEmpty())
         {
-            context.sendTranslated(NEGATIVE, "There are no players online at the moment!");
+            i18n.sendTranslated(context, NEGATIVE, "There are no players online at the moment!");
             return null;
         }
 
         SortedMap<String, Set<User>> grouped = this.groupUsers(users);
-        context.sendTranslated(POSITIVE, "Players online: {amount#online}/{amount#max}", users.size(),
+        i18n.sendTranslated(context, POSITIVE, "Players online: {amount#online}/{amount#max}", users.size(),
                              game.getServer().getMaxPlayers());
 
         for (Entry<String, Set<User>> entry : grouped.entrySet())

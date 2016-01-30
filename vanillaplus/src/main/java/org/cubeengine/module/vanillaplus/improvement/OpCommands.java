@@ -31,26 +31,26 @@ public class OpCommands
             Set<org.spongepowered.api.entity.player.User> ops = this.core.getServer().getOperators();
             if (ops.isEmpty())
             {
-                context.sendTranslated(NEUTRAL, "There are currently no operators!");
+                i18n.sendTranslated(context, NEUTRAL, "There are currently no operators!");
                 return;
             }
-            context.sendTranslated(NEUTRAL, "The following users are operators:");
+            i18n.sendTranslated(context, NEUTRAL, "The following users are operators:");
             context.sendMessage(" ");
             for (org.spongepowered.api.entity.player.User opPlayer : ops)
             {
-                context.sendTranslated(POSITIVE, " - {user} (Last seen: {date:notime})", opPlayer, opPlayer.getData(JoinData.class).get().getLastPlayed());
+                i18n.sendTranslated(context, POSITIVE, " - {user} (Last seen: {date:notime})", opPlayer, opPlayer.getData(JoinData.class).get().getLastPlayed());
             }
             return;
         }
         if (!(player.getData(JoinData.class).isPresent() || player.isOnline()) && !force)
         {
-            context.sendTranslated(NEGATIVE, "{user} has never played on this server!", player);
-            context.sendTranslated(NEGATIVE, "If you still want to op him, use the -force flag.");
+            i18n.sendTranslated(context, NEGATIVE, "{user} has never played on this server!", player);
+            i18n.sendTranslated(context, NEGATIVE, "If you still want to op him, use the -force flag.");
             return;
         }
         if (player.isOp())
         {
-            context.sendTranslated(NEUTRAL, "{user} is already an operator.", player);
+            i18n.sendTranslated(context, NEUTRAL, "{user} is already an operator.", player);
             return;
         }
         player.setOp(true);
@@ -58,7 +58,7 @@ public class OpCommands
         {
             um.getExactUser(player.getUniqueId()).sendTranslated(POSITIVE, "You were opped by {sender}", context);
         }
-        context.sendTranslated(POSITIVE, "{user} is now an operator!", player);
+        i18n.sendTranslated(context, POSITIVE, "{user} is now an operator!", player);
 
         for (User onlineUser : um.getOnlineUsers())
         {
@@ -83,7 +83,7 @@ public class OpCommands
         }
         if (!player.isOp())
         {
-            context.sendTranslated(NEGATIVE, "The player you tried to deop is not an operator.");
+            i18n.sendTranslated(context, NEGATIVE, "The player you tried to deop is not an operator.");
             return;
         }
         player.setOp(false);
@@ -92,7 +92,7 @@ public class OpCommands
             um.getExactUser(player.getUniqueId()).sendTranslated(POSITIVE, "You were deopped by {user}.",
                                                                  context.getSource());
         }
-        context.sendTranslated(POSITIVE, "{user} is no longer an operator!", player);
+        i18n.sendTranslated(context, POSITIVE, "{user} is no longer an operator!", player);
 
         for (User onlineUser : um.getOnlineUsers())
         {

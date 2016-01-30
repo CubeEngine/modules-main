@@ -73,11 +73,11 @@ public class WhitelistCommand extends ContainerCommand
     {
         if (player.getData(WhitelistData.class).isPresent())
         {
-            context.sendTranslated(NEUTRAL, "{user} is already whitelisted.", player);
+            i18n.sendTranslated(context, NEUTRAL, "{user} is already whitelisted.", player);
             return;
         }
         player.offer(core.getGame().getRegistry().getBuilderOf(WhitelistData.class).get());
-        context.sendTranslated(POSITIVE, "{user} is now whitelisted.", player);
+        i18n.sendTranslated(context, POSITIVE, "{user} is now whitelisted.", player);
     }
 
     @Command(alias = "rm", desc = "Removes a player from the whitelist.")
@@ -85,11 +85,11 @@ public class WhitelistCommand extends ContainerCommand
     {
         if (!player.getData(WhitelistData.class).isPresent())
         {
-            context.sendTranslated(NEUTRAL, "{user} is not whitelisted.", player);
+            i18n.sendTranslated(context, NEUTRAL, "{user} is not whitelisted.", player);
             return;
         }
         player.getOfflinePlayer().remove(WhitelistData.class);
-        context.sendTranslated(POSITIVE, "{user} is not whitelisted anymore.", player.getName());
+        i18n.sendTranslated(context, POSITIVE, "{user} is not whitelisted anymore.", player.getName());
     }
 
     @Command(desc = "Lists all the whitelisted players")
@@ -99,20 +99,20 @@ public class WhitelistCommand extends ContainerCommand
         Set<org.spongepowered.api.entity.player.User> whitelist = this.core.getGame().getServer().getWhitelistedPlayers();
         if (!this.core.getGame().getServer().hasWhitelist())
         {
-            context.sendTranslated(NEUTRAL, "The whitelist is currently disabled.");
+            i18n.sendTranslated(context, NEUTRAL, "The whitelist is currently disabled.");
         }
         else
         {
-            context.sendTranslated(POSITIVE, "The whitelist is enabled!.");
+            i18n.sendTranslated(context, POSITIVE, "The whitelist is enabled!.");
         }
         context.sendMessage(" ");
         if (whitelist.isEmpty())
         {
-            context.sendTranslated(NEUTRAL, "There are currently no whitelisted players!");
+            i18n.sendTranslated(context, NEUTRAL, "There are currently no whitelisted players!");
         }
         else
         {
-            context.sendTranslated(NEUTRAL, "The following players are whitelisted:");
+            i18n.sendTranslated(context, NEUTRAL, "The following players are whitelisted:");
             for (org.spongepowered.api.entity.player.User player : whitelist)
             {
                 context.sendMessage(" - " + player.getName());
@@ -121,7 +121,7 @@ public class WhitelistCommand extends ContainerCommand
         Set<org.spongepowered.api.entity.player.User> operators = this.core.getGame().getServer().getOperators();
         if (!operators.isEmpty())
         {
-            context.sendTranslated(NEUTRAL, "The following players are OP and can bypass the whitelist");
+            i18n.sendTranslated(context, NEUTRAL, "The following players are OP and can bypass the whitelist");
             for (org.spongepowered.api.entity.player.User operator : operators)
             {
                 context.sendMessage(" - " + operator.getName());
@@ -135,11 +135,11 @@ public class WhitelistCommand extends ContainerCommand
     {
         if (this.core.getGame().getServer().hasWhitelist())
         {
-            context.sendTranslated(NEGATIVE, "The whitelist is already enabled!");
+            i18n.sendTranslated(context, NEGATIVE, "The whitelist is already enabled!");
             return;
         }
         this.core.getGame().getServer().setHasWhitelist(true);
-        context.sendTranslated(POSITIVE, "The whitelist is now enabled.");
+        i18n.sendTranslated(context, POSITIVE, "The whitelist is now enabled.");
     }
 
     @Command(desc = "Disables the whitelisting")
@@ -147,11 +147,11 @@ public class WhitelistCommand extends ContainerCommand
     {
         if (!this.core.getGame().getServer().hasWhitelist())
         {
-            context.sendTranslated(NEGATIVE, "The whitelist is already disabled!");
+            i18n.sendTranslated(context, NEGATIVE, "The whitelist is already disabled!");
             return;
         }
         this.core.getGame().getServer().setHasWhitelist(false);
-        context.sendTranslated(POSITIVE, "The whitelist is now disabled.");
+        i18n.sendTranslated(context, POSITIVE, "The whitelist is now disabled.");
     }
 
     @Command(desc = "Wipes the whitelist completely")
@@ -159,6 +159,6 @@ public class WhitelistCommand extends ContainerCommand
     public void wipe(CommandSender context)
     {
         // TODO wipe whitelist
-        context.sendTranslated(POSITIVE, "The whitelist was successfully wiped!");
+        i18n.sendTranslated(context, POSITIVE, "The whitelist was successfully wiped!");
     }
 }

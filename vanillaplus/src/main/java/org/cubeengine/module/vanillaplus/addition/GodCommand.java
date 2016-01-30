@@ -18,7 +18,7 @@ public class GodCommand
         {
             if (!module.perms().COMMAND_GOD_OTHER.isAuthorized(context))
             {
-                context.sendTranslated(NEGATIVE, "You are not allowed to god others!");
+                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to god others!");
                 return;
             }
             other = true;
@@ -30,20 +30,20 @@ public class GodCommand
             player.asPlayer().remove(Keys.INVULNERABILITY);
             if (!other)
             {
-                context.sendTranslated(NEUTRAL, "You are no longer invincible!");
+                i18n.sendTranslated(context, NEUTRAL, "You are no longer invincible!");
                 return;
             }
             player.sendTranslated(NEUTRAL, "You are no longer invincible!");
-            context.sendTranslated(NEUTRAL, "{user} is no longer invincible!", player);
+            i18n.sendTranslated(context, NEUTRAL, "{user} is no longer invincible!", player);
             return;
         }
         player.asPlayer().offer(Keys.INVULNERABILITY, Integer.MAX_VALUE);
         if (!other)
         {
-            context.sendTranslated(POSITIVE, "You are now invincible!");
+            i18n.sendTranslated(context, POSITIVE, "You are now invincible!");
             return;
         }
         player.sendTranslated(POSITIVE, "You are now invincible!");
-        context.sendTranslated(POSITIVE, "{user} is now invincible!", player);
+        i18n.sendTranslated(context, POSITIVE, "{user} is now invincible!", player);
     }
 }

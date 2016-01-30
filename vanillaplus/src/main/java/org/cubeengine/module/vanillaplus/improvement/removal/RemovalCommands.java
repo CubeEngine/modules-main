@@ -99,7 +99,7 @@ public class RemovalCommands
         radius = radius == null ? this.config.commands.removeDefaultRadius : radius;
         if (radius <= 0 && radius != RADIUS_INFINITE)
         {
-            context.sendTranslated(NEGATIVE, "The radius has to be a whole number greater than 0!");
+            i18n.sendTranslated(context, NEGATIVE, "The radius has to be a whole number greater than 0!");
             return;
         }
         Location loc = context instanceof User ? ((User)context).getLocation() : null;
@@ -130,8 +130,8 @@ public class RemovalCommands
                 }
                 if (type == null)
                 {
-                    context.sendTranslated(NEGATIVE, "Invalid entity-type!");
-                    context.sendTranslated(NEUTRAL, "Use one of those instead:");
+                    i18n.sendTranslated(context, NEGATIVE, "Invalid entity-type!");
+                    i18n.sendTranslated(context, NEUTRAL, "Use one of those instead:");
                     context.sendMessage(DROPPED_ITEM.toString() + YELLOW + ", " +
                                             GOLD + ARROW.getName() + YELLOW + ", " +
                                             GOLD + BOAT.getName() + YELLOW + ", " +
@@ -143,14 +143,14 @@ public class RemovalCommands
                 }
                 if (Living.class.isAssignableFrom(type.getEntityClass()))
                 {
-                    context.sendTranslated(NEGATIVE, "To kill living entities use the {text:/butcher} command!");
+                    i18n.sendTranslated(context, NEGATIVE, "To kill living entities use the {text:/butcher} command!");
                     return;
                 }
                 if (entityString.contains(":"))
                 {
                     if (!DROPPED_ITEM.equals(type))
                     {
-                        context.sendTranslated(NEGATIVE, "You can only specify data for removing items!");
+                        i18n.sendTranslated(context, NEGATIVE, "You can only specify data for removing items!");
                         return;
                     }
                     ItemType itemtype = materialMatcher.material(entityString.substring(entityString.indexOf(":") + 1));
@@ -184,22 +184,22 @@ public class RemovalCommands
         }
         if (entitiesRemoved == 0)
         {
-            context.sendTranslated(NEUTRAL, "No entities to remove!");
+            i18n.sendTranslated(context, NEUTRAL, "No entities to remove!");
             return;
         }
         if ("*".equals(entities))
         {
             if (radius == RADIUS_INFINITE)
             {
-                context.sendTranslated(POSITIVE, "Removed all entities in {world}! ({amount})", world, entitiesRemoved);
+                i18n.sendTranslated(context, POSITIVE, "Removed all entities in {world}! ({amount})", world, entitiesRemoved);
                 return;
             }
-            context.sendTranslated(POSITIVE, "Removed all entities around you! ({amount})", entitiesRemoved);
+            i18n.sendTranslated(context, POSITIVE, "Removed all entities around you! ({amount})", entitiesRemoved);
             return;
         }
         if (radius == RADIUS_INFINITE)
         {
-            context.sendTranslated(POSITIVE, "Removed {amount} entities in {world}!", entitiesRemoved, world);
+            i18n.sendTranslated(context, POSITIVE, "Removed {amount} entities in {world}!", entitiesRemoved, world);
             return;
         }
         context.sendTranslatedN(POSITIVE, entitiesRemoved, "Removed one entity nearby!",
@@ -223,7 +223,7 @@ public class RemovalCommands
         radius = radius == null ? this.config.commands.butcherDefaultRadius : radius;
         if (radius < 0 && !(radius == -1 && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context)))
         {
-            context.sendTranslated(NEGATIVE, "The radius has to be a number greater than 0!");
+            i18n.sendTranslated(context, NEGATIVE, "The radius has to be a number greater than 0!");
             return;
         }
         int removed;
@@ -259,7 +259,7 @@ public class RemovalCommands
                 allTypes = true;
                 if (!module.perms().COMMAND_BUTCHER_FLAG_ALLTYPE.isAuthorized(context))
                 {
-                    context.sendTranslated(NEGATIVE, "You are not allowed to butcher all types of living entities at once!");
+                    i18n.sendTranslated(context, NEGATIVE, "You are not allowed to butcher all types of living entities at once!");
                     return;
                 }
             }
@@ -280,7 +280,7 @@ public class RemovalCommands
                     directEntityMatch = entityMatcher.mob(s_type);
                     if (directEntityMatch == null)
                     {
-                        context.sendTranslated(NEGATIVE, "Unknown entity {input#entity}", s_type);
+                        i18n.sendTranslated(context, NEGATIVE, "Unknown entity {input#entity}", s_type);
                         return;
                     }
                     if (this.entityRemovals.DIRECT_ENTITY_REMOVAL.get(directEntityMatch) == null) throw new IllegalStateException("Missing Entity? " + directEntityMatch);
@@ -313,11 +313,11 @@ public class RemovalCommands
         removed = this.removeEntities(list, loc, radius, lightning);
         if (removed == 0)
         {
-            context.sendTranslated(NEUTRAL, "Nothing to butcher!");
+            i18n.sendTranslated(context, NEUTRAL, "Nothing to butcher!");
         }
         else
         {
-            context.sendTranslated(POSITIVE, "You just slaughtered {amount} living entities!", removed);
+            i18n.sendTranslated(context, POSITIVE, "You just slaughtered {amount} living entities!", removed);
         }
 
     }

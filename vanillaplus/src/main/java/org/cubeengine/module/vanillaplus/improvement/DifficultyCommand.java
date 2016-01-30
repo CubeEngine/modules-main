@@ -17,41 +17,41 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import org.cubeengine.butler.parameter.TooFewArgumentsException;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.i18n.formatter.MessageType;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.difficulty.Difficulty;
 
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+
 public class DifficultyCommand
 {
+    private I18n i18n;
+
+    public DifficultyCommand(I18n i18n)
+    {
+        this.i18n = i18n;
+    }
 
     @Command(desc = "Changes the difficulty level of the server")
-    public void difficulty(CommandSender context, @Optional Difficulty difficulty, @Named({"world", "w", "in"}) World world)
+    public void difficulty(CommandSource context, @Optional Difficulty difficulty,
+                           @Default @Named({"world", "w", "in"}) World world)
     {
-        if (world == null)
-        {
-            if (context instanceof User)
-            {
-                world = ((User)context).getWorld();
-            }
-            else
-            {
-                context.sendTranslated(NEGATIVE, "You have to specify a world");
-                throw new TooFewArgumentsException();
-            }
-        }
         if (difficulty != null)
         {
             world.getProperties().setDifficulty(difficulty); // TODO is this saved?
-            context.sendTranslated(POSITIVE, "The difficulty has been successfully set!");
+            i18n.sendTranslated(context, POSITIVE, "The difficulty has been successfully set!");
             return;
         }
-        context.sendTranslated(POSITIVE, "Current difficulty level: {input}", world.getDifficulty().getName());
+        i18n.sendTranslated(context, POSITIVE, "Current difficulty level: {input}", world.getDifficulty().getName());
         if (world.getProperties().isHardcore())
         {
-            context.sendTranslated(POSITIVE, "The world {world} has the hardcore mode enabled.", world);
+            i18n.sendTranslated(context, POSITIVE, "The world {world} has the hardcore mode enabled.", world);
         }
     }
 }

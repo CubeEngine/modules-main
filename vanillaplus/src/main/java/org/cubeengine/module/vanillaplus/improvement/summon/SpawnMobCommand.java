@@ -58,7 +58,7 @@ public class SpawnMobCommand
         }
         else if (sender == null)
         {
-            context.sendTranslated(NEUTRAL, "Succesfully spawned some {text:bugs:color=RED} inside your server!");
+            i18n.sendTranslated(context, NEUTRAL, "Succesfully spawned some {text:bugs:color=RED} inside your server!");
             return;
         }
         else
@@ -69,12 +69,12 @@ public class SpawnMobCommand
 
         if (amount <= 0)
         {
-            context.sendTranslated(NEUTRAL, "And how am i supposed to know which mobs to despawn?");
+            i18n.sendTranslated(context, NEUTRAL, "And how am i supposed to know which mobs to despawn?");
             return;
         }
         if (amount > module.getConfig().spawnmobLimit)
         {
-            context.sendTranslated(NEGATIVE, "The serverlimit is set to {amount}, you cannot spawn more mobs at once!", module.getConfig().spawnmobLimit);
+            i18n.sendTranslated(context, NEGATIVE, "The serverlimit is set to {amount}, you cannot spawn more mobs at once!", module.getConfig().spawnmobLimit);
             return;
         }
         loc = loc.add(0.5, 0, 0.5);
@@ -86,7 +86,7 @@ public class SpawnMobCommand
         Entity entitySpawned = entitiesSpawned[0];
         if (!entitySpawned.getData(PassengerData.class).isPresent())
         {
-            context.sendTranslated(POSITIVE, "Spawned {amount} {input#entity}!", amount, entitySpawned.getType().getName());
+            i18n.sendTranslated(context, POSITIVE, "Spawned {amount} {input#entity}!", amount, entitySpawned.getType().getName());
         }
         else
         {

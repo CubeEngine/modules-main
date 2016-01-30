@@ -85,7 +85,7 @@ public class ItemDBCommand
             List<ItemStack> itemList = materialMatcher.itemStackList(item);
             if (itemList == null || itemList.size() <= 0)
             {
-                context.sendTranslated(NEGATIVE, "Could not find any item named {input}!", item);
+                i18n.sendTranslated(context, NEGATIVE, "Could not find any item named {input}!", item);
                 return null;
             }
             List<Text> lines = new ArrayList<>();
@@ -110,18 +110,18 @@ public class ItemDBCommand
         User sender = (User)context.getSource();
         if (!sender.getItemInHand().isPresent())
         {
-            context.sendTranslated(NEUTRAL, "You hold nothing in your hands!");
+            i18n.sendTranslated(context, NEUTRAL, "You hold nothing in your hands!");
             return null;
         }
         ItemStack aItem = sender.getItemInHand().get();
         String found = materialMatcher.getNameFor(aItem);
         if (found == null)
         {
-            context.sendTranslated(NEGATIVE, "Itemname unknown! Itemdata: {integer#id}",
+            i18n.sendTranslated(context, NEGATIVE, "Itemname unknown! Itemdata: {integer#id}",
                                    aItem.getItem().getId());
             return null;
         }
-        context.sendTranslated(POSITIVE, "The Item in your hand is: {input#item} ({integer#id})",
+        i18n.sendTranslated(context, POSITIVE, "The Item in your hand is: {input#item} ({integer#id})",
                                found, aItem.getItem().getId());
         return null;
     }

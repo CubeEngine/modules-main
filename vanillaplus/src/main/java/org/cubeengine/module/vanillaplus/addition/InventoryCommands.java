@@ -63,7 +63,7 @@ public class InventoryCommands
         {
             if (!module.perms().COMMAND_INVSEE_ENDERCHEST.isAuthorized(sender))
             {
-                context.sendTranslated(NEGATIVE, "You are not allowed to look into enderchests!");
+                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to look into enderchests!");
                 return;
             }
             inv = player.getEnderChest();

@@ -18,152 +18,111 @@
 package org.cubeengine.module.vanillaplus.improvement;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Greed;
-import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.CommandContext;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserList;
-import org.spongepowered.api.entity.player.gamemode.GameMode;
-import org.spongepowered.api.entity.player.gamemode.GameModes;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.entity.player.gamemode.GameModes.CREATIVE;
-import static org.spongepowered.api.entity.player.gamemode.GameModes.SURVIVAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
  * {@link #kill}
- * {@link #sudo}
  * {@link #suicide}
  */
 public class KillCommands
 {
     private VanillaPlus module;
+    private I18n i18n;
 
-    public KillCommands(VanillaPlus module)
+    public KillCommands(VanillaPlus module, I18n i18n)
     {
         this.module = module;
+        this.i18n = i18n;
     }
 
 
     @Command(alias = "slay", desc = "Kills a player")
-    public void kill(CommandSender context, UserList players, // TODO default line of sight player
+    public void kill(CommandSource context, UserList players, // TODO default line of sight player
                      @Flag boolean force, @Flag boolean quiet, @Flag boolean lightning)
     {
-        lightning = lightning && module.perms().COMMAND_KILL_LIGHTNING.isAuthorized(context);
-        force = force && module.perms().COMMAND_KILL_FORCE.isAuthorized(context);
-        quiet = quiet && module.perms().COMMAND_KILL_QUIET.isAuthorized(context);
+        lightning = lightning && context.hasPermission(module.perms().COMMAND_KILL_LIGHTNING.getId());
+        force = force && context.hasPermission(module.perms().COMMAND_KILL_FORCE.getId());
+        quiet = quiet && context.hasPermission(module.perms().COMMAND_KILL_QUIET.getId());
         List<Text> killed = new ArrayList<>();
-        List<User> userList = players.list();
+        Collection<Player> userList = players.list();
         if (players.isAll())
         {
-            if (!module.perms().COMMAND_KILL_ALL.isAuthorized(context))
+            if (!context.hasPermission(module.perms().COMMAND_KILL_ALL.getId()))
             {
-                context.sendTranslated(NEGATIVE, "You are not allowed to kill everyone!");
+                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to kill everyone!");
                 return;
             }
-            if (context instanceof User)
+            if (context instanceof Player)
             {
                 userList.remove(context);
             }
         }
-        for (User user : userList)
+        for (Player user : userList)
         {
             if (this.kill(user, lightning, context, false, force, quiet))
             {
-                killed.add(user.getDisplayName());
+                killed.add(user.getName());
             }
         }
         if (killed.isEmpty())
         {
-            context.sendTranslated(NEUTRAL, "No one was killed!");
+            i18n.sendTranslated(context, NEUTRAL, "No one was killed!");
             return;
         }
-        context.sendTranslated(POSITIVE, "You killed {user#list}!", StringUtils.implode(",", killed));
+        i18n.sendTranslated(context, POSITIVE, "You killed {user#list}!", StringUtils.implode(",", killed));
     }
 
-    private GameMode getGameMode(String name)
-    {
-        if (name == null)
-        {
-            return null;
-        }
-        switch (name.trim().toLowerCase())
-        {
-            case "survival":
-            case "s":
-            case "0":
-                return GameModes.SURVIVAL;
-            case "creative":
-            case "c":
-            case "1":
-                return GameModes.CREATIVE;
-            case "adventure":
-            case "a":
-            case "2":
-                return GameModes.ADVENTURE;
-            default:
-                return null;
-        }
-    }
 
-    private GameMode toggleGameMode(GameMode mode)
-    {
-        if (mode == SURVIVAL)
-        {
-            return CREATIVE;
-        }
-        //if (mode == ADVENTURE || mode == CREATIVE)
-        return SURVIVAL;
-    }
-
-    private boolean kill(User user, boolean lightning, CommandSender context, boolean showMessage, boolean force, boolean quiet)
+    private boolean kill(Player player, boolean lightning, CommandSource context, boolean showMessage, boolean force, boolean quiet)
     {
         if (!force)
         {
-            if (module.perms().COMMAND_KILL_PREVENT.isAuthorized(user) || this.module.getBasicsUser(user.asPlayer()).getEntity().getValue(TABLE_BASIC_USER.GODMODE))
+            if (player.hasPermission(module.perms().COMMAND_KILL_PREVENT.getId())) // TODO also check "creative/godmode"
             {
-                context.sendTranslated(NEGATIVE, "You cannot kill {user}!", user);
+
+                i18n.sendTranslated(context, NEGATIVE, "You cannot kill {user}!", player);
                 return false;
             }
         }
         if (lightning)
         {
-            user.getWorld().strikeLightningEffect(user.getLocation());
+            player.getWorld().strikeLightningEffect(player.getLocation());
         }
-        user.setHealth(0);
+        player.setHealth(0);
         if (showMessage)
         {
-            context.sendTranslated(POSITIVE, "You killed {user}!", user);
+            i18n.sendTranslated(context, POSITIVE, "You killed {user}!", player);
         }
-        if (!quiet && module.perms().COMMAND_KILL_NOTIFY.isAuthorized(user))
+        if (!quiet && player.hasPermission(module.perms().COMMAND_KILL_NOTIFY.getId()))
         {
-            user.sendTranslated(NEUTRAL, "You were killed by {user}", context);
+            i18n.sendTranslated(player, NEUTRAL, "You were killed by {user}", context);
         }
         return true;
     }
 
 
     @Command(desc = "Kills yourself")
-    @Restricted(value = User.class, msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}") // TODO replace User.class /w interface that has life stuff?
-    public void suicide(User context)
+    @Restricted(value = Player.class, msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}") // TODO replace User.class /w interface that has life stuff?
+    public void suicide(Player context)
     {
         context.setHealth(0);
 
         // TODO context.setLastDamageCause(new EntityDamageEvent(context, CUSTOM, context.getMaxHealth()));
         // maybe DamageableData
-        context.sendTranslated(NEGATIVE, "You ended your life. Why? {text:\\:(:color=DARK_RED}");
+        i18n.sendTranslated(context, NEGATIVE, "You ended your life. Why? {text:\\:(:color=DARK_RED}");
     }
 
 

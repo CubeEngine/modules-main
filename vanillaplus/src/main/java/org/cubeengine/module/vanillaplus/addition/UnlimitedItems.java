@@ -17,11 +17,11 @@ public class UnlimitedItems
     {
         if (unlimited)
         {
-            context.sendTranslated(POSITIVE, "You now have unlimited items to build!");
+            i18n.sendTranslated(context, POSITIVE, "You now have unlimited items to build!");
         }
         else
         {
-            context.sendTranslated(NEUTRAL, "You no longer have unlimited items to build!");
+            i18n.sendTranslated(context, NEUTRAL, "You no longer have unlimited items to build!");
         }
         context.get(BasicsAttachment.class).setUnlimitedItems(unlimited);
     }

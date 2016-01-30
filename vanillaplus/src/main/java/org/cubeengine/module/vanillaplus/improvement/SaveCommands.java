@@ -70,12 +70,12 @@ public class SaveCommands
     @Command(desc = "Saves all or a specific world to disk.")
     public void saveall(CommandSender context, @Optional World world)
     {
-        context.sendTranslated(NEUTRAL, "Saving...");
+        i18n.sendTranslated(context, NEUTRAL, "Saving...");
         if (world != null)
         {
             game.getServer().saveWorldProperties(world.getProperties()); // TODO is this saving the world?
             // TODO world.getEntities().stream().filter(entity -> entity instanceof Player).forEach(player -> player.saveData());
-            context.sendTranslated(POSITIVE, "World {world} has been saved to disk!", world);
+            i18n.sendTranslated(context, POSITIVE, "World {world} has been saved to disk!", world);
             return;
         }
         Profiler.startProfiling("save-worlds");
@@ -84,8 +84,8 @@ public class SaveCommands
             game.getServer().saveWorldProperties(aWorld.getProperties()); // TODO is this saving the world?
         }
         // TODO this.core.getServer().savePlayers();
-        context.sendTranslated(POSITIVE, "All worlds have been saved to disk!");
-        context.sendTranslated(POSITIVE, "The saving took {integer#time} milliseconds.", Profiler.endProfiling("save-worlds", MILLISECONDS));
+        i18n.sendTranslated(context, POSITIVE, "All worlds have been saved to disk!");
+        i18n.sendTranslated(context, POSITIVE, "The saving took {integer#time} milliseconds.", Profiler.endProfiling("save-worlds", MILLISECONDS));
     }
 
 

@@ -24,15 +24,22 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.StringUtils;
-import org.cubeengine.module.core.util.matcher.EnchantMatcher;
-import org.cubeengine.module.core.util.matcher.MaterialMatcher;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.User;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.i18n.formatter.MessageType;
+import org.cubeengine.service.matcher.EnchantMatcher;
+import org.cubeengine.service.matcher.MaterialMatcher;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Type;
 
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.ITEM_DATA;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
 
@@ -49,59 +56,65 @@ public class ItemCommands
     private MaterialMatcher materialMatcher;
     private EnchantMatcher enchantMatcher;
     private Game game;
+    private I18n i18n;
 
-    public ItemCommands(VanillaPlus module, MaterialMatcher materialMatcher, EnchantMatcher enchantMatcher, Game game)
+    public ItemCommands(VanillaPlus module, MaterialMatcher materialMatcher, EnchantMatcher enchantMatcher, Game game, I18n i18n)
     {
         this.module = module;
         this.materialMatcher = materialMatcher;
         this.enchantMatcher = enchantMatcher;
         this.game = game;
+        this.i18n = i18n;
     }
 
     @SuppressWarnings("deprecation")
     @Command(desc = "Gives the specified Item to a player")
-    public void give(CommandSender context, User player, @Label("material[:data]") ItemStack item, @Optional Integer amount, @Flag boolean blacklist)
+    public void give(CommandSource context, User player, @Label("material[:data]") ItemStack item, @Optional Integer amount, @Flag boolean blacklist)
     {
-        if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(context)
+        if (!blacklist && context.hasPermission(module.perms().ITEM_BLACKLIST.getId())
             && this.module.getConfiguration().commands.itemBlacklist.contains(item)) // TODO
         {
-            context.sendTranslated(NEGATIVE, "This item is blacklisted!");
+            i18n.sendTranslated(context, NEGATIVE, "This item is blacklisted!");
             return;
         }
         amount = amount == null ? item.getMaxStackQuantity() : amount;
         if (amount <= 0)
         {
-            context.sendTranslated(NEGATIVE, "The amount has to be a number greater than 0!");
+            i18n.sendTranslated(context, NEGATIVE, "The amount has to be a number greater than 0!");
             return;
         }
         item.setQuantity(amount);
-        if (player.getInventory().offer(item))
+        if (player.getInventory().offer(item).getType() == Type.SUCCESS)
         {
             String matname = materialMatcher.getNameFor(item);
-            context.sendTranslated(POSITIVE, "You gave {user} {amount} {input#item}!", player, amount, matname);
-            player.sendTranslated(POSITIVE, "{user} just gave you {amount} {input#item}!", context.getName(), amount, matname);
+            i18n.sendTranslated(context, POSITIVE, "You gave {user} {amount} {input#item}!", player, amount, matname);
+            if (player.isOnline())
+            {
+                i18n.sendTranslated(player.getPlayer().get(), POSITIVE, "{user} just gave you {amount} {input#item}!", context.getName(), amount, matname);
+            }
             return;
         }
-        player.sendTranslated(NEGATIVE, "{user} had no place for the item.");
+        i18n.sendTranslated(context, NEGATIVE, "{user} had no place for the item.");
     }
 
     @Command(alias = "i", desc = "Gives the specified Item to you")
-    @Restricted(value = User.class, msg = "Did you try to use {text:/give} on your new I-Tem?")
+    @Restricted(value = Player.class, msg = "Did you try to use {text:/give} on your new I-Tem?")
     @SuppressWarnings("deprecation")
-    public void item(User context, @Label("material[:data]") ItemStack item,
+    public void item(Player context, @Label("material[:data]") ItemStack item,
                      @Optional Integer amount,
                      @Named("ench") @Label("enchantment[:level]") String enchantmentString,
                      @Flag boolean blacklist)
     {
-        if (!blacklist && module.perms().ITEM_BLACKLIST.isAuthorized(context) && this.module.getConfiguration().commands.containsBlackListed(item.getItem()))
+        if (!blacklist && context.hasPermission(module.perms().ITEM_BLACKLIST.getId())
+            && this.module.getConfiguration().commands.containsBlackListed(item.getItem()))
         {
-            context.sendTranslated(NEGATIVE, "This item is blacklisted!");
+            i18n.sendTranslated(context, NEGATIVE, "This item is blacklisted!");
             return;
         }
         amount = amount == null ? item.getMaxStackQuantity() : amount;
         if (amount <= 0)
         {
-            context.sendTranslated(NEGATIVE, "The amount has to be a number greater than 0!");
+            i18n.sendTranslated(context, NEGATIVE, "The amount has to be a number greater than 0!");
             return;
         }
 
@@ -116,9 +129,9 @@ public class ItemCommands
                     enchLvl = Integer.parseInt(ench.substring(ench.indexOf(":") + 1, ench.length()));
                     ench = ench.substring(0, ench.indexOf(":"));
                 }
-                if (module.perms().COMMAND_ITEM_ENCHANTMENTS.isAuthorized(context))
+                if (context.hasPermission(module.perms().COMMAND_ITEM_ENCHANTMENTS.getId()))
                 {
-                    if (module.perms().COMMAND_ITEM_ENCHANTMENTS_UNSAFE.isAuthorized(context))
+                    if (context.hasPermission(module.perms().COMMAND_ITEM_ENCHANTMENTS_UNSAFE.getId()))
                     {
                         enchantMatcher.applyMatchedEnchantment(item, ench, enchLvl, true);
                     }
@@ -131,12 +144,12 @@ public class ItemCommands
         }
         item.setQuantity(amount);
         context.getInventory().offer(item);
-        context.sendTranslated(NEUTRAL, "Received: {amount} {input#item}", amount, materialMatcher.getNameFor(item));
+        i18n.sendTranslated(context, NEUTRAL, "Received: {amount} {input#item}", amount, materialMatcher.getNameFor(item));
     }
 
     @Command(desc = "Refills the stack in hand")
-    @Restricted(value = User.class, msg = "You can't get enough of it, can you?")
-    public void more(User context, @Optional Integer amount, @Flag boolean all) // TODO staticvalues staticValues = "*",
+    @Restricted(value = Player.class, msg = "You can't get enough of it, can you?")
+    public void more(Player context, @Optional Integer amount, @Flag boolean all) // TODO staticvalues staticValues = "*",
     {
         if (all)
         {
@@ -148,46 +161,46 @@ public class ItemCommands
                     item.setQuantity(64);
                 }
             }
-            context.sendTranslated(POSITIVE, "Refilled all stacks!");
+            i18n.sendTranslated(context, POSITIVE, "Refilled all stacks!");
             return;
         }
         amount = amount == null ? 1 : amount;
         if (amount < 1)
         {
-            context.sendTranslated(NEGATIVE, "Invalid amount {input#amount}", amount);
+            i18n.sendTranslated(context, NEGATIVE, "Invalid amount {input#amount}", amount);
             return;
         }
 
         if (!context.getItemInHand().isPresent())
         {
-            context.sendTranslated(NEUTRAL, "More nothing is still nothing!");
+            i18n.sendTranslated(context, NEUTRAL, "More nothing is still nothing!");
             return;
         }
         context.getItemInHand().get().setQuantity(64);
         if (amount == 1)
         {
-            context.sendTranslated(POSITIVE, "Refilled stack in hand!");
+            i18n.sendTranslated(context, POSITIVE, "Refilled stack in hand!");
             return;
         }
         for (int i = 1; i < amount; ++i)
         {
             context.getInventory().offer(context.getItemInHand().get());
         }
-        context.sendTranslated(POSITIVE, "Refilled {amount} stacks in hand!", amount);
+        i18n.sendTranslated(context, POSITIVE, "Refilled {amount} stacks in hand!", amount);
     }
 
 
 
     @Command(desc = "Stacks your items up to 64")
-    @Restricted(value = User.class, msg = "No stacking for you.")
-    public void stack(User context)
+    @Restricted(value = Player.class, msg = "No stacking for you.")
+    public void stack(Player context)
     {
-        boolean allow64 = module.perms().COMMAND_STACK_FULLSTACK.isAuthorized(context);
+        boolean allow64 = context.hasPermission(module.perms().COMMAND_STACK_FULLSTACK.getId());
         ItemStack[] items = new ItemStack[context.getInventory().capacity()];
         int slotIndex = 0;
         for (Inventory slot : context.getInventory().slots())
         {
-            items[slotIndex] = slot.peek().orNull();
+            items[slotIndex] = slot.peek().orElse(null);
         }
 
         int size = items.length;
@@ -239,9 +252,9 @@ public class ItemCommands
             {
                 slot.set(items[i++]);
             }
-            context.sendTranslated(POSITIVE, "Items stacked together!");
+            i18n.sendTranslated(context, POSITIVE, "Items stacked together!");
             return;
         }
-        context.sendTranslated(NEUTRAL, "Nothing to stack!");
+        i18n.sendTranslated(context, NEUTRAL, "Nothing to stack!");
     }
 }

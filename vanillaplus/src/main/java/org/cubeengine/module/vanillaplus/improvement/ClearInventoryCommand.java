@@ -24,6 +24,7 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.command.exception.PermissionDeniedException;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.User;
 import org.spongepowered.api.command.CommandPermissionException;
 import org.spongepowered.api.command.CommandSource;
@@ -38,10 +39,12 @@ import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 public class ClearInventoryCommand
 {
     private VanillaPlus module;
+    private I18n i18n;
 
-    public ClearInventoryCommand(VanillaPlus module)
+    public ClearInventoryCommand(VanillaPlus module, I18n i18n)
     {
         this.module = module;
+        this.i18n = i18n;
     }
 
     @Command(alias = {"ci", "clear"}, desc = "Clears the inventory")
@@ -51,40 +54,39 @@ public class ClearInventoryCommand
                                @Flag boolean force)
     {
         //sender.sendTranslated(NEGATIVE, "That awkward moment when you realize you do not have an inventory!");
-        if (!context.getIdentifier().equals(player.getIdentifier()))
+        boolean self = context.getIdentifier().equals(player.getIdentifier());
+        if (!self)
         {
             if (!context.hasPermission(module.perms().COMMAND_CLEARINVENTORY_OTHER.getId()))
             {
                 throw new PermissionDeniedException(module.perms().COMMAND_CLEARINVENTORY_OTHER);
             }
-            if (module.perms().COMMAND_CLEARINVENTORY_PREVENT.isAuthorized(player)
-                && !(force && module.perms().COMMAND_CLEARINVENTORY_FORCE.isAuthorized(sender)))
+            if (player.hasPermission(module.perms().COMMAND_CLEARINVENTORY_PREVENT.getId())
+                && !(force && context.hasPermission(module.perms().COMMAND_CLEARINVENTORY_FORCE.getId())))
             {
-                context.sendTranslated(NEGATIVE, "You are not allowed to clear the inventory of {user}", player);
+                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to clear the inventory of {user}", player);
                 return;
             }
         }
-        player.getUser().getInventory().clear();
-        org.spongepowered.api.entity.player.User user = player.getOfflinePlayer();
+        player.getInventory().clear(); // TODO will this clear armor too
         if (removeArmor)
         {
-            user.setBoots(null);
-            user.setLeggings(null);
-            user.setChestplate(null);
-            user.setHelmet(null);
+            // TODO is this needed?
+            player.setBoots(null);
+            player.setLeggings(null);
+            player.setChestplate(null);
+            player.setHelmet(null);
         }
-        if (sender.equals(player))
+        if (self)
         {
-            sender.sendTranslated(POSITIVE, "Your inventory has been cleared!");
+            i18n.sendTranslated(context, POSITIVE, "Your inventory has been cleared!");
             return;
         }
-        if (module.perms().COMMAND_CLEARINVENTORY_NOTIFY.isAuthorized(player)) // notify
+        if (player.isOnline() && player.hasPermission(module.perms().COMMAND_CLEARINVENTORY_NOTIFY.getId()) && !(
+            context.hasPermission(module.perms().COMMAND_CLEARINVENTORY_QUIET.getId()) && quiet))
         {
-            if (!(module.perms().COMMAND_CLEARINVENTORY_QUIET.isAuthorized(sender) && quiet)) // quiet
-            {
-                player.sendTranslated(NEUTRAL, "Your inventory has been cleared by {sender}!", sender);
-            }
+            i18n.sendTranslated(player.getPlayer().get(), NEUTRAL, "Your inventory has been cleared by {sender}!", context);
         }
-        sender.sendTranslated(POSITIVE, "The inventory of {user} has been cleared!", player);
+        i18n.sendTranslated(context, POSITIVE, "The inventory of {user} has been cleared!", player);
     }
 }

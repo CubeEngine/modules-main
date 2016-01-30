@@ -38,7 +38,7 @@ public class PluginCommands
         Collection<PluginContainer> plugins = game.getPluginManager().getPlugins();
         Set<Module> modules = this.module.getModularity().getModules();
 
-        context.sendTranslated(NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:",
+        i18n.sendTranslated(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:",
                                plugins.size(), modules.size());
         context.sendMessage(" ");
         context.sendMessage(" - " + ChatFormat.BRIGHT_GREEN + "CubeEngine" + ChatFormat.RESET + " (" + module.getInformation().getVersion() + ")");
@@ -60,10 +60,10 @@ public class PluginCommands
         if (plugin == null)
         {
             Platform platform = game.getPlatform();
-            context.sendTranslated(NEUTRAL, "This server is running {name#server} in version {input#version:color=INDIGO}", platform.getMinecraftVersion().getName(), platform.getVersion());
-            context.sendTranslated(NEUTRAL, "Sponge API {text:version\\::color=WHITE} {input#version:color=INDIGO}", platform.getApiVersion());
+            i18n.sendTranslated(context, NEUTRAL, "This server is running {name#server} in version {input#version:color=INDIGO}", platform.getMinecraftVersion().getName(), platform.getVersion());
+            i18n.sendTranslated(context, NEUTRAL, "Sponge API {text:version\\::color=WHITE} {input#version:color=INDIGO}", platform.getApiVersion());
             context.sendMessage(" ");
-            context.sendTranslated(NEUTRAL,
+            i18n.sendTranslated(context, NEUTRAL,
                                    "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}",
                                    module.getInformation().getVersion());
             if (source)
@@ -84,11 +84,11 @@ public class PluginCommands
                     plugins.add(container);
                 }
             }
-            context.sendTranslated(NEGATIVE,
+            i18n.sendTranslated(context, NEGATIVE,
                                    "The given plugin doesn't seem to be loaded, have you typed it correctly (casing does matter)?");
             if (!plugins.isEmpty())
             {
-                context.sendTranslated(NEGATIVE, "You might want to try one of these:");
+                i18n.sendTranslated(context, NEGATIVE, "You might want to try one of these:");
                 for (PluginContainer p : plugins)
                 {
                     context.sendMessage(" - " + p.getName());
@@ -96,19 +96,19 @@ public class PluginCommands
             }
             return;
         }
-        context.sendTranslated(NEUTRAL, "{name#plugin} is currently running in version {input#version:color=INDIGO}.",
+        i18n.sendTranslated(context, NEUTRAL, "{name#plugin} is currently running in version {input#version:color=INDIGO}.",
                                instance.get().getName(), instance.get().getVersion());
         context.sendMessage(" ");
-        context.sendTranslated(NEUTRAL, "Plugin information:");
+        i18n.sendTranslated(context, NEUTRAL, "Plugin information:");
         context.sendMessage(" ");
         if (instance.get().getInstance() instanceof CoreModule && source)
         {
             ModuleCommands.showSourceVersion(context.getSource(), module.getInformation().getSourceVersion());
         }
         /* TODO if possible later get detailed descriptions
-        context.sendTranslated(NEUTRAL, "Description: {input}", instance.getDescription().getDescription() == null ? "NONE" : instance.getDescription().getDescription());
-        context.sendTranslated(NEUTRAL, "Website: {input}", instance.getDescription().getWebsite() == null ? "NONE" : instance.getDescription().getWebsite());
-        context.sendTranslated(NEUTRAL, "Authors:");
+        i18n.sendTranslated(context, NEUTRAL, "Description: {input}", instance.getDescription().getDescription() == null ? "NONE" : instance.getDescription().getDescription());
+        i18n.sendTranslated(context, NEUTRAL, "Website: {input}", instance.getDescription().getWebsite() == null ? "NONE" : instance.getDescription().getWebsite());
+        i18n.sendTranslated(context, NEUTRAL, "Authors:");
         for (String author : instance.getDescription().getAuthors())
         {
             context.sendMessage("   - " + ChatFormat.AQUA + author);

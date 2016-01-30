@@ -76,7 +76,7 @@ public class HealCommand
         {
             if (!(context instanceof User))
             {
-                context.sendTranslated(NEGATIVE, "Only time can heal your wounds!");
+                i18n.sendTranslated(context, NEGATIVE, "Only time can heal your wounds!");
                 return;
             }
             User sender = (User)context;
@@ -86,7 +86,7 @@ public class HealCommand
         }
         if (!context.hasPermission(module.perms().COMMAND_HEAL_OTHER))
         {
-            context.sendTranslated(NEGATIVE, "You are not allowed to heal other players!");
+            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to heal other players!");
             return;
         }
         List<User> userList = players.list();
@@ -94,15 +94,15 @@ public class HealCommand
         {
             if (userList.isEmpty())
             {
-                context.sendTranslated(NEGATIVE, "There are no players online at the moment!");
+                i18n.sendTranslated(context, NEGATIVE, "There are no players online at the moment!");
                 return;
             }
-            context.sendTranslated(POSITIVE, "You healed everyone!");
+            i18n.sendTranslated(context, POSITIVE, "You healed everyone!");
             this.um.broadcastStatus(ChatFormat.BRIGHT_GREEN + "healed every player.", context);
         }
         else
         {
-            context.sendTranslated(POSITIVE, "Healed {amount} players!", userList.size());
+            i18n.sendTranslated(context, POSITIVE, "Healed {amount} players!", userList.size());
         }
         for (User user : userList)
         {

@@ -52,7 +52,7 @@ public class TimeCommands
                 {
                     if (world == null)
                     {
-                        context.sendTranslated(NEGATIVE, "Could not match all worlds! {input#worlds}", worlds);
+                        i18n.sendTranslated(context, NEGATIVE, "Could not match all worlds! {input#worlds}", worlds);
                         return;
                     }
                 }
@@ -62,7 +62,7 @@ public class TimeCommands
         {
             if (!(context instanceof User))
             {
-                context.sendTranslated(NEGATIVE, "You have to specify a world when using this command from the console!");
+                i18n.sendTranslated(context, NEGATIVE, "You have to specify a world when using this command from the console!");
                 return;
             }
             worldList = Collections.singletonList(((User)context).getWorld());
@@ -72,21 +72,21 @@ public class TimeCommands
             final Long lTime = timeMatcher.matchTimeValue(time);
             if (lTime == null)
             {
-                context.sendTranslated(NEGATIVE, "The time you entered is not valid!");
+                i18n.sendTranslated(context, NEGATIVE, "The time you entered is not valid!");
                 return;
             }
             if (worldList.size() == 1)
             {
-                context.sendTranslated(POSITIVE, "The time of {world} have been set to {input#time} ({input#neartime})!", worldList.get(0), timeMatcher.format(
+                i18n.sendTranslated(context, POSITIVE, "The time of {world} have been set to {input#time} ({input#neartime})!", worldList.get(0), timeMatcher.format(
                     lTime), timeMatcher.getNearTimeName(lTime));
             }
             else if ("*".equals(worlds))
             {
-                context.sendTranslated(POSITIVE, "The time of all worlds have been set to {input#time} ({input#neartime})!", timeMatcher.format(lTime), timeMatcher.getNearTimeName(
+                i18n.sendTranslated(context, POSITIVE, "The time of all worlds have been set to {input#time} ({input#neartime})!", timeMatcher.format(lTime), timeMatcher.getNearTimeName(
                     lTime));            }
             else
             {
-                context.sendTranslated(POSITIVE, "The time of {amount} worlds have been set to {input#time} ({input#neartime})!", worldList.size(), timeMatcher.format(
+                i18n.sendTranslated(context, POSITIVE, "The time of {amount} worlds have been set to {input#time} ({input#neartime})!", worldList.size(), timeMatcher.format(
                     lTime), timeMatcher.getNearTimeName(lTime));
             }
             for (World world : worldList)
@@ -97,12 +97,12 @@ public class TimeCommands
                     if (this.lockTask.worlds.containsKey(world.getName()))
                     {
                         this.lockTask.remove(world);
-                        context.sendTranslated(POSITIVE, "Time unlocked for {world}!", world);
+                        i18n.sendTranslated(context, POSITIVE, "Time unlocked for {world}!", world);
                     }
                     else
                     {
                         this.lockTask.add(world);
-                        context.sendTranslated(POSITIVE, "Time locked for {world}!", world);
+                        i18n.sendTranslated(context, POSITIVE, "Time locked for {world}!", world);
                     }
                 }
             }
@@ -115,20 +115,20 @@ public class TimeCommands
                 if (this.lockTask.worlds.containsKey(world.getName()))
                 {
                     this.lockTask.remove(world);
-                    context.sendTranslated(POSITIVE, "Time unlocked for {world}!", world);
+                    i18n.sendTranslated(context, POSITIVE, "Time unlocked for {world}!", world);
                 }
                 else
                 {
                     this.lockTask.add(world);
-                    context.sendTranslated(POSITIVE, "Time locked for {world}!", world);
+                    i18n.sendTranslated(context, POSITIVE, "Time locked for {world}!", world);
                 }
             }
             return;
         }
-        context.sendTranslated(POSITIVE, "The current time is:");
+        i18n.sendTranslated(context, POSITIVE, "The current time is:");
         for (World world : worldList)
         {
-            context.sendTranslated(NEUTRAL, "{input#time} ({input#neartime}) in {world}.", timeMatcher.format(
+            i18n.sendTranslated(context, NEUTRAL, "{input#time} ({input#neartime}) in {world}.", timeMatcher.format(
                 world.getTime()), timeMatcher.getNearTimeName(world.getTime()), world);
         }
     }
@@ -147,20 +147,20 @@ public class TimeCommands
             lTime = timeMatcher.matchTimeValue(time);
             if (lTime == null)
             {
-                context.sendTranslated(NEGATIVE, "Invalid time format!");
+                i18n.sendTranslated(context, NEGATIVE, "Invalid time format!");
                 return;
             }
         }
 
         if (!context.equals(player) && !module.perms().COMMAND_PTIME_OTHER.isAuthorized(context))
         {
-            context.sendTranslated(NEGATIVE, "You are not allowed to change the time of other players!");
+            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to change the time of other players!");
             return;
         }
         if (reset)
         {
             player.resetPlayerTime();
-            context.sendTranslated(POSITIVE, "Reseted the time for {user}!", player);
+            i18n.sendTranslated(context, POSITIVE, "Reseted the time for {user}!", player);
             if (context.equals(player))
             {
                 player.sendTranslated(NEUTRAL, "Your time was reset!");
@@ -173,17 +173,17 @@ public class TimeCommands
         {
             player.resetPlayerTime();
             player.setPlayerTime(lTime, false);
-            context.sendTranslated(POSITIVE, "Time locked to {input#time} ({input#neartime}) for {user}!", format, nearTime, player);
+            i18n.sendTranslated(context, POSITIVE, "Time locked to {input#time} ({input#neartime}) for {user}!", format, nearTime, player);
         }
         else
         {
             player.resetPlayerTime();
             player.setPlayerTime(lTime - player.getWorld().getTime(), true);
-            context.sendTranslated(POSITIVE, "Time set to {input#time} ({input#neartime}) for {user}!", format, nearTime, player);
+            i18n.sendTranslated(context, POSITIVE, "Time set to {input#time} ({input#neartime}) for {user}!", format, nearTime, player);
         }
         if (context.equals(player))
         {
-            context.sendTranslated(POSITIVE, "Your time was set to {input#time} ({input#neartime})!", format, nearTime);
+            i18n.sendTranslated(context, POSITIVE, "Your time was set to {input#time} ({input#neartime})!", format, nearTime);
         }
     }
 
