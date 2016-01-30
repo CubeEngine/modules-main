@@ -89,7 +89,7 @@ public class UniverseManager
         {
             if (property.isEnabled())
             {
-                mainUConfig.worlds.add(new ConfigWorld(game, property.getWorldName()));
+                mainUConfig.worlds.add(new ConfigWorld(property.getWorldName()));
                 worlds.put(property.getWorldName(), mainUConfig);
             }
         }

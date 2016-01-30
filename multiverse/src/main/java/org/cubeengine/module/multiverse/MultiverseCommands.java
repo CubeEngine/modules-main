@@ -55,7 +55,7 @@ public class MultiverseCommands extends ContainerCommand
     public void setMainWorld(CommandSource context, World world)
     {
         UniverseConfig config = um.getUniverseFrom(world);
-        config.mainWorld = new ConfigWorld(game, world);
+        config.mainWorld = new ConfigWorld(world);
         config.save();
 
         i18n.sendTranslated(context, POSITIVE, "{world} is now the main world of the universe {name}", world, config.getFile().getName()); // TODO correct name
@@ -94,7 +94,7 @@ public class MultiverseCommands extends ContainerCommand
         }
 
         from.save();
-        to.worlds.add(new ConfigWorld(game, world.getName()));
+        to.worlds.add(new ConfigWorld(world.getName()));
         to.save();
 
         // TODO update maps in Manager accordingly

@@ -263,7 +263,7 @@ public class MultiverseListener
             config = reflector.create(PlayerConfig.class);
         }
         config.lastName = player.getName();
-        config.lastWorld = new ConfigWorld(this.wm, player.getWorld()); // update last world
+        config.lastWorld = new ConfigWorld(player.getWorld()); // update last world
         config.setFile(path.toFile());
         config.save();
     }
@@ -272,7 +272,7 @@ public class MultiverseListener
     {
         Path path = this.dirPlayers.resolve(player.getUniqueId() + YAML.getExtention());
         PlayerConfig config = this.module.getCore().getConfigFactory().load(PlayerConfig.class, path.toFile());
-        config.lastWorld = new ConfigWorld(this.wm, player.getWorld());
+        config.lastWorld = new ConfigWorld(player.getWorld());
         config.save();
         logger.debug("{} is now in the world: {} ({})", player.getDisplayName(), player.getWorld().getName(),
                 this.getUniverseFrom(player.getWorld()).getName());
