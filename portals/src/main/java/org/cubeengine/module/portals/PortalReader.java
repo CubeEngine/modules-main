@@ -17,13 +17,16 @@
  */
 package org.cubeengine.module.portals;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.cubeengine.butler.CommandInvocation;
+import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.DefaultValue;
 import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.spongepowered.api.entity.living.player.Player;
 
-public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal>
+public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal>, Completer
 {
     private Portals module;
 
@@ -57,5 +60,20 @@ public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal
             throw new ReaderException("You need to define a portal to use");
         }
         return portal;
+    }
+
+    @Override
+    public List<String> getSuggestions(CommandInvocation invocation)
+    {
+        List<String> list = new ArrayList<>();
+        String token = invocation.currentToken();
+        for (Portal portal : module.getPortals())
+        {
+            if (portal.getName().startsWith(token))
+            {
+                list.add(portal.getName());
+            }
+        }
+        return list;
     }
 }
