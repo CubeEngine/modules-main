@@ -5,7 +5,7 @@ CubeEngine Minecraft module framework
 
 Website
 -------
-http://engine.cubeisland.de \[[Downloads](http://engine.cubeisland.de/download)\]
+http://cubeengine.org \[[Downloads](http://cubeengine.org/download)\]
 
 Related repositories:
 * [Core](http://github.com/CubeEngine/core)
