@@ -21,9 +21,7 @@ import java.util.Random;
 import org.cubeengine.module.core.util.Pair;
 import org.cubeengine.module.portals.Portals;
 import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldManager;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Chunk;
@@ -35,11 +33,11 @@ public class RandomDestination extends Destination
     private final Random random = new Random();
     private Game game;
 
-    public RandomDestination(Game game, WorldManager wm, World world)
+    public RandomDestination(Game game, World world)
     {
         this.game = game;
         this.type = Type.RANDOM;
-        this.world = new ConfigWorld(wm, world);
+        this.world = new ConfigWorld(world);
     }
 
     protected RandomDestination()
@@ -54,7 +52,6 @@ public class RandomDestination extends Destination
             // TODO particles
             return;
         }
-        entity = entity.get(Keys.BASE_VEHICLE).or(entity);
         World world = this.world.getWorld();
         Location<World> block;
         Pair<Integer, Chunk> config = module.getRandomDestinationSetting(world);
@@ -63,7 +60,7 @@ public class RandomDestination extends Destination
         int z = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
         chunk = world.loadChunk(chunk.getPosition().getX() + x * 16, 0, chunk.getPosition().getZ() + z * 16, true).get();
         block = world.getLocation(chunk.getPosition().add(random.nextInt(16), 0, random.nextInt(16)));
-        block = game.getTeleportHelper().getSafeLocation(block).or(block);
+        block = game.getTeleportHelper().getSafeLocation(block).orElse(block);
         entity.setLocation(block);
     }
 }

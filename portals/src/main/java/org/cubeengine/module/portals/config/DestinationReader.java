@@ -17,29 +17,27 @@
  */
 package org.cubeengine.module.portals.config;
 
+import java.util.Optional;
 import java.util.Random;
-import com.google.common.base.Optional;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.world.WorldManager;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
 public class DestinationReader implements ArgumentReader<Destination>
 {
     private final Portals module;
-    private final WorldManager wm;
     private I18n i18n;
     private final Random random = new Random();
 
-    public DestinationReader(Portals module, WorldManager wm, I18n i18n)
+    public DestinationReader(Portals module, I18n i18n)
     {
         this.module = module;
-        this.wm = wm;
         this.i18n = i18n;
     }
 
@@ -51,7 +49,7 @@ public class DestinationReader implements ArgumentReader<Destination>
         {
             if ((invocation.getCommandSource() instanceof Player))
             {
-                return new Destination(wm, ((Player)invocation.getCommandSource()).getLocation(), ((Player)invocation.getCommandSource()).getRotation(), i18n);
+                return new Destination(((Player)invocation.getCommandSource()).getLocation(), ((Player)invocation.getCommandSource()).getRotation(), i18n);
             }
             throw new ReaderException(
                 "The Portal Agency will bring you your portal for just {text:$ 1337} within {input#amount} weeks",
@@ -68,12 +66,12 @@ public class DestinationReader implements ArgumentReader<Destination>
         }
         else // world
         {
-            Optional<World> world = wm.getWorld(token);
+            Optional<World> world = Sponge.getServer().getWorld(token);
             if (!world.isPresent())
             {
                 throw new ReaderException("World {input} not found!", token);
             }
-            return new Destination(wm, world.get());
+            return new Destination(world.get());
         }
     }
 }

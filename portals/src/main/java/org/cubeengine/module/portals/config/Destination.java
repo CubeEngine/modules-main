@@ -18,19 +18,17 @@
 package org.cubeengine.module.portals.config;
 
 import com.flowpowered.math.vector.Vector3d;
+import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.module.core.util.WorldLocation;
 import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.module.portals.Portal;
-import org.cubeengine.service.world.WorldManager;
+import org.cubeengine.service.world.WorldLocation;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.spongepowered.api.data.key.Keys.BASE_VEHICLE;
 
 public class Destination
 {
@@ -40,17 +38,17 @@ public class Destination
     public String portal;
     private I18n i18n;
 
-    public Destination(WorldManager wm, Location location, Vector3d direction, I18n i18n)
+    public Destination(Location<World> location, Vector3d direction, I18n i18n)
     {
         this.i18n = i18n;
         this.location = new WorldLocation(location, direction);
-        this.world = new ConfigWorld(wm, (World)location.getExtent());
+        this.world = new ConfigWorld(location.getExtent());
         this.type = Type.LOCATION;
     }
 
-    public Destination(WorldManager wm, World world)
+    public Destination(World world)
     {
-        this.world = new ConfigWorld(wm, world);
+        this.world = new ConfigWorld(world);
         this.type = Type.WORLD;
     }
 
@@ -65,7 +63,7 @@ public class Destination
 
     public void teleport(Entity entity, Portals module, boolean safe)
     {
-        Location loc = null;
+        Location<World> loc;
         Vector3d rotation = null;
         switch (type)
         {
@@ -83,17 +81,16 @@ public class Destination
             break;
         case WORLD:
             loc = world.getWorld().getSpawnLocation();
-            loc = new Location(loc.getExtent(), loc.getBlockX() + 0.5, loc.getY(), loc.getBlockZ() + 0.5);
+            loc = new Location<>(loc.getExtent(), loc.getBlockX() + 0.5, loc.getY(), loc.getBlockZ() + 0.5);
             break;
         case LOCATION:
             loc = location.getLocationIn(world.getWorld());
             rotation = location.getRotation();
             break;
+        default:
+            throw new IllegalStateException();
         }
-        if (BASE_VEHICLE != null) // TODO remove once its implemented in sponge
-        {
-            entity = entity.get(BASE_VEHICLE).or(entity);
-        }
+        // TODO check if this is working when riding on a horse
         if (safe)
         {
             entity.setLocationSafely(loc);

@@ -22,7 +22,6 @@ import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Desc;
-import org.cubeengine.module.core.util.WorldLocation;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.core.util.math.shape.Cuboid;
 import org.cubeengine.module.portals.config.Destination;
@@ -31,7 +30,7 @@ import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.world.WorldManager;
+import org.cubeengine.service.world.WorldLocation;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
@@ -45,15 +44,13 @@ import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 public class PortalModifyCommand extends ContainerCommand
 {
     private Selector selector;
-    private WorldManager wm;
     private Game game;
     private I18n i18n;
 
-    public PortalModifyCommand(Portals module, Selector selector, WorldManager wm, Game game, I18n i18n)
+    public PortalModifyCommand(Portals module, Selector selector, Game game, I18n i18n)
     {
         super(module);
         this.selector = selector;
-        this.wm = wm;
         this.game = game;
         this.i18n = i18n;
     }
@@ -81,7 +78,7 @@ public class PortalModifyCommand extends ContainerCommand
     @Command(alias = "randdest", desc = "Changes the destination of the selected portal to a random position each time")
     public void randomDestination(CommandContext context, World world, @Default Portal portal)
     {
-        this.destination(context, new RandomDestination(game, wm, world), portal);
+        this.destination(context, new RandomDestination(game, world), portal);
     }
 
     @Command(desc = "Changes a portals location")

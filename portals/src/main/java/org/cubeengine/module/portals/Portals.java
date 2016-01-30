@@ -37,7 +37,6 @@ import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.core.util.LocationUtil;
 import org.cubeengine.module.core.util.Pair;
 import org.cubeengine.module.portals.config.Destination;
@@ -46,10 +45,9 @@ import org.cubeengine.module.portals.config.DestinationConverter;
 import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.event.EventManager;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.task.TaskManager;
-import org.cubeengine.service.user.UserManager;
-import org.cubeengine.service.world.WorldManager;
 import de.cubeisland.engine.reflect.Reflector;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.Entity;
@@ -66,8 +64,6 @@ public class Portals extends Module
 {
     @Inject private Reflector reflector;
     @Inject private CommandManager cm;
-    @Inject private WorldManager wm;
-    @Inject private UserManager um;
     @Inject private Selector selector;
     @Inject private EventManager em;
     @Inject private TaskManager tm;
@@ -87,27 +83,20 @@ public class Portals extends Module
     @Enable
     public void onEnable() throws IOException
     {
-        reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(wm), Destination.class);
+        reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(), Destination.class);
         ProviderManager rManager = cm.getProviderManager();
         rManager.register(this, new PortalReader(this), Portal.class);
-        rManager.register(this, new DestinationReader(this, wm, i18n), Destination.class);
+        rManager.register(this, new DestinationReader(this, i18n), Destination.class);
 
         this.portalsDir = Files.createDirectories(path.resolve("portals"));
 
-        PortalCommands portals = new PortalCommands(this, selector, reflector, wm, i18n);
+        PortalCommands portals = new PortalCommands(this, selector, reflector, i18n);
         cm.addCommand(portals);
-        portals.addCommand(new PortalModifyCommand(this, selector, wm, game, i18n));
+        portals.addCommand(new PortalModifyCommand(this, selector, game, i18n));
 
-        em.registerListener(this, new PortalListener(this, um, i18n));
+        em.registerListener(this, new PortalListener(this, i18n));
         this.loadPortals();
         tm.runTimer(this, this::checkForEntitiesInPortals, 5, 5);
-    }
-
-    @Disable
-    public void onDisable()
-    {
-        em.removeListeners(this);
-        cm.removeCommands(this);
     }
 
     public void setRandomDestinationSetting(World world, Integer radius, Chunk center)

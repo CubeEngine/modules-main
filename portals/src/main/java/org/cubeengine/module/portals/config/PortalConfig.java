@@ -17,12 +17,12 @@
  */
 package org.cubeengine.module.portals.config;
 
-import org.cubeengine.module.core.util.WorldLocation;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.cubeengine.service.world.WorldLocation;
 
 @SuppressWarnings("all")
 public class PortalConfig extends ReflectedYaml

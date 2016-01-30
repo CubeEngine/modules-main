@@ -18,13 +18,13 @@
 package org.cubeengine.module.portals;
 
 import java.util.Set;
+import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parameter.FixedValues;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.core.util.WorldLocation;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.module.core.util.math.shape.Cuboid;
 import org.cubeengine.module.portals.config.Destination;
@@ -34,10 +34,9 @@ import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldManager;
-import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.service.world.WorldLocation;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.util.command.CommandSource;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -50,16 +49,14 @@ public class PortalCommands extends ContainerCommand
     private final Portals module;
     private Selector selector;
     private Reflector reflector;
-    private WorldManager wm;
     private I18n i18n;
 
-    public PortalCommands(Portals module, Selector selector, Reflector reflector, WorldManager wm, I18n i18n)
+    public PortalCommands(Portals module, Selector selector, Reflector reflector, I18n i18n)
     {
         super(module);
         this.module = module;
         this.selector = selector;
         this.reflector = reflector;
-        this.wm = wm;
         this.i18n = i18n;
     }
 
@@ -85,7 +82,7 @@ public class PortalCommands extends ContainerCommand
         config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
         config.location.destination = new WorldLocation(context.getLocation(), context.getRotation());
         config.owner = context.getName();
-        config.world = new ConfigWorld(wm, (World)p1.getExtent());
+        config.world = new ConfigWorld((World)p1.getExtent());
 
         config.destination = destination;
 

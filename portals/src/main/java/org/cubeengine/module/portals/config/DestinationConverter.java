@@ -24,20 +24,12 @@ import de.cubeisland.engine.converter.converter.SingleClassConverter;
 import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
-import org.cubeengine.module.core.util.WorldLocation;
 import org.cubeengine.module.portals.config.Destination.Type;
 import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldManager;
+import org.cubeengine.service.world.WorldLocation;
 
 public class DestinationConverter extends SingleClassConverter<Destination>
 {
-    private WorldManager wm;
-
-    public DestinationConverter(WorldManager wm)
-    {
-        this.wm = wm;
-    }
-
     @Override
     public Node toNode(Destination destination, ConverterManager converterManager) throws ConversionException
     {
@@ -86,12 +78,11 @@ public class DestinationConverter extends SingleClassConverter<Destination>
                         break;
                     case RANDOM:
                     case WORLD:
-                        destination.world = new ConfigWorld(wm, mappedNodes.get("world").asText());
+                        destination.world = new ConfigWorld(mappedNodes.get("world").asText());
                         break;
                     case LOCATION:
-                        destination.world = new ConfigWorld(wm, mappedNodes.get("world").asText());
-                        destination.location = converterManager.convertFromNode(mappedNodes.get("location"),
-                                                                                WorldLocation.class);
+                        destination.world = new ConfigWorld(mappedNodes.get("world").asText());
+                        destination.location = converterManager.convertFromNode(mappedNodes.get("location"), WorldLocation.class);
                         break;
                 }
                 return destination;
