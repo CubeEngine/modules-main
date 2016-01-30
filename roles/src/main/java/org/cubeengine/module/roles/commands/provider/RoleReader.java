@@ -52,7 +52,7 @@ public class RoleReader implements ArgumentReader<RoleSubject>, Completer
     public List<String> getSuggestions(CommandInvocation invocation)
     {
         ArrayList<String> result = new ArrayList<>();
-        String token = invocation.consume(1).toLowerCase();
+        String token = invocation.currentToken().toLowerCase();
         for (Subject subject : service.getGroupSubjects().getAllSubjects())
         {
             if (subject.getIdentifier().startsWith("role:" + token))

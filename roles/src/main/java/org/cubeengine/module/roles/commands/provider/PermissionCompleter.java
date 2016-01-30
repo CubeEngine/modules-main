@@ -42,7 +42,7 @@ public class PermissionCompleter implements Completer
     public List<String> getSuggestions(CommandInvocation invocation)
     {
         Set<String> result = new HashSet<>();
-        String token = invocation.consume(1);
+        String token = invocation.currentToken();
 
         for (String permission : ps.getDescriptions().stream().map(PermissionDescription::getId).filter(p -> p.startsWith(token)).collect(toList()))
         {
