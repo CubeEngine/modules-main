@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.fixes;
+package org.cubeengine.module.vanillaplus;
 
 import org.cubeengine.module.basics.Basics;
 import org.spongepowered.api.data.manipulator.entity.FlyingData;

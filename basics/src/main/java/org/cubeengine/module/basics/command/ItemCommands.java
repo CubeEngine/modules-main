@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.basics.command.moderation;
+package org.cubeengine.module.basics.command;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -126,30 +126,11 @@ public class ItemCommands
         return null;
     }
 
-
-    public enum OnOff implements FixedValues
-    {
-        ON(true), OFF(false);
-        public final boolean value;
-
-        OnOff(boolean value)
-        {
-            this.value = value;
-        }
-
-        @Override
-        public String getName()
-        {
-            return this.name().toLowerCase();
-        }
-    }
-
     @Command(desc = "Grants unlimited items")
     @Restricted(User.class)
-    public void unlimited(User context, @Optional OnOff unlimited)
+    public void unlimited(User context, @Optional boolean unlimited)
     {
-        boolean setTo = unlimited != null ? unlimited.value : !context.get(BasicsAttachment.class).hasUnlimitedItems();
-        if (setTo)
+        if (unlimited)
         {
             context.sendTranslated(POSITIVE, "You now have unlimited items to build!");
         }
@@ -157,7 +138,21 @@ public class ItemCommands
         {
             context.sendTranslated(NEUTRAL, "You no longer have unlimited items to build!");
         }
-        context.get(BasicsAttachment.class).setUnlimitedItems(setTo);
+        context.get(BasicsAttachment.class).setUnlimitedItems(unlimited);
+    }
+
+    @Subscribe
+    public void blockplace(final PlayerPlaceBlockEvent event)
+    {
+        User user = um.getExactUser(event.getUser().getUniqueId());
+        if (user.get(BasicsAttachment.class).hasUnlimitedItems())
+        {
+            com.google.common.base.Optional<ItemStack> itemInHand = event.getUser().getItemInHand();
+            if (itemInHand.isPresent())
+            {
+                itemInHand.get().setQuantity(itemInHand.get().getQuantity() + 1);
+            }
+        }
     }
 
 }
