@@ -107,4 +107,7 @@ public class VanillaPlusPerms extends PermissionContainer<VanillaPlus>
     public final Permission COMMAND_PTIME_OTHER = COMMAND.child("ptime.other");
 
     public final PermissionDescription SPAM = register("spam", "Prevents getting kicked for the Vanilla Spam Reason", null);
+
+    public final Permission SIGN_COLORED = getBasePerm().childWildcard("sign").child("colored");
+    public final Permission SIGN_STYLED = getBasePerm().childWildcard("sign").child("styled");
 }

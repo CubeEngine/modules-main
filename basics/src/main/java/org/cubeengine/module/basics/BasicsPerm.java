@@ -107,7 +107,7 @@ public class BasicsPerm extends PermissionContainer<Basics>
     /**
      * Allows writing colored signs
      */
-    public final Permission SIGN_COLORED = getBasePerm().childWildcard("sign").child("colored");
+
     // TODO maybe permissions for obfuscated format?
 
     public final Permission CHANGEPAINTING = getBasePerm().child("changepainting");

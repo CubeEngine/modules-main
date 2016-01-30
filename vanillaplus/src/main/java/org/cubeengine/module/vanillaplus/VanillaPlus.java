@@ -21,31 +21,44 @@ import javax.inject.Inject;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.Module;
-import org.cubeengine.module.vanillaplus.removal.RemovalCommands;
+import org.cubeengine.module.vanillaplus.addition.PluginCommands;
+import org.cubeengine.module.vanillaplus.addition.SudoCommand;
+import org.cubeengine.module.vanillaplus.improvement.ClearInventoryCommand;
+import org.cubeengine.module.vanillaplus.improvement.DifficultyCommand;
+import org.cubeengine.module.vanillaplus.improvement.GameModeCommand;
+import org.cubeengine.module.vanillaplus.improvement.ItemCommands;
+import org.cubeengine.module.vanillaplus.improvement.ItemModifyCommands;
+import org.cubeengine.module.vanillaplus.improvement.KillCommands;
+import org.cubeengine.module.vanillaplus.improvement.PlayerListCommand;
+import org.cubeengine.module.vanillaplus.improvement.SaveCommands;
+import org.cubeengine.module.vanillaplus.improvement.TimeCommands;
+import org.cubeengine.module.vanillaplus.improvement.WeatherCommands;
+import org.cubeengine.module.vanillaplus.improvement.WhitelistCommand;
+import org.cubeengine.module.vanillaplus.improvement.removal.RemovalCommands;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.user.UserManager;
-import org.cubeengine.module.vanillaplus.spawnmob.SpawnMobCommand;
+import org.cubeengine.module.vanillaplus.improvement.summon.SpawnMobCommand;
 import org.spongepowered.api.Game;
 
 /**
  * A module to improve vanilla commands:
  *
- * /clear 	Clears items from player inventory. {@link InventoryCommands#clearinventory}
+ * /clear 	Clears items from player inventory. {@link ClearInventoryCommand#clearinventory}
  * ??? /deop 	Revoke operator status from a player.
- * /difficulty 	Sets the difficulty level. {@link VanillaCommands#difficulty}
+ * /difficulty 	Sets the difficulty level. {@link DifficultyCommand#difficulty}
  * ??? /effect 	Add or remove status effects.
  * /enchant 	Enchants a player item. {@link ItemModifyCommands#enchant}
- * /execute (sudo)	Executes another command. {@link PlayerCommands#sudo}
- * /gamemode 	Sets a player's game mode. {@link PlayerCommands#gamemode}
+ * /execute (sudo)	Executes another command. {@link SudoCommand#sudo}
+ * /gamemode 	Sets a player's game mode. {@link GameModeCommand#gamemode}
  * /give 	Gives an item to a player. {@link ItemCommands#give},{@link ItemCommands#item}
  * ??? /help 	Provides help for commands.
  * /kill (butcher,remove,removeALl)   Kills entities (players, mobs, items, etc.). {@link RemovalCommands#butcher},{@link RemovalCommands#remove},{@link RemovalCommands#removeAll}
- * /list 	Lists players on the server. {@link ListCommand#list}
+ * /list 	Lists players on the server. {@link PlayerListCommand#list}
  * ??? /op 	Grants operator status to a player.
  * ??? /replaceitem 	Replaces items in inventories.
- * /save-all 	Saves the server to disk. {@link VanillaCommands#saveall}
+ * /save-all 	Saves the server to disk. {@link SaveCommands#saveall}
  * ??? /save-off 	Disables automatic server saves.
  * ??? /save-on 	Enables automatic server saves.
  * configure say color??? /say 	Displays a message to multiple players.
@@ -54,30 +67,29 @@ import org.spongepowered.api.Game;
  * ??? /spreadplayers 	Teleports entities to random locations.
  * /stop 	Stops a server.
  * /summon (spawnmob) Summons an entity. {@link SpawnMobCommand#spawnMob}
- * /time 	Changes or queries the world's game time. {@link WeatherTimeCommands#time}
+ * /time 	Changes or queries the world's game time. {@link TimeCommands#time}
  * ??? /toggledownfall 	Toggles the weather.
- * /weather 	Sets the weather. {@link WeatherTimeCommands#weather}
+ * /weather 	Sets the weather. {@link WeatherCommands#weather}
  * /whitelist 	Manages server whitelist. {@link WhitelistCommand}
  * ??? /xp 	Adds or removes player experience.
  *
  * Extra commands:
  *
- * /plugins {@link VanillaCommands#plugins}
- * /version {@link VanillaCommands#version}
- * /pweather {@link WeatherTimeCommands#pweather}
- * /ptime {@link WeatherTimeCommands#ptime}
+ * /plugins {@link PluginCommands#plugins}
+ * /version {@link PluginCommands#version}
+ * /pweather {@link WeatherCommands#pweather}
+ * /ptime {@link TimeCommands#ptime}
  * /more {@link ItemCommands#more}
  * /stack {@link ItemCommands#stack}
  * /rename {@link ItemModifyCommands#rename}
  * /headchange {@link ItemModifyCommands#headchange}
  * /repair {@link ItemModifyCommands#repair}
- * /kill (for players) {@link PlayerCommands#kill}
- * /suicide (kill self) {@link PlayerCommands#suicide}
+ * /kill (for players) {@link KillCommands#kill}
+ * /suicide (kill self) {@link KillCommands#suicide}
  */
 public class VanillaPlus extends Module
 {
     @Inject private CommandManager cm;
-    @Inject private UserManager um;
     @Inject private Game game;
     @Inject private FileManager fm;
     @Inject private PermissionManager pm;
@@ -89,15 +101,9 @@ public class VanillaPlus extends Module
     {
         perms = new VanillaPlusPerms(this);
         config = fm.loadConfig(this, VanillaPlusConfig.class);
-        cm.addCommands(this, new ListCommand(this, um, game));
-        cm.addCommands(this, new VanillaCommands(this, game, pm));
+        cm.addCommands(this, new PlayerListCommand(this, game));
+        cm.addCommands(this, new SaveCommands(this, game, pm));
         cm.addCommands(this, new SpawnMobCommand(this));
-    }
-
-    @Disable
-    public void onDisable()
-    {
-        cm.removeCommands(this);
     }
 
     public VanillaPlusConfig getConfig()
