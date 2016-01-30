@@ -25,30 +25,26 @@ import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.module.mail.storage.TableMail;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.database.Database;
+import org.cubeengine.service.database.ModuleTables;
 import org.cubeengine.service.event.EventManager;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.task.TaskManager;
 
 @ModuleInfo(name = "Mail", description = "Send ingame Mails")
+@ModuleTables(TableMail.class)
 public class MailModule extends Module
 {
     @Inject private Database db;
     @Inject private EventManager em;
     @Inject private CommandManager cm;
     @Inject private TaskManager tm;
-
+    @Inject private I18n i18n;
 
     @Enable
     public void onEnable()
     {
-        db.registerTable(TableMail.class);
-        cm.addCommand(new MailCommand(this, tm, db, i18n));
-        em.registerListener(this, new MailListener(this));
-    }
-
-    @Disable
-    public void onDisable()
-    {
-        cm.removeCommands(this);
-        em.removeListeners(this);
+        MailCommand cmd = new MailCommand(this, tm, db, i18n);
+        cm.addCommand(cmd);
+        em.registerListener(this, cmd);
     }
 }

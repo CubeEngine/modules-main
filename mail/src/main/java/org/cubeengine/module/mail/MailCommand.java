@@ -18,9 +18,12 @@
 package org.cubeengine.module.mail;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
@@ -38,12 +41,19 @@ import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record1;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.event.Order.POST;
 import static org.spongepowered.api.text.format.TextColors.WHITE;
 
 @Command(name = "mail", desc = "Manages your server mail.")
@@ -53,6 +63,8 @@ public class MailCommand extends ContainerCommand
     private final TaskManager taskManager;
     private final Database db;
     private I18n i18n;
+
+    private Map<UUID, PlayerMails> mails = new HashMap<>();
 
     public MailCommand(MailModule module, TaskManager taskManager, Database db, I18n i18n)
     {
@@ -84,7 +96,9 @@ public class MailCommand extends ContainerCommand
             i18n.sendTranslated(context,  NEGATIVE, "Otherwise be quiet!");
             return;
         }
-        MailAttachment attachment = sender.attachOrGet(MailAttachment.class, module);
+
+
+        PlayerMails attachment = getMails(sender);
         if (attachment.countMail() == 0)
         {
             i18n.sendTranslated(context,  NEUTRAL, "You do not have any mail!");
@@ -113,11 +127,22 @@ public class MailCommand extends ContainerCommand
 
     }
 
+    private PlayerMails getMails(User sender)
+    {
+        PlayerMails mails = this.mails.get(sender.getUniqueId());
+        if (mails == null)
+        {
+            mails = new PlayerMails(sender.getUniqueId(), db);
+            this.mails.put(sender.getUniqueId(), mails);
+        }
+        return mails;
+    }
+
     @Alias(value = "spymail")
     @Command(desc = "Shows the mail of other players.")
     public void spy(CommandSource context, User player)
     {
-        List<Mail> mails = player.attachOrGet(MailAttachment.class, module).getMails();
+        List<Mail> mails = getMails(player).getMails();
         if (mails.isEmpty()) // Mailbox is not empty but no message from that player
         {
             i18n.sendTranslated(context,  NEUTRAL, "{user} does not have any mail!", player);
@@ -145,39 +170,25 @@ public class MailCommand extends ContainerCommand
     @Command(desc = "Sends mails to all players.")
     public void sendAll(CommandSource context, final @Greed(INFINITE) String message)
     {
-        Set<User> users = um.getOnlineUsers();
-        final Set<UInteger> alreadySend = new HashSet<>();
-        User sender = null;
-        if (context instanceof User)
-        {
-            sender = (User)context;
-        }
+        Collection<Player> users = Sponge.getServer().getOnlinePlayers();
+        final Set<UUID> alreadySend = new HashSet<>();
         for (User user : users)
         {
-            user.attachOrGet(MailAttachment.class, module).addMail(sender, message);
-            alreadySend.add(user.getEntity().getId());
+            getMails(user).addMail(context, message);
+            alreadySend.add(user.getUniqueId());
         }
-        final UInteger senderId = sender == null ? null : sender.getEntity().getId();
-        taskManager.runAsynchronousTaskDelayed(this.module, () -> {
-            DSLContext dsl = db.getDSL();
-
-            Collection<Query> queries = dsl.select(TABLE_USER.KEY).from(TABLE_USER).where(TABLE_USER.KEY.notIn(
-                alreadySend)).fetch()
-                       .map(Record1::value1).stream()
-                       .map(userKey -> dsl.insertInto(
-                           TableMail.TABLE_MAIL, TableMail.TABLE_MAIL.MESSAGE, TableMail.TABLE_MAIL.USERID, TableMail.TABLE_MAIL.SENDERID)
-                                          .values(message, userKey, senderId))
-                       .collect(Collectors.toList());
-            dsl.batch(queries).execute();
-        }, 0);
+        taskManager.runAsynchronousTaskDelayed(this.module, () ->
+            Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll().stream()
+                .filter(p -> alreadySend.contains(p.getUniqueId()))
+                .forEach(p -> new PlayerMails(p.getUniqueId(), db).addMail(context, message)), 0);
         i18n.sendTranslated(context,  POSITIVE, "Sent mail to everyone!");
     }
 
     @Command(desc = "Removes a single mail")
-    @Restricted(value = User.class, msg = "The console has no mails!")
-    public void remove(User context, Integer mailId)
+    @Restricted(value = Player.class, msg = "The console has no mails!")
+    public void remove(Player context, Integer mailId)
     {
-        MailAttachment attachment = context.attachOrGet(MailAttachment.class, module);
+        PlayerMails attachment = getMails(context);
         if (attachment.countMail() == 0)
         {
             i18n.sendTranslated(context,  NEUTRAL, "You do not have any mail!");
@@ -197,16 +208,16 @@ public class MailCommand extends ContainerCommand
     }
 
     @Command(desc = "Clears your mail.")
-    @Restricted(value = User.class, msg = "You will never have mail here!")
-    public void clear(User context, @Optional CommandSource player)
+    @Restricted(value = Player.class, msg = "You will never have mail here!")
+    public void clear(Player context, @Optional CommandSource player)
     {
         if (player == null)
         {
-            context.attachOrGet(MailAttachment.class, module).clearMail();
+            getMails(context).clearMail();
             i18n.sendTranslated(context,  NEUTRAL, "Cleared all mails!");
             return;
         }
-        context.attachOrGet(MailAttachment.class, module).clearMailFrom(player);
+        getMails(context).clearMailFrom(player);
         i18n.sendTranslated(context,  NEUTRAL, "Cleared all mail from {user}!", player instanceof User ? player : "console");
     }
 
@@ -214,11 +225,25 @@ public class MailCommand extends ContainerCommand
     {
         for (User user : users)
         {
-            user.attachOrGet(MailAttachment.class, module).addMail(from, message);
-            if (user.asPlayer().isOnline())
+            getMails(user).addMail(from, message);
+            if (user.isOnline())
             {
-                user.sendTranslated(NEUTRAL, "You just got a mail from {user}!", from.getName());
+                i18n.sendTranslated(user.getPlayer().get(), NEUTRAL, "You just got a mail from {user}!", from.getName());
             }
+        }
+    }
+
+
+    @Listener(order = POST)
+    public void onAfterJoin(ClientConnectionEvent.Join event)
+    {
+        Player player = event.getTargetEntity();
+        PlayerMails mails = getMails(player);
+        int amount = mails.countMail();
+        if (amount > 0)
+        {
+            i18n.sendTranslatedN(player, POSITIVE, amount, "You have a new mail!", "You have {amount} of mail!", amount);
+            i18n.sendTranslated(player, NEUTRAL, "Use {text:/mail read} to display them.");
         }
     }
 }

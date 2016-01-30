@@ -19,29 +19,37 @@ package org.cubeengine.module.mail;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.cubeengine.module.mail.storage.Mail;
-import org.cubeengine.service.command.CommandSender;
 import org.cubeengine.service.database.Database;
-import org.cubeengine.service.user.User;
-import org.cubeengine.service.user.UserAttachment;
 import org.jooq.DSLContext;
-import org.jooq.types.UInteger;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 
 import static org.cubeengine.module.mail.storage.TableMail.TABLE_MAIL;
 
-public class MailAttachment extends UserAttachment
+public class PlayerMails
 {
+    private UUID player;
+    private Database db;
+
+    public PlayerMails(UUID player, Database db)
+    {
+        this.player = player;
+        this.db = db;
+    }
+
     private List<Mail> mailbox = new ArrayList<>();
 
     public void loadMails()
     {
-        this.mailbox = dsl().selectFrom(TABLE_MAIL).where(TABLE_MAIL.USERID.eq(getHolder().getEntity().getId())).fetch();
+        this.mailbox = dsl().selectFrom(TABLE_MAIL)
+                        .where(TABLE_MAIL.USERID.eq(player)).fetch();
     }
 
     private DSLContext dsl()
     {
-        return getModule().getModularity().provide(Database.class).getDSL();
+        return db.getDSL();
     }
 
     public List<Mail> getMails()
@@ -58,10 +66,10 @@ public class MailAttachment extends UserAttachment
         List<Mail> mails = new ArrayList<>();
         for (Mail mail : this.getMails())
         {
-            UInteger senderId = UInteger.valueOf(0);
-            if (sender instanceof User)
+            UUID senderId = null;
+            if (sender instanceof Player)
             {
-                senderId = ((User)sender).getEntity().getId();
+                senderId = ((Player)sender).getUniqueId();
             }
             if (mail.getValue(TABLE_MAIL.SENDERID).equals(senderId))
             {
@@ -75,13 +83,13 @@ public class MailAttachment extends UserAttachment
     {
         this.getMails(); // load if not loaded
         Mail mail;
-        if (from instanceof User)
+        if (from instanceof Player)
         {
-            mail = dsl().newRecord(TABLE_MAIL).newMail(getHolder(), ((User)from).getEntity().getId(), message);
+            mail = dsl().newRecord(TABLE_MAIL).newMail(player, ((Player)from).getUniqueId(), message);
         }
         else
         {
-            mail = dsl().newRecord(TABLE_MAIL).newMail(getHolder(), null, message);
+            mail = dsl().newRecord(TABLE_MAIL).newMail(player, null, message);
         }
         this.mailbox.add(mail);
         mail.insertAsync();
@@ -94,7 +102,7 @@ public class MailAttachment extends UserAttachment
 
     public void clearMail()
     {
-        dsl().delete(TABLE_MAIL).where(TABLE_MAIL.USERID.eq(getHolder().getEntity().getId())).execute();
+        dsl().delete(TABLE_MAIL).where(TABLE_MAIL.USERID.eq(player)).execute();
         this.mailbox = new ArrayList<>();
     }
 
@@ -102,9 +110,9 @@ public class MailAttachment extends UserAttachment
     {
         final List<Mail> mailsFrom = this.getMailsFrom(sender);
         this.mailbox.removeAll(mailsFrom);
-        UInteger senderId = sender instanceof User ? ((User)sender).getEntity().getId() : UInteger.valueOf(0);
+        UUID senderId = sender instanceof Player ? ((Player)sender).getUniqueId() : null;
         dsl().delete(TABLE_MAIL).where(
-            TABLE_MAIL.USERID.eq(getHolder().getEntity().getId()),
+            TABLE_MAIL.USERID.eq(player),
             TABLE_MAIL.SENDERID.eq(senderId)).execute();
     }
 }

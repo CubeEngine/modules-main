@@ -40,10 +40,10 @@ public class Mail extends AsyncRecord<Mail>
         super(TABLE_MAIL);
     }
 
-    public Mail newMail(Player user, UUID senderId, String message)
+    public Mail newMail(UUID userId, UUID senderId, String message)
     {
         this.setValue(TABLE_MAIL.MESSAGE, message);
-        this.setValue(TABLE_MAIL.USERID, user.getUniqueId());
+        this.setValue(TABLE_MAIL.USERID, userId);
         this.setValue(TABLE_MAIL.SENDERID, senderId);
         return this;
     }
