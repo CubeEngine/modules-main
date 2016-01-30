@@ -30,6 +30,7 @@ import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.world.ConfigWorld;
 import org.cubeengine.service.world.WorldLocation;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
@@ -90,8 +91,9 @@ public class PortalModifyCommand extends ContainerCommand
             i18n.sendTranslated(context, NEGATIVE, "Please select a cuboid first!");
             return;
         }
-        Location p1 = selector.getFirstPoint(context);
-        Location p2 = selector.getSecondPoint(context);
+        Location<World> p1 = selector.getFirstPoint(context);
+        Location<World> p2 = selector.getSecondPoint(context);
+        portal.config.world = new ConfigWorld(p1.getExtent());
         portal.config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
         portal.config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
         portal.config.save();

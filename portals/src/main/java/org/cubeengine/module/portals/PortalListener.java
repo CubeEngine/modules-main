@@ -20,9 +20,12 @@ package org.cubeengine.module.portals;
 import java.util.List;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.world.World;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
@@ -41,20 +44,27 @@ public class PortalListener
     @Listener
     public void onTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event)
     {
-        List<Portal> portals = this.module.getPortalsInChunk(event.getToTransform().getLocation());
+        Transform<World> target = event.getToTransform();
+        Player player = event.getTargetEntity();
+        onTeleport(target, player);
+    }
+
+    private void onTeleport(Transform<World> target, Player player)
+    {
+        List<Portal> portals = this.module.getPortalsInChunk(target.getLocation());
         if (portals == null)
         {
             return;
         }
         for (Portal portal : portals)
         {
-            if (portal.has(event.getToTransform().getLocation()))
+            if (portal.has(target.getLocation()))
             {
-                PortalsAttachment attachment = module.getPortalsAttachment(event.getTargetEntity().getUniqueId());
+                PortalsAttachment attachment = module.getPortalsAttachment(player.getUniqueId());
                 attachment.setInPortal(true);
                 if (attachment.isDebug())
                 {
-                    i18n.sendTranslated(event.getTargetEntity(), POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Teleported into portal: {name}", portal.getName());
+                    i18n.sendTranslated(player, POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Teleported into portal: {name}", portal.getName());
                 }
                 return;
             }
@@ -93,9 +103,9 @@ public class PortalListener
     public void onMove(DisplaceEntityEvent.Move.TargetPlayer event)
     {
         if (event.getFromTransform().getExtent() != event.getToTransform().getExtent()
-            || event.getFromTransform().getLocation().getBlockX() == event.getToTransform().getLocation().getBlockX()
+            || (event.getFromTransform().getLocation().getBlockX() == event.getToTransform().getLocation().getBlockX()
             && event.getFromTransform().getLocation().getBlockY() == event.getToTransform().getLocation().getBlockY()
-            && event.getFromTransform().getLocation().getBlockZ() == event.getToTransform().getLocation().getBlockZ())
+            && event.getFromTransform().getLocation().getBlockZ() == event.getToTransform().getLocation().getBlockZ()))
         {
             return;
         }
@@ -112,11 +122,11 @@ public class PortalListener
                     {
                         if (attachment.isInPortal())
                         {
-                            i18n.sendTranslated(player, POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Move in portal: {name}", portal.getName());
+                            i18n.sendTranslated(player, POSITIVE, "{text:[Portals] Debug} Move in portal: {name}", portal.getName());
                         }
                         else
                         {
-                            i18n.sendTranslated(player, POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Entered portal: {name}", portal.getName());
+                            i18n.sendTranslated(player, POSITIVE, "{text:[Portals] Debug} Entered portal: {name}", portal.getName());
                             portal.showInfo(player);
                             attachment.setInPortal(true);
                         }
@@ -124,6 +134,7 @@ public class PortalListener
                     else if (!attachment.isInPortal())
                     {
                         portal.teleport(player);
+                        onTeleport(player.getTransform(), player); // TODO remove when DisplaceEntityEvent.Teleport is implemented
                     }
                     return;
                 }
