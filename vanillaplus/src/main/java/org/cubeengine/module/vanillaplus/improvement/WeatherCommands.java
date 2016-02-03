@@ -17,51 +17,27 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.UUID;
-import org.cubeengine.butler.parameter.IncorrectUsageException;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.core.util.matcher.TimeMatcher;
-import org.cubeengine.module.core.util.matcher.WorldMatcher;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.CommandContext;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.task.TaskManager;
-import org.cubeengine.service.user.User;
-import org.cubeengine.service.world.WorldManager;
+import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
-import org.spongepowered.api.world.weather.Weathers;
+
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 /**
  * Commands changing time. /time /ptime
  */
 public class WeatherCommands
 {
-    private final VanillaPlus module;
-    private final TaskManager taskmgr;
-    private WorldManager wm;
-    private WorldMatcher worldMatcher;
-    private TimeMatcher timeMatcher;
-    private final LockTask lockTask;
+    private I18n i18n;
 
-    public WeatherCommands(VanillaPlus module, TaskManager taskmgr, WorldManager wm, WorldMatcher worldMatcher,
-                           TimeMatcher timeMatcher)
+    public WeatherCommands(I18n i18n)
     {
-        this.module = module;
-        this.taskmgr = taskmgr;
-        this.wm = wm;
-        this.worldMatcher = worldMatcher;
-        this.timeMatcher = timeMatcher;
-        this.lockTask = new LockTask();
+        this.i18n = i18n;
     }
 
 
@@ -72,7 +48,7 @@ public class WeatherCommands
     }
 
     @Command(desc = "Changes the weather")
-    public void weather(CommandContext context, Weather weather, @Optional Integer duration, @Default @Named({"in", "world"}) World world)
+    public void weather(CommandSource context, Weather weather, @Optional Integer duration, @Default @Named({"in", "world"}) World world)
     {
         boolean sunny = true;
         boolean noThunder = true;
@@ -112,8 +88,9 @@ public class WeatherCommands
         CLEAR, DOWNFALL, RESET
     }
 
+    /* TODO wait for https://github.com/SpongePowered/SpongeAPI/issues/1059
     @Command(alias = "playerweather", desc = "Changes your weather")
-    public void pweather(CommandContext context, PlayerWeather weather, @Default @Named("player") User player)
+    public void pweather(CommandContext context, PlayerWeather weather, @Default @Named("player") Player player)
     {
         if (!player.isOnline())
         {
@@ -161,4 +138,5 @@ public class WeatherCommands
         }
         throw new IncorrectUsageException("You did something wrong!");
     }
+    */
 }

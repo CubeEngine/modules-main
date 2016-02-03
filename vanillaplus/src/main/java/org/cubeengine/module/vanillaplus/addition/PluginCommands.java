@@ -22,25 +22,47 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.modularity.core.service.ServiceProvider;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.i18n.formatter.MessageType;
 import org.spongepowered.api.Platform;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.text.Text;
+
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 
 public class PluginCommands
 {
-    @Command(desc = "Lists all loaded plugins")
-    public void plugins(CommandSender context)
+    private I18n i18n;
+
+    public PluginCommands(I18n i18n)
     {
-        Collection<PluginContainer> plugins = game.getPluginManager().getPlugins();
+        this.i18n = i18n;
+    }
+
+    private final Permission COMMAND_VERSION_PLUGINS;
+
+    COMMAND_VERSION_PLUGINS = module.getProvided(Permission.class).childWildcard("command").childWildcard("version").child("plugins");
+    pm.registerPermission(module, COMMAND_VERSION_PLUGINS);
+
+
+    @Command(desc = "Lists all loaded plugins")
+    public void plugins(CommandSource context)
+    {
+        Collection<PluginContainer> plugins = Sponge.getPluginManager().getPlugins();
         Set<Module> modules = this.module.getModularity().getModules();
 
         i18n.sendTranslated(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:",
-                               plugins.size(), modules.size());
-        context.sendMessage(" ");
+                            plugins.size(), modules.size());
+        context.sendMessage(Text.EMPTY);
         context.sendMessage(" - " + ChatFormat.BRIGHT_GREEN + "CubeEngine" + ChatFormat.RESET + " (" + module.getInformation().getVersion() + ")");
 
         for (Module m : modules)
@@ -59,7 +81,7 @@ public class PluginCommands
     {
         if (plugin == null)
         {
-            Platform platform = game.getPlatform();
+            Platform platform = Sponge.getGame().getPlatform();
             i18n.sendTranslated(context, NEUTRAL, "This server is running {name#server} in version {input#version:color=INDIGO}", platform.getMinecraftVersion().getName(), platform.getVersion());
             i18n.sendTranslated(context, NEUTRAL, "Sponge API {text:version\\::color=WHITE} {input#version:color=INDIGO}", platform.getApiVersion());
             context.sendMessage(" ");

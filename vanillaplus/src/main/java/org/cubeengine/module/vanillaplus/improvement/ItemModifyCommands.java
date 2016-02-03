@@ -24,13 +24,17 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.cubeengine.service.command.annotation.ParameterPermission;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.i18n.formatter.MessageType;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.data.type.SkullTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
@@ -49,6 +53,8 @@ import static org.spongepowered.api.item.ItemTypes.SKULL;
 public class ItemModifyCommands
 {
     private I18n i18n;
+
+
 
     public ItemModifyCommands(I18n i18n)
     {
@@ -114,7 +120,8 @@ public class ItemModifyCommands
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
     @Restricted(value = Player.class, msg = "Want to be Harry Potter?")
-    public void enchant(Player context, @Default Enchantment enchantment, @Optional Integer level, @Flag boolean unsafe)
+    public void enchant(Player context, @Default Enchantment enchantment, @Optional Integer level,
+                        @ParameterPermission @Flag boolean unsafe)
     {
         if (!context.getItemInHand().isPresent())
         {

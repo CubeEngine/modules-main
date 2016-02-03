@@ -17,10 +17,8 @@
  */
 package org.cubeengine.module.vanillaplus;
 
-import de.cubeisland.engine.service.permission.Permission;
 import org.cubeengine.service.permission.PermissionContainer;
-
-import static de.cubeisland.engine.service.permission.PermDefault.FALSE;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 @SuppressWarnings("all")
 public class VanillaPlusPerms extends PermissionContainer<VanillaPlus>
@@ -28,86 +26,49 @@ public class VanillaPlusPerms extends PermissionContainer<VanillaPlus>
     public VanillaPlusPerms(VanillaPlus module)
     {
         super(module);
-        this.registerAllPermissions();
     }
 
-    public final Permission COMMAND = getBasePerm().childWildcard("command");
+    public final PermissionDescription ITEM_BLACKLIST = getBasePerm().child("item-blacklist", "Allows to create items that are blacklisted");
 
-    private final Permission COMMAND_CLEARINVENTORY = COMMAND.childWildcard("clearinventory");
-    /**
-     * Allows clearing the inventory of other players
-     */
-    public final Permission COMMAND_CLEARINVENTORY_OTHER = COMMAND_CLEARINVENTORY.child("notify");
-    /**
-     * Notifies you if your inventory got cleared by someone else
-     */
-    public final Permission COMMAND_CLEARINVENTORY_NOTIFY = COMMAND_CLEARINVENTORY.child("other");
-    /**
-     * Prevents the other player being notified when his inventory got cleared
-     */
-    public final Permission COMMAND_CLEARINVENTORY_QUIET = COMMAND_CLEARINVENTORY.child("quiet");
-    /**
-     * Prevents your inventory from being cleared unless forced
-     */
-    public final Permission COMMAND_CLEARINVENTORY_PREVENT = COMMAND_CLEARINVENTORY.newPerm("prevent", FALSE);
-    /**
-     * Clears an inventory even if the player has the prevent permission
-     */
-    public final Permission COMMAND_CLEARINVENTORY_FORCE = COMMAND_CLEARINVENTORY.child("force");
+    public final PermissionDescription COMMAND_PTIME_OTHER = COMMAND.child("ptime.other");
 
-    private final Permission COMMAND_GAMEMODE = COMMAND.childWildcard("gamemode");
-    /**
-     * Allows to change the game-mode of other players too
-     */
-    public final Permission COMMAND_GAMEMODE_OTHER = COMMAND_GAMEMODE.child("other");
-    /**
-     * Without this permission the players game-mode will be reset when leaving the server or changing the world
-     */
-    public final Permission COMMAND_GAMEMODE_KEEP = COMMAND_GAMEMODE.child("keep");
+    public final PermissionDescription SPAM = register("spam", "Prevents getting kicked for the Vanilla Spam Reason",
+                                                       null);
 
 
-    private final Permission COMMAND_KILL = COMMAND.childWildcard("kill");
-    /**
-     * Prevents from being killed by the kill command unless forced
-     */
-    public final Permission COMMAND_KILL_PREVENT = COMMAND_KILL.newPerm("prevent", FALSE);
-    /**
-     * Kills a player even if the player has the prevent permission
-     */
-    public final Permission COMMAND_KILL_FORCE = COMMAND_KILL.child("force");
-    /**
-     * Allows killing all players currently online
-     */
-    public final Permission COMMAND_KILL_ALL = COMMAND_KILL.child("all");
-    /**
-     * Allows killing a player with a lightning strike
-     */
-    public final Permission COMMAND_KILL_LIGHTNING = COMMAND_KILL.child("lightning");
-    /**
-     * Prevents the other player being notified who killed him
-     */
-    public final Permission COMMAND_KILL_QUIET = COMMAND_KILL.child("quiet");
-    /**
-     * Shows who killed you
-     */
-    public final Permission COMMAND_KILL_NOTIFY = COMMAND_KILL.child("notify");
+
+    public final PermissionDescription COMMAND = getBasePerm().childWildcard("command");
+
+    public final PermissionDescription COMMAND_LAG_RESET = COMMAND.childWildcard("lag").child("reset");
 
 
     /**
-     * Allows to create items that are blacklisted
+     * Without this PermissionDescription the player will loose god-mode leaving the server or changing the world
      */
-    public final Permission ITEM_BLACKLIST = getBasePerm().child("item-blacklist");
 
-    private final Permission COMMAND_ITEM = COMMAND.childWildcard("item");
-    public final Permission COMMAND_ITEM_ENCHANTMENTS = COMMAND_ITEM.child("enchantments");
-    public final Permission COMMAND_ITEM_ENCHANTMENTS_UNSAFE = COMMAND_ITEM.child("enchantments.unsafe");
+    private final PermissionDescription COMMAND_BUTCHER = COMMAND.childWildcard("butcher");
+    private final PermissionDescription COMMAND_BUTCHER_FLAG = COMMAND_BUTCHER.childWildcard("flag");
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_PET = COMMAND_BUTCHER_FLAG.child("pet");
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_ANIMAL = COMMAND_BUTCHER_FLAG.child("animal");
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_LIGHTNING = COMMAND_BUTCHER_FLAG.child("lightning");
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_GOLEM = COMMAND_BUTCHER_FLAG.child("golem");
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_ALLTYPE = COMMAND_BUTCHER_FLAG.child("alltype");
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_ALL = COMMAND_BUTCHER_FLAG.child("all");
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_OTHER = COMMAND_BUTCHER_FLAG.child("other");
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_NPC = COMMAND_BUTCHER_FLAG.child("npc");
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_MONSTER = COMMAND_BUTCHER_FLAG.child("monster");
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_BOSS = COMMAND_BUTCHER_FLAG.child("boss");
 
-    public final Permission COMMAND_STACK_FULLSTACK = COMMAND.childWildcard("stack").child("fullstack");
 
-    public final Permission COMMAND_PTIME_OTHER = COMMAND.child("ptime.other");
 
-    public final PermissionDescription SPAM = register("spam", "Prevents getting kicked for the Vanilla Spam Reason", null);
 
-    public final Permission SIGN_COLORED = getBasePerm().childWildcard("sign").child("colored");
-    public final Permission SIGN_STYLED = getBasePerm().childWildcard("sign").child("styled");
+
+    /**
+     * Allows writing colored signs
+     */
+
+    // TODO maybe permissions for obfuscated format?
+
+
+
 }

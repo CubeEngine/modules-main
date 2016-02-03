@@ -19,34 +19,22 @@ package org.cubeengine.module.vanillaplus.addition;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parameter.TooFewArgumentsException;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.butler.parameter.FixedValues;
-import org.cubeengine.butler.parameter.TooFewArgumentsException;
-import org.cubeengine.module.core.util.matcher.EnchantMatcher;
-import org.cubeengine.module.core.util.matcher.MaterialMatcher;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.command.CommandContext;
-import de.cubeisland.engine.service.command.result.paginated.PaginatedResult;
-import org.cubeengine.service.paginate.PaginatedResult;
-import org.cubeengine.service.user.User;
-import de.cubeisland.engine.module.core.util.matcher.Match;
-import org.cubeengine.module.basics.Basics;
-import org.cubeengine.module.basics.BasicsAttachment;
-import org.bukkit.enchantments.Enchantment;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.matcher.EnchantMatcher;
+import org.cubeengine.service.matcher.MaterialMatcher;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.SkullMeta;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
-import static org.bukkit.Material.AIR;
-import static org.bukkit.Material.SKULL_ITEM;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
  * item-related commands
@@ -63,22 +51,22 @@ import static org.bukkit.Material.SKULL_ITEM;
  */
 public class ItemDBCommand
 {
-    private final Basics module;
+    private final VanillaPlus module;
     private MaterialMatcher materialMatcher;
     private EnchantMatcher enchantMatcher;
-    private Game game;
+    private I18n i18n;
 
-    public ItemDBCommand(Basics module, MaterialMatcher materialMatcher, EnchantMatcher enchantMatcher, Game game)
+    public ItemDBCommand(VanillaPlus module, MaterialMatcher materialMatcher, EnchantMatcher enchantMatcher, I18n i18n)
     {
         this.module = module;
         this.materialMatcher = materialMatcher;
         this.enchantMatcher = enchantMatcher;
-        this.game = game;
+        this.i18n = i18n;
     }
 
     @Command(desc = "Looks up an item for you!")
     @SuppressWarnings("deprecation")
-    public PaginatedResult itemDB(CommandContext context, @Optional String item)
+    public void itemDB(CommandSource context, @Optional String item)
     {
         if (item != null)
         {
@@ -86,46 +74,39 @@ public class ItemDBCommand
             if (itemList == null || itemList.size() <= 0)
             {
                 i18n.sendTranslated(context, NEGATIVE, "Could not find any item named {input}!", item);
-                return null;
+                return;
             }
             List<Text> lines = new ArrayList<>();
             ItemStack key = itemList.get(0);
-            lines.add(Texts.of(context.getSource().getTranslation(POSITIVE,
-                                                                   "Best Matched {input#item} ({integer#id} for {input}",
-                                                                   materialMatcher.getNameFor(key),
-                                                                   key.getItem().getId(), item)));
+            lines.add(i18n.getTranslation(context, POSITIVE, "Best Matched {input#item} ({integer#id} for {input}",
+                                          materialMatcher.getNameFor(key), key.getItem().getId(), item));
             itemList.remove(0);
-            for (ItemStack stack : itemList) {
-                lines.add(Texts.of(context.getSource().getTranslation(POSITIVE,
-                                                                      "Matched {input#item} ({integer#id} for {input}",
-                                                                      materialMatcher.getNameFor(stack),
-                                                                      stack.getItem().getId(), item)));
+            for (ItemStack stack : itemList)
+            {
+                lines.add(i18n.getTranslation(context, POSITIVE, "Matched {input#item} ({integer#id} for {input}",
+                                              materialMatcher.getNameFor(stack), stack.getItem().getId(), item));
             }
-            return new PaginatedResult(context, lines);
+            Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder()
+                .contents(lines).sendTo(context);
+            return;
         }
-        if (!context.isSource(User.class))
+        if (!(context instanceof Player))
         {
             throw new TooFewArgumentsException();
         }
-        User sender = (User)context.getSource();
+        Player sender = (Player)context;
         if (!sender.getItemInHand().isPresent())
         {
             i18n.sendTranslated(context, NEUTRAL, "You hold nothing in your hands!");
-            return null;
+            return;
         }
         ItemStack aItem = sender.getItemInHand().get();
         String found = materialMatcher.getNameFor(aItem);
         if (found == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Itemname unknown! Itemdata: {integer#id}",
-                                   aItem.getItem().getId());
-            return null;
+            i18n.sendTranslated(context, NEGATIVE, "Itemname unknown! Itemdata: {integer#id}", aItem.getItem().getId());
+            return;
         }
-        i18n.sendTranslated(context, POSITIVE, "The Item in your hand is: {input#item} ({integer#id})",
-                               found, aItem.getItem().getId());
-        return null;
+        i18n.sendTranslated(context, POSITIVE, "The Item in your hand is: {input#item} ({integer#id})", found, aItem.getItem().getId());
     }
-
-
-
 }

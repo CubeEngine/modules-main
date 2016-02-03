@@ -17,28 +17,38 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
+import java.util.Optional;
 import java.util.UUID;
-import com.google.common.base.Optional;
+import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.service.user.UserStorageService;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 public class TamedListener
 {
-    @Subscribe
-    public void onInteractWithTamed(PlayerInteractEntityEvent event)
-    {
-        UUID uuid = event.getTargetEntity().get(Keys.TAMED_OWNER).or(Optional.<UUID>absent()).orNull();
-        if (uuid != null)
-        {
+    private I18n i18n;
 
-            if (!event.getUser().getUniqueId().equals(uuid))
-            {
-                User clicker = um.getExactUser(event.getUser().getUniqueId());
-                User owner = um.getExactUser(uuid);
-                clicker.sendTranslated(POSITIVE, "This {name#entity} belongs to {tamer}!",
-                                       event.getEntity().getType().getName(), owner);
-            }
+    public TamedListener(I18n i18n)
+    {
+        this.i18n = i18n;
+    }
+
+    @Listener
+    public void onInteractWithTamed(InteractEntityEvent event, @First Player player)
+    {
+        Optional<UUID> uuid = event.getTargetEntity().get(Keys.TAMED_OWNER).orElse(Optional.empty());
+        if (uuid.isPresent())
+        {
+            Optional<User> owner = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid.get());
+            i18n.sendTranslated(player, POSITIVE, "This {name#entity} belongs to {tamer}!",
+                                event.getTargetEntity().getType().getName(), owner);
         }
     }
 }

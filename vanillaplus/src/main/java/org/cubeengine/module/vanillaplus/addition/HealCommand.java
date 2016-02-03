@@ -17,79 +17,58 @@
  */
 package org.cubeengine.module.vanillaplus.addition;
 
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import java.util.Collection;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.basics.Basics;
-import org.cubeengine.module.basics.BasicsAttachment;
-import org.cubeengine.module.core.sponge.EventManager;
 import org.cubeengine.module.core.util.ChatFormat;
-import org.cubeengine.module.core.util.TimeUtil;
-import org.cubeengine.module.core.util.math.BlockVector3;
-import de.cubeisland.engine.service.ban.UserBan;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.task.TaskManager;
-import org.cubeengine.service.user.User;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.service.user.Broadcaster;
 import org.cubeengine.service.user.UserList;
-import org.cubeengine.service.user.UserManager;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.service.ban.BanService;
-import org.spongepowered.api.text.Texts;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static java.text.DateFormat.SHORT;
-import static org.spongepowered.api.entity.player.gamemode.GameModes.CREATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
-public class HealCommand
+public class HealCommand extends PermissionContainer<VanillaPlus>
 {
-    private final UserManager um;
-    private CommandManager cm;
-    private BanService banService;
-    private Game game;
-    private final Basics module;
+    private I18n i18n;
+    private Broadcaster bc;
 
-    public HealCommand(Basics basics, UserManager um, EventManager em, TaskManager taskManager, CommandManager cm,
-                       BanService banService, Game game)
+    public HealCommand(VanillaPlus module, I18n i18n, Broadcaster bc)
     {
-        this.module = basics;
-        this.um = um;
-        this.cm = cm;
-        this.banService = banService;
-        this.game = game;
-
+        super(module);
+        this.i18n = i18n;
+        this.bc = bc;
     }
 
+    public final PermissionDescription COMMAND_HEAL_OTHER = register("command.heal.other", "", null);
+
     @Command(desc = "Heals a player")
-    public void heal(CommandSender context, @Optional UserList players)
+    public void heal(CommandSource context, @Optional UserList players)
     {
         if (players == null)
         {
-            if (!(context instanceof User))
+            if (!(context instanceof Player))
             {
                 i18n.sendTranslated(context, NEGATIVE, "Only time can heal your wounds!");
                 return;
             }
-            User sender = (User)context;
-            sender.asPlayer().offer(Keys.HEALTH, sender.asPlayer().get(Keys.MAX_HEALTH).get());
-            sender.sendTranslated(POSITIVE, "You are now healed!");
+            Player sender = (Player)context;
+            sender.offer(Keys.HEALTH, sender.get(Keys.MAX_HEALTH).get());
+            i18n.sendTranslated(sender, POSITIVE, "You are now healed!");
             return;
         }
-        if (!context.hasPermission(module.perms().COMMAND_HEAL_OTHER))
+        if (!context.hasPermission(COMMAND_HEAL_OTHER.getId()))
         {
             i18n.sendTranslated(context, NEGATIVE, "You are not allowed to heal other players!");
             return;
         }
-        List<User> userList = players.list();
+        Collection<Player> userList = players.list();
         if (players.isAll())
         {
             if (userList.isEmpty())
@@ -98,19 +77,19 @@ public class HealCommand
                 return;
             }
             i18n.sendTranslated(context, POSITIVE, "You healed everyone!");
-            this.um.broadcastStatus(ChatFormat.BRIGHT_GREEN + "healed every player.", context);
+            bc.broadcastStatus(ChatFormat.BRIGHT_GREEN + "healed every player.", context);
         }
         else
         {
             i18n.sendTranslated(context, POSITIVE, "Healed {amount} players!", userList.size());
         }
-        for (User user : userList)
+        for (Player user : userList)
         {
             if (!players.isAll())
             {
-                user.sendTranslated(POSITIVE, "You got healed by {sender}!", context);
+                i18n.sendTranslated(user, POSITIVE, "You got healed by {sender}!", context);
             }
-            user.asPlayer().offer(Keys.HEALTH, user.asPlayer().get(Keys.MAX_HEALTH).get());
+            user.offer(Keys.HEALTH, user.get(Keys.MAX_HEALTH).get());
         }
     }
 

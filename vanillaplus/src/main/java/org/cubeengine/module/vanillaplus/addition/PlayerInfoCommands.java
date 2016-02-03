@@ -3,6 +3,7 @@ package org.cubeengine.module.vanillaplus.addition;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import java.util.Locale;
 import org.cubeengine.butler.parametric.Command;
@@ -10,17 +11,30 @@ import org.cubeengine.module.basics.BasicsAttachment;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.TimeUtil;
 import org.cubeengine.module.core.util.math.BlockVector3;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.i18n.formatter.MessageType;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.world.Location;
 
 import static java.text.DateFormat.SHORT;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 
 public class PlayerInfoCommands
 {
+    private I18n i18n;
+
+    public PlayerInfoCommands(I18n i18n)
+    {
+        this.i18n = i18n;
+    }
+
     private static final long SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
     @Command(desc = "Shows when given player was online the last time")
-    public void seen(CommandSender context, Player player)
+    public void seen(CommandSource context, Player player)
     {
         if (player.isOnline())
         {
@@ -28,14 +42,14 @@ public class PlayerInfoCommands
             return;
         }
 
-        Date lastPlayed = player.get(Keys.FIRST_DATE_PLAYED).get();
-        if (System.currentTimeMillis() - lastPlayed.getTime() <= SEVEN_DAYS) // If less than 7 days show timeframe instead of date
+        Instant lastPlayed = player.get(Keys.FIRST_DATE_PLAYED).get();
+        if (System.currentTimeMillis() - lastPlayed.toEpochMilli() <= SEVEN_DAYS) // If less than 7 days show timeframe instead of date
         {
             i18n.sendTranslated(context, NEUTRAL, "{user} was last seen {input#date}.", player, TimeUtil.format(
-                context.getLocale(), new Date(lastPlayed.getTime())));
+                context.getLocale(), new Date(lastPlayed.toEpochMilli())));
             return;
         }
-        Date date = new Date(lastPlayed.getTime());
+        Date date = new Date(lastPlayed.toEpochMilli());
         DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale());
         i18n.sendTranslated(context, NEUTRAL, "{user} is offline since {input#time}", player, format.format(date));
     }
@@ -44,9 +58,9 @@ public class PlayerInfoCommands
 
 
     @Command(desc = "Displays informations from a player!")
-    public void whois(CommandSender context, User player)
+    public void whois(CommandSource context, User player)
     {
-        if (player.asPlayer().isOnline())
+        if (player.isOnline())
         {
             i18n.sendTranslated(context, NEUTRAL, "Nickname: {user}", player);
         }

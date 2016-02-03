@@ -26,16 +26,16 @@ import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.i18n.formatter.MessageType;
 import org.cubeengine.service.matcher.EnchantMatcher;
 import org.cubeengine.service.matcher.MaterialMatcher;
-import org.spongepowered.api.Game;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Type;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
@@ -50,20 +50,26 @@ import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
  * <p>/more
  * <p>/stack
  */
-public class ItemCommands
+public class ItemCommands extends PermissionContainer<VanillaPlus>
 {
     private final VanillaPlus module;
     private MaterialMatcher materialMatcher;
     private EnchantMatcher enchantMatcher;
-    private Game game;
     private I18n i18n;
 
-    public ItemCommands(VanillaPlus module, MaterialMatcher materialMatcher, EnchantMatcher enchantMatcher, Game game, I18n i18n)
+    private final PermissionDescription COMMAND_ITEM = register("command.item", "", null);
+    public final PermissionDescription COMMAND_ITEM_ENCHANTMENTS = register("enchantments.safe", "", COMMAND_ITEM);
+    public final PermissionDescription COMMAND_ITEM_ENCHANTMENTS_UNSAFE = register("enchantments.unsafe", "",
+                                                                                   COMMAND_ITEM);
+
+    public final PermissionDescription COMMAND_STACK_FULLSTACK = register("command.stack.fullstack", "", null);
+
+    public ItemCommands(VanillaPlus module, MaterialMatcher materialMatcher, EnchantMatcher enchantMatcher, I18n i18n)
     {
+        super(module);
         this.module = module;
         this.materialMatcher = materialMatcher;
         this.enchantMatcher = enchantMatcher;
-        this.game = game;
         this.i18n = i18n;
     }
 
@@ -72,7 +78,7 @@ public class ItemCommands
     public void give(CommandSource context, User player, @Label("material[:data]") ItemStack item, @Optional Integer amount, @Flag boolean blacklist)
     {
         if (!blacklist && context.hasPermission(module.perms().ITEM_BLACKLIST.getId())
-            && this.module.getConfiguration().commands.itemBlacklist.contains(item)) // TODO
+            && this.module.getConfig().commands.itemBlacklist.contains(item)) // TODO
         {
             i18n.sendTranslated(context, NEGATIVE, "This item is blacklisted!");
             return;
@@ -106,7 +112,7 @@ public class ItemCommands
                      @Flag boolean blacklist)
     {
         if (!blacklist && context.hasPermission(module.perms().ITEM_BLACKLIST.getId())
-            && this.module.getConfiguration().commands.containsBlackListed(item.getItem()))
+            && this.module.getConfig().commands.containsBlackListed(item.getItem()))
         {
             i18n.sendTranslated(context, NEGATIVE, "This item is blacklisted!");
             return;
@@ -129,9 +135,9 @@ public class ItemCommands
                     enchLvl = Integer.parseInt(ench.substring(ench.indexOf(":") + 1, ench.length()));
                     ench = ench.substring(0, ench.indexOf(":"));
                 }
-                if (context.hasPermission(module.perms().COMMAND_ITEM_ENCHANTMENTS.getId()))
+                if (context.hasPermission(COMMAND_ITEM_ENCHANTMENTS.getId()))
                 {
-                    if (context.hasPermission(module.perms().COMMAND_ITEM_ENCHANTMENTS_UNSAFE.getId()))
+                    if (context.hasPermission(COMMAND_ITEM_ENCHANTMENTS_UNSAFE.getId()))
                     {
                         enchantMatcher.applyMatchedEnchantment(item, ench, enchLvl, true);
                     }
@@ -195,7 +201,7 @@ public class ItemCommands
     @Restricted(value = Player.class, msg = "No stacking for you.")
     public void stack(Player context)
     {
-        boolean allow64 = context.hasPermission(module.perms().COMMAND_STACK_FULLSTACK.getId());
+        boolean allow64 = context.hasPermission(COMMAND_STACK_FULLSTACK.getId());
         ItemStack[] items = new ItemStack[context.getInventory().capacity()];
         int slotIndex = 0;
         for (Inventory slot : context.getInventory().slots())

@@ -29,12 +29,41 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.matcher.TimeMatcher;
+import org.cubeengine.service.matcher.WorldMatcher;
+import org.cubeengine.service.task.TaskManager;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
+
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 public class TimeCommands
 {
+    private final TaskManager tam;
+    private VanillaPlus module;
+    private I18n i18n;
+    private TimeMatcher tm;
+    private final WorldMatcher worldMatcher;
+
+    private Map<UUID, UUID> locked = new HashMap<>();
+
+    public TimeCommands(VanillaPlus module, I18n i18n, TimeMatcher tm, WorldMatcher worldMatcher, TaskManager tam)
+    {
+        this.module = module;
+        this.i18n = i18n;
+        this.tm = tm;
+        this.worldMatcher = worldMatcher;
+        this.tam = tam;
+    }
+
     @Command(desc = "Changes the time of a world")
-    public void time(CommandSender context, @Optional String time,
+    public void time(CommandSource context, @Optional String time,
                      @Named({ "w", "worlds", "in"}) String worlds, // TODO worldlist reader // TODO NParams static label reader
                      @Flag boolean lock)
     {
@@ -43,7 +72,7 @@ public class TimeCommands
         {
             if ("*".equals(worlds))
             {
-                worldList = wm.getWorlds();
+                worldList = Sponge.getServer().getWorlds();
             }
             else
             {
@@ -60,48 +89,55 @@ public class TimeCommands
         }
         else
         {
-            if (!(context instanceof User))
+            if (!(context instanceof Player))
             {
                 i18n.sendTranslated(context, NEGATIVE, "You have to specify a world when using this command from the console!");
                 return;
             }
-            worldList = Collections.singletonList(((User)context).getWorld());
+            worldList = Collections.singletonList(((Player)context).getWorld());
         }
         if (time != null)
         {
-            final Long lTime = timeMatcher.matchTimeValue(time);
+            final Long lTime = tm.matchTimeValue(time);
             if (lTime == null)
             {
                 i18n.sendTranslated(context, NEGATIVE, "The time you entered is not valid!");
                 return;
             }
+            String timeNumeric = tm.format(lTime);
+            String timeName = tm.matchTimeName(lTime);
             if (worldList.size() == 1)
             {
-                i18n.sendTranslated(context, POSITIVE, "The time of {world} have been set to {input#time} ({input#neartime})!", worldList.get(0), timeMatcher.format(
-                    lTime), timeMatcher.getNearTimeName(lTime));
+                i18n.sendTranslated(context, POSITIVE,
+                                    "The time of {world} have been set to {input#time} ({input#neartime})!",
+                                    worldList.iterator().next(), timeNumeric, timeName);
             }
             else if ("*".equals(worlds))
             {
-                i18n.sendTranslated(context, POSITIVE, "The time of all worlds have been set to {input#time} ({input#neartime})!", timeMatcher.format(lTime), timeMatcher.getNearTimeName(
-                    lTime));            }
+                i18n.sendTranslated(context, POSITIVE,
+                                    "The time of all worlds have been set to {input#time} ({input#neartime})!",
+                                    timeNumeric, timeName);
+            }
             else
             {
-                i18n.sendTranslated(context, POSITIVE, "The time of {amount} worlds have been set to {input#time} ({input#neartime})!", worldList.size(), timeMatcher.format(
-                    lTime), timeMatcher.getNearTimeName(lTime));
+                i18n.sendTranslated(context, POSITIVE,
+                                    "The time of {amount} worlds have been set to {input#time} ({input#neartime})!",
+                                    worldList.size(), timeNumeric, timeName);
             }
             for (World world : worldList)
             {
                 this.setTime(world, lTime);
                 if (lock)
                 {
-                    if (this.lockTask.worlds.containsKey(world.getName()))
+                    long worldTime = world.getProperties().getWorldTime();
+                    if (locked.containsKey(world.getUniqueId()))
                     {
-                        this.lockTask.remove(world);
+                        tam.cancelTask(module, locked.remove(world.getUniqueId()));
                         i18n.sendTranslated(context, POSITIVE, "Time unlocked for {world}!", world);
                     }
                     else
                     {
-                        this.lockTask.add(world);
+                        locked.put(world.getUniqueId(), tam.runTimer(module, () -> setTime(world, worldTime), 0, 10));
                         i18n.sendTranslated(context, POSITIVE, "Time locked for {world}!", world);
                     }
                 }
@@ -112,14 +148,15 @@ public class TimeCommands
         {
             for (World world : worldList)
             {
-                if (this.lockTask.worlds.containsKey(world.getName()))
+                long worldTime = world.getProperties().getWorldTime();
+                if (locked.containsKey(world.getUniqueId()))
                 {
-                    this.lockTask.remove(world);
+                    tam.cancelTask(module, locked.remove(world.getUniqueId()));
                     i18n.sendTranslated(context, POSITIVE, "Time unlocked for {world}!", world);
                 }
                 else
                 {
-                    this.lockTask.add(world);
+                    locked.put(world.getUniqueId(), tam.runTimer(module, () -> setTime(world, worldTime), 0, 10));
                     i18n.sendTranslated(context, POSITIVE, "Time locked for {world}!", world);
                 }
             }
@@ -128,13 +165,14 @@ public class TimeCommands
         i18n.sendTranslated(context, POSITIVE, "The current time is:");
         for (World world : worldList)
         {
-            i18n.sendTranslated(context, NEUTRAL, "{input#time} ({input#neartime}) in {world}.", timeMatcher.format(
-                world.getTime()), timeMatcher.getNearTimeName(world.getTime()), world);
+            long worldTime = world.getProperties().getWorldTime();
+            i18n.sendTranslated(context, NEUTRAL, "{input#time} ({input#neartime}) in {world}.", tm.format(worldTime), tm.matchTimeName(worldTime), world);
         }
     }
 
+    /* TODO wait for API https://github.com/SpongePowered/SpongeAPI/issues/393
     @Command(desc = "Changes the time for a player")
-    public void ptime(CommandSender context, String time, @Default User player, @Flag boolean lock) // TODO staticValues = "reset"
+    public void ptime(CommandSource context, String time, @Default Player player, @Flag boolean lock) // TODO staticValues = "reset"
     {
         Long lTime = 0L;
         boolean reset = false;
@@ -144,7 +182,7 @@ public class TimeCommands
         }
         else
         {
-            lTime = timeMatcher.matchTimeValue(time);
+            lTime = tm.matchTimeValue(time);
             if (lTime == null)
             {
                 i18n.sendTranslated(context, NEGATIVE, "Invalid time format!");
@@ -152,7 +190,7 @@ public class TimeCommands
             }
         }
 
-        if (!context.equals(player) && !module.perms().COMMAND_PTIME_OTHER.isAuthorized(context))
+        if (!context.equals(player) && !context.hasPermission(module.perms().COMMAND_PTIME_OTHER.getId()))
         {
             i18n.sendTranslated(context, NEGATIVE, "You are not allowed to change the time of other players!");
             return;
@@ -163,12 +201,12 @@ public class TimeCommands
             i18n.sendTranslated(context, POSITIVE, "Reseted the time for {user}!", player);
             if (context.equals(player))
             {
-                player.sendTranslated(NEUTRAL, "Your time was reset!");
+                i18n.sendTranslated(player, NEUTRAL, "Your time was reset!");
             }
             return;
         }
-        String format = timeMatcher.format(lTime);
-        String nearTime = timeMatcher.getNearTimeName(lTime);
+        String format = tm.format(lTime);
+        String nearTime = tm.matchTimeName(lTime);
         if (lock)
         {
             player.resetPlayerTime();
@@ -178,7 +216,7 @@ public class TimeCommands
         else
         {
             player.resetPlayerTime();
-            player.setPlayerTime(lTime - player.getWorld().getTime(), true);
+            player.setPlayerTime(lTime - player.getWorld().getProperties().getWorldTime(), true);
             i18n.sendTranslated(context, POSITIVE, "Time set to {input#time} ({input#neartime}) for {user}!", format, nearTime, player);
         }
         if (context.equals(player))
@@ -186,64 +224,10 @@ public class TimeCommands
             i18n.sendTranslated(context, POSITIVE, "Your time was set to {input#time} ({input#neartime})!", format, nearTime);
         }
     }
+    */
 
     private void setTime(World world, long time)
     {
-        world.setTime(time);
+        world.getProperties().setWorldTime(time);
     }
-
-
-    private final class LockTask implements Runnable
-    {
-
-        private final Map<String, Long> worlds = new HashMap<>();
-        private UUID taskid = null;
-
-        public void add(World world)
-        {
-            this.worlds.put(world.getName(), world.getTime());
-            if (this.taskid == null)
-            {
-                this.taskid = taskmgr.runTimer(module, this, 10, 10).get();
-            }
-        }
-
-        public void remove(World world)
-        {
-            this.worlds.remove(world.getName());
-            if (this.taskid != null && this.worlds.isEmpty())
-            {
-                taskmgr.cancelTask(module, this.taskid);
-                this.taskid = null;
-            }
-        }
-
-        @Override
-        public void run()
-        {
-            Iterator<Entry<String, Long>> iter = this.worlds.entrySet().iterator();
-
-            Map.Entry<String, Long> entry;
-            World world;
-            while (iter.hasNext())
-            {
-                entry = iter.next();
-                world = wm.getWorld(entry.getKey()).orNull();
-                if (world != null)
-                {
-                    world.setTime(entry.getValue());
-                }
-                else
-                {
-                    iter.remove();
-                }
-            }
-            if (this.taskid != null && this.worlds.isEmpty())
-            {
-                taskmgr.cancelTask(module, this.taskid);
-                this.taskid = null;
-            }
-        }
-    }
-
 }

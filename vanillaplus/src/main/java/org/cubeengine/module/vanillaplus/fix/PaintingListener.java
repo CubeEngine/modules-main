@@ -21,62 +21,75 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.UUID;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.User;
 import org.cubeengine.module.basics.Basics;
 import org.cubeengine.service.user.UserManager;
 
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.hanging.Painting;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
+import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 public class PaintingListener
 {
-    private final Basics module;
-    private UserManager um;
+    private final VanillaPlus module;
+    private I18n i18n;
     private final Map<UUID, Painting> paintingChange;
 
-    public PaintingListener(Basics module, UserManager um)
+    public final PermissionDescription CHANGEPAINTING = getBasePerm().child("changepainting");
+
+
+    public PaintingListener(VanillaPlus module, I18n i18n)
     {
         this.module = module;
-        this.um = um;
+        this.i18n = i18n;
         this.paintingChange = new HashMap<>();
     }
     // TODO maybe save painting type when breaking so the same can be placed and allow stacking them somehow
 
-    @Subscribe(order = Order.EARLY)
-    public void onPlayerInteractEntity(PlayerInteractEntityEvent event)
+    @Listener(order = Order.EARLY)
+    public void onPlayerInteractEntity(InteractEntityEvent event, @First Player player)
     {
         if (event.getTargetEntity().getType() == EntityTypes.PAINTING)
         {
-            User user = um.getExactUser(event.getUser().getUniqueId());
-
-            if (!module.perms().CHANGEPAINTING.isAuthorized(user))
+            if (!player.hasPermission(CHANGEPAINTING.getId()))
             {
-                user.sendTranslated(NEGATIVE, "You are not allowed to change this painting.");
+                i18n.sendTranslated(player, NEGATIVE, "You are not allowed to change this painting.");
                 return;
             }
             Painting painting = (Painting)event.getTargetEntity();
 
-            Painting playerPainting = this.paintingChange.get(user.getUniqueId());
+            Painting playerPainting = this.paintingChange.get(player.getUniqueId());
             if(playerPainting == null && this.paintingChange.containsValue(painting))
             {
-                user.sendTranslated(NEGATIVE, "This painting is being used by another player.");
+                i18n.sendTranslated(player, NEGATIVE, "This painting is being used by another player.");
             }
             else if (playerPainting == null)
             {
-                this.paintingChange.put(user.getUniqueId(), painting);
-                user.sendTranslated(POSITIVE, "You can now cycle through the paintings using your mousewheel.");
+                this.paintingChange.put(player.getUniqueId(), painting);
+                i18n.sendTranslated(player, POSITIVE, "You can now cycle through the paintings using your mousewheel.");
             }
             else
             {
-                this.paintingChange.remove(user.getUniqueId());
-                user.sendTranslated(POSITIVE, "Painting locked");
+                this.paintingChange.remove(player.getUniqueId());
+                i18n.sendTranslated(player, POSITIVE, "Painting locked");
             }
         }
     }
@@ -94,24 +107,22 @@ public class PaintingListener
         return Integer.compare(previousSlot, newSlot);
     }
 
-    @Subscribe(order = Order.EARLY)
-    public void onItemHeldChange(PlayerItemHeldEvent event)
+    @Listener(order = Order.EARLY)
+    public void onItemHeldChange(ChangeInventoryEvent.Held event, @First Player player)
     {
         if (!this.paintingChange.isEmpty())
         {
-            Painting painting = this.paintingChange.get(event.getUser().getUniqueId());
+            Painting painting = this.paintingChange.get(player.getUniqueId());
 
             if (painting != null)
             {
-                User user = um.getExactUser(event.getUser().getUniqueId());
-                final int maxDistanceSquared = this.module.getConfiguration().maxChangePaintingDistance * this.module
-                    .getConfiguration().maxChangePaintingDistance;
+                final int maxDistanceSquared = this.module.getConfig().maxChangePaintingDistance * this.module.getConfig().maxChangePaintingDistance;
 
                 if (painting.getLocation().getPosition()
-                            .distanceSquared(user.getLocation().getPosition()) > maxDistanceSquared)
+                            .distanceSquared(player.getLocation().getPosition()) > maxDistanceSquared)
                 {
-                    this.paintingChange.remove(user.getUniqueId());
-                    user.sendTranslated(POSITIVE, "Painting locked");
+                    this.paintingChange.remove(player.getUniqueId());
+                    i18n.sendTranslated(player, POSITIVE, "Painting locked");
                     return;
                 }
 
@@ -148,15 +159,15 @@ public class PaintingListener
         }
     }
 
-    @Subscribe(order = Order.EARLY)
-    public void onPaintingBreakEvent(HangingBreakEvent event)
+    @Listener(order = Order.EARLY)
+    public void onPaintingBreakEvent(DestructEntityEvent event)
     {
-        if (!(event.getEntity() instanceof Painting))
+        if (!(event.getTargetEntity() instanceof Painting))
         {
             return;
         }
 
-        Painting painting = (Painting)event.getEntity();
+        Painting painting = (Painting)event.getTargetEntity();
 
         Iterator<Entry<UUID, Painting>> paintingIterator = this.paintingChange.entrySet().iterator();
         while(paintingIterator.hasNext())
@@ -164,7 +175,11 @@ public class PaintingListener
             Entry<UUID, Painting> entry = paintingIterator.next();
             if(entry.getValue().equals(painting))
             {
-                um.getExactUser(entry.getKey()).sendTranslated(NEGATIVE, "The painting broke");
+                Optional<Player> player = Sponge.getServer().getPlayer(entry.getKey());
+                if (player.isPresent())
+                {
+                    i18n.sendTranslated(player.get(), NEGATIVE, "The painting broke");
+                }
                 paintingIterator.remove();
             }
         }

@@ -10,7 +10,7 @@
   <artifactId>vanillaplus</artifactId>
   <name>VanillaPlus</name>
   <version>1.0.0-SNAPSHOT</version>
-  <description>Better Vanilla Commands</description>
+  <description>Improved Vanilla</description>
 
   <dependencies>
     <dependency>

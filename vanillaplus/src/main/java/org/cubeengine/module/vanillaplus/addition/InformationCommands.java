@@ -39,20 +39,26 @@ import org.cubeengine.module.basics.Basics;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.Pair;
 import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.i18n.formatter.MessageType;
 import org.cubeengine.module.core.util.matcher.MaterialMatcher;
 import org.cubeengine.module.core.util.math.BlockVector2;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.matcher.MaterialMatcher;
 import org.cubeengine.service.user.User;
 import org.cubeengine.service.world.WorldManager;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
@@ -60,20 +66,23 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 
 import static java.util.Locale.ENGLISH;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.util.Direction.*;
 
 public class InformationCommands
 {
     private final PeriodFormatter formatter;
-    private final Basics module;
-    private WorldManager wm;
+    private final VanillaPlus module;
     private MaterialMatcher materialMatcher;
+    private I18n i18n;
 
-    public InformationCommands(Basics module, WorldManager wm, MaterialMatcher materialMatcher)
+    public InformationCommands(VanillaPlus module, MaterialMatcher materialMatcher, I18n i18n)
     {
         this.module = module;
-        this.wm = wm;
         this.materialMatcher = materialMatcher;
+        this.i18n = i18n;
         this.formatter = new PeriodFormatterBuilder().appendWeeks().appendSuffix(" week"," weeks").appendSeparator(" ")
                                                      .appendDays().appendSuffix(" day", " days").appendSeparator(" ")
                                                      .appendHours().appendSuffix(" hour"," hours").appendSeparator(" ")
@@ -82,19 +91,19 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the biome type you are standing in.")
-    public void biome(CommandSender context,
+    public void biome(CommandSource context,
                       @Optional World world,
                       @Label("block-x") @Optional Integer x,
                       @Label("block-z") @Optional Integer z)
     {
-        if (!(context instanceof User) && (world == null || z == null))
+        if (!(context instanceof Player) && (world == null || z == null))
         {
             i18n.sendTranslated(context, NEGATIVE, "Please provide a world and x and z coordinates!");
             return;
         }
         if (z == null)
         {
-            Location loc = ((User)context).getLocation();
+            Location loc = ((Player)context).getLocation();
             world = (World)loc.getExtent();
             x = loc.getBlockX();
             z = loc.getBlockZ();
@@ -104,30 +113,30 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays the seed of a world.")
-    public void seed(CommandSender context, @Optional World world)
+    public void seed(CommandSource context, @Optional World world)
     {
         if (world == null)
         {
-            if (!(context instanceof User))
+            if (!(context instanceof Player))
             {
                 throw new TooFewArgumentsException();
             }
-            world = ((User)context).getWorld();
+            world = ((Player)context).getWorld();
         }
         i18n.sendTranslated(context, NEUTRAL, "Seed of {world} is {long#seed}", world, world.getWorldStorage().getWorldProperties().getSeed());
     }
 
     @Command(desc = "Displays the direction in which you are looking.")
-    @Restricted(value = User.class, msg = "{text:ProTip}: I assume you are looking right at your screen, right?")
-    public void compass(User context)
+    @Restricted(value = Player.class, msg = "{text:ProTip}: I assume you are looking right at your screen, right?")
+    public void compass(Player context)
     {
         i18n.sendTranslated(context, NEUTRAL, "You are looking to {input#direction}!", getClosest(
-            context.asPlayer().getRotation()).name()); // TODO translation of direction
+            context.getRotation()).name()); // TODO translation of direction
     }
 
     @Command(desc = "Displays your current depth.")
-    @Restricted(value = User.class, msg = "You dug too deep!")
-    public void depth(User context)
+    @Restricted(value = Player.class, msg = "You dug too deep!")
+    public void depth(Player context)
     {
         final int height = context.getLocation().getBlockY();
         if (height > 62)
@@ -139,19 +148,19 @@ public class InformationCommands
     }
 
     @Command(desc = "Displays your current location.")
-    @Restricted(value = User.class, msg = "Your position: {text:Right in front of your screen!:color=RED}")
-    public void getPos(User context)
+    @Restricted(value = Player.class, msg = "Your position: {text:Right in front of your screen!:color=RED}")
+    public void getPos(Player context)
     {
         final Location loc = context.getLocation();
         i18n.sendTranslated(context, NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
     }
 
     @Command(desc = "Displays near players(entities/mobs) to you.")
-    public void near(CommandSender context, @Optional Integer radius, @Default User player, @Flag boolean entity, @Flag boolean mob)
+    public void near(CommandSource context, @Optional Integer radius, @Default Player player, @Flag boolean entity, @Flag boolean mob)
     {
         if (radius == null)
         {
-            radius = this.module.getConfiguration().commands.nearDefaultRadius;
+            radius = this.module.getConfig().commands.nearDefaultRadius;
         }
         int squareRadius = radius * radius;
         Location userLocation = player.getLocation();
@@ -273,16 +282,16 @@ public class InformationCommands
     public void ping(CommandContext context)
     {
         final String label = context.getInvocation().getLabels().get(0).toLowerCase(ENGLISH);
-        if (context.isSource(User.class))
+        if (context.isSource(Player.class))
         {
             i18n.sendTranslated(context, MessageType.NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}", ((User)context.getSource()).asPlayer().getConnection().getPing());
             return;
         }
-        i18n.sendTranslated(context, NEUTRAL, label + " in the console?");
+        i18n.sendTranslated(context.getSource(), NEUTRAL, label + " in the console?");
     }
 
     @Command(desc = "Displays chunk, memory and world information.")
-    public void lag(CommandSender context, @Flag boolean reset)
+    public void lag(CommandSource context, @Flag boolean reset)
     {
         if (reset)
         {
@@ -374,11 +383,11 @@ public class InformationCommands
 
 
     @Command(desc = "Displays all loaded worlds", alias = {"worldlist","worlds"})
-    public void listWorlds(CommandSender context)
+    public void listWorlds(CommandSource context)
     {
         i18n.sendTranslated(context, POSITIVE, "Loaded worlds:");
         String format = " " + WHITE + "- " + GOLD + "%s" + WHITE + ":" + INDIGO + "%s";
-        for (World world : wm.getWorlds())
+        for (World world : Sponge.getServer().getWorlds())
         {
             context.sendMessage(String.format(format, world.getName(), world.getWorldStorage().getWorldProperties().getDimensionType().getName()));
         }

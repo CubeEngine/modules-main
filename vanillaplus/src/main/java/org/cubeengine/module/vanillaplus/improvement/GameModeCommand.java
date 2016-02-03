@@ -5,10 +5,12 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
@@ -17,14 +19,23 @@ import static org.spongepowered.api.entity.living.player.gamemode.GameModes.ADVE
 import static org.spongepowered.api.entity.living.player.gamemode.GameModes.CREATIVE;
 import static org.spongepowered.api.entity.living.player.gamemode.GameModes.SURVIVAL;
 
-public class GameModeCommand
+public class GameModeCommand extends PermissionContainer<VanillaPlus>
 {
-    private VanillaPlus module;
     private I18n i18n;
+
+    private final PermissionDescription COMMAND_GAMEMODE = register("command.gamemode", "", null);
+    public final PermissionDescription COMMAND_GAMEMODE_OTHER = register("other",
+                                                                         "Allows to change the game-mode of other players too",
+                                                                         COMMAND_GAMEMODE);
+
+    // TODO is this even used?
+    public final PermissionDescription COMMAND_GAMEMODE_KEEP = register("keep",
+                                                                        "Without this PermissionDescription the players game-mode will be reset when leaving the server or changing the world",
+                                                                        COMMAND_GAMEMODE);
 
     public GameModeCommand(VanillaPlus module, I18n i18n)
     {
-        this.module = module;
+        super(module);
         this.i18n = i18n;
     }
 
@@ -32,7 +43,7 @@ public class GameModeCommand
     public void gamemode(CommandSource context, @Optional String gamemode, @Default User player)
     {
         if (!context.getIdentifier().equals(player.getIdentifier())
-            && !context.hasPermission(module.perms().COMMAND_GAMEMODE_OTHER.getId()))
+            && !context.hasPermission(COMMAND_GAMEMODE_OTHER.getId()))
         {
             i18n.sendTranslated(context, NEGATIVE, "You are not allowed to change the game mode of an other player!");
             return;

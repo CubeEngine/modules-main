@@ -17,29 +17,34 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
 import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
 import org.spongepowered.api.event.block.tileentity.SignChangeEvent;
+import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Texts;
 
 public class ColoredSigns
 {
-    private final Basics module;
+    private final VanillaPlus module;
 
-    public ColoredSigns(Basics module)
+    public ColoredSigns(VanillaPlus module)
     {
         this.module = module;
     }
 
-    @Subscribe
-    public void onSignChange(SignChangeEvent event)
+    public final PermissionDescription SIGN_COLORED = getBasePerm().childWildcard("sign").child("colored");
+    public final PermissionDescription SIGN_STYLED = getBasePerm().childWildcard("sign").child("styled");
+
+    @Listener
+    public void onSignChange(ChangeSignEvent event, @First Subject cause)
     {
-        if (!(event.getCause().orNull() instanceof Subject))
-        {
-            return;
-        }
         SIGN_STYLED
         if (module.perms().SIGN_COLORED.isAuthorized((Subject)event.getCause().get())) // ALL colors
         {

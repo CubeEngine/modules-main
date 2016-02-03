@@ -18,12 +18,17 @@
 package org.cubeengine.module.vanillaplus.fix;
 
 import org.cubeengine.module.basics.Basics;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.data.manipulator.entity.FlyingData;
 import org.spongepowered.api.entity.player.Player;
 import org.spongepowered.api.entity.player.gamemode.GameModes;
+import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
 import org.spongepowered.api.event.entity.player.PlayerQuitEvent;
 import org.spongepowered.api.event.inventory.InventoryClickEvent;
+import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.spongepowered.api.event.Order.EARLY;
 import static org.spongepowered.api.event.Order.FIRST;
@@ -35,15 +40,17 @@ import static org.spongepowered.api.event.Order.FIRST;
  */
 public class FixListener
 {
-    private final Basics module;
+    private final VanillaPlus module;
 
-    public FixListener(Basics module)
+    public FixListener(VanillaPlus module)
     {
         this.module = module;
     }
 
-    @Subscribe(order = EARLY)
-    public void join(final PlayerJoinEvent event)
+    public final PermissionDescription OVERSTACKED_ANVIL_AND_BREWING = getBasePerm().child("allow-overstacked-anvil-and-brewing");
+
+    @Listener(order = EARLY)
+    public void join(final ClientConnectionEvent.Join event)
     {
         // TODO set persisted flymode
         final Player player = event.getUser();
@@ -63,11 +70,11 @@ public class FixListener
         }
     }
 
-    @Subscribe
-    public void onPlayerInventoryClick(InventoryClickEvent event)
+    @Listener
+    public void onPlayerInventoryClick(ClickInventoryEvent event)
     {
         // TODO is this still needed?
-        if (this.module.getConfiguration().preventOverstackedItems && !module.perms().OVERSTACKED_ANVIL_AND_BREWING.isAuthorized(event.getViewer()))
+        if (this.module.getConfig().preventOverstackedItems && !module.perms().OVERSTACKED_ANVIL_AND_BREWING.isAuthorized(event.getViewer()))
         {
 
             if (event.getView().getTopInventory() instanceof AnvilInventory

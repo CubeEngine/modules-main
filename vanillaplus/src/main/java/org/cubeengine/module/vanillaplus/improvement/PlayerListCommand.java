@@ -29,69 +29,65 @@ import java.util.TreeSet;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.result.CommandResult;
 import org.cubeengine.module.core.util.ChatFormat;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.User;
-import org.cubeengine.service.user.UserManager;
+import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextBuilder;
-import org.spongepowered.api.text.Texts;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.text.format.TextColors.*;
+import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
+import static org.spongepowered.api.text.format.TextColors.WHITE;
 
 public class PlayerListCommand
 {
-    protected static final Comparator<User> USER_COMPARATOR = new UserComparator();
-    private final VanillaPlus module;
-    private Game game;
+    protected static final Comparator<Player> USER_COMPARATOR = new UserComparator();
+    private I18n i18n;
 
-    public PlayerListCommand(VanillaPlus module, Game game)
+    public PlayerListCommand(I18n i18n)
     {
-        this.module = module;
-        this.um = um;
-        this.game = game;
+        this.i18n = i18n;
     }
 
-    protected SortedMap<String, Set<User>> groupUsers(Set<User> users)
+    protected SortedMap<String, Set<Player>> groupUsers(Set<Player> users)
     {
-        SortedMap<String, Set<User>> grouped = new TreeMap<>();
-        for (User user : users)
+        SortedMap<String, Set<Player>> grouped = new TreeMap<>();
+        for (Player player : users)
         {
-            Player player = user.asPlayer();
             SubjectData data = player.getSubjectData();
             String listGroup = "&6Players";
             if (data instanceof OptionSubjectData)
             {
                 listGroup = ((OptionSubjectData)data).getOptions(player.getActiveContexts()).get("list-group");
             }
-            Set<User> assigned = grouped.get(listGroup);
+            Set<Player> assigned = grouped.get(listGroup);
             if (assigned == null)
             {
                 assigned = new LinkedHashSet<>();
                 grouped.put(listGroup, assigned);
             }
-            assigned.add(user);
+            assigned.add(player);
         }
         return grouped;
     }
 
     @Command(desc = "Displays all the online players.")
-    public CommandResult list(CommandSender context)
+    public CommandResult list(CommandSource context)
     {
-        final SortedSet<User> users = new TreeSet<>(USER_COMPARATOR);
+        final SortedSet<Player> users = new TreeSet<>(USER_COMPARATOR);
 
-        for (User user : um.getOnlineUsers())
+        for (Player user : Sponge.getServer().getOnlinePlayers())
         {
-            if (context instanceof User && !((User)context).canSee(user.asPlayer()))
+            // TODO can see
+            /*if (context instanceof Player && !((Player)context).canSee(user))
             {
                 continue;
             }
+            */
             users.add(user);
         }
 
@@ -101,22 +97,22 @@ public class PlayerListCommand
             return null;
         }
 
-        SortedMap<String, Set<User>> grouped = this.groupUsers(users);
+        SortedMap<String, Set<Player>> grouped = this.groupUsers(users);
         i18n.sendTranslated(context, POSITIVE, "Players online: {amount#online}/{amount#max}", users.size(),
                              game.getServer().getMaxPlayers());
 
-        for (Entry<String, Set<User>> entry : grouped.entrySet())
+        for (Entry<String, Set<Player>> entry : grouped.entrySet())
         {
-            Iterator<User> it = entry.getValue().iterator();
+            Iterator<Player> it = entry.getValue().iterator();
             if (!it.hasNext())
             {
                 continue;
             }
-            TextBuilder builder = Texts.of(ChatFormat.fromLegacy(entry.getKey(), '&'), WHITE, ":").builder();
+            Text.Builder builder = Text.of(ChatFormat.fromLegacy(entry.getKey(), '&'), WHITE, ":").toBuilder();
             builder.append(formatUser(it.next()));
             while (it.hasNext())
             {
-                builder.append(Texts.of(WHITE, ", "), formatUser(it.next()));
+                builder.append(Text.of(WHITE, ", "), formatUser(it.next()));
             }
             context.sendMessage(builder.build());
         }
@@ -124,9 +120,9 @@ public class PlayerListCommand
         return null;
     }
 
-    private Text formatUser(User user)
+    private Text formatUser(Player user)
     {
-        Text result = Texts.of(DARK_GREEN, user.getDisplayName());
+        Text result = Text.of(DARK_GREEN, user.getName());
         // TODO chat module pass info that player is afk
         /*
         if (user.attachOrGet(BasicsAttachment.class, module).isAfk())
@@ -137,12 +133,12 @@ public class PlayerListCommand
         return result;
     }
 
-    private static final class UserComparator implements Comparator<User>
+    private static final class UserComparator implements Comparator<Player>
     {
         @Override
-        public int compare(User user1, User user2)
+        public int compare(Player user1, Player user2)
         {
-            return String.CASE_INSENSITIVE_ORDER.compare(Texts.toPlain(user1.getDisplayName()), Texts.toPlain(user2.getDisplayName()));
+            return String.CASE_INSENSITIVE_ORDER.compare(user1.getName(), user2.getName());
         }
     }
 }

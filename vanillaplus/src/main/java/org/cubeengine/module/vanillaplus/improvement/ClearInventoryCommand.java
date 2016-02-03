@@ -21,48 +21,59 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.CommandContext;
-import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.command.annotation.ParameterPermission;
 import org.cubeengine.service.command.exception.PermissionDeniedException;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.User;
-import org.spongepowered.api.command.CommandPermissionException;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
-public class ClearInventoryCommand
+public class ClearInventoryCommand extends PermissionContainer<VanillaPlus>
 {
-    private VanillaPlus module;
+    private final PermissionDescription COMMAND_CLEARINVENTORY = register("command.clearinventory", "", null);
+    public final PermissionDescription COMMAND_CLEARINVENTORY_OTHER = register("notify",
+                                                                               "Allows clearing the inventory of other players",
+                                                                               COMMAND_CLEARINVENTORY);
+    public final PermissionDescription COMMAND_CLEARINVENTORY_NOTIFY = register("other",
+                                                                                "Notifies you if your inventory got cleared by someone else",
+                                                                                COMMAND_CLEARINVENTORY);
+    public final PermissionDescription COMMAND_CLEARINVENTORY_PREVENT = register("prevent",
+                                                                                 "Prevents your inventory from being cleared unless forced",
+                                                                                 COMMAND_CLEARINVENTORY);
+    public final PermissionDescription COMMAND_CLEARINVENTORY_FORCE = register("force",
+                                                                               "Clears an inventory even if the player has the prevent PermissionDescription",
+                                                                               COMMAND_CLEARINVENTORY);
+
     private I18n i18n;
+
 
     public ClearInventoryCommand(VanillaPlus module, I18n i18n)
     {
-        this.module = module;
+        super(module);
         this.i18n = i18n;
     }
+
 
     @Command(alias = {"ci", "clear"}, desc = "Clears the inventory")
     public void clearinventory(CommandSource context, @Default User player,
                                @Flag(longName = "removeArmor", name = "ra") boolean removeArmor,
-                               @Flag boolean quiet,
+                               @ParameterPermission(value = "quiet", desc = "Prevents the other player being notified when his inventory got cleared")
+                                    @Flag boolean quiet,
                                @Flag boolean force)
     {
         //sender.sendTranslated(NEGATIVE, "That awkward moment when you realize you do not have an inventory!");
         boolean self = context.getIdentifier().equals(player.getIdentifier());
         if (!self)
         {
-            if (!context.hasPermission(module.perms().COMMAND_CLEARINVENTORY_OTHER.getId()))
+            if (!context.hasPermission(COMMAND_CLEARINVENTORY_OTHER.getId()))
             {
-                throw new PermissionDeniedException(module.perms().COMMAND_CLEARINVENTORY_OTHER);
+                throw new PermissionDeniedException(COMMAND_CLEARINVENTORY_OTHER);
             }
-            if (player.hasPermission(module.perms().COMMAND_CLEARINVENTORY_PREVENT.getId())
-                && !(force && context.hasPermission(module.perms().COMMAND_CLEARINVENTORY_FORCE.getId())))
+            if (player.hasPermission(COMMAND_CLEARINVENTORY_PREVENT.getId())
+                && !(force && context.hasPermission(COMMAND_CLEARINVENTORY_FORCE.getId())))
             {
                 i18n.sendTranslated(context, NEGATIVE, "You are not allowed to clear the inventory of {user}", player);
                 return;
@@ -82,8 +93,7 @@ public class ClearInventoryCommand
             i18n.sendTranslated(context, POSITIVE, "Your inventory has been cleared!");
             return;
         }
-        if (player.isOnline() && player.hasPermission(module.perms().COMMAND_CLEARINVENTORY_NOTIFY.getId()) && !(
-            context.hasPermission(module.perms().COMMAND_CLEARINVENTORY_QUIET.getId()) && quiet))
+        if (player.isOnline() && player.hasPermission(COMMAND_CLEARINVENTORY_NOTIFY.getId()) && !quiet)
         {
             i18n.sendTranslated(player.getPlayer().get(), NEUTRAL, "Your inventory has been cleared by {sender}!", context);
         }

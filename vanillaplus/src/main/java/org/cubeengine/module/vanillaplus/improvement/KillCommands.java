@@ -26,10 +26,11 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.cubeengine.service.user.UserList;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
@@ -37,30 +38,45 @@ import static org.cubeengine.service.i18n.formatter.MessageType.*;
  * {@link #kill}
  * {@link #suicide}
  */
-public class KillCommands
+public class KillCommands extends PermissionContainer<VanillaPlus>
 {
-    private VanillaPlus module;
     private I18n i18n;
 
     public KillCommands(VanillaPlus module, I18n i18n)
     {
-        this.module = module;
+        super(module);
         this.i18n = i18n;
     }
 
+    private final PermissionDescription COMMAND_KILL = register("command.kill", "", null);
+    public final PermissionDescription COMMAND_KILL_PREVENT = register("prevent",
+                                                                       "Prevents from being killed by the kill command unless forced",
+                                                                       COMMAND_KILL);
+    public final PermissionDescription COMMAND_KILL_FORCE = register("force",
+                                                                     "Kills a player even if the player has the prevent PermissionDescription",
+                                                                     COMMAND_KILL);
+    public final PermissionDescription COMMAND_KILL_ALL = register("all", "Allows killing all players currently online",
+                                                                   COMMAND_KILL);
+    public final PermissionDescription COMMAND_KILL_LIGHTNING = register("lightning",
+                                                                         "Allows killing a player with a lightning strike",
+                                                                         COMMAND_KILL);
+    public final PermissionDescription COMMAND_KILL_QUIET = register("quiet",
+                                                                     "Prevents the other player being notified who killed him",
+                                                                     COMMAND_KILL);
+    public final PermissionDescription COMMAND_KILL_NOTIFY = register("notify", "Shows who killed you", COMMAND_KILL);
 
     @Command(alias = "slay", desc = "Kills a player")
     public void kill(CommandSource context, UserList players, // TODO default line of sight player
                      @Flag boolean force, @Flag boolean quiet, @Flag boolean lightning)
     {
-        lightning = lightning && context.hasPermission(module.perms().COMMAND_KILL_LIGHTNING.getId());
-        force = force && context.hasPermission(module.perms().COMMAND_KILL_FORCE.getId());
-        quiet = quiet && context.hasPermission(module.perms().COMMAND_KILL_QUIET.getId());
-        List<Text> killed = new ArrayList<>();
+        lightning = lightning && context.hasPermission(COMMAND_KILL_LIGHTNING.getId());
+        force = force && context.hasPermission(COMMAND_KILL_FORCE.getId());
+        quiet = quiet && context.hasPermission(COMMAND_KILL_QUIET.getId());
+        List<String> killed = new ArrayList<>();
         Collection<Player> userList = players.list();
         if (players.isAll())
         {
-            if (!context.hasPermission(module.perms().COMMAND_KILL_ALL.getId()))
+            if (!context.hasPermission(COMMAND_KILL_ALL.getId()))
             {
                 i18n.sendTranslated(context, NEGATIVE, "You are not allowed to kill everyone!");
                 return;
@@ -90,7 +106,7 @@ public class KillCommands
     {
         if (!force)
         {
-            if (player.hasPermission(module.perms().COMMAND_KILL_PREVENT.getId())) // TODO also check "creative/godmode"
+            if (player.hasPermission(COMMAND_KILL_PREVENT.getId())) // TODO also check "creative/godmode"
             {
 
                 i18n.sendTranslated(context, NEGATIVE, "You cannot kill {user}!", player);
@@ -106,7 +122,7 @@ public class KillCommands
         {
             i18n.sendTranslated(context, POSITIVE, "You killed {user}!", player);
         }
-        if (!quiet && player.hasPermission(module.perms().COMMAND_KILL_NOTIFY.getId()))
+        if (!quiet && player.hasPermission(COMMAND_KILL_NOTIFY.getId()))
         {
             i18n.sendTranslated(player, NEUTRAL, "You were killed by {user}", context);
         }

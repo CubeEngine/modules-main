@@ -18,7 +18,7 @@
 package org.cubeengine.module.vanillaplus;
 
 import javax.inject.Inject;
-import de.cubeisland.engine.modularity.core.marker.Disable;
+import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.Module;
 import org.cubeengine.module.vanillaplus.addition.PluginCommands;
@@ -29,17 +29,24 @@ import org.cubeengine.module.vanillaplus.improvement.GameModeCommand;
 import org.cubeengine.module.vanillaplus.improvement.ItemCommands;
 import org.cubeengine.module.vanillaplus.improvement.ItemModifyCommands;
 import org.cubeengine.module.vanillaplus.improvement.KillCommands;
+import org.cubeengine.module.vanillaplus.improvement.OpCommands;
 import org.cubeengine.module.vanillaplus.improvement.PlayerListCommand;
 import org.cubeengine.module.vanillaplus.improvement.SaveCommands;
+import org.cubeengine.module.vanillaplus.improvement.StopCommand;
 import org.cubeengine.module.vanillaplus.improvement.TimeCommands;
 import org.cubeengine.module.vanillaplus.improvement.WeatherCommands;
 import org.cubeengine.module.vanillaplus.improvement.WhitelistCommand;
 import org.cubeengine.module.vanillaplus.improvement.removal.RemovalCommands;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.permission.PermissionManager;
-import org.cubeengine.service.user.UserManager;
+import org.cubeengine.service.filesystem.ModuleConfig;
+import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.module.vanillaplus.improvement.summon.SpawnMobCommand;
+import org.cubeengine.service.matcher.EnchantMatcher;
+import org.cubeengine.service.matcher.MaterialMatcher;
+import org.cubeengine.service.matcher.TimeMatcher;
+import org.cubeengine.service.matcher.WorldMatcher;
+import org.cubeengine.service.task.TaskManager;
 import org.spongepowered.api.Game;
 
 /**
@@ -87,32 +94,104 @@ import org.spongepowered.api.Game;
  * /kill (for players) {@link KillCommands#kill}
  * /suicide (kill self) {@link KillCommands#suicide}
  */
+@ModuleInfo(name = "VanillaPlus", description = "Improved Vanilla")
 public class VanillaPlus extends Module
 {
     @Inject private CommandManager cm;
     @Inject private Game game;
     @Inject private FileManager fm;
-    @Inject private PermissionManager pm;
-    private VanillaPlusConfig config;
-    private VanillaPlusPerms perms;
+    @Inject private I18n i18n;
+    @Inject private MaterialMatcher mm;
+    @Inject private EnchantMatcher em;
+    @Inject private TimeMatcher tm;
+    @Inject private WorldMatcher wm;
+    @Inject private TaskManager tam;
+    @ModuleConfig private VanillaPlusConfig config;
 
     @Enable
     public void onEnable()
     {
-        perms = new VanillaPlusPerms(this);
-        config = fm.loadConfig(this, VanillaPlusConfig.class);
-        cm.addCommands(this, new PlayerListCommand(this, game));
-        cm.addCommands(this, new SaveCommands(this, game, pm));
-        cm.addCommands(this, new SpawnMobCommand(this));
+        enableImprovements();
+        enableFixes();
+        enableAdditions();
+    }
+
+    private void enableAdditions()
+    {
+
+    }
+
+    private void enableFixes()
+    {
+
+    }
+
+    private void enableImprovements()
+    {
+        if (config.improve.commandRemove)
+        {
+            // TODO remove cmds
+        }
+        if (config.improve.commandSummon)
+        {
+            cm.addCommands(this, new SpawnMobCommand(this));
+        }
+        if (config.improve.commandClearinventory)
+        {
+            cm.addCommands(this, new ClearInventoryCommand(this, i18n));
+        }
+        if (config.improve.commandDifficulty)
+        {
+            cm.addCommands(this, new DifficultyCommand(i18n));
+        }
+        if (config.improve.commandGamemode)
+        {
+            cm.addCommands(this, new GameModeCommand(this, i18n));
+        }
+        if (config.improve.commandItem)
+        {
+            cm.addCommands(this, new ItemCommands(this, mm, em, i18n));
+        }
+        if (config.improve.commandItemModify)
+        {
+            cm.addCommands(this, new ItemModifyCommands(i18n));
+        }
+        if (config.improve.commandKill)
+        {
+            cm.addCommands(this, new KillCommands(this, i18n));
+        }
+        if (config.improve.commandOp)
+        {
+            cm.addCommands(this, new OpCommands());
+        }
+        if (config.improve.commandList)
+        {
+            cm.addCommands(this, new PlayerListCommand(i18n));
+        }
+        if (config.improve.commandSave)
+        {
+            cm.addCommands(this, new SaveCommands(i18n));
+        }
+        if (config.improve.commandStop)
+        {
+            cm.addCommands(this, new StopCommand());
+        }
+        if (config.improve.commandTime)
+        {
+            cm.addCommands(this, new TimeCommands(this, i18n, tm, wm, tam));
+        }
+        if (config.improve.commandWeather)
+        {
+            cm.addCommands(this, new WeatherCommands(i18n));
+        }
+        if (config.improve.commandWhitelist)
+        {
+            cm.addCommands(this, new WhitelistCommand(this, i18n));
+        }
     }
 
     public VanillaPlusConfig getConfig()
     {
         return config;
-    }
-
-    public VanillaPlusPerms perms()
-    {
-        return perms;
     }
 }

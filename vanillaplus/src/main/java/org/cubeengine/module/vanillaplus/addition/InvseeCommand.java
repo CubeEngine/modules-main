@@ -20,13 +20,19 @@ package org.cubeengine.module.vanillaplus.addition;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.inventoryguard.InventoryGuardFactory;
 import org.cubeengine.service.user.User;
 import org.cubeengine.module.core.util.InventoryGuardFactory;
 import org.cubeengine.module.basics.Basics;
 import org.cubeengine.module.basics.BasicsAttachment;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
@@ -38,30 +44,54 @@ import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
  * <p>/clearinventory
  * <p>/stash
  */
-public class InventoryCommands
+public class InvseeCommand
 {
-    private final Basics module;
+    private final VanillaPlus module;
     private InventoryGuardFactory invGuard;
+    private I18n i18n;
 
-    public InventoryCommands(Basics module, InventoryGuardFactory invGuard)
+    public InvseeCommand(VanillaPlus module, InventoryGuardFactory invGuard, I18n i18n)
     {
         this.module = module;
         this.invGuard = invGuard;
+        this.i18n = i18n;
     }
 
+    private final PermissionDescription COMMAND_INVSEE = COMMAND.childWildcard("invsee");
+    /**
+     * Allows to modify the inventory of other players
+     */
+    public final PermissionDescription COMMAND_INVSEE_MODIFY = COMMAND_INVSEE.child("modify");
+    public final PermissionDescription COMMAND_INVSEE_ENDERCHEST = COMMAND_INVSEE.child("ender");
+    /**
+     * Prevents an inventory from being modified unless forced
+     */
+    public final PermissionDescription COMMAND_INVSEE_MODIFY_PREVENT = COMMAND_INVSEE.newPerm("modify.prevent", FALSE);
+    /**
+     * Allows modifying an inventory even if the player has the prevent permission
+     */
+    public final PermissionDescription COMMAND_INVSEE_MODIFY_FORCE = COMMAND_INVSEE.child("modify.force");
+    /**
+     * Notifies you when someone is looking into your inventory
+     */
+    public final PermissionDescription COMMAND_INVSEE_NOTIFY = COMMAND_INVSEE.child("notify");
+    /**
+     * Prevents the other player from being notified when looking into his inventory
+     */
+    public final PermissionDescription COMMAND_INVSEE_QUIET = COMMAND_INVSEE.child("quiet");
+
     @Command(desc = "Allows you to see into the inventory of someone else.")
-    @Restricted(value = User.class, msg = "This command can only be used by a player!")
-    public void invsee(CommandContext context, User player,
+    @Restricted(value = Player.class, msg = "This command can only be used by a player!")
+    public void invsee(Player context, User player,
                        @Flag boolean force,
                        @Flag boolean quiet,
                        @Flag boolean ender)
     {
-        User sender = (User)context.getSource();
         boolean denyModify = false;
         Inventory inv;
         if (ender)
         {
-            if (!module.perms().COMMAND_INVSEE_ENDERCHEST.isAuthorized(sender))
+            if (!context.hasPermission(COMMAND_INVSEE_ENDERCHEST.getId()))
             {
                 i18n.sendTranslated(context, NEGATIVE, "You are not allowed to look into enderchests!");
                 return;
@@ -72,61 +102,24 @@ public class InventoryCommands
         {
             inv = player.getInventory();
         }
-        if (module.perms().COMMAND_INVSEE_MODIFY.isAuthorized(sender))
+        if (context.hasPermission(COMMAND_INVSEE_MODIFY.getId()))
         {
-            denyModify = !(force && module.perms().COMMAND_INVSEE_MODIFY_FORCE.isAuthorized(sender))
-                && module.perms().COMMAND_INVSEE_MODIFY_PREVENT.isAuthorized(player);
+            denyModify = !(force && context.hasPermission(COMMAND_INVSEE_MODIFY_FORCE.getId()))
+                && player.hasPermission(COMMAND_INVSEE_MODIFY_PREVENT.getId());
         }
-        if (module.perms().COMMAND_INVSEE_NOTIFY.isAuthorized(player))
+        if (player.hasPermission(COMMAND_INVSEE_NOTIFY.getId()))
         {
-            if (!(quiet && module.perms().COMMAND_INVSEE_QUIET.isAuthorized(context.getSource())))
+            if (!(quiet && context.hasPermission(COMMAND_INVSEE_QUIET.getId())))
             {
-                player.sendTranslated(NEUTRAL, "{sender} is looking into your inventory.", sender);
+                i18n.sendTranslated(player, NEUTRAL, "{sender} is looking into your inventory.", context);
             }
         }
-        InventoryGuardFactory guard = invGuard.prepareInventory(inv, sender);
+        InventoryGuardFactory guard = invGuard.prepareInv(inv);
         if (denyModify)
         {
             guard.blockPutInAll().blockTakeOutAll();
         }
         guard.submitInventory(this.module, true);
-    }
-
-    @Command(desc = "Stashes or unstashes your inventory to reuse later")
-    @Restricted(value = User.class, msg = "Yeah you better put it away!")
-    public void stash(CommandContext context)
-    {
-        User sender = (User)context.getSource();
-        ItemStack[] stashedInv = sender.get(BasicsAttachment.class).getStashedInventory();
-        ItemStack[] stashedArmor = sender.get(BasicsAttachment.class).getStashedArmor();
-        ItemStack[] invToStash = sender.getInventory().getContents().clone();
-        ItemStack[] armorToStash = sender.getInventory().getArmorContents().clone();
-        if (stashedInv != null)
-        {
-            sender.getInventory().setContents(stashedInv);
-        }
-        else
-        {
-            sender.getInventory().clear();
-        }
-
-        sender.get(BasicsAttachment.class).setStashedInventory(invToStash);
-        if (stashedArmor != null)
-        {
-            sender.getInventory().setBoots(stashedArmor[0]);
-            sender.getInventory().setLeggings(stashedArmor[1]);
-            sender.getInventory().setChestplate(stashedArmor[2]);
-            sender.getInventory().setHelmet(stashedArmor[3]);
-        }
-        else
-        {
-            sender.getInventory().setBoots(null);
-            sender.getInventory().setLeggings(null);
-            sender.getInventory().setChestplate(null);
-            sender.getInventory().setHelmet(null);
-        }
-        sender.get(BasicsAttachment.class).setStashedArmor(armorToStash);
-        sender.sendTranslated(POSITIVE, "Swapped stashed Inventory!");
     }
 
 
