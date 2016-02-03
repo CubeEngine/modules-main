@@ -461,7 +461,7 @@ public class Lock
             if ((in && out) || user.hasPermission(module.perms().ACCESS_OTHER.getId())) return; // Has full access
             if (protectedInventory == null) return; // Just checking else do lock
             InventoryGuardFactory inventoryGuardFactory = module.getModularity().provide(InventoryGuardFactory.class);
-            inventoryGuardFactory.prepareInv(protectedInventory, game, user.getUniqueId());
+            inventoryGuardFactory.prepareInv(protectedInventory, user.getUniqueId());
             if (!in)
             {
                 inventoryGuardFactory.blockPutInAll();
