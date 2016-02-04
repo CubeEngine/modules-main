@@ -11,11 +11,11 @@ import org.spongepowered.api.item.inventory.ItemStack;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
-public class StashCommands
+public class StashCommand
 {
     private I18n i18n;
 
-    public StashCommands(I18n i18n)
+    public StashCommand(I18n i18n)
     {
         this.i18n = i18n;
     }
