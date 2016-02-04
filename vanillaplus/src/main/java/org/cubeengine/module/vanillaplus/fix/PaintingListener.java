@@ -17,19 +17,19 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.User;
-import org.cubeengine.module.basics.Basics;
-import org.cubeengine.service.user.UserManager;
-
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Art;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.hanging.Painting;
@@ -38,27 +38,24 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
-import org.spongepowered.api.event.entity.player.PlayerInteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
-import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
-public class PaintingListener
+public class PaintingListener extends PermissionContainer<VanillaPlus>
 {
-    private final VanillaPlus module;
     private I18n i18n;
     private final Map<UUID, Painting> paintingChange;
 
-    public final PermissionDescription CHANGEPAINTING = getBasePerm().child("changepainting");
+    public final PermissionDescription CHANGEPAINTING = register("changepainting", "", null);
 
 
     public PaintingListener(VanillaPlus module, I18n i18n)
     {
-        this.module = module;
+        super(module);
         this.i18n = i18n;
         this.paintingChange = new HashMap<>();
     }
@@ -116,7 +113,7 @@ public class PaintingListener
 
             if (painting != null)
             {
-                final int maxDistanceSquared = this.module.getConfig().maxChangePaintingDistance * this.module.getConfig().maxChangePaintingDistance;
+                final int maxDistanceSquared = this.module.getConfig().fix.paintingSwitcherMaxDistance * this.module.getConfig().fix.paintingSwitcherMaxDistance;
 
                 if (painting.getLocation().getPosition()
                             .distanceSquared(player.getLocation().getPosition()) > maxDistanceSquared)
@@ -126,33 +123,32 @@ public class PaintingListener
                     return;
                 }
 
-                Art[] arts = Art.values();
-
-                int artNumber = painting.getArtData().getArt().ordinal();
-                int change = this.compareSlots(event.getPreviousSlot(), event.getNewSlot());
+                List<Art> arts = new ArrayList<>(Sponge.getRegistry().getAllOf(Art.class));
+                int artNumber = arts.indexOf(painting.art().get());
+                int change = 1; // TODO this.compareSlots(event.getPreviousSlot(), event.getNewSlot());
                 artNumber += change;
-                if (artNumber >= arts.length)
+                if (artNumber >= arts.size())
                 {
                     artNumber = 0;
                 }
                 else if(artNumber < 0)
                 {
-                    artNumber = arts.length - 1;
+                    artNumber = arts.size() - 1;
                 }
                 for (Art art : arts)
                 {
-                    if (painting.setArt(arts[artNumber]))
+                    if (painting.offer(Keys.ART, arts.get(artNumber)).isSuccessful())
                     {
                         return;
                     }
                     artNumber += change;
-                    if (artNumber >= arts.length)
+                    if (artNumber >= arts.size())
                     {
                         artNumber = 0;
                     }
                     if (artNumber == -1)
                     {
-                        artNumber = arts.length - 1;
+                        artNumber = arts.size() - 1;
                     }
                 }
             }

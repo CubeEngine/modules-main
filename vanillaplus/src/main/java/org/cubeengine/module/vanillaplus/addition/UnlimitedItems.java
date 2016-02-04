@@ -1,9 +1,11 @@
 package org.cubeengine.module.vanillaplus.addition;
 
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.basics.BasicsAttachment;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
@@ -17,6 +19,7 @@ import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 public class UnlimitedItems
 {
     private I18n i18n;
+    private Set<UUID> unlimitedPlayers = new HashSet<>();
 
     public UnlimitedItems(I18n i18n)
     {
@@ -35,18 +38,26 @@ public class UnlimitedItems
         {
             i18n.sendTranslated(context, NEUTRAL, "You no longer have unlimited items to build!");
         }
-        context.get(BasicsAttachment.class).setUnlimitedItems(unlimited);
+        if (unlimited)
+        {
+            this.unlimitedPlayers.add(context.getUniqueId());
+        }
+        else
+        {
+            this.unlimitedPlayers.remove(context.getUniqueId());
+        }
     }
 
     @Listener
     public void blockplace(final ChangeBlockEvent.Place event, @First Player player)
     {
-        if (player.get(BasicsAttachment.class).hasUnlimitedItems())
+        if (this.unlimitedPlayers.contains(player.getUniqueId()))
         {
-            java.util.Optional<ItemStack> itemInHand = player.getItemInHand();
-            if (itemInHand.isPresent())
+            ItemStack item = player.getItemInHand().orElse(null);
+            if (item != null)
             {
-                itemInHand.get().setQuantity(itemInHand.get().getQuantity() + 1);
+                item.setQuantity(item.getQuantity() + 1);
+                player.setItemInHand(item);
             }
         }
     }

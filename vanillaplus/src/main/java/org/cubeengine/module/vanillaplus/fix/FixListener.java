@@ -17,66 +17,61 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
-import org.cubeengine.module.basics.Basics;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.spongepowered.api.data.manipulator.entity.FlyingData;
-import org.spongepowered.api.entity.player.Player;
-import org.spongepowered.api.entity.player.gamemode.GameModes;
+import org.cubeengine.service.permission.PermissionContainer;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.player.PlayerJoinEvent;
-import org.spongepowered.api.event.entity.player.PlayerQuitEvent;
-import org.spongepowered.api.event.inventory.InventoryClickEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.service.permission.PermissionDescription;
-
-import static org.spongepowered.api.event.Order.EARLY;
-import static org.spongepowered.api.event.Order.FIRST;
 
 /**
  * Persists Player flymode on logout so they don't fall out of the sky
  * <p></p>
  * Prevents placing overstacked items into anvil or brewingstands
  */
-public class FixListener
+public class FixListener extends PermissionContainer<VanillaPlus>
 {
-    private final VanillaPlus module;
-
     public FixListener(VanillaPlus module)
     {
-        this.module = module;
+        super(module);
     }
 
-    public final PermissionDescription OVERSTACKED_ANVIL_AND_BREWING = getBasePerm().child("allow-overstacked-anvil-and-brewing");
+    public final PermissionDescription OVERSTACKED_ANVIL_AND_BREWING = register("allow-overstacked-anvil-and-brewing", "", null);
 
+    /* TODO is this still needed?
     @Listener(order = EARLY)
     public void join(final ClientConnectionEvent.Join event)
     {
         // TODO set persisted flymode
-        final Player player = event.getUser();
-        if (player.getGameModeData().getGameMode() != GameModes.CREATIVE && module.perms().COMMAND_FLY_KEEP.isAuthorized(player))
+        Player player = event.getTargetEntity();
+        if (player.getGameModeData().type().get() != CREATIVE &&
+            module.perms().COMMAND_FLY_KEEP.isAuthorized(player))
         {
             player.offer(player.getOrCreate(FlyingData.class).get());
         }
     }
 
-    @Subscribe(order = FIRST)
-    public void quit(final PlayerQuitEvent event)
+    @Listener(order = FIRST)
+    public void quit(final ClientConnectionEvent.Disconnect event)
     {
-        final Player player = event.getUser();
-        if (player.getGameModeData().getGameMode() != GameModes.CREATIVE && player.getData(FlyingData.class).isPresent() && module.perms().COMMAND_FLY_KEEP.isAuthorized(player))
+        Player player = event.getTargetEntity();
+        if (player.getGameModeData().type().get() != CREATIVE &&
+            player.getData(FlyingData.class).isPresent() && module.perms().COMMAND_FLY_KEEP.isAuthorized(player))
         {
             // TODO set persisted flymode
         }
     }
+    */
 
     @Listener
-    public void onPlayerInventoryClick(ClickInventoryEvent event)
+    public void onPlayerInventoryClick(ClickInventoryEvent event, @First Player player)
     {
         // TODO is this still needed?
-        if (this.module.getConfig().preventOverstackedItems && !module.perms().OVERSTACKED_ANVIL_AND_BREWING.isAuthorized(event.getViewer()))
+        if (this.module.getConfig().fix.preventOverstackedItems &&
+            !player.hasPermission(OVERSTACKED_ANVIL_AND_BREWING.getId()))
         {
-
+            /* TODO
             if (event.getView().getTopInventory() instanceof AnvilInventory
                 || event.getView().getTopInventory() instanceof BrewerInventory)
             {
@@ -99,6 +94,7 @@ public class FixListener
                         }
                 }
             }
+            */
         }
     }
 }

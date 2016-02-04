@@ -29,7 +29,12 @@ import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.permission.PermissionContainer;
 import org.cubeengine.service.user.UserList;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.weather.WeatherEffect;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
@@ -49,20 +54,11 @@ public class KillCommands extends PermissionContainer<VanillaPlus>
     }
 
     private final PermissionDescription COMMAND_KILL = register("command.kill", "", null);
-    public final PermissionDescription COMMAND_KILL_PREVENT = register("prevent",
-                                                                       "Prevents from being killed by the kill command unless forced",
-                                                                       COMMAND_KILL);
-    public final PermissionDescription COMMAND_KILL_FORCE = register("force",
-                                                                     "Kills a player even if the player has the prevent PermissionDescription",
-                                                                     COMMAND_KILL);
-    public final PermissionDescription COMMAND_KILL_ALL = register("all", "Allows killing all players currently online",
-                                                                   COMMAND_KILL);
-    public final PermissionDescription COMMAND_KILL_LIGHTNING = register("lightning",
-                                                                         "Allows killing a player with a lightning strike",
-                                                                         COMMAND_KILL);
-    public final PermissionDescription COMMAND_KILL_QUIET = register("quiet",
-                                                                     "Prevents the other player being notified who killed him",
-                                                                     COMMAND_KILL);
+    public final PermissionDescription COMMAND_KILL_PREVENT = register("prevent", "Prevents from being killed by the kill command unless forced", COMMAND_KILL);
+    public final PermissionDescription COMMAND_KILL_FORCE = register("force", "Kills a player even if the player has the prevent PermissionDescription", COMMAND_KILL);
+    public final PermissionDescription COMMAND_KILL_ALL = register("all", "Allows killing all players currently online", COMMAND_KILL);
+    public final PermissionDescription COMMAND_KILL_LIGHTNING = register("lightning", "Allows killing a player with a lightning strike", COMMAND_KILL);
+    public final PermissionDescription COMMAND_KILL_QUIET = register("quiet", "Prevents the other player being notified who killed him", COMMAND_KILL);
     public final PermissionDescription COMMAND_KILL_NOTIFY = register("notify", "Shows who killed you", COMMAND_KILL);
 
     @Command(alias = "slay", desc = "Kills a player")
@@ -115,9 +111,10 @@ public class KillCommands extends PermissionContainer<VanillaPlus>
         }
         if (lightning)
         {
-            player.getWorld().strikeLightningEffect(player.getLocation());
+            player.getWorld().spawnEntity(player.getWorld().createEntity(EntityTypes.LIGHTNING, player.getLocation().getPosition()).get(), Cause.of(context));
         }
-        player.setHealth(0);
+
+        player.damage(player.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(DamageTypes.CUSTOM).build(), Cause.of(context));
         if (showMessage)
         {
             i18n.sendTranslated(context, POSITIVE, "You killed {user}!", player);
@@ -134,12 +131,7 @@ public class KillCommands extends PermissionContainer<VanillaPlus>
     @Restricted(value = Player.class, msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}") // TODO replace User.class /w interface that has life stuff?
     public void suicide(Player context)
     {
-        context.setHealth(0);
-
-        // TODO context.setLastDamageCause(new EntityDamageEvent(context, CUSTOM, context.getMaxHealth()));
-        // maybe DamageableData
+        context.damage(context.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(DamageTypes.CUSTOM).build(), Cause.of(context));
         i18n.sendTranslated(context, NEGATIVE, "You ended your life. Why? {text:\\:(:color=DARK_RED}");
     }
-
-
 }

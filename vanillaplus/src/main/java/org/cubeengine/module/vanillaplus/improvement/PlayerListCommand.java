@@ -98,8 +98,7 @@ public class PlayerListCommand
         }
 
         SortedMap<String, Set<Player>> grouped = this.groupUsers(users);
-        i18n.sendTranslated(context, POSITIVE, "Players online: {amount#online}/{amount#max}", users.size(),
-                             game.getServer().getMaxPlayers());
+        i18n.sendTranslated(context, POSITIVE, "Players online: {amount#online}/{amount#max}", users.size(), Sponge.getServer().getMaxPlayers());
 
         for (Entry<String, Set<Player>> entry : grouped.entrySet())
         {

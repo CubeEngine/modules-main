@@ -28,7 +28,7 @@ public class VanillaPlusPerms extends PermissionContainer<VanillaPlus>
         super(module);
     }
 
-    public final PermissionDescription ITEM_BLACKLIST = getBasePerm().child("item-blacklist", "Allows to create items that are blacklisted");
+
 
     public final PermissionDescription COMMAND_PTIME_OTHER = COMMAND.child("ptime.other");
 
@@ -58,10 +58,6 @@ public class VanillaPlusPerms extends PermissionContainer<VanillaPlus>
     public final PermissionDescription COMMAND_BUTCHER_FLAG_NPC = COMMAND_BUTCHER_FLAG.child("npc");
     public final PermissionDescription COMMAND_BUTCHER_FLAG_MONSTER = COMMAND_BUTCHER_FLAG.child("monster");
     public final PermissionDescription COMMAND_BUTCHER_FLAG_BOSS = COMMAND_BUTCHER_FLAG.child("boss");
-
-
-
-
 
     /**
      * Allows writing colored signs

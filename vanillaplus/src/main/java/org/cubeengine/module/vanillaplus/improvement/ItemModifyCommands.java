@@ -18,6 +18,8 @@
 package org.cubeengine.module.vanillaplus.improvement;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
@@ -27,22 +29,24 @@ import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.command.annotation.ParameterPermission;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.i18n.formatter.MessageType;
+import org.cubeengine.service.matcher.EnchantMatcher;
 import org.cubeengine.service.permission.PermissionContainer;
-import org.spongepowered.api.data.type.SkullTypes;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
+import org.spongepowered.api.data.meta.ItemEnchantment;
+import org.spongepowered.api.data.property.item.UseLimitProperty;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.service.command.readers.EnchantmentReader.getPossibleEnchantments;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.item.ItemTypes.SKULL;
+import static org.spongepowered.api.text.serializer.TextSerializers.FORMATTING_CODE;
 
 /**
  * <p>/rename
@@ -50,22 +54,22 @@ import static org.spongepowered.api.item.ItemTypes.SKULL;
  * <p>/enchant
  * <p>/repair
  */
-public class ItemModifyCommands
+public class ItemModifyCommands extends PermissionContainer<VanillaPlus>
 {
     private I18n i18n;
+    private EnchantMatcher em;
 
-
-
-    public ItemModifyCommands(I18n i18n)
+    public ItemModifyCommands(VanillaPlus module, I18n i18n, EnchantMatcher em)
     {
+        super(module);
         this.i18n = i18n;
+        this.em = em;
     }
 
     @Command(desc = "Changes the display name of the item in your hand.")
     @Restricted(value = Player.class, msg = "Trying to give your {text:toys} a name?")
     public void rename(Player context, String name, @Optional @Greed(INFINITE) String... lore)
     {
-        // TODO lore cmd
         if (!context.getItemInHand().isPresent())
         {
             i18n.sendTranslated(context, NEGATIVE, "You need to hold an item to rename in your hand!");
@@ -73,21 +77,17 @@ public class ItemModifyCommands
         }
         ItemStack item = context.getItemInHand().get();
 
-        DisplayNameData data = item.getOrCreate(DisplayNameData.class).get();
-        data.setDisplayName(Texts.fromLegacy(name, '&'));
-        item.offer(data);
-
+        item.offer(Keys.DISPLAY_NAME, FORMATTING_CODE.deserialize(name));
         if (lore != null)
         {
-            LoreData loreData = item.getOrCreate(LoreData.class).get();
-            ArrayList<Text> list = new ArrayList<>();
+            List<Text> list = new ArrayList<>();
             for (String line : lore)
             {
-                list.add(Texts.fromLegacy(line, '&'));
+                list.add(FORMATTING_CODE.deserialize(line));
             }
-            loreData.set(list);
-            item.offer(loreData);
+            item.offer(Keys.ITEM_LORE, list);
         }
+        context.setItemInHand(item);
         i18n.sendTranslated(context, POSITIVE, "You now hold {input#name} in your hands!", name);
     }
 
@@ -95,14 +95,27 @@ public class ItemModifyCommands
     @Restricted(value = Player.class)
     public void lore(Player context, @Greed(INFINITE) String... lore)
     {
-        // TODO
-        context.sendMessage(Text.of("Not implemented"));
+        if (!context.getItemInHand().isPresent())
+        {
+            i18n.sendTranslated(context, NEGATIVE, "You need to hold an item to change the lore of in your hand!");
+            return;
+        }
+        ItemStack item = context.getItemInHand().get();
+
+        List<Text> list = new ArrayList<>();
+        for (String line : lore)
+        {
+            list.add(FORMATTING_CODE.deserialize(line));
+        }
+        item.offer(Keys.ITEM_LORE, list);
+        context.setItemInHand(item);
+        i18n.sendTranslated(context, POSITIVE, "You changed the lore.");
     }
 
 
     @Command(alias = "skullchange", desc = "Changes a skull to a players skin.")
     @Restricted(value = Player.class, msg = "This will you only give headaches!")
-    public void headchange(Player context, @Optional String name)
+    public void headchange(Player context, @Optional String name) throws ExecutionException, InterruptedException
     {
         ItemStack item = context.getItemInHand().orElse(null);
         if (item == null || item.getItem() != SKULL)
@@ -110,11 +123,10 @@ public class ItemModifyCommands
             i18n.sendTranslated(context, NEGATIVE, "You are not holding a head.");
             return;
         }
-        SkullData data = item.getOrCreate(SkullData.class).get();
-        data.setValue(SkullTypes.PLAYER);
-        item.offer(data);
 
-        // TODO actually set head type
+        item.offer(Keys.REPRESENTED_PLAYER, Sponge.getServer().getGameProfileManager().get(name).get());
+
+        context.setItemInHand(item);
         i18n.sendTranslated(context, POSITIVE, "You now hold {user}'s head in your hands!", name);
     }
 
@@ -136,40 +148,43 @@ public class ItemModifyCommands
             i18n.sendTranslated(context, NEGATIVE, "The enchantment level has to be a number greater than 0!");
             return;
         }
+        ItemEnchantment ench = new ItemEnchantment(enchantment, level);
+
         if (unsafe)
         {
-            if (!module.perms().COMMAND_ENCHANT_UNSAFE.isAuthorized(context))
+            if (item.get(Keys.STORED_ENCHANTMENTS).isPresent())
             {
-                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to add unsafe enchantments!");
+                List<ItemEnchantment> list = item.get(Keys.STORED_ENCHANTMENTS).get();
+                list.add(ench);
+                item.offer(Keys.STORED_ENCHANTMENTS, list);
                 return;
             }
-            if (item.getItemMeta() instanceof EnchantmentStorageMeta)
-            {
-                EnchantmentStorageMeta itemMeta = (EnchantmentStorageMeta)item.getItemMeta();
-                itemMeta.addStoredEnchant(enchantment, level, true);
-                item.setItemMeta(itemMeta);
-                return;
-            }
-            // TODO enchant item event when sponge event is not only for enchanting via table #WaitForBukkit
-            item.addUnsafeEnchantment(enchantment, level);
+
+            List<ItemEnchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
+            list.add(ench);
+            item.offer(Keys.ITEM_ENCHANTMENTS, list);
+
             i18n.sendTranslated(context, POSITIVE,
                                    "Added unsafe enchantment: {input#enchantment} {integer#level} to your item!",
-                                   Match.enchant().nameFor(enchantment), level);
+                                   enchantment.getTranslation(), level);
             return;
         }
-        if (enchantment.canEnchantItem(item))
+
+        if (enchantment.canBeAppliedToStack(item))
         {
-            if (level >= enchantment.getStartLevel() && level <= enchantment.getMaxLevel())
+            if (level >= enchantment.getMinimumLevel() && level <= enchantment.getMaximumLevel())
             {
-                item.addUnsafeEnchantment(enchantment, level);
+                List<ItemEnchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
+                list.add(ench);
+                item.offer(Keys.ITEM_ENCHANTMENTS, list);
                 i18n.sendTranslated(context, POSITIVE, "Added enchantment: {input#enchantment} {integer#level} to your item!",
-                                       Match.enchant().nameFor(enchantment), level);
+                                    enchantment.getTranslation(), level);
                 return;
             }
             i18n.sendTranslated(context, NEGATIVE, "This enchantment level is not allowed!");
             return;
         }
-        String possibleEnchs = getPossibleEnchantments(game.getRegistry(), item);
+        Text possibleEnchs = getPossibleEnchantments(Sponge.getRegistry(), item);
         if (possibleEnchs != null)
         {
             i18n.sendTranslated(context, NEGATIVE, "This enchantment is not allowed for this item!", possibleEnchs);
@@ -192,10 +207,10 @@ public class ItemModifyCommands
                 if (slot.peek().isPresent())
                 {
                     ItemStack item = slot.peek().get();
-                    if (item.isCompatible(DurabilityData.class))
+                    if (item.supports(DurabilityData.class))
                     {
                         Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
-                        item.offer(item.getOrCreate(DurabilityData.class).get().setDurability(max));
+                        item.offer(Keys.ITEM_DURABILITY, max);
                         repaired++;
                     }
                 }
@@ -209,15 +224,15 @@ public class ItemModifyCommands
             return;
         }
         ItemStack item = context.getItemInHand().get();
-        if (item.isCompatible(DurabilityData.class))
+        if (item.supports(DurabilityData.class))
         {
             Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
-            if (item.getOrCreate(DurabilityData.class).get().getDurability() == max)
+            if (item.get(Keys.ITEM_DURABILITY).get().equals(max))
             {
                 i18n.sendTranslated(context, NEUTRAL, "No need to repair this!");
                 return;
             }
-            item.offer(item.getOrCreate(DurabilityData.class).get().setDurability(max));
+            item.offer(Keys.ITEM_DURABILITY, max);
             i18n.sendTranslated(context, POSITIVE, "Item repaired!");
             return;
         }

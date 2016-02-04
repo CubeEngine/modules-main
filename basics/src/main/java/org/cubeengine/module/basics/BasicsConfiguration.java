@@ -43,44 +43,7 @@ public class BasicsConfiguration extends ReflectedYaml
 
         public int nearDefaultRadius = 20;
 
-        public Collection<BlockType> itemBlacklist = new LinkedList<BlockType>()
-        {
-            {
-                this.add(BEDROCK);
-                this.add(WATER);
-                this.add(FLOWING_WATER);
-                this.add(LAVA);
-                this.add(FLOWING_LAVA);
-                this.add(BED);
-                this.add(PISTON_EXTENSION);
-                this.add(PISTON_HEAD);
-                this.add(REDSTONE_WIRE);
-                this.add(WHEAT);
-                this.add(STANDING_SIGN);
-                this.add(WOODEN_DOOR);
-                this.add(WALL_SIGN);
-                this.add(IRON_DOOR);
-                this.add(UNLIT_REDSTONE_TORCH);
-                this.add(PORTAL);
-                this.add(CAKE);
-                this.add(POWERED_REPEATER);
-                this.add(UNPOWERED_REPEATER);
-                this.add(PUMPKIN_STEM);
-                this.add(MELON_STEM);
-                this.add(NETHER_WART);
-                this.add(BREWING_STAND);
-                this.add(CAULDRON);
-                this.add(END_PORTAL);
-                this.add(LIT_REDSTONE_LAMP);
-                this.add(COCOA);
-                this.add(TRIPWIRE);
-                this.add(COMMAND_BLOCK);
-                this.add(FLOWER_POT);
-                this.add(CARROTS);
-                this.add(POTATOES);
-                this.add(SKULL);
-            }
-        };
+
 
         @Name("ban.disallow-if-offline-mode")
         public boolean disallowBanIfOfflineMode;
@@ -106,8 +69,6 @@ public class BasicsConfiguration extends ReflectedYaml
 
 
 
-    @Name("changepainting.max.distance")
-    public int maxChangePaintingDistance = 10;
 
     @Name("overstacked.prevent-anvil-and-brewing")
     public boolean preventOverstackedItems = true;

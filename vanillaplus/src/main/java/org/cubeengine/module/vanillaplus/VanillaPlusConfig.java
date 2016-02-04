@@ -17,9 +17,17 @@
  */
 package org.cubeengine.module.vanillaplus;
 
+import java.util.Collection;
+import java.util.LinkedList;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
+import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.item.ItemType;
+
+import static org.spongepowered.api.item.ItemTypes.*;
+
 
 @SuppressWarnings("all")
 public class VanillaPlusConfig extends ReflectedYaml
@@ -33,15 +41,17 @@ public class VanillaPlusConfig extends ReflectedYaml
         @Comment("Allows using & followed by the appropriate color-code or style-code to write colored signs")
         public boolean styledSigns = true;
 
-        @Comment("Right click on a painting allows switching the painting with the mouse wheel")
-        public boolean paintingSwitcher = true;
-
-        @Comment("Shows the tamer of an animal when rightclicking on it")
-        public boolean showTamer = true;
-
         @Comment("Potions or Tools can be put into an Anvil or Brewingstand, allowing to brew/enchant the whole stack instead of just one item\n"
             + "Turning this on prevents putting unsafe Itemstacks into these inventories")
         public boolean preventOverstackedItems = true;
+
+        @Comment("Right click on a painting allows switching the painting with the mouse wheel")
+        public boolean paintingSwitcher = true;
+
+        public int paintingSwitcherMaxDistance = 10;
+
+        @Comment("Shows the tamer of an animal when rightclicking on it")
+        public boolean showTamer = true;
     }
 
     public static class Improvments implements Section
@@ -61,22 +71,22 @@ public class VanillaPlusConfig extends ReflectedYaml
         public boolean commandGamemode = true;
 
         @Comment("Improves /give\n"
-            + "adds an alias /item to give an item to yourself\n"
-            + "adds /more to refill itemstacks\n"
-            + "adds /stack to stack similar items together")
+            + "Adds an alias /item to give an item to yourself\n"
+            + "Adds /more to refill itemstacks\n"
+            + "Adds /stack to stack similar items together")
         public boolean commandItem = true;
 
         @Comment("Allows stacking tools and other items up to 64 even when they usually do not stack that high")
         public boolean commandStackTools = false;
 
         @Comment("Improves /enchant\n"
-            + "adds /rename and /lore to allow colored ItemNames and Lore\n"
-            + "adds /headchange to change any head to a player-head of your choice\n"
-            + "adds /repair to refill the durability of tools")
+            + "Adds /rename and /lore to allow colored ItemNames and Lore\n"
+            + "Adds /headchange to change any head to a player-head of your choice\n"
+            + "Adds /repair to refill the durability of tools")
         public boolean commandItemModify = true;
 
         @Comment("Improves /kill\n"
-            + "adds an alias /suicide to kill yourself")
+            + "Adds an alias /suicide to kill yourself")
         public boolean commandKill = true;
 
         @Comment("Improves /op and /deop")
@@ -103,6 +113,40 @@ public class VanillaPlusConfig extends ReflectedYaml
 
     public static class Additions implements Section
     {
+        @Comment("Adds /god")
+        public boolean commandGod = true;
 
+        @Comment("Adds /heal")
+        public boolean commandHeal = true;
+
+        @Comment("Adds /biome, /seed, /compass, /depth, /getPos, /near, /ping, /lag, /listWorlds ")
+        public boolean commandsInformation = true;
+
+        @Comment("Adds /invsee")
+        public boolean commandInvsee = true;
+
+        @Comment("Adds /itemDB")
+        public boolean commandItemDB = true;
+
+        @Comment("Adds /walkspeed and /fly")
+        public boolean commandsMovement = true;
+
+        @Comment("Adds /feed and /starve")
+        public boolean commandsFood = true;
+
+        @Comment("Adds /seen and /whois")
+        public boolean commandsPlayerInformation = true;
+
+        @Comment("Adds /plugins and /version")
+        public boolean commandsPlugins = true;
+
+        @Comment("Adds /stash")
+        public boolean commandStash = true;
+
+        @Comment("Adds /sudo")
+        public boolean commandSudo = true;
+
+        @Comment("Adds /unlimited")
+        public boolean commandUnlimited = true;
     }
 }

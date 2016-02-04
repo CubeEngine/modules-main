@@ -59,8 +59,7 @@ public class ItemCommands extends PermissionContainer<VanillaPlus>
 
     private final PermissionDescription COMMAND_ITEM = register("command.item", "", null);
     public final PermissionDescription COMMAND_ITEM_ENCHANTMENTS = register("enchantments.safe", "", COMMAND_ITEM);
-    public final PermissionDescription COMMAND_ITEM_ENCHANTMENTS_UNSAFE = register("enchantments.unsafe", "",
-                                                                                   COMMAND_ITEM);
+    public final PermissionDescription COMMAND_ITEM_ENCHANTMENTS_UNSAFE = register("enchantments.unsafe", "", COMMAND_ITEM);
 
     public final PermissionDescription COMMAND_STACK_FULLSTACK = register("command.stack.fullstack", "", null);
 
@@ -75,14 +74,8 @@ public class ItemCommands extends PermissionContainer<VanillaPlus>
 
     @SuppressWarnings("deprecation")
     @Command(desc = "Gives the specified Item to a player")
-    public void give(CommandSource context, User player, @Label("material[:data]") ItemStack item, @Optional Integer amount, @Flag boolean blacklist)
+    public void give(CommandSource context, User player, @Label("material[:data]") ItemStack item, @Optional Integer amount)
     {
-        if (!blacklist && context.hasPermission(module.perms().ITEM_BLACKLIST.getId())
-            && this.module.getConfig().commands.itemBlacklist.contains(item)) // TODO
-        {
-            i18n.sendTranslated(context, NEGATIVE, "This item is blacklisted!");
-            return;
-        }
         amount = amount == null ? item.getMaxStackQuantity() : amount;
         if (amount <= 0)
         {
@@ -108,15 +101,8 @@ public class ItemCommands extends PermissionContainer<VanillaPlus>
     @SuppressWarnings("deprecation")
     public void item(Player context, @Label("material[:data]") ItemStack item,
                      @Optional Integer amount,
-                     @Named("ench") @Label("enchantment[:level]") String enchantmentString,
-                     @Flag boolean blacklist)
+                     @Named("ench") @Label("enchantment[:level]") String enchantmentString)
     {
-        if (!blacklist && context.hasPermission(module.perms().ITEM_BLACKLIST.getId())
-            && this.module.getConfig().commands.containsBlackListed(item.getItem()))
-        {
-            i18n.sendTranslated(context, NEGATIVE, "This item is blacklisted!");
-            return;
-        }
         amount = amount == null ? item.getMaxStackQuantity() : amount;
         if (amount <= 0)
         {

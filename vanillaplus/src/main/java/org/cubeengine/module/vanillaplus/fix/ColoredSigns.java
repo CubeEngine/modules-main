@@ -18,44 +18,48 @@
 package org.cubeengine.module.vanillaplus.fix;
 
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.spongepowered.api.data.manipulator.mutable.tileentity.SignData;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
-import org.spongepowered.api.event.block.tileentity.SignChangeEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.Texts;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
-public class ColoredSigns
+public class ColoredSigns extends PermissionContainer<VanillaPlus>
 {
-    private final VanillaPlus module;
-
     public ColoredSigns(VanillaPlus module)
     {
-        this.module = module;
+        super(module);
     }
 
-    public final PermissionDescription SIGN_COLORED = getBasePerm().childWildcard("sign").child("colored");
-    public final PermissionDescription SIGN_STYLED = getBasePerm().childWildcard("sign").child("styled");
+    public final PermissionDescription SIGN_COLORED = register("sign.colored", "", null);
+    public final PermissionDescription SIGN_STYLED = register("sign.styled", "", null);
 
     @Listener
     public void onSignChange(ChangeSignEvent event, @First Subject cause)
     {
-        SIGN_STYLED
-        if (module.perms().SIGN_COLORED.isAuthorized((Subject)event.getCause().get())) // ALL colors
+        ListValue<Text> lines = event.getText().lines();
+        if (!cause.hasPermission(SIGN_STYLED.getId()))
         {
-            SignData newData = event.getNewData();
-            ListValue<Text> lines = newData.lines();
             for (int i = 0; i < lines.size(); i++)
             {
-                final Text text = lines.get(i);
-                lines.set(i, Texts.legacy().fromUnchecked(Texts.toPlain(text)));
+                lines.set(i, Text.of(lines.get(i).toPlain().replaceAll("&[klmno]", "")));
             }
-            event.setNewData(newData);
+        }
+        if (cause.hasPermission(SIGN_COLORED.getId()))
+        {
+            for (int i = 0; i < lines.size(); i++)
+            {
+                lines.set(i, Text.of(lines.get(i).toPlain().replaceAll("&[0123456789abcdef]", "")));
+            }
+        }
+
+        for (int i = 0; i < lines.size(); i++)
+        {
+            lines.set(i, TextSerializers.FORMATTING_CODE.deserialize(lines.get(i).toPlain()));
         }
     }
 }
