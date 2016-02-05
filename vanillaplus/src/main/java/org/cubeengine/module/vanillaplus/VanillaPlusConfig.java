@@ -17,16 +17,9 @@
  */
 package org.cubeengine.module.vanillaplus;
 
-import java.util.Collection;
-import java.util.LinkedList;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
-import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.item.ItemType;
-
-import static org.spongepowered.api.item.ItemTypes.*;
 
 
 @SuppressWarnings("all")
@@ -35,6 +28,12 @@ public class VanillaPlusConfig extends ReflectedYaml
     public Fixes fix;
     public Improvments improve;
     public Additions add;
+
+
+
+
+    public int nearDefaultRadius = 20;
+
 
     public static class Fixes implements Section
     {
@@ -56,8 +55,14 @@ public class VanillaPlusConfig extends ReflectedYaml
 
     public static class Improvments implements Section
     {
-        @Comment("Also adds an alias /butcher for living entities only")
+        @Comment("Adds /remove as an alternative for killing non linving entities only")
         public boolean commandRemove = true;
+        public int commandRemoveDefaultRadius = 20;
+
+        @Comment("Also /butcher for living entities only")
+        public boolean commandButcher = true;
+        public int commandButcherDefaultRadius = 20;
+
         @Comment("Also adds an alias /spawnmob for living entities only")
         public boolean commandSummon = true;
 
@@ -109,6 +114,7 @@ public class VanillaPlusConfig extends ReflectedYaml
 
         @Comment("Improves /whitelist")
         public boolean commandWhitelist = true;
+
     }
 
     public static class Additions implements Section
@@ -149,4 +155,7 @@ public class VanillaPlusConfig extends ReflectedYaml
         @Comment("Adds /unlimited")
         public boolean commandUnlimited = true;
     }
+
+
+
 }

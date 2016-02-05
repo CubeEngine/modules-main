@@ -37,11 +37,7 @@ public class BasicsConfiguration extends ReflectedYaml
     public class CommandsSection implements Section
     {
 
-        public int removeDefaultRadius = 20;
 
-        public int butcherDefaultRadius = 20;
-
-        public int nearDefaultRadius = 20;
 
 
 

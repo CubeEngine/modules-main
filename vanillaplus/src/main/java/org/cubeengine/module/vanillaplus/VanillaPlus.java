@@ -36,7 +36,7 @@ import org.cubeengine.module.vanillaplus.improvement.StopCommand;
 import org.cubeengine.module.vanillaplus.improvement.TimeCommands;
 import org.cubeengine.module.vanillaplus.improvement.WeatherCommands;
 import org.cubeengine.module.vanillaplus.improvement.WhitelistCommand;
-import org.cubeengine.module.vanillaplus.improvement.removal.RemovalCommands;
+import org.cubeengine.module.vanillaplus.improvement.removal.RemoveCommands;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.filesystem.ModuleConfig;
@@ -61,7 +61,7 @@ import org.spongepowered.api.Game;
  * /gamemode 	Sets a player's game mode. {@link GameModeCommand#gamemode}
  * /give 	Gives an item to a player. {@link ItemCommands#give},{@link ItemCommands#item}
  * ??? /help 	Provides help for commands.
- * /kill (butcher,remove,removeALl)   Kills entities (players, mobs, items, etc.). {@link RemovalCommands#butcher},{@link RemovalCommands#remove},{@link RemovalCommands#removeAll}
+ * /kill (butcher,remove,removeALl)   Kills entities (players, mobs, items, etc.). {@link RemoveCommands#butcher},{@link RemoveCommands#remove},{@link RemoveCommands#removeAll}
  * /list 	Lists players on the server. {@link PlayerListCommand#list}
  * ??? /op 	Grants operator status to a player.
  * ??? /replaceitem 	Replaces items in inventories.
@@ -154,7 +154,7 @@ public class VanillaPlus extends Module
         }
         if (config.improve.commandItemModify)
         {
-            cm.addCommands(this, new ItemModifyCommands(i18n));
+            cm.addCommands(this, new ItemModifyCommands(this, i18n, em));
         }
         if (config.improve.commandKill)
         {
