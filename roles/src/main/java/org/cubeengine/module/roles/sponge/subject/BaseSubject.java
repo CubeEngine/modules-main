@@ -169,14 +169,7 @@ public abstract class BaseSubject<T extends OptionSubjectData> implements Option
         {
             return Tristate.fromBoolean(state);
         }
-        for (Subject subject : data.getParents(contexts))
-        {
-            Tristate value = subject.getPermissionValue(contexts, permission);
-            if (value != Tristate.UNDEFINED)
-            {
-                return value;
-            }
-        }
+
         if (resolve)
         {
             List<String> implicits = new ArrayList<>();
@@ -191,9 +184,9 @@ public abstract class BaseSubject<T extends OptionSubjectData> implements Option
                 lastDot = perm.lastIndexOf(".");
             }
             Tristate value = Tristate.UNDEFINED;
-            for (String parent : implicits)
+            for (String implicit : implicits)
             {
-                value = getPermissionValue(contexts, parent, data, service, false); // not recursive (we got all already)
+                value = getPermissionValue(contexts, implicit, data, service, false); // not recursive (we got all already)
                 if (value != Tristate.UNDEFINED)
                 {
                     break;
@@ -225,6 +218,19 @@ public abstract class BaseSubject<T extends OptionSubjectData> implements Option
                     }
                 }
             }
+
+            if (value == Tristate.UNDEFINED)
+            {
+                for (Subject subject : data.getParents(contexts))
+                {
+                    value = subject.getPermissionValue(contexts, permission);
+                    if (value != Tristate.UNDEFINED)
+                    {
+                        return value;
+                    }
+                }
+            }
+
             return value;
         }
         return Tristate.UNDEFINED;
