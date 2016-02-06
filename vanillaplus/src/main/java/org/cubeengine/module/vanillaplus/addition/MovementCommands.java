@@ -4,12 +4,12 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.i18n.formatter.MessageType;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.block.ChangeBlockEvent.Place;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
@@ -19,21 +19,16 @@ import static org.spongepowered.api.data.key.Keys.CAN_FLY;
 import static org.spongepowered.api.data.key.Keys.FLYING_SPEED;
 import static org.spongepowered.api.data.key.Keys.IS_FLYING;
 
-public class MovementCommands
+public class MovementCommands extends PermissionContainer<VanillaPlus>
 {
     private I18n i18n;
 
-    private final PermissionDescription COMMAND_FLY = COMMAND.childWildcard("fly");
-    public final PermissionDescription COMMAND_FLY_KEEP = COMMAND_FLY.child("keep");
-    public final PermissionDescription COMMAND_FLY_OTHER = COMMAND_FLY.child("other");
+    public final PermissionDescription COMMAND_FLY_OTHER = register("command.fly.other", "", null);
+    public final PermissionDescription COMMAND_WALKSPEED_OTHER = register("command.walkspeed.other", "Allows to change the walkspeed of other players", null);
 
-    /**
-     * Allows to change the walkspeed of other players
-     */
-    public final PermissionDescription COMMAND_WALKSPEED_OTHER = COMMAND.childWildcard("walkspeed").child("other");
-
-    public MovementCommands(I18n i18n)
+    public MovementCommands(VanillaPlus module, I18n i18n)
     {
+        super(module);
         this.i18n = i18n;
     }
 
@@ -60,6 +55,7 @@ public class MovementCommands
         {
             player.offer(Keys.WALKING_SPEED, speed / 10.0);
             i18n.sendTranslated(player, POSITIVE, "You can now walk at {decimal:2}!", speed);
+            // TODO msg for other player
             return;
         }
         player.offer(Keys.WALKING_SPEED, 0.2);

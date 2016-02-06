@@ -40,7 +40,7 @@ import static java.util.stream.Collectors.toList;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
- * Commands controlling / affecting worlds. /weather /remove /butcher
+ * A command to remove non-living entities
  */
 public class RemoveCommands
 {

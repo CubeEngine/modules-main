@@ -21,22 +21,15 @@ import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.inventoryguard.InventoryGuardFactory;
-import org.cubeengine.service.user.User;
-import org.cubeengine.module.core.util.InventoryGuardFactory;
-import org.cubeengine.module.basics.Basics;
-import org.cubeengine.module.basics.BasicsAttachment;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
 /**
  * Contains commands that allow to modify an inventory.
@@ -44,61 +37,47 @@ import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
  * <p>/clearinventory
  * <p>/stash
  */
-public class InvseeCommand
+public class InvseeCommand extends PermissionContainer<VanillaPlus>
 {
-    private final VanillaPlus module;
     private InventoryGuardFactory invGuard;
     private I18n i18n;
 
     public InvseeCommand(VanillaPlus module, InventoryGuardFactory invGuard, I18n i18n)
     {
-        this.module = module;
+        super(module);
         this.invGuard = invGuard;
         this.i18n = i18n;
     }
 
-    private final PermissionDescription COMMAND_INVSEE = COMMAND.childWildcard("invsee");
-    /**
-     * Allows to modify the inventory of other players
-     */
-    public final PermissionDescription COMMAND_INVSEE_MODIFY = COMMAND_INVSEE.child("modify");
-    public final PermissionDescription COMMAND_INVSEE_ENDERCHEST = COMMAND_INVSEE.child("ender");
-    /**
-     * Prevents an inventory from being modified unless forced
-     */
-    public final PermissionDescription COMMAND_INVSEE_MODIFY_PREVENT = COMMAND_INVSEE.newPerm("modify.prevent", FALSE);
-    /**
-     * Allows modifying an inventory even if the player has the prevent permission
-     */
-    public final PermissionDescription COMMAND_INVSEE_MODIFY_FORCE = COMMAND_INVSEE.child("modify.force");
-    /**
-     * Notifies you when someone is looking into your inventory
-     */
-    public final PermissionDescription COMMAND_INVSEE_NOTIFY = COMMAND_INVSEE.child("notify");
-    /**
-     * Prevents the other player from being notified when looking into his inventory
-     */
-    public final PermissionDescription COMMAND_INVSEE_QUIET = COMMAND_INVSEE.child("quiet");
+    private final PermissionDescription COMMAND_INVSEE = register("command.invsee", "", null);
+    public final PermissionDescription COMMAND_INVSEE_ENDERCHEST = register("ender", "", COMMAND_INVSEE);
+    public final PermissionDescription COMMAND_INVSEE_MODIFY = register("modify.allow", "Allows to modify the inventory of other players", COMMAND_INVSEE);
+    public final PermissionDescription COMMAND_INVSEE_MODIFY_PREVENT = register("modify.prevent", "Prevents an inventory from being modified unless forced", COMMAND_INVSEE);
+    public final PermissionDescription COMMAND_INVSEE_MODIFY_FORCE = register("modify.force", "Allows modifying an inventory even if the player has the prevent permission", COMMAND_INVSEE);
+    public final PermissionDescription COMMAND_INVSEE_NOTIFY = register("notify", "Notifies you when someone is looking into your inventory", COMMAND_INVSEE);
+    public final PermissionDescription COMMAND_INVSEE_QUIET = register("quiet", "Prevents the other player from being notified when looking into his inventory", COMMAND_INVSEE);
 
     @Command(desc = "Allows you to see into the inventory of someone else.")
     @Restricted(value = Player.class, msg = "This command can only be used by a player!")
     public void invsee(Player context, User player,
                        @Flag boolean force,
-                       @Flag boolean quiet,
-                       @Flag boolean ender)
+                       @Flag boolean quiet
+                       // TODO https://github.com/SpongePowered/SpongeAPI/issues/684 ,@Flag boolean ender
+                      )
     {
         boolean denyModify = false;
         Inventory inv;
-        if (ender)
+        /*if (ender)
         {
             if (!context.hasPermission(COMMAND_INVSEE_ENDERCHEST.getId()))
             {
                 i18n.sendTranslated(context, NEGATIVE, "You are not allowed to look into enderchests!");
                 return;
             }
-            inv = player.getEnderChest();
+            inv = player.get(Keys.End);
         }
         else
+        */
         {
             inv = player.getInventory();
         }
@@ -107,11 +86,11 @@ public class InvseeCommand
             denyModify = !(force && context.hasPermission(COMMAND_INVSEE_MODIFY_FORCE.getId()))
                 && player.hasPermission(COMMAND_INVSEE_MODIFY_PREVENT.getId());
         }
-        if (player.hasPermission(COMMAND_INVSEE_NOTIFY.getId()))
+        if (player.isOnline() && player.hasPermission(COMMAND_INVSEE_NOTIFY.getId()))
         {
             if (!(quiet && context.hasPermission(COMMAND_INVSEE_QUIET.getId())))
             {
-                i18n.sendTranslated(player, NEUTRAL, "{sender} is looking into your inventory.", context);
+                i18n.sendTranslated(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your inventory.", context);
             }
         }
         InventoryGuardFactory guard = invGuard.prepareInv(inv);
@@ -121,6 +100,4 @@ public class InvseeCommand
         }
         guard.submitInventory(this.module, true);
     }
-
-
 }

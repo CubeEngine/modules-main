@@ -17,125 +17,117 @@
  */
 package org.cubeengine.module.vanillaplus.addition;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.service.ServiceProvider;
+import java.util.stream.Collectors;
+import de.cubeisland.engine.modularity.core.LifeCycle;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.ChatFormat;
-import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.cubeengine.service.command.exception.PermissionDeniedException;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.i18n.formatter.MessageType;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.spongepowered.api.text.format.TextColors.GREEN;
+import static org.spongepowered.api.text.format.TextColors.RESET;
 
-public class PluginCommands
+public class PluginCommands extends PermissionContainer<VanillaPlus>
 {
     private I18n i18n;
 
-    public PluginCommands(I18n i18n)
+    public PluginCommands(I18n i18n, VanillaPlus module)
     {
+        super(module);
         this.i18n = i18n;
     }
 
-    private final Permission COMMAND_VERSION_PLUGINS;
-
-    COMMAND_VERSION_PLUGINS = module.getProvided(Permission.class).childWildcard("command").childWildcard("version").child("plugins");
-    pm.registerPermission(module, COMMAND_VERSION_PLUGINS);
-
+    private final PermissionDescription COMMAND_VERSION_PLUGINS = register("command.version.plugins", "", null);
 
     @Command(desc = "Lists all loaded plugins")
     public void plugins(CommandSource context)
     {
         Collection<PluginContainer> plugins = Sponge.getPluginManager().getPlugins();
-        Set<Module> modules = this.module.getModularity().getModules();
+        Set<LifeCycle> modules = this.module.getModularity().getModules();
 
         i18n.sendTranslated(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:",
                             plugins.size(), modules.size());
         context.sendMessage(Text.EMPTY);
-        context.sendMessage(" - " + ChatFormat.BRIGHT_GREEN + "CubeEngine" + ChatFormat.RESET + " (" + module.getInformation().getVersion() + ")");
+        context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", RESET, " (" + module.getInformation().getVersion() + ")"));
 
-        for (Module m : modules)
+        for (LifeCycle m : modules)
         {
-            context.sendMessage("   - " + m.getInformation().getName() + ChatFormat.RESET + " (" + m.getInformation().getVersion() + ")");
+            context.sendMessage(Text.of("   - ", m.getInformation().getIdentifier().name(), RESET, " (" + m.getInformation().getVersion() + ")"));
         }
 
-        plugins.stream().filter(p -> p.getInstance() != this.module)
-               .forEach(p -> context.sendMessage(
-                   " - " + ChatFormat.BRIGHT_GREEN + p.getName() + ChatFormat.RESET + " (" + p.getVersion()
-                       + ")"));
+        for (PluginContainer plugin : plugins)
+        {
+            context.sendMessage(Text.of(" - ", GREEN, plugin.getName(), ChatFormat.RESET, " (" + plugin.getVersion() + ")"));
+        }
     }
 
     @Command(desc = "Displays the version of the server or a given plugin")
-    public void version(CommandContext context, @Optional String plugin, @Flag boolean source)
+    public void version(CommandSource context, @Optional String plugin)
     {
         if (plugin == null)
         {
             Platform platform = Sponge.getGame().getPlatform();
-            i18n.sendTranslated(context, NEUTRAL, "This server is running {name#server} in version {input#version:color=INDIGO}", platform.getMinecraftVersion().getName(), platform.getVersion());
-            i18n.sendTranslated(context, NEUTRAL, "Sponge API {text:version\\::color=WHITE} {input#version:color=INDIGO}", platform.getApiVersion());
-            context.sendMessage(" ");
-            i18n.sendTranslated(context, NEUTRAL,
-                                   "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}",
-                                   module.getInformation().getVersion());
-            if (source)
+            switch (platform.getType())
             {
-                ModuleCommands.showSourceVersion(context.getSource(), module.getInformation().getSourceVersion());
+                case CLIENT:
+                    i18n.sendTranslated(context, NEUTRAL, "This client is running {name#server}",
+                                        platform.getMinecraftVersion().getName());
+                    break;
+                case SERVER:
+                    i18n.sendTranslated(context, NEUTRAL, "This server is running {name#server}",
+                                        platform.getMinecraftVersion().getName());
+                    break;
+                case UNKNOWN:
+                    i18n.sendTranslated(context, NEUTRAL, "Unknown platform running {name#server}",
+                                        platform.getMinecraftVersion().getName());
             }
+
+            i18n.sendTranslated(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getApi().getVersion());
+            i18n.sendTranslated(context, NEUTRAL, "implemented by {input#name} {input#version:color=INDIGO}", platform.getImplementation().getName(), platform.getImplementation().getVersion());
+            context.sendMessage(Text.EMPTY);
+            i18n.sendTranslated(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", module.getInformation().getVersion());
             return;
         }
-        context.ensurePermission(COMMAND_VERSION_PLUGINS);
-        com.google.common.base.Optional<PluginContainer> instance = game.getPluginManager().getPlugin(plugin);
+        if (context.hasPermission(COMMAND_VERSION_PLUGINS.getId()))
+        {
+            throw new PermissionDeniedException(COMMAND_VERSION_PLUGINS);
+        }
+        java.util.Optional<PluginContainer> instance = Sponge.getPluginManager().getPlugin(plugin);
         if (!instance.isPresent())
         {
-            List<PluginContainer> plugins = new ArrayList<>();
-            for (PluginContainer container : game.getPluginManager().getPlugins())
-            {
-                if (container.getName().toLowerCase().startsWith(plugin.toLowerCase()))
-                {
-                    plugins.add(container);
-                }
-            }
-            i18n.sendTranslated(context, NEGATIVE,
-                                   "The given plugin doesn't seem to be loaded, have you typed it correctly (casing does matter)?");
+            List<PluginContainer> plugins = Sponge.getPluginManager().getPlugins().stream()
+                  .filter(container -> container.getName().toLowerCase().startsWith(plugin.toLowerCase()))
+                  .collect(Collectors.toList());
+            i18n.sendTranslated(context, NEGATIVE, "The given plugin doesn't seem to be loaded, have you typed it correctly (casing does matter)?");
             if (!plugins.isEmpty())
             {
                 i18n.sendTranslated(context, NEGATIVE, "You might want to try one of these:");
                 for (PluginContainer p : plugins)
                 {
-                    context.sendMessage(" - " + p.getName());
+                    context.sendMessage(Text.of(" - " + p.getName()));
                 }
             }
             return;
         }
         i18n.sendTranslated(context, NEUTRAL, "{name#plugin} is currently running in version {input#version:color=INDIGO}.",
                                instance.get().getName(), instance.get().getVersion());
-        context.sendMessage(" ");
+        context.sendMessage(Text.EMPTY);
         i18n.sendTranslated(context, NEUTRAL, "Plugin information:");
-        context.sendMessage(" ");
-        if (instance.get().getInstance() instanceof CoreModule && source)
-        {
-            ModuleCommands.showSourceVersion(context.getSource(), module.getInformation().getSourceVersion());
-        }
-        /* TODO if possible later get detailed descriptions
-        i18n.sendTranslated(context, NEUTRAL, "Description: {input}", instance.getDescription().getDescription() == null ? "NONE" : instance.getDescription().getDescription());
-        i18n.sendTranslated(context, NEUTRAL, "Website: {input}", instance.getDescription().getWebsite() == null ? "NONE" : instance.getDescription().getWebsite());
-        i18n.sendTranslated(context, NEUTRAL, "Authors:");
-        for (String author : instance.getDescription().getAuthors())
-        {
-            context.sendMessage("   - " + ChatFormat.AQUA + author);
-        }
-        */
+        context.sendMessage(Text.EMPTY);
     }
 
 }

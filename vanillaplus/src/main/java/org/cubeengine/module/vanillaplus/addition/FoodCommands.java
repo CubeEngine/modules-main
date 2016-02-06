@@ -1,11 +1,12 @@
 package org.cubeengine.module.vanillaplus.addition;
 
 import java.util.Collection;
-import java.util.List;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.ChatFormat;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.cubeengine.service.user.Broadcaster;
 import org.cubeengine.service.user.UserList;
 import org.spongepowered.api.command.CommandSource;
@@ -19,20 +20,18 @@ import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
-public class PlayerFoodCommands
+public class FoodCommands extends PermissionContainer<VanillaPlus>
 {
 
     private I18n i18n;
     private Broadcaster bc;
 
-    private final PermissionDescription COMMAND_FEED = COMMAND.childWildcard("feed");
-    public final PermissionDescription COMMAND_FEED_OTHER = COMMAND_FEED.child("other");
+    public final PermissionDescription COMMAND_FEED_OTHER = register("command.feed.other", "", null);
+    public final PermissionDescription COMMAND_STARVE_OTHER = register("command.starve.other", "", null);
 
-    private final PermissionDescription COMMAND_STARVE = COMMAND.childWildcard("starve");
-    public final PermissionDescription COMMAND_STARVE_OTHER = COMMAND_STARVE.child("other");
-
-    public PlayerFoodCommands(I18n i18n, Broadcaster bc)
+    public FoodCommands(VanillaPlus module, I18n i18n, Broadcaster bc)
     {
+        super(module);
         this.i18n = i18n;
         this.bc = bc;
     }

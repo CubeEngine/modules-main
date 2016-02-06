@@ -34,7 +34,10 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
 
@@ -58,11 +61,11 @@ public class PlayerListCommand
         SortedMap<String, Set<Player>> grouped = new TreeMap<>();
         for (Player player : users)
         {
-            SubjectData data = player.getSubjectData();
+            Subject subject = Sponge.getServiceManager().provideUnchecked(PermissionService.class).getUserSubjects().get(player.getUniqueId().toString());
             String listGroup = "&6Players";
-            if (data instanceof OptionSubjectData)
+            if (subject instanceof OptionSubject)
             {
-                listGroup = ((OptionSubjectData)data).getOptions(player.getActiveContexts()).get("list-group");
+                listGroup = ((OptionSubject)subject).getOption("list-group").orElse(listGroup);
             }
             Set<Player> assigned = grouped.get(listGroup);
             if (assigned == null)
@@ -107,7 +110,7 @@ public class PlayerListCommand
             {
                 continue;
             }
-            Text.Builder builder = Text.of(ChatFormat.fromLegacy(entry.getKey(), '&'), WHITE, ":").toBuilder();
+            Text.Builder builder = Text.of(ChatFormat.fromLegacy(entry.getKey(), '&'), WHITE, ": ").toBuilder();
             builder.append(formatUser(it.next()));
             while (it.hasNext())
             {

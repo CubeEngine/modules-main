@@ -1,148 +1,86 @@
 package org.cubeengine.module.vanillaplus.improvement.removal;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.function.Predicate;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.matcher.StringMatcher;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.World;
 
-import static java.util.stream.Collectors.toList;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
-public class ButcherCommand
+public class ButcherCommand extends PermissionContainer<VanillaPlus>
 {
+    private I18n i18n;
 
-    this.entityRemovals = new EntityRemovals(module);
+    public ButcherCommand(VanillaPlus module, I18n i18n, CommandManager cm, StringMatcher sm)
+    {
+        super(module);
+        this.i18n = i18n;
+        cm.getProviderManager().register(module, new LivingFilterReader(module, i18n, sm), LivingFilter.class);
+    }
+
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_LIGHTNING = register("command.butcher.lightning", "", null);
+    public final PermissionDescription COMMAND_BUTCHER_FLAG_ALL = register("command.butcher.all", "", null);
 
 
     @Command(desc = "Gets rid of mobs close to you. Valid types are:\n" +
         "monster, animal, pet, golem, boss, other, creeper, skeleton, spider etc.")
-    public void butcher(CommandSource context, @Label("types...") @Optional String types,
+    public void butcher(CommandSource context, @Label("types...") @Default LivingFilter types,
                         @Optional Integer radius,
-                        @Named("in") World world,
+                        @Default @Named("in") World world,
                         @Flag boolean lightning, // die with style
                         @Flag boolean all) // infinite radius
     {
-        User sender = null;
-        if (context instanceof User)
-        {
-            sender = (User)context;
-        }
-        Location loc;
-        radius = radius == null ? this.config.commands.butcherDefaultRadius : radius;
-        if (radius < 0 && !(radius == -1 && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context)))
+        radius = radius == null ? module.getConfig().improve.commandButcherDefaultRadius : radius;
+        if (radius < 0 && !(radius == -1 && context.hasPermission(COMMAND_BUTCHER_FLAG_ALL.getId())))
         {
             i18n.sendTranslated(context, NEGATIVE, "The radius has to be a number greater than 0!");
             return;
         }
-        int removed;
-        if (sender == null)
-        {
-            radius = -1;
-            loc = this.config.mainWorld.getWorld().getSpawnLocation();
-        }
-        else
-        {
-            loc = sender.getLocation();
-        }
-        if (all && module.perms().COMMAND_BUTCHER_FLAG_ALL.isAuthorized(context))
+        if (all && context.hasPermission(COMMAND_BUTCHER_FLAG_ALL.getId()))
         {
             radius = -1;
         }
-        lightning = lightning && module.perms().COMMAND_BUTCHER_FLAG_LIGHTNING.isAuthorized(context);
-        Collection<Entity> list;
-        if (context instanceof User && !(radius == -1))
+        lightning = lightning && context.hasPermission(COMMAND_BUTCHER_FLAG_LIGHTNING.getId());
+
+        Integer rSquared = radius * radius;
+        Predicate<Entity> filter = radius == -1 ? types :
+           types.and(e -> e.getTransform().getPosition().distance(((Player)context).getLocation().getPosition()) <= rSquared);
+
+        Cause lightningCause = Cause.of(context);
+        Collection<Entity> remove = world.getEntities(filter);
+        for (Entity entity : remove)
         {
-            list = ((User)context).getNearbyEntities(radius);
-        }
-        else
-        {
-            list = loc.getExtent().getEntities();
-        }
-        String[] s_types = { "monster" };
-        boolean allTypes = false;
-        if (types != null)
-        {
-            if ("*".equals(types))
+            if (lightning)
             {
-                allTypes = true;
-                if (!module.perms().COMMAND_BUTCHER_FLAG_ALLTYPE.isAuthorized(context))
-                {
-                    i18n.sendTranslated(context, NEGATIVE, "You are not allowed to butcher all types of living entities at once!");
-                    return;
-                }
+                world.spawnEntity(world.createEntity(EntityTypes.LIGHTNING, entity.getLocation().getPosition()).get(), lightningCause);
             }
-            else
-            {
-                s_types = StringUtils.explode(",", types);
-            }
+            entity.remove();
         }
-        List<Entity> remList = new ArrayList<>();
-        if (!allTypes)
-        {
-            for (String s_type : s_types)
-            {
-                String match = stringMatcher.matchString(s_type, this.entityRemovals.GROUPED_ENTITY_REMOVAL.keySet());
-                EntityType directEntityMatch = null;
-                if (match == null)
-                {
-                    directEntityMatch = entityMatcher.mob(s_type);
-                    if (directEntityMatch == null)
-                    {
-                        i18n.sendTranslated(context, NEGATIVE, "Unknown entity {input#entity}", s_type);
-                        return;
-                    }
-                    if (this.entityRemovals.DIRECT_ENTITY_REMOVAL.get(directEntityMatch) == null) throw new IllegalStateException("Missing Entity? " + directEntityMatch);
-                }
-                EntityRemoval entityRemoval;
-                if (directEntityMatch != null)
-                {
-                    entityRemoval = this.entityRemovals.DIRECT_ENTITY_REMOVAL.get(directEntityMatch);
-                }
-                else
-                {
-                    entityRemoval = this.entityRemovals.GROUPED_ENTITY_REMOVAL.get(match);
-                }
-                remList.addAll(list.stream().filter(entity -> entityRemoval.doesMatch(entity)
-                    && entityRemoval.isAllowed(context)).collect(toList()));
-            }
-        }
-        else
-        {
-            remList.addAll(list);
-        }
-        list = new ArrayList<>();
-        for (Entity entity : remList)
-        {
-            if (entity instanceof Living)
-            {
-                list.add(entity);
-            }
-        }
-        removed = this.removeEntities(list, loc, radius, lightning);
-        if (removed == 0)
+
+        if (remove.size() == 0)
         {
             i18n.sendTranslated(context, NEUTRAL, "Nothing to butcher!");
         }
         else
         {
-            i18n.sendTranslated(context, POSITIVE, "You just slaughtered {amount} living entities!", removed);
+            i18n.sendTranslated(context, POSITIVE, "You just slaughtered {amount} living entities!", remove.size());
         }
 
     }
-
-
-    //eLoc.getExtent().spawnEntity(eLoc.getExtent().createEntity(EntityTypes.LIGHTNING, eLoc.getPosition()).get(), Cause.of(context));
 }

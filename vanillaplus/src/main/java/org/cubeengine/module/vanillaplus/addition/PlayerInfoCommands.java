@@ -1,26 +1,36 @@
 package org.cubeengine.module.vanillaplus.addition;
 
-import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Optional;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.module.basics.BasicsAttachment;
-import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.TimeUtil;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.i18n.formatter.MessageType;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.manipulator.mutable.entity.InvulnerabilityData;
+import org.spongepowered.api.data.manipulator.mutable.entity.JoinData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.service.ban.BanService;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.ban.Ban.Profile;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import static java.text.DateFormat.SHORT;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.service.i18n.formatter.MessageType.NONE;
 
 public class PlayerInfoCommands
 {
@@ -54,9 +64,6 @@ public class PlayerInfoCommands
         i18n.sendTranslated(context, NEUTRAL, "{user} is offline since {input#time}", player, format.format(date));
     }
 
-
-
-
     @Command(desc = "Displays informations from a player!")
     public void whois(CommandSource context, User player)
     {
@@ -68,66 +75,77 @@ public class PlayerInfoCommands
         {
             i18n.sendTranslated(context, NEUTRAL, "Nickname: {user} ({text:offline})", player);
         }
-        if (player.hasPlayedBefore() || player.isOnline())
+        if (player.get(JoinData.class).isPresent() || player.isOnline())
         {
-            i18n.sendTranslated(context, NEUTRAL, "Life: {decimal:0}/{decimal#max:0}", player.getHealth(), player.getMaxHealth());
-            i18n.sendTranslated(context, NEUTRAL, "Hunger: {integer#foodlvl:0}/{text:20} ({integer#saturation}/{integer#foodlvl:0})", player.getFoodLevel(), (int)player.getSaturation(), player.getFoodLevel());
-            i18n.sendTranslated(context, NEUTRAL, "Level: {integer#level} + {integer#percent}%", player.getLevel(), (int)(player.getExpPerecent() * 100));
-            Location loc = player.getLocation();
-            if (loc != null)
+            i18n.sendTranslated(context, NEUTRAL, "Life: {decimal:0}/{decimal#max:0}", player.get(Keys.HEALTH).get(), player.get(Keys.MAX_HEALTH).get());
+            i18n.sendTranslated(context, NEUTRAL, "Hunger: {integer#foodlvl:0}/{text:20} ({integer#saturation}/{integer#foodlvl:0})", player.get(Keys.FOOD_LEVEL).get(), player.get(Keys.SATURATION).get().intValue(), player.get(Keys.FOOD_LEVEL).get());
+            i18n.sendTranslated(context, NEUTRAL, "Level: {integer#level} + {integer#percent}%", player.get(Keys.EXPERIENCE_LEVEL).get(), player.get(Keys.EXPERIENCE_SINCE_LEVEL).get() * 100 / player.get(Keys.EXPERIENCE_FROM_START_OF_LEVEL).get());
+
+            if (player.isOnline())
             {
+                Location<World> loc = player.getPlayer().get().getLocation();
                 i18n.sendTranslated(context, NEUTRAL, "Position: {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
             }
-            if (player.getAddress() != null)
+            if (player.isOnline())
             {
-                i18n.sendTranslated(context, NEUTRAL, "IP: {input#ip}", player.getAddress().getAddress().getHostAddress());
+                i18n.sendTranslated(context, NEUTRAL, "IP: {input#ip}", player.getPlayer().get().getConnection().getAddress().getAddress().getHostAddress());
             }
-            if (player.getGameMode() != null)
+            Optional<GameMode> gameMode = player.get(Keys.GAME_MODE);
+            if (gameMode.isPresent())
             {
-                i18n.sendTranslated(context, NEUTRAL, "Gamemode: {input#gamemode}", player.getGameMode().toString());
+                i18n.sendTranslated(context, NEUTRAL, "Gamemode: {input#gamemode}", gameMode.get().getTranslation());
             }
-            if (player.getAllowFlight())
+            if (player.get(Keys.CAN_FLY).orElse(false))
             {
-                i18n.sendTranslated(context, NEUTRAL, "Flymode: {text:true:color=BRIGHT_GREEN} {input#flying}", player.isFlying() ? "flying" : "not flying");
+                i18n.sendTranslated(context, NEUTRAL, "Flymode: {text:true:color=BRIGHT_GREEN} {input#flying}", player.get(Keys.IS_FLYING).orElse(false) ? "flying" : "not flying");
             }
             else
             {
                 i18n.sendTranslated(context, NEUTRAL, "Flymode: {text:false:color=RED}");
             }
+            /* TODO
             if (player.isOp())
             {
                 i18n.sendTranslated(context, NEUTRAL, "OP: {text:true:color=BRIGHT_GREEN}");
-            }
-            Timestamp muted = module.getBasicsUser(player.asPlayer()).getEntity().getValue(TABLE_BASIC_USER.MUTED);
-            if (muted != null && muted.getTime() > System.currentTimeMillis())
+            }*/
+
+            if (!gameMode.isPresent() || !gameMode.get().equals(GameModes.CREATIVE))
             {
-                i18n.sendTranslated(context, NEUTRAL, "Muted until {input#time}", DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale()).format(muted));
+                Optional<InvulnerabilityData> data = player.get(InvulnerabilityData.class);
+                if (data.isPresent())
+                {
+                    i18n.sendTranslated(context, NEUTRAL, "is invulnerable");
+                }
             }
-            if (player.getGameMode() != CREATIVE)
-            {
-                i18n.sendTranslated(context, NEUTRAL, "GodMode: {input#godmode}", player.isInvulnerable() ? ChatFormat.BRIGHT_GREEN + "true" : ChatFormat.RED + "false");
-            }
+            /*
             if (player.get(BasicsAttachment.class).isAfk())
             {
                 i18n.sendTranslated(context, NEUTRAL, "AFK: {text:true:color=BRIGHT_GREEN}");
             }
-            DateFormat dateFormat = SimpleDateFormat.getDateTimeInstance(SHORT, SHORT, Locale.ENGLISH);
-            i18n.sendTranslated(context, NEUTRAL, "First played: {input#date}", dateFormat.format(player.getFirstPlayed()));
+            */
+            String format = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(context.getLocale())
+                                             .withZone(ZoneId.systemDefault())
+                                             .format(player.get(Keys.FIRST_DATE_PLAYED).get());
+            i18n.sendTranslated(context, NEUTRAL, "First played: {input#date}", format);
         }
-        if (banManager.isUserBanned(player.getUniqueId()))
+        BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
+        if (banService.isBanned(player.getProfile()))
         {
-            UserBan ban = banManager.getUserBan(player.getUniqueId());
-            String expires;
+            Profile ban = banService.getBanFor(player.getProfile()).get();
+            Text expires;
             DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale());
-            if (ban.getExpires() != null)
+
+            if (!ban.getExpirationDate().isPresent())
             {
-                expires = format.format(ban.getExpires());
+                expires = i18n.getTranslation(context, NONE, "for ever");
             }
             else
             {
-                expires = context.getTranslation(NONE, "for ever").toString();
+                expires = Text.of(format.format(ban.getExpirationDate().get()));
             }
-            i18n.sendTranslated(context, NEUTRAL, "Banned by {user} on {input#date}: {input#reason} ({input#expire})", ban.getSource(), format.format(ban.getCreated()), ban.getReason(), expires);
+            i18n.sendTranslated(context, NEUTRAL, "Banned by {user} on {input#date}: {input#reason} ({input#expire})",
+                                ban.getBanSource().map(Text::toPlain).orElse("?"), format.format(ban.getCreationDate()),
+                                ban.getReason(), expires);
         }
     }
 }

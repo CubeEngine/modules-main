@@ -29,12 +29,6 @@ public class VanillaPlusConfig extends ReflectedYaml
     public Improvments improve;
     public Additions add;
 
-
-
-
-    public int nearDefaultRadius = 20;
-
-
     public static class Fixes implements Section
     {
         @Comment("Allows using & followed by the appropriate color-code or style-code to write colored signs")
@@ -65,7 +59,6 @@ public class VanillaPlusConfig extends ReflectedYaml
 
         @Comment("Also adds an alias /spawnmob for living entities only")
         public boolean commandSummon = true;
-
         public int spawnmobLimit = 20;
 
         @Comment("Improves /clear and adds some aliases")
@@ -127,6 +120,8 @@ public class VanillaPlusConfig extends ReflectedYaml
 
         @Comment("Adds /biome, /seed, /compass, /depth, /getPos, /near, /ping, /lag, /listWorlds ")
         public boolean commandsInformation = true;
+
+        public int commandNearDefaultRadius = 20;
 
         @Comment("Adds /invsee")
         public boolean commandInvsee = true;

@@ -21,8 +21,22 @@ import javax.inject.Inject;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.Module;
+import org.cubeengine.module.vanillaplus.addition.GodCommand;
+import org.cubeengine.module.vanillaplus.addition.HealCommand;
+import org.cubeengine.module.vanillaplus.addition.InformationCommands;
+import org.cubeengine.module.vanillaplus.addition.InvseeCommand;
+import org.cubeengine.module.vanillaplus.addition.ItemDBCommand;
+import org.cubeengine.module.vanillaplus.addition.MovementCommands;
+import org.cubeengine.module.vanillaplus.addition.FoodCommands;
+import org.cubeengine.module.vanillaplus.addition.PlayerInfoCommands;
 import org.cubeengine.module.vanillaplus.addition.PluginCommands;
+import org.cubeengine.module.vanillaplus.addition.StashCommand;
 import org.cubeengine.module.vanillaplus.addition.SudoCommand;
+import org.cubeengine.module.vanillaplus.addition.UnlimitedItems;
+import org.cubeengine.module.vanillaplus.fix.ColoredSigns;
+import org.cubeengine.module.vanillaplus.fix.FixListener;
+import org.cubeengine.module.vanillaplus.fix.PaintingListener;
+import org.cubeengine.module.vanillaplus.fix.TamedListener;
 import org.cubeengine.module.vanillaplus.improvement.ClearInventoryCommand;
 import org.cubeengine.module.vanillaplus.improvement.DifficultyCommand;
 import org.cubeengine.module.vanillaplus.improvement.GameModeCommand;
@@ -36,18 +50,22 @@ import org.cubeengine.module.vanillaplus.improvement.StopCommand;
 import org.cubeengine.module.vanillaplus.improvement.TimeCommands;
 import org.cubeengine.module.vanillaplus.improvement.WeatherCommands;
 import org.cubeengine.module.vanillaplus.improvement.WhitelistCommand;
+import org.cubeengine.module.vanillaplus.improvement.removal.ButcherCommand;
 import org.cubeengine.module.vanillaplus.improvement.removal.RemoveCommands;
-import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.event.EventManager;
 import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.module.vanillaplus.improvement.summon.SpawnMobCommand;
+import org.cubeengine.service.inventoryguard.InventoryGuardFactory;
 import org.cubeengine.service.matcher.EnchantMatcher;
+import org.cubeengine.service.matcher.EntityMatcher;
 import org.cubeengine.service.matcher.MaterialMatcher;
+import org.cubeengine.service.matcher.StringMatcher;
 import org.cubeengine.service.matcher.TimeMatcher;
 import org.cubeengine.service.matcher.WorldMatcher;
 import org.cubeengine.service.task.TaskManager;
-import org.spongepowered.api.Game;
+import org.cubeengine.service.user.Broadcaster;
 
 /**
  * A module to improve vanilla commands:
@@ -61,7 +79,7 @@ import org.spongepowered.api.Game;
  * /gamemode 	Sets a player's game mode. {@link GameModeCommand#gamemode}
  * /give 	Gives an item to a player. {@link ItemCommands#give},{@link ItemCommands#item}
  * ??? /help 	Provides help for commands.
- * /kill (butcher,remove,removeALl)   Kills entities (players, mobs, items, etc.). {@link RemoveCommands#butcher},{@link RemoveCommands#remove},{@link RemoveCommands#removeAll}
+ * /kill (butcher,remove,removeALl)   Kills entities (players, mobs, items, etc.). {@link ButcherCommand#butcher},{@link RemoveCommands#remove},{@link RemoveCommands#removeAll}
  * /list 	Lists players on the server. {@link PlayerListCommand#list}
  * ??? /op 	Grants operator status to a player.
  * ??? /replaceitem 	Replaces items in inventories.
@@ -98,15 +116,18 @@ import org.spongepowered.api.Game;
 public class VanillaPlus extends Module
 {
     @Inject private CommandManager cm;
-    @Inject private Game game;
-    @Inject private FileManager fm;
     @Inject private I18n i18n;
     @Inject private MaterialMatcher mm;
     @Inject private EnchantMatcher em;
+    @Inject private EntityMatcher enm;
     @Inject private TimeMatcher tm;
     @Inject private WorldMatcher wm;
     @Inject private TaskManager tam;
+    @Inject private Broadcaster bc;
+    @Inject private InventoryGuardFactory invGuard;
     @ModuleConfig private VanillaPlusConfig config;
+    @Inject private EventManager evm;
+    @Inject private StringMatcher sm;
 
     @Enable
     public void onEnable()
@@ -118,23 +139,91 @@ public class VanillaPlus extends Module
 
     private void enableAdditions()
     {
-
+        if (config.add.commandGod)
+        {
+            cm.addCommands(this, new GodCommand(this, i18n));
+        }
+        if (config.add.commandHeal)
+        {
+            cm.addCommands(this, new HealCommand(this, i18n, bc));
+        }
+        if (config.add.commandsInformation)
+        {
+            cm.addCommands(this, new InformationCommands(this, mm, i18n));
+        }
+        if (config.add.commandInvsee)
+        {
+            cm.addCommands(this, new InvseeCommand(this, invGuard, i18n));
+        }
+        if (config.add.commandItemDB)
+        {
+            cm.addCommands(this, new ItemDBCommand(this, mm, em, i18n));
+        }
+        if (config.add.commandsMovement)
+        {
+            cm.addCommands(this, new MovementCommands(this, i18n));
+        }
+        if (config.add.commandsFood)
+        {
+            cm.addCommands(this, new FoodCommands(this, i18n, bc));
+        }
+        if (config.add.commandsPlayerInformation)
+        {
+            cm.addCommands(this, new PlayerInfoCommands(i18n));
+        }
+        if (config.add.commandsPlugins)
+        {
+            cm.addCommands(this, new PluginCommands(i18n, this));
+        }
+        if (config.add.commandStash)
+        {
+            cm.addCommands(this, new StashCommand(i18n));
+        }
+        if (config.add.commandSudo)
+        {
+            cm.addCommands(this, new SudoCommand(i18n, cm));
+        }
+        if (config.add.commandUnlimited)
+        {
+            UnlimitedItems cmd = new UnlimitedItems(i18n);
+            cm.addCommands(this, cmd);
+            evm.registerListener(this, cmd);
+        }
     }
 
     private void enableFixes()
     {
-
+        if (config.fix.styledSigns)
+        {
+            evm.registerListener(this, new ColoredSigns(this));
+        }
+        if (config.fix.preventOverstackedItems)
+        {
+            evm.registerListener(this, new FixListener(this));
+        }
+        if (config.fix.paintingSwitcher)
+        {
+            evm.registerListener(this, new PaintingListener(this, i18n));
+        }
+        if (config.fix.showTamer)
+        {
+            evm.registerListener(this, new TamedListener(i18n));
+        }
     }
 
     private void enableImprovements()
     {
         if (config.improve.commandRemove)
         {
-            // TODO remove cmds
+            cm.addCommands(this, new RemoveCommands(this, enm, mm, i18n, cm));
+        }
+        if (config.improve.commandButcher)
+        {
+            cm.addCommands(this, new ButcherCommand(this, i18n, cm, sm));
         }
         if (config.improve.commandSummon)
         {
-            cm.addCommands(this, new SpawnMobCommand(this));
+            cm.addCommands(this, new SpawnMobCommand(this, i18n, enm));
         }
         if (config.improve.commandClearinventory)
         {
@@ -186,7 +275,7 @@ public class VanillaPlus extends Module
         }
         if (config.improve.commandWhitelist)
         {
-            cm.addCommands(this, new WhitelistCommand(this, i18n));
+            cm.addCommand(new WhitelistCommand(this, i18n));
         }
     }
 

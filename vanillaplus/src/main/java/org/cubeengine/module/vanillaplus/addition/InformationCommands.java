@@ -27,7 +27,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
-import java.util.concurrent.TimeUnit;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parameter.TooFewArgumentsException;
 import org.cubeengine.butler.parametric.Command;
@@ -35,52 +34,49 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.basics.Basics;
-import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.Pair;
-import org.cubeengine.module.core.util.StringUtils;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.i18n.formatter.MessageType;
-import org.cubeengine.module.core.util.matcher.MaterialMatcher;
 import org.cubeengine.module.core.util.math.BlockVector2;
 import org.cubeengine.module.core.util.math.BlockVector3;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.command.CommandContext;
-import org.cubeengine.service.command.CommandSender;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.i18n.formatter.MessageType;
 import org.cubeengine.service.matcher.MaterialMatcher;
-import org.cubeengine.service.user.User;
-import org.cubeengine.service.world.WorldManager;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.Text.Builder;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.biome.BiomeType;
 
 import static java.util.Locale.ENGLISH;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.util.Direction.*;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.text.format.TextColors.*;
+import static org.spongepowered.api.util.Direction.getClosest;
 
-public class InformationCommands
+public class InformationCommands extends PermissionContainer<VanillaPlus>
 {
     private final PeriodFormatter formatter;
-    private final VanillaPlus module;
     private MaterialMatcher materialMatcher;
     private I18n i18n;
 
     public InformationCommands(VanillaPlus module, MaterialMatcher materialMatcher, I18n i18n)
     {
-        this.module = module;
+        super(module);
         this.materialMatcher = materialMatcher;
         this.i18n = i18n;
         this.formatter = new PeriodFormatterBuilder().appendWeeks().appendSuffix(" week"," weeks").appendSeparator(" ")
@@ -89,6 +85,7 @@ public class InformationCommands
                                                      .appendMinutes().appendSuffix(" minute", " minutes").appendSeparator(" ")
                                                      .appendSeconds().appendSuffix(" second", " seconds").toFormatter();
     }
+
 
     @Command(desc = "Displays the biome type you are standing in.")
     public void biome(CommandSource context,
@@ -160,12 +157,12 @@ public class InformationCommands
     {
         if (radius == null)
         {
-            radius = this.module.getConfig().commands.nearDefaultRadius;
+            radius = this.module.getConfig().add.commandNearDefaultRadius;
         }
         int squareRadius = radius * radius;
         Location userLocation = player.getLocation();
-        Collection<Entity> list = ((World)userLocation.getExtent()).getEntities();
-        LinkedList<String> outputlist = new LinkedList<>();
+        Collection<Entity> list = userLocation.getExtent().getEntities();
+        LinkedList<Text> outputlist = new LinkedList<>();
         TreeMap<Double, List<Entity>> sortedMap = new TreeMap<>();
         for (Entity e : list)
         {
@@ -186,7 +183,7 @@ public class InformationCommands
             }
         }
         int i = 0;
-        LinkedHashMap<String, Pair<Double, Integer>> groupedEntities = new LinkedHashMap<>();
+        LinkedHashMap<Text, Pair<Double, Integer>> groupedEntities = new LinkedHashMap<>();
         for (double dist : sortedMap.keySet())
         {
             i++;
@@ -197,22 +194,22 @@ public class InformationCommands
                     this.addNearInformation(outputlist, e, Math.sqrt(dist));
                     continue;
                 }
-                String key;
+                Text key;
                 if (e instanceof Player)
                 {
-                    key = DARK_GREEN + "player";
+                    key = Text.of(TextColors.DARK_GREEN, i18n.getTranslation(context, TextFormat.NONE, "player"));
                 }
                 else if (e instanceof Living)
                 {
-                    key = ChatFormat.DARK_AQUA + e.getType().getName();
+                    key = Text.of(TextColors.DARK_AQUA, e.getType().getTranslation());
                 }
                 else if (e instanceof Item)
                 {
-                    key = ChatFormat.GREY + materialMatcher.getNameFor(((Item)e).getItemData().getValue());
+                    key = Text.of(GRAY, e.get(Keys.REPRESENTED_ITEM).get().createStack().getTranslation());
                 }
                 else
                 {
-                    key = ChatFormat.GREY + e.getType().getName();
+                    key = Text.of(GRAY, e.getType().getTranslation());
                 }
                 Pair<Double, Integer> pair = groupedEntities.get(key);
                 if (pair == null)
@@ -226,22 +223,20 @@ public class InformationCommands
                 }
             }
         }
-        StringBuilder groupedOutput = new StringBuilder();
-        for (String key : groupedEntities.keySet())
+        Builder builder = Text.builder();
+        for (Text key : groupedEntities.keySet())
         {
-            groupedOutput.append("\n").append(GOLD).append(groupedEntities.get(key).getRight()).append("x ")
-                         .append(key).append(WHITE).append(" (").append(GOLD)
-                         .append(Math.round(groupedEntities.get(key).getLeft())).append("m")
-                         .append(WHITE).append(")");
+            builder.append(Text.NEW_LINE)
+                   .append(Text.of(GOLD, groupedEntities.get(key).getRight())).append(Text.of("x ")).append(key)
+                   .append(Text.of(WHITE, " (", GOLD, Math.round(groupedEntities.get(key).getLeft()), "m", WHITE, ")"));
         }
         if (outputlist.isEmpty())
         {
             i18n.sendTranslated(context, NEGATIVE, "Nothing detected nearby!");
             return;
         }
-        String result;
-        result = StringUtils.implode(WHITE + ", ", outputlist);
-        result += groupedOutput.toString();
+
+        Text result = Text.of(Text.joinWith(Text.of(WHITE, ", "), outputlist), builder.build());
         if (context.equals(player))
         {
             i18n.sendTranslated(context, NEUTRAL, "Found those nearby you:");
@@ -252,30 +247,29 @@ public class InformationCommands
         context.sendMessage(result);
     }
 
-    private void addNearInformation(List<String> list, Entity entity, double distance)
+    private void addNearInformation(List<Text> list, Entity entity, double distance)
     {
-        String s;
+        Text s;
         if (entity instanceof Player)
         {
-            s = DARK_GREEN + ((Player)entity).getName();
+            s = Text.of(TextColors.DARK_GREEN, ((Player)entity).getName());
         }
         else if (entity instanceof Living)
         {
-            s = ChatFormat.DARK_AQUA + entity.getType().getName();
+            s = Text.of(TextColors.DARK_AQUA, entity.getType().getName());
         }
         else
         {
             if (entity instanceof Item)
             {
-                s = ChatFormat.GREY + materialMatcher.getNameFor(((Item)entity).getItemData().getValue());
+                s = Text.of(GRAY, entity.get(Keys.REPRESENTED_ITEM).get().createStack().getTranslation());
             }
             else
             {
-                s = ChatFormat.GREY + entity.getType().getName();
+                s = Text.of(GRAY, entity.getType().getTranslation());
             }
         }
-        s += WHITE + " (" + GOLD + distance + "m" + WHITE + ")";
-        list.add(s);
+        list.add(Text.of(s, WHITE, " (" + GOLD, distance + "m", WHITE + ")"));
     }
 
     @Command(alias = "pong", desc = "Pong!")
@@ -284,26 +278,16 @@ public class InformationCommands
         final String label = context.getInvocation().getLabels().get(0).toLowerCase(ENGLISH);
         if (context.isSource(Player.class))
         {
-            i18n.sendTranslated(context, MessageType.NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}", ((User)context.getSource()).asPlayer().getConnection().getPing());
+            i18n.sendTranslated(context.getSource(), MessageType.NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}",
+                                ((Player)context.getSource()).getConnection().getPing());
             return;
         }
         i18n.sendTranslated(context.getSource(), NEUTRAL, label + " in the console?");
     }
 
     @Command(desc = "Displays chunk, memory and world information.")
-    public void lag(CommandSource context, @Flag boolean reset)
+    public void lag(CommandSource context)
     {
-        if (reset)
-        {
-            if (module.perms().COMMAND_LAG_RESET.isAuthorized(context))
-            {
-                this.module.getLagTimer().resetLowestTPS();
-                i18n.sendTranslated(context, POSITIVE, "Reset lowest TPS!");
-                return;
-            }
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to do this!");
-            return;
-        }
         //Uptime:
         i18n.sendTranslated(context, POSITIVE, "[{text:CubeEngine-Basics:color=RED}]");
         DateFormat df = SimpleDateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT,
@@ -313,25 +297,13 @@ public class InformationCommands
         i18n.sendTranslated(context, POSITIVE, "Server has been running since {input#uptime}", df.format(start));
         i18n.sendTranslated(context, POSITIVE, "Uptime: {input#uptime}", formatter.print(dura.toPeriod()));
         //TPS:
-        float tps = this.module.getLagTimer().getAverageTPS();
-        String color = tps == 20 ? DARK_GREEN.toString() :
-                       tps > 17 ?  YELLOW.toString() :
-                       tps > 10 ?  RED.toString() :
-                       tps == 0 ?  (YELLOW.toString() + "NaN") :
-                                   DARK_RED.toString();
-        i18n.sendTranslated(context, POSITIVE, "Current TPS: {input#color}{decimal#tps:1}", color, tps);
-        Pair<Long, Float> lowestTPS = this.module.getLagTimer().getLowestTPS();
-        if (lowestTPS.getRight() != 20)
-        {
-            color = ChatFormat.parseFormats(tps > 17 ? YELLOW.toString() : tps > 10 ? RED.toString() : DARK_RED.toString());
-            Date date = new Date(lowestTPS.getLeft());
-            i18n.sendTranslated(context, POSITIVE, "Lowest TPS was {}{decimal#tps:1} ({input#date})", color, lowestTPS.getRight(), df.format(date));
-            long timeSinceLastLowTPS = System.currentTimeMillis() - this.module.getLagTimer().getLastLowTPS();
-            if (tps == 20 && TimeUnit.MINUTES.convert(timeSinceLastLowTPS,TimeUnit.MILLISECONDS) < 1)
-            {
-                i18n.sendTranslated(context, NEGATIVE, "TPS was low in the last minute!");
-            }
-        }
+        double tps = Sponge.getServer().getTicksPerSecond();
+        TextColor color = tps == 20 ? DARK_GREEN :
+                       tps > 17 ?  YELLOW :
+                       tps > 10 ?  RED :
+                       tps == 0 ?  YELLOW :
+                                   DARK_RED;
+        i18n.sendTranslated(context, POSITIVE, "Current TPS: {txt}", Text.of(color, tps));
         //Memory
         long memUse = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576;
         long memCom = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getCommitted() / 1048576;
@@ -360,9 +332,9 @@ public class InformationCommands
         memused += memUse;
         i18n.sendTranslated(context, POSITIVE, "Memory Usage: {input#memused}/{integer#memcom}/{integer#memMax} MB", memused, memCom, memMax);
         //Worlds with loaded Chunks / Entities
-        for (World world : wm.getWorlds())
+        for (World world : Sponge.getServer().getWorlds())
         {
-            String type = world.getWorldStorage().getWorldProperties().getDimensionType().getName();
+            String type = world.getProperties().getDimensionType().getName();
             int loadedChunks;
             if (world.getLoadedChunks() instanceof Collection)
             {
@@ -381,15 +353,16 @@ public class InformationCommands
         }
     }
 
-
+    /* TODO handle duplicate cmd registrations
     @Command(desc = "Displays all loaded worlds", alias = {"worldlist","worlds"})
     public void listWorlds(CommandSource context)
     {
         i18n.sendTranslated(context, POSITIVE, "Loaded worlds:");
-        String format = " " + WHITE + "- " + GOLD + "%s" + WHITE + ":" + INDIGO + "%s";
         for (World world : Sponge.getServer().getWorlds())
         {
-            context.sendMessage(String.format(format, world.getName(), world.getWorldStorage().getWorldProperties().getDimensionType().getName()));
+            context.sendMessage(Text.of(" ", TextColors.WHITE, "- ", GOLD, world.getName(), WHITE, ":", BLUE,
+                                        world.getProperties().getDimensionType().getName()));
         }
     }
+    */
 }

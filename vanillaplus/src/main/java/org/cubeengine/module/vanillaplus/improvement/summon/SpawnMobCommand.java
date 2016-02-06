@@ -17,18 +17,26 @@
  */
 package org.cubeengine.module.vanillaplus.improvement.summon;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.CommandSender;
-import org.cubeengine.service.user.User;
-import org.spongepowered.api.data.manipulator.entity.PassengerData;
+import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.matcher.EnchantMatcher;
+import org.cubeengine.service.matcher.EntityMatcher;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntitySnapshot;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.util.blockray.BlockRay;
+import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import static org.spongepowered.api.block.BlockTypes.AIR;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.util.blockray.BlockRay.onlyAirFilter;
 
 /**
  * The /spawnmob command.
@@ -36,34 +44,38 @@ import static org.spongepowered.api.block.BlockTypes.AIR;
 public class SpawnMobCommand
 {
     private VanillaPlus module;
+    private I18n i18n;
+    private EntityMatcher em;
 
-    public SpawnMobCommand(VanillaPlus module)
+    public SpawnMobCommand(VanillaPlus module, I18n i18n, EntityMatcher em)
     {
         this.module = module;
+        this.i18n = i18n;
+        this.em = em;
     }
 
     @Command(desc = "Spawns the specified Mob")
-    public void spawnMob(CommandSender context, @Label("<mob>[:data][,<ridingmob>[:data]]") String data,
-                         @Optional Integer amount, @Optional User player)
+    public void spawnMob(CommandSource context, @Label("<mob>[:data][,<ridingmob>[:data]]") String data, @Optional Integer amount, @Optional Player player)
     {
-        User sender = null;
-        if (context instanceof User)
-        {
-            sender = (User)context;
-        }
         Location loc;
         if (player != null)
         {
             loc = player.getLocation();
         }
-        else if (sender == null)
+        else if (!(context instanceof Player))
         {
             i18n.sendTranslated(context, NEUTRAL, "Succesfully spawned some {text:bugs:color=RED} inside your server!");
             return;
         }
         else
         {
-            loc = sender.getTargetBlock(200, AIR).add(new Vector3d(0, 1, 0));
+            BlockRayHit<World> hit = BlockRay.from(((Player)context)).blockLimit(200).filter(onlyAirFilter()).end().orElse(null);
+            if (hit == null)
+            {
+                i18n.sendTranslated(context, NEGATIVE, "Cannot find Targetblock");
+                return;
+            }
+            loc = hit.getLocation();
         }
         amount = amount == null ? 1 : amount;
 
@@ -72,32 +84,31 @@ public class SpawnMobCommand
             i18n.sendTranslated(context, NEUTRAL, "And how am i supposed to know which mobs to despawn?");
             return;
         }
-        if (amount > module.getConfig().spawnmobLimit)
+        if (amount > module.getConfig().improve.spawnmobLimit)
         {
-            i18n.sendTranslated(context, NEGATIVE, "The serverlimit is set to {amount}, you cannot spawn more mobs at once!", module.getConfig().spawnmobLimit);
+            i18n.sendTranslated(context, NEGATIVE, "The serverlimit is set to {amount}, you cannot spawn more mobs at once!", module.getConfig().improve.spawnmobLimit);
             return;
         }
         loc = loc.add(0.5, 0, 0.5);
-        Entity[] entitiesSpawned = SpawnMob.spawnMobs(context, data, loc, amount);
+        Entity[] entitiesSpawned = SpawnMob.spawnMobs(context, data, loc, amount, em, i18n);
         if (entitiesSpawned == null)
         {
             return;
         }
-        Entity entitySpawned = entitiesSpawned[0];
-        if (!entitySpawned.getData(PassengerData.class).isPresent())
+        EntitySnapshot entitySpawned = entitiesSpawned[0].createSnapshot();
+        if (!entitySpawned.get(Keys.PASSENGER).isPresent())
         {
             i18n.sendTranslated(context, POSITIVE, "Spawned {amount} {input#entity}!", amount, entitySpawned.getType().getName());
         }
         else
         {
-            String message = entitySpawned.getType().getName();
-            while (entitySpawned.getData(PassengerData.class).isPresent())
+            Text message = Text.of(entitySpawned.getType().getTranslation());
+            while (entitySpawned.get(Keys.PASSENGER).isPresent())
             {
-                entitySpawned = entitySpawned.getData(PassengerData.class).get().getVehicle();
-                message = context.getTranslation(NONE, "{input#entity} riding {input}", entitySpawned.getType().getName(), message).getTranslation().get(context.getLocale());
+                entitySpawned = entitySpawned.get(Keys.PASSENGER).get();
+                message = i18n.getTranslation(context, NONE, "{input#entity} riding {input}", entitySpawned.getType().getName(), message);
             }
-            message = context.getTranslation(POSITIVE, "Spawned {amount} {input#message}!", amount, message).getTranslation().get(
-                context.getLocale());
+            message = i18n.getTranslation(context, POSITIVE, "Spawned {amount} {input#message}!", amount, message);
             context.sendMessage(message);
         }
     }

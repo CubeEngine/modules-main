@@ -1,12 +1,16 @@
 package org.cubeengine.module.vanillaplus.addition;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
@@ -14,6 +18,8 @@ import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 public class StashCommand
 {
     private I18n i18n;
+
+    private Map<UUID, StashedInventory> stashed = new HashMap<>();
 
     public StashCommand(I18n i18n)
     {
@@ -24,35 +30,27 @@ public class StashCommand
     @Restricted(value = Player.class, msg = "Yeah you better put it away!")
     public void stash(Player context)
     {
-        ItemStack[] stashedInv = context.get(BasicsAttachment.class).getStashedInventory();
-        ItemStack[] stashedArmor = context.get(BasicsAttachment.class).getStashedArmor();
-        ItemStack[] invToStash = context.getInventory().getContents().clone();
-        ItemStack[] armorToStash = context.getInventory().getArmorContents().clone();
-        if (stashedInv != null)
+        StashedInventory newStash = new StashedInventory();
+        for (Inventory slot : context.getInventory().slots())
         {
-            context.getInventory().setContents(stashedInv);
-        }
-        else
-        {
-            context.getInventory().clear();
+            newStash.items.add(slot.peek().orElse(null));
         }
 
-        context.get(BasicsAttachment.class).setStashedInventory(invToStash);
-        if (stashedArmor != null)
+        StashedInventory replaced = stashed.put(context.getUniqueId(), newStash);
+        if (replaced != null)
         {
-            context.getInventory().setBoots(stashedArmor[0]);
-            context.getInventory().setLeggings(stashedArmor[1]);
-            context.getInventory().setChestplate(stashedArmor[2]);
-            context.getInventory().setHelmet(stashedArmor[3]);
+            Iterator<ItemStack> it = replaced.items.iterator();
+            for (Inventory inventory : context.getInventory().slots())
+            {
+                inventory.offer(it.next());
+            }
         }
-        else
-        {
-            context.getInventory().setBoots(null);
-            context.getInventory().setLeggings(null);
-            context.getInventory().setChestplate(null);
-            context.getInventory().setHelmet(null);
-        }
-        context.get(BasicsAttachment.class).setStashedArmor(armorToStash);
+
         i18n.sendTranslated(context, POSITIVE, "Swapped stashed Inventory!");
+    }
+
+    private class StashedInventory
+    {
+        public List<ItemStack> items = new ArrayList<>();
     }
 }

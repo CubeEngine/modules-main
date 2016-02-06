@@ -20,12 +20,9 @@ package org.cubeengine.module.vanillaplus.improvement;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.UUID;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
@@ -33,6 +30,7 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.matcher.TimeMatcher;
 import org.cubeengine.service.matcher.WorldMatcher;
+import org.cubeengine.service.permission.PermissionContainer;
 import org.cubeengine.service.task.TaskManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -43,10 +41,9 @@ import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 
-public class TimeCommands
+public class TimeCommands extends PermissionContainer<VanillaPlus>
 {
     private final TaskManager tam;
-    private VanillaPlus module;
     private I18n i18n;
     private TimeMatcher tm;
     private final WorldMatcher worldMatcher;
@@ -55,12 +52,13 @@ public class TimeCommands
 
     public TimeCommands(VanillaPlus module, I18n i18n, TimeMatcher tm, WorldMatcher worldMatcher, TaskManager tam)
     {
-        this.module = module;
+        super( module);
         this.i18n = i18n;
         this.tm = tm;
         this.worldMatcher = worldMatcher;
         this.tam = tam;
     }
+
 
     @Command(desc = "Changes the time of a world")
     public void time(CommandSource context, @Optional String time,
@@ -129,17 +127,7 @@ public class TimeCommands
                 this.setTime(world, lTime);
                 if (lock)
                 {
-                    long worldTime = world.getProperties().getWorldTime();
-                    if (locked.containsKey(world.getUniqueId()))
-                    {
-                        tam.cancelTask(module, locked.remove(world.getUniqueId()));
-                        i18n.sendTranslated(context, POSITIVE, "Time unlocked for {world}!", world);
-                    }
-                    else
-                    {
-                        locked.put(world.getUniqueId(), tam.runTimer(module, () -> setTime(world, worldTime), 0, 10));
-                        i18n.sendTranslated(context, POSITIVE, "Time locked for {world}!", world);
-                    }
+                    toggleTimeLock(context, world, world.getProperties().getWorldTime());
                 }
             }
             return;
@@ -148,17 +136,7 @@ public class TimeCommands
         {
             for (World world : worldList)
             {
-                long worldTime = world.getProperties().getWorldTime();
-                if (locked.containsKey(world.getUniqueId()))
-                {
-                    tam.cancelTask(module, locked.remove(world.getUniqueId()));
-                    i18n.sendTranslated(context, POSITIVE, "Time unlocked for {world}!", world);
-                }
-                else
-                {
-                    locked.put(world.getUniqueId(), tam.runTimer(module, () -> setTime(world, worldTime), 0, 10));
-                    i18n.sendTranslated(context, POSITIVE, "Time locked for {world}!", world);
-                }
+                toggleTimeLock(context, world, world.getProperties().getWorldTime());
             }
             return;
         }
@@ -169,6 +147,22 @@ public class TimeCommands
             i18n.sendTranslated(context, NEUTRAL, "{input#time} ({input#neartime}) in {world}.", tm.format(worldTime), tm.matchTimeName(worldTime), world);
         }
     }
+
+    private void toggleTimeLock(CommandSource context, World world, long worldTime)
+    {
+        if (locked.containsKey(world.getUniqueId()))
+        {
+            tam.cancelTask(module, locked.remove(world.getUniqueId()));
+            i18n.sendTranslated(context, POSITIVE, "Time unlocked for {world}!", world);
+        }
+        else
+        {
+            locked.put(world.getUniqueId(), tam.runTimer(module, () -> setTime(world, worldTime), 0, 10));
+            i18n.sendTranslated(context, POSITIVE, "Time locked for {world}!", world);
+        }
+    }
+
+    // TODO public final PermissionDescription COMMAND_PTIME_OTHER = register("command.ptime.other", "", null);
 
     /* TODO wait for API https://github.com/SpongePowered/SpongeAPI/issues/393
     @Command(desc = "Changes the time for a player")

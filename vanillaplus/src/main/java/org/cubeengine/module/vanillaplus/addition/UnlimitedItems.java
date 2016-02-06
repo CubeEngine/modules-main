@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.service.event.EventManager;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;

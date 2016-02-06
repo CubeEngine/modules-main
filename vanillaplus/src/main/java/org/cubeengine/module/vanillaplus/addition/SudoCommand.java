@@ -28,7 +28,7 @@ public class SudoCommand
     {
         if (!message.startsWith("/"))
         {
-            player.getMessageChannel().send(Text.of(message));
+            player.getMessageChannel().send(player, Text.of(message));
             i18n.sendTranslated(context, POSITIVE, "Forced {user} to chat: {input#message}", player, message);
             return;
         }

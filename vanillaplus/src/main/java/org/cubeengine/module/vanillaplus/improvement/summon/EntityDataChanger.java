@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.vanillaplus.improvement.summon;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -24,18 +25,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import com.google.common.base.Optional;
-import org.cubeengine.module.core.sponge.BukkitUtils;
-import org.cubeengine.service.user.User;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.data.manipulator.DisplayNameData;
-import org.spongepowered.api.data.manipulator.DyeableData;
-import org.spongepowered.api.data.manipulator.entity.ChargedData;
-import org.spongepowered.api.data.manipulator.entity.HealthData;
-import org.spongepowered.api.data.manipulator.entity.SaddleData;
-import org.spongepowered.api.data.manipulator.entity.ShearedData;
-import org.spongepowered.api.data.manipulator.entity.SittingData;
-import org.spongepowered.api.data.manipulator.entity.VillagerZombieData;
+import org.cubeengine.service.matcher.StringMatcher;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.HorseColor;
@@ -62,9 +54,11 @@ import org.spongepowered.api.entity.living.monster.Skeleton;
 import org.spongepowered.api.entity.living.monster.Slime;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.monster.ZombiePigman;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
-
-import static org.spongepowered.api.item.ItemTypes.SADDLE;
+import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.text.serializer.TextSerializers;
 
 
 public class EntityDataChanger<EntityInterface>
@@ -73,8 +67,6 @@ public class EntityDataChanger<EntityInterface>
     protected final EntityChanger<EntityInterface, ?> changer;
     public static final Set<EntityDataChanger> entityDataChangers = new HashSet<>();
 
-    static Game game; // TODO
-
     public static final EntityDataChanger<Pig> PIG_SADDLE =
             new EntityDataChanger<>(Pig.class,
                 new BoolEntityChanger<Pig>("saddled")
@@ -82,7 +74,7 @@ public class EntityDataChanger<EntityInterface>
                     @Override
                     public void applyEntity(Pig entity, Boolean input)
                     {
-                        entity.offer(entity.getOrCreate(SaddleData.class).get().setSaddle(game.getRegistry().getItemBuilder().itemType(SADDLE).build()));
+                        entity.offer(Keys.PIG_SADDLE, input);
                     }
                 });
 
@@ -93,12 +85,7 @@ public class EntityDataChanger<EntityInterface>
                                     @Override
                                     public void applyEntity(Horse entity, Boolean input)
                                     {
-                                        Optional<SaddleData> saddleData = entity.getOrCreate(SaddleData.class);
-                                        if (saddleData.isPresent())
-                                        {
-                                            entity.offer(saddleData.get().setSaddle(
-                                                game.getRegistry().getItemBuilder().itemType(SADDLE).build()));
-                                        }
+                                        entity.offer(Keys.PIG_SADDLE, input);
                                     }
                                 });
 
@@ -108,13 +95,14 @@ public class EntityDataChanger<EntityInterface>
                         @Override
                         public void applyEntity(Ageable entity, Boolean input)
                         {
+                            // TODO how is this set?
                             if (input)
                             {
-                                entity.offer(entity.getAgeData().setBaby());
+                                entity.offer(Keys.AGE, 0);
                             }
                             else
                             {
-                                entity.offer(entity.getAgeData().setAdult());
+                                entity.offer(Keys.AGE, 1);
                             }
                         }
                     });
@@ -124,13 +112,14 @@ public class EntityDataChanger<EntityInterface>
           new BoolEntityChanger<Zombie>("villager") {
               @Override
               public void applyEntity(Zombie entity, Boolean input) {
+                  // TODO how is this set?
                   if (input)
                   {
-                      entity.offer(entity.getOrCreate(VillagerZombieData.class).get());
+                      entity.offer(Keys.AGE, 0);
                   }
                   else
                   {
-                      entity.remove(VillagerZombieData.class);
+                      entity.offer(Keys.AGE, 1);
                   }
               }
           });
@@ -140,7 +129,7 @@ public class EntityDataChanger<EntityInterface>
                     new BoolEntityChanger<Wolf>("angry") {
                         @Override
                         public void applyEntity(Wolf entity, Boolean input) {
-                            entity.setAngry(input);
+                            entity.offer(Keys.ANGRY, input);
                         }
                     });
 
@@ -149,7 +138,7 @@ public class EntityDataChanger<EntityInterface>
                           new BoolEntityChanger<ZombiePigman>("angry") {
                               @Override
                               public void applyEntity(ZombiePigman entity, Boolean input) {
-                                  entity.setAngry(input);
+                                  entity.offer(Keys.ANGRY, input);
                               }
                           });
 
@@ -158,14 +147,7 @@ public class EntityDataChanger<EntityInterface>
                     new BoolEntityChanger<Creeper>("powered", "power", "charged") {
                         @Override
                         public void applyEntity(Creeper entity, Boolean input) {
-                            if (input)
-                            {
-                                entity.offer(entity.getOrCreate(ChargedData.class).get());
-                            }
-                            else
-                            {
-                                entity.remove(ChargedData.class);
-                            }
+                            entity.offer(Keys.CREEPER_CHARGED, input);
                         }
                     });
 
@@ -174,14 +156,7 @@ public class EntityDataChanger<EntityInterface>
                     new BoolEntityChanger<Wolf>("sitting", "sit") {
                         @Override
                         public void applyEntity(Wolf entity, Boolean input) {
-                            if (input)
-                            {
-                                entity.offer(entity.getOrCreate(SittingData.class).get());
-                            }
-                            else
-                            {
-                                entity.remove(SittingData.class);
-                            }
+                            entity.offer(Keys.IS_SITTING, input);
                         }
                     });
 
@@ -190,14 +165,7 @@ public class EntityDataChanger<EntityInterface>
          new BoolEntityChanger<Ocelot>("sitting", "sit") {
              @Override
              public void applyEntity(Ocelot entity, Boolean input) {
-                 if (input)
-                 {
-                     entity.offer(entity.getOrCreate(SittingData.class).get());
-                 }
-                 else
-                 {
-                     entity.remove(SittingData.class);
-                 }
+                 entity.offer(Keys.IS_SITTING, input);
              }
          });
 
@@ -207,7 +175,7 @@ public class EntityDataChanger<EntityInterface>
              @Override
              public void applyEntity(Skeleton entity, Boolean input)
              {
-                 entity.offer(entity.getSkeletonData().setValue(input ? SkeletonTypes.WITHER : SkeletonTypes.NORMAL));
+                 entity.offer(Keys.SKELETON_TYPE, input ? SkeletonTypes.WITHER : SkeletonTypes.NORMAL);
              }
          });
 
@@ -217,14 +185,7 @@ public class EntityDataChanger<EntityInterface>
                          @Override
                          public void applyEntity(Sheep entity, Boolean input)
                          {
-                             if (input)
-                             {
-                                 entity.offer(entity.getOrCreate(ShearedData.class).get());
-                             }
-                             else
-                             {
-                                 entity.remove(ShearedData.class);
-                             }
+                             entity.offer(Keys.IS_SHEARED, input);
                          }
                      });
 
@@ -245,7 +206,7 @@ public class EntityDataChanger<EntityInterface>
                   @Override
                   public void applyEntity(Ocelot entity, OcelotType input)
                   {
-                      entity.offer(entity.getOcelotData().setValue(input));
+                      entity.offer(Keys.OCELOT_TYPE, input);
                   }
               });
 
@@ -255,12 +216,19 @@ public class EntityDataChanger<EntityInterface>
                         @Override
                         public void applyEntity(Sheep entity, DyeColor input)
                         {
-                            entity.offer(entity.getDyeData().setValue(input));
+                            entity.offer(Keys.DYE_COLOR, input);
                         }
                         @Override
                         public DyeColor getTypeValue(String input)
                         {
-                            return Match.materialData().colorData(input);
+                            for (DyeColor color : Sponge.getRegistry().getAllOf(DyeColor.class))
+                            {
+                                if (color.getName().equals(input))
+                                {
+                                    return color;
+                                }
+                            }
+                            return null;
                         }
                     });
 
@@ -273,7 +241,8 @@ public class EntityDataChanger<EntityInterface>
                      {
                          if (input)
                          {
-                             entity.offer(entity.getDyeData().setValue(randomColor));
+                             ArrayList<DyeColor> list = new ArrayList<>(Sponge.getRegistry().getAllOf(DyeColor.class));
+                             entity.offer(Keys.DYE_COLOR, list.get(random.nextInt(list.size())));
                          }
                      }
                  });
@@ -284,12 +253,19 @@ public class EntityDataChanger<EntityInterface>
                    new EntityChanger<Wolf, DyeColor>() {
                          @Override
                          public void applyEntity(Wolf entity, DyeColor input) {
-                             entity.offer(entity.getOrCreate(DyeableData.class).get().setValue(input));
+                             entity.offer(Keys.DYE_COLOR, input);
                          }
                          @Override
                          public DyeColor getTypeValue(String input)
                          {
-                             return Match.materialData().colorData(input);
+                             for (DyeColor color : Sponge.getRegistry().getAllOf(DyeColor.class))
+                             {
+                                 if (color.getName().equals(input))
+                                 {
+                                     return color;
+                                 }
+                             }
+                             return null;
                          }
                      });
 
@@ -299,13 +275,20 @@ public class EntityDataChanger<EntityInterface>
                         @Override
                         public void applyEntity(Villager entity, Career input)
                         {
-                            entity.offer(entity.getCareerData().setCareer(input));
+                            entity.offer(Keys.CAREER, input);
                         }
 
                         @Override
                         public Career getTypeValue(String input)
                         {
-                            return Match.profession().profession(input);
+                            for (Career career : Sponge.getRegistry().getAllOf(Career.class))
+                            {
+                                if (career.getName().equals(input))
+                                {
+                                    return career;
+                                }
+                            }
+                            return null;
                         }
                     });
 
@@ -315,16 +298,20 @@ public class EntityDataChanger<EntityInterface>
                         @Override
                         public void applyEntity(Enderman entity, ItemStack value)
                         {
-                            if (value.getType().isBlock())
-                            {
-                                entity.setCarriedMaterial(value.getData());
-                            }
+                            // TODO Enderman item
                         }
 
                         @Override
                         public ItemStack getTypeValue(String input)
                         {
-                            return Match.material().itemStack(input);
+                            for (ItemType item : Sponge.getRegistry().getAllOf(ItemType.class))
+                            {
+                                if (item.getName().equals(input))
+                                {
+                                    return ItemStack.of(item, 1);
+                                }
+                            }
+                            return null;
                         }
                     });
 
@@ -334,13 +321,15 @@ public class EntityDataChanger<EntityInterface>
                                                  @Override
                                                  public void applyEntity(Slime entity, Integer input)
                                                  {
-                                                     entity.offer(entity.getSlimeData().setSize(input));
+                                                     entity.offer(Keys.SLIME_SIZE, input);
                                                  }
+
+                                                 private StringMatcher sm = new StringMatcher();
 
                                                  @Override
                                                  public Integer getTypeValue(String input)
                                                  {
-                                                     String match = Match.string().matchString(input, "tiny", "small", "big");
+                                                     String match = sm.matchString(input, "tiny", "small", "big");
                                                      if (match != null)
                                                      {
                                                          switch (match)
@@ -371,10 +360,8 @@ public class EntityDataChanger<EntityInterface>
                         @Override
                         public void applyEntity(Living entity, Integer input)
                         {
-                            HealthData healthData = entity.getHealthData();
-                            healthData.setMaxHealth(input);
-                            healthData.setHealth(input);
-                            entity.offer(healthData);
+                            entity.offer(Keys.MAX_HEALTH, input.doubleValue());
+                            entity.offer(Keys.HEALTH, input.doubleValue());
                         }
 
                         @Override
@@ -399,7 +386,7 @@ public class EntityDataChanger<EntityInterface>
                                     @Override
                                     public void applyEntity(Horse entity, Integer input)
                                     {
-                                        entity.setJumpStrength(input);
+                                        // TODO jumpstrength
                                     }
 
                                     @Override
@@ -429,7 +416,7 @@ public class EntityDataChanger<EntityInterface>
                                     @Override
                                     public void applyEntity(Living entity, Double input)
                                     {
-                                        BukkitUtils.setEntitySpeed(entity, input);
+                                        // TODO set Entity Speed
                                     }
 
                                     @Override
@@ -468,7 +455,7 @@ public class EntityDataChanger<EntityInterface>
                                     @Override
                                     public void applyEntity(Living entity, String input)
                                     {
-                                        entity.getOrCreate(DisplayNameData.class).get().setDisplayName(fromLegacy(input, '&'));
+                                        entity.offer(Keys.DISPLAY_NAME, TextSerializers.FORMATTING_CODE.deserialize(input));
                                     }
 
                                     @Override
@@ -482,36 +469,42 @@ public class EntityDataChanger<EntityInterface>
                                     }
                                 });
 
-    public static final EntityDataChanger<Tameable> TAMEABLE =
-        new EntityDataChanger<>(Tameable.class,
-                        new BoolEntityChanger<Tameable>("tamed") {
+    public static final EntityDataChanger<Entity> TAMEABLE =
+        new EntityDataChanger<>(Entity.class,
+                        new BoolEntityChanger<Entity>("tamed") {
                             @Override
-                            public void applyEntity(Tameable entity, Boolean value) {
-                                entity.setTamed(value);
+                            public void applyEntity(Entity entity, Boolean value) {
+                                if (entity.supports(Keys.TAMED_OWNER))
+                                {
+                                    entity.offer(Keys.TAMED_OWNER, java.util.Optional.empty());
+                                }
                             }
                         });
 
-    public static final EntityDataChanger<Tameable> TAMER =
-        new EntityDataChanger<>(Tameable.class,
-                                new EntityChanger<Tameable, AnimalTamer>() {
+    public static final EntityDataChanger<Entity> TAMER =
+        new EntityDataChanger<>(Entity.class,
+                                new EntityChanger<Entity, User>() {
                                     @Override
-                                    public void applyEntity(Tameable entity, AnimalTamer value) {
-                                        entity.setOwner(value);
+                                    public void applyEntity(Entity entity, User value) {
+                                        if (entity.supports(Keys.TAMED_OWNER))
+                                        {
+                                            entity.offer(Keys.TAMED_OWNER, java.util.Optional.of(value.getUniqueId()));
+                                        }
                                     }
 
                                     @Override
-                                    public AnimalTamer getTypeValue(String input)
+                                    public User getTypeValue(String input)
                                     {
                                         if (input.startsWith("tamer_"))
                                         {
                                             String userName = input.substring(6, input.length());
-                                            User user = CubeEngine.getUserManager().findUser(userName);
-                                            return user;
+                                            return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(userName).orElse(null);
                                         }
                                         return null;
                                     }
                                 });
 
+    /* TODO eventually #tm)
     public static final EntityDataChanger<Living> ARMOR_CHESTPLATE =
         new EntityDataChanger<>(Living.class,
                                 new EntityChanger<Living, ItemStack>() {
@@ -640,6 +633,7 @@ public class EntityDataChanger<EntityInterface>
                                         }
                                     }
                                 });
+                */
 
     public static final EntityDataChanger<Horse> HORSE_COLOR =
         new EntityDataChanger<>(Horse.class,
@@ -659,7 +653,7 @@ public class EntityDataChanger<EntityInterface>
                                     @Override
                                     public void applyEntity(Horse entity, HorseColor input)
                                     {
-                                        entity.offer(entity.getHorseData().setColor(input));
+                                        entity.offer(Keys.HORSE_COLOR, input);
                                     }
                                 });
 
@@ -679,7 +673,7 @@ public class EntityDataChanger<EntityInterface>
                                     @Override
                                     public void applyEntity(Horse entity, HorseVariant input)
                                     {
-                                        entity.offer(entity.getHorseData().setVariant(input));
+                                        entity.offer(Keys.HORSE_VARIANT, input);
                                     }
                                 });
 
@@ -699,7 +693,7 @@ public class EntityDataChanger<EntityInterface>
                                     @Override
                                     public void applyEntity(Horse entity, HorseStyle input)
                                     {
-                                        entity.offer(entity.getHorseData().setStyle(input));
+                                        entity.offer(Keys.HORSE_STYLE, input);
                                     }
                                 });
 
