@@ -27,7 +27,6 @@
 
   <modules>
     <module>conomy</module>
-    <module>basics</module>
     <module>roles</module>
     <module>travel</module>
     <module>locker</module>

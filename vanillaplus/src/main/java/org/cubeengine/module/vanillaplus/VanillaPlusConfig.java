@@ -49,7 +49,7 @@ public class VanillaPlusConfig extends ReflectedYaml
 
     public static class Improvments implements Section
     {
-        @Comment("Adds /remove as an alternative for killing non linving entities only")
+        @Comment("Adds /remove as an alternative for killing non living entities only")
         public boolean commandRemove = true;
         public int commandRemoveDefaultRadius = 20;
 
