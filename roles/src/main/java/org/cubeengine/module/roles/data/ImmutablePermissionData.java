@@ -41,6 +41,7 @@ public class ImmutablePermissionData extends AbstractImmutableData<ImmutablePerm
         this.parents = parents;
         this.permissions = permissions;
         this.options = options;
+        registerGetters();
     }
 
     private ImmutableMapValue<String, String> options()

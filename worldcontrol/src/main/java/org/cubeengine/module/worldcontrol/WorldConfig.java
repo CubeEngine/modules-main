@@ -98,6 +98,20 @@ public class WorldConfig extends ReflectedYaml
     @Comment("The world where EndPortals will lead to. (This won't work in a nether world)")
     public String endTarget;
 
+
+    @Comment({"The gamemode to enforce in every world of this universe",
+              "Players with the keep gamemode permission ignore this",
+              "leave empty to configure the gamemode for each world individually"})
+    public GameMode enforceGameMode = null;
+
+    @Comment({"Players will keep their gamemode when changing worlds in this universe",
+              "You should set this to false if players cannot change their gamemode in this universe"})
+    public boolean keepGameMode = false; // if false can use perm
+
+    @Comment("Players will keep their flymode when changing worlds in this universe")
+    public boolean keepFlyMode = false; // if false can use perm
+
+
     public void applyToWorld(World world) // TODO how can this be implemented in sponge?
     {// TODO if anything is null take from world ; update inheritance & save
         /*

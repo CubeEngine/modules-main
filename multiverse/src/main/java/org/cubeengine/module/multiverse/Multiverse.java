@@ -1,27 +1,47 @@
+/**
+ * This file is part of CubeEngine.
+ * CubeEngine is licensed under the GNU General Public License Version 3.
+ *
+ * CubeEngine is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * CubeEngine is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
+ */
 package org.cubeengine.module.multiverse;
 
 
-import de.cubeisland.engine.converter.ConverterManager;
-import de.cubeisland.engine.logscribe.Log;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
+import javax.inject.Inject;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.reflect.Reflector;
-import de.cubeisland.engine.reflect.codec.nbt.NBTCodec;
-import org.cubeengine.service.event.EventManager;
-import org.cubeengine.module.multiverse.converter.InventoryConverter;
-import org.cubeengine.module.multiverse.converter.PotionEffectConverter;
+import org.cubeengine.module.multiverse.player.ImmutableMultiverseData;
+import org.cubeengine.module.multiverse.player.MultiverseData;
+import org.cubeengine.module.multiverse.player.MultiverseDataBuilder;
 import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.event.EventManager;
+import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.permission.PermissionManager;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.effect.potion.PotionEffect;
-import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.service.permission.PermissionDescription;
+import org.cubeengine.service.world.ConfigWorld;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.world.World;
 
-import javax.inject.Inject;
-import java.io.IOException;
-import java.nio.file.Path;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Group Worlds into Universes
@@ -41,30 +61,86 @@ import java.nio.file.Path;
 @ModuleInfo(name = "Multiverse", description = "Group worlds into universes")
 public class Multiverse extends Module
 {
-    @Inject private Game game;
     @Inject private CommandManager cm;
     @Inject private EventManager em;
     @Inject private I18n i18n;
     @Inject private Reflector reflector;
     @Inject private PermissionManager pm;
+    @ModuleConfig private MultiverseConfig config;
+
+    public Multiverse()
+    {
+        Sponge.getDataManager().register(MultiverseData.class, ImmutableMultiverseData.class, new MultiverseDataBuilder());
+    }
 
     @Enable
     public void onEnable() throws IOException
     {
-        ConverterManager manager = reflector.getDefaultConverterManager();
-///*TODO remove saving into yml too
-        manager.registerConverter(new InventoryConverter(game), Inventory.class);
-        manager.registerConverter(new PotionEffectConverter(), PotionEffect.class);
-//*/
-        NBTCodec codec = reflector.getCodecManager().getCodec(NBTCodec.class);
-        manager = codec.getConverterManager();
-        manager.registerConverter(new InventoryConverter(game), Inventory.class);
-        manager.registerConverter(new PotionEffectConverter(), PotionEffect.class);
 
-        UniverseManager um = new UniverseManager(this, getProvided(Path.class), getProvided(Log.class), reflector, pm);
-        cm.addCommand(new MultiverseCommands(this, um, i18n, game));
-        em.registerListener(this, new MultiverseListener());
-
+        cm.addCommand(new MultiverseCommands(this, i18n));
+        em.registerListener(this, new MultiverseListener(this));
     }
 
+    public MultiverseConfig getConfig()
+    {
+        return config;
+    }
+
+    public String getUniverse(World world)
+    {
+        for (Entry<String, List<ConfigWorld>> entry : config.universes.entrySet())
+        {
+            for (ConfigWorld cWorld : entry.getValue())
+            {
+                if (cWorld.getWorld().equals(world))
+                {
+                    return entry.getKey();
+                }
+            }
+        }
+
+        if (config.autoDetectUnivserse)
+        {
+            if (world.getName().contains("_"))
+            {
+                String name = world.getName().substring(0, world.getName().indexOf("_"));
+                List<ConfigWorld> list = config.universes.get(name);
+                if (list == null)
+                {
+                    list = new ArrayList<>();
+                    config.universes.put(name, list);
+                }
+                list.add(new ConfigWorld(world));
+                config.save();
+                return name;
+            }
+        }
+
+        List<ConfigWorld> list = config.universes.get("unknown");
+        if (list == null)
+        {
+            list = new ArrayList<>();
+            config.universes.put("unknown", list);
+        }
+        list.add(new ConfigWorld(world));
+        config.save();
+        return "unknown";
+    }
+
+    public void setUniverse(World world, String universe)
+    {
+        ConfigWorld cWorld = new ConfigWorld(world);
+        for (List<ConfigWorld> list : config.universes.values())
+        {
+            list.remove(cWorld);
+        }
+        List<ConfigWorld> list = config.universes.get(universe);
+        if (list == null)
+        {
+            list = new ArrayList<>();
+            config.universes.put(universe, list);
+        }
+        list.add(cWorld);
+        config.save();
+    }
 }

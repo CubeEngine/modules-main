@@ -15,14 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.multiverse.player;
+package org.cubeengine.module.multiverse;
 
-import org.cubeengine.service.world.ConfigWorld;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.cubeengine.service.world.ConfigWorld;
 
 @SuppressWarnings("all")
-public class PlayerConfig extends ReflectedYaml
+public class MultiverseConfig extends ReflectedYaml
 {
-    public ConfigWorld lastWorld;
-    public String lastName;
+    public Map<String, List<ConfigWorld>> universes = new HashMap<>();
+    public boolean autoDetectUnivserse = true;
 }
