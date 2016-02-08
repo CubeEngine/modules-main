@@ -81,7 +81,7 @@ public class SpawnCommands
             direction = ((Player)context).getRotation();
         }
         em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location<>(world, x, y, z), direction, context));
-        world.getWorldStorage().getWorldProperties().setSpawnPosition(new Vector3i(x, y, z));
+        world.getProperties().setSpawnPosition(new Vector3i(x, y, z));
         i18n.sendTranslated(context, POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new BlockVector3(x, y, z));
     }
 
