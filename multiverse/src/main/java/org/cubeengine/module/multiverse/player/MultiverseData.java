@@ -27,6 +27,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
+import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.manipulator.mutable.common.AbstractData;
@@ -38,7 +39,7 @@ import org.spongepowered.api.world.World;
 
 public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiverseData> implements IMultiverseData
 {
-    public static final Key<Value<String>> WORLD = KeyFactory.makeSingleKey(String.class, BaseValue.class, DataQuery.of("currentworld"));
+    public static final Key<Value<String>> WORLD = KeyFactory.makeSingleKey(String.class, BaseValue.class, DataQuery.of("current"));
     public static final Key<MapValue<String, DataContainer>> DATA = KeyFactory.makeMapKey(String.class, DataContainer.class, DataQuery.of("playerdata"));
 
     public String currentUniverse;
@@ -84,8 +85,17 @@ public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiv
     @SuppressWarnings("unchecked")
     public Optional<MultiverseData> from(DataContainer container)
     {
-        return apply(container.getString(WORLD.getQuery()),
-                     (Optional<Map<String, DataContainer>>)container.getMap(DATA.getQuery()));
+        Optional<DataView> data = container.getView(DATA.getQuery());
+        if (data.isPresent())
+        {
+            Map<String, DataContainer> map = new HashMap<>();
+            for (DataQuery key : data.get().getKeys(false))
+            {
+                map.put(key.asString("."), data.get().getView(key).get().copy());
+            }
+            return apply(container.getString(WORLD.getQuery()), Optional.of(map));
+        }
+        return Optional.empty();
     }
 
     @Override

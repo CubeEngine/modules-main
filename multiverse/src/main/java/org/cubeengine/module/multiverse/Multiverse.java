@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
@@ -61,11 +62,11 @@ import static java.util.stream.Collectors.toList;
 @ModuleInfo(name = "Multiverse", description = "Group worlds into universes")
 public class Multiverse extends Module
 {
+    public static final String UNKNOWN = "unknown";
     @Inject private CommandManager cm;
     @Inject private EventManager em;
     @Inject private I18n i18n;
-    @Inject private Reflector reflector;
-    @Inject private PermissionManager pm;
+    @Inject private Log log;
     @ModuleConfig private MultiverseConfig config;
 
     public Multiverse()
@@ -76,7 +77,6 @@ public class Multiverse extends Module
     @Enable
     public void onEnable() throws IOException
     {
-
         cm.addCommand(new MultiverseCommands(this, i18n));
         em.registerListener(this, new MultiverseListener(this));
     }
@@ -111,20 +111,22 @@ public class Multiverse extends Module
                     config.universes.put(name, list);
                 }
                 list.add(new ConfigWorld(world));
+                log.info("Added {} to the universe {}", world.getName(), name);
                 config.save();
                 return name;
             }
         }
 
-        List<ConfigWorld> list = config.universes.get("unknown");
+        List<ConfigWorld> list = config.universes.get(UNKNOWN);
         if (list == null)
         {
             list = new ArrayList<>();
-            config.universes.put("unknown", list);
+            config.universes.put(UNKNOWN, list);
         }
         list.add(new ConfigWorld(world));
+        log.info("Added {} to the universe {}", world.getName(), UNKNOWN);
         config.save();
-        return "unknown";
+        return UNKNOWN;
     }
 
     public void setUniverse(World world, String universe)

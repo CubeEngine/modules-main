@@ -63,7 +63,7 @@ public class MultiverseListener
         }
     }
 
-    @Listener(order = Order.EARLY)
+    @Listener
     public void onJoin(ClientConnectionEvent.Join event)
     {
         Player player = event.getTargetEntity();

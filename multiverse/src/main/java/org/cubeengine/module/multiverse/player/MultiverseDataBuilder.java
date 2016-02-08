@@ -41,6 +41,6 @@ public class MultiverseDataBuilder implements DataManipulatorBuilder<MultiverseD
     @Override
     public Optional<MultiverseData> build(DataView container) throws InvalidDataException
     {
-        return create().from(container.getContainer());
+        return create().from(container.copy());
     }
 }
