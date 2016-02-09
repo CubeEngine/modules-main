@@ -25,11 +25,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.trait.IntegerTrait;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
+import org.spongepowered.api.data.MemoryDataView;
 import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.KeyFactory;
@@ -104,17 +106,20 @@ public class PlayerData implements DataSerializable
         this.exp = value.getInt(EXP.getQuery()).get();
         this.lvl = value.getInt(LVL.getQuery()).get();
         this.fireTicks = value.getInt(FIRE_TICKS.getQuery()).get();
-        this.activePotionEffects = value.getSerializableList(ACTIVE_EFFECTS.getQuery(), PotionEffect.class).get();
-        // TODO maybe we need a map slot->item instead
+        this.activePotionEffects = value.getSerializableList(ACTIVE_EFFECTS.getQuery(), PotionEffect.class).orElse(new ArrayList<>());
+
         inventory.clear();
-        for (Entry<Integer, DataView> entry : ((Map<Integer, DataView>)value.getMap(INVENTORY.getQuery()).get()).entrySet())
+        DataView inventoryView = value.getView(INVENTORY.getQuery()).get();
+        for (DataQuery key : inventoryView.getKeys(false))
         {
-            inventory.put(entry.getKey(), ItemStack.builder().fromContainer(entry.getValue()).build());
+            inventory.put(Integer.valueOf(key.asString("")), ItemStack.builder().fromContainer(inventoryView.getView(key).get()).build());
         }
+
         enderChest.clear();
-        for (Entry<Integer, DataView> entry : ((Map<Integer, DataView>)value.getMap(ENDER_INVENTORY.getQuery()).get()).entrySet())
+        inventoryView = value.getView(ENDER_INVENTORY.getQuery()).orElse(new MemoryDataContainer());
+        for (DataQuery key : inventoryView.getKeys(false))
         {
-            enderChest.put(entry.getKey(), ItemStack.builder().fromContainer(entry.getValue()).build());
+            enderChest.put(Integer.valueOf(key.asString("")), ItemStack.builder().fromContainer(inventoryView.getView(key).get()).build());
         }
 
         this.gameMode = Sponge.getRegistry().getType(GameMode.class, value.getString(GAMEMODE.getQuery()).get()).get();

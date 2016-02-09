@@ -18,6 +18,7 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.HashMap;
+import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.module.multiverse.player.PlayerData;
 import org.spongepowered.api.entity.Entity;
@@ -56,6 +57,7 @@ public class MultiverseListener
             data.from(module.getUniverse(from), from).applyFromPlayer(((Player)target)); // save playerdata
             data.from(module.getUniverse(to), to).applyToPlayer(((Player)target)); // load playerdata
             target.offer(data);
+            module.getProvided(Log.class).info("{} entered the universe {}", ((Player)target).getName(), module.getUniverse(to));
         }
         else
         {
