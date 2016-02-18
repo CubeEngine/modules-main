@@ -57,6 +57,7 @@ public class ManagementCommands extends ContainerCommand
         service.getGroupSubjects().reload();
         service.getUserSubjects().reload();
         // TODO remove cached data
+        // TODO adding mirrors in file -> manload is not working
         context.sendTranslated(POSITIVE, "{text:Roles} reload complete!");
     }
 

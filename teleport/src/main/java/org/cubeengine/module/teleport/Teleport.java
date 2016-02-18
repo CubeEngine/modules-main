@@ -38,6 +38,7 @@ import org.cubeengine.service.user.Broadcaster;
 @ModuleInfo(name = "Teleport", description = "Better Teleportation")
 public class Teleport extends Module
 {
+    // TODO make override of vanilla-commands optional
     @Inject private CommandManager cm;
     @Inject private EventManager em;
     @Inject private TaskManager tm;
