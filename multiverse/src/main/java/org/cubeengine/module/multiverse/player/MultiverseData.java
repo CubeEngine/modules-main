@@ -55,18 +55,19 @@ public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiv
     @Override
     protected void registerGettersAndSetters()
     {
-        registerFieldGetter(WORLD, MultiverseData.this::getCurrentUniverse);
-        registerFieldSetter(WORLD, MultiverseData.this::setCurrentUniverse);
-        registerKeyValue(WORLD, MultiverseData.this::currentWorld);
+        registerFieldGetter(WORLD, this::getCurrentUniverse);
+        registerFieldSetter(WORLD, this::setCurrentUniverse);
+        registerKeyValue(WORLD, this::currentWorld);
 
-        registerFieldGetter(DATA, MultiverseData.this::getPlayerData);
-        registerFieldSetter(DATA, MultiverseData.this::setPlayerData);
-        registerKeyValue(DATA, MultiverseData.this::playerData);
+        registerFieldGetter(DATA, this::getPlayerData);
+        registerFieldSetter(DATA,this::setPlayerData);
+        registerKeyValue(DATA, this::playerData);
     }
 
     @Override
     public Optional<MultiverseData> fill(DataHolder dataHolder, MergeFunction overlap)
     {
+        // TODO mergeFunction
         return apply(dataHolder.get(WORLD), dataHolder.get(DATA));
     }
 

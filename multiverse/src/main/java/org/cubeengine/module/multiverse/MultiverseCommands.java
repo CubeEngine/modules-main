@@ -18,15 +18,20 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
@@ -69,6 +74,40 @@ public class MultiverseCommands extends ContainerCommand
                 i18n.sendTranslated(p, NEUTRAL, "When you open your eyes you now are in {input#univserse}.", universe);
                 p.offer(data);
             });
+    }
+
+    @Command(desc = "Lists all known universes")
+    public void list(CommandSource context)
+    {
+        Set<Entry<String, List<ConfigWorld>>> universes = module.getConfig().universes.entrySet();
+        if (universes.isEmpty())
+        {
+            i18n.sendTranslated(context, NEUTRAL, "There is no universe yet.");
+            return;
+        }
+        i18n.sendTranslated(context, POSITIVE, "The following univserses exits:");
+        for (Entry<String, List<ConfigWorld>> entry : universes)
+        {
+            context.sendMessage(Text.of(entry.getKey(), ":"));
+            for (ConfigWorld world : entry.getValue())
+            {
+                context.sendMessage(Text.of(" - ", world.getName()));
+            }
+        }
+    }
+
+    @Command(desc = "Renames a universe")
+    public void rename(CommandSource context, String universe, String newName)
+    {
+        List<ConfigWorld> worlds = module.getConfig().universes.remove(universe);
+        if (worlds == null)
+        {
+            i18n.sendTranslated(context, NEGATIVE, "There is no universe named {}", universe);
+            return;
+        }
+        i18n.sendTranslated(context, POSITIVE, "Renamed universe {input} to {input}", universe, newName);
+        module.getConfig().universes.put(newName, worlds);
+        module.getConfig().save();
     }
 
 }
