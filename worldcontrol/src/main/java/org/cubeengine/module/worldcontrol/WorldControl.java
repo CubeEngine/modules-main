@@ -17,20 +17,38 @@
  */
 package org.cubeengine.module.worldcontrol;
 
-/**
- * Nether Portal Control / Targetworld and scale
- * End Portal Control / Targetworld and maybe spawnpos?
- *
- * pvp settings
- *
- * spawn rates for mobs?
- *
- * bedspawn control? maybe smth for spawn module better?
- *
- * access control via permissions
- *
- * keep fly / game mode when changing worlds
- */
-public class WorldControl
+import java.util.Map.Entry;
+import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
+import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.modularity.core.marker.Enable;
+import org.cubeengine.module.worldcontrol.WorldControlConfig.WorldSection;
+import org.cubeengine.service.filesystem.ModuleConfig;
+import org.cubeengine.service.world.ConfigWorld;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
+
+@ModuleInfo(name = "WorldControl", description = "Control what happens in your world")
+public class WorldControl extends Module
 {
+    @ModuleConfig private WorldControlConfig config;
+
+    @Enable
+    public void onEnable()
+    {
+        for (Entry<ConfigWorld, WorldSection> entry : config.worldSettings.entrySet())
+        {
+            entry.getKey().getWorld().getProperties().setPVPEnabled(entry.getValue().pvp);
+        }
+    }
+
+    @Listener
+    public void onSpawnEntity(SpawnEntityEvent event)
+    {
+        WorldSection section = config.worldSettings.get(new ConfigWorld(event.getTargetWorld()));
+        if (section != null)
+        {
+
+        }
+    }
 }
