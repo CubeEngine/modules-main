@@ -22,13 +22,16 @@ import java.util.Collection;
 import java.util.List;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.cubeengine.service.command.readers.UserListInSight;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.permission.PermissionContainer;
 import org.cubeengine.service.user.UserList;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.weather.WeatherEffect;
@@ -62,7 +65,7 @@ public class KillCommands extends PermissionContainer<VanillaPlus>
     public final PermissionDescription COMMAND_KILL_NOTIFY = register("notify", "Shows who killed you", COMMAND_KILL);
 
     @Command(alias = "slay", desc = "Kills a player")
-    public void kill(CommandSource context, UserList players, // TODO default line of sight player
+    public void kill(CommandSource context, @Default(UserListInSight.class) UserList players,
                      @Flag boolean force, @Flag boolean quiet, @Flag boolean lightning)
     {
         lightning = lightning && context.hasPermission(COMMAND_KILL_LIGHTNING.getId());
@@ -102,9 +105,8 @@ public class KillCommands extends PermissionContainer<VanillaPlus>
     {
         if (!force)
         {
-            if (player.hasPermission(COMMAND_KILL_PREVENT.getId())) // TODO also check "creative/godmode"
+            if (player.hasPermission(COMMAND_KILL_PREVENT.getId()) || player.get(Keys.INVULNERABILITY).isPresent())
             {
-
                 i18n.sendTranslated(context, NEGATIVE, "You cannot kill {user}!", player);
                 return false;
             }
@@ -128,7 +130,7 @@ public class KillCommands extends PermissionContainer<VanillaPlus>
 
 
     @Command(desc = "Kills yourself")
-    @Restricted(value = Player.class, msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}") // TODO replace User.class /w interface that has life stuff?
+    @Restricted(value = Player.class, msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}")
     public void suicide(Player context)
     {
         context.damage(context.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(DamageTypes.CUSTOM).build(), Cause.of(context));

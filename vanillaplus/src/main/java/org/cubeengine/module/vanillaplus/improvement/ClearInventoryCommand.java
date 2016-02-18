@@ -27,6 +27,9 @@ import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
+import org.spongepowered.api.item.inventory.property.ArmorSlotType;
+import org.spongepowered.api.item.inventory.type.InventoryRow;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
@@ -79,14 +82,10 @@ public class ClearInventoryCommand extends PermissionContainer<VanillaPlus>
                 return;
             }
         }
-        player.getInventory().clear(); // TODO will this clear armor too
+        player.getInventory().query(InventoryRow.class).clear();
         if (removeArmor)
         {
-            // TODO is this needed?
-            player.setBoots(null);
-            player.setLeggings(null);
-            player.setChestplate(null);
-            player.setHelmet(null);
+            player.getInventory().query(EquipmentInventory.class).clear();
         }
         if (self)
         {

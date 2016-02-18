@@ -71,8 +71,12 @@ public class MovementCommands extends PermissionContainer<VanillaPlus>
         if (speed >= 0 && speed <= 10)
         {
             player.offer(Keys.WALKING_SPEED, speed / 10.0);
+            if (other)
+            {
+                i18n.sendTranslated(player, POSITIVE, "{user} can now walk at {decimal:2}!", player, speed);
+                return;
+            }
             i18n.sendTranslated(player, POSITIVE, "You can now walk at {decimal:2}!", speed);
-            // TODO msg for other player
             return;
         }
         player.offer(Keys.WALKING_SPEED, 0.2);
@@ -131,6 +135,7 @@ public class MovementCommands extends PermissionContainer<VanillaPlus>
             }
             return;
         }
+        player.offer(IS_FLYING, false);
         i18n.sendTranslated(player, NEUTRAL, "You cannot fly anymore!");
         if (!player.equals(context))
         {

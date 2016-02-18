@@ -44,8 +44,8 @@ public class DifficultyCommand
     {
         if (difficulty != null)
         {
-            world.getProperties().setDifficulty(difficulty); // TODO is this saved?
-            i18n.sendTranslated(context, POSITIVE, "The difficulty has been successfully set!");
+            world.getProperties().setDifficulty(difficulty);
+            i18n.sendTranslated(context, POSITIVE, "The difficulty has been set to {input}!", difficulty.getTranslation());
             return;
         }
         i18n.sendTranslated(context, POSITIVE, "Current difficulty level: {input}", world.getDifficulty().getName());

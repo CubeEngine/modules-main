@@ -35,6 +35,7 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Type;
+import org.spongepowered.api.item.inventory.type.InventoryRow;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
@@ -141,7 +142,7 @@ public class ItemCommands extends PermissionContainer<VanillaPlus>
 
     @Command(desc = "Refills the stack in hand")
     @Restricted(value = Player.class, msg = "You can't get enough of it, can you?")
-    public void more(Player context, @Optional Integer amount, @Flag boolean all) // TODO staticvalues staticValues = "*",
+    public void more(Player context, @Optional Integer amount, @Flag boolean all)
     {
         if (all)
         {
@@ -188,11 +189,16 @@ public class ItemCommands extends PermissionContainer<VanillaPlus>
     public void stack(Player context)
     {
         boolean allow64 = context.hasPermission(COMMAND_STACK_FULLSTACK.getId());
-        ItemStack[] items = new ItemStack[context.getInventory().capacity()];
+        allow64 = false; // TODO this is currently not working /w Sponge
+        Inventory rows = context.getInventory().query(InventoryRow.class);
+        ItemStack[] items = new ItemStack[rows.capacity()];
         int slotIndex = 0;
-        for (Inventory slot : context.getInventory().slots())
+        for (Inventory row : rows)
         {
-            items[slotIndex] = slot.peek().orElse(null);
+            for (Inventory slot : row.slots())
+            {
+                items[slotIndex++] = slot.peek().orElse(null);
+            }
         }
 
         int size = items.length;
@@ -240,9 +246,20 @@ public class ItemCommands extends PermissionContainer<VanillaPlus>
         if (changed)
         {
             int i = 0;
-            for (Inventory slot : context.getInventory().slots())
+            for (Inventory row : rows)
             {
-                slot.set(items[i++]);
+                for (Inventory slot : row.slots())
+                {
+                    ItemStack item = items[i++];
+                    if (item == null)
+                    {
+                        slot.clear();
+                    }
+                    else
+                    {
+                        slot.set(item);
+                    }
+                }
             }
             i18n.sendTranslated(context, POSITIVE, "Items stacked together!");
             return;

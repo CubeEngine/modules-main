@@ -32,6 +32,7 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.data.key.Keys.GAME_MODE;
 import static org.spongepowered.api.entity.living.player.gamemode.GameModes.ADVENTURE;
 import static org.spongepowered.api.entity.living.player.gamemode.GameModes.CREATIVE;
 import static org.spongepowered.api.entity.living.player.gamemode.GameModes.SURVIVAL;
@@ -40,15 +41,7 @@ public class GameModeCommand extends PermissionContainer<VanillaPlus>
 {
     private I18n i18n;
 
-    private final PermissionDescription COMMAND_GAMEMODE = register("command.gamemode", "", null);
-    public final PermissionDescription COMMAND_GAMEMODE_OTHER = register("other",
-                                                                         "Allows to change the game-mode of other players too",
-                                                                         COMMAND_GAMEMODE);
-
-    // TODO is this even used?
-    public final PermissionDescription COMMAND_GAMEMODE_KEEP = register("keep",
-                                                                        "Without this PermissionDescription the players game-mode will be reset when leaving the server or changing the world",
-                                                                        COMMAND_GAMEMODE);
+    public final PermissionDescription COMMAND_GAMEMODE_OTHER = register("command.gamemode.other", "Allows to change the game-mode of other players too", null);
 
     public GameModeCommand(VanillaPlus module, I18n i18n)
     {
@@ -68,9 +61,9 @@ public class GameModeCommand extends PermissionContainer<VanillaPlus>
         GameMode newMode = getGameMode(gamemode);
         if (newMode == null)
         {
-            newMode = toggleGameMode(player.get(Keys.GAME_MODE).get());
+            newMode = toggleGameMode(player.get(GAME_MODE).get());
         }
-        player.offer(Keys.GAME_MODE, newMode);
+        player.offer(GAME_MODE, newMode);
         if (context.equals(player))
         {
             i18n.sendTranslated(context, POSITIVE, "You changed your game mode to {input#gamemode}!", newMode.getTranslation());

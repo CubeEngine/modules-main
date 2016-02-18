@@ -34,8 +34,12 @@ import org.cubeengine.module.vanillaplus.addition.StashCommand;
 import org.cubeengine.module.vanillaplus.addition.SudoCommand;
 import org.cubeengine.module.vanillaplus.addition.UnlimitedItems;
 import org.cubeengine.module.vanillaplus.fix.ColoredSigns;
-import org.cubeengine.module.vanillaplus.fix.FixListener;
+import org.cubeengine.module.vanillaplus.fix.FlymodeFixListener;
+import org.cubeengine.module.vanillaplus.fix.ImmutableSafeLoginData;
+import org.cubeengine.module.vanillaplus.fix.OverstackedListener;
 import org.cubeengine.module.vanillaplus.fix.PaintingListener;
+import org.cubeengine.module.vanillaplus.fix.SafeLoginData;
+import org.cubeengine.module.vanillaplus.fix.SafeLoginDataBuilder;
 import org.cubeengine.module.vanillaplus.fix.TamedListener;
 import org.cubeengine.module.vanillaplus.improvement.ClearInventoryCommand;
 import org.cubeengine.module.vanillaplus.improvement.DifficultyCommand;
@@ -66,6 +70,7 @@ import org.cubeengine.service.matcher.TimeMatcher;
 import org.cubeengine.service.matcher.WorldMatcher;
 import org.cubeengine.service.task.TaskManager;
 import org.cubeengine.service.user.Broadcaster;
+import org.spongepowered.api.Sponge;
 
 /**
  * A module to improve vanilla commands:
@@ -128,6 +133,11 @@ public class VanillaPlus extends Module
     @ModuleConfig private VanillaPlusConfig config;
     @Inject private EventManager evm;
     @Inject private StringMatcher sm;
+
+    public VanillaPlus()
+    {
+        Sponge.getDataManager().register(SafeLoginData.class, ImmutableSafeLoginData.class, new SafeLoginDataBuilder());
+    }
 
     @Enable
     public void onEnable()
@@ -199,7 +209,11 @@ public class VanillaPlus extends Module
         }
         if (config.fix.preventOverstackedItems)
         {
-            evm.registerListener(this, new FixListener(this));
+            evm.registerListener(this, new OverstackedListener(this));
+        }
+        if (config.fix.safeLogin)
+        {
+            evm.registerListener(this, new FlymodeFixListener());
         }
         if (config.fix.paintingSwitcher)
         {
@@ -263,7 +277,7 @@ public class VanillaPlus extends Module
         }
         if (config.improve.commandStop)
         {
-            cm.addCommands(this, new StopCommand());
+            cm.addCommands(this, new StopCommand(this));
         }
         if (config.improve.commandTime)
         {

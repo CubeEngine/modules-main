@@ -19,10 +19,14 @@ package org.cubeengine.module.vanillaplus.fix;
 
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.permission.PermissionContainer;
+import org.spongepowered.api.data.manipulator.mutable.entity.FlyingData;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 /**
@@ -30,39 +34,16 @@ import org.spongepowered.api.service.permission.PermissionDescription;
  * <p></p>
  * Prevents placing overstacked items into anvil or brewingstands
  */
-public class FixListener extends PermissionContainer<VanillaPlus>
+public class OverstackedListener extends PermissionContainer<VanillaPlus>
 {
-    public FixListener(VanillaPlus module)
+    public OverstackedListener(VanillaPlus module)
     {
         super(module);
     }
 
     public final PermissionDescription OVERSTACKED_ANVIL_AND_BREWING = register("allow-overstacked-anvil-and-brewing", "", null);
 
-    /* TODO is this still needed?
-    @Listener(order = EARLY)
-    public void join(final ClientConnectionEvent.Join event)
-    {
-        // TODO set persisted flymode
-        Player player = event.getTargetEntity();
-        if (player.getGameModeData().type().get() != CREATIVE &&
-            module.perms().COMMAND_FLY_KEEP.isAuthorized(player))
-        {
-            player.offer(player.getOrCreate(FlyingData.class).get());
-        }
-    }
 
-    @Listener(order = FIRST)
-    public void quit(final ClientConnectionEvent.Disconnect event)
-    {
-        Player player = event.getTargetEntity();
-        if (player.getGameModeData().type().get() != CREATIVE &&
-            player.getData(FlyingData.class).isPresent() && module.perms().COMMAND_FLY_KEEP.isAuthorized(player))
-        {
-            // TODO set persisted flymode
-        }
-    }
-    */
 
     @Listener
     public void onPlayerInventoryClick(ClickInventoryEvent event, @First Player player)

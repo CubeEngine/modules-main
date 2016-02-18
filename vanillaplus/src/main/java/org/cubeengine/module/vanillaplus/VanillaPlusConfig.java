@@ -38,6 +38,9 @@ public class VanillaPlusConfig extends ReflectedYaml
             + "Turning this on prevents putting unsafe Itemstacks into these inventories")
         public boolean preventOverstackedItems = true;
 
+        @Comment("Retaints fly-mode on login")
+        public boolean safeLogin = true;
+
         @Comment("Right click on a painting allows switching the painting with the mouse wheel")
         public boolean paintingSwitcher = true;
 
@@ -98,6 +101,8 @@ public class VanillaPlusConfig extends ReflectedYaml
 
         @Comment("Improves /stop including a kick reason for the players")
         public boolean commandStop = true;
+
+        public String commandStopDefaultMessage = "Server is shutting down.";
 
         @Comment("Improves /time with per World time and adds /ptime for per Player time")
         public boolean commandTime = true;

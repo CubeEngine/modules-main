@@ -32,10 +32,14 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextFormat;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.text.format.TextColors.GREEN;
+import static org.spongepowered.api.text.format.TextFormat.NONE;
 
 public class FoodCommands extends PermissionContainer<VanillaPlus>
 {
@@ -83,8 +87,7 @@ public class FoodCommands extends PermissionContainer<VanillaPlus>
                 i18n.sendTranslated(context, NEGATIVE, "There are no players online at the moment!");
             }
             i18n.sendTranslated(context, POSITIVE, "You made everyone fat!");
-            bc.broadcastStatus(ChatFormat.BRIGHT_GREEN + "shared food with everyone.", context);
-            // TODO MessageType separate for translate Messages and messages from external input e.g. /me
+            bc.broadcastStatus(NONE.color(GREEN), "shared food with everyone.", context);
         }
         else
         {
