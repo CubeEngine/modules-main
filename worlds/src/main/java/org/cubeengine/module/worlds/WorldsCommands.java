@@ -45,6 +45,7 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 
@@ -308,7 +309,15 @@ public class WorldsCommands extends ContainerCommand
         Vector3i spawn = properties.getSpawnPosition();
         i18n.sendTranslated(context, POSITIVE, "This worlds spawn is at {vector}", new BlockVector3(spawn.getX(), spawn.getY(), spawn.getZ()));
         // gamerules
-        // TODO finish worlds info cmd
+        if (!properties.getGameRules().isEmpty())
+        {
+            i18n.sendTranslated(context, POSITIVE, "The following game-rules are active:");
+            for (Entry<String, String> entry : properties.getGameRules().entrySet())
+            {
+                context.sendMessage(Text.of(entry.getKey(), ": ", entry.getValue()));
+            }
+        }
+        // TODO more?
     }
     // info
 
