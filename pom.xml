@@ -38,6 +38,7 @@
     <module>vanillaplus</module>
     <module>multiverse</module>
     <module>worldcontrol</module>
+    <module>netherportals</module>
   </modules>
 
   <build>
