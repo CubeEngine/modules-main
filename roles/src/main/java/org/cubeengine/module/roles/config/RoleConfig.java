@@ -18,13 +18,15 @@
 package org.cubeengine.module.roles.config;
 
 import java.io.File;
-import java.util.*;
-
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.spongepowered.api.util.Tristate;
 
 @SuppressWarnings("all")
 public class RoleConfig extends ReflectedYaml

@@ -76,11 +76,11 @@ public class SpawnMob
                                                                                          .indexOf(":") + 1, entityName
                                                                                          .length())));
             entityName = entityName.substring(0, entityName.indexOf(":"));
-            entityType = em.mob(entityName);
+            entityType = em.mob(entityName, context.getLocale());
         }
         else
         {
-            entityType = em.mob(entityName);
+            entityType = em.mob(entityName, context.getLocale());
         }
         if (entityType == null)
         {

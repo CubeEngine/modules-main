@@ -17,11 +17,11 @@
  */
 package org.cubeengine.module.roles.commands.provider;
 
-import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 
 public class RoleFormatter extends AbstractFormatter<RoleSubject>
 {

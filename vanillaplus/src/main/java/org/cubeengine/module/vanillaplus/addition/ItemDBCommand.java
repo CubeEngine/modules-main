@@ -23,7 +23,6 @@ import org.cubeengine.butler.parameter.TooFewArgumentsException;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.matcher.EnchantMatcher;
 import org.cubeengine.service.matcher.MaterialMatcher;

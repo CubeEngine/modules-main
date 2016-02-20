@@ -17,6 +17,12 @@
  */
 package org.cubeengine.module.locker.data;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Key;
@@ -24,9 +30,6 @@ import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
-import org.spongepowered.api.data.value.mutable.PatternListValue;
-
-import java.util.*;
 
 import static org.cubeengine.module.locker.data.LockerData.LOCK_ID;
 import static org.cubeengine.module.locker.data.LockerData.LOCK_PASS;

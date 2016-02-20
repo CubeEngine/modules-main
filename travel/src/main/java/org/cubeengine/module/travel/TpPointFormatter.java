@@ -17,11 +17,11 @@
  */
 package org.cubeengine.module.travel;
 
-import org.cubeengine.module.travel.home.Home;
-import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.module.travel.home.Home;
+import org.cubeengine.service.i18n.I18n;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NONE;
 import static org.cubeengine.service.i18n.formatter.component.ClickComponent.runCommand;

@@ -17,13 +17,12 @@
  */
 package org.cubeengine.module.roles.sponge.collection;
 
+import java.util.UUID;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.UserSubject;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-
-import java.util.UUID;
 
 public class UserCollection extends BaseSubjectCollection<UserSubject>
 {

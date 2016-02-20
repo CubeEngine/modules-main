@@ -27,19 +27,19 @@ import org.cubeengine.module.core.util.BlockUtil;
 import org.cubeengine.module.core.util.LocationUtil;
 import org.cubeengine.service.command.annotation.CommandPermission;
 import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.AIR;
 import static org.spongepowered.api.block.BlockTypes.GLASS;
 import static org.spongepowered.api.util.Direction.DOWN;
 import static org.spongepowered.api.util.Direction.UP;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains commands for fast movement. /up /ascend /descend /jumpto /through

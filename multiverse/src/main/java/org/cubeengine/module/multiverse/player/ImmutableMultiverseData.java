@@ -20,7 +20,6 @@ package org.cubeengine.module.multiverse.player;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;

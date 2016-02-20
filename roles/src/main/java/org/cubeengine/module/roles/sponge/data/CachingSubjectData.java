@@ -20,7 +20,6 @@ package org.cubeengine.module.roles.sponge.data;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;

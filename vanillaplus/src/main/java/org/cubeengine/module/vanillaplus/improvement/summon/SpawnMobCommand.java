@@ -22,7 +22,6 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.matcher.EnchantMatcher;
 import org.cubeengine.service.matcher.EntityMatcher;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;

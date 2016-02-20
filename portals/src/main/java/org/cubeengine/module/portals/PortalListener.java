@@ -23,7 +23,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
 import org.spongepowered.api.world.World;
 

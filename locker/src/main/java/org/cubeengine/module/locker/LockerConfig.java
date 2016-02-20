@@ -21,17 +21,15 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Transient;
-
-import org.cubeengine.module.locker.config.BlockLockConfig;
-import org.cubeengine.module.locker.config.EntityLockConfig;
-import org.cubeengine.service.world.ConfigWorld;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.cubeengine.module.locker.config.BlockLockConfig;
+import org.cubeengine.module.locker.config.EntityLockConfig;
+import org.cubeengine.service.world.ConfigWorld;
 
 import static org.cubeengine.module.locker.storage.LockType.PRIVATE;
 import static org.cubeengine.module.locker.storage.ProtectionFlag.*;
-import static org.cubeengine.module.locker.storage.ProtectionFlag.BLOCK_REDSTONE;
 import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.entity.EntityTypes.*;
 

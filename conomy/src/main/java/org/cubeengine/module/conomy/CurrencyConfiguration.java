@@ -17,12 +17,14 @@
  */
 package org.cubeengine.module.conomy;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.service.context.Context;
-
-import java.util.*;
 
 @SuppressWarnings("all")
 public class CurrencyConfiguration extends ReflectedYaml

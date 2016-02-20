@@ -29,12 +29,8 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.data.key.Keys.CAN_FLY;
-import static org.spongepowered.api.data.key.Keys.FLYING_SPEED;
-import static org.spongepowered.api.data.key.Keys.IS_FLYING;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.data.key.Keys.*;
 
 public class MovementCommands extends PermissionContainer<VanillaPlus>
 {

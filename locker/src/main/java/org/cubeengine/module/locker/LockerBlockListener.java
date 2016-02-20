@@ -17,6 +17,10 @@
  */
 package org.cubeengine.module.locker;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.cubeengine.module.core.util.BlockUtil;
 import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.storage.Lock;
@@ -44,26 +48,17 @@ import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.cubeengine.module.core.util.BlockUtil.CARDINAL_DIRECTIONS;
 import static org.cubeengine.module.core.util.BlockUtil.getChunk;
 import static org.cubeengine.module.locker.storage.ProtectionFlag.BLOCK_REDSTONE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.data.property.block.MatterProperty.Matter.LIQUID;
 import static org.spongepowered.api.data.property.block.MatterProperty.Matter.SOLID;
 import static org.spongepowered.api.data.type.PortionTypes.TOP;
 import static org.spongepowered.api.util.Direction.*;
-import static org.spongepowered.api.util.Direction.SOUTH;
-import static org.spongepowered.api.util.Direction.WEST;
 
 public class LockerBlockListener
 {

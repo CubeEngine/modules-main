@@ -17,6 +17,10 @@
  */
 package org.cubeengine.module.locker.commands;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
@@ -33,12 +37,6 @@ import org.spongepowered.api.event.entity.TameEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
 

@@ -17,12 +17,11 @@
  */
 package org.cubeengine.module.conomy.storage;
 
+import java.math.BigDecimal;
 import org.cubeengine.module.conomy.ConfigCurrency;
 import org.cubeengine.service.database.AsyncRecord;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
-
-import java.math.BigDecimal;
 
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
 import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;

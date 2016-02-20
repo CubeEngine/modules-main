@@ -30,15 +30,12 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.result.CommandResult;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.service.i18n.I18n;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubject;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;

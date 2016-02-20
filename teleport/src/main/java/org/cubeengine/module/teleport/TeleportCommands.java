@@ -29,8 +29,8 @@ import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.Broadcaster;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 

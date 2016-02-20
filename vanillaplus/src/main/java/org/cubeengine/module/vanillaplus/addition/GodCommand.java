@@ -27,9 +27,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
  * Provides Gamemodelike Protection

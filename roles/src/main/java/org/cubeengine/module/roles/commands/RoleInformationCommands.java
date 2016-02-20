@@ -33,8 +33,9 @@ import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
@@ -42,24 +43,26 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.util.Tristate.FALSE;
 import static org.spongepowered.api.util.Tristate.TRUE;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 @Command(name = "role", desc = "Manage roles")
 public class RoleInformationCommands extends ContainerCommand
 {
     private RolesPermissionService service;
+    private I18n i18n;
 
-    public RoleInformationCommands(Roles module, RolesPermissionService service)
+    public RoleInformationCommands(Roles module, RolesPermissionService service, I18n i18n)
     {
         super(module);
         this.service = service;
+        this.i18n = i18n;
     }
 
     @Alias(value = "listroles")
     @Command(desc = "Lists all roles")
-    public void list(CommandContext cContext)
+    public void list(CommandSource cContext)
     {
         List<Subject> roles = new ArrayList<>();
         for (Subject subject : service.getGroupSubjects().getAllSubjects())
@@ -68,36 +71,36 @@ public class RoleInformationCommands extends ContainerCommand
         }
         if (roles.isEmpty())
         {
-            cContext.sendTranslated(NEGATIVE, "There are no roles!");
+            i18n.sendTranslated(cContext, NEGATIVE, "There are no roles!");
             return;
         }
-        cContext.sendTranslated(POSITIVE, "The following roles are available:");
+        i18n.sendTranslated(cContext, POSITIVE, "The following roles are available:");
         for (Subject r : roles)
         {
-            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, r instanceof RoleSubject ? ((RoleSubject) r).getName() : r.getIdentifier()));
+            cContext.sendMessage(Text.of("- ", TextColors.YELLOW, r instanceof RoleSubject ? ((RoleSubject) r).getName() : r.getIdentifier()));
         }
     }
 
     @Alias(value = "checkrperm")
     @Command(alias = "checkpermission", desc = "Checks the permission in given role")
-    public void checkperm(CommandContext cContext, RoleSubject role,
+    public void checkperm(CommandSource cContext, RoleSubject role,
                           @Complete(PermissionCompleter.class) String permission,
                           @Named("in") @Default Context context)
     {
         Tristate value = role.getPermissionValue(toSet(context), permission);
         if (value == TRUE)
         {
-            cContext.sendTranslated(POSITIVE, "{name#permission} is set to {text:true:color=DARK_GREEN} for the role {role} in {context}.",
+            i18n.sendTranslated(cContext, POSITIVE, "{name#permission} is set to {text:true:color=DARK_GREEN} for the role {role} in {context}.",
                                     permission, role, context);
         }
         else if (value == FALSE)
         {
-            cContext.sendTranslated(NEGATIVE, "{name#permission} is set to {text:false:color=DARK_RED} for the role {role} in {context}.",
+            i18n.sendTranslated(cContext, NEGATIVE, "{name#permission} is set to {text:false:color=DARK_RED} for the role {role} in {context}.",
                                     permission, role, context);
         }
         else
         {
-            cContext.sendTranslated(NEUTRAL, "The permission {name} is not assigned to the role {role} in {context}.",
+            i18n.sendTranslated(cContext, NEUTRAL, "The permission {name} is not assigned to the role {role} in {context}.",
                                     permission, role, context);
             return;
         }
@@ -109,7 +112,7 @@ public class RoleInformationCommands extends ContainerCommand
 
     @Alias(value = "listrperm")
     @Command(alias = "listpermission", desc = "Lists all permissions of given role")
-    public void listperm(CommandContext cContext, RoleSubject role,
+    public void listperm(CommandSource cContext, RoleSubject role,
                          @Flag boolean all,
                          @Named("in") @Default Context context)
     {
@@ -120,13 +123,13 @@ public class RoleInformationCommands extends ContainerCommand
         }
         if (permissions.isEmpty())
         {
-            cContext.sendTranslated(NEUTRAL, "No permissions set for the role {role} in {context}.", role, context);
+            i18n.sendTranslated(cContext, NEUTRAL, "No permissions set for the role {role} in {context}.", role, context);
             return;
         }
-        cContext.sendTranslated(POSITIVE, "Permissions of the role {role} in {context}:", role, context);
+        i18n.sendTranslated(cContext, POSITIVE, "Permissions of the role {role} in {context}:", role, context);
         if (all)
         {
-            cContext.sendTranslated(POSITIVE, "(Including inherited permissions)");
+            i18n.sendTranslated(cContext, POSITIVE, "(Including inherited permissions)");
         }
         String trueString = ChatFormat.DARK_GREEN + "true";
         String falseString = ChatFormat.DARK_RED + "false";
@@ -134,18 +137,18 @@ public class RoleInformationCommands extends ContainerCommand
         {
             if (perm.getValue())
             {
-                cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, perm.getKey(),
+                cContext.sendMessage(Text.of("- ", TextColors.YELLOW, perm.getKey(),
                         TextColors.WHITE, ": ", TextColors.GOLD, trueString));
                 continue;
             }
-            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, perm.getKey(),
+            cContext.sendMessage(Text.of("- ", TextColors.YELLOW, perm.getKey(),
                     TextColors.WHITE, ": ", TextColors.GOLD, falseString));
         }
     }
 
     @Alias(value = "listrdata")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists all metadata of given role")
-    public void listmetadata(CommandContext cContext, RoleSubject role,
+    public void listmetadata(CommandSource cContext, RoleSubject role,
                              @Flag boolean all,
                              @Named("in") @Default Context context)
     {
@@ -156,59 +159,59 @@ public class RoleInformationCommands extends ContainerCommand
         }
         if (options.isEmpty())
         {
-            cContext.sendTranslated(NEUTRAL, "No metadata set for the role {role} in {context}.", role, context);
+            i18n.sendTranslated(cContext, NEUTRAL, "No metadata set for the role {role} in {context}.", role, context);
             return;
         }
-        cContext.sendTranslated(POSITIVE, "Metadata of the role {role} in {context}:", role, context);
+        i18n.sendTranslated(cContext, POSITIVE, "Metadata of the role {role} in {context}:", role, context);
         if (all)
         {
-            cContext.sendTranslated(POSITIVE, "(Including inherited metadata)");
+            i18n.sendTranslated(cContext, POSITIVE, "(Including inherited metadata)");
         }
         for (Entry<String, String> entry : options.entrySet())
         {
-            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, entry.getKey(),
+            cContext.sendMessage(Text.of("- ", TextColors.YELLOW, entry.getKey(),
                     TextColors.WHITE, ": ", TextColors.GOLD, entry.getValue()));
         }
     }
 
     @Alias(value = "listrparent")
     @Command(desc = "Lists all parents of given role")
-    public void listParent(CommandContext ctx, RoleSubject role,
+    public void listParent(CommandSource ctx, RoleSubject role,
                            @Named("in") @Default Context context)
     {
         List<Subject> parents = role.getSubjectData().getParents(toSet(context));
         if (parents.isEmpty())
         {
-            ctx.sendTranslated(NEUTRAL, "The role {role} in {context} has no parent roles.", role, context);
+            i18n.sendTranslated(ctx, NEUTRAL, "The role {role} in {context} has no parent roles.", role, context);
             return;
         }
-        ctx.sendTranslated(NEUTRAL, "The role {role} in {context} has following parent roles:", role, context);
+        i18n.sendTranslated(ctx, NEUTRAL, "The role {role} in {context} has following parent roles:", role, context);
         for (Subject parent : parents)
         {
-            ctx.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, parent instanceof RoleSubject ? ((RoleSubject) parent).getName() : parent.getIdentifier()));
+            ctx.sendMessage(Text.of("- ", TextColors.YELLOW, parent instanceof RoleSubject ? ((RoleSubject) parent).getName() : parent.getIdentifier()));
         }
     }
 
     @Command(alias = "prio", desc = "Show the priority of given role")
-    public void priority(CommandContext ctx, RoleSubject role)
+    public void priority(CommandSource ctx, RoleSubject role)
     {
         Priority priority = role.prio();
-        ctx.sendTranslated(NEUTRAL, "The priority of the role {role} is: {integer#priority}", role, priority.value);
+        i18n.sendTranslated(ctx, NEUTRAL, "The priority of the role {role} is: {integer#priority}", role, priority.value);
     }
 
     @Command(alias = {"default","defaultroles","listdefroles"}, desc = "Lists all default roles [in context]")
-    public void listDefaultRoles(CommandContext cContext, @Named("in") @Default Context context)
+    public void listDefaultRoles(CommandSource cContext, @Named("in") @Default Context context)
     {
         List<Subject> parents = service.getDefaultData().getParents(toSet(context));
         if (parents.isEmpty())
         {
-            cContext.sendTranslated(NEGATIVE, "There are no default roles set for {context}!", context);
+            i18n.sendTranslated(cContext, NEGATIVE, "There are no default roles set for {context}!", context);
             return;
         }
-        cContext.sendTranslated(POSITIVE, "The following roles are default roles in {context}!", context);
+        i18n.sendTranslated(cContext, POSITIVE, "The following roles are default roles in {context}!", context);
         for (Subject role : parents)
         {
-            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, role instanceof RoleSubject ? ((RoleSubject) role).getName() : role.getIdentifier()));
+            cContext.sendMessage(Text.of("- ", TextColors.YELLOW, role instanceof RoleSubject ? ((RoleSubject) role).getName() : role.getIdentifier()));
         }
     }
 }

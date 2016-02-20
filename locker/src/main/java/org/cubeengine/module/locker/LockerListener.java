@@ -17,10 +17,10 @@
  */
 package org.cubeengine.module.locker;
 
+import java.util.Optional;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.service.i18n.I18n;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
@@ -43,8 +43,6 @@ import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import java.util.Optional;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.spongepowered.api.entity.EntityTypes.HORSE;

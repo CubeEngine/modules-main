@@ -17,6 +17,10 @@
  */
 package org.cubeengine.module.conomy.bank.command;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
@@ -42,14 +46,7 @@ import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.text.format.TextColors.GOLD;
 
 @Command(name = "bank", desc = "Manages your money in banks.")

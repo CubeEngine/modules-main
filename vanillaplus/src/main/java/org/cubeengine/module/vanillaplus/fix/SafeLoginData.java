@@ -18,16 +18,13 @@
 package org.cubeengine.module.vanillaplus.fix;
 
 import java.util.Optional;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.manipulator.mutable.common.AbstractBooleanData;
-import org.spongepowered.api.data.manipulator.mutable.common.AbstractSingleData;
 import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
 public class SafeLoginData extends AbstractBooleanData<SafeLoginData, ImmutableSafeLoginData>

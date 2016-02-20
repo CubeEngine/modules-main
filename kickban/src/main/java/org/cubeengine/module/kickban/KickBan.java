@@ -20,7 +20,6 @@ package org.cubeengine.module.kickban;
 import javax.inject.Inject;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.filesystem.FileManager;

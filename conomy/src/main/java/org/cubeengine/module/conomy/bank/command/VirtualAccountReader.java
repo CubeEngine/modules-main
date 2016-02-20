@@ -17,6 +17,9 @@
  */
 package org.cubeengine.module.conomy.bank.command;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.DefaultValue;
@@ -27,10 +30,6 @@ import org.cubeengine.module.conomy.bank.BankConomyService;
 import org.cubeengine.service.command.TranslatedReaderException;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.entity.living.player.User;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 

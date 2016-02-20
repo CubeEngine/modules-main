@@ -19,14 +19,10 @@ package org.cubeengine.module.vanillaplus.fix;
 
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.permission.PermissionContainer;
-import org.spongepowered.api.data.manipulator.mutable.entity.FlyingData;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 /**

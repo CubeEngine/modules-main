@@ -17,15 +17,14 @@
  */
 package org.cubeengine.module.roles.data;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.MapValue;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.toMap;
 

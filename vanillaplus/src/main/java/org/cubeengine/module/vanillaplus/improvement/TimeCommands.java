@@ -37,9 +37,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 public class TimeCommands extends PermissionContainer<VanillaPlus>
 {

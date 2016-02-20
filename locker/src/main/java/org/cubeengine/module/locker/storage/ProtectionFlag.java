@@ -26,8 +26,8 @@ import java.util.Set;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.service.matcher.StringMatcher;
 
-import static org.cubeengine.module.core.util.StringUtils.startsWithIgnoreCase;
 import static java.util.stream.Collectors.toList;
+import static org.cubeengine.module.core.util.StringUtils.startsWithIgnoreCase;
 
 /**
  * Flags that can be given to a protection.

@@ -17,13 +17,12 @@
  */
 package org.cubeengine.module.locker.data;
 
+import java.util.Optional;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.util.persistence.InvalidDataException;
-
-import java.util.Optional;
 
 public class LockerDataBuilder implements DataManipulatorBuilder<LockerData, ImmutableLockerData>
 {

@@ -31,9 +31,7 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 @Command(name = "manage", desc = "Management commands for Conomy Banks.")
 public class BankManageCommand extends ContainerCommand

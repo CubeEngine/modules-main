@@ -27,12 +27,12 @@ import org.cubeengine.module.core.util.math.shape.Cuboid;
 import org.cubeengine.module.portals.config.Destination;
 import org.cubeengine.module.portals.config.RandomDestination;
 import org.cubeengine.service.Selector;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.world.ConfigWorld;
 import org.cubeengine.service.world.WorldLocation;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -57,27 +57,27 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Changes the owner of a portal")
-    public void owner(CommandContext context, Player owner, @Default Portal portal)
+    public void owner(CommandSource context, Player owner, @Default Portal portal)
     {
         portal.config.owner = owner.getName();
         portal.config.save();
-        context.sendTranslated(POSITIVE, "{user} is now the owner of {name#portal}!", owner, portal.getName());
+        i18n.sendTranslated(context, POSITIVE, "{user} is now the owner of {name#portal}!", owner, portal.getName());
     }
 
     @Alias(value = "mvpd")
     @Command(alias = "dest", desc = "changes the destination of the selected portal")
-    public void destination(CommandContext context,
+    public void destination(CommandSource context,
         @Desc("A destination can be: here, <world> or p:<portal>") Destination destination,
         @Default Portal portal)
     {
         portal.config.destination = destination;
         portal.config.save();
-        context.sendTranslated(POSITIVE, "Portal destination set!");
+        i18n.sendTranslated(context, POSITIVE, "Portal destination set!");
     }
 
     @Alias(value = "mvprd")
     @Command(alias = "randdest", desc = "Changes the destination of the selected portal to a random position each time")
-    public void randomDestination(CommandContext context, World world, @Default Portal portal)
+    public void randomDestination(CommandSource context, World world, @Default Portal portal)
     {
         this.destination(context, new RandomDestination(game, world), portal);
     }
@@ -102,44 +102,43 @@ public class PortalModifyCommand extends ContainerCommand
 
     @Command(desc = "Modifies the location where a player exits when teleporting a portal")
     @Restricted(value = Player.class, msg = "You have to be ingame to do this!")
-    public void exit(CommandContext context, @Default Portal portal)
+    public void exit(Player context, @Default Portal portal)
     {
-        Player sender = (Player)context.getSource();
-        Location location = sender.getLocation();
+        Location<World> location = context.getLocation();
         if (portal.config.world.getWorld() != location.getExtent())
         {
             // TODO range check? range in config
-            context.sendTranslated(NEGATIVE, "A portals exit cannot be in an other world than its location!");
+            i18n.sendTranslated(context, NEGATIVE, "A portals exit cannot be in an other world than its location!");
             return;
         }
-        portal.config.location.destination = new WorldLocation(location, sender.getRotation());
+        portal.config.location.destination = new WorldLocation(location, context.getRotation());
         portal.config.save();
-        context.sendTranslated(POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
+        i18n.sendTranslated(context, POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
     }
 
     @Command(desc = "Toggles safe teleportation for this portal")
-    public void togglesafe(CommandContext context, @Default Portal portal)
+    public void togglesafe(CommandSource context, @Default Portal portal)
     {
         portal.config.safeTeleport = !portal.config.safeTeleport;
         portal.config.save();
         if (portal.config.safeTeleport)
         {
-            context.sendTranslated(POSITIVE, "The portal {name} will not teleport to an unsafe destination", portal.getName());
+            i18n.sendTranslated(context, POSITIVE, "The portal {name} will not teleport to an unsafe destination", portal.getName());
             return;
         }
-        context.sendTranslated(POSITIVE, "The portal {name} will also teleport to an unsafe destination", portal.getName());
+        i18n.sendTranslated(context, POSITIVE, "The portal {name} will also teleport to an unsafe destination", portal.getName());
     }
 
     @Command(desc = "Toggles whether entities can teleport with this portal")
-    public void entity(CommandContext context, @Default Portal portal)
+    public void entity(CommandSource context, @Default Portal portal)
     {
         portal.config.teleportNonPlayers = !portal.config.teleportNonPlayers;
         portal.config.save();
         if (portal.config.teleportNonPlayers)
         {
-            context.sendTranslated(POSITIVE, "The portal {name} will teleport entities too", portal.getName());
+            i18n.sendTranslated(context, POSITIVE, "The portal {name} will teleport entities too", portal.getName());
             return;
         }
-        context.sendTranslated(POSITIVE, "The portal {name} will only teleport players", portal.getName());
+        i18n.sendTranslated(context, POSITIVE, "The portal {name} will only teleport players", portal.getName());
     }
 }

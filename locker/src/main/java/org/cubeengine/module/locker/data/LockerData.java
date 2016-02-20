@@ -17,6 +17,10 @@
  */
 package org.cubeengine.module.locker.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -28,11 +32,6 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.Value;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
 {

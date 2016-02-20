@@ -17,10 +17,14 @@
  */
 package org.cubeengine.module.teleport;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import org.cubeengine.module.core.util.LocationUtil;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.block.MatterProperty;
 import org.spongepowered.api.entity.Transform;
@@ -30,17 +34,12 @@ import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.DisplaceEntityEvent;
-import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.event.filter.type.Include;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import java.util.*;
-import java.util.function.Predicate;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;

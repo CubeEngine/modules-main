@@ -30,13 +30,13 @@ import org.cubeengine.module.core.util.math.shape.Cuboid;
 import org.cubeengine.module.portals.config.Destination;
 import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.service.Selector;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.world.ConfigWorld;
 import org.cubeengine.service.world.WorldLocation;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -117,10 +117,10 @@ public class PortalCommands extends ContainerCommand
 
     @Alias(value = "mvpr")
     @Command(desc = "Removes a portal permanently")
-    public void remove(CommandContext context, @Default Portal portal)
+    public void remove(CommandSource context, @Default Portal portal)
     {
         portal.delete();
-        context.sendTranslated(POSITIVE, "Portal {name} deleted", portal.getName());
+        i18n.sendTranslated(context, POSITIVE, "Portal {name} deleted", portal.getName());
     }
 
     public enum OnOff implements FixedValues
@@ -164,18 +164,18 @@ public class PortalCommands extends ContainerCommand
 
     @Alias("mvpl")
     @Command(desc = "Lists the portals")
-    public void list(CommandContext context, @Default World world)
+    public void list(CommandSource context, @Default World world)
     {
         Set<Portal> portals = module.getPortals(world);
         if (portals.isEmpty())
         {
-            context.sendTranslated(POSITIVE, "There are no portals in {world}", world);
+            i18n.sendTranslated(context, POSITIVE, "There are no portals in {world}", world);
             return;
         }
-        context.sendTranslated(POSITIVE, "The following portals are located in {world}", world);
+        i18n.sendTranslated(context, POSITIVE, "The following portals are located in {world}", world);
         for (Portal portal : portals)
         {
-            context.sendMessage(" - " + portal.getName());
+            context.sendMessage(Text.of(" - ", portal.getName()));
         }
     }
 }

@@ -24,18 +24,13 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.data.key.Keys.GAME_MODE;
-import static org.spongepowered.api.entity.living.player.gamemode.GameModes.ADVENTURE;
-import static org.spongepowered.api.entity.living.player.gamemode.GameModes.CREATIVE;
-import static org.spongepowered.api.entity.living.player.gamemode.GameModes.SURVIVAL;
+import static org.spongepowered.api.entity.living.player.gamemode.GameModes.*;
 
 public class GameModeCommand extends PermissionContainer<VanillaPlus>
 {

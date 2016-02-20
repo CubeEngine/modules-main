@@ -28,7 +28,6 @@ import org.cubeengine.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
-import org.spongepowered.api.item.inventory.property.ArmorSlotType;
 import org.spongepowered.api.item.inventory.type.InventoryRow;
 import org.spongepowered.api.service.permission.PermissionDescription;
 

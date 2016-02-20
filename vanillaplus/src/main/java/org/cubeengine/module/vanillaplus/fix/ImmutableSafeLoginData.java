@@ -18,13 +18,10 @@
 package org.cubeengine.module.vanillaplus.fix;
 
 import java.util.Optional;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutableBooleanData;
-import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutableSingleData;
 import org.spongepowered.api.data.value.BaseValue;
-import org.spongepowered.api.data.value.immutable.ImmutableValue;
 
 import static org.cubeengine.module.vanillaplus.fix.SafeLoginData.FLYMODE;
 

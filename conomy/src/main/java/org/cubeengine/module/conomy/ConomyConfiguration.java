@@ -20,9 +20,6 @@ package org.cubeengine.module.conomy;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.spongepowered.api.service.context.Context;
-
-import java.util.*;
 
 @SuppressWarnings("all")
 public class ConomyConfiguration extends ReflectedYaml

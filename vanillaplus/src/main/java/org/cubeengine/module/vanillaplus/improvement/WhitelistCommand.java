@@ -34,9 +34,7 @@ import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
  * All Whitelist related commands:

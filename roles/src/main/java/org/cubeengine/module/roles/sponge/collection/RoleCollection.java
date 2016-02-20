@@ -17,6 +17,9 @@
  */
 package org.cubeengine.module.roles.sponge.collection;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.RoleConfig;
@@ -24,10 +27,6 @@ import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.cubeengine.module.roles.sponge.subject.UserSubject;
 import org.spongepowered.api.service.permission.Subject;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.util.ArrayList;
 
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.newDirectoryStream;

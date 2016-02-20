@@ -17,14 +17,13 @@
  */
 package org.cubeengine.module.worlds;
 
+import javax.inject.Inject;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.Game;
-
-import javax.inject.Inject;
 
 @ModuleInfo(name = "Worlds", description = "easy lightweight worldmanagement")
 public class Worlds extends Module

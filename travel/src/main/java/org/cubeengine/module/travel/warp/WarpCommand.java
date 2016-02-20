@@ -22,8 +22,8 @@ import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
@@ -32,25 +32,25 @@ import org.cubeengine.module.travel.TpPointCommand;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.storage.TeleportInvite;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
-import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.command.CommandUtil;
 import org.cubeengine.service.command.exception.PermissionDeniedException;
 import org.cubeengine.service.confirm.ConfirmResult;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.module.core.util.ChatFormat.DARK_GREEN;
-import static org.cubeengine.module.core.util.ChatFormat.YELLOW;
-import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
 import static java.util.stream.Collectors.toSet;
+import static org.cubeengine.butler.parameter.Parameter.INFINITE;
+import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
+import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 @Command(name = "warp", desc = "Teleport to a warp")
 public class WarpCommand extends TpPointCommand
@@ -255,42 +255,42 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(desc = "List warps of a player")
-    public void list(CommandContext context, @Default Player owner,
+    public void list(CommandSource context, @Default Player owner,
                      @Flag(name = "pub", longName = "public") boolean pub,
                      @Flag boolean owned, @Flag boolean invited)
     {
-        if (!owner.equals(context.getSource()))
+        if (!owner.equals(context))
         {
-            context.ensurePermission(module.getPermissions().WARP_LIST_OTHER);
+            CommandUtil.ensurePermission(context, module.getPermissions().WARP_LIST_OTHER);
         }
         Set<Warp> warps = this.manager.list(owner, owned, pub, invited);
         if (warps.isEmpty())
         {
-            context.sendTranslated(NEGATIVE, "No warps are available to you!");
+            i18n.sendTranslated(context, NEGATIVE, "No warps are available to you!");
             return;
         }
-        context.sendTranslated(NEUTRAL, "The following warps are available to you:");
+        i18n.sendTranslated(context, NEUTRAL, "The following warps are available to you:");
         for (Warp warp : warps)
         {
             if (warp.isPublic())
             {
                 if (warp.isOwnedBy(owner))
                 {
-                    context.sendTranslated(NEUTRAL, "  {name#warp} ({text:public})", warp.getName());
+                    i18n.sendTranslated(context, NEUTRAL, "  {name#warp} ({text:public})", warp.getName());
                 }
                 else
                 {
-                    context.sendTranslated(NEUTRAL, "  {user}:{name#warp} ({text:public})", warp.getOwnerName(), warp.getName());
+                    i18n.sendTranslated(context, NEUTRAL, "  {user}:{name#warp} ({text:public})", warp.getOwnerName(), warp.getName());
                 }
                 continue;
             }
             if (warp.isOwnedBy(owner))
             {
-                context.sendTranslated(NEUTRAL, "  {name#warp} ({text:private})", warp.getName());
+                i18n.sendTranslated(context, NEUTRAL, "  {name#warp} ({text:private})", warp.getName());
             }
             else
             {
-                context.sendTranslated(NEUTRAL, "  {user}:{name#warp} ({text:private})", warp.getOwnerName(), warp.getName());
+                i18n.sendTranslated(context, NEUTRAL, "  {user}:{name#warp} ({text:private})", warp.getOwnerName(), warp.getName());
             }
         }
     }
@@ -309,28 +309,28 @@ public class WarpCommand extends TpPointCommand
     }
 
     @Command(alias = {"ilist", "invited"}, desc = "List all players invited to your warps")
-    public void invitedList(CommandContext sender, @Default Player owner) // TODO named permission "other"
+    public void invitedList(CommandSource sender, @Default Player owner) // TODO named permission "other"
     {
         Set<Warp> warps = this.manager.list(owner, true, false, false).stream()
                                       .filter(w -> !w.getInvited().isEmpty())
                                       .collect(toSet());
         if (warps.isEmpty())
         {
-            if (owner.equals(sender.getSource()))
+            if (owner.equals(sender))
             {
-                sender.sendTranslated(NEGATIVE, "You have no warps with players invited to them!");
+                i18n.sendTranslated(sender, NEGATIVE, "You have no warps with players invited to them!");
                 return;
             }
-            sender.sendTranslated(NEGATIVE, "{user} has no warps with players invited to them!", owner);
+            i18n.sendTranslated(sender, NEGATIVE, "{user} has no warps with players invited to them!", owner);
             return;
         }
-        if (owner.equals(sender.getSource()))
+        if (owner.equals(sender))
         {
-            sender.sendTranslated(NEUTRAL, "Your following warps have players invited to them:");
+            i18n.sendTranslated(sender, NEUTRAL, "Your following warps have players invited to them:");
         }
         else
         {
-            sender.sendTranslated(NEUTRAL, "The following warps of {user} have players invited to them:", owner);
+            i18n.sendTranslated(sender, NEUTRAL, "The following warps of {user} have players invited to them:", owner);
         }
         // TODO do async db access here
         for (Warp w : warps)
@@ -338,11 +338,11 @@ public class WarpCommand extends TpPointCommand
             Set<TeleportInvite> invites = this.iManager.getInvites(w.getModel());
             if (!invites.isEmpty())
             {
-                sender.sendMessage(YELLOW + "  " + w.getName() + ":");
+                sender.sendMessage(Text.of(YELLOW, " " + w.getName() + ":"));
                 for (TeleportInvite invite : invites)
                 {
                     String name = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(invite.getValue(TABLE_INVITE.USERKEY)).get().getName();
-                    sender.sendMessage("    " + DARK_GREEN + name);
+                    sender.sendMessage(Text.of(DARK_GREEN, "    " + name));
                 }
             }
         }
@@ -466,56 +466,56 @@ public class WarpCommand extends TpPointCommand
 
     @Alias(value = "clearwarps")
     @Command(desc = "Clear all warps (of a player)")
-    public ConfirmResult clear(final CommandContext context, @Optional Player owner,
+    public ConfirmResult clear(final CommandSource context, @Optional Player owner,
                                @Flag(name = "pub", longName = "public") boolean pub,
                                @Flag(name = "priv", longName = "private") boolean priv)
     {
-        if (this.module.getConfig().clearOnlyFromConsole && !(context.getSource() instanceof ConsoleSource))
+        if (this.module.getConfig().clearOnlyFromConsole && !(context instanceof ConsoleSource))
         {
-            context.sendTranslated(NEGATIVE, "This command has been disabled for ingame use via the configuration");
+            i18n.sendTranslated(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return null;
         }
         if (owner != null)
         {
             if (pub)
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all public warps ever created by {user}?", owner);
+                i18n.sendTranslated(context, NEUTRAL, "Are you sure you want to delete all public warps ever created by {user}?", owner);
             }
             else if (priv)
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all private warps ever created by {user}?", owner);
+                i18n.sendTranslated(context, NEUTRAL, "Are you sure you want to delete all private warps ever created by {user}?", owner);
             }
             else
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all warps ever created by {user}?", owner);
+                i18n.sendTranslated(context, NEUTRAL, "Are you sure you want to delete all warps ever created by {user}?", owner);
             }
         }
         else
         {
             if (pub)
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all public warps ever created on this server!?");
+                i18n.sendTranslated(context, NEUTRAL, "Are you sure you want to delete all public warps ever created on this server!?");
             }
             else if (priv)
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all private warps ever created on this server?");
+                i18n.sendTranslated(context, NEUTRAL, "Are you sure you want to delete all private warps ever created on this server?");
             }
             else
             {
-                context.sendTranslated(NEUTRAL, "Are you sure you want to delete all warps ever created on this server!?");
+                i18n.sendTranslated(context, NEUTRAL, "Are you sure you want to delete all warps ever created on this server!?");
             }
         }
-        context.sendTranslated(NEUTRAL, "Confirm with: {text:/confirm} before 30 seconds have passed to delete the warps");
+        i18n.sendTranslated(context, NEUTRAL, "Confirm with: {text:/confirm} before 30 seconds have passed to delete the warps");
         return new ConfirmResult(module, () -> {
             if (owner != null)
             {
                 manager.massDelete(owner, priv, pub);
-                context.sendTranslated(POSITIVE, "Deleted warps.");
+                i18n.sendTranslated(context, POSITIVE, "Deleted warps.");
             }
             else
             {
                 manager.massDelete(priv, pub);
-                context.sendTranslated(POSITIVE, "The warps are now deleted");
+                i18n.sendTranslated(context, POSITIVE, "The warps are now deleted");
             }
         }, context);
     }

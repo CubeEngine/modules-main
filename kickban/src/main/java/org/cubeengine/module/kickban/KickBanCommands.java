@@ -17,12 +17,21 @@
  */
 package org.cubeengine.module.kickban;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+import java.time.Instant;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import org.cubeengine.butler.parameter.TooFewArgumentsException;
-import org.cubeengine.butler.parametric.*;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Greed;
+import org.cubeengine.butler.parametric.Label;
+import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.core.util.ChatFormat;
 import org.cubeengine.module.core.util.StringUtils;
 import org.cubeengine.module.core.util.TimeConversionException;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.Broadcaster;
 import org.cubeengine.service.user.UserList;
@@ -38,15 +47,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.Ban.Ip;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.time.Instant;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.module.core.util.ChatFormat.*;
+import static org.cubeengine.service.command.CommandUtil.ensurePermission;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 /**
@@ -78,15 +81,15 @@ public class KickBanCommands
     }
 
     @Command(desc = "Kicks a player from the server")
-    public void kick(CommandContext context, UserList players, @Optional @Greed(INFINITE) String reason)
+    public void kick(CommandSource context, UserList players, @Optional @Greed(INFINITE) String reason)
     {
-        reason = parseReason(reason, module.perms().COMMAND_KICK_NOREASON, context.getSource());
+        reason = parseReason(reason, module.perms().COMMAND_KICK_NOREASON, context);
         if (players.isAll())
         {
-            context.ensurePermission(module.perms().COMMAND_KICK_ALL);
+            ensurePermission(context, module.perms().COMMAND_KICK_ALL);
             for (Player toKick : game.getServer().getOnlinePlayers())
             {
-                if (!context.getSource().equals(toKick))
+                if (!context.equals(toKick))
                 {
                     toKick.kick(Text.of(i18n.getTranslation(toKick, NEGATIVE, kickMessage) + "\n\n" + reason));
                 }
@@ -97,7 +100,7 @@ public class KickBanCommands
         {
             user.kick(Text.of(i18n.getTranslation(user, NEGATIVE, kickMessage) + "\n\n" + reason));
             bc.broadcastTranslatedWithPerm(NEGATIVE, "{user} was kicked from the server by {user}!",
-                                                module.perms().KICK_RECEIVEMESSAGE.getId(), user, context.getSource());
+                                                module.perms().KICK_RECEIVEMESSAGE.getId(), user, context);
         }
         bc.broadcastMessageWithPerm(NONE, reason, module.perms().KICK_RECEIVEMESSAGE.getId());
     }

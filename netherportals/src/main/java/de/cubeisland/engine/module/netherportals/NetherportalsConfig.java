@@ -1,6 +1,5 @@
 package de.cubeisland.engine.module.netherportals;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 import de.cubeisland.engine.reflect.Section;

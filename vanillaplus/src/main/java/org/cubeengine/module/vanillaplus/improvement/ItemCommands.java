@@ -38,9 +38,7 @@ import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResu
 import org.spongepowered.api.item.inventory.type.InventoryRow;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.ITEM_DATA;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
 

@@ -20,8 +20,8 @@ package org.cubeengine.module.locker.storage;
 import java.security.SecureRandom;
 import java.sql.Timestamp;
 import java.util.UUID;
-import org.cubeengine.service.database.AsyncRecord;
 import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.service.database.AsyncRecord;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.text.Text;
 

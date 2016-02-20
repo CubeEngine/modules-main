@@ -19,13 +19,14 @@ package org.cubeengine.module.locker.commands;
 
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.module.locker.storage.LockManager;
-import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
+import org.cubeengine.module.locker.storage.LockManager;
+import org.cubeengine.service.command.ContainerCommand;
+import org.cubeengine.service.i18n.I18n;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Carrier;
@@ -37,31 +38,33 @@ import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
 public class LockerAdminCommands extends ContainerCommand
 {
     private final LockManager manager;
+    private I18n i18n;
 
-    public LockerAdminCommands(Locker module, LockManager manager)
+    public LockerAdminCommands(Locker module, LockManager manager, I18n i18n)
     {
         super(module);
         this.manager = manager;
+        this.i18n = i18n;
     }
 
-    private Lock getLockById(CommandContext context, Integer id)
+    private Lock getLockById(CommandSource context, Integer id)
     {
         if (id == null)
         {
-            context.sendTranslated(NEGATIVE, "{input} is not a valid id!", context.get(0));
+            i18n.sendTranslated(context, NEGATIVE, "Invalid id!"); // TODO parameter reader
             return null;
         }
         Lock lockById = this.manager.getLockById(UInteger.valueOf(id));
         if (lockById == null)
         {
-            context.sendTranslated(NEGATIVE, "There is no protection with the id {integer}", id);
+            i18n.sendTranslated(context, NEGATIVE, "There is no protection with the id {integer}", id);
         }
         return lockById;
     }
 
     @Command(desc = "Opens a protected chest by protection id")
     @Restricted(value = Player.class, msg = "This command can only be used in game")
-    public void view(CommandContext context, Integer id)
+    public void view(CommandSource context, Integer id)
     {
         Lock lock = this.getLockById(context, id);
         switch (lock.getProtectedType())
@@ -74,59 +77,59 @@ public class LockerAdminCommands extends ContainerCommand
                     TileEntity te = lock.getFirstLocation().getTileEntity().orElse(null);
                     if (te instanceof Carrier)
                     {
-                        ((Player)context.getSource()).openInventory(((Carrier)te).getInventory());
+                        ((Player)context).openInventory(((Carrier)te).getInventory());
                     }
                 }
                 else
                 {
-                    context.sendTranslated(NEGATIVE, "The protection with the id {integer} is an entity and cannot be accessed from far away!", lock.getId());
+                    i18n.sendTranslated(context, NEGATIVE, "The protection with the id {integer} is an entity and cannot be accessed from far away!", lock.getId());
                 }
                 return;
             default:
-                context.sendTranslated(NEGATIVE, "The protection with the id {integer} is not a container!", lock.getId());
+                i18n.sendTranslated(context, NEGATIVE, "The protection with the id {integer} is not a container!", lock.getId());
         }
     }
 
     @Command(desc = "Deletes a protection by its id")
     @Restricted(value = Player.class, msg = "This command can only be used in game")
-    public void remove(CommandContext context, Integer id)
+    public void remove(CommandSource context, Integer id)
     {
         Lock lock = this.getLockById(context, id);
         if (lock == null) return;
-        lock.delete((Player)context.getSource());
+        lock.delete((Player)context);
     }
 
     @Command(desc = "Teleport to a protection")
     @Restricted(value = Player.class, msg = "This command can only be used in game")
-    public void tp(CommandContext context, Integer id)
+    public void tp(CommandSource context, Integer id)
     {
         Lock lock = this.getLockById(context, id);
         if (lock == null) return;
         if (lock.isBlockLock())
         {
-            ((Player)context.getSource()).setLocation(lock.getFirstLocation());
+            ((Player)context).setLocation(lock.getFirstLocation());
         }
         else
         {
-            context.sendTranslated(NEGATIVE, "You cannot teleport to an entity protection!");
+            i18n.sendTranslated(context, NEGATIVE, "You cannot teleport to an entity protection!");
         }
     }
 
     @Command(desc = "Deletes all locks of given player")
-    public void purge(CommandContext context, User player)
+    public void purge(CommandSource context, User player)
     {
         this.manager.purgeLocksFrom(player);
-        context.sendTranslated(POSITIVE, "All locks for {user} are now deleted!", player);
+        i18n.sendTranslated(context, POSITIVE, "All locks for {user} are now deleted!", player);
     }
 
     // TODO admin cmds
 
-    public void cleanup(CommandContext context)
+    public void cleanup(CommandSource context)
     {
         // cleanup remove not accessed protections / time in config
     }
 
-    public void list(CommandContext context)
+    public void list(CommandSource context)
     {
         // find & show all protections of a user/selection
     }

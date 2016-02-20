@@ -17,6 +17,18 @@
  */
 package org.cubeengine.module.conomy;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.conomy.command.EcoCommand;
 import org.cubeengine.module.conomy.command.MoneyCommand;
@@ -42,11 +54,6 @@ import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.account.VirtualAccount;
 import org.spongepowered.api.service.user.UserStorageService;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
 
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
 import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;

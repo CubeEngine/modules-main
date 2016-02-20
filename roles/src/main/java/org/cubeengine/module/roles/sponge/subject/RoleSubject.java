@@ -17,6 +17,8 @@
  */
 package org.cubeengine.module.roles.sponge.subject;
 
+import java.util.Optional;
+import java.util.Set;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.RoleConfig;
@@ -26,9 +28,6 @@ import org.cubeengine.module.roles.sponge.data.RoleSubjectData;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
-
-import java.util.Optional;
-import java.util.Set;
 
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 

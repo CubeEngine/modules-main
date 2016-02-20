@@ -22,11 +22,11 @@ import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import org.spongepowered.api.event.filter.cause.First;
 
+import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.event.Order.EARLY;
 
 public class HomeListener

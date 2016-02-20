@@ -17,10 +17,14 @@
  */
 package org.cubeengine.module.roles.sponge.data;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
+import javax.inject.Provider;
 import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.collection.RoleCollection;
@@ -29,8 +33,6 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.util.Tristate;
-
-import javax.inject.Provider;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;

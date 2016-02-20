@@ -34,7 +34,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.weather.WeatherEffect;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;

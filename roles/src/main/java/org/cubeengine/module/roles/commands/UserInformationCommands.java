@@ -29,10 +29,9 @@ import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
@@ -40,6 +39,7 @@ import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
+
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 @Command(name = "user", desc = "Manage users")
@@ -55,50 +55,50 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "listuroles")
     @Command(desc = "Lists roles of a user [in context]")
-    public void list(CommandContext cContext, @Default User player, @Named("in") @Default Context context)
+    public void list(CommandSource ctx, @Default User player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         List<Subject> parents = player.getSubjectData().getParents(contexts);
 
-        cContext.sendTranslated(NEUTRAL, "Roles of {user} in {context}:", player, context);
+        i18n.sendTranslated(ctx, NEUTRAL, "Roles of {user} in {context}:", player, context);
         parents.stream().filter(parent -> parent instanceof RoleSubject)
-               .forEach(parent -> cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, context.getName().isEmpty() ? context.getType() : context.getName(),
+               .forEach(parent -> ctx.sendMessage(Text.of("- ", TextColors.YELLOW, context.getName().isEmpty() ? context.getType() : context.getName(),
                                TextColors.WHITE, ": ", TextColors.GOLD, ((RoleSubject)parent).getName())));
     }
 
 
     @Alias(value = "checkuperm")
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in context]")
-    public void checkpermission(CommandContext cContext, @Default User player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
+    public void checkpermission(CommandSource ctx, @Default User player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         Tristate value = player.getPermissionValue(contexts, permission);
         // TODO search registered permission
         if (value == Tristate.TRUE)
         {
-            cContext.sendTranslated(POSITIVE, "The player {user} does have access to {input#permission} in {context}",
+            i18n.sendTranslated(ctx, POSITIVE, "The player {user} does have access to {input#permission} in {context}",
                                    player, permission, context);
         }
         else if (value == Tristate.FALSE)
         {
-            cContext.sendTranslated(NEGATIVE, "The player {user} does not have access to {input#permission} in {context}",
+            i18n.sendTranslated(ctx, NEGATIVE, "The player {user} does not have access to {input#permission} in {context}",
                                    player, permission, context);
         }
         else
         {
-            // cContext.sendTranslated(NEGATIVE, "Permission {input} neither set nor registered!", permission);
-            // cContext.sendTranslated(NEGATIVE, "Permission {input} not set but default is: {name#default}!", permission, defaultFor.name());
+            // i18n.sendTranslated(ctx, NEGATIVE, "Permission {input} neither set nor registered!", permission);
+            // i18n.sendTranslated(ctx, NEGATIVE, "Permission {input} not set but default is: {name#default}!", permission, defaultFor.name());
             return;
         }
         // TODO find origin
-        //cContext.sendTranslated(NEUTRAL, "Permission inherited from:");
-        //cContext.sendTranslated(NEUTRAL, "{input#permission} directly assigned to the user!", permission);
-        //cContext.sendTranslated(NEUTRAL, "{input#permission} in the role {name}!", permission, store.getName());
+        //i18n.sendTranslated(ctx, NEUTRAL, "Permission inherited from:");
+        //i18n.sendTranslated(ctx, NEUTRAL, "{input#permission} directly assigned to the user!", permission);
+        //i18n.sendTranslated(ctx, NEUTRAL, "{input#permission} in the role {name}!", permission, store.getName());
     }
 
     @Alias(value = "listuperm")
     @Command(alias = "listperm", desc = "List permission assigned to a user [in context]")
-    public void listpermission(CommandContext cContext, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
+    public void listpermission(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         Map<String, Boolean> permissions = player.getSubjectData().getPermissions(contexts);
@@ -110,40 +110,40 @@ public class UserInformationCommands extends ContainerCommand
         {
             if (all)
             {
-                cContext.sendTranslated(NEUTRAL, "{user} has no permissions set in {context}.", player, context);
+                i18n.sendTranslated(ctx, NEUTRAL, "{user} has no permissions set in {context}.", player, context);
                 return;
             }
-            cContext.sendTranslated(NEUTRAL, "{user} has no permissions set directly in {context}.", player, context);
+            i18n.sendTranslated(ctx, NEUTRAL, "{user} has no permissions set directly in {context}.", player, context);
             return;
         }
-        cContext.sendTranslated(NEUTRAL, "Permissions of {user} in {context}:", player, context);
+        i18n.sendTranslated(ctx, NEUTRAL, "Permissions of {user} in {context}:", player, context);
         for (Map.Entry<String, Boolean> entry : permissions.entrySet())
         {
-            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, entry.getKey(),
+            ctx.sendMessage(Text.of("- ", TextColors.YELLOW, entry.getKey(),
                     TextColors.WHITE, ": ", TextColors.GOLD, entry.getValue()));
         }
     }
 
     @Alias(value = "checkumeta")
     @Command(alias = {"checkdata", "checkmeta"}, desc = "Checks for metadata of a user [in context]")
-    public void checkmetadata(CommandContext cContext, @Default User player, String metadatakey, @Named("in") @Default Context context)
+    public void checkmetadata(CommandSource ctx, @Default User player, String metadatakey, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         String value = ((OptionSubjectData)player.getSubjectData()).getOptions(contexts).get(metadatakey);
         if (value == null)
         {
-            cContext.sendTranslated(NEUTRAL, "{input#key} is not set for {user} in {context}.", metadatakey, player, context);
+            i18n.sendTranslated(ctx, NEUTRAL, "{input#key} is not set for {user} in {context}.", metadatakey, player, context);
             return;
         }
-        cContext.sendTranslated(NEUTRAL, "{input#key}: {input#value} is set for {user} in {context}.", metadatakey, value, player, context);
+        i18n.sendTranslated(ctx, NEUTRAL, "{input#key}: {input#value} is set for {user} in {context}.", metadatakey, value, player, context);
         // TODO find origin
-        // cContext.sendTranslated(NEUTRAL, "Origin: {name#role}", metadata.get(metadatakey).getOrigin().getName());
-        // cContext.sendTranslated(NEUTRAL, "Origin: {text:directly assigned}");
+        // i18n.sendTranslated(ctx, NEUTRAL, "Origin: {name#role}", metadata.get(metadatakey).getOrigin().getName());
+        // i18n.sendTranslated(ctx, NEUTRAL, "Origin: {text:directly assigned}");
     }
 
     @Alias(value = "listumeta")
     @Command(alias = {"listdata", "listmeta"}, desc = "Lists assigned metadata from a user [in context]")
-    public void listmetadata(CommandContext cContext, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
+    public void listmetadata(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         Map<String, String> options = ((OptionSubjectData)player.getSubjectData()).getOptions(contexts);
@@ -151,10 +151,10 @@ public class UserInformationCommands extends ContainerCommand
         {
             // TODO recursive
         }
-        cContext.sendTranslated(NEUTRAL, "Metadata of {user} in {context}:", player, context);
+        i18n.sendTranslated(ctx, NEUTRAL, "Metadata of {user} in {context}:", player, context);
         for (Map.Entry<String, String> entry : options.entrySet())
         {
-            cContext.getSource().sendMessage(Text.of("- ", TextColors.YELLOW, entry.getKey(),
+            ctx.sendMessage(Text.of("- ", TextColors.YELLOW, entry.getKey(),
                     TextColors.WHITE, ": ", TextColors.GOLD, entry.getValue()));
         }
     }

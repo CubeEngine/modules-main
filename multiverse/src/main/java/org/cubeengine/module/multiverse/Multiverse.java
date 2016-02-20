@@ -20,16 +20,13 @@ package org.cubeengine.module.multiverse;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
-import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.multiverse.player.ImmutableMultiverseData;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.module.multiverse.player.MultiverseDataBuilder;
@@ -37,12 +34,9 @@ import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.event.EventManager;
 import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.permission.PermissionManager;
 import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.World;
-
-import static java.util.stream.Collectors.toList;
 
 /**
  * Group Worlds into Universes

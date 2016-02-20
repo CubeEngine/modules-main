@@ -17,6 +17,8 @@
  */
 package org.cubeengine.module.conomy;
 
+import java.math.BigDecimal;
+import java.util.Set;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.economy.EconomyTransactionEvent;
@@ -27,9 +29,6 @@ import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.economy.transaction.TransactionType;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
-
-import java.math.BigDecimal;
-import java.util.Set;
 
 public class Result implements TransactionResult
 {

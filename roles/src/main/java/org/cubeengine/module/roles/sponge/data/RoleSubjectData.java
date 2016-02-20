@@ -19,8 +19,12 @@ package org.cubeengine.module.roles.sponge.data;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.*;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;

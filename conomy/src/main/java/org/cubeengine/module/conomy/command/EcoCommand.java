@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.conomy.command;
 
+import java.math.BigDecimal;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.module.conomy.BaseAccount;
@@ -33,8 +34,6 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.text.Text;
-
-import java.math.BigDecimal;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 

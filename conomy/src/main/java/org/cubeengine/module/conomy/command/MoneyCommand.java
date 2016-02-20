@@ -17,16 +17,24 @@
  */
 package org.cubeengine.module.conomy.command;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parametric.*;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Label;
+import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.ConfigCurrency;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyService;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.command.annotation.ParameterPermission;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.user.UserList;
 import org.spongepowered.api.Sponge;
@@ -41,17 +49,9 @@ import org.spongepowered.api.service.pagination.PaginationBuilder;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
-import static org.spongepowered.api.text.format.TextColors.GOLD;
-import static org.spongepowered.api.text.format.TextColors.WHITE;
+import static org.spongepowered.api.text.format.TextColors.*;
 
 @Command(name = "money", desc = "Manage your money")
 public class MoneyCommand extends ContainerCommand

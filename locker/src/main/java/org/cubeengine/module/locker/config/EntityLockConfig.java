@@ -19,8 +19,8 @@ package org.cubeengine.module.locker.config;
 
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.logscribe.Log;
-import org.cubeengine.service.matcher.EntityMatcher;
 import org.cubeengine.module.locker.storage.ProtectedType;
+import org.cubeengine.service.matcher.EntityMatcher;
 import org.spongepowered.api.entity.EntityType;
 
 public class EntityLockConfig extends LockConfig<EntityLockConfig, EntityType>
@@ -48,7 +48,7 @@ public class EntityLockConfig extends LockConfig<EntityLockConfig, EntityType>
 
         protected EntityLockConfig fromString(String s) throws ConversionException
         {
-            EntityType entityType = em.any(s);
+            EntityType entityType = em.any(s, null);
             if (entityType == null)
             {
                 throw ConversionException.of(this, s, "Invalid EntityType!");

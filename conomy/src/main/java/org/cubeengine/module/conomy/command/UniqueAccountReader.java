@@ -17,6 +17,9 @@
  */
 package org.cubeengine.module.conomy.command;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
@@ -27,13 +30,8 @@ import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyService;
 import org.cubeengine.service.command.TranslatedReaderException;
 import org.cubeengine.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
-
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 

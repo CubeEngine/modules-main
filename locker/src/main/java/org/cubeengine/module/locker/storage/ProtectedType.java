@@ -22,11 +22,11 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import org.spongepowered.api.block.BlockType;
-import static org.spongepowered.api.block.BlockTypes.*;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
 
+import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.entity.EntityTypes.*;
 
 public enum ProtectedType

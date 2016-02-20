@@ -17,14 +17,27 @@
  */
 package org.cubeengine.module.conomy.bank;
 
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.butler.Dispatcher;
-import org.cubeengine.module.conomy.*;
+import org.cubeengine.module.conomy.AccessLevel;
+import org.cubeengine.module.conomy.BaseAccount;
+import org.cubeengine.module.conomy.Conomy;
+import org.cubeengine.module.conomy.ConomyConfiguration;
+import org.cubeengine.module.conomy.ConomyService;
 import org.cubeengine.module.conomy.bank.command.BankCommand;
 import org.cubeengine.module.conomy.bank.command.BankManageCommand;
-import org.cubeengine.module.conomy.bank.command.VirtualAccountReader;
 import org.cubeengine.module.conomy.bank.command.EcoBankCommand;
+import org.cubeengine.module.conomy.bank.command.VirtualAccountReader;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.database.Database;
@@ -34,10 +47,6 @@ import org.spongepowered.api.service.economy.account.VirtualAccount;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
-
-import java.nio.file.Path;
-import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
 

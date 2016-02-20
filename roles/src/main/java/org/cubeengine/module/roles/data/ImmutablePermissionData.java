@@ -17,6 +17,9 @@
  */
 package org.cubeengine.module.roles.data;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.key.Key;
@@ -24,10 +27,6 @@ import org.spongepowered.api.data.manipulator.immutable.common.AbstractImmutable
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.immutable.ImmutableListValue;
 import org.spongepowered.api.data.value.immutable.ImmutableMapValue;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 public class ImmutablePermissionData extends AbstractImmutableData<ImmutablePermissionData, PermissionData> implements IPermissionData
 {

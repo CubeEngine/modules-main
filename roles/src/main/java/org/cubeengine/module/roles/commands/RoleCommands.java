@@ -24,9 +24,6 @@ import org.cubeengine.module.roles.Roles;
 import org.cubeengine.service.command.ContainerCommand;
 import org.spongepowered.api.service.context.Context;
 
-import static org.cubeengine.module.core.util.ChatFormat.GOLD;
-import static org.cubeengine.module.core.util.ChatFormat.WHITE;
-import static org.cubeengine.module.core.util.ChatFormat.YELLOW;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 @Command(name = "roles", desc = "Manages the roles")

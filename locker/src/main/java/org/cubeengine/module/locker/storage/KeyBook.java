@@ -20,15 +20,12 @@ package org.cubeengine.module.locker.storage;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
 import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.data.LockerData;
 import org.cubeengine.service.i18n.I18n;
 import org.jooq.types.UInteger;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;

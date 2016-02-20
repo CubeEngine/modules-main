@@ -17,15 +17,18 @@
  */
 package org.cubeengine.module.conomy;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.Text;
-
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.*;
 
 public class ConfigCurrency implements Currency
 {

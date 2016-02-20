@@ -17,18 +17,17 @@
  */
 package org.cubeengine.module.roles.sponge.collection;
 
-import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.option.OptionSubject;
-import org.spongepowered.api.util.Tristate;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.option.OptionSubject;
+import org.spongepowered.api.util.Tristate;
 
 import static org.spongepowered.api.util.Tristate.UNDEFINED;
 

@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.conomy.bank.command;
 
+import java.math.BigDecimal;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
@@ -30,8 +31,6 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.text.Text;
-
-import java.math.BigDecimal;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;

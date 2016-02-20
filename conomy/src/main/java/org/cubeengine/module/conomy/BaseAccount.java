@@ -17,6 +17,12 @@
  */
 package org.cubeengine.module.conomy;
 
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import org.cubeengine.module.conomy.bank.BankConomyService;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
@@ -31,17 +37,10 @@ import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
 import org.spongepowered.api.text.Text;
 
-import java.math.BigDecimal;
-import java.util.*;
-
 import static java.util.stream.Collectors.toMap;
 import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;
-import static org.spongepowered.api.service.economy.transaction.ResultType.ACCOUNT_NO_FUNDS;
-import static org.spongepowered.api.service.economy.transaction.ResultType.CONTEXT_MISMATCH;
-import static org.spongepowered.api.service.economy.transaction.ResultType.SUCCESS;
-import static org.spongepowered.api.service.economy.transaction.TransactionTypes.DEPOSIT;
-import static org.spongepowered.api.service.economy.transaction.TransactionTypes.TRANSFER;
-import static org.spongepowered.api.service.economy.transaction.TransactionTypes.WITHDRAW;
+import static org.spongepowered.api.service.economy.transaction.ResultType.*;
+import static org.spongepowered.api.service.economy.transaction.TransactionTypes.*;
 
 public abstract class BaseAccount implements Account
 {

@@ -17,17 +17,21 @@
  */
 package org.cubeengine.module.roles.sponge.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
 import org.cubeengine.module.roles.sponge.subject.RoleSubject;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.user.UserStorageService;
-
-import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;

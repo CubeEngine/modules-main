@@ -17,19 +17,24 @@
  */
 package org.cubeengine.module.roles.sponge;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
-
 import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.sponge.collection.BasicSubjectCollection;
 import org.cubeengine.module.roles.sponge.collection.RoleCollection;
 import org.cubeengine.module.roles.sponge.collection.UserCollection;
 import org.cubeengine.module.roles.sponge.data.DefaultSubjectData;
-import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;

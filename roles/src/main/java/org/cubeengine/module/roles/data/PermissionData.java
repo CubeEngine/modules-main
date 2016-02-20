@@ -17,19 +17,17 @@
  */
 package org.cubeengine.module.roles.data;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.manipulator.mutable.common.AbstractData;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.MapValue;
 import org.spongepowered.api.service.permission.Subject;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
 import static java.util.stream.Collectors.toMap;
 

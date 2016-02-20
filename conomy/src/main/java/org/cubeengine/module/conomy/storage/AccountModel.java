@@ -17,10 +17,9 @@
  */
 package org.cubeengine.module.conomy.storage;
 
-import org.cubeengine.service.database.AsyncRecord;
-
 import java.util.Optional;
 import java.util.UUID;
+import org.cubeengine.service.database.AsyncRecord;
 
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
 

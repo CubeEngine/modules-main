@@ -17,15 +17,13 @@
  */
 package org.cubeengine.module.roles.exception;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.ExecutionException;
 import org.cubeengine.butler.CommandBase;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.exception.PriorityExceptionHandler;
 import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.i18n.formatter.MessageType;
 import org.spongepowered.api.command.CommandSource;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.ExecutionException;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 

@@ -20,7 +20,6 @@ package org.cubeengine.module.travel.storage;
 import java.util.Optional;
 import java.util.UUID;
 import javax.persistence.Transient;
-
 import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.service.database.AsyncRecord;
 import org.spongepowered.api.entity.Transform;

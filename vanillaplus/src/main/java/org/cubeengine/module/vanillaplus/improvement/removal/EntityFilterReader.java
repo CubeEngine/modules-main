@@ -19,9 +19,9 @@ package org.cubeengine.module.vanillaplus.improvement.removal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.exception.SilentException;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.ReaderException;
@@ -68,7 +68,7 @@ public class EntityFilterReader implements ArgumentReader<EntityFilter>
             ItemType itemType = null;
             if (entityString.contains(":"))
             {
-                type = em.any(entityString.substring(0, entityString.indexOf(":")));
+                type = em.any(entityString.substring(0, entityString.indexOf(":")), invocation.getContext(Locale.class));
                 if (!ITEM.equals(type))
                 {
                     i18n.sendTranslated(cmdSource, NEGATIVE, "You can only specify data for removing items!");
@@ -84,7 +84,7 @@ public class EntityFilterReader implements ArgumentReader<EntityFilter>
             }
             else
             {
-                type = em.any(entityString);
+                type = em.any(entityString, invocation.getContext(Locale.class));
             }
             if (type == null)
             {

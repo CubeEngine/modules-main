@@ -18,8 +18,8 @@
 package org.cubeengine.module.locker.storage;
 
 import java.util.UUID;
-import org.cubeengine.service.database.AutoIncrementTable;
 import org.cubeengine.module.core.util.Version;
+import org.cubeengine.service.database.AutoIncrementTable;
 import org.cubeengine.service.database.Database;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;

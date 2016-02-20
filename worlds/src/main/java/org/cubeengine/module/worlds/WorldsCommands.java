@@ -17,6 +17,12 @@
  */
 package org.cubeengine.module.worlds;
 
+import java.text.SimpleDateFormat;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.concurrent.Executors;
 import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
@@ -28,26 +34,18 @@ import org.cubeengine.service.command.annotation.ParameterPermission;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.storage.WorldProperties;
-
-import java.text.SimpleDateFormat;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.concurrent.Executors;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 

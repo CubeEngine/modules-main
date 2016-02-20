@@ -2,7 +2,6 @@ package de.cubeisland.engine.module.netherportals;
 
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.module.netherportals.NetherportalsConfig.WorldSection;
 import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.world.ConfigWorld;

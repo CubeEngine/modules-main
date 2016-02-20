@@ -18,13 +18,11 @@
 package org.cubeengine.module.vanillaplus.addition;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Date;
-import java.util.Locale;
 import java.util.Optional;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.module.core.util.TimeUtil;

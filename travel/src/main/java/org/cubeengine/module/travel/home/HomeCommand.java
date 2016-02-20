@@ -18,32 +18,32 @@
 package org.cubeengine.module.travel.home;
 
 import java.util.Set;
+import de.cubeisland.engine.modularity.core.Maybe;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.butler.result.CommandResult;
-import de.cubeisland.engine.modularity.core.Maybe;
+import org.cubeengine.module.core.util.math.Cuboid;
+import org.cubeengine.module.core.util.math.shape.Shape;
 import org.cubeengine.module.travel.TpPointCommand;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.storage.TeleportInvite;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
-import org.cubeengine.service.command.property.RawPermission;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.command.CommandContext;
+import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.annotation.ParameterPermission;
 import org.cubeengine.service.command.exception.PermissionDeniedException;
-import org.cubeengine.service.Selector;
+import org.cubeengine.service.command.property.RawPermission;
 import org.cubeengine.service.confirm.ConfirmResult;
-import org.cubeengine.module.core.util.math.Cuboid;
-import org.cubeengine.module.core.util.math.shape.Shape;
+import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -51,14 +51,13 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import static java.util.stream.Collectors.toSet;
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
-import static java.util.stream.Collectors.toSet;
 
 @Command(name = "home", desc = "Teleport to your home")
 public class HomeCommand extends TpPointCommand
@@ -135,29 +134,29 @@ public class HomeCommand extends TpPointCommand
     @Alias("sethome")
     @Command(alias = {"create", "sethome", "createhome"}, desc = "Set your home")
     @Restricted(value = Player.class, msg = "Ok so I'll need your new address then. No seriously this won't work!")
-    public void set(CommandContext context, @Optional String name, @ParameterPermission @Flag(longName = "public", name = "pub") boolean isPublic)
+    public void set(CommandSource context, @Optional String name, @ParameterPermission @Flag(longName = "public", name = "pub") boolean isPublic)
     {
-        Player sender = (Player)context.getSource();
+        Player sender = (Player)context;
         if (this.manager.getCount(sender) >= this.module.getConfig().homes.max
-            && !context.getSource().hasPermission(module.getPermissions().HOME_SET_MORE.getId()))
+            && !context.hasPermission(module.getPermissions().HOME_SET_MORE.getId()))
         {
-            context.sendTranslated(NEGATIVE, "You have reached your maximum number of homes!");
-            context.sendTranslated(NEUTRAL, "You have to delete a home to make a new one");
+            i18n.sendTranslated(context, NEGATIVE, "You have reached your maximum number of homes!");
+            i18n.sendTranslated(context, NEUTRAL, "You have to delete a home to make a new one");
             return;
         }
         name = name == null ? "home" : name;
         if (name.contains(":") || name.length() >= 32)
         {
-            context.sendTranslated(NEGATIVE, "Homes may not have names that are longer then 32 characters nor contain colon(:)'s!");
+            i18n.sendTranslated(context, NEGATIVE, "Homes may not have names that are longer then 32 characters nor contain colon(:)'s!");
             return;
         }
         if (this.manager.has(sender, name))
         {
-            context.sendTranslated(NEGATIVE, "The home already exists! You can move it with {text:/home move}");
+            i18n.sendTranslated(context, NEGATIVE, "The home already exists! You can move it with {text:/home move}");
             return;
         }
         Home home = this.manager.create(sender, name, sender.getTransform(), isPublic);
-        context.sendTranslated(POSITIVE, "Your home {name} has been created!", home.getName());
+        i18n.sendTranslated(context, POSITIVE, "Your home {name} has been created!", home.getName());
     }
 
     @Command(desc = "Set the welcome message of homes", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
@@ -497,14 +496,14 @@ public class HomeCommand extends TpPointCommand
 
     @Alias(value = {"clearhomes"})
     @Command(desc = "Clear all homes (of an user)")
-    public CommandResult clear(final CommandContext context, @Optional final Player owner,
+    public CommandResult clear(final CommandSource context, @Optional final Player owner,
                                @Flag(name = "pub", longName = "public") final boolean isPublic,
                                @Flag(name = "priv", longName = "private") final boolean isPrivate,
                                @Flag(name = "sel", longName = "selection") final boolean selection)
     {
-        if (this.module.getConfig().clearOnlyFromConsole && !(context.getSource() instanceof ConsoleSource))
+        if (this.module.getConfig().clearOnlyFromConsole && !(context instanceof ConsoleSource))
         {
-            context.sendTranslated(NEGATIVE, "This command has been disabled for ingame use via the configuration");
+            i18n.sendTranslated(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return null;
         }
         String type = "";
@@ -524,32 +523,32 @@ public class HomeCommand extends TpPointCommand
         {
             if (selector.isAvailable())
             {
-                context.sendTranslated(NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
+                i18n.sendTranslated(context, NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
                 return null;
             }
-            if (!context.isSource(Player.class))
+            if (!(context instanceof Player))
             {
-                context.sendTranslated(NEGATIVE, "You have to be in game to use the selection flag");
+                i18n.sendTranslated(context, NEGATIVE, "You have to be in game to use the selection flag");
                 return null;
             }
             Selector selector = this.selector.value();
-            Shape shape = selector.getSelection((Player)context.getSource());
+            Shape shape = selector.getSelection((Player)context);
             if (!(shape instanceof Cuboid))
             {
-                context.sendTranslated(NEGATIVE, "Invalid selection!");
+                i18n.sendTranslated(context, NEGATIVE, "Invalid selection!");
                 return null;
             }
-            firstPoint = selector.getFirstPoint((Player)context.getSource());
-            secondPoint = selector.getSecondPoint((Player)context.getSource());
+            firstPoint = selector.getFirstPoint((Player)context);
+            secondPoint = selector.getSecondPoint((Player)context);
             if (owner != null)
             {
-                context.sendTranslated(NEUTRAL,
+                i18n.sendTranslated(context, NEUTRAL,
                                       "Are you sure you want to delete all {input#public|private}homes created by {user} in your current selection?",
                                       type, owner);
             }
             else
             {
-                context.sendTranslated(NEUTRAL,
+                i18n.sendTranslated(context, NEUTRAL,
                                       "Are you sure you want to delete all {input#public|private}homes created in your current selection?",
                                       type);
             }
@@ -560,38 +559,38 @@ public class HomeCommand extends TpPointCommand
             secondPoint = null;
             if (owner != null)
             {
-                context.sendTranslated(NEUTRAL,
+                i18n.sendTranslated(context, NEUTRAL,
                                       "Are you sure you want to delete all {input#public|private}homes ever created by {user}?",
                                       type, owner);
             }
             else
             {
-                context.sendTranslated(NEUTRAL,
+                i18n.sendTranslated(context, NEUTRAL,
                                       "Are you sure you want to delete all {input#public|private}homes ever created on this server?",
                                       type);
             }
         }
-        context.sendTranslated(NEUTRAL,
+        i18n.sendTranslated(context, NEUTRAL,
                               "Confirm with: {text:/confirm} before 30 seconds have passed to delete the homes");
         return new ConfirmResult(module, () -> {
             if (selection)
             {
                 manager.massDelete(owner, isPrivate, isPublic, firstPoint, secondPoint);
-                if (context.hasPositional(0))
+                if (owner != null)
                 {
-                    context.sendTranslated(POSITIVE, "The homes of {user} in the selection are now deleted", owner);
+                    i18n.sendTranslated(context, POSITIVE, "The homes of {user} in the selection are now deleted", owner);
                     return;
                 }
-                context.sendTranslated(POSITIVE, "The homes in the selection are now deleted.");
+                i18n.sendTranslated(context, POSITIVE, "The homes in the selection are now deleted.");
                 return;
             }
             manager.massDelete(owner, isPrivate, isPublic);
-            if (context.hasPositional(0))
+            if (owner != null)
             {
-                context.sendTranslated(POSITIVE, "The homes of {user} are now deleted", owner);
+                i18n.sendTranslated(context, POSITIVE, "The homes of {user} are now deleted", owner);
                 return;
             }
-            context.sendTranslated(POSITIVE, "The homes are now deleted.");
+            i18n.sendTranslated(context, POSITIVE, "The homes are now deleted.");
         }, context);
     }
 

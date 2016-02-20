@@ -22,13 +22,12 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.service.command.CommandContext;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
@@ -51,24 +50,24 @@ public class ManagementCommands extends ContainerCommand
 
     @Alias(value = "manload")
     @Command(desc = "Reloads all roles from config")
-    public void reload(CommandContext context)
+    public void reload(CommandSource context)
     {
         module.getConfiguration().reload();
         service.getGroupSubjects().reload();
         service.getUserSubjects().reload();
         // TODO remove cached data
         // TODO adding mirrors in file -> manload is not working
-        context.sendTranslated(POSITIVE, "{text:Roles} reload complete!");
+        i18n.sendTranslated(context, POSITIVE, "{text:Roles} reload complete!");
     }
 
     @Alias(value = "mansave")
     @Command(desc = "Overrides all configs with current settings")
-    public void save(CommandContext context)
+    public void save(CommandSource context)
     {
         // database is up to date so only saving configs
         module.getConfiguration().save();
         // TODO save RoleSubject Configurations
-        context.sendTranslated(POSITIVE, "{text:Roles} all configurations saved!");
+        i18n.sendTranslated(context, POSITIVE, "{text:Roles} all configurations saved!");
     }
 
     public static World curWorldOfConsole = null;

@@ -19,9 +19,9 @@ package org.cubeengine.module.travel.home;
 
 import org.cubeengine.module.travel.TeleportPoint;
 import org.cubeengine.module.travel.Travel;
+import org.cubeengine.module.travel.storage.TableTeleportPoint;
 import org.cubeengine.module.travel.storage.TeleportPointModel;
 import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
-import org.cubeengine.module.travel.storage.TableTeleportPoint;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.PermissionDescription;
 

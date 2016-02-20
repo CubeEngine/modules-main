@@ -18,9 +18,9 @@
 package org.cubeengine.module.travel.storage;
 
 import java.util.UUID;
+import org.cubeengine.module.core.util.Version;
 import org.cubeengine.service.database.AutoIncrementTable;
 import org.cubeengine.service.database.Database;
-import org.cubeengine.module.core.util.Version;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;

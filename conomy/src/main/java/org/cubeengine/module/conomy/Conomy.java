@@ -17,6 +17,11 @@
  */
 package org.cubeengine.module.conomy;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.concurrent.ThreadFactory;
+import javax.inject.Inject;
 import de.cubeisland.engine.logscribe.LogFactory;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
@@ -29,18 +34,11 @@ import org.cubeengine.module.conomy.storage.TableBalance;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.database.Database;
 import org.cubeengine.service.database.ModuleTables;
-import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.permission.ModulePermissions;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.economy.EconomyService;
-
-import javax.inject.Inject;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.concurrent.ThreadFactory;
 
 @ModuleInfo(name = "Conomy", description = "Economy API and basic commands")
 @ModuleTables({TableAccount.class, TableBalance.class})

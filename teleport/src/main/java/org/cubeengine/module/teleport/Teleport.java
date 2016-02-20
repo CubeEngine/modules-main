@@ -18,11 +18,11 @@
 package org.cubeengine.module.teleport;
 
 import javax.inject.Inject;
-import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import org.cubeengine.service.event.EventManager;
+import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.service.command.CommandManager;
+import org.cubeengine.service.event.EventManager;
 import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.permission.ModulePermissions;

@@ -23,11 +23,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import org.cubeengine.service.database.Database;
 import org.cubeengine.module.travel.storage.TeleportInvite;
 import org.cubeengine.module.travel.storage.TeleportPointModel;
+import org.cubeengine.service.database.Database;
 import org.jooq.DSLContext;
-import org.jooq.types.UInteger;
 import org.spongepowered.api.entity.living.player.Player;
 
 import static org.cubeengine.module.travel.storage.TableInvite.TABLE_INVITE;
