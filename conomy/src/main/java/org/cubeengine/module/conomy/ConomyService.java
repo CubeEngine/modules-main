@@ -117,7 +117,31 @@ public class ConomyService implements EconomyService
     }
 
     @Override
-    public Optional<UniqueAccount> getAccount(UUID uuid)
+    public boolean hasAccount(UUID uuid)
+    {
+        Account account = accounts.get(uuid.toString());
+        if (account instanceof UniqueAccount)
+        {
+            return true;
+        }
+        return loadAccount(uuid, false).isPresent();
+    }
+
+    @Override
+    public boolean hasAccount(String identifier)
+    {
+        try
+        {
+            return hasAccount(UUID.fromString(identifier));
+        }
+        catch (IllegalArgumentException e)
+        {
+            return false;
+        }
+    }
+
+    @Override
+    public Optional<UniqueAccount> getOrCreateAccount(UUID uuid)
     {
         Account account = accounts.get(uuid.toString());
         if (account instanceof UniqueAccount)
@@ -126,17 +150,23 @@ public class ConomyService implements EconomyService
         }
         if (account == null)
         {
-            return loadAccount(uuid, false);
+            return loadAccount(uuid, true);
         }
         // else not UniqueAccount under uuid
         return Optional.empty();
     }
 
     @Override
-    public Optional<UniqueAccount> createAccount(UUID uuid)
+    public Optional<Account> getOrCreateAccount(String identifier)
     {
-        Optional<UniqueAccount> account = getAccount(uuid);
-        return account.isPresent() ? account : loadAccount(uuid, true);
+        try
+        {
+            return getOrCreateAccount(UUID.fromString(identifier)).map(Account.class::cast);
+        }
+        catch (IllegalArgumentException e)
+        {
+            return Optional.empty();
+        }
     }
 
     protected Optional<UniqueAccount> loadAccount(UUID uuid, boolean create)
@@ -170,25 +200,6 @@ public class ConomyService implements EconomyService
     protected AccountModel loadModel(String id)
     {
         return db.getDSL().selectFrom(TABLE_ACCOUNT).where(TABLE_ACCOUNT.ID.eq(id)).fetchOne();
-    }
-
-    @Override
-    public Optional<Account> getAccount(String identifier)
-    {
-        try
-        {
-            return getAccount(UUID.fromString(identifier)).map(Account.class::cast);
-        }
-        catch (IllegalArgumentException e)
-        {
-            return Optional.empty();
-        }
-    }
-
-    @Override
-    public Optional<VirtualAccount> createVirtualAccount(String s)
-    {
-        return Optional.empty();
     }
 
     @Override

@@ -17,69 +17,57 @@
  */
 package org.cubeengine.module.travel;
 
-import java.util.concurrent.TimeUnit;
+import java.nio.file.Path;
 import javax.inject.Inject;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Maybe;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
-import org.cubeengine.module.core.util.Profiler;
+import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.module.travel.config.HomeConfig;
+import org.cubeengine.module.travel.config.TravelConfig;
+import org.cubeengine.module.travel.config.WarpConfig;
 import org.cubeengine.module.travel.home.HomeCommand;
-import org.cubeengine.module.travel.home.HomeListener;
 import org.cubeengine.module.travel.home.HomeManager;
-import org.cubeengine.module.travel.storage.TableInvite;
-import org.cubeengine.module.travel.storage.TableTeleportPoint;
 import org.cubeengine.module.travel.warp.WarpCommand;
 import org.cubeengine.module.travel.warp.WarpManager;
 import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.database.Database;
-import org.cubeengine.service.database.ModuleTables;
 import org.cubeengine.service.event.EventManager;
 import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.permission.ModulePermissions;
-import org.cubeengine.service.permission.PermissionManager;
 
 @ModuleInfo(name = "Travel", description = "Travel anywhere")
-@ModuleTables({TableTeleportPoint.class, TableInvite.class})
 public class Travel extends Module
 {
     @ModuleConfig private TravelConfig config;
     @ModulePermissions private TravelPerm permissions;
 
-    private InviteManager inviteManager;
     private HomeManager homeManager;
     private WarpManager warpManager;
 
-    @Inject private Database db;
     @Inject private Log logger;
     @Inject private CommandManager cm;
     @Inject private EventManager em;
-    @Inject private PermissionManager pm;
     @Inject private Maybe<Selector> selector;
     @Inject private I18n i18n;
+    @Inject private Reflector reflector;
 
     @Enable
     public void onEnable()
     {
         i18n.getCompositor().registerFormatter(new TpPointFormatter(i18n));
 
-        Profiler.startProfiling("travelEnable");
-        logger.trace("Loading TeleportPoints...");
-        this.inviteManager = new InviteManager(db, this);
-        this.homeManager = new HomeManager(this, this.inviteManager, db, pm);
-        this.homeManager.load();
-        this.warpManager = new WarpManager(this, this.inviteManager, db, pm);
-        this.warpManager.load();
-        logger.trace("Loaded TeleportPoints in {} ms", Profiler.endProfiling("travelEnable", TimeUnit.MILLISECONDS));
+        this.homeManager = new HomeManager(this, i18n, reflector.load(HomeConfig.class, getProvided(Path.class).resolve("homes.yml").toFile()));
+        this.em.registerListener(this, this.homeManager);
+        this.warpManager = new WarpManager(reflector.load(WarpConfig.class, getProvided(Path.class).resolve("warps.yml").toFile()));
 
-        HomeCommand homeCmd = new HomeCommand(this, selector, i18n);
-        cm.addCommand(homeCmd);
-        WarpCommand warpCmd = new WarpCommand(this, i18n);
-        cm.addCommand(warpCmd);
-        em.registerListener(this, new HomeListener(this, i18n));
+        cm.addCommand(new HomeCommand(this, selector, i18n));
+        cm.addCommand(new WarpCommand(this, i18n));
+
+        cm.getProviderManager().getExceptionHandler().addHandler(new TravelExceptionHandler(i18n));
     }
 
     public TravelConfig getConfig()
@@ -95,11 +83,6 @@ public class Travel extends Module
     public WarpManager getWarpManager()
     {
         return warpManager;
-    }
-
-    public InviteManager getInviteManager()
-    {
-        return this.inviteManager;
     }
 
     public TravelPerm getPermissions()

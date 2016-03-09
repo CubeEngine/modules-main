@@ -35,6 +35,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.World;
 
@@ -79,7 +80,7 @@ public class ButcherCommand extends PermissionContainer<VanillaPlus>
         Predicate<Entity> filter = radius == -1 ? types :
            types.and(e -> e.getTransform().getPosition().distance(((Player)context).getLocation().getPosition()) <= rSquared);
 
-        Cause lightningCause = Cause.of(context);
+        Cause lightningCause = Cause.of(NamedCause.source(context));
         Collection<Entity> remove = world.getEntities(filter);
         for (Entity entity : remove)
         {

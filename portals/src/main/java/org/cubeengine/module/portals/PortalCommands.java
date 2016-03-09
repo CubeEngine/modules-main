@@ -33,7 +33,7 @@ import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldLocation;
+import org.cubeengine.service.world.WorldTransform;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -80,7 +80,7 @@ public class PortalCommands extends ContainerCommand
         PortalConfig config = reflector.create(PortalConfig.class);
         config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
         config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
-        config.location.destination = new WorldLocation(context.getLocation(), context.getRotation());
+        config.location.destination = new WorldTransform(context.getLocation(), context.getRotation());
         config.owner = context.getName();
         config.world = new ConfigWorld((World)p1.getExtent());
 

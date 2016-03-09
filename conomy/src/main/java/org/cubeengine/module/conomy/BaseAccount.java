@@ -149,15 +149,9 @@ public abstract class BaseAccount implements Account
     }
 
     @Override
-    public TransactionResult resetBalances(Cause cause, Set<Context> contexts)
+    public Map<Currency, TransactionResult> resetBalances(Cause cause, Set<Context> contexts)
     {
-        // TODO what is the result supposed to be?
-        TransactionResult last = null;
-        for (Currency currency : service.getCurrencies())
-        {
-            last = resetBalance(currency, cause, contexts);
-        }
-        return last;
+        return service.getCurrencies().stream().collect(toMap(c -> c, c -> resetBalance(c, cause, contexts)));
     }
 
     @Override
@@ -269,7 +263,7 @@ public abstract class BaseAccount implements Account
         }
 
         @Override
-        public UUID getUUID()
+        public UUID getUniqueId()
         {
             return uuid;
         }

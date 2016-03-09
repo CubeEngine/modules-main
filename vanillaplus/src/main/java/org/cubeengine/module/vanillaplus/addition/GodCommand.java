@@ -59,10 +59,10 @@ public class GodCommand extends PermissionContainer<VanillaPlus>
             other = true;
         }
 
-        Integer invTime = player.get(Keys.INVULNERABILITY).orElse(0);
+        Integer invTime = player.get(Keys.INVULNERABILITY_TICKS).orElse(0);
         if (invTime > 0)
         {
-            player.remove(Keys.INVULNERABILITY);
+            player.remove(Keys.INVULNERABILITY_TICKS);
             if (!other)
             {
                 i18n.sendTranslated(context, NEUTRAL, "You are no longer invincible!");
@@ -72,7 +72,7 @@ public class GodCommand extends PermissionContainer<VanillaPlus>
             i18n.sendTranslated(context, NEUTRAL, "{user} is no longer invincible!", player);
             return;
         }
-        player.offer(Keys.INVULNERABILITY, Integer.MAX_VALUE);
+        player.offer(Keys.INVULNERABILITY_TICKS, Integer.MAX_VALUE);
         if (!other)
         {
             i18n.sendTranslated(context, POSITIVE, "You are now invincible!");

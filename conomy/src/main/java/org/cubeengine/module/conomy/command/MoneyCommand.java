@@ -45,7 +45,7 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
-import org.spongepowered.api.service.pagination.PaginationBuilder;
+import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 
@@ -77,7 +77,7 @@ public class MoneyCommand extends ContainerCommand
 
     private BaseAccount.Unique getUserAccount(User user)
     {
-        return service.createAccount(user.getUniqueId())
+        return service.getOrCreateAccount(user.getUniqueId())
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast).orElse(null);
     }
@@ -128,8 +128,8 @@ public class MoneyCommand extends ContainerCommand
         int i = fromRank;
 
 
-        PaginationBuilder pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder();
-        pagination.paddingString("-");
+        PaginationList.Builder pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder();
+        pagination.padding(Text.of("-"));
         if (fromRank == 1)
         {
             pagination.title(i18n.getTranslation(context, POSITIVE, "Top Balance ({amount})", models.size()));
@@ -142,7 +142,7 @@ public class MoneyCommand extends ContainerCommand
         List<Text> texts = new ArrayList<>();
         for (BalanceModel balance : models)
         {
-            Account account = service.getAccount(balance.getAccountID()).get();
+            Account account = service.getOrCreateAccount(balance.getAccountID()).get();
             ConfigCurrency currency = service.getCurrency(balance.getCurrency());
             texts.add(Text.of(i++, WHITE, " - ",
                     DARK_GREEN, account.getDisplayName(), WHITE, ": ",

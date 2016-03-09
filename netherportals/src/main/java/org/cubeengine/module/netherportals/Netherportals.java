@@ -1,8 +1,8 @@
-package de.cubeisland.engine.module.netherportals;
+package org.cubeengine.module.netherportals;
 
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.module.netherportals.NetherportalsConfig.WorldSection;
+import org.cubeengine.module.netherportals.NetherportalsConfig.WorldSection;
 import org.cubeengine.service.filesystem.ModuleConfig;
 import org.cubeengine.service.world.ConfigWorld;
 import org.spongepowered.api.entity.Transform;

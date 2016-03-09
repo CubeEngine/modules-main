@@ -29,6 +29,7 @@ import org.jooq.types.UInteger;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -110,7 +111,7 @@ public class KeyBook
 
             final Vector3d userDirection = holder.getRotation();
 
-            holder.damage(0, DamageSources.MAGIC, Cause.of(item));
+            holder.damage(0, DamageSources.MAGIC, Cause.of(NamedCause.source(item)));
             VelocityData velocity = holder.getOrCreate(VelocityData.class).get();
             velocity.velocity().set(userDirection.mul(-3));
             holder.offer(velocity);

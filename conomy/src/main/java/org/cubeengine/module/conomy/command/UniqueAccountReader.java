@@ -86,7 +86,7 @@ public class UniqueAccountReader implements ArgumentReader<BaseAccount.Unique>, 
 
     private Optional<BaseAccount.Unique> getAccount(User user)
     {
-        return service.createAccount(user.getUniqueId())
+        return service.getOrCreateAccount(user.getUniqueId())
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast);
     }

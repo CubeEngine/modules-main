@@ -17,51 +17,96 @@
  */
 package org.cubeengine.module.travel.warp;
 
-import org.cubeengine.module.travel.InviteManager;
-import org.cubeengine.module.travel.TelePointManager;
-import org.cubeengine.module.travel.Travel;
-import org.cubeengine.module.travel.storage.TableTeleportPoint;
-import org.cubeengine.module.travel.storage.TeleportPointModel;
-import org.cubeengine.module.travel.storage.TeleportPointModel.TeleportType;
-import org.cubeengine.module.travel.storage.TeleportPointModel.Visibility;
-import org.cubeengine.service.database.Database;
-import org.cubeengine.service.permission.PermissionManager;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import javax.annotation.Nullable;
+import org.cubeengine.module.travel.config.Warp;
+import org.cubeengine.module.travel.config.WarpConfig;
+import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.service.world.WorldTransform;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.world.World;
 
-public class WarpManager extends TelePointManager<Warp>
+public class WarpManager
 {
-    private PermissionManager pm;
+    private WarpConfig config;
 
-    public WarpManager(Travel module, InviteManager iManager, Database db, PermissionManager pm)
+    public WarpManager(WarpConfig config)
     {
-        super(module, iManager, db);
-        this.pm = pm;
+        this.config = config;
     }
 
-    @Override
-    public void load()
+    public Warp create(Player owner, String name, Transform<World> transform)
     {
-        for (TeleportPointModel teleportPoint : this.dsl.selectFrom(TableTeleportPoint.TABLE_TP_POINT).where(
-            TableTeleportPoint.TABLE_TP_POINT.TYPE.eq(TeleportType.WARP.value)).fetch())
-        {
-            this.addPoint(new Warp(teleportPoint, this.module, pm));
-        }
-        module.getLog().info("{} Homes loaded", this.getCount());
-    }
-
-    @Override
-    public Warp create(Player owner, String name, Transform<World> transform, boolean publicVisibility)
-    {
-        if (this.has(owner, name))
+        if (this.has(name))
         {
             throw new IllegalArgumentException("Tried to create duplicate warp!");
         }
-        TeleportPointModel model = this.dsl.newRecord(TableTeleportPoint.TABLE_TP_POINT).newTPPoint(transform, name, owner.getUniqueId(), null, TeleportType.WARP, publicVisibility ? Visibility.PUBLIC : Visibility.PRIVATE);
-        Warp warp = new Warp(model, this.module, pm);
-        model.insertAsync();
-        this.addPoint(warp);
+
+        Warp warp = new Warp();
+        warp.name = name;
+        warp.owner = owner.getUniqueId();
+        warp.transform = new WorldTransform(transform.getLocation(), transform.getRotation());
+        warp.world = new ConfigWorld(transform.getExtent());
+
+        config.warps.add(warp);
+        config.save();
         return warp;
     }
+
+    public void delete(Warp warp)
+    {
+        config.warps.remove(warp);
+        config.save();
+    }
+
+    public boolean has(String name)
+    {
+        return get(name).isPresent();
+    }
+
+    public Optional<Warp> get(String name)
+    {
+        return config.warps.stream().filter(warp -> warp.name.equals(name)).findFirst();
+    }
+
+    public long getCount()
+    {
+        return config.warps.size();
+    }
+
+    public void save()
+    {
+        config.save();
+    }
+
+    public boolean rename(Warp point, String name)
+    {
+        if (has(name))
+        {
+            return false;
+        }
+
+        point.name = name;
+        save();
+        return true;
+    }
+
+    public Set<Warp> list(@Nullable User user)
+    {
+        return config.warps.stream()
+                           .filter(warp -> user == null || warp.owner.equals(user.getUniqueId()))
+                           .collect(Collectors.toSet());
+    }
+
+    public void massDelete(Predicate<Warp> predicate)
+    {
+        config.warps = config.warps.stream().filter(predicate).collect(Collectors.toList());
+        save();
+    }
+    
 }

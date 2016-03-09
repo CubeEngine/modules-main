@@ -32,43 +32,49 @@ import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.command.annotation.ParameterPermission;
 import org.cubeengine.service.i18n.I18n;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.Server;
+import org.spongepowered.api.Platform.Type;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldCreationSettings;
 import org.spongepowered.api.world.difficulty.Difficulty;
+import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.text.format.TextColors.*;
+import static org.spongepowered.api.text.format.TextStyles.STRIKETHROUGH;
 
+/**
+ * WorldsCommands includes the following sub-commands:
+ *
+ * - create
+ * - load
+ * - unload
+ * - remove
+ * - list
+ * - info
+ * - listplayers
+ *
+ * TODO autosave?
+ * TODO custom Generators
+ */
 @Command(name = "worlds", desc = "Worlds commands")
 public class WorldsCommands extends ContainerCommand
 {
-    private Worlds module;
     private I18n i18n;
-    private Game game;
-    private Server server;
 
-    public WorldsCommands(Worlds module, I18n i18n, Game game)
+    public WorldsCommands(Worlds module, I18n i18n)
     {
         super(module);
-        this.module = module;
         this.i18n = i18n;
-        this.game = game;
-        this.server = game.getServer();
     }
-
-    // TODO keep spawn in memory?
-    // TODO autosave?
-    // TODO custom Generators
 
     @Command(desc = "Creates a new world")
     public void create(CommandSource context,
@@ -80,9 +86,10 @@ public class WorldsCommands extends ContainerCommand
                        @Default @Named({"gamemode", "mode"}) GameMode gamemode,
                        @Default @Named({"difficulty", "diff"}) Difficulty difficulty,
                        @Flag boolean recreate,
-                       @Flag boolean noload)
+                       @Flag boolean noload,
+                       @Flag boolean spawnInMemory)
     {
-        Optional<World> world = server.getWorld(name);
+        Optional<World> world = Sponge.getServer().getWorld(name);
         if (world.isPresent())
         {
             if (recreate)
@@ -93,7 +100,7 @@ public class WorldsCommands extends ContainerCommand
             i18n.sendTranslated(context, NEGATIVE, "A world named {world} already exists and is loaded!", world.get());
             return;
         }
-        Optional<WorldProperties> worldProperties = server.getWorldProperties(name);
+        Optional<WorldProperties> worldProperties = Sponge.getServer().getWorldProperties(name);
         if (worldProperties.isPresent())
         {
             if (!recreate)
@@ -103,13 +110,12 @@ public class WorldsCommands extends ContainerCommand
             }
             worldProperties.get().setEnabled(false);
             String newName = name + "_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-            server.renameWorld(worldProperties.get(), newName);
+            Sponge.getServer().renameWorld(worldProperties.get(), newName);
             i18n.sendTranslated(context, POSITIVE, "Old world moved to {name#folder}", newName);
         }
 
         WorldCreationSettings.Builder builder = WorldCreationSettings.builder();
-        // TODO check nulls
-
+        builder.keepsSpawnLoaded(spawnInMemory);
         builder.name(name);
         builder.loadsOnStartup(!noload);
         if (seed != null)
@@ -128,7 +134,7 @@ public class WorldsCommands extends ContainerCommand
         builder.dimension(dimension);
         builder.usesMapFeatures(generateStructures);
         builder.gameMode(gamemode);
-        Optional<WorldProperties> properties = game.getServer().createWorldProperties(builder.build());
+        Optional<WorldProperties> properties = Sponge.getServer().createWorldProperties(builder.build());
         if (properties.isPresent())
         {
             properties.get().setDifficulty(difficulty);
@@ -139,22 +145,21 @@ public class WorldsCommands extends ContainerCommand
     }
 
     @Command(desc = "Loads a world")
-    public void load(CommandSource context, String world)
+    public void load(CommandSource context, WorldProperties world, @Flag boolean enable)
     {
-        Optional<World> w = this.game.getServer().getWorld(world);
+        Optional<World> w = Sponge.getServer().getWorld(world.getUniqueId());
         if (w.isPresent())
         {
             i18n.sendTranslated(context, POSITIVE, "The world {world} is already loaded!", w);
             return;
         }
 
-        if (!server.getWorldProperties(world).isPresent())
+        if (enable)
         {
-            i18n.sendTranslated(context, NEGATIVE, "World {input} not found!", world);
-            return;
+            world.setEnabled(true);
         }
 
-        Optional<World> loaded = server.loadWorld(world);
+        Optional<World> loaded = Sponge.getServer().loadWorld(world);
         if (!loaded.isPresent())
         {
             i18n.sendTranslated(context, NEGATIVE, "Could not load {name#world}", world);
@@ -166,7 +171,7 @@ public class WorldsCommands extends ContainerCommand
     @Command(desc = "Unload a loaded world")
     public void unload(CommandSource context, World world, @Flag boolean force)
     {
-        if (server.unloadWorld(world))
+        if (Sponge.getServer().unloadWorld(world))
         {
             i18n.sendTranslated(context, POSITIVE, "Unloaded the world {world}!", world);
             return;
@@ -186,14 +191,14 @@ public class WorldsCommands extends ContainerCommand
             return;
         }
 
-        Optional<WorldProperties> defWorld = server.getDefaultWorld();
+        Optional<WorldProperties> defWorld = Sponge.getServer().getDefaultWorld();
         if (!defWorld.isPresent())
         {
             i18n.sendTranslated(context, NEUTRAL, "Could not unload {world}. No default world to evacuate to.", world);
             return;
         }
 
-        World evacuation = server.getWorld(defWorld.get().getWorldName()).get();
+        World evacuation = Sponge.getServer().getWorld(defWorld.get().getWorldName()).get();
         if (evacuation == world)
         {
             world.getEntities(entity -> entity instanceof Player).stream()
@@ -208,7 +213,7 @@ public class WorldsCommands extends ContainerCommand
         }
 
         i18n.sendTranslated(context, POSITIVE, "Teleported all players out of {world}", world);
-        if (server.unloadWorld(world))
+        if (Sponge.getServer().unloadWorld(world))
         {
             i18n.sendTranslated(context, POSITIVE, "Unloaded the world {world}!", world);
             return;
@@ -217,110 +222,115 @@ public class WorldsCommands extends ContainerCommand
     }
 
     @Command(desc = "Remove a world", alias = "delete")
-    public void remove(CommandSource context, String world, @Flag @ParameterPermission(value = "remove-worldfolder", desc = "Allows deleting the world folder") boolean folder)
+    public void remove(CommandSource context, WorldProperties world, @Flag @ParameterPermission(value = "remove-worldfolder", desc = "Allows deleting the world folder") boolean folder)
     {
-        Optional<World> w = server.getWorld(world);
-        if (w.isPresent())
+        if (Sponge.getServer().getWorld(world.getUniqueId()).isPresent())
         {
             i18n.sendTranslated(context, NEGATIVE, "You have to unload the world first!");
-            return;
-        }
-
-        Optional<WorldProperties> worldProperties = server.getWorldProperties(world);
-        if (!worldProperties.isPresent())
-        {
-            i18n.sendTranslated(context, NEGATIVE, "World {input} not found!", world);
             return;
         }
 
         if (folder)
         {
             i18n.sendTranslated(context, POSITIVE, "Deleting the world {name} from disk...", world);
-            server.deleteWorld(worldProperties.get()).addListener(
-                    () -> i18n.sendTranslated(context, POSITIVE, "Finished deleting the world {name} from disk", world),
-                    Executors.newSingleThreadExecutor() // TODO choose an executor?
-            );
+            Sponge.getServer().deleteWorld(world).
+                thenAccept(b -> i18n.sendTranslated(context, POSITIVE, "Finished deleting the world {name} from disk", world));
+            return;
         }
-        else
-        {
-            worldProperties.get().setEnabled(false);
-            i18n.sendTranslated(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
-        }
+        world.setEnabled(false);
+        i18n.sendTranslated(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
     }
 
     @Command(desc = "Lists all worlds")
     public void list(CommandSource context)
     {
-        // TODO check world permissions for display?
         i18n.sendTranslated(context, POSITIVE, "The following worlds do exist:");
 
-        for (WorldProperties properties : server.getAllWorldProperties())
+        for (WorldProperties properties : Sponge.getServer().getAllWorldProperties())
         {
-            Optional<World> world = server.getWorld(properties.getWorldName());
-            if (world.isPresent())
+            if (Sponge.getServer().getWorld(properties.getWorldName()).isPresent())
             {
                 i18n.sendTranslated(context, POSITIVE,
                         "{name#world} {input#environement:color=INDIGO}",
                         properties.getWorldName(), properties.getDimensionType().getName());
+                return;
             }
-            else if (properties.isEnabled())
+            if (properties.isEnabled())
             {
                 i18n.sendTranslated(context, POSITIVE,
                         "{name#world} {input#environement:color=INDIGO} {text:(not loaded):color=RED}",
                         properties.getWorldName(), properties.getDimensionType().getName());
+                return;
             }
-            else
-            {
-                i18n.sendTranslated(context, POSITIVE,
-                        "{name#world} {input#environement:color=INDIGO} {text:(not enabled):color=DARK_RED}",
-                        properties.getWorldName(), properties.getDimensionType().getName());
-            }
+            i18n.sendTranslated(context, POSITIVE.style(STRIKETHROUGH),
+                    "{name#world} {input#environement:color=INDIGO} {text:(not enabled):color=DARK_RED}",
+                    properties.getWorldName(), properties.getDimensionType().getName());
         }
     }
 
-    // list / list worlds that you can enter
     @Command(desc = "Show info about a world")
-    public void info(CommandSource context, String world)
+    public void info(CommandSource context, @Default WorldProperties world, @Flag boolean showGameRules)
     {
-        WorldProperties properties = server.getWorldProperties(world).orElse(null);
-        if (properties == null)
+        context.sendMessage(Text.EMPTY);
+        i18n.sendTranslated(context, POSITIVE, "World information for {world}:", world);
+        if (!world.isEnabled())
         {
-            i18n.sendTranslated(context, NEGATIVE, "World {input} not found!", world);
-            return;
+            i18n.sendTranslated(context, NEUTRAL, "This world is disabled.");
         }
-        i18n.sendTranslated(context, POSITIVE, "World information for {input#world}:", world);
-        i18n.sendTranslated(context, POSITIVE, "Gamemode: {input}", properties.getGameMode().getTranslation());
-        i18n.sendTranslated(context, POSITIVE, "DimensionType: {input}", properties.getDimensionType().getName());
-        if (properties.usesMapFeatures())
+        if (!world.isInitialized())
         {
-            i18n.sendTranslated(context, POSITIVE, "WorldType: {input} with structures", properties.getGeneratorType().getName());
+            i18n.sendTranslated(context, NEUTRAL, "This world has not been initialized.");
+        }
+        i18n.sendTranslated(context, POSITIVE, "Gamemode: {input}", world.getGameMode().getTranslation());
+        i18n.sendTranslated(context, POSITIVE, "DimensionType: {input}", world.getDimensionType().getName());
+        if (world.usesMapFeatures())
+        {
+            i18n.sendTranslated(context, POSITIVE, "WorldType: {input} with structures", world.getGeneratorType().getName());
         }
         else
         {
-            i18n.sendTranslated(context, POSITIVE, "WorldType: {input}", properties.getGeneratorType().getName());
+            i18n.sendTranslated(context, POSITIVE, "WorldType: {input} no structures", world.getGeneratorType().getName());
         }
-        // TODO custom generator
-        if (!properties.loadOnStartup())
+        i18n.sendTranslated(context, POSITIVE, "Difficulty {input}", world.getDifficulty().getTranslation());
+        if (world.isHardcore())
+        {
+            i18n.sendTranslated(context, POSITIVE, "Hardcoremode active");
+        }
+        if (!world.isPVPEnabled())
+        {
+            i18n.sendTranslated(context, POSITIVE, "PVP disabled");
+        }
+        if (!world.areCommandsAllowed() && Sponge.getPlatform().getType() == Type.CLIENT)
+        {
+            i18n.sendTranslated(context, POSITIVE, "Commands are not allowed");
+        }
+        i18n.sendTranslated(context, POSITIVE, "Seed: {long}", world.getSeed());
+        if (!world.getGeneratorModifiers().isEmpty())
+        {
+            i18n.sendTranslated(context, POSITIVE, "Generation is modified by:");
+            for (WorldGeneratorModifier modifier : world.getGeneratorModifiers())
+            {
+                context.sendMessage(Text.of(YELLOW, " - ", GOLD, modifier.getName()));
+            }
+        }
+        if (!world.loadOnStartup())
         {
             i18n.sendTranslated(context, POSITIVE, "This world will not load automatically on startup!");
         }
-        Vector3i spawn = properties.getSpawnPosition();
+        Vector3i spawn = world.getSpawnPosition();
         i18n.sendTranslated(context, POSITIVE, "This worlds spawn is at {vector}", new BlockVector3(spawn.getX(), spawn.getY(), spawn.getZ()));
-        // gamerules
-        if (!properties.getGameRules().isEmpty())
+        if (showGameRules && !world.getGameRules().isEmpty()) // Show gamerules
         {
-            i18n.sendTranslated(context, POSITIVE, "The following game-rules are active:");
-            for (Entry<String, String> entry : properties.getGameRules().entrySet())
+            i18n.sendTranslated(context, POSITIVE, "The following game-rules are set:");
+            for (Entry<String, String> entry : world.getGameRules().entrySet())
             {
-                context.sendMessage(Text.of(entry.getKey(), ": ", entry.getValue()));
+                context.sendMessage(Text.of(YELLOW, entry.getKey(), ": ", GOLD, entry.getValue()));
             }
         }
-        // TODO more?
     }
-    // info
 
     @Command(desc = "Lists the players in a world")
-    public void listplayers(CommandSource context, World world)
+    public void listplayers(CommandSource context, @Default World world)
     {
         Collection<Entity> players = world.getEntities(e -> e instanceof Player);
         if (players.isEmpty())
@@ -329,10 +339,9 @@ public class WorldsCommands extends ContainerCommand
             return;
         }
         i18n.sendTranslated(context, POSITIVE, "The following players are in {world}", world);
-        Text s = Text.of(TextColors.YELLOW, " -", TextColors.GOLD);
         for (Entity player : players)
         {
-            context.sendMessage(Text.of(s, ((Player) player).getName()));
+            context.sendMessage(Text.of(YELLOW, " - ", DARK_GREEN, ((Player) player).getName()));
         }
     }
 }

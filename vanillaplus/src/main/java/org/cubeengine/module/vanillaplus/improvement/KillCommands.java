@@ -35,11 +35,15 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.entity.EntityTypes.LIGHTNING;
+import static org.spongepowered.api.event.cause.NamedCause.source;
+import static org.spongepowered.api.event.cause.entity.damage.DamageTypes.CUSTOM;
 
 /**
  * {@link #kill}
@@ -104,7 +108,7 @@ public class KillCommands extends PermissionContainer<VanillaPlus>
     {
         if (!force)
         {
-            if (player.hasPermission(COMMAND_KILL_PREVENT.getId()) || player.get(Keys.INVULNERABILITY).isPresent())
+            if (player.hasPermission(COMMAND_KILL_PREVENT.getId()) || player.get(Keys.INVULNERABILITY_TICKS).isPresent())
             {
                 i18n.sendTranslated(context, NEGATIVE, "You cannot kill {user}!", player);
                 return false;
@@ -112,10 +116,10 @@ public class KillCommands extends PermissionContainer<VanillaPlus>
         }
         if (lightning)
         {
-            player.getWorld().spawnEntity(player.getWorld().createEntity(EntityTypes.LIGHTNING, player.getLocation().getPosition()).get(), Cause.of(context));
+            player.getWorld().spawnEntity(player.getWorld().createEntity(LIGHTNING, player.getLocation().getPosition()).get(), Cause.of(source(context)));
         }
 
-        player.damage(player.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(DamageTypes.CUSTOM).build(), Cause.of(context));
+        player.damage(player.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build(), Cause.of(source(context)));
         if (showMessage)
         {
             i18n.sendTranslated(context, POSITIVE, "You killed {user}!", player);
@@ -132,7 +136,7 @@ public class KillCommands extends PermissionContainer<VanillaPlus>
     @Restricted(value = Player.class, msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}")
     public void suicide(Player context)
     {
-        context.damage(context.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(DamageTypes.CUSTOM).build(), Cause.of(context));
+        context.damage(context.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build(), Cause.of(source(context)));
         i18n.sendTranslated(context, NEGATIVE, "You ended your life. Why? {text:\\:(:color=DARK_RED}");
     }
 }

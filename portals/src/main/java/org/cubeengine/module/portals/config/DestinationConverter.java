@@ -26,7 +26,7 @@ import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
 import org.cubeengine.module.portals.config.Destination.Type;
 import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldLocation;
+import org.cubeengine.service.world.WorldTransform;
 
 public class DestinationConverter extends SingleClassConverter<Destination>
 {
@@ -82,7 +82,7 @@ public class DestinationConverter extends SingleClassConverter<Destination>
                         break;
                     case LOCATION:
                         destination.world = new ConfigWorld(mappedNodes.get("world").asText());
-                        destination.location = converterManager.convertFromNode(mappedNodes.get("location"), WorldLocation.class);
+                        destination.location = converterManager.convertFromNode(mappedNodes.get("location"), WorldTransform.class);
                         break;
                 }
                 return destination;

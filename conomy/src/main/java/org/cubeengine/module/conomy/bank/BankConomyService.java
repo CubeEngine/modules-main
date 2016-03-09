@@ -58,21 +58,27 @@ public class BankConomyService extends ConomyService
     }
 
     @Override
-    public Optional<Account> getAccount(String identifier)
+    public Optional<Account> getOrCreateAccount(String identifier)
     {
         try
         {
-            return getAccount(UUID.fromString(identifier)).map(Account.class::cast);
+            return getOrCreateAccount(UUID.fromString(identifier)).map(Account.class::cast);
         }
         catch (IllegalArgumentException e)
         {
             Account account = accounts.get(identifier);
             if (account == null)
             {
-                return loadAccount(identifier, false);
+                return loadAccount(identifier, true);
             }
             return Optional.of(account);
         }
+    }
+
+    @Override
+    public boolean hasAccount(String identifier)
+    {
+        return super.hasAccount(identifier) || accounts.get(identifier) != null || loadAccount(identifier, false).isPresent();
     }
 
     protected Optional<Account> loadAccount(String name, boolean create)
@@ -104,26 +110,6 @@ public class BankConomyService extends ConomyService
         AccountModel model = db.getDSL().newRecord(TABLE_ACCOUNT).newAccount(name, false, false);
         model.store();
         return model;
-    }
-
-
-    @Override
-    public Optional<VirtualAccount> createVirtualAccount(String identifier)
-    {
-        Optional<Account> account = getAccount(identifier);
-        if (account.isPresent())
-        {
-            return account.filter(a -> a instanceof VirtualAccount).map(VirtualAccount.class::cast);
-        }
-        try
-        {
-            UUID.fromString(identifier);
-            return Optional.empty();
-        }
-        catch (Exception e)
-        {
-            return loadAccount(identifier, true).map(VirtualAccount.class::cast);
-        }
     }
 
     public List<BaseAccount.Virtual> getBanks(Subject user, AccessLevel level)
@@ -178,7 +164,7 @@ public class BankConomyService extends ConomyService
             manage.addAll(see);
         }
 
-        List<BaseAccount.Virtual> collect = manage.stream().map(this::getAccount)
+        List<BaseAccount.Virtual> collect = manage.stream().map(this::getOrCreateAccount)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .filter(a -> a instanceof BaseAccount.Virtual)

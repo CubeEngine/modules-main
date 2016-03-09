@@ -29,12 +29,11 @@ import org.spongepowered.api.Game;
 public class Worlds extends Module
 {
     @Inject private CommandManager cm;
-    @Inject private Game game;
     @Inject private I18n i18n;
 
     @Enable
     public void onLoad()
     {
-        this.cm.addCommand(new WorldsCommands(this, i18n, game));
+        this.cm.addCommand(new WorldsCommands(this, i18n));
     }
 }

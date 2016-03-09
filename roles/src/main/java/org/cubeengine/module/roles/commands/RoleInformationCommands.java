@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import com.google.common.collect.ImmutableMap;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Complete;
@@ -39,11 +40,16 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextElement;
+import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.text.TextTemplate.arg;
+import static org.spongepowered.api.text.format.TextColors.*;
 import static org.spongepowered.api.util.Tristate.FALSE;
 import static org.spongepowered.api.util.Tristate.TRUE;
 
@@ -77,7 +83,7 @@ public class RoleInformationCommands extends ContainerCommand
         i18n.sendTranslated(cContext, POSITIVE, "The following roles are available:");
         for (Subject r : roles)
         {
-            cContext.sendMessage(Text.of("- ", TextColors.YELLOW, r instanceof RoleSubject ? ((RoleSubject) r).getName() : r.getIdentifier()));
+            cContext.sendMessage(Text.of("- ", YELLOW, r instanceof RoleSubject ? ((RoleSubject) r).getName() : r.getIdentifier()));
         }
     }
 
@@ -131,18 +137,17 @@ public class RoleInformationCommands extends ContainerCommand
         {
             i18n.sendTranslated(cContext, POSITIVE, "(Including inherited permissions)");
         }
-        String trueString = ChatFormat.DARK_GREEN + "true";
-        String falseString = ChatFormat.DARK_RED + "false";
+        TextTemplate trueTemplate = TextTemplate.of("- ", arg("perm").color(YELLOW), WHITE, ": ", DARK_GREEN, "true");
+        TextTemplate falseTemplate = TextTemplate.of("- ", arg("perm").color(YELLOW), WHITE, ": ", DARK_RED, "false");
         for (Entry<String, Boolean> perm : permissions.entrySet())
         {
+            Map<String, TextElement> map = ImmutableMap.of("perm", Text.of(perm.getKey()));
             if (perm.getValue())
             {
-                cContext.sendMessage(Text.of("- ", TextColors.YELLOW, perm.getKey(),
-                        TextColors.WHITE, ": ", TextColors.GOLD, trueString));
+                cContext.sendMessage(trueTemplate, map);
                 continue;
             }
-            cContext.sendMessage(Text.of("- ", TextColors.YELLOW, perm.getKey(),
-                    TextColors.WHITE, ": ", TextColors.GOLD, falseString));
+            cContext.sendMessage(falseTemplate, map);
         }
     }
 
@@ -169,8 +174,8 @@ public class RoleInformationCommands extends ContainerCommand
         }
         for (Entry<String, String> entry : options.entrySet())
         {
-            cContext.sendMessage(Text.of("- ", TextColors.YELLOW, entry.getKey(),
-                    TextColors.WHITE, ": ", TextColors.GOLD, entry.getValue()));
+            cContext.sendMessage(Text.of("- ", YELLOW, entry.getKey(),
+                    WHITE, ": ", TextColors.GOLD, entry.getValue()));
         }
     }
 
@@ -188,7 +193,7 @@ public class RoleInformationCommands extends ContainerCommand
         i18n.sendTranslated(ctx, NEUTRAL, "The role {role} in {context} has following parent roles:", role, context);
         for (Subject parent : parents)
         {
-            ctx.sendMessage(Text.of("- ", TextColors.YELLOW, parent instanceof RoleSubject ? ((RoleSubject) parent).getName() : parent.getIdentifier()));
+            ctx.sendMessage(Text.of("- ", YELLOW, parent instanceof RoleSubject ? ((RoleSubject) parent).getName() : parent.getIdentifier()));
         }
     }
 
@@ -211,7 +216,7 @@ public class RoleInformationCommands extends ContainerCommand
         i18n.sendTranslated(cContext, POSITIVE, "The following roles are default roles in {context}!", context);
         for (Subject role : parents)
         {
-            cContext.sendMessage(Text.of("- ", TextColors.YELLOW, role instanceof RoleSubject ? ((RoleSubject) role).getName() : role.getIdentifier()));
+            cContext.sendMessage(Text.of("- ", YELLOW, role instanceof RoleSubject ? ((RoleSubject) role).getName() : role.getIdentifier()));
         }
     }
 }

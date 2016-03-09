@@ -120,7 +120,7 @@ public class InformationCommands extends PermissionContainer<VanillaPlus>
             }
             world = ((Player)context).getWorld();
         }
-        i18n.sendTranslated(context, NEUTRAL, "Seed of {world} is {long#seed}", world, world.getWorldStorage().getWorldProperties().getSeed());
+        i18n.sendTranslated(context, NEUTRAL, "Seed of {world} is {long#seed}", world, world.getProperties().getSeed());
     }
 
     @Command(desc = "Displays the direction in which you are looking.")
@@ -279,7 +279,7 @@ public class InformationCommands extends PermissionContainer<VanillaPlus>
         if (context.isSource(Player.class))
         {
             i18n.sendTranslated(context.getSource(), MessageType.NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}",
-                                ((Player)context.getSource()).getConnection().getPing());
+                                ((Player)context.getSource()).getConnection().getLatency());
             return;
         }
         i18n.sendTranslated(context.getSource(), NEUTRAL, label + " in the console?");

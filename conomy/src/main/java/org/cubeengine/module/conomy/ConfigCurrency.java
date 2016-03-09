@@ -62,6 +62,18 @@ public class ConfigCurrency implements Currency
     }
 
     @Override
+    public String getId()
+    {
+        return config.name;
+    }
+
+    @Override
+    public String getName()
+    {
+        return config.name;
+    }
+
+    @Override
     public Text getDisplayName()
     {
         return Text.of(config.name);

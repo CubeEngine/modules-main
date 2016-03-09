@@ -42,6 +42,8 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Humanoid;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.text.Text;
@@ -228,7 +230,8 @@ public class LockerCommands extends ContainerCommand
                 if (te.isPresent() && te.get() instanceof Carrier)
                 {
                     // TODO check if this is working
-                    ((Carrier) te.get()).getInventory().<Container>query(Container.class).getViewers().forEach(Humanoid::closeInventory);
+                    Cause cause = Cause.of(NamedCause.source(context));
+                    ((Carrier) te.get()).getInventory().<Container>query(Container.class).getViewers().forEach(p -> p.closeInventory(cause));
                 }
             });
             i18n.sendTranslated(context, POSITIVE, "Right click a protection to invalidate old KeyBooks for it!");

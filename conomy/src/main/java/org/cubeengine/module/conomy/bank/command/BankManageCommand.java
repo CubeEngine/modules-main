@@ -113,12 +113,12 @@ public class BankManageCommand extends ContainerCommand
                        @Flag(longName = "hidden", name = "h") boolean hidden,
                        @Flag(longName = "invite", name = "i") boolean invite)
     {
-        if (service.getAccount(name).isPresent())
+        if (service.hasAccount(name))
         {
             i18n.sendTranslated(context, NEGATIVE, "There is already a bank names {input#bank}!", name);
             return;
         }
-        BaseAccount.Virtual bank = service.createVirtualAccount(name).map(BaseAccount.Virtual.class::cast).get();
+        BaseAccount.Virtual bank = service.getOrCreateAccount(name).map(BaseAccount.Virtual.class::cast).get();
         bank.setHidden(hidden);
         bank.setInvite(invite);
         i18n.sendTranslated(context, POSITIVE, "Created new Bank {account}!", bank);

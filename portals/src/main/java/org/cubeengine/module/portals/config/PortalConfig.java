@@ -22,7 +22,7 @@ import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import org.cubeengine.module.core.util.math.BlockVector3;
 import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldLocation;
+import org.cubeengine.service.world.WorldTransform;
 
 @SuppressWarnings("all")
 public class PortalConfig extends ReflectedYaml
@@ -41,7 +41,7 @@ public class PortalConfig extends ReflectedYaml
         public BlockVector3 to;
 
         @Comment("When linking another portal to this one a player will be teleported to this location")
-        public WorldLocation destination;
+        public WorldTransform destination;
     }
 
     public Destination destination;

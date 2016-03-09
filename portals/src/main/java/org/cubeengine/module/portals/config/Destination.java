@@ -22,7 +22,7 @@ import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldLocation;
+import org.cubeengine.service.world.WorldTransform;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
@@ -34,14 +34,14 @@ public class Destination
 {
     public Type type;
     public ConfigWorld world;
-    public WorldLocation location;
+    public WorldTransform location;
     public String portal;
     private I18n i18n;
 
     public Destination(Location<World> location, Vector3d direction, I18n i18n)
     {
         this.i18n = i18n;
-        this.location = new WorldLocation(location, direction);
+        this.location = new WorldTransform(location, direction);
         this.world = new ConfigWorld(location.getExtent());
         this.type = Type.LOCATION;
     }

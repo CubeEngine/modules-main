@@ -1,4 +1,4 @@
-package de.cubeisland.engine.module.netherportals;
+package org.cubeengine.module.netherportals;
 
 import java.util.HashMap;
 import java.util.Map;

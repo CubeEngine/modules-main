@@ -43,14 +43,10 @@ public class TravelPerm extends PermissionContainer<Travel>
     public final PermissionDescription HOME_REMOVE_OTHER = register("home.remove.other", "", COMMAND);
     public final PermissionDescription HOME_RENAME_OTHER = register("home.rename.other", "", COMMAND);
     public final PermissionDescription HOME_LIST_OTHER = register("home.list.other", "", COMMAND);
-    public final PermissionDescription HOME_PRIVATE_OTHER = register("home.private.other", "", COMMAND);
-    public final PermissionDescription HOME_PUBLIC_OTHER = register("home.public.other", "", COMMAND);
 
     public final PermissionDescription WARP_TP_OTHER = register("warp.tp.other", "", COMMAND);
     public final PermissionDescription WARP_MOVE_OTHER = register("warp.move.other", "", COMMAND);
     public final PermissionDescription WARP_REMOVE_OTHER = register("warp.remove.other", "", COMMAND);
     public final PermissionDescription WARP_RENAME_OTHER = register("warp.rename.other", "", COMMAND);
     public final PermissionDescription WARP_LIST_OTHER = register("warp.list.other", "", COMMAND);
-    public final PermissionDescription WARP_PRIVATE_OTHER = register("warp.private.other", "", COMMAND);
-    public final PermissionDescription WARP_PUBLIC_OTHER = register("warp.public.other", "", COMMAND);
 }

@@ -48,6 +48,7 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -206,7 +207,7 @@ public class Lock
                 Optional<Entity> entity = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
                 entity.ifPresent(e -> {
                     e.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
-                    loc.getExtent().spawnEntity(e, Cause.of(player));
+                    loc.getExtent().spawnEntity(e, Cause.of(NamedCause.source(player)));
                 });
             }
         }
@@ -834,7 +835,7 @@ public class Lock
             else
             {
                 i18n.sendTranslated(user, NEUTRAL, "Sudden pain makes you realize this was not the right passphrase!");
-                user.damage(1, DamageSources.MAGIC, Cause.of(user));
+                user.damage(1, DamageSources.MAGIC, Cause.of(NamedCause.source(user)));
             }
         }
         else

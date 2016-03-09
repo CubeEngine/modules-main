@@ -48,7 +48,11 @@ public class VirtualAccountReader implements ArgumentReader<BaseAccount.Virtual>
     public BaseAccount.Virtual read(Class type, CommandInvocation invocation) throws ReaderException
     {
         String arg = invocation.consume(1);
-        Optional<BaseAccount.Virtual> target = service.getAccount(arg).filter(a -> a instanceof BaseAccount.Virtual).map(BaseAccount.Virtual.class::cast);
+        Optional<BaseAccount.Virtual> target = Optional.empty();
+        if (service.hasAccount(arg))
+        {
+            target = service.getOrCreateAccount(arg).filter(a -> a instanceof BaseAccount.Virtual).map(BaseAccount.Virtual.class::cast);
+        }
         if (!target.isPresent())
         {
             throw new TranslatedReaderException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE, "There is no bank account named {input#name}!", arg));

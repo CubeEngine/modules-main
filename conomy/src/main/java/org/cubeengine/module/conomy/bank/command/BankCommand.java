@@ -89,7 +89,7 @@ public class BankCommand extends ContainerCommand
     @Restricted(value = Player.class, msg =  "You cannot deposit into a bank as console!")
     public void deposit(Player context, BaseAccount.Virtual bank, Double amount)
     {
-        Optional<UniqueAccount> account = service.createAccount(context.getUniqueId());
+        Optional<UniqueAccount> account = service.getOrCreateAccount(context.getUniqueId());
         if (!account.isPresent())
         {
             i18n.sendTranslated(context, NEGATIVE, "You do not have an account!");
@@ -123,7 +123,7 @@ public class BankCommand extends ContainerCommand
     @Restricted(value = Player.class, msg = "You cannot withdraw from a bank as console!")
     public void withdraw(Player context, BaseAccount.Virtual bank, Double amount) //takes money from the bank
     {
-        Optional<UniqueAccount> account = service.createAccount(context.getUniqueId());
+        Optional<UniqueAccount> account = service.getOrCreateAccount(context.getUniqueId());
         if (!account.isPresent())
         {
             i18n.sendTranslated(context, NEGATIVE, "You do not have an account!");

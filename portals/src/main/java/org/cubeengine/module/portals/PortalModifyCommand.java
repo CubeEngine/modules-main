@@ -30,7 +30,7 @@ import org.cubeengine.service.Selector;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldLocation;
+import org.cubeengine.service.world.WorldTransform;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -111,7 +111,7 @@ public class PortalModifyCommand extends ContainerCommand
             i18n.sendTranslated(context, NEGATIVE, "A portals exit cannot be in an other world than its location!");
             return;
         }
-        portal.config.location.destination = new WorldLocation(location, context.getRotation());
+        portal.config.location.destination = new WorldTransform(location, context.getRotation());
         portal.config.save();
         i18n.sendTranslated(context, POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
     }

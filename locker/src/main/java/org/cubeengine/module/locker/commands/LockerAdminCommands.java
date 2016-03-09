@@ -29,6 +29,8 @@ import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.Carrier;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
@@ -77,7 +79,7 @@ public class LockerAdminCommands extends ContainerCommand
                     TileEntity te = lock.getFirstLocation().getTileEntity().orElse(null);
                     if (te instanceof Carrier)
                     {
-                        ((Player)context).openInventory(((Carrier)te).getInventory());
+                        ((Player)context).openInventory(((Carrier)te).getInventory(), Cause.of(NamedCause.source(context)));
                     }
                 }
                 else

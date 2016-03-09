@@ -85,7 +85,7 @@ public class EcoCommand extends ContainerCommand
 
     private BaseAccount.Unique getAccount(CommandSource context, User user)
     {
-        BaseAccount.Unique target = service.createAccount(user.getUniqueId())
+        BaseAccount.Unique target = service.getOrCreateAccount(user.getUniqueId())
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast).orElse(null);
         if (target == null)

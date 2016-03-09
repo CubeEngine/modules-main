@@ -105,7 +105,7 @@ public class PlayerData implements DataSerializable
         this.activePotionEffects = value.getSerializableList(ACTIVE_EFFECTS.getQuery(), PotionEffect.class).orElse(new ArrayList<>());
 
         inventory.clear();
-        DataView inventoryView = value.getView(INVENTORY.getQuery()).get();
+        DataView inventoryView = value.getView(INVENTORY.getQuery()).orElse(new MemoryDataContainer());
         for (DataQuery key : inventoryView.getKeys(false))
         {
             inventory.put(Integer.valueOf(key.asString("")), ItemStack.builder().fromContainer(inventoryView.getView(key).get()).build());

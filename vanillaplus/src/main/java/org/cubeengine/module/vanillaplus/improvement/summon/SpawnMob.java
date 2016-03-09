@@ -32,6 +32,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
@@ -92,7 +93,7 @@ public class SpawnMob
         {
             //CreatureSpawnEvent
             Optional<Entity> entity = loc.getExtent().createEntity(entityType, loc.getPosition());
-            loc.getExtent().spawnEntity(entity.get(), Cause.of(context));
+            loc.getExtent().spawnEntity(entity.get(), Cause.of(NamedCause.source(context)));
             spawnedMobs[i] = entity.get();
             if (ridingOn != null)
             {
