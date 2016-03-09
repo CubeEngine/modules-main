@@ -82,7 +82,7 @@ public class Conomy extends Module
         {
             service = new ConomyService(this, config, curencyPath, db, reflector);
         }
-        Object plugin = game.getPluginManager().getPlugin("CubeEngine").get().getInstance().get();
+        Object plugin = game.getPluginManager().getPlugin("org.cubeengine").get().getInstance().get();
         game.getServiceManager().setProvider(plugin, EconomyService.class, service);
 
         service.registerCommands(cm, i18n);

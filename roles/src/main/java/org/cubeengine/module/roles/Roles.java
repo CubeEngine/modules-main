@@ -121,7 +121,7 @@ public class Roles extends Module
 
         PermissionService proxy = (PermissionService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{PermissionService.class}, handler);
 
-        Object plugin = game.getPluginManager().getPlugin("CubeEngine").get().getInstance().get();
+        Object plugin = game.getPluginManager().getPlugin("org.cubeengine").get().getInstance().get();
 
         game.getServiceManager().setProvider(plugin, PermissionService.class, proxy);
         if (previous.isPresent())
