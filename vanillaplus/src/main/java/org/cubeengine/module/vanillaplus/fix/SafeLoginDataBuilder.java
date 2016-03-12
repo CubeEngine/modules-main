@@ -21,10 +21,16 @@ import java.util.Optional;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
-import org.spongepowered.api.util.persistence.InvalidDataException;
+import org.spongepowered.api.data.persistence.AbstractDataBuilder;
+import org.spongepowered.api.data.persistence.InvalidDataException;
 
-public class SafeLoginDataBuilder implements DataManipulatorBuilder<SafeLoginData, ImmutableSafeLoginData>
+public class SafeLoginDataBuilder extends AbstractDataBuilder<SafeLoginData> implements DataManipulatorBuilder<SafeLoginData, ImmutableSafeLoginData>
 {
+    public SafeLoginDataBuilder()
+    {
+        super(SafeLoginData.class, 1);
+    }
+
     @Override
     public SafeLoginData create()
     {
@@ -38,7 +44,7 @@ public class SafeLoginDataBuilder implements DataManipulatorBuilder<SafeLoginDat
     }
 
     @Override
-    public Optional<SafeLoginData> build(DataView container) throws InvalidDataException
+    protected Optional<SafeLoginData> buildContent(DataView container) throws InvalidDataException
     {
         return create().from(container.copy());
     }

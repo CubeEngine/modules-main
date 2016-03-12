@@ -25,12 +25,18 @@ import java.util.Optional;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
+import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 
 import static org.cubeengine.module.roles.data.IPermissionData.*;
 
-public class PermissionDataBuilder implements DataManipulatorBuilder<PermissionData, ImmutablePermissionData>
+public class PermissionDataBuilder extends AbstractDataBuilder<PermissionData> implements DataManipulatorBuilder<PermissionData, ImmutablePermissionData>
 {
+    public PermissionDataBuilder()
+    {
+        super(PermissionData.class, 1);
+    }
+
     @Override
     public PermissionData create()
     {
@@ -44,8 +50,7 @@ public class PermissionDataBuilder implements DataManipulatorBuilder<PermissionD
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public Optional<PermissionData> build(DataView container) throws InvalidDataException
+    protected Optional<PermissionData> buildContent(DataView container) throws org.spongepowered.api.data.persistence.InvalidDataException
     {
         Optional<List<String>> parents = container.getStringList(PARENTS.getQuery());
         Optional<Map<String, Boolean>> permissions = ((Optional<Map<String, Boolean>>) container.getMap(PERMISSIONS.getQuery()));

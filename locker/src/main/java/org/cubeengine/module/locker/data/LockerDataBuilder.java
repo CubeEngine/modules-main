@@ -21,15 +21,17 @@ import java.util.Optional;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
+import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 
-public class LockerDataBuilder implements DataManipulatorBuilder<LockerData, ImmutableLockerData>
+public class LockerDataBuilder extends AbstractDataBuilder<LockerData> implements DataManipulatorBuilder<LockerData, ImmutableLockerData>
 {
     private ValueFactory valueFactory;
 
     public LockerDataBuilder(ValueFactory valueFactory)
     {
+        super(LockerData.class, 1);
         this.valueFactory = valueFactory;
     }
 
@@ -46,7 +48,7 @@ public class LockerDataBuilder implements DataManipulatorBuilder<LockerData, Imm
     }
 
     @Override
-    public Optional<LockerData> build(DataView container) throws InvalidDataException
+    protected Optional<LockerData> buildContent(DataView container) throws InvalidDataException
     {
         Optional<Long> lockID = container.getLong(LockerData.LOCK_ID.getQuery());
         if (lockID.isPresent())

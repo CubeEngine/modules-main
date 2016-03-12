@@ -22,10 +22,16 @@ import java.util.Optional;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
+import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.util.persistence.InvalidDataException;
 
-public class MultiverseDataBuilder implements DataManipulatorBuilder<MultiverseData, ImmutableMultiverseData>
+public class MultiverseDataBuilder extends AbstractDataBuilder<MultiverseData> implements DataManipulatorBuilder<MultiverseData, ImmutableMultiverseData>
 {
+    public MultiverseDataBuilder()
+    {
+        super(MultiverseData.class, 1);
+    }
+
     @Override
     public MultiverseData create()
     {
@@ -38,8 +44,9 @@ public class MultiverseDataBuilder implements DataManipulatorBuilder<MultiverseD
         return create().fill(dataHolder);
     }
 
+
     @Override
-    public Optional<MultiverseData> build(DataView container) throws InvalidDataException
+    protected Optional<MultiverseData> buildContent(DataView container) throws InvalidDataException
     {
         return create().from(container.copy());
     }
