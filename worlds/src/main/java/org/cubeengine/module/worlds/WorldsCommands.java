@@ -20,10 +20,12 @@ package org.cubeengine.module.worlds;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.Executors;
 import com.flowpowered.math.vector.Vector3i;
+import com.google.common.collect.ImmutableMap;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
@@ -38,7 +40,11 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.TextElement;
+import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
@@ -48,6 +54,7 @@ import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
 
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.text.TextTemplate.arg;
 import static org.spongepowered.api.text.format.TextColors.*;
 import static org.spongepowered.api.text.format.TextStyles.STRIKETHROUGH;
 
@@ -246,25 +253,30 @@ public class WorldsCommands extends ContainerCommand
     {
         i18n.sendTranslated(context, POSITIVE, "The following worlds do exist:");
 
+        TextTemplate normal = TextTemplate.of(" - ", arg("world").color(GOLD), " ", arg("environment").color(DARK_AQUA));
+        TextTemplate notLoaded = TextTemplate.of(" - ", arg("world").color(GOLD), " ", arg("environment").color(DARK_AQUA), RED, " (", arg("notloaded"), ")");
+        TextTemplate notEnabled = TextTemplate.of(" - ", arg("world").color(GOLD), " ", arg("environment").color(DARK_AQUA), RED, " (", arg("notenabled"), ")");
+        String tNotLoaded = i18n.translate(context.getLocale(), "not loaded");
+        String tNotEnabled = i18n.translate(context.getLocale(), "not enabled");
+
         for (WorldProperties properties : Sponge.getServer().getAllWorldProperties())
         {
+            Map<String, TextElement> templateData = ImmutableMap.of("world", Text.of(properties.getWorldName()),
+                                                                    "environment", Text.of(properties.getDimensionType().getName()),
+                                                                    "notloaded", Text.of(tNotLoaded),
+                                                                    "notenabled", Text.of(tNotEnabled));
             if (Sponge.getServer().getWorld(properties.getWorldName()).isPresent())
             {
-                i18n.sendTranslated(context, POSITIVE,
-                        "{name#world} {input#environement:color=INDIGO}",
-                        properties.getWorldName(), properties.getDimensionType().getName());
-                return;
+                context.sendMessage(normal, templateData);
             }
-            if (properties.isEnabled())
+            else if (properties.isEnabled())
             {
-                i18n.sendTranslated(context, POSITIVE,
-                        "{name#world} {input#environement:color=INDIGO} {text:(not loaded):color=RED}",
-                        properties.getWorldName(), properties.getDimensionType().getName());
-                return;
+                context.sendMessage(notLoaded, templateData);
             }
-            i18n.sendTranslated(context, POSITIVE.style(STRIKETHROUGH),
-                    "{name#world} {input#environement:color=INDIGO} {text:(not enabled):color=DARK_RED}",
-                    properties.getWorldName(), properties.getDimensionType().getName());
+            else
+            {
+                context.sendMessage(notEnabled, templateData);
+            }
         }
     }
 

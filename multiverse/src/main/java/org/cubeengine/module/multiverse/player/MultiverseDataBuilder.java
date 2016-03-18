@@ -23,7 +23,7 @@ import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
-import org.spongepowered.api.util.persistence.InvalidDataException;
+import org.spongepowered.api.data.persistence.InvalidDataException;
 
 public class MultiverseDataBuilder extends AbstractDataBuilder<MultiverseData> implements DataManipulatorBuilder<MultiverseData, ImmutableMultiverseData>
 {
