@@ -23,7 +23,7 @@ import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.DefaultValue;
 import org.cubeengine.butler.parameter.reader.ReaderException;
-import org.cubeengine.module.roles.sponge.RolesPermissionService;
+import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.context.Context;
@@ -84,7 +84,7 @@ public class ContextReader implements ArgumentReader<Context>, Completer, Defaul
         {
             return new Context("world", ((Player)invocation.getCommandSource()).getWorld().getName());
         }
-        throw new ReaderException("You have to provide a context");
+        return new Context("global", "");
     }
 
     @Override

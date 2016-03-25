@@ -15,11 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.roles.sponge.collection;
+package org.cubeengine.module.roles.service.collection;
 
 import java.util.UUID;
-import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.module.roles.sponge.subject.UserSubject;
+import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.subject.UserSubject;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;

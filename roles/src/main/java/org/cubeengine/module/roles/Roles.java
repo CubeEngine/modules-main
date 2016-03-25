@@ -60,8 +60,8 @@ import org.cubeengine.module.roles.data.ImmutablePermissionData;
 import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.data.PermissionDataBuilder;
 import org.cubeengine.module.roles.exception.RolesExceptionHandler;
-import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.module.roles.sponge.subject.RoleSubject;
+import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.cubeengine.service.command.CommandManager;
 import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.i18n.I18n;
@@ -75,6 +75,10 @@ import org.spongepowered.api.util.Tristate;
 import static org.cubeengine.service.logging.LoggingUtil.*;
 
 @ModuleInfo(name = "Roles", description = "Manages permissions of players and roles")
+/*
+TODO generate sample configs on the first run AND/OR cmd to generate samples
+TODO role / user permlist clickable red - to remove perm after ok - green + to add (deny/allow?)  - then catch chat tab complete for perm
+*/
 public class Roles extends Module
 {
     private RolesConfig config;
@@ -152,7 +156,7 @@ public class Roles extends Module
 
         UserManagementCommands cmdUsers = new UserManagementCommands(this, service, i18n);
         cmdRoles.addCommand(cmdUsers);
-        cm.addCommands(cmdUsers, this, new UserInformationCommands(this, i18n));
+        cm.addCommands(cmdUsers, this, new UserInformationCommands(this, i18n, service));
         cmdRoles.addCommand(new ManagementCommands(this, service, i18n));
     }
 

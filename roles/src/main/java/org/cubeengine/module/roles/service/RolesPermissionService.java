@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.roles.sponge;
+package org.cubeengine.module.roles.service;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -31,10 +31,10 @@ import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesConfig;
-import org.cubeengine.module.roles.sponge.collection.BasicSubjectCollection;
-import org.cubeengine.module.roles.sponge.collection.RoleCollection;
-import org.cubeengine.module.roles.sponge.collection.UserCollection;
-import org.cubeengine.module.roles.sponge.data.DefaultSubjectData;
+import org.cubeengine.module.roles.service.collection.BasicSubjectCollection;
+import org.cubeengine.module.roles.service.collection.RoleCollection;
+import org.cubeengine.module.roles.service.collection.UserCollection;
+import org.cubeengine.module.roles.service.data.DefaultSubjectData;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -46,7 +46,7 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.util.Tristate;
 
-import static org.cubeengine.module.roles.sponge.subject.RoleSubject.SEPARATOR;
+import static org.cubeengine.module.roles.service.subject.RoleSubject.SEPARATOR;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 public class RolesPermissionService implements PermissionService

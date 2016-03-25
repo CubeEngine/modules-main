@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.roles.sponge.data;
+package org.cubeengine.module.roles.service.data;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.RoleConfig;
-import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.module.roles.sponge.subject.RoleSubject;
+import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 

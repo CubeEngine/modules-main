@@ -21,7 +21,7 @@ import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.roles.Roles;
-import org.cubeengine.module.roles.sponge.RolesPermissionService;
+import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;

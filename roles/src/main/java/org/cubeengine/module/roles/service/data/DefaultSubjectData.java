@@ -15,12 +15,12 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.roles.sponge.data;
+package org.cubeengine.module.roles.service.data;
 
 import java.util.Map.Entry;
 import java.util.Set;
 import org.cubeengine.module.roles.RolesConfig;
-import org.cubeengine.module.roles.sponge.RolesPermissionService;
+import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.spongepowered.api.service.context.Context;
 
 import static java.util.Collections.singleton;

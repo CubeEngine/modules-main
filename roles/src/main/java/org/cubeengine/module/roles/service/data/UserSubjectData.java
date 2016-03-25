@@ -15,18 +15,19 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.roles.sponge.data;
+package org.cubeengine.module.roles.service.data;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.data.PermissionData;
-import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.module.roles.sponge.subject.RoleSubject;
+import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
@@ -107,31 +108,24 @@ public class UserSubjectData extends CachingSubjectData
     @Override
     protected void cacheParents(Set<Context> c)
     {
-        for (Context context : c)
+        if (!parents.containsKey(RolesUtil.GLOBAL))
         {
-            context = service.getMirror(context);
-            String contextString = stringify(context) + "#";
-            if (!parents.containsKey(context))
-            {
-                List<String> parentList = getData()
-                    .map(PermissionData::getParents)
-                    .orElse(Collections.emptyList());
-                List<Subject> list = parentList.stream()
-                       .filter(p -> p.startsWith(contextString))
-                       .map(p -> p.split("#")[1])
-                       .map(r -> "role:" + r)
-                       .map(roleCollection::get)
-                       .sorted((o1, o2) -> {
-                           if (o1 != null && o2 != null)
-                           {
-                               return o1.compareTo(o2);
-                           }
-                           return 1;
-                       })
-                       .map(Subject.class::cast)
-                       .collect(toList());
-                parents.put(context, list);
-            }
+            List<String> parentList = getData()
+                .map(PermissionData::getParents)
+                .orElse(Collections.emptyList());
+            List<Subject> list = parentList.stream()
+                                           .map(r -> "role:" + r)
+                                           .map(roleCollection::get)
+                                           .sorted((o1, o2) -> {
+                                               if (o1 != null && o2 != null)
+                                               {
+                                                   return o1.compareTo(o2);
+                                               }
+                                               return 1;
+                                           })
+                                           .map(Subject.class::cast)
+                                           .collect(toList());
+            parents.put(RolesUtil.GLOBAL, list);
         }
     }
 
@@ -142,20 +136,13 @@ public class UserSubjectData extends CachingSubjectData
         {
             UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
 
-            List<String> parents = this.parents.entrySet().stream().flatMap(e -> {
-                String context = stringify(e.getKey()) + "#";
-                List<String> list = new ArrayList<>();
-                for (Subject subject : e.getValue())
-                {
-                    if (!(subject instanceof RoleSubject))
-                    {
-                        // TODO WARN: Subject that is not a role will not be persisted
-                        continue;
-                    }
-                    list.add(context + subject.getIdentifier().substring(5));
-                }
-                return list.stream();
-            }).collect(toList());
+            // On users only global assigned Roles get persisted
+            List<String> parents = this.parents.get(RolesUtil.GLOBAL).stream()
+                                               .filter(s -> s instanceof RoleSubject)
+                                               // TODO WARN: Subject that is not a role will not be persisted
+                                               .map(RoleSubject.class::cast)
+                                               .map(subject -> subject.getName())
+                                               .collect(Collectors.toList());
 
             Map<String, Boolean> permissions = this.permissions.entrySet().stream().flatMap(e -> {
                 String context = stringify(e.getKey()) + "#";

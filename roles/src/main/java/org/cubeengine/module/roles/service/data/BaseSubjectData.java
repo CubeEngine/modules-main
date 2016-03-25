@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.roles.sponge.data;
+package org.cubeengine.module.roles.service.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,10 +25,12 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import javax.inject.Provider;
+import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
+import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
-import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.module.roles.sponge.collection.RoleCollection;
-import org.cubeengine.module.roles.sponge.collection.UserCollection;
+import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.collection.RoleCollection;
+import org.cubeengine.module.roles.service.collection.UserCollection;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
@@ -36,6 +38,7 @@ import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static org.cubeengine.module.roles.RolesUtil.GLOBAL;
 import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
 
 /**
@@ -46,8 +49,6 @@ public class BaseSubjectData implements OptionSubjectData
     protected final Map<Context, Map<String, String>> options = new ConcurrentHashMap<>();
     protected final Map<Context, Map<String, Boolean>> permissions = new ConcurrentHashMap<>();
     protected final Map<Context, List<Subject>> parents = new ConcurrentHashMap<>();
-
-    public static final Context GLOBAL = new Context("global", "");
 
     protected final UserCollection userCollection;
     protected final RoleCollection roleCollection;
@@ -112,13 +113,21 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public boolean setOption(Set<Context> contexts, String key, String value)
     {
-        return operate(contexts, options, map -> map.put(key, value), HashMap::new);
+        if (value == null)
+        {
+            return operate(contexts, options, map -> map.remove(key) != null);
+        }
+        return operate(contexts, options, map -> !value.equals(map.put(key, value)), HashMap::new);
     }
 
     @Override
     public boolean clearOptions(Set<Context> contexts)
     {
-        return operate(contexts, options, Map::clear);
+        return operate(contexts, options,  m -> {
+            boolean empty = !m.isEmpty();
+            m.clear();
+            return empty;
+        });
     }
 
     @Override
@@ -148,22 +157,24 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public boolean setPermission(Set<Context> contexts, String permission, Tristate value)
     {
+        if (value == Tristate.UNDEFINED)
+        {
+            return operate(contexts, permissions, map -> map.remove(permission) != null);
+        }
         return operate(contexts, permissions, map -> {
-            if (value == Tristate.UNDEFINED)
-            {
-                map.remove(permission);
-            }
-            else
-            {
-                map.put(permission, value.asBoolean());
-            }
+            Boolean replaced = map.put(permission, value.asBoolean());
+            return replaced == null || replaced != value.asBoolean();
         }, HashMap::new);
     }
 
     @Override
     public boolean clearPermissions(Set<Context> contexts)
     {
-        return operate(contexts, permissions, Map::clear);
+        return operate(contexts, permissions, m -> {
+            boolean empty = !m.isEmpty();
+            m.clear();
+            return empty;
+        });
     }
 
     @Override
@@ -195,14 +206,16 @@ public class BaseSubjectData implements OptionSubjectData
     {
         checkForCircularDependency(contexts, parent, 0);
 
+        if (contexts.isEmpty() && parents.get(GLOBAL).contains(parent))
+        {
+            return false;
+        }
+
         for (Context context : contexts)
         {
-            if (parents.containsKey(context))
+            if (parents.containsKey(context) && parents.get(context).contains(parent))
             {
-                if (parents.get(context).contains(parent))
-                {
-                    return false;
-                }
+                return false;
             }
         }
 
@@ -232,20 +245,32 @@ public class BaseSubjectData implements OptionSubjectData
     @Override
     public boolean clearParents()
     {
-        parents.values().forEach(List::clear);
-        return true;
+        boolean changed = false;
+        for (List<Subject> list : parents.values())
+        {
+            if (!list.isEmpty())
+            {
+                list.clear();
+                changed = true;
+            }
+        }
+        return changed;
     }
 
     @Override
     public boolean clearParents(Set<Context> contexts)
     {
-        return operate(contexts, parents, List::clear);
+        return operate(contexts, parents, l -> {
+            boolean empty = !l.isEmpty();
+            l.clear();
+            return empty;
+        });
     }
 
     @FunctionalInterface
     interface Operator<T>
     {
-        void operate(T mapOrList);
+        boolean operate(T mapOrList);
     }
 
     private <T> boolean operate(Set<Context> contexts, Map<Context, T> all, Operator<T> operator)
@@ -256,20 +281,31 @@ public class BaseSubjectData implements OptionSubjectData
     private <T> boolean operate(Set<Context> contexts, Map<Context, T> all, Operator<T> operator, Provider<T> provider)
     {
         boolean changed = false;
+        if (contexts.isEmpty())
+        {
+            changed = operateOn(all, operator, provider, changed, GLOBAL);
+        }
         for (Context context : contexts)
         {
-            T val = all.get(context);
-            if (val == null)
-            {
-                val = provider.get();
-                all.put(context, val);
-            }
+            changed = operateOn(all, operator, provider, changed, context);
+        }
+        return changed;
+    }
+
+    private <T> boolean operateOn(Map<Context, T> all, Operator<T> operator, Provider<T> provider, boolean changed, Context context)
+    {
+        T val = all.get(context);
+        if (val == null)
+        {
+            val = provider.get();
             if (val != null)
             {
-                operator.operate(val);
-                changed = true;
+                all.put(context, val);
             }
-
+        }
+        if (val != null)
+        {
+            changed = operator.operate(val);
         }
         return changed;
     }
@@ -282,19 +318,16 @@ public class BaseSubjectData implements OptionSubjectData
 
     private <T> T accumulate(Set<Context> contexts, Map<Context, T> all, T result, Accumulator<T> accumulator)
     {
-        if (contexts.isEmpty())
+        T other = all.get(GLOBAL);
+        if (other != null)
         {
-            T other = all.get(GLOBAL);
-            if (other != null)
-            {
-                accumulator.operate(result, other);
-            }
+            accumulator.operate(result, other);
         }
 
         for (Context context : contexts)
         {
             context = service.getMirror(context);
-            T other = all.get(context);
+            other = all.get(context);
             if (other != null)
             {
                 accumulator.operate(result, other);
@@ -302,4 +335,6 @@ public class BaseSubjectData implements OptionSubjectData
         }
         return result;
     }
+
+
 }

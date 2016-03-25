@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.roles.sponge.subject;
+package org.cubeengine.module.roles.service.subject;
 
 import java.util.Optional;
 import java.util.Set;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.RoleConfig;
-import org.cubeengine.module.roles.sponge.RolesPermissionService;
-import org.cubeengine.module.roles.sponge.collection.RoleCollection;
-import org.cubeengine.module.roles.sponge.data.RoleSubjectData;
+import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.collection.RoleCollection;
+import org.cubeengine.module.roles.service.data.RoleSubjectData;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
@@ -74,16 +74,10 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
         return -Integer.compare(getSubjectData().getConfig().priority.value, o.getSubjectData().getConfig().priority.value);
     }
 
-    public boolean canAssignAndRemove(CommandSource source, Context context)
+    public boolean canAssignAndRemove(CommandSource source)
     {
         String perm = module.getModularity().provide(PermissionManager.class).getModulePermission(module).getId();
-        perm += "." + context.getType() + "." + context.getName();
-        if (!perm.endsWith(".")) // in case of global (or no context name)
-        {
-            perm += ".";
-        }
-        perm += identifier;
-        return source.hasPermission(perm);
+        return source.hasPermission(perm + "." + identifier);
     }
 
     public void setPriorityValue(int value)
