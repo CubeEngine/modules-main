@@ -52,16 +52,14 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
     @Override
     public boolean hasRegistered(String identifier)
     {
-        // TODO DB-Lookup ?
         return super.hasRegistered(identifier) || false;
     }
 
     @Override
     public Iterable<Subject> getAllSubjects()
     {
-        Iterable<Subject> allSubjects = super.getAllSubjects();
-        // TODO lazy DB-Lookup
-        return null;
+        // TODO get from all offline users once they can have custom data
+        return super.getAllSubjects();
     }
 
     public void reload()

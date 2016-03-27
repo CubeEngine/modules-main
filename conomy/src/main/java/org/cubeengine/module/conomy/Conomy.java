@@ -91,6 +91,7 @@ public class Conomy extends Module
         // TODO logging new accounts not! workaround set start value using transaction
 
         // we're doing this via permissions
+
     }
 
     public ConomyConfiguration getConfig()

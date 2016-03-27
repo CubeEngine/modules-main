@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.roles.commands;
 
+import java.util.UUID;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.node.StringNode;
@@ -59,9 +60,9 @@ public class RoleManagementCommands extends ContainerCommand
         this.i18n = i18n;
     }
 
-    @Alias("setrperm")
-    @Command(alias = "setperm", desc = "Sets the permission for given role")
-    public void setpermission(CommandSource ctx, RoleSubject role,
+    @Alias("setRPerm")
+    @Command(alias = "setPerm", desc = "Sets the permission for given role [in context]")
+    public void setPermission(CommandSource ctx, RoleSubject role,
                               @Complete(PermissionCompleter.class) String permission,
                               @Default Tristate type,
                               @Named("in") @Default Context context)
@@ -86,56 +87,49 @@ public class RoleManagementCommands extends ContainerCommand
         }
     }
 
-    @Alias(value = "setrdata")
-    @Command(alias = {"setdata", "setmeta"}, desc = "Sets the metadata for given role")
-    public void setmetadata(CommandSource ctx, RoleSubject role,
-                            String key,
-                            @Optional String value,
-                            @Named("in") @Default Context context)
+    @Alias(value = {"setROption", "setRData"})
+    @Command(alias = "setData", desc = "Sets an option for given role [in context]")
+    public void setOption(CommandSource ctx, RoleSubject role, String key, @Optional String value, @Named("in") @Default Context context)
     {
         role.getSubjectData().setOption(toSet(context), key, value);
         if (value == null)
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Metadata {input#key} reset for the role {role} in {context}!",
-                                    key, role, context);
+            i18n.sendTranslated(ctx, NEUTRAL, "Options {input#key} reset for the role {role} in {context}!", key, role, context);
             return;
         }
-        i18n.sendTranslated(ctx, POSITIVE, "Metadata {input#key} set to {input#value} for the role {role} in {context}!",
-                                key, value, role, context);
+        i18n.sendTranslated(ctx, POSITIVE, "Options {input#key} set to {input#value} for the role {role} in {context}!", key, value, role, context);
     }
 
-    @Alias(value = "resetrdata")
-    @Command(alias = {"resetdata", "resetmeta"}, desc = "Resets the metadata for given role")
-    public void resetmetadata(CommandSource ctx, RoleSubject role, String key, @Named("in") @Default Context context)
+    @Alias(value = {"resetROption", "resetRData"})
+    @Command(alias = "resetData", desc = "Resets the options for given role [in context]")
+    public void resetOption(CommandSource ctx, RoleSubject role, String key, @Named("in") @Default Context context)
     {
-        this.setmetadata(ctx, role, key, null, context);
+        this.setOption(ctx, role, key, null, context);
     }
 
-    @Alias(value = "clearrdata")
-    @Command(alias = {"cleardata", "clearmeta"}, desc = "Clears the metadata for given role")
-    public void clearmetadata(CommandSource ctx, RoleSubject role, @Named("in") @Default Context context)
+    @Alias(value = {"clearROption", "clearRData"})
+    @Command(alias = "clearData", desc = "Clears the options for given role [in context]")
+    public void clearOption(CommandSource ctx, RoleSubject role, @Named("in") @Default Context context)
     {
         role.getSubjectData().clearOptions(toSet(context));
-        i18n.sendTranslated(ctx, NEUTRAL, "Metadata cleared for the role {role} in {context}!", role, context);
+        i18n.sendTranslated(ctx, NEUTRAL, "Options cleared for the role {role} in {context}!", role, context);
     }
 
-    @Alias(value = {"addrparent", "manradd"})
-    @Command(desc = "Adds a parent role to given role")
+    @Alias(value = {"addRParent", "manRAdd"})
+    @Command(desc = "Adds a parent role to given role [in context]")
     public void addParent(CommandSource ctx, RoleSubject role, RoleSubject parentRole, @Named("in") @Default Context context)
     {
         if (role.getSubjectData().addParent(toSet(context), parentRole))
         {
-            i18n.sendTranslated(ctx, POSITIVE, "Added {name#role} as parent role for the role {role} in {context}",
-                    parentRole, role, context);
+            i18n.sendTranslated(ctx, POSITIVE, "Added {name#role} as parent role for the role {role} in {context}", parentRole, role, context);
             return;
         }
-        i18n.sendTranslated(ctx, NEUTRAL, "{name#role} is already parent role of the role {role} in {context}!",
-                parentRole, role, context);
+        i18n.sendTranslated(ctx, NEUTRAL, "{name#role} is already parent role of the role {role} in {context}!", parentRole, role, context);
         // TODO i18n.sendTranslated(ctx, NEGATIVE, "Circular Dependency! {name#role} depends on the role {name}!", pr.getName(), r.getName());
     }
 
-    @Alias(value = "remrparent")
-    @Command(desc = "Removes a parent role from given role")
+    @Alias(value = "remRParent")
+    @Command(desc = "Removes a parent role from given role [in context]")
     public void removeParent(CommandSource ctx, RoleSubject role, RoleSubject parentRole, @Named("in") @Default Context context)
     {
         if (role.getSubjectData().removeParent(toSet(context), parentRole))
@@ -146,8 +140,8 @@ public class RoleManagementCommands extends ContainerCommand
         i18n.sendTranslated(ctx, POSITIVE, "Removed the parent role {role} from the role {role} in {context}!", parentRole, role, context);
     }
 
-    @Alias(value = "clearrparent")
-    @Command(desc = "Removes all parent roles from given role")
+    @Alias(value = "clearRParent")
+    @Command(desc = "Removes all parent roles from given role [in context]")
     public void clearParent(CommandSource ctx, RoleSubject role, @Named("in") @Default Context context)
     {
         if (role.getSubjectData().clearParents(toSet(context)))
@@ -155,18 +149,18 @@ public class RoleManagementCommands extends ContainerCommand
             i18n.sendTranslated(ctx, NEUTRAL, "All parent roles of the role {role} in {context} cleared!", role, context);
             return;
         }
-        // TODO msg
+        i18n.sendTranslated(ctx, NEUTRAL, "{role} had no parent roles in {context}!", role, context);
     }
 
-    @Alias(value = "setrolepriority")
-    @Command(alias = "setprio", desc = "Sets the priority of given role")
+    @Alias(value = "setRolePriority")
+    @Command(alias = "setPrio", desc = "Sets the priority of given role")
     public void setPriority(CommandSource ctx, RoleSubject role, String priority)
     {
         try
         {
             ClassedConverter<Priority> converter = new PriorityConverter();
             Priority prio = converter.fromNode(new StringNode(priority), Priority.class, null);
-            role.setPriorityValue(prio.value); // TODO set priority
+            role.setPriorityValue(prio.value);
             i18n.sendTranslated(ctx, POSITIVE, "Priority of the role {role} set to {input#priority}!", role, priority);
         }
         catch (ConversionException ex)
@@ -175,7 +169,7 @@ public class RoleManagementCommands extends ContainerCommand
         }
     }
 
-    @Alias(value = "renamerole")
+    @Alias(value = "renameRole")
     @Command(desc = "Renames given role")
     public void rename(CommandSource ctx, RoleSubject role, @Label("new name") String newName)
     {
@@ -187,23 +181,23 @@ public class RoleManagementCommands extends ContainerCommand
         }
         if (service.getGroupSubjects().rename(role, newName))
         {
-            i18n.sendTranslated(ctx, POSITIVE, "{role} renamed to {name#new}", role, newName);
+            i18n.sendTranslated(ctx, POSITIVE, "The role {name#old} was renamed to {role}", oldName, role);
             return;
         }
         i18n.sendTranslated(ctx, NEGATIVE, "Renaming failed! The role {name} already exists!", newName);
     }
 
-    @Alias(value = "createrole")
-    @Command(desc = "Creates a new role [in context]")
+    @Alias(value = "createRole")
+    @Command(desc = "Creates a new role")
     public void create(CommandSource ctx, String name)
     {
-        if (service.getGroupSubjects().hasRegistered("role:" + name))
+        if (service.getGroupSubjects().hasRegisteredName(name))
         {
             i18n.sendTranslated(ctx, NEUTRAL, "There is already a role named {name}.", name);
             return;
         }
-        RoleSubject r = service.getGroupSubjects().get("role:" + name);
-        r.getSubjectData().save(true); // TODO force save
+        RoleSubject r = service.getGroupSubjects().get(UUID.randomUUID().toString());
+        service.getGroupSubjects().setRoleName(r, name);
         i18n.sendTranslated(ctx, POSITIVE, "Role {name} created!", name);
     }
 
@@ -219,7 +213,7 @@ public class RoleManagementCommands extends ContainerCommand
         i18n.sendTranslated(ctx, NEGATIVE, "Role is still in use! Use the -force flag to delete the role and all occurrences");
     }
 
-    @Command(alias = {"toggledefault", "toggledef"}, desc = "Toggles whether given role is a default role")
+    @Command(alias = {"toggleDefault", "toggleDef"}, desc = "Toggles whether given role is a default role")
     public void toggleDefaultRole(CommandSource ctx, RoleSubject role)
     {
         SubjectData defaultData = service.getDefaultData();

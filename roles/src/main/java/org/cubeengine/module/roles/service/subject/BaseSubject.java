@@ -135,10 +135,9 @@ public abstract class BaseSubject<T extends OptionSubjectData> implements Option
     public Set<Context> getActiveContexts()
     {
         Set<Context> contexts = new HashSet<>();
-        for (ContextCalculator calculator : service.getContextCalculators())
+        for (ContextCalculator<Subject> calculator : service.getContextCalculators())
         {
             calculator.accumulateContexts(this, contexts);
-            // TODO calculator.accumulateContexts(getUser(), contexts); for user
         }
         return contexts;
     }

@@ -23,6 +23,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -30,10 +33,14 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
+import org.spongepowered.api.text.Text;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
+import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.spongepowered.api.service.permission.PermissionService.SUBJECTS_ROLE_TEMPLATE;
+import static org.spongepowered.api.text.action.TextActions.showText;
+import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 public class RolesUtil
 {
@@ -158,6 +165,33 @@ public class RolesUtil
             option = getOption(subject, subject.getSubjectData(), key, contexts);
         }
         return option;
+    }
+
+    public static Text permText(CommandSource cmdSource, String permission, PermissionService service, I18n i18n)
+    {
+        Text permText = Text.of(permission);
+        Optional<PermissionDescription> permDesc = service.getDescription(permission);
+        if (permDesc.isPresent())
+        {
+            permText = permText.toBuilder().onHover(showText(permDesc.get().getDescription().toBuilder().color(YELLOW).build())).build();
+        }
+        else
+        {
+            permText = permText.toBuilder().onHover(showText(i18n.getTranslation(cmdSource, NEGATIVE, "Permission not registered"))).build();
+        }
+        return permText;
+    }
+
+    public static Context contextOf(String ctx)
+    {
+        String name = ctx;
+        String type = Context.WORLD_KEY;
+        if (name.contains("|"))
+        {
+            type = name.substring(0, name.indexOf("|"));
+            name = name.substring(name.indexOf("|") + 1);
+        }
+        return "global".equals(name) ? GLOBAL : new Context(name, type);
     }
 
     public static final class FoundOption

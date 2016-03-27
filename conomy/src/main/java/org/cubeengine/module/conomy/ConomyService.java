@@ -46,6 +46,7 @@ import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.registry.CatalogRegistryModule;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.economy.Currency;
@@ -58,7 +59,7 @@ import org.spongepowered.api.service.user.UserStorageService;
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
 import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;
 
-public class ConomyService implements EconomyService
+public class ConomyService implements EconomyService, CatalogRegistryModule<Currency>
 {
     private ConfigCurrency defaultCurrency;
     private List<ContextCalculator<Account>> contextCalculators = new ArrayList<>();
@@ -78,6 +79,9 @@ public class ConomyService implements EconomyService
             {
                 String name = file.getFileName().toString();
                 currencies.put(name, new ConfigCurrency(reflector.load(CurrencyConfiguration.class, file.toFile())));
+
+                Sponge.getRegistry().registerModule(Currency.class, this);
+
             }
         }
         catch (IOException e)
@@ -102,6 +106,18 @@ public class ConomyService implements EconomyService
             logger.setLevel(LogLevel.NONE);
         }
          */
+    }
+
+    @Override
+    public Optional<Currency> getById(String id)
+    {
+        return Optional.ofNullable(currencies.get(id));
+    }
+
+    @Override
+    public Collection<Currency> getAll()
+    {
+        return new ArrayList<>(currencies.values());
     }
 
     @Override

@@ -17,34 +17,19 @@
  */
 package org.cubeengine.module.roles.service.data;
 
-import java.util.Map.Entry;
-import java.util.Set;
 import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.spongepowered.api.service.context.Context;
-
-import static java.util.Collections.singleton;
 
 public class DefaultSubjectData extends BaseSubjectData
 {
     public DefaultSubjectData(RolesPermissionService service, RolesConfig config)
     {
         super(service);
-        for (Entry<String, Set<String>> entry : config.defaultRoles.entrySet())
+        for (String role : config.defaultRoles)
         {
-            String name = entry.getKey();
-            String type = Context.WORLD_KEY;
-            if (name.contains("|"))
-            {
-                type = name.substring(0, name.indexOf("|"));
-                name = name.substring(name.indexOf("|") + 1);
-            }
-            Set<Context> contexts = "global".equals(name) ? GLOBAL_CONTEXT : singleton(new Context(type, name));
-            for (String role : entry.getValue())
-            {
-                addParent(contexts, service.getGroupSubjects().get(role));
-            }
+            addParent(GLOBAL_CONTEXT, service.getGroupSubjects().getByName(role));
         }
     }
-    // TODO overrides change configuration
+
+    // TODO overrides for add/remove/clear Parent change configuration
 }

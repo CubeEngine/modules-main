@@ -34,20 +34,18 @@ import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEX
 public class RoleSubject extends BaseSubject<RoleSubjectData> implements Comparable<RoleSubject>
 {
     public static final String SEPARATOR = "|";
-    private final String identifier;
     private Roles module;
 
     public RoleSubject(Roles module, RolesPermissionService service, RoleCollection collection, RoleConfig config)
     {
         super(collection, service, new RoleSubjectData(service, config));
         this.module = module;
-        this.identifier = "role:" + config.roleName;
     }
 
     @Override
     public String getIdentifier()
     {
-        return identifier;
+        return getSubjectData().getConfig().identifier.toString();
     }
 
     public String getName()
@@ -77,7 +75,7 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
     public boolean canAssignAndRemove(CommandSource source)
     {
         String perm = module.getModularity().provide(PermissionManager.class).getModulePermission(module).getId();
-        return source.hasPermission(perm + "." + identifier);
+        return source.hasPermission(perm + ".assign." + getName());
     }
 
     public void setPriorityValue(int value)

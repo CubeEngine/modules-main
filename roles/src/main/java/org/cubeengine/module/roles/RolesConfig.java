@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.roles;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,12 +35,8 @@ public class RolesConfig extends ReflectedYaml
     @Name("default.roles")
     @Comment("The list of roles a user will get when first joining the server.\n" +
                  "default:\n" +
-                 "  roles: \n" +
-                 "    world: \n" +
-                 "      - guest\n" +
-                 "    world_the_end\n" +
-                 "      - guest_in_the_end")
-    public Map<String, Set<String>> defaultRoles = new HashMap<>();
+                 "      - guest\n")
+    public List<String> defaultRoles = new ArrayList<>();
 
     @Comment("Example for a mirror:\n" +
             "  world|world: \n" +

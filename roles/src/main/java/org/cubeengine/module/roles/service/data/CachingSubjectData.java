@@ -32,11 +32,8 @@ public abstract class CachingSubjectData extends BaseSubjectData
         super(service);
     }
 
-    protected abstract void cacheParents(Set<Context> c);
     protected abstract void cacheParents();
-    protected abstract void cachePermissions(Set<Context> c);
     protected abstract void cachePermissions();
-    protected abstract void cacheOptions(Set<Context> c);
     protected abstract void cacheOptions();
     public abstract boolean save(boolean changed);
 
@@ -50,21 +47,21 @@ public abstract class CachingSubjectData extends BaseSubjectData
     @Override
     public List<Subject> getParents(Set<Context> contexts)
     {
-        cacheParents(contexts);
+        cacheParents();
         return super.getParents(contexts);
     }
 
     @Override
     public boolean addParent(Set<Context> contexts, Subject parent)
     {
-        cacheParents(contexts);
+        cacheParents();
         return save(super.addParent(contexts, parent));
     }
 
     @Override
     public boolean removeParent(Set<Context> contexts, Subject parent)
     {
-        cacheParents(contexts);
+        cacheParents();
         return save(super.removeParent(contexts, parent));
     }
 
@@ -78,7 +75,7 @@ public abstract class CachingSubjectData extends BaseSubjectData
     @Override
     public boolean clearParents(Set<Context> contexts)
     {
-        cacheParents(contexts);
+        cacheParents();
         return save(super.clearParents(contexts));
     }
 
@@ -92,14 +89,14 @@ public abstract class CachingSubjectData extends BaseSubjectData
     @Override
     public Map<String, Boolean> getPermissions(Set<Context> contexts)
     {
-        cachePermissions(contexts);
+        cachePermissions();
         return super.getPermissions(contexts);
     }
 
     @Override
     public boolean setPermission(Set<Context> contexts, String permission, Tristate value)
     {
-        cachePermissions(contexts);
+        cachePermissions();
         return save(super.setPermission(contexts, permission, value));
     }
 
@@ -113,7 +110,7 @@ public abstract class CachingSubjectData extends BaseSubjectData
     @Override
     public boolean clearPermissions(Set<Context> contexts)
     {
-        cachePermissions(contexts);
+        cachePermissions();
         return save(super.clearPermissions(contexts));
     }
 
@@ -127,21 +124,21 @@ public abstract class CachingSubjectData extends BaseSubjectData
     @Override
     public Map<String, String> getOptions(Set<Context> contexts)
     {
-        cacheOptions(contexts);
+        cacheOptions();
         return super.getOptions(contexts);
     }
 
     @Override
     public boolean setOption(Set<Context> contexts, String key, String value)
     {
-        cacheOptions(contexts);
+        cacheOptions();
         return save(super.setOption(contexts, key, value));
     }
 
     @Override
     public boolean clearOptions(Set<Context> contexts)
     {
-        cacheOptions(contexts);
+        cacheOptions();
         return save(super.clearOptions(contexts));
     }
 

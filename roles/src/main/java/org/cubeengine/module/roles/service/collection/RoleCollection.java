@@ -20,6 +20,7 @@ package org.cubeengine.module.roles.service.collection;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.UUID;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.RoleConfig;
@@ -79,17 +80,17 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
     @Override
     protected RoleSubject createSubject(String identifier)
     {
-        if (!identifier.startsWith("role:"))
+        try
         {
-            throw new IllegalArgumentException("Provided identifier is not a role: " + identifier);
+            UUID uuid = UUID.fromString(identifier);
+            RoleConfig config = reflector.create(RoleConfig.class);
+            config.identifier = uuid;
+            return addSubject(module, service, config);
         }
-        String name = identifier.substring(5);
-
-        RoleConfig config = reflector.create(RoleConfig.class);
-        config.roleName = name;
-        config.setFile(modulePath.resolve("roles").resolve(name + YAML.getExtention()).toFile());
-        config.reload();
-        return addSubject(module, service, config);
+        catch (IllegalArgumentException e)
+        {
+            throw new IllegalArgumentException("Provided identifier must be a uuid, was " + identifier);
+        }
     }
 
     @Override
@@ -106,8 +107,20 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 
     public boolean rename(RoleSubject role, String newName)
     {
-        // TODO rename
-        return false;
+        if (hasRegisteredName(newName))
+        {
+            return false;
+        }
+
+
+        if (!role.getSubjectData().getConfig().getFile().delete())
+        {
+            throw new IllegalStateException();
+        }
+        setRoleName(role, newName);
+        subjects.values().stream().filter(subject -> subject.getParents().contains(subject)).forEach(subject -> subject.getSubjectData().save(true));
+
+        return true;
     }
 
     public boolean delete(RoleSubject r, boolean force)
@@ -139,17 +152,49 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
             }
         }
 
-        // TODO remove defaultrole status
+        service.getConfig().defaultRoles.remove(r.getName());
 
         subjects.values().remove(r);
         r.getSubjectData().delete(); // delete file
 
-        // TODO reload/calculate perms ; is this needed ?
+        // TODO maybe force reload ; is this needed ?
         return true;
     }
 
     public void reload()
     {
         loadRoles();
+    }
+
+    public boolean hasRegisteredName(String name)
+    {
+        for (RoleSubject subject : subjects.values())
+        {
+            if (subject.getName().equalsIgnoreCase(name))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setRoleName(RoleSubject subject, String name)
+    {
+        RoleConfig config = subject.getSubjectData().getConfig();
+        config.roleName = name;
+        config.setFile(modulePath.resolve("roles").resolve(name + YAML.getExtention()).toFile());
+        subject.getSubjectData().save(true);
+    }
+
+    public RoleSubject getByName(String name)
+    {
+        for (RoleSubject subject : subjects.values())
+        {
+            if (subject.getName().equalsIgnoreCase(name))
+            {
+                return subject;
+            }
+        }
+        return null;
     }
 }

@@ -45,24 +45,6 @@ public class RoleSubjectData extends CachingSubjectData
     }
 
     @Override
-    protected void cacheOptions(Set<Context> c)
-    {
-        cacheOptions();
-    }
-
-    @Override
-    protected void cachePermissions(Set<Context> c)
-    {
-        cachePermissions();
-    }
-
-    @Override
-    protected void cacheParents(Set<Context> c)
-    {
-        cacheParents();
-    }
-
-    @Override
     public boolean save(boolean changed)
     {
         if (changed)
@@ -126,7 +108,7 @@ public class RoleSubjectData extends CachingSubjectData
         {
             for (Map.Entry<String, RoleConfig.ContextSetting> entry : config.settings.entrySet())
             {
-                List<RoleSubject> collect = entry.getValue().parents.stream().map(n -> "role:" + n).map(roleCollection::get).collect(toList());
+                List<RoleSubject> collect = entry.getValue().parents.stream().map(roleCollection::getByName).collect(toList());
                 Collections.sort(collect);
                 parents.put(asContext(entry.getKey()), new ArrayList<>(collect));
             }
@@ -156,87 +138,6 @@ public class RoleSubjectData extends CachingSubjectData
             }
         }
     }
-
-    /* TODO rename and delete
-     public boolean rename(String newName)
-    {
-        if (this.provider.getRole(newName) != null)
-        {
-            return false;
-        }
-        this.makeDirty();
-        if (this.isGlobal())
-        {
-            this.manager.dsl.update(TABLE_ROLE).set(DSL.row(TABLE_ROLE.ROLE), DSL.row("g:" + newName)).
-                where(TABLE_ROLE.ROLE.eq(this.getName())).execute();
-        }
-        else
-        {
-            Set<UInteger> worldMirrors = new HashSet<>();
-            for (Entry<World, Triplet<Boolean, Boolean, Boolean>> entry : ((WorldRoleProvider)provider).getWorldMirrors().entrySet())
-            {
-                if (entry.getValue().getSecond())
-                {
-                    worldMirrors.add(wm.getWorldId(entry.getKey()));
-                }
-            }
-            this.manager.dsl.update(TABLE_ROLE).set(TABLE_ROLE.ROLE, newName).
-                where(TABLE_ROLE.ROLE.eq(this.getName()), TABLE_ROLE.CONTEXT.in(worldMirrors)).execute();
-        }
-        this.delete();
-        this.config.roleName = newName;
-        this.provider.addRole(this);
-        for (Role role : this.resolvedRoles)
-        {
-            role.dependentRoles.add(this);
-        }
-        for (ResolvedDataHolder dataHolder : this.dependentRoles)
-        {
-            dataHolder.assignRole(this);
-        }
-        this.config.setTarget(new File(this.config.getTarget().getParent(), this.config.roleName + ".yml"));
-        this.save();
-        return true;
-    }
-
-    public void delete()
-    {
-        for (Role role : this.resolvedRoles)
-        {
-            role.dependentRoles.remove(this);
-        }
-        for (ResolvedDataHolder dataHolder : this.dependentRoles)
-        {
-            dataHolder.removeRole(this);
-        }
-        if (this.isGlobal())
-        {
-            this.manager.dsl.delete(TABLE_ROLE).where(TABLE_ROLE.ROLE.eq(this.getName())).execute();
-        }
-        else
-        {
-            Set<UInteger> worldMirrors = new HashSet<>();
-            for (Entry<World, Triplet<Boolean, Boolean, Boolean>> entry : ((WorldRoleProvider)provider).getWorldMirrors().entrySet())
-            {
-                if (entry.getValue().getSecond())
-                {
-                    worldMirrors.add(wm.getWorldId(entry.getKey()));
-                }
-            }
-            this.manager.dsl.delete(TABLE_ROLE).where(TABLE_ROLE.ROLE.eq(this.getName()),
-                                                      TABLE_ROLE.CONTEXT.in(worldMirrors)).execute();
-        }
-        this.provider.removeRole(this);
-        try
-        {
-            Files.delete(this.config.getTarget().toPath());
-        }
-        catch (IOException e)
-        {
-            logger.error(e, "Could not delete role {}!", this.config.getTarget().getName());
-        }
-    }
-     */
 
     @Override
     public void reload()

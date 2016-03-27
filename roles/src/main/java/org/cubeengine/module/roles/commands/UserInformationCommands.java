@@ -40,7 +40,6 @@ import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
@@ -121,7 +120,7 @@ public class UserInformationCommands extends ContainerCommand
     {
         Set<Context> contexts = RoleCommands.toSet(context);
 
-        Text permText = permText(ctx, permission);
+        Text permText = RolesUtil.permText(ctx, permission, service, i18n);
         FoundPermission found = RolesUtil.findPermission(service, player, permission, contexts);
 
         if (found != null && found.value)
@@ -142,24 +141,11 @@ public class UserInformationCommands extends ContainerCommand
             else
             {
                 i18n.sendTranslated(ctx, NEUTRAL, "Permission inherited from:");
-                i18n.sendTranslated(ctx, NEUTRAL, "{txt#permission} in the role {name}!", permText(ctx, found.permission), found.subject.getIdentifier().substring(5));
+                i18n.sendTranslated(ctx, NEUTRAL, "{txt#permission} in the role {name}!",
+                                    RolesUtil.permText(ctx, found.permission, service, i18n),
+                                    ((RoleSubject)found.subject).getName());
             }
         }
-    }
-
-    private Text permText(CommandSource cmdSource, String permission)
-    {
-        Text permText = Text.of(permission);
-        Optional<PermissionDescription> permDesc = service.getDescription(permission);
-        if (permDesc.isPresent())
-        {
-            permText = permText.toBuilder().onHover(showText(permDesc.get().getDescription().toBuilder().color(YELLOW).build())).build();
-        }
-        else
-        {
-            permText = permText.toBuilder().onHover(showText(i18n.getTranslation(cmdSource, NEGATIVE, "Permission not registered"))).build();
-        }
-        return permText;
     }
 
     @Alias(value = "listuperm")
@@ -189,37 +175,37 @@ public class UserInformationCommands extends ContainerCommand
         i18n.sendTranslated(ctx, NEUTRAL, "Permissions of {user} in {context}:", player, context);
         for (Map.Entry<String, Boolean> entry : permissions.entrySet())
         {
-            ctx.sendMessage(Text.of("- ", YELLOW, permText(ctx, entry.getKey()), TextColors.WHITE, ": ", GOLD, entry.getValue()));
+            ctx.sendMessage(Text.of("- ", YELLOW, RolesUtil.permText(ctx, entry.getKey(), service, i18n), TextColors.WHITE, ": ", GOLD, entry.getValue()));
         }
     }
 
-    @Alias(value = "checkumeta")
-    @Command(alias = {"checkdata", "checkmeta"}, desc = "Checks for metadata of a user [in context]")
-    public void checkmetadata(CommandSource ctx, @Default User player, String metadatakey, @Named("in") @Default Context context)
+    @Alias(value = {"checkUOption", "checkUData"})
+    @Command(alias = {"checkData"}, desc = "Checks for options of a user [in context]")
+    public void checkOption(CommandSource ctx, @Default User player, String key, @Named("in") @Default Context context)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
 
-        Optional<FoundOption> option = RolesUtil.getOption(service.getUserSubjects().get(player.getIdentifier()), metadatakey, contexts);
+        Optional<FoundOption> option = RolesUtil.getOption(service.getUserSubjects().get(player.getIdentifier()), key, contexts);
         if (!option.isPresent())
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "{input#key} is not set for {user} in {context}.", metadatakey, player, context);
+            i18n.sendTranslated(ctx, NEUTRAL, "{input#key} is not set for {user} in {context}.", key, player, context);
             return;
         }
 
-        i18n.sendTranslated(ctx, NEUTRAL, "{input#key}: {input#value} is set for {user} in {context}.", metadatakey, option.get().value, player, context);
+        i18n.sendTranslated(ctx, NEUTRAL, "{input#key}: {input#value} is set for {user} in {context}.", key, option.get().value, player, context);
         if (option.get().subject.getIdentifier().equals(player.getIdentifier()))
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Metadata is directly assigned to the user!");
+            i18n.sendTranslated(ctx, NEUTRAL, "Options is directly assigned to the user!");
         }
         else
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Metadata inherited from the role {name}!", option.get().subject.getIdentifier().substring(5));
+            i18n.sendTranslated(ctx, NEUTRAL, "Options inherited from the role {name}!", ((RoleSubject)option.get().subject).getName());
         }
     }
 
-    @Alias(value = "listumeta")
-    @Command(alias = {"listdata", "listmeta"}, desc = "Lists assigned metadata from a user [in context]")
-    public void listmetadata(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
+    @Alias(value = {"listUOption", "listUData"})
+    @Command(alias = "listData", desc = "Lists assigned options from a user [in context]")
+    public void listOptions(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = RoleCommands.toSet(context);
         Map<String, String> options = new HashMap<>();
@@ -231,7 +217,7 @@ public class UserInformationCommands extends ContainerCommand
         {
             options.putAll(((OptionSubjectData)player.getSubjectData()).getOptions(contexts));
         }
-        i18n.sendTranslated(ctx, NEUTRAL, "Metadata of {user} in {context}:", player, context);
+        i18n.sendTranslated(ctx, NEUTRAL, "Options of {user} in {context}:", player, context);
         for (Map.Entry<String, String> entry : options.entrySet())
         {
             ctx.sendMessage(Text.of("- ", YELLOW, entry.getKey(), TextColors.WHITE, ": ", GOLD, entry.getValue()));

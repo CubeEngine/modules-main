@@ -59,7 +59,7 @@ public class UserManagementCommands extends ContainerCommand
         this.i18n = i18n;
     }
 
-    @Alias({"manuadd", "assignurole", "addurole", "giveurole"})
+    @Alias({"manUAdd", "assignURole", "addURole", "giveURole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [-temp]")
     public void assign(CommandSource ctx, @Default User player, RoleSubject role, @Flag boolean temp)
     {
@@ -91,7 +91,7 @@ public class UserManagementCommands extends ContainerCommand
         i18n.sendTranslated(ctx, NEUTRAL, "{user} already has the role {role}.", player, role);
     }
 
-    @Alias(value = {"remurole", "manudel"})
+    @Alias(value = {"remURole", "manUDel"})
     @Command(desc = "Removes a role from the player")
     public void remove(CommandSource ctx, @Default Player player, RoleSubject role)
     {
@@ -110,7 +110,7 @@ public class UserManagementCommands extends ContainerCommand
         i18n.sendTranslated(ctx, NEUTRAL, "{user} did not have the role {role}.", player, role);
     }
 
-    @Alias(value = {"clearurole", "manuclear"})
+    @Alias(value = {"clearURole", "manUClear"})
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in context]")
     public void clear(CommandSource ctx, @Default Player player)
     {
@@ -128,13 +128,13 @@ public class UserManagementCommands extends ContainerCommand
         }
     }
 
-    @Alias(value = "setuperm")
-    @Command(alias = "setperm", desc = "Sets a permission for this user [in context]")
-    public void setpermission(CommandSource ctx, @Default Player player, @Complete(PermissionCompleter.class) String permission, @Default Tristate value, @Named("in") @Default Context context)
+    @Alias(value = "setUPerm")
+    @Command(alias = "setPerm", desc = "Sets a permission for this user [in context]")
+    public void setPermission(CommandSource ctx, @Default Player player, @Complete(PermissionCompleter.class) String permission, @Default Tristate value, @Named("in") @Default Context context)
     {
         if (value == Tristate.UNDEFINED)
         {
-            resetpermission(ctx, player, permission, context);
+            resetPermission(ctx, player, permission, context);
         }
         Set<Context> contexts = toSet(context);
         if (!player.getSubjectData().setPermission(contexts, permission, value))
@@ -150,9 +150,9 @@ public class UserManagementCommands extends ContainerCommand
         }
     }
 
-    @Alias(value = "resetuperm")
-    @Command(alias = "resetperm", desc = "Resets a permission for this user [in context]")
-    public void resetpermission(CommandSource ctx, @Default Player player, String permission, @Named("in") @Default Context context)
+    @Alias(value = "resetUPerm")
+    @Command(alias = "resetPerm", desc = "Resets a permission for this user [in context]")
+    public void resetPermission(CommandSource ctx, @Default Player player, String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         if (player.getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED))
@@ -164,42 +164,42 @@ public class UserManagementCommands extends ContainerCommand
 
     }
 
-    @Alias(value = {"setudata","setumeta","setumetadata"})
-    @Command(alias = {"setdata", "setmeta"}, desc = "Sets metadata for this user [in context]")
-    public void setmetadata(CommandSource ctx, @Default Player player, String metaKey, String metaValue, @Named("in") @Default Context context)
+    @Alias(value = {"setUOption","setUData"})
+    @Command(alias = "setData", desc = "Sets options for this user [in context]")
+    public void setOption(CommandSource ctx, @Default Player player, String key, String value, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        if (((OptionSubjectData)player.getSubjectData()).setOption(contexts, metaKey, metaValue))
+        if (((OptionSubjectData)player.getSubjectData()).setOption(contexts, key, value))
         {
-            i18n.sendTranslated(ctx, POSITIVE, "Metadata {input#key} of {user} set to {input#value} in {context}!", metaKey, player, metaValue, context);
+            i18n.sendTranslated(ctx, POSITIVE, "Options {input#key} of {user} set to {input#value} in {context}!", key, player, value, context);
             return;
         }
-        i18n.sendTranslated(ctx, NEGATIVE, "Metadata {input#key} of {user} was already set to {input#value} in {context}!", metaKey, player, metaValue, context);
+        i18n.sendTranslated(ctx, NEGATIVE, "Options {input#key} of {user} was already set to {input#value} in {context}!", key, player, value, context);
     }
 
-    @Alias(value = {"resetudata","resetumeta","resetumetadata"})
-    @Command(alias = {"resetdata", "resetmeta", "deletedata", "deletemetadata", "deletemeta"}, desc = "Resets metadata for this user [in context]")
-    public void resetmetadata(CommandSource ctx, @Default Player player, String metaKey, @Named("in") @Default Context context)
+    @Alias(value = {"resetUOption","resetUData"})
+    @Command(alias = {"resetData", "deleteOption", "deleteData"}, desc = "Resets options for this user [in context]")
+    public void resetOption(CommandSource ctx, @Default Player player, String key, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        if (((OptionSubjectData)player.getSubjectData()).setOption(contexts, metaKey, null))
+        if (((OptionSubjectData)player.getSubjectData()).setOption(contexts, key, null))
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Metadata {input#key} of {user} removed in {context}!", metaKey, player, context);
+            i18n.sendTranslated(ctx, NEUTRAL, "Options {input#key} of {user} removed in {context}!", key, player, context);
             return;
         }
-        i18n.sendTranslated(ctx, NEGATIVE, "Metadata {input#key} was not set for {user} in {context}!", metaKey, player, context);
+        i18n.sendTranslated(ctx, NEGATIVE, "Options {input#key} was not set for {user} in {context}!", key, player, context);
     }
 
-    @Alias(value = {"clearudata","clearumeta","clearumetadata"})
-    @Command(alias = {"cleardata", "clearmeta"}, desc = "Resets metadata for this user [in context]")
-    public void clearMetaData(CommandSource ctx, @Default Player player, @Named("in") @Default Context context)
+    @Alias(value = {"clearUOption","clearUData"})
+    @Command(alias = "clearData", desc = "Resets options for this user [in context]")
+    public void clearOption(CommandSource ctx, @Default Player player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         if (((OptionSubjectData)player.getSubjectData()).clearOptions(contexts))
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Metadata of {user} cleared in {context}!", player, context);
+            i18n.sendTranslated(ctx, NEUTRAL, "Options of {user} cleared in {context}!", player, context);
             return;
         }
-        i18n.sendTranslated(ctx, NEGATIVE, "Metadata of {user} was already cleared in {context}!", player, context);
+        i18n.sendTranslated(ctx, NEGATIVE, "Options of {user} was already cleared in {context}!", player, context);
     }
 }

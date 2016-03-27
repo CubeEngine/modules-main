@@ -40,9 +40,9 @@ public class RoleReader implements ArgumentReader<RoleSubject>, Completer
     public RoleSubject read(Class type, CommandInvocation invocation) throws ReaderException
     {
         String token = invocation.consume(1);
-        if (service.getGroupSubjects().hasRegistered("role:" + token))
+        if (service.getGroupSubjects().hasRegisteredName(token))
         {
-            return service.getGroupSubjects().get("role:" + token);
+            return service.getGroupSubjects().getByName(token);
         }
         throw new ReaderException("Could not find the role: {input#role}", token);
     }
@@ -54,9 +54,10 @@ public class RoleReader implements ArgumentReader<RoleSubject>, Completer
         String token = invocation.currentToken().toLowerCase();
         for (Subject subject : service.getGroupSubjects().getAllSubjects())
         {
-            if (subject.getIdentifier().startsWith("role:" + token))
+            String name = ((RoleSubject)subject).getName();
+            if (name.startsWith(token))
             {
-                result.add(subject.getIdentifier().substring(5));
+                result.add(name);
             }
         }
         return result;

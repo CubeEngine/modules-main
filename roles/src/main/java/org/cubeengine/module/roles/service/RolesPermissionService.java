@@ -43,6 +43,7 @@ import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.util.Tristate;
 
@@ -52,7 +53,7 @@ import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEX
 public class RolesPermissionService implements PermissionService
 {
     private final ConcurrentMap<String, SubjectCollection> collections = new ConcurrentHashMap<>();
-    private final List<ContextCalculator> calculators = new CopyOnWriteArrayList<>();
+    private final List<ContextCalculator<Subject>> calculators = new CopyOnWriteArrayList<>();
 
     private final DefaultSubjectData defaultData;
     private final Map<Context, Context> mirrors;
@@ -109,12 +110,12 @@ public class RolesPermissionService implements PermissionService
     }
 
     @Override
-    public void registerContextCalculator(ContextCalculator calculator)
+    public void registerContextCalculator(ContextCalculator<Subject> calculator)
     {
         calculators.add(calculator);
     }
 
-    public List<ContextCalculator> getContextCalculators()
+    public List<ContextCalculator<Subject>> getContextCalculators()
     {
         return this.calculators;
     }
@@ -135,7 +136,7 @@ public class RolesPermissionService implements PermissionService
     @Override
     public Optional<PermissionDescription> getDescription(String permission)
     {
-        return Optional.ofNullable(descriptionMap.get(permission));
+        return Optional.ofNullable(descriptionMap.get(permission.toLowerCase()));
     }
 
     @Override

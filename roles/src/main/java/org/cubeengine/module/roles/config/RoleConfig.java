@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
@@ -31,6 +32,9 @@ import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 @SuppressWarnings("all")
 public class RoleConfig extends ReflectedYaml
 {
+    @Comment("Unique Identifier for this role. Do not change!")
+    public UUID identifier;
+
     @Name("role-name")
     @Comment("The name of this role")
     public String roleName = "defaultName";
@@ -89,6 +93,10 @@ public class RoleConfig extends ReflectedYaml
             {
                 setting.options = new LinkedHashMap<>();
             }
+        }
+        if (identifier == null)
+        {
+            identifier = UUID.randomUUID();
         }
     }
 

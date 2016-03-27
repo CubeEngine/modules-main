@@ -20,6 +20,7 @@ package org.cubeengine.module.roles.service.data;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -34,8 +35,11 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.user.UserStorageService;
 
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.cubeengine.module.roles.RolesUtil.contextOf;
 
 public class UserSubjectData extends CachingSubjectData
 {
@@ -47,55 +51,10 @@ public class UserSubjectData extends CachingSubjectData
         this.uuid = uuid;
     }
 
-    @Override
-    protected void cacheOptions(Set<Context> c)
-    {
-        for (Context context : c)
-        {
-            context = service.getMirror(context);
-            String contextString = stringify(context) + "#";
-            if (!options.containsKey(context))
-            {
-                Map<String, String> opts = getData()
-                    .map(PermissionData::getOptions)
-                    .orElse(Collections.emptyMap());
-
-                opts = opts.entrySet().stream()
-                        .filter(e -> e.getKey().startsWith(contextString))
-                        .collect(toMap(e -> e.getKey().split("#")[1], Map.Entry::getValue));
-
-                options.put(context, opts);
-            }
-        }
-    }
-
-    @Override
-    protected void cachePermissions(Set<Context> c)
-    {
-        for (Context context : c)
-        {
-            context = service.getMirror(context);
-            String contextString = stringify(context) + "#";
-            if (!permissions.containsKey(context))
-            {
-                Map<String, Boolean> perms = getData()
-                    .map(PermissionData::getPermissions)
-                    .orElse(Collections.emptyMap());
-
-                perms = perms.entrySet().stream()
-                        .filter(e -> e.getKey().startsWith(contextString))
-                        .collect(toMap(e -> e.getKey().split("#")[1], Map.Entry::getValue));
-
-                permissions.put(context, perms);
-            }
-        }
-    }
-
     private Optional<PermissionData> getData()
     {
         UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
-        User player = storage.get(uuid).get()
-            .getPlayer().get(); // TODO wait for User Data impl
+        User player = storage.get(uuid).get().getPlayer().get(); // TODO wait for User Data impl
 
         Optional<PermissionData> permData = player.get(PermissionData.class);
         if (permData.isPresent())
@@ -103,30 +62,6 @@ public class UserSubjectData extends CachingSubjectData
             return permData;
         }
         return Optional.empty();
-    }
-
-    @Override
-    protected void cacheParents(Set<Context> c)
-    {
-        if (!parents.containsKey(RolesUtil.GLOBAL))
-        {
-            List<String> parentList = getData()
-                .map(PermissionData::getParents)
-                .orElse(Collections.emptyList());
-            List<Subject> list = parentList.stream()
-                                           .map(r -> "role:" + r)
-                                           .map(roleCollection::get)
-                                           .sorted((o1, o2) -> {
-                                               if (o1 != null && o2 != null)
-                                               {
-                                                   return o1.compareTo(o2);
-                                               }
-                                               return 1;
-                                           })
-                                           .map(Subject.class::cast)
-                                           .collect(toList());
-            parents.put(RolesUtil.GLOBAL, list);
-        }
     }
 
     @Override
@@ -138,10 +73,7 @@ public class UserSubjectData extends CachingSubjectData
 
             // On users only global assigned Roles get persisted
             List<String> parents = this.parents.get(RolesUtil.GLOBAL).stream()
-                                               .filter(s -> s instanceof RoleSubject)
-                                               // TODO WARN: Subject that is not a role will not be persisted
-                                               .map(RoleSubject.class::cast)
-                                               .map(subject -> subject.getName())
+                                               .map(Subject::getIdentifier)
                                                .collect(Collectors.toList());
 
             Map<String, Boolean> permissions = this.permissions.entrySet().stream().flatMap(e -> {
@@ -174,18 +106,49 @@ public class UserSubjectData extends CachingSubjectData
     @Override
     protected void cacheParents()
     {
-        // TODO cache all the things
+        if (!parents.containsKey(RolesUtil.GLOBAL))
+        {
+            List<String> parentList = getData()
+                .map(PermissionData::getParents)
+                .orElse(Collections.emptyList());
+            List<Subject> list = parentList.stream()
+                                           .map(roleCollection::get)
+                                           .sorted((o1, o2) -> {
+                                               if (o1 != null && o2 != null)
+                                               {
+                                                   return o1.compareTo(o2);
+                                               }
+                                               return 1;
+                                           })
+                                           .map(Subject.class::cast)
+                                           .collect(toList());
+            parents.put(RolesUtil.GLOBAL, list);
+        }
     }
 
     @Override
     protected void cachePermissions()
     {
-        // TODO cache all the things
+        if (!permissions.isEmpty())
+        {
+            Map<Context, Map<String, Boolean>> collected = getData().map(PermissionData::getPermissions).orElse(emptyMap())
+                .entrySet().stream().collect(groupingBy(e -> contextOf(e.getKey().split("#")[0]),
+                                                toMap(e -> e.getKey().split("#")[1], Entry::getValue)));
+
+            permissions.putAll(collected);
+        }
     }
 
     @Override
     protected void cacheOptions()
     {
-        // TODO cache all the things
+        if (options.isEmpty())
+        {
+            Map<Context, Map<String, String>> collected = getData().map(PermissionData::getOptions).orElse(emptyMap())
+                .entrySet().stream().collect(groupingBy(e -> contextOf(e.getKey().split("#")[0]),
+                                                toMap(e -> e.getKey().split("#")[1], Entry::getValue)));
+
+            options.putAll(collected);
+        }
     }
 }

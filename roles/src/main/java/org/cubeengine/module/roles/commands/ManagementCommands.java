@@ -22,10 +22,12 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.world.World;
@@ -55,8 +57,9 @@ public class ManagementCommands extends ContainerCommand
         module.getConfiguration().reload();
         service.getGroupSubjects().reload();
         service.getUserSubjects().reload();
-        // TODO remove cached data
-        // TODO adding mirrors in file -> manload is not working
+
+        service.getConfig().reload();
+        // TODO remove cached data ; needed?
         i18n.sendTranslated(context, POSITIVE, "{text:Roles} reload complete!");
     }
 
@@ -64,44 +67,15 @@ public class ManagementCommands extends ContainerCommand
     @Command(desc = "Overrides all configs with current settings")
     public void save(CommandSource context)
     {
-        // database is up to date so only saving configs
         module.getConfiguration().save();
-        // TODO save RoleSubject Configurations
+        for (Subject subject : service.getGroupSubjects().getAllSubjects())
+        {
+            if (subject instanceof RoleSubject)
+            {
+                ((RoleSubject)subject).getSubjectData().save(true);
+            }
+        }
+
         i18n.sendTranslated(context, POSITIVE, "{text:Roles} all configurations saved!");
     }
-
-    public static World curWorldOfConsole = null;
-
-    @Command(desc = "Sets or resets the current default world")
-    public void defaultworld(CommandSource source, @Optional World world)
-    {
-        if (world == null)
-        {
-            i18n.sendTranslated(source, NEUTRAL, "Current world for roles resetted!");
-        }
-        else
-        {
-            i18n.sendTranslated(source, POSITIVE, "All your roles commands will now have {world} as default world!", world);
-        }
-
-        if (source instanceof Player)
-        {
-            SubjectData data = source.getTransientSubjectData();
-            if (data instanceof OptionSubjectData)
-            {
-                if (world == null)
-                {
-                    // TODO remove? ((OptionSubjectData)data).setOption(source.getActiveContexts(), "CubeEngine:roles:active-world", null);
-                }
-                else
-                {
-                    ((OptionSubjectData)data).setOption(source.getActiveContexts(), "CubeEngine:roles:active-world", world.getName());
-                }
-            }
-            return;
-        }
-        curWorldOfConsole = world;
-    }
-
-    // TODO lookup permissions
 }
