@@ -70,6 +70,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.service.logging.LoggingUtil.*;
@@ -181,7 +182,7 @@ public class Roles extends Module
     private static class SettableInvocationHandler implements InvocationHandler
     {
         private Object target;
-        private List<ContextCalculator> meta = Collections.emptyList();
+        private List<ContextCalculator<Subject>> meta = Collections.emptyList();
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
@@ -202,7 +203,7 @@ public class Roles extends Module
             return this;
         }
 
-        public SettableInvocationHandler and(List<ContextCalculator> meta)
+        public SettableInvocationHandler and(List<ContextCalculator<Subject>> meta)
         {
             this.meta = meta;
             return this;
