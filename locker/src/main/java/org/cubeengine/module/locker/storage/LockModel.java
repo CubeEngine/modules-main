@@ -29,8 +29,6 @@ import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 
 public class LockModel extends AsyncRecord<LockModel>
 {
-    private Text colorPass = null;
-
     public LockModel()
     {
         super(TABLE_LOCK);
