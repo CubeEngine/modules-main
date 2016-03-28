@@ -98,7 +98,7 @@ public abstract class BaseAccount implements Account
     {
         if (currency instanceof ConfigCurrency)
         {
-            return ((ConfigCurrency) currency);
+            return (ConfigCurrency) currency;
         }
         throw new IllegalArgumentException("Unknown Currency: " + currency.getDisplayName() + " " + currency.getClass().getName());
     }

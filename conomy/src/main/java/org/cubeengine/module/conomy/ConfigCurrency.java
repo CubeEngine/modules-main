@@ -130,24 +130,24 @@ public class ConfigCurrency implements Currency
 
     public BigDecimal fromLong(long longBalance)
     {
-        return new BigDecimal((double)longBalance / config.fractionalDigitsFactor());
+        return BigDecimal.valueOf(((double)longBalance / config.fractionalDigitsFactor()));
     }
 
     public BigDecimal getDefaultBalance(BaseAccount baseAccount)
     {
         if (baseAccount instanceof UniqueAccount)
         {
-            return new BigDecimal(this.config.defaultBalance);
+            return BigDecimal.valueOf((this.config.defaultBalance));
         }
-        return new BigDecimal(this.config.defaultBankBalance);
+        return BigDecimal.valueOf((this.config.defaultBankBalance));
     }
 
     public BigDecimal getMin(BaseAccount baseAccount)
     {
         if (baseAccount instanceof UniqueAccount)
         {
-            return new BigDecimal(config.minimumBalance);
+            return BigDecimal.valueOf((config.minimumBalance));
         }
-        return new BigDecimal(config.minimumBankBalance);
+        return BigDecimal.valueOf((config.minimumBankBalance));
     }
 }
