@@ -46,8 +46,6 @@ import org.cubeengine.module.roles.commands.RoleInformationCommands;
 import org.cubeengine.module.roles.commands.RoleManagementCommands;
 import org.cubeengine.module.roles.commands.UserInformationCommands;
 import org.cubeengine.module.roles.commands.UserManagementCommands;
-import org.cubeengine.module.roles.commands.provider.ContextFormatter;
-import org.cubeengine.module.roles.commands.provider.ContextReader;
 import org.cubeengine.module.roles.commands.provider.DefaultPermissionValueProvider;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.commands.provider.RoleFormatter;
@@ -67,7 +65,6 @@ import org.cubeengine.service.filesystem.FileManager;
 import org.cubeengine.service.i18n.I18n;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -81,6 +78,7 @@ TODO generate sample configs on the first run AND/OR cmd to generate samples
 TODO role / user permlist clickable red - to remove perm after ok - green + to add (deny/allow?)  - then catch chat tab complete for perm
 TODO lookup permissions (via PermissionDescription)
 TODO lookup permissions (via Command?)
+
 */
 public class Roles extends Module
 {
@@ -143,10 +141,8 @@ public class Roles extends Module
     @Enable
     public void onEnable()
     {
-        i18n.getCompositor().registerFormatter(new ContextFormatter());
         i18n.getCompositor().registerFormatter(new RoleFormatter());
 
-        cm.getProviderManager().register(this, new ContextReader(service, game), Context.class);
         cm.getProviderManager().register(this, new RoleReader(service), RoleSubject.class);
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
         cm.getProviderManager().register(this, new PermissionCompleter(service));

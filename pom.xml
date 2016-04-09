@@ -39,6 +39,7 @@
     <module>multiverse</module>
     <module>worldcontrol</module>
     <module>netherportals</module>
+    <module>contextmirror</module>
   </modules>
 
   <build>

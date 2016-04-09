@@ -15,22 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.roles.commands;
+package org.cubeengine.module.contextmirror;
 
 import java.util.Collections;
 import java.util.Set;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.module.roles.Roles;
-import org.cubeengine.service.command.ContainerCommand;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.context.ContextCalculator;
+import org.spongepowered.api.service.permission.Subject;
 
-import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
-
-@Command(name = "roles", desc = "Manages the roles")
-public class RoleCommands extends ContainerCommand
+public class ContextMirrorCalculator implements ContextCalculator<Subject>
 {
-    public RoleCommands(Roles module)
+    private ContextmirrorConfig config;
+
+    public ContextMirrorCalculator(ContextmirrorConfig config)
     {
-        super(module);
+        this.config = config;
+    }
+
+    @Override
+    public void accumulateContexts(Subject calculable, Set<Context> accumulator)
+    {
+        config.contextMirrors.entrySet().stream()
+             .filter(entry -> !Collections.disjoint(entry.getValue(), accumulator))
+             .forEach(entry -> accumulator.add(entry.getKey()));
+    }
+
+    @Override
+    public boolean matches(Context context, Subject subject)
+    {
+        return config.contextMirrors.keySet().contains(context);
     }
 }

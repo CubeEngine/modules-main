@@ -42,7 +42,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.emptySet;
-import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
+import static org.cubeengine.service.ContextUtil.toSet;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 
 @Alias("manuser")

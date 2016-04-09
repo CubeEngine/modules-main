@@ -22,13 +22,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.service.ContextUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
@@ -72,7 +70,7 @@ public class UserSubjectData extends CachingSubjectData
             UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
 
             // On users only global assigned Roles get persisted
-            List<String> parents = this.parents.get(RolesUtil.GLOBAL).stream()
+            List<String> parents = this.parents.get(ContextUtil.GLOBAL).stream()
                                                .map(Subject::getIdentifier)
                                                .collect(Collectors.toList());
 
@@ -106,7 +104,7 @@ public class UserSubjectData extends CachingSubjectData
     @Override
     protected void cacheParents()
     {
-        if (!parents.containsKey(RolesUtil.GLOBAL))
+        if (!parents.containsKey(ContextUtil.GLOBAL))
         {
             List<String> parentList = getData()
                 .map(PermissionData::getParents)
@@ -122,7 +120,7 @@ public class UserSubjectData extends CachingSubjectData
                                            })
                                            .map(Subject.class::cast)
                                            .collect(toList());
-            parents.put(RolesUtil.GLOBAL, list);
+            parents.put(ContextUtil.GLOBAL, list);
         }
     }
 

@@ -35,6 +35,7 @@ import org.cubeengine.module.roles.service.collection.BasicSubjectCollection;
 import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
 import org.cubeengine.module.roles.service.data.DefaultSubjectData;
+import org.cubeengine.service.ContextUtil;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -48,6 +49,8 @@ import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.module.roles.service.subject.RoleSubject.SEPARATOR;
+import static org.cubeengine.service.ContextUtil.GLOBAL;
+import static org.spongepowered.api.service.context.Context.WORLD_KEY;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 public class RolesPermissionService implements PermissionService
@@ -56,7 +59,6 @@ public class RolesPermissionService implements PermissionService
     private final List<ContextCalculator<Subject>> calculators = new CopyOnWriteArrayList<>();
 
     private final DefaultSubjectData defaultData;
-    private final Map<Context, Context> mirrors;
     private Game game;
     private RolesConfig config;
     private Log logger;
@@ -75,8 +77,6 @@ public class RolesPermissionService implements PermissionService
         getGroupSubjects().reload();
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM, game));
         collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE, game));
-
-        mirrors = readMirrors(config.mirrors); // TODO reload on relaod
     }
 
     @Override
@@ -164,9 +164,9 @@ public class RolesPermissionService implements PermissionService
     {
         if (!source.contains(SEPARATOR))
         {
-            if (!"global".equals(source))
+            if (!GLOBAL.getType().equals(source))
             {
-                return new Context(Context.WORLD_KEY, source);
+                return new Context(WORLD_KEY, source);
             }
         }
         String[] split = source.split("\\|");
@@ -187,10 +187,4 @@ public class RolesPermissionService implements PermissionService
         }
         return mirrors;
     }
-
-    public Context getMirror(Context context)
-    {
-        return mirrors.getOrDefault(context, context);
-    }
-
 }

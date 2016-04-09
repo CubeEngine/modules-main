@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.service.ContextUtil;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
@@ -37,6 +37,7 @@ import org.spongepowered.api.text.Text;
 
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.StreamSupport.stream;
+import static org.cubeengine.service.ContextUtil.GLOBAL;
 import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.spongepowered.api.service.permission.PermissionService.SUBJECTS_ROLE_TEMPLATE;
 import static org.spongepowered.api.text.action.TextActions.showText;
@@ -44,7 +45,6 @@ import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 public class RolesUtil
 {
-    public static final Context GLOBAL = new Context("global", "");
     public static final String PERMISSION_TEMPLATE_PREFIX = "permission:";
 
     public static FoundPermission findPermission(PermissionService service, Subject subject, String permission, Set<Context> contexts)
@@ -191,7 +191,7 @@ public class RolesUtil
             type = name.substring(0, name.indexOf("|"));
             name = name.substring(name.indexOf("|") + 1);
         }
-        return "global".equals(name) ? GLOBAL : new Context(name, type);
+        return GLOBAL.getType().equals(name) ? GLOBAL : new Context(name, type);
     }
 
     public static final class FoundOption

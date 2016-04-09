@@ -25,8 +25,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import javax.inject.Provider;
-import javax.xml.bind.annotation.XmlElementDecl.GLOBAL;
-import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.RoleCollection;
@@ -38,8 +36,9 @@ import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
-import static org.cubeengine.module.roles.RolesUtil.GLOBAL;
-import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
+import static org.cubeengine.service.ContextUtil.GLOBAL;
+import static org.cubeengine.service.ContextUtil.toSet;
+import static org.spongepowered.api.service.context.Context.WORLD_KEY;
 
 /**
  * The Base for Roles OptionSubjectData without persistence
@@ -63,7 +62,8 @@ public class BaseSubjectData implements OptionSubjectData
 
     public static String stringify(Context c)
     {
-        return c.getName().isEmpty() ? c.getType() : c.getType().equals(Context.WORLD_KEY) ? c.getName() : c.getType() + "|" + c.getName();
+        return c.getName().isEmpty() ? c.getType() : c.getType().equals(
+            WORLD_KEY) ? c.getName() : c.getType() + "|" + c.getName();
     }
 
     public static Context asContext(String string)
@@ -71,11 +71,11 @@ public class BaseSubjectData implements OptionSubjectData
         String[] context = string.split("\\|");
         if (context.length == 1)
         {
-            if (context[0].equals("global"))
+            if (context[0].equals(GLOBAL.getType()))
             {
                 return new Context(context[0], "");
             }
-            return new Context(Context.WORLD_KEY, context[0]);
+            return new Context(WORLD_KEY, context[0]);
         }
         if (context.length == 2)
         {
@@ -326,7 +326,6 @@ public class BaseSubjectData implements OptionSubjectData
 
         for (Context context : contexts)
         {
-            context = service.getMirror(context);
             other = all.get(context);
             if (other != null)
             {

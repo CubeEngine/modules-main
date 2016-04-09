@@ -37,11 +37,4 @@ public class RolesConfig extends ReflectedYaml
                  "default:\n" +
                  "      - guest\n")
     public List<String> defaultRoles = new ArrayList<>();
-
-    @Comment("Example for a mirror:\n" +
-            "  world|world: \n" +
-            "    - world|world_the_end\n" +
-            "    - world|world_nether\n" +
-            "The context-type world can be omitted")
-    public Map<String, List<String>> mirrors = new HashMap<>();
 }

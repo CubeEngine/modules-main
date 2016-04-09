@@ -35,6 +35,7 @@ import org.cubeengine.module.roles.RolesUtil.FoundPermission;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.service.ContextUtil;
 import org.cubeengine.service.command.ContainerCommand;
 import org.cubeengine.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
@@ -47,6 +48,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextFormat;
 
+import static org.cubeengine.service.ContextUtil.toSet;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 import static org.spongepowered.api.text.action.TextActions.showText;
@@ -118,7 +120,7 @@ public class UserInformationCommands extends ContainerCommand
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in context]")
     public void checkpermission(CommandSource ctx, @Default User player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
     {
-        Set<Context> contexts = RoleCommands.toSet(context);
+        Set<Context> contexts = toSet(context);
 
         Text permText = RolesUtil.permText(ctx, permission, service, i18n);
         FoundPermission found = RolesUtil.findPermission(service, player, permission, contexts);
@@ -152,7 +154,7 @@ public class UserInformationCommands extends ContainerCommand
     @Command(alias = "listperm", desc = "List permission assigned to a user [in context]")
     public void listpermission(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
-        Set<Context> contexts = RoleCommands.toSet(context);
+        Set<Context> contexts = toSet(context);
         Map<String, Boolean> permissions = new HashMap<>();
         if (all)
         {
@@ -183,7 +185,7 @@ public class UserInformationCommands extends ContainerCommand
     @Command(alias = {"checkData"}, desc = "Checks for options of a user [in context]")
     public void checkOption(CommandSource ctx, @Default User player, String key, @Named("in") @Default Context context)
     {
-        Set<Context> contexts = RoleCommands.toSet(context);
+        Set<Context> contexts = toSet(context);
 
         Optional<FoundOption> option = RolesUtil.getOption(service.getUserSubjects().get(player.getIdentifier()), key, contexts);
         if (!option.isPresent())
@@ -207,7 +209,7 @@ public class UserInformationCommands extends ContainerCommand
     @Command(alias = "listData", desc = "Lists assigned options from a user [in context]")
     public void listOptions(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
-        Set<Context> contexts = RoleCommands.toSet(context);
+        Set<Context> contexts = toSet(context);
         Map<String, String> options = new HashMap<>();
         if (all)
         {

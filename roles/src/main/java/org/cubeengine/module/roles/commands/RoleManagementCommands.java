@@ -42,7 +42,7 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
-import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
+import static org.cubeengine.service.ContextUtil.toSet;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 

@@ -15,23 +15,18 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.roles.commands.provider;
+package org.cubeengine.module.contextmirror;
 
-import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.formatter.AbstractFormatter;
-import org.cubeengine.dirigent.parser.component.Text;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import de.cubeisland.engine.reflect.annotations.Comment;
+import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.service.context.Context;
 
-public class ContextFormatter extends AbstractFormatter<Context>
+@SuppressWarnings("all")
+public class ContextmirrorConfig extends ReflectedYaml
 {
-    public ContextFormatter()
-    {
-        super("context");
-    }
-
-    @Override
-    public Component format(Context object, org.cubeengine.dirigent.formatter.Context context)
-    {
-        return new Text(object.getValue().isEmpty() ? object.getKey() : object.getKey() + "|" + object.getValue());
-    }
+    @Comment("Maps any context to a list of contexts")
+    public Map<Context, List<Context>> contextMirrors = new HashMap<>();
 }

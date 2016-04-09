@@ -48,7 +48,7 @@ import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.text.format.TextColors;
 
 import static org.cubeengine.module.roles.RolesUtil.permText;
-import static org.cubeengine.module.roles.commands.RoleCommands.toSet;
+import static org.cubeengine.service.ContextUtil.toSet;
 import static org.cubeengine.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.text.TextTemplate.arg;
 import static org.spongepowered.api.text.format.TextColors.*;
