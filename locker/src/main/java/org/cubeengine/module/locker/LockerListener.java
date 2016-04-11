@@ -21,6 +21,7 @@ import java.util.Optional;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.service.i18n.I18n;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
@@ -63,7 +64,7 @@ public class LockerListener
     @Listener
     public void onPlayerInteract(InteractBlockEvent.Secondary event, @First Player player)
     {
-        if (!this.module.getConfig().protectBlockFromRClick) return;
+        if (!this.module.getConfig().protectBlockFromRClick || event.getTargetBlock() == BlockSnapshot.NONE) return;
 
         Location<World> block = event.getTargetBlock().getLocation().get();
         Lock lock = this.manager.getLockAtLocation(block, player);
