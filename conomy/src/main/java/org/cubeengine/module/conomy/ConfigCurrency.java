@@ -25,10 +25,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import org.cubeengine.service.ContextUtil;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.Text;
+
+import static org.cubeengine.service.ContextUtil.GLOBAL;
 
 public class ConfigCurrency implements Currency
 {
@@ -41,7 +44,7 @@ public class ConfigCurrency implements Currency
     {
         if (mirrors.isEmpty())
         {
-            return Optional.of(new Context("global", ""));
+            return Optional.of(GLOBAL);
         }
         contexts.retainAll(mirrors.keySet()); // remove context where not allowed
 
