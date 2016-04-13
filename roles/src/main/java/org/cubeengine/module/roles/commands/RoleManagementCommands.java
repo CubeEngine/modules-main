@@ -173,7 +173,7 @@ public class RoleManagementCommands extends ContainerCommand
     @Command(desc = "Renames given role")
     public void rename(CommandSource ctx, RoleSubject role, @Label("new name") String newName)
     {
-        String oldName = role.getName();
+        String oldName = role.getIdentifier();
         if (oldName.equalsIgnoreCase(newName))
         {
             i18n.sendTranslated(ctx, NEGATIVE, "These are the same names!");
@@ -191,13 +191,13 @@ public class RoleManagementCommands extends ContainerCommand
     @Command(desc = "Creates a new role")
     public void create(CommandSource ctx, String name)
     {
-        if (service.getGroupSubjects().hasRegisteredName(name))
+        if (service.getGroupSubjects().hasRegistered(name))
         {
             i18n.sendTranslated(ctx, NEUTRAL, "There is already a role named {name}.", name);
             return;
         }
-        RoleSubject r = service.getGroupSubjects().get(UUID.randomUUID().toString());
-        service.getGroupSubjects().setRoleName(r, name);
+        RoleSubject r = service.getGroupSubjects().get(name);
+        r.getSubjectData().save(true);
         i18n.sendTranslated(ctx, POSITIVE, "Role {name} created!", name);
     }
 

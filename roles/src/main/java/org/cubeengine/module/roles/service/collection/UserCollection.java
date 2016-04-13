@@ -50,12 +50,6 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
     }
 
     @Override
-    public boolean hasRegistered(String identifier)
-    {
-        return super.hasRegistered(identifier) || false;
-    }
-
-    @Override
     public Iterable<Subject> getAllSubjects()
     {
         // TODO get from all offline users once they can have custom data

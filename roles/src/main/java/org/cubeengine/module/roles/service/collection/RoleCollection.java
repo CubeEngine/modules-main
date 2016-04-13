@@ -20,7 +20,10 @@ package org.cubeengine.module.roles.service.collection;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.RoleConfig;
@@ -40,6 +43,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
     private Roles module;
     private RolesPermissionService service;
     private Reflector reflector;
+    private Map<UUID, RoleSubject> subjectByUUID = new ConcurrentHashMap<>();
 
     public RoleCollection(Roles module, RolesPermissionService service, Reflector reflector)
     {
@@ -53,6 +57,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
     private void loadRoles()
     {
         this.subjects.clear();
+        this.subjectByUUID.clear();
         try
         {
             createDirectories(modulePath.resolve("roles"));
@@ -74,12 +79,20 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
     {
         RoleSubject subject = new RoleSubject(module, service, this, config);
         subjects.put(subject.getIdentifier(), subject);
+        subjectByUUID.put(subject.getSubjectData().getConfig().identifier, subject);
         return subject;
     }
 
     @Override
     protected RoleSubject createSubject(String identifier)
     {
+        for (RoleSubject role : subjects.values())
+        {
+            if (role.getIdentifier().equalsIgnoreCase(identifier))
+            {
+                return role;
+            }
+        }
         try
         {
             UUID uuid = UUID.fromString(identifier);
@@ -89,14 +102,18 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         }
         catch (IllegalArgumentException e)
         {
-            throw new IllegalArgumentException("Provided identifier must be a uuid, was " + identifier);
+            RoleConfig config = reflector.create(RoleConfig.class);
+            config.identifier = UUID.randomUUID();
+            config.roleName = identifier;
+            config.setFile(modulePath.resolve("roles").resolve(identifier + YAML.getExtention()).toFile());
+            return addSubject(module, service, config);
         }
     }
 
     @Override
     public boolean hasRegistered(String identifier)
     {
-        return subjects.containsKey(identifier);
+        return super.hasRegistered(identifier) || subjects.values().stream().map(RoleSubject::getIdentifier).anyMatch(name -> name.equalsIgnoreCase(identifier));
     }
 
     @Override
@@ -107,11 +124,10 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 
     public boolean rename(RoleSubject role, String newName)
     {
-        if (hasRegisteredName(newName))
+        if (hasRegistered(newName))
         {
             return false;
         }
-
 
         if (!role.getSubjectData().getConfig().getFile().delete())
         {
@@ -119,7 +135,6 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         }
         setRoleName(role, newName);
         subjects.values().stream().filter(subject -> subject.getParents().contains(subject)).forEach(subject -> subject.getSubjectData().save(true));
-
         return true;
     }
 
@@ -152,9 +167,11 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
             }
         }
 
-        service.getConfig().defaultRoles.remove(r.getName());
+        service.getConfig().defaultRoles.remove(r.getIdentifier());
 
-        subjects.values().remove(r);
+        subjects.remove(r.getIdentifier());
+        subjectByUUID.remove(r.getSubjectData().getConfig().identifier);
+
         r.getSubjectData().delete(); // delete file
 
         // TODO maybe force reload ; is this needed ?
@@ -166,34 +183,42 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         loadRoles();
     }
 
-    public boolean hasRegisteredName(String name)
-    {
-        for (RoleSubject subject : subjects.values())
-        {
-            if (subject.getName().equalsIgnoreCase(name))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public void setRoleName(RoleSubject subject, String name)
     {
         RoleConfig config = subject.getSubjectData().getConfig();
+        subjects.remove(subject.getIdentifier());
+        subjects.put(name, subject);
         config.roleName = name;
         config.setFile(modulePath.resolve("roles").resolve(name + YAML.getExtention()).toFile());
         subject.getSubjectData().save(true);
     }
 
-    public RoleSubject getByName(String name)
+    public Optional<RoleSubject> getByUUID(UUID uuid)
     {
-        for (RoleSubject subject : subjects.values())
+        return Optional.ofNullable(subjectByUUID.get(uuid));
+    }
+
+    public RoleSubject getByInternalIdentifier(String internalId, String owner)
+    {
+        try
         {
-            if (subject.getName().equalsIgnoreCase(name))
+            UUID uuid = UUID.fromString(internalId);
+            Optional<RoleSubject> byUUID = getByUUID(uuid);
+            if (byUUID.isPresent())
             {
-                return subject;
+                return byUUID.get();
             }
+            System.out.print("Could not find Role for UUID: " + uuid + " and therefor removed it from " + owner + "\n");
+            // TODO message in logger
+        }
+        catch (IllegalArgumentException ignored)
+        {
+            if (hasRegistered(internalId))
+            {
+                return get(internalId);
+            }
+            System.out.print("Could not find Role for Identifier: " + internalId + " and therefor removed it from " + owner + "\n");
+            // TODO message in logger
         }
         return null;
     }

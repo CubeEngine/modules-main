@@ -24,7 +24,10 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.service.RolesPermissionService;
@@ -53,22 +56,20 @@ public class RoleSubjectData extends CachingSubjectData
             for (Map.Entry<Context, List<Subject>> entry : parents.entrySet())
             {
                 List<String> collect = entry.getValue().stream()
-                        .filter(s -> s instanceof RoleSubject) // TODO WARN: Subject that is not a role will not be persisted
-                        .map(RoleSubject.class::cast)
-                        .map(RoleSubject::getName)
+                        .map(RoleSubject::getInternalIdentifier)
                         .collect(toList());
 
-                getContextSetting(entry.getKey()).parents.addAll(collect);
+                getContextSetting(config, entry.getKey()).parents.addAll(collect);
             }
 
             for (Map.Entry<Context, Map<String, Boolean>> entry : permissions.entrySet())
             {
-                getContextSetting(entry.getKey()).permissions = new PermissionTree().setPermissions(entry.getValue());
+                getContextSetting(config, entry.getKey()).permissions = new PermissionTree().setPermissions(entry.getValue());
             }
 
             for (Map.Entry<Context, Map<String, String>> entry : options.entrySet())
             {
-                getContextSetting(entry.getKey()).options = entry.getValue();
+                getContextSetting(config, entry.getKey()).options = entry.getValue();
             }
 
             try
@@ -84,7 +85,7 @@ public class RoleSubjectData extends CachingSubjectData
         return changed;
     }
 
-    private RoleConfig.ContextSetting getContextSetting(Context context)
+    private static RoleConfig.ContextSetting getContextSetting(RoleConfig config, Context context)
     {
         String contextString = stringify(context);
         RoleConfig.ContextSetting setting = config.settings.get(contextString);
@@ -108,8 +109,11 @@ public class RoleSubjectData extends CachingSubjectData
         {
             for (Map.Entry<String, RoleConfig.ContextSetting> entry : config.settings.entrySet())
             {
-                List<RoleSubject> collect = entry.getValue().parents.stream().map(roleCollection::getByName).collect(toList());
-                Collections.sort(collect);
+                List<RoleSubject> collect = entry.getValue().parents.stream()
+                                                .map(s -> roleCollection.getByInternalIdentifier(s, getConfig().roleName))
+                                                .filter(Objects::nonNull)
+                                                .sorted(RoleSubject::compare)
+                                                .collect(toList());
                 parents.put(asContext(entry.getKey()), new ArrayList<>(collect));
             }
         }

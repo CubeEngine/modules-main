@@ -33,6 +33,6 @@ public class RoleFormatter extends AbstractFormatter<RoleSubject>
     @Override
     public Component format(RoleSubject object, Context context)
     {
-        return new Text(object.getName());
+        return new Text(object.getIdentifier());
     }
 }

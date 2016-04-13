@@ -27,7 +27,7 @@ public class DefaultSubjectData extends BaseSubjectData
         super(service);
         for (String role : config.defaultRoles)
         {
-            addParent(GLOBAL_CONTEXT, service.getGroupSubjects().getByName(role));
+            addParent(GLOBAL_CONTEXT, service.getGroupSubjects().get(role));
         }
     }
 

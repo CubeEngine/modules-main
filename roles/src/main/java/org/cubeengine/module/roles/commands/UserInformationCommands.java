@@ -86,8 +86,8 @@ public class UserInformationCommands extends ContainerCommand
                             // TODO perm check for each role
                             if (!parents.contains(subject) && subject instanceof RoleSubject)
                             {
-                                sender.sendMessage(Text.of(YELLOW, " - ", ((RoleSubject)subject).getName()).toBuilder().onClick(
-                                    TextActions.runCommand("/roles user assign " + player.getName() + " " + ((RoleSubject)subject).getName())).build());
+                                sender.sendMessage(Text.of(YELLOW, " - ", subject.getIdentifier()).toBuilder().onClick(
+                                    TextActions.runCommand("/roles user assign " + player.getName() + " " + subject.getIdentifier())).build());
                             }
                         }
                     })).onHover(showText(i18n.getTranslation(ctx, POSITIVE, "Click to add role"))).build()).build();
@@ -103,15 +103,15 @@ public class UserInformationCommands extends ContainerCommand
                     Text removeText = Text.of(RED, "(-)").toBuilder().onClick(TextActions.executeCallback(sender -> {
                         i18n.sendTranslated(sender, NEGATIVE, "Do you really want to remove {role} from {user}?", parent, player);
                         ctx.sendMessage(i18n.getTranslation(sender, TextFormat.NONE, "Confirm").toBuilder().color(DARK_GREEN).onClick(
-                            TextActions.runCommand("/roles user remove " + player.getName() + " " + parent.getName())).build());
+                            TextActions.runCommand("/roles user remove " + player.getName() + " " + parent.getIdentifier())).build());
                     })).onHover(showText(removeText1)).build();
-                    ctx.sendMessage(Text.of("- ", GOLD, parent.getName(), " ", removeText));
+                    ctx.sendMessage(Text.of("- ", GOLD, parent.getIdentifier(), " ", removeText));
                 });
         }
         else
         {
             parents.stream().filter(parent -> parent instanceof RoleSubject).map(RoleSubject.class::cast)
-                   .forEach(parent -> ctx.sendMessage(Text.of("- ", GOLD, parent.getName())));
+                   .forEach(parent -> ctx.sendMessage(Text.of("- ", GOLD, parent.getIdentifier())));
         }
     }
 
@@ -145,7 +145,7 @@ public class UserInformationCommands extends ContainerCommand
                 i18n.sendTranslated(ctx, NEUTRAL, "Permission inherited from:");
                 i18n.sendTranslated(ctx, NEUTRAL, "{txt#permission} in the role {name}!",
                                     RolesUtil.permText(ctx, found.permission, service, i18n),
-                                    ((RoleSubject)found.subject).getName());
+                                    found.subject.getIdentifier());
             }
         }
     }
@@ -201,7 +201,7 @@ public class UserInformationCommands extends ContainerCommand
         }
         else
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Options inherited from the role {name}!", ((RoleSubject)option.get().subject).getName());
+            i18n.sendTranslated(ctx, NEUTRAL, "Options inherited from the role {name}!", ((RoleSubject)option.get().subject).getIdentifier());
         }
     }
 
@@ -219,7 +219,14 @@ public class UserInformationCommands extends ContainerCommand
         {
             options.putAll(((OptionSubjectData)player.getSubjectData()).getOptions(contexts));
         }
-        i18n.sendTranslated(ctx, NEUTRAL, "Options of {user} in {context}:", player, context);
+        if (all)
+        {
+            i18n.sendTranslated(ctx, NEUTRAL, "Options of {user} in {context}:", player, context);
+        }
+        else
+        {
+            i18n.sendTranslated(ctx, NEUTRAL, "Options of {user} directly set in {context}:", player, context);
+        }
         for (Map.Entry<String, String> entry : options.entrySet())
         {
             ctx.sendMessage(Text.of("- ", YELLOW, entry.getKey(), TextColors.WHITE, ": ", GOLD, entry.getValue()));

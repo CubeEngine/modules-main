@@ -83,7 +83,7 @@ public class RoleInformationCommands extends ContainerCommand
         i18n.sendTranslated(cContext, POSITIVE, "The following roles are available:");
         for (Subject r : roles)
         {
-            cContext.sendMessage(Text.of("- ", YELLOW, r instanceof RoleSubject ? ((RoleSubject) r).getName() : r.getIdentifier()));
+            cContext.sendMessage(Text.of("- ", YELLOW, r.getIdentifier()));
         }
     }
 
@@ -109,7 +109,7 @@ public class RoleInformationCommands extends ContainerCommand
         }
         i18n.sendTranslated(ctx, NEUTRAL, "Permission inherited from:");
         i18n.sendTranslated(ctx, NEUTRAL, "{txt#permission} in the role {name}!",
-            permText(ctx, perm.permission, service, i18n), ((RoleSubject)perm.subject).getName());
+            permText(ctx, perm.permission, service, i18n), perm.subject.getIdentifier());
     }
 
     @Alias(value = "listRPerm")
@@ -191,7 +191,7 @@ public class RoleInformationCommands extends ContainerCommand
         i18n.sendTranslated(ctx, NEUTRAL, "The role {role} in {context} has following parent roles:", role, context);
         for (Subject parent : parents)
         {
-            ctx.sendMessage(Text.of("- ", YELLOW, parent instanceof RoleSubject ? ((RoleSubject) parent).getName() : parent.getIdentifier()));
+            ctx.sendMessage(Text.of("- ", YELLOW, parent.getIdentifier()));
         }
     }
 
@@ -214,7 +214,7 @@ public class RoleInformationCommands extends ContainerCommand
         i18n.sendTranslated(cContext, POSITIVE, "The following roles are default roles in {context}!", context);
         for (Subject role : parents)
         {
-            cContext.sendMessage(Text.of("- ", YELLOW, role instanceof RoleSubject ? ((RoleSubject) role).getName() : role.getIdentifier()));
+            cContext.sendMessage(Text.of("- ", YELLOW, role.getIdentifier()));
         }
     }
 }

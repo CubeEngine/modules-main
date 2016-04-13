@@ -21,11 +21,15 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.cubeengine.service.ContextUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
@@ -34,9 +38,7 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.user.UserStorageService;
 
 import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 import static org.cubeengine.module.roles.RolesUtil.contextOf;
 
 public class UserSubjectData extends CachingSubjectData
@@ -52,7 +54,8 @@ public class UserSubjectData extends CachingSubjectData
     private Optional<PermissionData> getData()
     {
         UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
-        User player = storage.get(uuid).get().getPlayer().get(); // TODO wait for User Data impl
+        User player = storage.get(uuid).get();
+        player = player.getPlayer().get(); // TODO wait for User Data impl
 
         Optional<PermissionData> permData = player.get(PermissionData.class);
         if (permData.isPresent())
@@ -67,38 +70,38 @@ public class UserSubjectData extends CachingSubjectData
     {
         if (changed)
         {
+            // Serialize Data
+            List<String> parents = serializeToList(this.parents);
+            Map<String, Boolean> permissions = serializeToMap(this.permissions);
+            Map<String, String> options = serializeToMap(this.options);
+
+            // Get User for Storage
             UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
-
-            // On users only global assigned Roles get persisted
-            List<String> parents = this.parents.get(ContextUtil.GLOBAL).stream()
-                                               .map(Subject::getIdentifier)
-                                               .collect(Collectors.toList());
-
-            Map<String, Boolean> permissions = this.permissions.entrySet().stream().flatMap(e -> {
-                String context = stringify(e.getKey()) + "#";
-                return e.getValue().entrySet().stream()
-                        .collect(toMap(
-                                ee -> context + ee.getKey(),
-                                Map.Entry::getValue
-                        )).entrySet().stream();
-            }).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-            Map<String, String> options = this.options.entrySet().stream().flatMap(e -> {
-                String context = stringify(e.getKey())+ "#";
-                return e.getValue().entrySet().stream()
-                        .collect(toMap(
-                                ee -> context + ee.getKey(),
-                                Map.Entry::getValue
-                        )).entrySet().stream();
-            }).collect(toMap(Map.Entry::getKey, Map.Entry::getValue));
-
             User user = storage.get(uuid).get();
+            // Save Data in User
             user.offer(new PermissionData(parents, permissions, options));
-
-            // TODO remove once saving data on user is implemented
+            // actually save Data in Player til -> TODO remove once saving data on user is implemented
             user.getPlayer().get().offer(new PermissionData(parents, permissions, options));
         }
         return changed;
+    }
+
+    private List<String> serializeToList(Map<Context, List<Subject>> map)
+    {
+        // On users only global assigned Roles get persisted
+        return map.get(ContextUtil.GLOBAL).stream().map(RoleSubject::getInternalIdentifier).collect(Collectors.toList());
+    }
+
+    private <T> Map<String, T> serializeToMap(Map<Context, Map<String, T>> map)
+    {
+        return map.entrySet().stream().flatMap(e ->
+                        e.getValue().entrySet().stream().collect(mapContextKeyCollector(e)).entrySet().stream())
+                  .collect(toMap(Entry::getKey, Entry::getValue));
+    }
+
+    private <T> Collector<Entry<String, T>, ?, Map<String, T>> mapContextKeyCollector(Entry<Context, Map<String, T>> entry)
+    {
+        return toMap(ee -> stringify(entry.getKey())+ "#" + ee.getKey(), Entry::getValue);
     }
 
     @Override
@@ -106,18 +109,11 @@ public class UserSubjectData extends CachingSubjectData
     {
         if (!parents.containsKey(ContextUtil.GLOBAL))
         {
-            List<String> parentList = getData()
-                .map(PermissionData::getParents)
-                .orElse(Collections.emptyList());
+            List<String> parentList = getData().map(PermissionData::getParents).orElse(Collections.emptyList());
             List<Subject> list = parentList.stream()
-                                           .map(roleCollection::get)
-                                           .sorted((o1, o2) -> {
-                                               if (o1 != null && o2 != null)
-                                               {
-                                                   return o1.compareTo(o2);
-                                               }
-                                               return 1;
-                                           })
+                                           .map(s -> roleCollection.getByInternalIdentifier(s, uuid.toString()))
+                                           .filter(Objects::nonNull)
+                                           .sorted(RoleSubject::compare)
                                            .map(Subject.class::cast)
                                            .collect(toList());
             parents.put(ContextUtil.GLOBAL, list);
@@ -129,11 +125,7 @@ public class UserSubjectData extends CachingSubjectData
     {
         if (!permissions.isEmpty())
         {
-            Map<Context, Map<String, Boolean>> collected = getData().map(PermissionData::getPermissions).orElse(emptyMap())
-                .entrySet().stream().collect(groupingBy(e -> contextOf(e.getKey().split("#")[0]),
-                                                toMap(e -> e.getKey().split("#")[1], Entry::getValue)));
-
-            permissions.putAll(collected);
+            permissions.putAll(deserialzeMap(PermissionData::getPermissions));
         }
     }
 
@@ -142,11 +134,17 @@ public class UserSubjectData extends CachingSubjectData
     {
         if (options.isEmpty())
         {
-            Map<Context, Map<String, String>> collected = getData().map(PermissionData::getOptions).orElse(emptyMap())
-                .entrySet().stream().collect(groupingBy(e -> contextOf(e.getKey().split("#")[0]),
-                                                toMap(e -> e.getKey().split("#")[1], Entry::getValue)));
-
-            options.putAll(collected);
+            options.putAll(deserialzeMap(PermissionData::getOptions));
         }
+    }
+
+    private <T> Map<Context, Map<String, T>> deserialzeMap(Function<PermissionData, Map<String, T>> func)
+    {
+        return getData().map(func).orElse(emptyMap()).entrySet().stream().collect(groupedByContext());
+    }
+
+    private <T> Collector<Entry<String, T>, ?, Map<Context, Map<String, T>>> groupedByContext()
+    {
+        return groupingBy(e -> contextOf(e.getKey().split("#")[0]), toMap(e -> e.getKey().split("#")[1], Entry::getValue));
     }
 }

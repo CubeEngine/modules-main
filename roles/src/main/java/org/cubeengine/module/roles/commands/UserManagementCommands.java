@@ -101,8 +101,9 @@ public class UserManagementCommands extends ContainerCommand
             return;
         }
 
-        if (player.getTransientSubjectData().removeParent(emptySet(), role) | // do not short-circuit
-            player.getSubjectData().removeParent(emptySet(), role))
+        boolean removed = player.getTransientSubjectData().removeParent(emptySet(), role);
+        removed = player.getSubjectData().removeParent(emptySet(), role) || removed;
+        if (removed)
         {
             i18n.sendTranslated(ctx, POSITIVE, "Removed the role {role} from {user}.", role, player);
             return;
@@ -123,7 +124,7 @@ public class UserManagementCommands extends ContainerCommand
             for (Subject subject : defaultData.getParents(emptySet()))
             {
                 player.getTransientSubjectData().addParent(emptySet(), subject);
-                ctx.sendMessage(Text.of("- ", TextColors.YELLOW, subject instanceof RoleSubject ? ((RoleSubject) subject).getName() : subject.getIdentifier()));
+                ctx.sendMessage(Text.of("- ", TextColors.YELLOW, subject.getIdentifier()));
             }
         }
     }

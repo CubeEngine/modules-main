@@ -19,6 +19,7 @@ package org.cubeengine.module.roles.service.subject;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.RoleConfig;
@@ -28,10 +29,11 @@ import org.cubeengine.module.roles.service.data.RoleSubjectData;
 import org.cubeengine.service.permission.PermissionManager;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.Subject;
 
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
-public class RoleSubject extends BaseSubject<RoleSubjectData> implements Comparable<RoleSubject>
+public class RoleSubject extends BaseSubject<RoleSubjectData>
 {
     public static final String SEPARATOR = "|";
     private Roles module;
@@ -42,13 +44,33 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
         this.module = module;
     }
 
-    @Override
-    public String getIdentifier()
+    /**
+     * Returns the internal UUID as String or the Subjects Identifier if it is not a RoleSubject
+     * @param s the subject
+     * @return the internal identifier
+     */
+    public static String getInternalIdentifier(Subject s)
     {
-        return getSubjectData().getConfig().identifier.toString();
+        return s instanceof RoleSubject ? ((RoleSubject)s).getUUID().toString() : s.getIdentifier();
     }
 
-    public String getName()
+    public static int compare(RoleSubject o1, RoleSubject o2)
+    {
+        if (o1 != null && o2 != null)
+        {
+            // Higher priority first
+            return -Integer.compare(o1.getSubjectData().getConfig().priority.value, o2.getSubjectData().getConfig().priority.value);
+        }
+        return 1;
+    }
+
+    protected UUID getUUID()
+    {
+        return getSubjectData().getConfig().identifier;
+    }
+
+    @Override
+    public String getIdentifier()
     {
         return getSubjectData().getConfig().roleName;
     }
@@ -65,17 +87,10 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
         return GLOBAL_CONTEXT;
     }
 
-    @Override
-    public int compareTo(RoleSubject o)
-    {
-        // Higher priority first
-        return -Integer.compare(getSubjectData().getConfig().priority.value, o.getSubjectData().getConfig().priority.value);
-    }
-
     public boolean canAssignAndRemove(CommandSource source)
     {
         String perm = module.getModularity().provide(PermissionManager.class).getModulePermission(module).getId();
-        return source.hasPermission(perm + ".assign." + getName());
+        return source.hasPermission(perm + ".assign." + getIdentifier());
     }
 
     public void setPriorityValue(int value)
@@ -88,4 +103,6 @@ public class RoleSubject extends BaseSubject<RoleSubjectData> implements Compara
     {
         return getSubjectData().getConfig().priority;
     }
+
+
 }
