@@ -151,7 +151,7 @@ public class RolesPermissionService implements PermissionService
 
     protected PermissionDescription addDescription(RolesPermissionDescription desc, Map<String, Tristate> roleAssignments)
     {
-        SubjectCollection subjects = getSubjects(SUBJECTS_ROLE_TEMPLATE);
+        SubjectCollection subjects = getSubjects(SUBJECTS_ROLE_TEMPLATE); // TODO prevent infinite recursion
         roleAssignments.entrySet().forEach(e -> subjects.get(e.getKey()).getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), e.getValue()));
 
         descriptionMap.put(desc.getId().toLowerCase(), desc);

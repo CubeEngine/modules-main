@@ -79,7 +79,7 @@ public class RolesUtil
                 {
                     // Find the explicit permission-parent value
                     // TODO prevent from looking up implicit permissions multiple times
-                    FoundPermission found = findPermission(service, subject, data, explicit, contexts, true); // recursive
+                    FoundPermission found = findPermission(service, subject, data, explicit, contexts, false); // recursive
                     if (found != null)
                     {
                         return found;
