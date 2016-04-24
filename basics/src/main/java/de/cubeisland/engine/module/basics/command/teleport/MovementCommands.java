@@ -225,6 +225,7 @@ public class MovementCommands
                 if (teleport(context, loc, !unsafe, true, true))
                 {
                     context.sendTranslated(POSITIVE, "Teleported to your death point!");
+                    context.sendMessage(loc.getX() + ":" + loc.getY() + ":" + loc.getZ());
                 }
                 else
                 {
@@ -244,6 +245,7 @@ public class MovementCommands
             if (teleport(context, loc, !unsafe, true, true))
             {
                 context.sendTranslated(POSITIVE, "Teleported to your last location!");
+                context.sendMessage(loc.getX() + ":" + loc.getY() + ":" + loc.getZ());
             }
             return;
         }
