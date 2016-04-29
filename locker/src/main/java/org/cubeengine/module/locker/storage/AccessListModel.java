@@ -17,7 +17,7 @@
  */
 package org.cubeengine.module.locker.storage;
 
-import org.cubeengine.service.database.AsyncRecord;
+import org.cubeengine.libcube.service.database.AsyncRecord;
 import org.spongepowered.api.entity.living.player.User;
 
 import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;

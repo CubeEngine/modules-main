@@ -25,9 +25,9 @@ import java.time.format.FormatStyle;
 import java.util.Date;
 import java.util.Optional;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.module.core.util.TimeUtil;
-import org.cubeengine.module.core.util.math.BlockVector3;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.util.TimeUtil;
+import org.cubeengine.libcube.util.math.BlockVector3;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
@@ -44,8 +44,8 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static java.text.DateFormat.SHORT;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.NONE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NONE;
 
 public class PlayerInfoCommands
 {

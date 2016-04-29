@@ -21,12 +21,12 @@ import java.util.Optional;
 import java.util.UUID;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.task.TaskManager;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.task.TaskManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains Teleport-Request commands.

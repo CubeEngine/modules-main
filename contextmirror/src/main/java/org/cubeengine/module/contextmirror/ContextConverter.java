@@ -24,7 +24,7 @@ import de.cubeisland.engine.converter.node.StringNode;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.context.Context;
 
-import static org.cubeengine.service.ContextUtil.GLOBAL;
+import static org.cubeengine.libcube.util.ContextUtil.GLOBAL;
 import static org.spongepowered.api.service.context.Context.WORLD_KEY;
 
 public class ContextConverter extends SimpleConverter<Context>

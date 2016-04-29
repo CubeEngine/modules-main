@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import org.cubeengine.module.mail.storage.Mail;
-import org.cubeengine.service.database.Database;
+import org.cubeengine.libcube.service.database.Database;
 import org.jooq.DSLContext;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;

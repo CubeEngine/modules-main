@@ -34,9 +34,9 @@ import org.cubeengine.module.conomy.ConfigCurrency;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyService;
 import org.cubeengine.module.conomy.storage.BalanceModel;
-import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.UserList;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.command.readers.UserList;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
@@ -49,8 +49,8 @@ import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.text.format.TextColors.*;
 
 @Command(name = "money", desc = "Manage your money")

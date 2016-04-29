@@ -23,8 +23,8 @@ import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.bank.BankConomyService;
-import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.event.cause.Cause;
@@ -32,8 +32,8 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 @Command(name = "bank", desc = "Administrative commands for Conomy Banks.")
 public class EcoBankCommand extends ContainerCommand

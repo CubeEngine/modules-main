@@ -21,17 +21,17 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.annotation.ParameterPermission;
-import org.cubeengine.service.command.exception.PermissionDeniedException;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
+import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.item.inventory.type.InventoryRow;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 public class ClearInventoryCommand extends PermissionContainer<VanillaPlus>
 {

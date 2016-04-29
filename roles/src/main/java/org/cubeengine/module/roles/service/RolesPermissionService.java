@@ -35,8 +35,7 @@ import org.cubeengine.module.roles.service.collection.BasicSubjectCollection;
 import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
 import org.cubeengine.module.roles.service.data.DefaultSubjectData;
-import org.cubeengine.service.ContextUtil;
-import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.Context;
@@ -49,7 +48,7 @@ import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.module.roles.service.subject.RoleSubject.SEPARATOR;
-import static org.cubeengine.service.ContextUtil.GLOBAL;
+import static org.cubeengine.libcube.util.ContextUtil.GLOBAL;
 import static org.spongepowered.api.service.context.Context.WORLD_KEY;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 

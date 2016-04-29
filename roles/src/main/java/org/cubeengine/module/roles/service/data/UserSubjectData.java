@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
-import org.cubeengine.service.ContextUtil;
+import org.cubeengine.libcube.util.ContextUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;

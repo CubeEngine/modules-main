@@ -19,8 +19,8 @@ package org.cubeengine.module.teleport;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.cubeengine.service.permission.PermissionContainer;
-import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.World;

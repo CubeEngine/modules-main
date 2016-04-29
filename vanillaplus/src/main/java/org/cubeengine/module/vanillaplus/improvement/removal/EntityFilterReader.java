@@ -25,10 +25,10 @@ import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.exception.SilentException;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.ReaderException;
-import org.cubeengine.module.core.util.StringUtils;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.matcher.EntityMatcher;
-import org.cubeengine.service.matcher.MaterialMatcher;
+import org.cubeengine.libcube.util.StringUtils;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.EntityMatcher;
+import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -38,9 +38,9 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.text.Text;
 
 import static java.util.Arrays.asList;
-import static org.cubeengine.module.core.util.ChatFormat.YELLOW;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.util.ChatFormat.YELLOW;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.entity.EntityTypes.*;
 
 public class EntityFilterReader implements ArgumentReader<EntityFilter>

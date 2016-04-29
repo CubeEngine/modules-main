@@ -21,15 +21,15 @@ import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.inventoryguard.InventoryGuardFactory;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 
 /**
  * Contains commands that allow to modify an inventory.

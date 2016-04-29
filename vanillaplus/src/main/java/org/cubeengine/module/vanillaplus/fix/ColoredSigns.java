@@ -18,7 +18,7 @@
 package org.cubeengine.module.vanillaplus.fix;
 
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;

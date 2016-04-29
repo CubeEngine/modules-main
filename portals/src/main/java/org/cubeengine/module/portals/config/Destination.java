@@ -20,15 +20,15 @@ package org.cubeengine.module.portals.config;
 import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldTransform;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.config.WorldTransform;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class Destination
 {

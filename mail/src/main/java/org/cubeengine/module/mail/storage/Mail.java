@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import org.cubeengine.service.database.AsyncRecord;
+import org.cubeengine.libcube.service.database.AsyncRecord;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;

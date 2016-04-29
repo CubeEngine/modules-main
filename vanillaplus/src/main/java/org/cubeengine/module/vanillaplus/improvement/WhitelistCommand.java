@@ -23,8 +23,8 @@ import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
@@ -34,7 +34,7 @@ import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 /**
  * All Whitelist related commands:

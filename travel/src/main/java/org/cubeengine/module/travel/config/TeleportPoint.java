@@ -19,8 +19,8 @@ package org.cubeengine.module.travel.config;
 
 import java.util.UUID;
 import de.cubeisland.engine.reflect.Section;
-import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldTransform;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.config.WorldTransform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Transform;

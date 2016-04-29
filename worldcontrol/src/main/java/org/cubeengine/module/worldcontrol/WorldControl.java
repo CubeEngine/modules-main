@@ -22,8 +22,8 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.module.worldcontrol.WorldControlConfig.WorldSection;
-import org.cubeengine.service.filesystem.ModuleConfig;
-import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 

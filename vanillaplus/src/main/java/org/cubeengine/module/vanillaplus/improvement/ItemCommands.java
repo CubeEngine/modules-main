@@ -23,12 +23,12 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.matcher.EnchantMatcher;
-import org.cubeengine.service.matcher.MaterialMatcher;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.EnchantMatcher;
+import org.cubeengine.libcube.service.matcher.MaterialMatcher;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -38,7 +38,7 @@ import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResu
 import org.spongepowered.api.item.inventory.type.InventoryRow;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.ITEM_DATA;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
 

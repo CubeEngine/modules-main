@@ -28,12 +28,12 @@ import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyService;
-import org.cubeengine.service.command.TranslatedReaderException;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.command.TranslatedReaderException;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class UniqueAccountReader implements ArgumentReader<BaseAccount.Unique>, DefaultValue<BaseAccount.Unique>, Completer
 {

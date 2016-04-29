@@ -18,7 +18,7 @@
 package org.cubeengine.module.conomy.bank;
 
 import org.cubeengine.module.conomy.Conomy;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 public class BankPermission extends PermissionContainer<Conomy>

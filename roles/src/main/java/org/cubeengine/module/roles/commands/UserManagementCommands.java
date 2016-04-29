@@ -28,8 +28,8 @@ import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
-import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -42,8 +42,8 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.emptySet;
-import static org.cubeengine.service.ContextUtil.toSet;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.util.ContextUtil.toSet;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 @Alias("manuser")
 @Command(name = "user", desc = "Manage users")

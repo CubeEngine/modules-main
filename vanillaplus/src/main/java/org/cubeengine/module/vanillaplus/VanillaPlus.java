@@ -57,19 +57,19 @@ import org.cubeengine.module.vanillaplus.improvement.WhitelistCommand;
 import org.cubeengine.module.vanillaplus.improvement.removal.ButcherCommand;
 import org.cubeengine.module.vanillaplus.improvement.removal.RemoveCommands;
 import org.cubeengine.module.vanillaplus.improvement.summon.SpawnMobCommand;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.event.EventManager;
-import org.cubeengine.service.filesystem.ModuleConfig;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.inventoryguard.InventoryGuardFactory;
-import org.cubeengine.service.matcher.EnchantMatcher;
-import org.cubeengine.service.matcher.EntityMatcher;
-import org.cubeengine.service.matcher.MaterialMatcher;
-import org.cubeengine.service.matcher.StringMatcher;
-import org.cubeengine.service.matcher.TimeMatcher;
-import org.cubeengine.service.matcher.WorldMatcher;
-import org.cubeengine.service.task.TaskManager;
-import org.cubeengine.service.user.Broadcaster;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.event.EventManager;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
+import org.cubeengine.libcube.service.matcher.EnchantMatcher;
+import org.cubeengine.libcube.service.matcher.EntityMatcher;
+import org.cubeengine.libcube.service.matcher.MaterialMatcher;
+import org.cubeengine.libcube.service.matcher.StringMatcher;
+import org.cubeengine.libcube.service.matcher.TimeMatcher;
+import org.cubeengine.libcube.service.matcher.WorldMatcher;
+import org.cubeengine.libcube.service.task.TaskManager;
+import org.cubeengine.libcube.service.Broadcaster;
 import org.spongepowered.api.Sponge;
 
 /**
@@ -297,4 +297,42 @@ public class VanillaPlus extends Module
     {
         return config;
     }
+
+
+    /*
+    TODO onlinemode cmd
+
+    @Command(desc = "Shows the online mode")
+    public void onlinemode(CommandSource context)
+    {
+        if (Sponge.getServer().getOnlineMode())
+        {
+            i18n.sendTranslated(context, POSITIVE, "The Server is running in online mode");
+            return;
+        }
+        i18n.sendTranslated(context, POSITIVE, "The Server is running in offline mode");
+        /* Changing online mode is no longer supported on a running server
+        BukkitUtils.setOnlineMode(newState);
+        if (newState)
+        {
+            context.sendTranslated(POSITIVE, "The server is now in online-mode.");
+        }
+        else
+        {
+            context.sendTranslated(POSITIVE, "The server is not in offline-mode.");
+        }
+        *//*
+}
+
+     @Command(alias = "finduser", desc = "Searches for a user in the database")
+    public void searchuser(CommandContext context, @Reader(FindUserReader.class) @Desc("The name to search for") User name)
+    {
+        if (name.getName().equalsIgnoreCase(context.getString(0)))
+        {
+            i18n.sendTranslated(context.getSource(), POSITIVE, "Matched exactly! User: {user}", name);
+            return;
+        }
+        i18n.sendTranslated(context.getSource(), POSITIVE, "Matched not exactly! User: {user}", name);
+    }
+    */
 }

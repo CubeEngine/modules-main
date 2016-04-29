@@ -25,8 +25,8 @@ import de.cubeisland.engine.converter.node.MapNode;
 import de.cubeisland.engine.converter.node.Node;
 import de.cubeisland.engine.converter.node.StringNode;
 import org.cubeengine.module.portals.config.Destination.Type;
-import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldTransform;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.config.WorldTransform;
 
 public class DestinationConverter extends SingleClassConverter<Destination>
 {

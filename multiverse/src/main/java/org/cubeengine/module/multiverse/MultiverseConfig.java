@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 
 @SuppressWarnings("all")
 public class MultiverseConfig extends ReflectedYaml

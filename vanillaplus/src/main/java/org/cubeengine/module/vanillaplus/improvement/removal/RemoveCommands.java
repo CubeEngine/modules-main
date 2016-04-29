@@ -25,10 +25,10 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.matcher.EntityMatcher;
-import org.cubeengine.service.matcher.MaterialMatcher;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.EntityMatcher;
+import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Living;
@@ -37,7 +37,7 @@ import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static java.util.stream.Collectors.toList;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 /**
  * A command to remove non-living entities

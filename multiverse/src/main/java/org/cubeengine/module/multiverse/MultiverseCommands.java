@@ -23,9 +23,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.module.multiverse.player.MultiverseData;
-import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
@@ -34,7 +34,7 @@ import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 @Command(name = "multiverse", desc = "Multiverse commands", alias = "mv")
 public class MultiverseCommands extends ContainerCommand

@@ -20,7 +20,7 @@ package org.cubeengine.module.locker.config;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.locker.storage.ProtectedType;
-import org.cubeengine.service.matcher.EntityMatcher;
+import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.spongepowered.api.entity.EntityType;
 
 public class EntityLockConfig extends LockConfig<EntityLockConfig, EntityType>

@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import java.util.UUID;
 import de.cubeisland.engine.converter.ConversionException;
 import de.cubeisland.engine.converter.converter.ClassedConverter;
 import de.cubeisland.engine.converter.node.StringNode;
@@ -35,15 +34,15 @@ import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.PriorityConverter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
-import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
-import static org.cubeengine.service.ContextUtil.toSet;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.util.ContextUtil.toSet;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 @Alias("manrole")

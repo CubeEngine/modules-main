@@ -28,8 +28,8 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.result.CommandResult;
-import org.cubeengine.module.core.util.ChatFormat;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.util.ChatFormat;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -38,8 +38,8 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
 import static org.spongepowered.api.text.format.TextColors.WHITE;
 

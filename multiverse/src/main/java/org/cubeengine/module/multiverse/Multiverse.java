@@ -30,11 +30,11 @@ import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.module.multiverse.player.ImmutableMultiverseData;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.module.multiverse.player.MultiverseDataBuilder;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.event.EventManager;
-import org.cubeengine.service.filesystem.ModuleConfig;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.event.EventManager;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.World;
 

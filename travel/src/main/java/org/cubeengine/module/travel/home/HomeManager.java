@@ -28,9 +28,9 @@ import javax.annotation.Nullable;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.module.travel.config.HomeConfig;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldTransform;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.config.WorldTransform;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
 import org.spongepowered.api.entity.Transform;
@@ -41,7 +41,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.event.Order.EARLY;
 
 public class HomeManager

@@ -24,7 +24,7 @@ import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.data.LockerData;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.entity.living.player.Player;
@@ -38,7 +38,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.data.key.Keys.DISPLAY_NAME;
 import static org.spongepowered.api.data.key.Keys.ITEM_LORE;
 import static org.spongepowered.api.effect.sound.SoundTypes.*;

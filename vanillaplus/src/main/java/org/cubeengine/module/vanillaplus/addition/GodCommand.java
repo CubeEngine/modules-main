@@ -20,14 +20,14 @@ package org.cubeengine.module.vanillaplus.addition;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 /**
  * Provides Gamemodelike Protection

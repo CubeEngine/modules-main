@@ -34,17 +34,17 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.butler.result.CommandResult;
-import org.cubeengine.module.core.util.math.Cuboid;
-import org.cubeengine.module.core.util.math.Vector3;
-import org.cubeengine.module.core.util.math.shape.Shape;
+import org.cubeengine.libcube.util.math.Cuboid;
+import org.cubeengine.libcube.util.math.Vector3;
+import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.config.Home;
-import org.cubeengine.service.Selector;
-import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.command.exception.PermissionDeniedException;
-import org.cubeengine.service.command.property.RawPermission;
-import org.cubeengine.service.confirm.ConfirmResult;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.Selector;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
+import org.cubeengine.libcube.service.command.property.RawPermission;
+import org.cubeengine.libcube.service.command.confirm.ConfirmResult;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
@@ -60,7 +60,7 @@ import org.spongepowered.api.world.World;
 
 import static java.util.stream.Collectors.toSet;
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 @Command(name = "home", desc = "Teleport to your home")

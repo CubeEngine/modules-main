@@ -27,12 +27,12 @@ import org.cubeengine.butler.exception.SilentException;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.DefaultValue;
 import org.cubeengine.butler.parameter.reader.ReaderException;
-import org.cubeengine.module.core.util.StringUtils;
+import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.exception.PermissionDeniedException;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.matcher.StringMatcher;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.StringMatcher;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
@@ -53,8 +53,8 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.text.format.TextFormat.NONE;
 
 public class LivingFilterReader extends PermissionContainer<VanillaPlus> implements ArgumentReader<LivingFilter>, DefaultValue<LivingFilter>

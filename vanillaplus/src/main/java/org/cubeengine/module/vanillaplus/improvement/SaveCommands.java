@@ -20,16 +20,16 @@ package org.cubeengine.module.vanillaplus.improvement;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.core.util.Profiler;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.util.Profiler;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.World;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 public class SaveCommands
 {

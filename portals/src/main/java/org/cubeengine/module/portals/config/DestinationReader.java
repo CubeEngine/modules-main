@@ -24,7 +24,7 @@ import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;

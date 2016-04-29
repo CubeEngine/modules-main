@@ -20,9 +20,9 @@ package org.cubeengine.module.portals.config;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.cubeengine.module.core.util.math.BlockVector3;
-import org.cubeengine.service.world.ConfigWorld;
-import org.cubeengine.service.world.WorldTransform;
+import org.cubeengine.libcube.util.math.BlockVector3;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.config.WorldTransform;
 
 @SuppressWarnings("all")
 public class PortalConfig extends ReflectedYaml

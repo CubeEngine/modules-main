@@ -40,16 +40,16 @@ import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.module.locker.storage.TableAccessList;
 import org.cubeengine.module.locker.storage.TableLockLocations;
 import org.cubeengine.module.locker.storage.TableLocks;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.database.Database;
-import org.cubeengine.service.database.ModuleTables;
-import org.cubeengine.service.event.EventManager;
-import org.cubeengine.service.filesystem.ModuleConfig;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.matcher.EntityMatcher;
-import org.cubeengine.service.matcher.MaterialMatcher;
-import org.cubeengine.service.matcher.StringMatcher;
-import org.cubeengine.service.task.TaskManager;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.database.Database;
+import org.cubeengine.libcube.service.database.ModuleTables;
+import org.cubeengine.libcube.service.event.EventManager;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.EntityMatcher;
+import org.cubeengine.libcube.service.matcher.MaterialMatcher;
+import org.cubeengine.libcube.service.matcher.StringMatcher;
+import org.cubeengine.libcube.service.task.TaskManager;
 import org.spongepowered.api.Game;
 
 // TODO protect lines of redstone

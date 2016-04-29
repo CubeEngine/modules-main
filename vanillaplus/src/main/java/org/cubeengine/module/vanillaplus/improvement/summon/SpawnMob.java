@@ -25,9 +25,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import org.cubeengine.butler.parameter.IncorrectUsageException;
-import org.cubeengine.module.core.util.StringUtils;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.matcher.EntityMatcher;
+import org.cubeengine.libcube.util.StringUtils;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -36,7 +36,7 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class SpawnMob
 {

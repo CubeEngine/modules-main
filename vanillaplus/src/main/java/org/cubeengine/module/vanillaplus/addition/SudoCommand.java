@@ -19,15 +19,15 @@ package org.cubeengine.module.vanillaplus.addition;
 
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Greed;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 public class SudoCommand
 {

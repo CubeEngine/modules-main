@@ -29,12 +29,12 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.core.util.ChatFormat;
-import org.cubeengine.module.core.util.StringUtils;
-import org.cubeengine.module.core.util.TimeConversionException;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.Broadcaster;
-import org.cubeengine.service.user.UserList;
+import org.cubeengine.libcube.util.ChatFormat;
+import org.cubeengine.libcube.util.StringUtils;
+import org.cubeengine.libcube.util.TimeConversionException;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.Broadcaster;
+import org.cubeengine.libcube.service.command.readers.UserList;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -48,9 +48,9 @@ import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.api.util.ban.Ban.Ip;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.module.core.util.ChatFormat.*;
-import static org.cubeengine.service.command.CommandUtil.ensurePermission;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.util.ChatFormat.*;
+import static org.cubeengine.libcube.service.command.CommandUtil.ensurePermission;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 /**
  * Contains commands to manage kicks/bans.

@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 import de.cubeisland.engine.modularity.core.LifeCycle;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.core.util.ChatFormat;
+import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.exception.PermissionDeniedException;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -36,8 +36,8 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.text.format.TextColors.GREEN;
 import static org.spongepowered.api.text.format.TextColors.RESET;
 

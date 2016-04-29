@@ -22,8 +22,8 @@ import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.dirigent.formatter.reflected.Format;
 import org.cubeengine.dirigent.formatter.reflected.Names;
 import org.cubeengine.dirigent.formatter.reflected.ReflectedFormatter;
-import org.cubeengine.service.i18n.formatter.component.StyledComponent;
-import org.cubeengine.service.i18n.formatter.component.TextComponent;
+import org.cubeengine.libcube.service.i18n.formatter.component.StyledComponent;
+import org.cubeengine.libcube.service.i18n.formatter.component.TextComponent;
 
 import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
 import static org.spongepowered.api.text.format.TextColors.GOLD;

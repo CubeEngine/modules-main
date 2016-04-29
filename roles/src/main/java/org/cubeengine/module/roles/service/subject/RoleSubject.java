@@ -26,7 +26,7 @@ import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.data.RoleSubjectData;
-import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;

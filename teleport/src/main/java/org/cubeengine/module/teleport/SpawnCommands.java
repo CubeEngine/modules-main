@@ -25,19 +25,19 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.core.util.math.BlockVector3;
-import org.cubeengine.service.event.EventManager;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.user.Broadcaster;
-import org.cubeengine.service.world.WorldSetSpawnEvent;
+import org.cubeengine.libcube.util.math.BlockVector3;
+import org.cubeengine.libcube.service.event.EventManager;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.Broadcaster;
+import org.cubeengine.libcube.service.config.WorldSetSpawnEvent;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 /**
  * Contains spawn-commands.

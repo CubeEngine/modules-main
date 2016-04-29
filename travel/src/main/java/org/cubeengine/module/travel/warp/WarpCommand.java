@@ -29,11 +29,11 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.config.Warp;
-import org.cubeengine.service.command.CommandUtil;
-import org.cubeengine.service.command.ContainerCommand;
-import org.cubeengine.service.command.exception.PermissionDeniedException;
-import org.cubeengine.service.confirm.ConfirmResult;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.command.CommandUtil;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
+import org.cubeengine.libcube.service.command.confirm.ConfirmResult;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.Transform;
@@ -42,7 +42,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 @Command(name = "warp", desc = "Teleport to a warp")

@@ -23,12 +23,12 @@ import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.module.mail.storage.TableMail;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.database.Database;
-import org.cubeengine.service.database.ModuleTables;
-import org.cubeengine.service.event.EventManager;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.task.TaskManager;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.database.Database;
+import org.cubeengine.libcube.service.database.ModuleTables;
+import org.cubeengine.libcube.service.event.EventManager;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.task.TaskManager;
 
 @ModuleInfo(name = "Mail", description = "Send ingame Mails")
 @ModuleTables(TableMail.class)

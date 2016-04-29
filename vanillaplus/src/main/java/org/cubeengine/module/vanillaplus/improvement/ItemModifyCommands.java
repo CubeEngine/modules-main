@@ -27,10 +27,10 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.annotation.ParameterPermission;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.matcher.EnchantMatcher;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.EnchantMatcher;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
@@ -43,8 +43,8 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.service.command.readers.EnchantmentReader.getPossibleEnchantments;
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.command.readers.EnchantmentReader.getPossibleEnchantments;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.item.ItemTypes.SKULL;
 import static org.spongepowered.api.text.serializer.TextSerializers.FORMATTING_CODE;
 

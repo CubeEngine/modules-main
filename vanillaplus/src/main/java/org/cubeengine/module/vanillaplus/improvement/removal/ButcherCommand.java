@@ -26,10 +26,10 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.matcher.StringMatcher;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.StringMatcher;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
@@ -39,7 +39,7 @@ import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 public class ButcherCommand extends PermissionContainer<VanillaPlus>
 {

@@ -34,7 +34,7 @@ import org.spongepowered.api.service.permission.Subject;
 
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.newDirectoryStream;
-import static org.cubeengine.service.filesystem.FileExtensionFilter.YAML;
+import static org.cubeengine.libcube.service.filesystem.FileExtensionFilter.YAML;
 import static org.spongepowered.api.service.permission.PermissionService.SUBJECTS_GROUP;
 
 public class RoleCollection extends BaseSubjectCollection<RoleSubject>

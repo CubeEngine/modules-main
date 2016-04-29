@@ -22,7 +22,7 @@ import java.util.Map;
 import de.cubeisland.engine.reflect.Section;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
-import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 
 @SuppressWarnings("all")

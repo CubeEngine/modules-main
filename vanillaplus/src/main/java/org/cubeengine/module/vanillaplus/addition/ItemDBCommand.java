@@ -23,9 +23,9 @@ import org.cubeengine.butler.parameter.TooFewArgumentsException;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.matcher.EnchantMatcher;
-import org.cubeengine.service.matcher.MaterialMatcher;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.EnchantMatcher;
+import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -33,7 +33,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 /**
  * item-related commands

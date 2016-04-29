@@ -22,8 +22,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import org.cubeengine.module.core.util.LocationUtil;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.util.LocationUtil;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.block.MatterProperty;
@@ -41,8 +41,8 @@ import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.data.property.block.MatterProperty.Matter.SOLID;
 import static org.spongepowered.api.item.ItemTypes.COMPASS;
 

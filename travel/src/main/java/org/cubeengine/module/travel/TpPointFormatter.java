@@ -22,12 +22,12 @@ import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.module.travel.config.TeleportPoint;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.I18n;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NONE;
-import static org.cubeengine.service.i18n.formatter.component.ClickComponent.runCommand;
-import static org.cubeengine.service.i18n.formatter.component.HoverComponent.hoverText;
-import static org.cubeengine.service.i18n.formatter.component.StyledComponent.styled;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NONE;
+import static org.cubeengine.libcube.service.i18n.formatter.component.ClickComponent.runCommand;
+import static org.cubeengine.libcube.service.i18n.formatter.component.HoverComponent.hoverText;
+import static org.cubeengine.libcube.service.i18n.formatter.component.StyledComponent.styled;
 import static org.spongepowered.api.text.format.TextStyles.UNDERLINE;
 
 public class TpPointFormatter extends AbstractFormatter<TeleportPoint>

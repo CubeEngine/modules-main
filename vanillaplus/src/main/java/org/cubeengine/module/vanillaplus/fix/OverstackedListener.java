@@ -18,7 +18,7 @@
 package org.cubeengine.module.vanillaplus.fix;
 
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.filter.cause.First;

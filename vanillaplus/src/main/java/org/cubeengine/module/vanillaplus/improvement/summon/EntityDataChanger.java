@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import org.cubeengine.service.matcher.StringMatcher;
+import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Career;

@@ -17,7 +17,7 @@
  */
 package org.cubeengine.module.locker.storage;
 
-import org.cubeengine.service.database.AsyncRecord;
+import org.cubeengine.libcube.service.database.AsyncRecord;
 import org.spongepowered.api.world.Location;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;

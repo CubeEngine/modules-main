@@ -39,7 +39,7 @@ import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.marker.Setup;
 import de.cubeisland.engine.reflect.Reflector;
-import org.cubeengine.module.core.CoreModule;
+
 import org.cubeengine.module.roles.commands.ManagementCommands;
 import org.cubeengine.module.roles.commands.RoleCommands;
 import org.cubeengine.module.roles.commands.RoleInformationCommands;
@@ -60,17 +60,17 @@ import org.cubeengine.module.roles.data.PermissionDataBuilder;
 import org.cubeengine.module.roles.exception.RolesExceptionHandler;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.filesystem.FileManager;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.permission.PermissionManager;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.filesystem.FileManager;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
-import static org.cubeengine.service.logging.LoggingUtil.*;
+import static org.cubeengine.libcube.service.logging.LoggingUtil.*;
 
 @ModuleInfo(name = "Roles", description = "Manages permissions of players and roles")
 /*
@@ -105,7 +105,7 @@ public class Roles extends Module
         game.getDataManager().register(PermissionData.class, ImmutablePermissionData.class, new PermissionDataBuilder());
 
         cm.getProviderManager().getExceptionHandler().addHandler(new RolesExceptionHandler(i18n));
-        this.permLogger = factory.getLog(CoreModule.class, "Permissions");
+        this.permLogger = factory.getLog(LogFactory.class, "Permissions");
         this.permLogger.addTarget(new AsyncFileTarget(getLogFile(fm, "Permissions"), getFileFormat(false, false), false, getCycler(), threadFactory));
 
         ConverterManager cManager = reflector.getDefaultConverterManager();

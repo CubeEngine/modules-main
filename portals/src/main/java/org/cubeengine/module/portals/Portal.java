@@ -19,18 +19,18 @@ package org.cubeengine.module.portals;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.cubeengine.module.core.util.Pair;
-import org.cubeengine.module.core.util.math.BlockVector3;
+import org.cubeengine.libcube.util.Pair;
+import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.module.portals.config.PortalConfig;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 public class Portal
 {

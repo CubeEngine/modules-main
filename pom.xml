@@ -40,6 +40,7 @@
     <module>worldcontrol</module>
     <module>netherportals</module>
     <module>contextmirror</module>
+    <module>libcube</module>
   </modules>
 
   <build>

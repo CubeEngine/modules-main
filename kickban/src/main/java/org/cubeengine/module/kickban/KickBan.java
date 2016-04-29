@@ -21,12 +21,12 @@ import javax.inject.Inject;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
-import org.cubeengine.service.command.CommandManager;
-import org.cubeengine.service.filesystem.FileManager;
-import org.cubeengine.service.filesystem.ModuleConfig;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.permission.ModulePermissions;
-import org.cubeengine.service.user.Broadcaster;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.filesystem.FileManager;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.permission.ModulePermissions;
+import org.cubeengine.libcube.service.Broadcaster;
 import org.spongepowered.api.Game;
 
 /**

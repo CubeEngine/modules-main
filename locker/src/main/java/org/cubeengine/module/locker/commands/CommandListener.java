@@ -25,8 +25,8 @@ import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.module.locker.storage.LockType;
-import org.cubeengine.service.i18n.I18n;
-import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -38,7 +38,7 @@ import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 
 public class CommandListener
 {

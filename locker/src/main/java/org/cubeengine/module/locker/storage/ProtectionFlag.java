@@ -23,11 +23,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.cubeengine.module.core.util.StringUtils;
-import org.cubeengine.service.matcher.StringMatcher;
+import org.cubeengine.libcube.util.StringUtils;
+import org.cubeengine.libcube.service.matcher.StringMatcher;
 
 import static java.util.stream.Collectors.toList;
-import static org.cubeengine.module.core.util.StringUtils.startsWithIgnoreCase;
+import static org.cubeengine.libcube.util.StringUtils.startsWithIgnoreCase;
 
 /**
  * Flags that can be given to a protection.

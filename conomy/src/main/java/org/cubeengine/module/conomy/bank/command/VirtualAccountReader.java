@@ -27,11 +27,11 @@ import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.bank.BankConomyService;
-import org.cubeengine.service.command.TranslatedReaderException;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.command.TranslatedReaderException;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.entity.living.player.User;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class VirtualAccountReader implements ArgumentReader<BaseAccount.Virtual>, DefaultValue<BaseAccount.Virtual>
 {

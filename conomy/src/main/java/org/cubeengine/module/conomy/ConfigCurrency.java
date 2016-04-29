@@ -30,7 +30,7 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.service.ContextUtil.GLOBAL;
+import static org.cubeengine.libcube.util.ContextUtil.GLOBAL;
 
 public class ConfigCurrency implements Currency
 {

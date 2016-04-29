@@ -26,7 +26,7 @@ import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.config.EntityLockConfig;
-import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 
 import static org.cubeengine.module.locker.storage.LockType.PRIVATE;
 import static org.cubeengine.module.locker.storage.ProtectionFlag.*;

@@ -18,9 +18,9 @@
 package org.cubeengine.module.portals.config;
 
 import java.util.Random;
-import org.cubeengine.module.core.util.Pair;
+import org.cubeengine.libcube.util.Pair;
 import org.cubeengine.module.portals.Portals;
-import org.cubeengine.service.world.ConfigWorld;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;

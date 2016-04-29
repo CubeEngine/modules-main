@@ -22,10 +22,10 @@ import java.util.concurrent.ExecutionException;
 import org.cubeengine.butler.CommandBase;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.exception.PriorityExceptionHandler;
-import org.cubeengine.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 
-import static org.cubeengine.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class RolesExceptionHandler implements PriorityExceptionHandler
 {
