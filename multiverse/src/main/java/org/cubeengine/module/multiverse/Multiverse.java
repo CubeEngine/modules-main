@@ -71,8 +71,8 @@ public class Multiverse extends Module
     @Enable
     public void onEnable() throws IOException
     {
-        cm.addCommand(new MultiverseCommands(this, i18n));
-        em.registerListener(this, new MultiverseListener(this));
+        cm.addCommand(new MultiverseCommands(cm, this, i18n));
+        em.registerListener(Multiverse.class, new MultiverseListener(this));
     }
 
     public MultiverseConfig getConfig()

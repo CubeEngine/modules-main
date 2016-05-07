@@ -27,12 +27,14 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.task.thread.TrackedThread;
+import org.cubeengine.libcube.util.ConfirmManager;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.config.Warp;
 import org.cubeengine.libcube.service.command.CommandUtil;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
-import org.cubeengine.libcube.service.command.confirm.ConfirmResult;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
@@ -52,9 +54,9 @@ public class WarpCommand extends ContainerCommand
     private I18n i18n;
     private final WarpManager manager;
 
-    public WarpCommand(Travel module, I18n i18n)
+    public WarpCommand(CommandManager base, Travel module, I18n i18n)
     {
-        super(module);
+        super(base, Travel.class);
         this.module = module;
         this.i18n = i18n;
         this.manager = module.getWarpManager();
@@ -269,12 +271,12 @@ public class WarpCommand extends ContainerCommand
 
     @Alias(value = "clearwarps")
     @Command(desc = "Clear all warps (of a player)")
-    public ConfirmResult clear(final CommandSource context, @Optional Player owner)
+    public void clear(final CommandSource context, @Optional Player owner)
     {
         if (this.module.getConfig().clearOnlyFromConsole && !(context instanceof ConsoleSource))
         {
             i18n.sendTranslated(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
-            return null;
+            return;
         }
         if (owner != null)
         {
@@ -284,8 +286,8 @@ public class WarpCommand extends ContainerCommand
         {
             i18n.sendTranslated(context, NEUTRAL, "Are you sure you want to delete all warps ever created on this server!?");
         }
-        i18n.sendTranslated(context, NEUTRAL, "Confirm with: {text:/confirm} before 30 seconds have passed to delete the warps");
-        return new ConfirmResult(module, () -> {
+        Text confirmText = i18n.getTranslation(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the warps");
+        ConfirmManager.requestConfirmation(i18n, confirmText, context, () -> {
             Predicate<Warp> predicate = warp -> true;
             if (owner != null)
             {
@@ -298,7 +300,7 @@ public class WarpCommand extends ContainerCommand
                 manager.massDelete(predicate);
                 i18n.sendTranslated(context, POSITIVE, "The warps are now deleted");
             }
-        }, context);
+        });
     }
 
 

@@ -20,12 +20,13 @@ package org.cubeengine.module.conomy.command;
 import java.math.BigDecimal;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Label;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyService;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.command.readers.UserList;
+import org.cubeengine.libcube.service.command.readers.PlayerList;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
@@ -40,21 +41,19 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 @Command(name = "eco", desc = "Administrative commands for Conomy")
 public class EcoCommand extends ContainerCommand
 {
-    private final Conomy module;
     private final ConomyService service;
     private I18n i18n;
 
-    public EcoCommand(Conomy module, ConomyService service, I18n i18n)
+    public EcoCommand(CommandManager base, ConomyService service, I18n i18n)
     {
-        super(module);
-        this.module = module;
+        super(base, Conomy.class);
         this.service = service;
         this.i18n = i18n;
     }
 
     @Command(alias = "grant", desc = "Gives money to one or all players.")
     public void give(CommandSource context,
-                     @Label("*|<players>") UserList users,
+                     @Label("*|<players>") PlayerList users,
                      Double amount)
     {
         for (User user : users.list())
@@ -96,7 +95,7 @@ public class EcoCommand extends ContainerCommand
     }
 
     @Command(alias = "remove", desc = "Takes money from given user")
-    public void take(CommandSource context, @Label("*|<players>") UserList users, Double amount)
+    public void take(CommandSource context, @Label("*|<players>") PlayerList users, Double amount)
     {
         for (User user : users.list())
         {
@@ -129,7 +128,7 @@ public class EcoCommand extends ContainerCommand
     }
 
     @Command(desc = "Reset the money from given user")
-    public void reset(CommandSource context, @Label("*|<players>") UserList users)
+    public void reset(CommandSource context, @Label("*|<players>") PlayerList users)
     {
         for (User user : users.list())
         {
@@ -157,7 +156,7 @@ public class EcoCommand extends ContainerCommand
     }
 
     @Command(desc = "Sets the money of a given player")
-    public void set(CommandSource context, @Label("*|<players>") UserList users, Double amount)
+    public void set(CommandSource context, @Label("*|<players>") PlayerList users, Double amount)
     {
         for (User user : users.list())
         {
@@ -185,7 +184,7 @@ public class EcoCommand extends ContainerCommand
     }
 
     @Command(desc = "Hides the account of a given player")
-    public void hide(CommandSource context, @Label("*|<players>") UserList users)
+    public void hide(CommandSource context, @Label("*|<players>") PlayerList users)
     {
         for (User user : users.list())
         {
@@ -206,7 +205,7 @@ public class EcoCommand extends ContainerCommand
     }
 
     @Command(desc = "Unhides the account of a given player")
-    public void unhide(CommandSource context, @Label("*|<players>") UserList users)
+    public void unhide(CommandSource context, @Label("*|<players>") PlayerList users)
     {
         for (User user : users.list())
         {

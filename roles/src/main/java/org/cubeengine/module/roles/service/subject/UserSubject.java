@@ -26,6 +26,7 @@ import java.util.UUID;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.UserSubjectData;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -38,14 +39,12 @@ import org.spongepowered.api.util.Tristate;
 
 public class UserSubject extends BaseSubject<UserSubjectData>
 {
-    private Game game;
     private User user;
     private final UUID uuid;
 
-    public UserSubject(Game game, RolesPermissionService service, UUID uuid)
+    public UserSubject(RolesPermissionService service, UUID uuid)
     {
         super(service.getUserSubjects(), service, new UserSubjectData(service, uuid));
-        this.game = game;
         this.uuid = uuid;
 
         SubjectData defaultData = service.getDefaultData();
@@ -82,8 +81,8 @@ public class UserSubject extends BaseSubject<UserSubjectData>
     {
         if (user == null)
         {
-            Optional<Player> player = game.getServer().getPlayer(uuid);
-            user = player.map(User.class::cast).orElse(game.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid).orElse(null));
+            Optional<Player> player = Sponge.getServer().getPlayer(uuid);
+            user = player.map(User.class::cast).orElse(Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid).orElse(null));
         }
         return user;
     }

@@ -27,13 +27,11 @@ import org.spongepowered.api.service.permission.Subject;
 public class UserCollection extends BaseSubjectCollection<UserSubject>
 {
     private RolesPermissionService service;
-    private Game game;
 
-    public UserCollection(RolesPermissionService service, Game game)
+    public UserCollection(RolesPermissionService service)
     {
         super(PermissionService.SUBJECTS_USER);
         this.service = service;
-        this.game = game;
     }
 
     @Override
@@ -41,7 +39,7 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
     {
         try
         {
-            return new UserSubject(game, service, UUID.fromString(identifier));
+            return new UserSubject(service, UUID.fromString(identifier));
         }
         catch (IllegalArgumentException e)
         {

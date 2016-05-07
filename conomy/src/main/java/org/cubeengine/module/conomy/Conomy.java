@@ -29,6 +29,7 @@ import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.conomy.bank.BankConomyService;
 import org.cubeengine.module.conomy.bank.BankPermission;
 import org.cubeengine.module.conomy.storage.TableAccount;
@@ -38,7 +39,6 @@ import org.cubeengine.libcube.service.database.Database;
 import org.cubeengine.libcube.service.database.ModuleTables;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.ModulePermissions;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.service.economy.EconomyService;
 
@@ -47,9 +47,10 @@ import org.spongepowered.api.service.economy.EconomyService;
 public class Conomy extends Module
 {
     @ModuleConfig private ConomyConfiguration config;
-    @ModulePermissions private ConomyPermission perms;
+    @Inject private ConomyPermission perms;
 
     @Inject private Database db;
+    @Inject private PermissionManager pm;
     @Inject private I18n i18n;
     @Inject private CommandManager cm;
     @Inject private ThreadFactory tf;
@@ -78,7 +79,7 @@ public class Conomy extends Module
         if (config.enableBanks)
         {
             service = new BankConomyService(this, config, curencyPath, db, reflector);
-            bankPerms = new BankPermission(this);
+            bankPerms = new BankPermission(pm);
         }
         else
         {

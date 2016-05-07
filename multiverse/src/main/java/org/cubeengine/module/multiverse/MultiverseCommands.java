@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -42,9 +43,9 @@ public class MultiverseCommands extends ContainerCommand
     private Multiverse module;
     private I18n i18n;
 
-    public MultiverseCommands(Multiverse module, I18n i18n)
+    public MultiverseCommands(CommandManager base, Multiverse module, I18n i18n)
     {
-        super(module);
+        super(base, Multiverse.class);
         this.module = module;
         this.i18n = i18n;
     }

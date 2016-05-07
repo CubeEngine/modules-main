@@ -25,7 +25,6 @@ import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.ModulePermissions;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.service.Broadcaster;
@@ -47,17 +46,17 @@ public class Teleport extends Module
     @Inject private Broadcaster bc;
     @Inject private I18n i18n;
 
-    @ModulePermissions private TeleportPerm perms;
+    @Inject private TeleportPerm perms;
     @ModuleConfig private TeleportConfiguration config;
     private TpWorldPermissions tpWorld;
 
     @Enable
     public void onEnable()
     {
-        tpWorld = new TpWorldPermissions(this, perms, game, pm); // per world permissions
+        tpWorld = new TpWorldPermissions(perms, pm); // per world permissions
 
         TeleportListener tl = new TeleportListener(this, i18n);
-        em.registerListener(this, tl);
+        em.registerListener(Teleport.class, tl);
 
         cm.addCommands(cm, this, new MovementCommands(this, tl, i18n));
         cm.addCommands(cm, this, new SpawnCommands(this, em, game, bc, tl, i18n));

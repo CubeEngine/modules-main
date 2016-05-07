@@ -17,19 +17,23 @@
  */
 package org.cubeengine.module.travel;
 
+import javax.inject.Inject;
+import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
-public class TravelPerm extends PermissionContainer<Travel>
+public class TravelPerm extends PermissionContainer
 {
-    public TravelPerm(Travel module)
+    @Inject
+    public TravelPerm(PermissionManager pm)
     {
-        super(module);
+        super(pm, Travel.class);
     }
 
-    private final PermissionDescription COMMAND = register("command", "Base Commands Permission", null);
+    private final Permission COMMAND = register("command", "Base Commands Permission", null);
 
-    public final PermissionDescription HOME_USER = register("home-user", "Home Permission Group for normal users", null);
+    public final Permission HOME_USER = register("home-user", "Home Permission Group for normal users", null);
     /* TODO
     HOME_USER.attach(homeCmd.getPermission("tp"), homeCmd.getPermission("set"), homeCmd.getPermission("move"),
                          homeCmd.getPermission("remove"), homeCmd.getPermission("rename"), homeCmd.getPermission(
@@ -37,16 +41,16 @@ public class TravelPerm extends PermissionContainer<Travel>
             "ilist"), homeCmd.getPermission("invite"), homeCmd.getPermission("uninvite"));
      */
 
-    public final PermissionDescription HOME_TP_OTHER = register("home.tp.other", "", COMMAND);
-    public final PermissionDescription HOME_SET_MORE = register("home.set.more", "", COMMAND);
-    public final PermissionDescription HOME_MOVE_OTHER = register("home.move.other", "", COMMAND);
-    public final PermissionDescription HOME_REMOVE_OTHER = register("home.remove.other", "", COMMAND);
-    public final PermissionDescription HOME_RENAME_OTHER = register("home.rename.other", "", COMMAND);
-    public final PermissionDescription HOME_LIST_OTHER = register("home.list.other", "", COMMAND);
+    public final Permission HOME_TP_OTHER = register("home.tp.other", "", COMMAND);
+    public final Permission HOME_SET_MORE = register("home.set.more", "", COMMAND);
+    public final Permission HOME_MOVE_OTHER = register("home.move.other", "", COMMAND);
+    public final Permission HOME_REMOVE_OTHER = register("home.remove.other", "", COMMAND);
+    public final Permission HOME_RENAME_OTHER = register("home.rename.other", "", COMMAND);
+    public final Permission HOME_LIST_OTHER = register("home.list.other", "", COMMAND);
 
-    public final PermissionDescription WARP_TP_OTHER = register("warp.tp.other", "", COMMAND);
-    public final PermissionDescription WARP_MOVE_OTHER = register("warp.move.other", "", COMMAND);
-    public final PermissionDescription WARP_REMOVE_OTHER = register("warp.remove.other", "", COMMAND);
-    public final PermissionDescription WARP_RENAME_OTHER = register("warp.rename.other", "", COMMAND);
-    public final PermissionDescription WARP_LIST_OTHER = register("warp.list.other", "", COMMAND);
+    public final Permission WARP_TP_OTHER = register("warp.tp.other", "", COMMAND);
+    public final Permission WARP_MOVE_OTHER = register("warp.move.other", "", COMMAND);
+    public final Permission WARP_REMOVE_OTHER = register("warp.remove.other", "", COMMAND);
+    public final Permission WARP_RENAME_OTHER = register("warp.rename.other", "", COMMAND);
+    public final Permission WARP_LIST_OTHER = register("warp.list.other", "", COMMAND);
 }

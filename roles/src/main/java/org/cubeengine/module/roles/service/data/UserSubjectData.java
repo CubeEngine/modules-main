@@ -55,7 +55,7 @@ public class UserSubjectData extends CachingSubjectData
     {
         UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
         User player = storage.get(uuid).get();
-        player = player.getPlayer().get(); // TODO wait for User Data impl
+        player = player.getPlayer().map(User.class::cast).orElse(player); // TODO wait for User Data impl
 
         Optional<PermissionData> permData = player.get(PermissionData.class);
         if (permData.isPresent())
@@ -81,7 +81,7 @@ public class UserSubjectData extends CachingSubjectData
             // Save Data in User
             user.offer(new PermissionData(parents, permissions, options));
             // actually save Data in Player til -> TODO remove once saving data on user is implemented
-            user.getPlayer().get().offer(new PermissionData(parents, permissions, options));
+            user.getPlayer().map(User.class::cast).orElse(user).offer(new PermissionData(parents, permissions, options));
         }
         return changed;
     }

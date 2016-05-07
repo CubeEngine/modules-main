@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import javax.inject.Inject;
 import org.cubeengine.libcube.util.BlockUtil;
 import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.storage.Lock;
@@ -31,6 +32,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.MatterProperty;
@@ -40,9 +42,14 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.block.ChangeBlockEvent.Place;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.world.ExplosionEvent;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
@@ -67,6 +74,7 @@ public class LockerBlockListener
     private final I18n i18n;
     private final Game game;
 
+    @Inject
     public LockerBlockListener(Locker locker, LockManager manager, I18n i18n, Game game)
     {
         this.module = locker;
@@ -75,21 +83,18 @@ public class LockerBlockListener
         this.game = game;
     }
 
-    @Listener(order = Order.EARLY)
+    @Listener(order = Order.LATE)
     public void onPlace(ChangeBlockEvent.Place event, @First Player player)
     {
-        if (player.get(Keys.IS_SNEAKING).orElse(false))
-        {
-            return;
-        }
         for (Transaction<BlockSnapshot> trans : event.getTransactions())
         {
             BlockSnapshot placed = trans.getFinal();
             BlockType type = placed.getState().getType();
 
+            Location<World> loc = placed.getLocation().get();
             if (type == CHEST || type == TRAPPED_CHEST)
             {
-                if (onPlaceChest(event, placed.getLocation().get(), player))
+                if (onPlaceChest(event, loc, player))
                 {
                     return;
                 }
@@ -102,7 +107,7 @@ public class LockerBlockListener
                 }
             }
             if (module.getConfig().disableAutoProtect.stream().map(ConfigWorld::getWorld).collect(toSet()).contains(
-                    placed.getLocation().get().getExtent()))
+                loc.getExtent()))
             {
                 return;
             }
@@ -111,7 +116,16 @@ public class LockerBlockListener
                 if (blockprotection.isType(type))
                 {
                     if (!blockprotection.isAutoProtect()) return;
-                    this.manager.createLock(placed.getLocation().get(), player, blockprotection.getAutoProtect(), null, false);
+                    if (player.get(Keys.IS_SNEAKING).orElse(false))
+                    {
+                        Text click = i18n.getTranslation(player, NEUTRAL, "Click here to protect").toBuilder().color(TextColors.GOLD).style(TextStyles.ITALIC)
+                                         .onClick(TextActions.executeCallback(s -> manager.createLock(loc, player, blockprotection.getAutoProtect(), null, false)))
+                                         .build();
+                        i18n.sendTranslated(player, NEUTRAL, "Autoprotect is disabled while sneaking. {txt}", click); // TODO click to protect anyway
+
+                        return;
+                    }
+                    this.manager.createLock(loc, player, blockprotection.getAutoProtect(), null, false);
                     return;
                 }
             }
@@ -124,7 +138,7 @@ public class LockerBlockListener
                 || type == JUNGLE_DOOR || type == ACACIA_DOOR || type == DARK_OAK_DOOR;
     }
 
-    private boolean onPlaceDoor(ChangeBlockEvent event, BlockSnapshot placed, Player user)
+    private boolean onPlaceDoor(ChangeBlockEvent event, BlockSnapshot placed, Player player)
     {
         Location<World> location = placed.getLocation().get();
         BlockState doorState = placed.getState();
@@ -141,42 +155,50 @@ public class LockerBlockListener
         {
             return false; // Not a doubledoor
         }
-        Lock lock = this.manager.getLockAtLocation(relative, null);
+        Lock lock = this.manager.getLock(relative);
         if (lock != null)
         {
             if (!lock.validateTypeAt(relative))
             {
-                i18n.sendTranslated(user, NEUTRAL, "Nearby BlockProtection is not valid!");
-                lock.delete(user);
+                i18n.sendTranslated(player, NEUTRAL, "Nearby BlockProtection is not valid!");
+                lock.delete(player);
                 return true;
             }
 
-            if (placed.get(Keys.PORTION_TYPE).get().equals(TOP))
+            Optional<? extends Enum<?>> halfTrait = placed.getState().getTraitValue(EnumTraits.WOODEN_DOOR_HALF);
+            if (halfTrait.isPresent() && halfTrait.get().name().equals("UPPER"))
             {
                 relative = location.getRelative(DOWN);
             }
+            /*
+            if (placed.get(Keys.PORTION_TYPE).get().equals(TOP)) // TODO use once implemented
+            {
+                relative = location.getRelative(DOWN);
+            }
+            */
             else
             {
                 relative = location.getRelative(UP);
             }
 
-            if (lock.isOwner(user) || lock.hasAdmin(user) || user.hasPermission(module.perms().EXPAND_OTHER.getId()))
+
+            if (lock.isOwner(player) || lock.hasAdmin(player) || player.hasPermission(module.perms().EXPAND_OTHER.getId()))
             {
                 this.manager.extendLock(lock, location);
                 this.manager.extendLock(lock, relative);
-                i18n.sendTranslated(user, POSITIVE, "Protection expanded!");
+                i18n.sendTranslated(player, POSITIVE, "Protection expanded to {amount} blocks!", lock.getLocations().size());
             }
             else
             {
                 event.setCancelled(true);
-                i18n.sendTranslated(user, NEGATIVE, "The nearby door is protected by someone else!");
+                i18n.sendTranslated(player, NEGATIVE, "The nearby door is protected by someone else!");
             }
             return true;
         }
         return false;
     }
 
-    private boolean onPlaceChest(ChangeBlockEvent.Place event, Location<World> placed, Player user)
+    private boolean onPlaceChest(Place event, Location<World> placed, Player player)
     {
         Location<World> relativeLoc;
         for (Direction direction : CARDINAL_DIRECTIONS)
@@ -186,25 +208,25 @@ public class LockerBlockListener
                 continue;
             }
             relativeLoc = placed.getRelative(direction);
-            Lock lock = this.manager.getLockAtLocation(relativeLoc, user);
+            Lock lock = this.manager.getLock(relativeLoc);
             if (lock == null)
             {
                 continue;
             }
             if (!lock.validateTypeAt(relativeLoc))
             {
-                i18n.sendTranslated(user, NEUTRAL, "Nearby BlockProtection is not valid!");
-                lock.delete(user);
+                i18n.sendTranslated(player, NEUTRAL, "Nearby BlockProtection is not valid!");
+                lock.delete(player);
             }
-            else if (lock.isOwner(user) || lock.hasAdmin(user) || user.hasPermission(module.perms().EXPAND_OTHER.getId()))
+            else if (lock.isOwner(player) || lock.hasAdmin(player) || player.hasPermission(module.perms().EXPAND_OTHER.getId()))
             {
                 this.manager.extendLock(lock, placed);
-                i18n.sendTranslated(user, POSITIVE, "Protection expanded!");
+                i18n.sendTranslated(player, POSITIVE, "Protection expanded to {amount} blocks!", lock.getLocations().size());
             }
             else
             {
                 event.setCancelled(true);
-                i18n.sendTranslated(user, NEGATIVE, "The nearby chest is protected by someone else!");
+                i18n.sendTranslated(player, NEGATIVE, "The nearby chest is protected by someone else!");
             }
             return true;
         }
@@ -256,7 +278,7 @@ public class LockerBlockListener
         {
             for (Map.Entry<Direction, BlockState> entry : event.getNeighbors().entrySet())
             {
-                Lock lock = manager.getLockAtLocation(block.getLocation().get().getRelative(entry.getKey()), null);
+                Lock lock = manager.getLock(block.getLocation().get().getRelative(entry.getKey()));
                 if (lock != null && lock.hasFlag(BLOCK_REDSTONE) && entry.getValue().supports(Keys.POWERED))
                 {
                     event.setCancelled(true);
@@ -274,7 +296,7 @@ public class LockerBlockListener
         {
             return false;
         }
-        if (manager.getLockAtLocation(block, null) != null) // Found Lock. Abort
+        if (manager.getLock(block) != null) // Found Lock. Abort
         {
             return true;
         }
@@ -307,7 +329,7 @@ public class LockerBlockListener
         for (Transaction<BlockSnapshot> trans : event.getTransactions())
         {
             Location<World> location = trans.getOriginal().getLocation().get();
-            Lock lock = manager.getLockAtLocation(location, null);
+            Lock lock = manager.getLock(location);
             if (lock != null)
             {
                 lock.handleBlockBreak(event, player);
@@ -315,7 +337,7 @@ public class LockerBlockListener
 
             for (Location<World> block : BlockUtil.getDetachableBlocks(location))
             {
-                lock = this.manager.getLockAtLocation(block, player);
+                lock = this.manager.getLock(block);
                 if (lock != null)
                 {
                     lock.handleBlockBreak(event, player);
@@ -363,7 +385,7 @@ public class LockerBlockListener
         for (Transaction<BlockSnapshot> trans : event.getTransactions())
         {
             Location<World> location = trans.getOriginal().getLocation().get();
-            if (manager.getLockAtLocation(location, null) != null)
+            if (manager.getLock(location) != null)
             {
                 trans.setValid(false);
             }
@@ -384,7 +406,7 @@ public class LockerBlockListener
         for (Transaction<BlockSnapshot> trans : event.getTransactions())
         {
             Location<World> location = trans.getOriginal().getLocation().get();
-            Lock lock = manager.getLockAtLocation(location, null);
+            Lock lock = manager.getLock(location);
             if (lock != null)
             {
                 trans.setValid(false);
@@ -392,7 +414,7 @@ public class LockerBlockListener
             }
             for (Location<World> block : BlockUtil.getDetachableBlocks(location))
             {
-                lock = this.manager.getLockAtLocation(block, null);
+                lock = this.manager.getLock(block);
                 if (lock != null)
                 {
                     trans.setValid(false);
@@ -445,7 +467,7 @@ public class LockerBlockListener
                 .filter(trans -> trans.getFinal().getState().getType().getProperty(MatterProperty.class).get().getValue() == LIQUID)
                 .forEach(trans -> {
                     Location<World> location = trans.getOriginal().getLocation().get();
-                    if (manager.getLockAtLocation(location, null) != null)
+                    if (manager.getLock(location) != null)
                     {
                         trans.setCustom(trans.getOriginal()); // do not allow change
                     }

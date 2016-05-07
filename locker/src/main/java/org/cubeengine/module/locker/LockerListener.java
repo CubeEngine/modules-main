@@ -18,6 +18,8 @@
 package org.cubeengine.module.locker;
 
 import java.util.Optional;
+import javax.inject.Inject;
+import jdk.nashorn.internal.ir.annotations.Ignore;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -41,6 +43,7 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -54,6 +57,7 @@ public class LockerListener
     private I18n i18n;
     private final Locker module;
 
+    @Inject
     public LockerListener(Locker module, LockManager manager, I18n i18n)
     {
         this.module = module;
@@ -67,7 +71,7 @@ public class LockerListener
         if (!this.module.getConfig().protectBlockFromRClick || event.getTargetBlock() == BlockSnapshot.NONE) return;
 
         Location<World> block = event.getTargetBlock().getLocation().get();
-        Lock lock = this.manager.getLockAtLocation(block, player);
+        Lock lock = this.manager.getValidLock(block, player);
         if (block.getTileEntity().orElse(null) instanceof Carrier)
         {
             if (!player.hasPermission(module.perms().ALLOW_CONTAINER.getId()))
@@ -77,7 +81,16 @@ public class LockerListener
                 return;
             }
             if (lock == null) return;
-            lock.handleInventoryOpen(event, null, block, player);
+            Inventory inv = null;
+            try
+            {
+                inv = ((Carrier)block.getTileEntity().get()).getInventory();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace(); // TODO wait for Carrier impl
+            }
+            lock.handleInventoryOpen(event, inv, block, player);
         }
         else if (block.supports(Keys.OPEN))
         {
@@ -246,6 +259,8 @@ public class LockerListener
     @Listener
     public void onEntityDeath(DestructEntityEvent event) // Cleanup Locks in case Entity dies
     {
+        //System.out.print(event.getCause() + "\n");
+        // TODO this is not working. https://github.com/SpongePowered/SpongeCommon/issues/707
         Entity target = event.getTargetEntity();
         Lock lock = this.manager.getLockForEntityUID(target.getUniqueId());
         if (lock == null) return;

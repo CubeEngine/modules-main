@@ -22,6 +22,7 @@ import java.util.stream.Collectors;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -51,9 +52,9 @@ public class WhitelistCommand extends ContainerCommand
 {
     private I18n i18n;
 
-    public WhitelistCommand(VanillaPlus module, I18n i18n)
+    public WhitelistCommand(CommandManager base, I18n i18n)
     {
-        super(module);
+        super(base, VanillaPlus.class);
         this.i18n = i18n;
     }
 

@@ -22,6 +22,7 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.ModuleCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Game;
 
@@ -30,10 +31,11 @@ public class Worlds extends Module
 {
     @Inject private CommandManager cm;
     @Inject private I18n i18n;
+    @Inject @ModuleCommand private WorldsCommands wc;
 
     @Enable
     public void onLoad()
     {
-        this.cm.addCommand(new WorldsCommands(this, i18n));
+        // TODO this.cm.addCommand(new WorldsCommands(cm, i18n));
     }
 }

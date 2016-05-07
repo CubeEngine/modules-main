@@ -20,6 +20,8 @@ package org.cubeengine.module.vanillaplus.addition;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
@@ -37,25 +39,25 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
  * <p>/clearinventory
  * <p>/stash
  */
-public class InvseeCommand extends PermissionContainer<VanillaPlus>
+public class InvseeCommand extends PermissionContainer
 {
     private InventoryGuardFactory invGuard;
     private I18n i18n;
 
-    public InvseeCommand(VanillaPlus module, InventoryGuardFactory invGuard, I18n i18n)
+    public InvseeCommand(PermissionManager pm, InventoryGuardFactory invGuard, I18n i18n)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.invGuard = invGuard;
         this.i18n = i18n;
     }
 
-    private final PermissionDescription COMMAND_INVSEE = register("command.invsee", "", null);
-    public final PermissionDescription COMMAND_INVSEE_ENDERCHEST = register("ender", "", COMMAND_INVSEE);
-    public final PermissionDescription COMMAND_INVSEE_MODIFY = register("modify.allow", "Allows to modify the inventory of other players", COMMAND_INVSEE);
-    public final PermissionDescription COMMAND_INVSEE_MODIFY_PREVENT = register("modify.prevent", "Prevents an inventory from being modified unless forced", COMMAND_INVSEE);
-    public final PermissionDescription COMMAND_INVSEE_MODIFY_FORCE = register("modify.force", "Allows modifying an inventory even if the player has the prevent permission", COMMAND_INVSEE);
-    public final PermissionDescription COMMAND_INVSEE_NOTIFY = register("notify", "Notifies you when someone is looking into your inventory", COMMAND_INVSEE);
-    public final PermissionDescription COMMAND_INVSEE_QUIET = register("quiet", "Prevents the other player from being notified when looking into his inventory", COMMAND_INVSEE);
+    private final Permission COMMAND_INVSEE = register("command.invsee", "", null);
+    public final Permission COMMAND_INVSEE_ENDERCHEST = register("ender", "", COMMAND_INVSEE);
+    public final Permission COMMAND_INVSEE_MODIFY = register("modify.allow", "Allows to modify the inventory of other players", COMMAND_INVSEE);
+    public final Permission COMMAND_INVSEE_MODIFY_PREVENT = register("modify.prevent", "Prevents an inventory from being modified unless forced", COMMAND_INVSEE);
+    public final Permission COMMAND_INVSEE_MODIFY_FORCE = register("modify.force", "Allows modifying an inventory even if the player has the prevent permission", COMMAND_INVSEE);
+    public final Permission COMMAND_INVSEE_NOTIFY = register("notify", "Notifies you when someone is looking into your inventory", COMMAND_INVSEE);
+    public final Permission COMMAND_INVSEE_QUIET = register("quiet", "Prevents the other player from being notified when looking into his inventory", COMMAND_INVSEE);
 
     @Command(desc = "Allows you to see into the inventory of someone else.")
     @Restricted(value = Player.class, msg = "This command can only be used by a player!")
@@ -98,6 +100,6 @@ public class InvseeCommand extends PermissionContainer<VanillaPlus>
         {
             guard.blockPutInAll().blockTakeOutAll();
         }
-        guard.submitInventory(this.module, true);
+        guard.submitInventory(VanillaPlus.class, true);
     }
 }

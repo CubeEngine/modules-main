@@ -20,6 +20,7 @@ package org.cubeengine.module.conomy.bank.command;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;
@@ -36,14 +37,12 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 @Command(name = "manage", desc = "Management commands for Conomy Banks.")
 public class BankManageCommand extends ContainerCommand
 {
-    private final Conomy module;
     private BankConomyService service;
     private I18n i18n;
 
-    public BankManageCommand(Conomy module, BankConomyService service, I18n i18n)
+    public BankManageCommand(CommandManager base, BankConomyService service, I18n i18n)
     {
-        super(module);
-        this.module = module;
+        super(base, Conomy.class);
         this.service = service;
         this.i18n = i18n;
     }

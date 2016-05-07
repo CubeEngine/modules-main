@@ -34,6 +34,7 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.Pair;
 import org.cubeengine.libcube.util.math.BlockVector2;
 import org.cubeengine.libcube.util.math.BlockVector3;
@@ -68,15 +69,17 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.text.format.TextColors.*;
 import static org.spongepowered.api.util.Direction.getClosest;
 
-public class InformationCommands extends PermissionContainer<VanillaPlus>
+public class InformationCommands extends PermissionContainer
 {
     private final PeriodFormatter formatter;
+    private VanillaPlus module;
     private MaterialMatcher materialMatcher;
     private I18n i18n;
 
-    public InformationCommands(VanillaPlus module, MaterialMatcher materialMatcher, I18n i18n)
+    public InformationCommands(PermissionManager pm, VanillaPlus module, MaterialMatcher materialMatcher, I18n i18n)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
+        this.module = module;
         this.materialMatcher = materialMatcher;
         this.i18n = i18n;
         this.formatter = new PeriodFormatterBuilder().appendWeeks().appendSuffix(" week"," weeks").appendSeparator(" ")
@@ -308,29 +311,9 @@ public class InformationCommands extends PermissionContainer<VanillaPlus>
         long memUse = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576;
         long memCom = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getCommitted() / 1048576;
         long memMax = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax() / 1048576;
-        String memused;
         long memUsePercent = 100 * memUse / memMax;
-        if (memUsePercent > 90)
-        {
-            if (memUsePercent > 95)
-            {
-                memused = DARK_RED.toString();
-            }
-            else
-            {
-                memused = RED.toString();
-            }
-        }
-        else if (memUsePercent > 60)
-        {
-            memused = YELLOW.toString();
-        }
-        else
-        {
-            memused = DARK_GREEN.toString();
-        }
-        memused += memUse;
-        i18n.sendTranslated(context, POSITIVE, "Memory Usage: {input#memused}/{integer#memcom}/{integer#memMax} MB", memused, memCom, memMax);
+        color = memUsePercent > 90 ? memUsePercent > 95 ? DARK_RED : RED : memUsePercent > 60 ? YELLOW : DARK_GREEN;
+        i18n.sendTranslated(context, POSITIVE, "Memory Usage: {txt#memused}/{integer#memcom}/{integer#memMax} MB", Text.of(color, memUse), memCom, memMax);
         //Worlds with loaded Chunks / Entities
         for (World world : Sponge.getServer().getWorlds())
         {

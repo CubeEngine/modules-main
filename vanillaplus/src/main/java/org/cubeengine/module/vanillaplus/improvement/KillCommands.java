@@ -24,12 +24,14 @@ import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.readers.UserListInSight;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.cubeengine.libcube.service.command.readers.UserList;
+import org.cubeengine.libcube.service.command.readers.PlayerList;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -46,26 +48,26 @@ import static org.spongepowered.api.event.cause.entity.damage.DamageTypes.CUSTOM
  * {@link #kill}
  * {@link #suicide}
  */
-public class KillCommands extends PermissionContainer<VanillaPlus>
+public class KillCommands extends PermissionContainer
 {
     private I18n i18n;
 
-    public KillCommands(VanillaPlus module, I18n i18n)
+    public KillCommands(PermissionManager pm, I18n i18n)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
     }
 
-    private final PermissionDescription COMMAND_KILL = register("command.kill", "", null);
-    public final PermissionDescription COMMAND_KILL_PREVENT = register("prevent", "Prevents from being killed by the kill command unless forced", COMMAND_KILL);
-    public final PermissionDescription COMMAND_KILL_FORCE = register("force", "Kills a player even if the player has the prevent PermissionDescription", COMMAND_KILL);
-    public final PermissionDescription COMMAND_KILL_ALL = register("all", "Allows killing all players currently online", COMMAND_KILL);
-    public final PermissionDescription COMMAND_KILL_LIGHTNING = register("lightning", "Allows killing a player with a lightning strike", COMMAND_KILL);
-    public final PermissionDescription COMMAND_KILL_QUIET = register("quiet", "Prevents the other player being notified who killed him", COMMAND_KILL);
-    public final PermissionDescription COMMAND_KILL_NOTIFY = register("notify", "Shows who killed you", COMMAND_KILL);
+    private final Permission COMMAND_KILL = register("command.kill", "", null);
+    public final Permission COMMAND_KILL_PREVENT = register("prevent", "Prevents from being killed by the kill command unless forced", COMMAND_KILL);
+    public final Permission COMMAND_KILL_FORCE = register("force", "Kills a player even if the player has the prevent PermissionDescription", COMMAND_KILL);
+    public final Permission COMMAND_KILL_ALL = register("all", "Allows killing all players currently online", COMMAND_KILL);
+    public final Permission COMMAND_KILL_LIGHTNING = register("lightning", "Allows killing a player with a lightning strike", COMMAND_KILL);
+    public final Permission COMMAND_KILL_QUIET = register("quiet", "Prevents the other player being notified who killed him", COMMAND_KILL);
+    public final Permission COMMAND_KILL_NOTIFY = register("notify", "Shows who killed you", COMMAND_KILL);
 
     @Command(alias = "slay", desc = "Kills a player")
-    public void kill(CommandSource context, @Default(UserListInSight.class) UserList players,
+    public void kill(CommandSource context, @Default(UserListInSight.class) PlayerList players,
                      @Flag boolean force, @Flag boolean quiet, @Flag boolean lightning)
     {
         lightning = lightning && context.hasPermission(COMMAND_KILL_LIGHTNING.getId());

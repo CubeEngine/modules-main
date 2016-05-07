@@ -19,6 +19,7 @@ package org.cubeengine.module.locker.commands;
 
 import java.util.List;
 import java.util.Optional;
+import javax.inject.Inject;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.completer.Completer;
@@ -28,6 +29,7 @@ import org.cubeengine.butler.parametric.Complete;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.KeyBook;
@@ -59,9 +61,10 @@ public class LockerCommands extends ContainerCommand
     private StringMatcher sm;
     private I18n i18n;
 
-    public LockerCommands(Locker module, LockManager manager, I18n i18n, StringMatcher sm)
+    @Inject
+    public LockerCommands(CommandManager base, Locker module, LockManager manager, I18n i18n, StringMatcher sm)
     {
-        super(module);
+        super(base, Locker.class);
         this.module = module;
         this.manager = manager;
         this.sm = sm;
@@ -194,6 +197,7 @@ public class LockerCommands extends ContainerCommand
             }
             i18n.sendTranslated(context, NEGATIVE, "This is not your protection!");
         });
+        i18n.sendTranslated(context, POSITIVE, "Right click a protection to give it to {user}!", player);
     }
 
     @Alias(value = "ckey")

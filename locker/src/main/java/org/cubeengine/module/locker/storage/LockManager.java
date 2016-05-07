@@ -19,11 +19,14 @@ package org.cubeengine.module.locker.storage;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -37,6 +40,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
+import javax.inject.Inject;
 import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.libcube.util.BlockUtil;
@@ -58,6 +62,7 @@ import org.jooq.types.UInteger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.PortionType;
@@ -125,8 +130,8 @@ public class LockManager
     private final ExecutorService unloadExecutor;
     private Future<?> unloadFuture = null;
 
-    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, TaskManager tm,
-                       I18n i18n, Game game)
+    @Inject
+    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, TaskManager tm, I18n i18n, Game game)
     {
         this.stringMatcher = stringMatcher;
         this.database = database;
@@ -146,8 +151,8 @@ public class LockManager
             throw new RuntimeException("SHA-1 hash algorithm not available!");
         }
         this.commandListener = new CommandListener(module, this, i18n);
-        em.registerListener(module, this.commandListener);
-        em.registerListener(module, this);
+        em.registerListener(Locker.class, this.commandListener);
+        em.registerListener(Locker.class, this);
 
         onEnable();
     }
@@ -156,8 +161,8 @@ public class LockManager
     {
         reloadLocks();
 
-        tm.runTimer(module, this::doLoadChunks, 5, 5); // 5 Ticks
-        tm.runTimer(module, this::doUnloadChunks, 100, 100); // 100 Ticks - 5 seconds
+        tm.runTimer(Locker.class, this::doLoadChunks, 5, 5); // 5 Ticks
+        tm.runTimer(Locker.class, this::doUnloadChunks, 100, 100); // 100 Ticks - 5 seconds
     }
 
     private void doUnloadChunks()
@@ -347,55 +352,24 @@ public class LockManager
      * @param location the location of the lock
      * @return the lock or null if there is no lock OR the chunk is not loaded
      */
-    public Lock getLockAtLocation(Location<World> location, Player user)
+    public Lock getLock(Location<World> location)
     {
-        Lock lock = this.getLocLockMap(location.getExtent().getUniqueId()).get(getLocationKey(location));
-        // TODO repairing Locks still needed?
-        /*
-        if (repairExpand && lock != null && lock.isSingleBlockLock())
-        {
-            Location block = lock.getFirstLocation();
-            if (block.getBlockType() == CHEST || block.getBlockType() == TRAPPED_CHEST)
-            {
-                for (Direction cardinalDirection : CARDINAL_DIRECTIONS)
-                {
-                    Location relative = block.getRelative(cardinalDirection);
-                    if (relative.getBlockType() == block.getBlockType())
-                    {
-                        if (this.getLockAtLocation(relative, null) == null)
-                        {
-                            this.extendLock(lock, relative);
-                            if (user != null)
-                            {
-                                i18n.sendTranslated(user, POSITIVE, "Protection repaired & expanded!");
-                            }
-                        }
-                        else
-                        {
-                            if (user != null)
-                            {
-                                i18n.sendTranslated(user, CRITICAL,
-                                                    "Broken protection detected! Try /cremove on nearby blocks!");
-                                i18n.sendTranslated(user, NEUTRAL,
-                                                    "If this message keeps coming please contact an administrator!");
-                            }
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-        */
+        return this.getLocLockMap(location.getExtent().getUniqueId()).get(getLocationKey(location));
+    }
+
+    public Lock getValidLock(Location<World> location, Player player)
+    {
+        Lock lock = getLock(location);
         if (lock == null)
         {
             return null;
         }
-        if (!lock.validateTypeAt(location)) // TODO don't validate each time maybe?
+        if (!lock.validateTypeAt(location))
         {
-            lock.delete(user);
-            if (user != null)
+            lock.delete(player);
+            if (player != null)
             {
-                i18n.sendTranslated(user, NEUTRAL, "Deleted invalid BlockProtection!");
+                i18n.sendTranslated(player, NEUTRAL, "Deleted invalid BlockProtection!");
             }
         }
         return lock;
@@ -451,7 +425,7 @@ public class LockManager
      */
     public void extendLock(Lock lock, Location<World> location)
     {
-        if (this.getLockAtLocation(location, null) != null)
+        if (this.getLock(location) != null)
         {
             throw new IllegalStateException("Cannot extend Lock onto another!");
         }
@@ -505,16 +479,22 @@ public class LockManager
      * Creates a new Lock at given Location
      *
      * @param block the location to create the lock for
-     * @param user the user creating the lock
+     * @param player the user creating the lock
      * @param lockType the lockType
      * @param password the password
      * @param createKeyBook whether to attempt to create a keyBook
      * @return the created Lock
      */
-    public CompletableFuture<Lock> createLock(Location<World> block, Player user, LockType lockType, String password, boolean createKeyBook)
+    public CompletableFuture<Lock> createLock(Location<World> block, Player player, LockType lockType, String password, boolean createKeyBook)
     {
+        if (getLock(block) != null)
+        {
+            i18n.sendTranslated(player, NEUTRAL, "There is already protection here!");
+            return null;
+        }
+
         BlockType material = block.getBlockType();
-        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(material));
+        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(player, lockType, getProtectedType(material));
         for (BlockLockConfig blockProtection : this.module.getConfig().blockprotections)
         {
             if (blockProtection.isType(material))
@@ -532,9 +512,10 @@ public class LockManager
         // Handle MultiBlock Protections
         if (material == CHEST || material == TRAPPED_CHEST)
         {
+            locations.add(block);
             for (Direction direction : CARDINAL_DIRECTIONS)
             {
-                Location relative = block.getRelative(direction);
+                Location<World> relative = block.getRelative(direction);
                 if (relative.getBlockType() == material)
                 {
                     locations.add(relative);
@@ -551,39 +532,33 @@ public class LockManager
         {
             locations.add(block); // Original Block
             // Find upper/lower door part
-            PortionType portion = block.get(Keys.PORTION_TYPE).orElse(null);
-            Location<World> relative = null;
-            if (portion == BOTTOM)
+
+            Optional<? extends Enum<?>> halfTrait = block.getBlock().getTraitValue(EnumTraits.WOODEN_DOOR_HALF);
+            boolean upperHalf = halfTrait.isPresent() && halfTrait.get().name().equals("UPPER");
+
+            // if (placed.get(Keys.PORTION_TYPE).get().equals(TOP)) // TODO use once implemented
+
+            Location<World> relative = block.getRelative(upperHalf ? Direction.DOWN : Direction.UP);
+            if (relative.getBlockType() != material) // try other half?
             {
                 relative = block.getRelative(Direction.UP);
             }
-            else if (portion == TOP)
+            if (relative.getBlockType() != material)
             {
-                relative = block.getRelative(Direction.DOWN);
+                throw new IllegalStateException("Other door half is missing");
             }
-            else // TODO PortionType is not working!?
-            {
-                relative = block.getRelative(Direction.DOWN);
-                if (relative.getBlockType() != block.getBlockType())
-                {
-                    relative = block.getRelative(Direction.UP);
-                    if (relative.getBlockType() != block.getBlockType())
-                    {
-                        throw new IllegalStateException("Other door half is missing");
-                    }
-                }
-            }
-            if (relative != null && relative.getBlockType() == material)
+
+            if (relative.getBlockType() == material)
             {
                 locations.add(relative);
 
                 Direction direction = block.get(Keys.DIRECTION).get();
                 Hinge hinge = block.get(Keys.HINGE_POSITION).get();
-                direction = BlockUtil.getOtherDoorDirection(direction, hinge);
-                Location<World> blockOther = block.getRelative(direction);
-                Location<World> relativeOther = relative.getRelative(direction);
-                if (portion != null && portion.equals(block.get(Keys.PORTION_TYPE).orElse(null)) // TODO null portion
-                    && blockOther.getBlockType().equals(relativeOther.getBlockType()))
+                Direction otherDoor = BlockUtil.getOtherDoorDirection(direction, hinge);
+                Location<World> blockOther = block.getRelative(otherDoor);
+                Location<World> relativeOther = relative.getRelative(otherDoor);
+                if (blockOther.getBlockType() == material && blockOther.getBlockType().equals(relativeOther.getBlockType()) && // Same DoorMaterial
+                    blockOther.get(Keys.DIRECTION).get() == direction && blockOther.get(Keys.HINGE_POSITION).get() != hinge) // Door-Pair
                 {
                     locations.add(blockOther);
                     locations.add(relativeOther);
@@ -595,16 +570,33 @@ public class LockManager
             locations.add(block);
         }
 
-        return model.createPassword(this, password).insertAsync()
-                    .thenCompose(m -> allOf(locations.parallelStream().map(loc -> database.getDSL().newRecord(
-                        TABLE_LOCK_LOCATION).newLocation(model, loc)).map(AsyncRecord::insertAsync).toArray(
-                        CompletableFuture[]::new)).thenApply((v) -> {
-                        Lock lock = new Lock(this, model, i18n, locations, game);
-                        this.addLoadedLocationLock(lock);
-                        lock.showCreatedMessage(user);
-                        lock.attemptCreatingKeyBook(user, createKeyBook);
-                        return lock;
-                    }));
+        return insertLock(player, password, createKeyBook, model, locations);
+    }
+
+    private CompletableFuture<Lock> insertLock(Player user, String password, boolean createKeyBook, LockModel model, List<Location<World>> locations)
+    {
+        model.createPassword(this, password);
+        CompletableFuture<Integer> future = model.insertAsync();
+        future.exceptionally(throwable -> {
+            throwable.printStackTrace();
+            return 0;
+        });
+
+        return future.thenCompose(m -> insertLockLocs(user, createKeyBook, model, locations));
+    }
+
+    private CompletableFuture<Lock> insertLockLocs(Player user, boolean createKeyBook, LockModel model, List<Location<World>> locations)
+    {
+        return allOf(locations.parallelStream()
+                              .map(loc -> database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(model, loc))
+                              .map(AsyncRecord::insertAsync).toArray(CompletableFuture[]::new))
+              .thenApply((v) -> {
+            Lock lock = new Lock(this, model, i18n, locations, game);
+            this.addLoadedLocationLock(lock);
+            lock.showCreatedMessage(user);
+            lock.attemptCreatingKeyBook(user, createKeyBook);
+            return lock;
+        });
     }
 
     /**
@@ -697,7 +689,7 @@ public class LockManager
         }
         if (holder instanceof TileEntityCarrier)
         {
-            return getLockAtLocation(((TileEntityCarrier)holder).getLocation(), null);
+            return getValidLock(((TileEntityCarrier)holder).getLocation(), null);
         }
         return null;
     }
@@ -801,11 +793,28 @@ public class LockManager
     public CompletableFuture<Integer> purgeLocksFrom(User user)
     {
         logger.info("Purging Locks from {}", user.getName());
-        CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCK).where(TABLE_LOCK.OWNER_ID.eq(
-            user.getUniqueId())));
+        CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCK)
+            .where(TABLE_LOCK.OWNER_ID.eq(user.getUniqueId())));
         future.thenAccept(integer -> {
             if (integer != 0)
             {
+                logger.info("{} Locks purged", integer);
+                reloadLocks();
+            }
+        });
+        return future;
+    }
+
+    public CompletableFuture<Integer> purgeOldLocks()
+    {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis() - module.getConfig().cleanupAge * 24 * 60 * 60 * 1000);
+        logger.info("Purging old Locks from {}", new Date(timestamp.getTime()));
+        CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCK)
+            .where(TABLE_LOCK.LAST_ACCESS.lessThan(timestamp)));
+        future.thenAccept(i -> {
+            if (i != 0)
+            {
+                logger.info("{} Locks purged", i);
                 reloadLocks();
             }
         });

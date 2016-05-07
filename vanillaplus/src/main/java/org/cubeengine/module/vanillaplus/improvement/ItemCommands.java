@@ -23,6 +23,8 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -49,23 +51,21 @@ import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
  * <p>/more
  * <p>/stack
  */
-public class ItemCommands extends PermissionContainer<VanillaPlus>
+public class ItemCommands extends PermissionContainer
 {
-    private final VanillaPlus module;
     private MaterialMatcher materialMatcher;
     private EnchantMatcher enchantMatcher;
     private I18n i18n;
 
-    private final PermissionDescription COMMAND_ITEM = register("command.item", "", null);
-    public final PermissionDescription COMMAND_ITEM_ENCHANTMENTS = register("enchantments.safe", "", COMMAND_ITEM);
-    public final PermissionDescription COMMAND_ITEM_ENCHANTMENTS_UNSAFE = register("enchantments.unsafe", "", COMMAND_ITEM);
+    private final Permission COMMAND_ITEM = register("command.item", "", null);
+    public final Permission COMMAND_ITEM_ENCHANTMENTS = register("enchantments.safe", "", COMMAND_ITEM);
+    public final Permission COMMAND_ITEM_ENCHANTMENTS_UNSAFE = register("enchantments.unsafe", "", COMMAND_ITEM);
 
-    public final PermissionDescription COMMAND_STACK_FULLSTACK = register("command.stack.fullstack", "", null);
+    public final Permission COMMAND_STACK_FULLSTACK = register("command.stack.fullstack", "", null);
 
-    public ItemCommands(VanillaPlus module, MaterialMatcher materialMatcher, EnchantMatcher enchantMatcher, I18n i18n)
+    public ItemCommands(PermissionManager pm, MaterialMatcher materialMatcher, EnchantMatcher enchantMatcher, I18n i18n)
     {
-        super(module);
-        this.module = module;
+        super(pm, VanillaPlus.class);
         this.materialMatcher = materialMatcher;
         this.enchantMatcher = enchantMatcher;
         this.i18n = i18n;

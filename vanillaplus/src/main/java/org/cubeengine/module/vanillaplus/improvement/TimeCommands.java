@@ -26,6 +26,7 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.TimeMatcher;
@@ -39,7 +40,7 @@ import org.spongepowered.api.world.World;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
-public class TimeCommands extends PermissionContainer<VanillaPlus>
+public class TimeCommands extends PermissionContainer
 {
     private final TaskManager tam;
     private I18n i18n;
@@ -48,9 +49,9 @@ public class TimeCommands extends PermissionContainer<VanillaPlus>
 
     private Map<UUID, UUID> locked = new HashMap<>();
 
-    public TimeCommands(VanillaPlus module, I18n i18n, TimeMatcher tm, WorldMatcher worldMatcher, TaskManager tam)
+    public TimeCommands(PermissionManager pm, I18n i18n, TimeMatcher tm, WorldMatcher worldMatcher, TaskManager tam)
     {
-        super( module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
         this.tm = tm;
         this.worldMatcher = worldMatcher;
@@ -150,17 +151,17 @@ public class TimeCommands extends PermissionContainer<VanillaPlus>
     {
         if (locked.containsKey(world.getUniqueId()))
         {
-            tam.cancelTask(module, locked.remove(world.getUniqueId()));
+            tam.cancelTask(VanillaPlus.class, locked.remove(world.getUniqueId()));
             i18n.sendTranslated(context, POSITIVE, "Time unlocked for {world}!", world);
         }
         else
         {
-            locked.put(world.getUniqueId(), tam.runTimer(module, () -> setTime(world, worldTime), 0, 10));
+            locked.put(world.getUniqueId(), tam.runTimer(VanillaPlus.class, () -> setTime(world, worldTime), 0, 10));
             i18n.sendTranslated(context, POSITIVE, "Time locked for {world}!", world);
         }
     }
 
-    // TODO public final PermissionDescription COMMAND_PTIME_OTHER = register("command.ptime.other", "", null);
+    // TODO public final Permission COMMAND_PTIME_OTHER = register("command.ptime.other", "", null);
 
     /* TODO wait for API https://github.com/SpongePowered/SpongeAPI/issues/393
     @Command(desc = "Changes the time for a player")

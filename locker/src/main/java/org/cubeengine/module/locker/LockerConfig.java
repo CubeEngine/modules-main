@@ -116,6 +116,9 @@ public class LockerConfig extends ReflectedYaml
     @Comment("Worlds to disable auto-protect in")
     public List<ConfigWorld> disableAutoProtect = new ArrayList<>();
 
+    @Comment("When using the cleanup command all locks not accessed since this number of days will be removed")
+    public int cleanupAge = 90;
+
     // limit protection count#
 
     @Override

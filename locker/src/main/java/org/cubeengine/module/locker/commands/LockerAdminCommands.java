@@ -17,13 +17,15 @@
  */
 package org.cubeengine.module.locker.commands;
 
+import javax.inject.Inject;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.command.CommandSource;
@@ -33,8 +35,7 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.Carrier;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 @Command(name = "admin", desc = "Administrate the protections")
 public class LockerAdminCommands extends ContainerCommand
@@ -42,9 +43,10 @@ public class LockerAdminCommands extends ContainerCommand
     private final LockManager manager;
     private I18n i18n;
 
-    public LockerAdminCommands(Locker module, LockManager manager, I18n i18n)
+    @Inject
+    public LockerAdminCommands(CommandManager base, LockManager manager, I18n i18n)
     {
-        super(module);
+        super(base, Locker.class);
         this.manager = manager;
         this.i18n = i18n;
     }
@@ -120,17 +122,34 @@ public class LockerAdminCommands extends ContainerCommand
     @Command(desc = "Deletes all locks of given player")
     public void purge(CommandSource context, User player)
     {
-        this.manager.purgeLocksFrom(player);
-        i18n.sendTranslated(context, POSITIVE, "All locks for {user} are now deleted!", player);
+        manager.purgeLocksFrom(player).thenAccept(i -> {
+            if (i != 0)
+            {
+              i18n.sendTranslated(context, POSITIVE, "All locks for {user} are now deleted!", player);
+            }
+            else
+            {
+              i18n.sendTranslated(context, NEUTRAL, "{user} had no locks!", player);
+            }
+        });
     }
 
-    // TODO admin cmds
-
+    @Command(desc = "Deletes old locks")
     public void cleanup(CommandSource context)
     {
-        // cleanup remove not accessed protections / time in config
+        manager.purgeOldLocks().thenAccept(i -> {
+            if (i != 0)
+            {
+                i18n.sendTranslated(context, POSITIVE, "{amount} locks deleted!", i);
+            }
+            else
+            {
+                i18n.sendTranslated(context, NEUTRAL, "No locks deleted!");
+            }
+        });
     }
 
+    // TODO list cmd
     public void list(CommandSource context)
     {
         // find & show all protections of a user/selection

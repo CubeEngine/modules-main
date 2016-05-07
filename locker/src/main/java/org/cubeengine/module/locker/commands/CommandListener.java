@@ -31,6 +31,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.entity.TameEntityEvent;
@@ -94,7 +95,7 @@ public class CommandListener
         return true;
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onRightClickBlock(InteractBlockEvent.Secondary event, @First Player player)
     {
         if (isPlayerInteract(player))
@@ -107,7 +108,7 @@ public class CommandListener
         LockAction lockAction = lockActions.get(player.getUniqueId());
         if (lockAction != null)
         {
-            Lock lock = this.manager.getLockAtLocation(location, player);
+            Lock lock = this.manager.getValidLock(location, player);
             if (lock != null || lockAction instanceof LockAction.LockCreateAction)
             {
                 lockAction.apply(lock, location, null);

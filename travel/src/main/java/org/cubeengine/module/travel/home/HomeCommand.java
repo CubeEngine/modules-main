@@ -34,6 +34,9 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.butler.result.CommandResult;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.util.ConfirmManager;
 import org.cubeengine.libcube.util.math.Cuboid;
 import org.cubeengine.libcube.util.math.Vector3;
 import org.cubeengine.libcube.util.math.shape.Shape;
@@ -43,7 +46,6 @@ import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
 import org.cubeengine.libcube.service.command.property.RawPermission;
-import org.cubeengine.libcube.service.command.confirm.ConfirmResult;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -71,9 +73,9 @@ public class HomeCommand extends ContainerCommand
     private Maybe<Selector> selector;
     private I18n i18n;
 
-    public HomeCommand(Travel module, Maybe<Selector> selector, I18n i18n)
+    public HomeCommand(CommandManager base, Travel module, Maybe<Selector> selector, I18n i18n)
     {
-        super(module);
+        super(base, Travel.class);
         this.module = module;
         this.selector = selector;
         this.i18n = i18n;
@@ -110,13 +112,8 @@ public class HomeCommand extends ContainerCommand
             i18n.sendTranslated(sender, NEUTRAL, "Use {text:/sethome} to set your home");
             return;
         }
-        if (!h.isInvited(sender))
+        if (!h.isInvited(sender) && !owner.equals(sender))
         {
-            if (owner.equals(sender))
-            {
-                homeNotFoundMessage(sender, owner, home);
-                return;
-            }
             if (!sender.hasPermission(module.getPermissions().HOME_TP_OTHER.getId()))
             {
                 throw new PermissionDeniedException(module.getPermissions().HOME_TP_OTHER);
@@ -293,10 +290,10 @@ public class HomeCommand extends ContainerCommand
     {
         if (!owner.equals(sender))
         {
-            PermissionDescription otherPerm = module.getPermissions().HOME_LIST_OTHER;
+            Permission otherPerm = module.getPermissions().HOME_LIST_OTHER;
             if (!sender.hasPermission(otherPerm.getId()))
             {
-                throw new PermissionDeniedException(new RawPermission(otherPerm.getId(), otherPerm.getDescription().toPlain()));
+                throw new PermissionDeniedException(new RawPermission(otherPerm.getId(), otherPerm.getDesc()));
             }
         }
         Set<Home> homes = this.manager.list(owner, owned, invited);
@@ -431,13 +428,13 @@ public class HomeCommand extends ContainerCommand
 
     @Alias(value = {"clearhomes"})
     @Command(desc = "Clear all homes (of an user)")
-    public CommandResult clear(final CommandSource context, @Optional final Player owner,
+    public void clear(final CommandSource context, @Optional final Player owner,
                                @Flag(name = "sel", longName = "selection") final boolean selection)
     {
         if (this.module.getConfig().clearOnlyFromConsole && !(context instanceof ConsoleSource))
         {
             i18n.sendTranslated(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
-            return null;
+            return;
         }
         final Location<World> firstPoint;
         final Location<World> secondPoint;
@@ -446,19 +443,19 @@ public class HomeCommand extends ContainerCommand
             if (selector.isAvailable())
             {
                 i18n.sendTranslated(context, NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
-                return null;
+                return;
             }
             if (!(context instanceof Player))
             {
                 i18n.sendTranslated(context, NEGATIVE, "You have to be in game to use the selection flag");
-                return null;
+                return;
             }
             Selector selector = this.selector.value();
             Shape shape = selector.getSelection((Player)context);
             if (!(shape instanceof Cuboid))
             {
                 i18n.sendTranslated(context, NEGATIVE, "Invalid selection!");
-                return null;
+                return;
             }
             firstPoint = selector.getFirstPoint((Player)context);
             secondPoint = selector.getSecondPoint((Player)context);
@@ -488,10 +485,8 @@ public class HomeCommand extends ContainerCommand
                                       "Are you sure you want to delete all homes ever created on this server?");
             }
         }
-        i18n.sendTranslated(context, NEUTRAL,
-                              "Confirm with: {text:/confirm} before 30 seconds have passed to delete the homes");
-
-        return new ConfirmResult(module, () -> {
+        Text confirmText = i18n.getTranslation(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the homes");
+        ConfirmManager.requestConfirmation(i18n,  confirmText, context,() -> {
             Predicate<Home> predicate = home -> true;
             if (owner != null)
             {
@@ -524,7 +519,7 @@ public class HomeCommand extends ContainerCommand
             }
             i18n.sendTranslated(context, POSITIVE, "The homes are now deleted.");
 
-        }, context);
+        });
 
     }
 

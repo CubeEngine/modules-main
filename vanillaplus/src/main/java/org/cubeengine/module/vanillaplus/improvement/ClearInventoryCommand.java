@@ -20,6 +20,8 @@ package org.cubeengine.module.vanillaplus.improvement;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
 import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
@@ -33,28 +35,28 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
-public class ClearInventoryCommand extends PermissionContainer<VanillaPlus>
+public class ClearInventoryCommand extends PermissionContainer
 {
-    private final PermissionDescription COMMAND_CLEARINVENTORY = register("command.clearinventory", "", null);
-    public final PermissionDescription COMMAND_CLEARINVENTORY_OTHER = register("notify",
+    private final Permission COMMAND_CLEARINVENTORY = register("command.clearinventory", "", null);
+    public final Permission COMMAND_CLEARINVENTORY_OTHER = register("notify",
                                                                                "Allows clearing the inventory of other players",
                                                                                COMMAND_CLEARINVENTORY);
-    public final PermissionDescription COMMAND_CLEARINVENTORY_NOTIFY = register("other",
+    public final Permission COMMAND_CLEARINVENTORY_NOTIFY = register("other",
                                                                                 "Notifies you if your inventory got cleared by someone else",
                                                                                 COMMAND_CLEARINVENTORY);
-    public final PermissionDescription COMMAND_CLEARINVENTORY_PREVENT = register("prevent",
+    public final Permission COMMAND_CLEARINVENTORY_PREVENT = register("prevent",
                                                                                  "Prevents your inventory from being cleared unless forced",
                                                                                  COMMAND_CLEARINVENTORY);
-    public final PermissionDescription COMMAND_CLEARINVENTORY_FORCE = register("force",
+    public final Permission COMMAND_CLEARINVENTORY_FORCE = register("force",
                                                                                "Clears an inventory even if the player has the prevent PermissionDescription",
                                                                                COMMAND_CLEARINVENTORY);
 
     private I18n i18n;
 
 
-    public ClearInventoryCommand(VanillaPlus module, I18n i18n)
+    public ClearInventoryCommand(PermissionManager pm, I18n i18n)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
     }
 

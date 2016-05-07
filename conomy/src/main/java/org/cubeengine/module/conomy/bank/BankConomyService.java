@@ -191,11 +191,11 @@ public class BankConomyService extends ConomyService
     public void registerCommands(CommandManager cm, I18n i18n)
     {
         super.registerCommands(cm, i18n);
-        ((Dispatcher) cm.getCommand("eco")).addCommand(new EcoBankCommand(module, this, i18n));
+        ((Dispatcher) cm.getCommand("eco")).addCommand(new EcoBankCommand(cm, this, i18n));
         cm.getProviderManager().register(module, new VirtualAccountReader(this, i18n), BaseAccount.Virtual.class);
-        BankCommand bankCommand = new BankCommand(module, this, i18n);
+        BankCommand bankCommand = new BankCommand(cm, this, i18n);
         cm.addCommand(bankCommand);
-        bankCommand.addCommand(new BankManageCommand(module, this, i18n));
+        bankCommand.addCommand(new BankManageCommand(cm, this, i18n));
     }
 
     public boolean hasAccess(BaseAccount.Virtual bank, AccessLevel level, Subject context)

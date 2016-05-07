@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
@@ -45,17 +47,19 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
-public class PaintingListener extends PermissionContainer<VanillaPlus>
+public class PaintingListener extends PermissionContainer
 {
+    private VanillaPlus module;
     private I18n i18n;
     private final Map<UUID, Painting> paintingChange;
 
-    public final PermissionDescription CHANGEPAINTING = register("changepainting", "", null);
+    public final Permission CHANGEPAINTING = register("changepainting", "", null);
 
 
-    public PaintingListener(VanillaPlus module, I18n i18n)
+    public PaintingListener(PermissionManager pm, VanillaPlus module, I18n i18n)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
+        this.module = module;
         this.i18n = i18n;
         this.paintingChange = new HashMap<>();
     }

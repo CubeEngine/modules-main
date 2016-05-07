@@ -25,6 +25,8 @@ import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.libcube.service.command.ModuleCommand;
+import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.module.locker.commands.LockerAdminCommands;
 import org.cubeengine.module.locker.commands.LockerCommands;
 import org.cubeengine.module.locker.commands.LockerCreateCommands;
@@ -51,6 +53,10 @@ import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandMapping;
+import org.spongepowered.api.text.LiteralText;
+import org.spongepowered.api.text.Text;
 
 // TODO protect lines of redstone
 
@@ -59,9 +65,6 @@ import org.spongepowered.api.Game;
 public class Locker extends Module
 {
     @ModuleConfig private LockerConfig config;
-    private LockerPerm perms;
-
-    private LockManager manager;
     private Log logger;
 
     @Inject private Database db;
@@ -70,36 +73,49 @@ public class Locker extends Module
 
     @Inject private StringMatcher sm;
 
-    @Inject private Game game;
     @Inject private TaskManager tm;
     @Inject private I18n i18n;
 
+    @Inject private LockManager manager;
+    @Inject @ModuleCommand private LockerCommands lockerCmd;
+    @Inject @ModuleCommand(LockerCommands.class) private LockerCreateCommands lockerCreateCmds;
+    @Inject @ModuleCommand(LockerCommands.class) private LockerAdminCommands lockerAdminCmds;
+
+    private LockerPerm perms;
+
+    @Inject @ModuleListener private LockerListener listener;
+    @Inject @ModuleListener private LockerBlockListener blockListener;
+
     @Inject
-    public Locker(Game game, Reflector reflector, EntityMatcher entityMatcher, Log logger, MaterialMatcher mm)
+    public Locker(Reflector reflector, EntityMatcher entityMatcher, Log logger, MaterialMatcher mm, CommandManager cm)
     {
         this.logger = logger;
-        game.getDataManager().register(LockerData.class, ImmutableLockerData.class,
-                                                    new LockerDataBuilder(game.getRegistry().getValueFactory()));
+        Sponge.getDataManager().register(LockerData.class, ImmutableLockerData.class, new LockerDataBuilder(Sponge.getRegistry().getValueFactory()));
 
         ConverterManager cManager = reflector.getDefaultConverterManager();
         cManager.registerConverter(new BlockLockerConfigConverter(logger, mm), BlockLockConfig.class);
         cManager.registerConverter(new EntityLockerConfigConverter(logger, entityMatcher), EntityLockConfig.class);
+
+        cm.getProviderManager().register(this, new PlayerAccess.PlayerAccessReader(), PlayerAccess.class);
     }
 
 
     @Enable
-    public void onEnable()
+    @Inject
+    public void onEnable(LockerPerm perms)
     {
-        cm.getProviderManager().register(this, new PlayerAccess.PlayerAccessReader(game), PlayerAccess.class);
-
+        this.perms = perms;
+        /*
         manager = new LockManager(this, em, sm, db, tm, i18n, game);
         LockerCommands lockerCmd = new LockerCommands(this, manager, i18n, sm);
         cm.addCommand(lockerCmd);
         lockerCmd.addCommand(new LockerCreateCommands(this, manager, i18n));
         lockerCmd.addCommand(new LockerAdminCommands(this, manager, i18n));
         perms = new LockerPerm(this, lockerCmd);
-        em.registerListener(this, new LockerListener(this, manager, i18n));
-        em.registerListener(this, new LockerBlockListener(this, manager, i18n, game));
+        */
+
+        //em.registerListener(Locker.class, new LockerListener(this, manager, i18n));
+        //em.registerListener(Locker.class, new LockerBlockListener(this, manager, i18n, game));
     }
 
     @Disable
@@ -131,11 +147,6 @@ public class Locker extends Module
     public LockerConfig getConfig()
     {
         return this.config;
-    }
-
-    public Game getGame()
-    {
-        return game;
     }
 
     public TaskManager getTaskManager()

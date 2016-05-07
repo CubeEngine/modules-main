@@ -71,7 +71,7 @@ public class TeleportRequestCommands
         if (waitTime > 0)
         {
             final Player sendingUser = context;
-            final UUID taskID = taskManager.runTaskDelayed(this.module, () -> {
+            final UUID taskID = taskManager.runTaskDelayed(Teleport.class, () -> {
 
                 tl.removeRequestTask(player);
                 tl.removeToRequest(player);
@@ -81,7 +81,7 @@ public class TeleportRequestCommands
             UUID oldtaskID = tl.getRequestTask(player);
             if (oldtaskID != null)
             {
-                taskManager.cancelTask(this.module, oldtaskID);
+                taskManager.cancelTask(Teleport.class, oldtaskID);
             }
             tl.setRequestTask(player    , taskID);
         }
@@ -106,7 +106,7 @@ public class TeleportRequestCommands
         if (waitTime > 0)
         {
             final Player sendingUser = context;
-            final UUID taskID = taskManager.runTaskDelayed(this.module, () -> {
+            final UUID taskID = taskManager.runTaskDelayed(Teleport.class, () -> {
                 tl.removeRequestTask(player);
                 tl.removeFromRequest(player);
                 i18n.sendTranslated(sendingUser, NEGATIVE, "{user} did not accept your teleport request.", player);
@@ -115,7 +115,7 @@ public class TeleportRequestCommands
             UUID oldtaskID = tl.getRequestTask(player);
             if (oldtaskID != null)
             {
-                taskManager.cancelTask(this.module, oldtaskID);
+                taskManager.cancelTask(Teleport.class, oldtaskID);
             }
             tl.setRequestTask(player, taskID);
         }
@@ -163,7 +163,7 @@ public class TeleportRequestCommands
         if (taskID != null)
         {
             tl.getRequestTask(context);
-            taskManager.cancelTask(this.module, taskID);
+            taskManager.cancelTask(Teleport.class, taskID);
         }
     }
 
@@ -206,7 +206,7 @@ public class TeleportRequestCommands
         if (taskID != null)
         {
             tl.removeRequestTask(sender);
-            taskManager.cancelTask(this.module, taskID);
+            taskManager.cancelTask(Teleport.class, taskID);
         }
     }
 }

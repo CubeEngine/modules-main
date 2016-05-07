@@ -89,7 +89,7 @@ public class RoleSubject extends BaseSubject<RoleSubjectData>
 
     public boolean canAssignAndRemove(CommandSource source)
     {
-        String perm = module.getModularity().provide(PermissionManager.class).getModulePermission(module).getId();
+        String perm = module.getModularity().provide(PermissionManager.class).getBasePermission(Roles.class).getId();
         return source.hasPermission(perm + ".assign." + getIdentifier());
     }
 

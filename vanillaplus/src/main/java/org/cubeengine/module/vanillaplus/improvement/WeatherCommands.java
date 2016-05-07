@@ -42,7 +42,7 @@ public class WeatherCommands
 
 
 
-    public enum Weather
+    public enum Weather // TODO completer
     {
         SUN, RAIN, STORM
     }

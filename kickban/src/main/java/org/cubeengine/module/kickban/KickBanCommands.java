@@ -34,7 +34,7 @@ import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.util.TimeConversionException;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.libcube.service.command.readers.UserList;
+import org.cubeengine.libcube.service.command.readers.PlayerList;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -81,7 +81,7 @@ public class KickBanCommands
     }
 
     @Command(desc = "Kicks a player from the server")
-    public void kick(CommandSource context, UserList players, @Optional @Greed(INFINITE) String reason)
+    public void kick(CommandSource context, PlayerList players, @Optional @Greed(INFINITE) String reason)
     {
         reason = parseReason(reason, module.perms().COMMAND_KICK_NOREASON, context);
         if (players.isAll())

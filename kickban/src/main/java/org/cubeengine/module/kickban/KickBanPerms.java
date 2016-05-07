@@ -27,15 +27,15 @@ public class KickBanPerms extends PermissionContainer<KickBan>
         super(module);
     }
 
-    private final PermissionDescription COMMAND = register("command", "Base Commands Permission", null);
+    private final Permission COMMAND = register("command", "Base Commands Permission", null);
 
-    public final PermissionDescription COMMAND_KICK_ALL = register("kick.all", "Allows kicking all players", COMMAND);
-    public final PermissionDescription COMMAND_KICK_NOREASON = register("kick.noreason", "Allows kicking without providing a reason", COMMAND);
+    public final Permission COMMAND_KICK_ALL = register("kick.all", "Allows kicking all players", COMMAND);
+    public final Permission COMMAND_KICK_NOREASON = register("kick.noreason", "Allows kicking without providing a reason", COMMAND);
 
-    public final PermissionDescription COMMAND_BAN_NOREASON = register("ban.noreason", "Allows banning without providing a reason",COMMAND);
-    public final PermissionDescription COMMAND_IPBAN_NOREASON = register("ipban.noreason", "Allows banning without providing a reason",COMMAND);
-    public final PermissionDescription COMMAND_TEMPBAN_NOREASON = register("tempban.noreason", "Allows banning without providing a reason",COMMAND);
+    public final Permission COMMAND_BAN_NOREASON = register("ban.noreason", "Allows banning without providing a reason",COMMAND);
+    public final Permission COMMAND_IPBAN_NOREASON = register("ipban.noreason", "Allows banning without providing a reason",COMMAND);
+    public final Permission COMMAND_TEMPBAN_NOREASON = register("tempban.noreason", "Allows banning without providing a reason",COMMAND);
 
-    public final PermissionDescription KICK_RECEIVEMESSAGE = register("kick.receivemessage", "Enables notification when a player gets kicked", COMMAND);
-    public final PermissionDescription BAN_RECEIVEMESSAGE = register("ban.receivemessage", "Enables notification when a player gets banned", COMMAND);
+    public final Permission KICK_RECEIVEMESSAGE = register("kick.receivemessage", "Enables notification when a player gets kicked", COMMAND);
+    public final Permission BAN_RECEIVEMESSAGE = register("ban.receivemessage", "Enables notification when a player gets banned", COMMAND);
 }

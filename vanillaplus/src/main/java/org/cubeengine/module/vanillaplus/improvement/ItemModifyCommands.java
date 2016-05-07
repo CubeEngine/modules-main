@@ -26,6 +26,7 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -54,16 +55,14 @@ import static org.spongepowered.api.text.serializer.TextSerializers.FORMATTING_C
  * <p>/enchant
  * <p>/repair
  */
-public class ItemModifyCommands extends PermissionContainer<VanillaPlus>
+public class ItemModifyCommands extends PermissionContainer
 {
     private I18n i18n;
-    private EnchantMatcher em;
 
-    public ItemModifyCommands(VanillaPlus module, I18n i18n, EnchantMatcher em)
+    public ItemModifyCommands(PermissionManager pm, I18n i18n)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
-        this.em = em;
     }
 
     @Command(desc = "Changes the display name of the item in your hand.")

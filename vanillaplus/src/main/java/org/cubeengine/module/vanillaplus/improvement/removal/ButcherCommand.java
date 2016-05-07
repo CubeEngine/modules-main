@@ -25,6 +25,8 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -41,19 +43,21 @@ import org.spongepowered.api.world.World;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
-public class ButcherCommand extends PermissionContainer<VanillaPlus>
+public class ButcherCommand extends PermissionContainer
 {
+    private VanillaPlus module;
     private I18n i18n;
 
-    public ButcherCommand(VanillaPlus module, I18n i18n, CommandManager cm, StringMatcher sm)
+    public ButcherCommand(PermissionManager pm, VanillaPlus module, I18n i18n, CommandManager cm, StringMatcher sm)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
+        this.module = module;
         this.i18n = i18n;
-        cm.getProviderManager().register(module, new LivingFilterReader(module, i18n, sm), LivingFilter.class);
+        cm.getProviderManager().register(module, new LivingFilterReader(pm, i18n, sm), LivingFilter.class);
     }
 
-    public final PermissionDescription COMMAND_BUTCHER_FLAG_LIGHTNING = register("command.butcher.lightning", "", null);
-    public final PermissionDescription COMMAND_BUTCHER_FLAG_ALL = register("command.butcher.all", "", null);
+    public final Permission COMMAND_BUTCHER_FLAG_LIGHTNING = register("command.butcher.lightning", "", null);
+    public final Permission COMMAND_BUTCHER_FLAG_ALL = register("command.butcher.all", "", null);
 
 
     @Command(desc = "Gets rid of mobs close to you. Valid types are:\n" +

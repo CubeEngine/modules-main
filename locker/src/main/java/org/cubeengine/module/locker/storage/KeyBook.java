@@ -26,6 +26,7 @@ import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.data.LockerData;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.jooq.types.UInteger;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -43,6 +44,7 @@ import static org.spongepowered.api.data.key.Keys.DISPLAY_NAME;
 import static org.spongepowered.api.data.key.Keys.ITEM_LORE;
 import static org.spongepowered.api.effect.sound.SoundTypes.*;
 import static org.spongepowered.api.item.ItemTypes.PAPER;
+import static org.spongepowered.api.item.ItemTypes.SPONGE;
 
 public class KeyBook
 {
@@ -138,7 +140,7 @@ public class KeyBook
                                             i18n.getTranslation(holder, NEUTRAL, "used up. It"),
                                             i18n.getTranslation(holder, NEUTRAL, "won't let you"),
                                             i18n.getTranslation(holder, NEUTRAL, "open any containers!")));
-        item = module.getGame().getRegistry().createBuilder(ItemStack.Builder.class).fromItemStack(item).itemType(PAPER).build();
+        item = Sponge.getRegistry().createBuilder(ItemStack.Builder.class).fromItemStack(item).itemType(PAPER).build();
         holder.setItemInHand(item);
     }
 

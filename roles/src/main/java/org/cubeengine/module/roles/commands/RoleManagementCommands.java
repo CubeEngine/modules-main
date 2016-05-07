@@ -28,6 +28,7 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.config.Priority;
@@ -52,9 +53,9 @@ public class RoleManagementCommands extends ContainerCommand
     private RolesPermissionService service;
     private I18n i18n;
 
-    public RoleManagementCommands(Roles module, RolesPermissionService service, I18n i18n)
+    public RoleManagementCommands(CommandManager base, RolesPermissionService service, I18n i18n)
     {
-        super(module);
+        super(base, Roles.class);
         this.service = service;
         this.i18n = i18n;
     }
@@ -80,7 +81,7 @@ public class RoleManagementCommands extends ContainerCommand
                 break;
             case FALSE:
                 i18n.sendTranslated(ctx, NEGATIVE,
-                                        "{name#permission} set to {text:false:color=DARK_RED} for the role {naroleme} in {context}!",
+                                        "{name#permission} set to {text:false:color=DARK_RED} for the role {role} in {context}!",
                                         permission, role, context);
                 break;
         }

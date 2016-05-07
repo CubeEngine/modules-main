@@ -17,43 +17,47 @@
  */
 package org.cubeengine.module.locker;
 
+import javax.inject.Inject;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.locker.commands.LockerCommands;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 @SuppressWarnings("all")
-public class LockerPerm extends PermissionContainer<Locker>
+public class LockerPerm extends PermissionContainer
 {
-    public LockerPerm(Locker module, LockerCommands mainCmd)
+    @Inject
+    public LockerPerm(PermissionManager pm, LockerCommands mainCmd)
     {
-        super(module);
+        super(pm, Locker.class);
     }
 
-    public final PermissionDescription ALLOW_CONTAINER = register("allow.container", "", null);
-    public final PermissionDescription ALLOW_DOOR = register("allow.door", "", null);
-    public final PermissionDescription ALLOW_ENTITY = register("allow.entity", "", null);
-    public final PermissionDescription ALLOW_HANGING = register("allow.hanging", "", null);
+    public final Permission ALLOW_CONTAINER = register("allow.container", "", null);
+    public final Permission ALLOW_DOOR = register("allow.door", "", null);
+    public final Permission ALLOW_ENTITY = register("allow.entity", "", null);
+    public final Permission ALLOW_HANGING = register("allow.hanging", "", null);
 
-    public final PermissionDescription SHOW_OWNER = register("show-owner", "", null);
-    public final PermissionDescription BREAK_OTHER = register("break-other", "", null);
-    public final PermissionDescription ACCESS_OTHER = register("access-other", "", null);
-    public final PermissionDescription EXPAND_OTHER = register("expand-other", "", null);
+    public final Permission SHOW_OWNER = register("show-owner", "", null);
+    public final Permission BREAK_OTHER = register("break-other", "", null);
+    public final Permission ACCESS_OTHER = register("access-other", "", null);
+    public final Permission EXPAND_OTHER = register("expand-other", "", null);
 
-    public final PermissionDescription PREVENT_NOTIFY = register("prevent-notify", "", null);
+    public final Permission PREVENT_NOTIFY = register("prevent-notify", "", null);
 
-    private final PermissionDescription COMMAND = register("command", "", null);
+    private final Permission COMMAND = register("command", "", null);
 
-    public final PermissionDescription CMD_REMOVE_OTHER = register("locker.remove.other", "", COMMAND);
-    public final PermissionDescription CMD_KEY_OTHER = register("locker.key.other", "", COMMAND);
-    public final PermissionDescription CMD_MODIFY_OTHER = register("locker.modify.other", "", COMMAND);
-    public final PermissionDescription CMD_GIVE_OTHER = register("locker.give.other", "", COMMAND);
+    public final Permission CMD_REMOVE_OTHER = register("locker.remove.other", "", COMMAND);
+    public final Permission CMD_KEY_OTHER = register("locker.key.other", "", COMMAND);
+    public final Permission CMD_MODIFY_OTHER = register("locker.modify.other", "", COMMAND);
+    public final Permission CMD_GIVE_OTHER = register("locker.give.other", "", COMMAND);
 
-    public final PermissionDescription CMD_INFO_OTHER = register("locker.info.other", "", COMMAND);
-    public final PermissionDescription CMD_INFO_SHOW_OWNER =  register("locker.info.show-owner", "", null);
+    public final Permission CMD_INFO_OTHER = register("locker.info.other", "", COMMAND);
+    public final Permission CMD_INFO_SHOW_OWNER =  register("locker.info.show-owner", "", null);
 
     // TODO Locker grouping Perms on commands
     /*
-    public final PermissionDescription PROTECT = registerS("protect", "", null,
+    public final Permission PROTECT = registerS("protect", "", null,
                                                           "command.locker.info.use",
                                                           "command.locker.persist.use",
                                                           "command.locker.remove.use",
@@ -71,6 +75,6 @@ public class LockerPerm extends PermissionContainer<Locker>
                                                           "command.locker.info.show-owner");
 
 
-    public final PermissionDescription MODERATOR = register("moderator", "", null, PROTECT, SHOW_OWNER, CMD_INFO_OTHER, ACCESS_OTHER, CMD_REMOVE_OTHER);
+    public final Permission MODERATOR = register("moderator", "", null, PROTECT, SHOW_OWNER, CMD_INFO_OTHER, ACCESS_OTHER, CMD_REMOVE_OTHER);
     */
 }

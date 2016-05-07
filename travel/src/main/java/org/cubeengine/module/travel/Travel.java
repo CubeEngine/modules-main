@@ -37,13 +37,12 @@ import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.ModulePermissions;
 
 @ModuleInfo(name = "Travel", description = "Travel anywhere")
 public class Travel extends Module
 {
     @ModuleConfig private TravelConfig config;
-    @ModulePermissions private TravelPerm permissions;
+    @Inject private TravelPerm permissions;
 
     private HomeManager homeManager;
     private WarpManager warpManager;
@@ -61,11 +60,11 @@ public class Travel extends Module
         i18n.getCompositor().registerFormatter(new TpPointFormatter(i18n));
 
         this.homeManager = new HomeManager(this, i18n, reflector.load(HomeConfig.class, getProvided(Path.class).resolve("homes.yml").toFile()));
-        this.em.registerListener(this, this.homeManager);
+        this.em.registerListener(Travel.class, this.homeManager);
         this.warpManager = new WarpManager(reflector.load(WarpConfig.class, getProvided(Path.class).resolve("warps.yml").toFile()));
 
-        cm.addCommand(new HomeCommand(this, selector, i18n));
-        cm.addCommand(new WarpCommand(this, i18n));
+        cm.addCommand(new HomeCommand(cm, this, selector, i18n));
+        cm.addCommand(new WarpCommand(cm, this, i18n));
 
         cm.getProviderManager().getExceptionHandler().addHandler(new TravelExceptionHandler(i18n));
     }

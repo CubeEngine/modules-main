@@ -29,6 +29,7 @@ import org.cubeengine.butler.parametric.Complete;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.RolesUtil.FoundPermission;
@@ -59,9 +60,9 @@ public class RoleInformationCommands extends ContainerCommand
     private RolesPermissionService service;
     private I18n i18n;
 
-    public RoleInformationCommands(Roles module, RolesPermissionService service, I18n i18n)
+    public RoleInformationCommands(CommandManager base, RolesPermissionService service, I18n i18n)
     {
-        super(module);
+        super(base, Roles.class);
         this.service = service;
         this.i18n = i18n;
     }

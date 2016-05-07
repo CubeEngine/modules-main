@@ -21,6 +21,7 @@ import javax.inject.Inject;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.addition.FoodCommands;
 import org.cubeengine.module.vanillaplus.addition.GodCommand;
 import org.cubeengine.module.vanillaplus.addition.HealCommand;
@@ -128,6 +129,7 @@ public class VanillaPlus extends Module
     @Inject private TimeMatcher tm;
     @Inject private WorldMatcher wm;
     @Inject private TaskManager tam;
+    @Inject private PermissionManager pm;
     @Inject private Broadcaster bc;
     @Inject private InventoryGuardFactory invGuard;
     @ModuleConfig private VanillaPlusConfig config;
@@ -151,19 +153,19 @@ public class VanillaPlus extends Module
     {
         if (config.add.commandGod)
         {
-            cm.addCommands(this, new GodCommand(this, i18n));
+            cm.addCommands(this, new GodCommand(pm, i18n));
         }
         if (config.add.commandHeal)
         {
-            cm.addCommands(this, new HealCommand(this, i18n, bc));
+            cm.addCommands(this, new HealCommand(pm, i18n, bc));
         }
         if (config.add.commandsInformation)
         {
-            cm.addCommands(this, new InformationCommands(this, mm, i18n));
+            cm.addCommands(this, new InformationCommands(pm, this, mm, i18n));
         }
         if (config.add.commandInvsee)
         {
-            cm.addCommands(this, new InvseeCommand(this, invGuard, i18n));
+            cm.addCommands(this, new InvseeCommand(pm, invGuard, i18n));
         }
         if (config.add.commandItemDB)
         {
@@ -171,11 +173,11 @@ public class VanillaPlus extends Module
         }
         if (config.add.commandsMovement)
         {
-            cm.addCommands(this, new MovementCommands(this, i18n));
+            cm.addCommands(this, new MovementCommands(pm, i18n));
         }
         if (config.add.commandsFood)
         {
-            cm.addCommands(this, new FoodCommands(this, i18n, bc));
+            cm.addCommands(this, new FoodCommands(pm, i18n, bc));
         }
         if (config.add.commandsPlayerInformation)
         {
@@ -183,7 +185,7 @@ public class VanillaPlus extends Module
         }
         if (config.add.commandsPlugins)
         {
-            cm.addCommands(this, new PluginCommands(i18n, this));
+            cm.addCommands(this, new PluginCommands(i18n, pm, getModularity()));
         }
         if (config.add.commandStash)
         {
@@ -197,7 +199,7 @@ public class VanillaPlus extends Module
         {
             UnlimitedItems cmd = new UnlimitedItems(i18n);
             cm.addCommands(this, cmd);
-            evm.registerListener(this, cmd);
+            evm.registerListener(VanillaPlus.class, cmd);
         }
     }
 
@@ -205,23 +207,23 @@ public class VanillaPlus extends Module
     {
         if (config.fix.styledSigns)
         {
-            evm.registerListener(this, new ColoredSigns(this));
+            evm.registerListener(VanillaPlus.class, new ColoredSigns(pm));
         }
         if (config.fix.preventOverstackedItems)
         {
-            evm.registerListener(this, new OverstackedListener(this));
+            evm.registerListener(VanillaPlus.class, new OverstackedListener(pm, this));
         }
         if (config.fix.safeLogin)
         {
-            evm.registerListener(this, new FlymodeFixListener());
+            evm.registerListener(VanillaPlus.class, new FlymodeFixListener());
         }
         if (config.fix.paintingSwitcher)
         {
-            evm.registerListener(this, new PaintingListener(this, i18n));
+            evm.registerListener(VanillaPlus.class, new PaintingListener(pm, this, i18n));
         }
         if (config.fix.showTamer)
         {
-            evm.registerListener(this, new TamedListener(i18n));
+            evm.registerListener(VanillaPlus.class, new TamedListener(i18n));
         }
     }
 
@@ -233,7 +235,7 @@ public class VanillaPlus extends Module
         }
         if (config.improve.commandButcher)
         {
-            cm.addCommands(this, new ButcherCommand(this, i18n, cm, sm));
+            cm.addCommands(this, new ButcherCommand(pm, this, i18n, cm, sm));
         }
         if (config.improve.commandSummon)
         {
@@ -241,7 +243,7 @@ public class VanillaPlus extends Module
         }
         if (config.improve.commandClearinventory)
         {
-            cm.addCommands(this, new ClearInventoryCommand(this, i18n));
+            cm.addCommands(this, new ClearInventoryCommand(pm, i18n));
         }
         if (config.improve.commandDifficulty)
         {
@@ -249,19 +251,19 @@ public class VanillaPlus extends Module
         }
         if (config.improve.commandGamemode)
         {
-            cm.addCommands(this, new GameModeCommand(this, i18n));
+            cm.addCommands(this, new GameModeCommand(pm, i18n));
         }
         if (config.improve.commandItem)
         {
-            cm.addCommands(this, new ItemCommands(this, mm, em, i18n));
+            cm.addCommands(this, new ItemCommands(pm, mm, em, i18n));
         }
         if (config.improve.commandItemModify)
         {
-            cm.addCommands(this, new ItemModifyCommands(this, i18n, em));
+            cm.addCommands(this, new ItemModifyCommands(pm, i18n));
         }
         if (config.improve.commandKill)
         {
-            cm.addCommands(this, new KillCommands(this, i18n));
+            cm.addCommands(this, new KillCommands(pm, i18n));
         }
         if (config.improve.commandOp)
         {
@@ -281,7 +283,7 @@ public class VanillaPlus extends Module
         }
         if (config.improve.commandTime)
         {
-            cm.addCommands(this, new TimeCommands(this, i18n, tm, wm, tam));
+            cm.addCommands(this, new TimeCommands(pm, i18n, tm, wm, tam));
         }
         if (config.improve.commandWeather)
         {
@@ -289,7 +291,7 @@ public class VanillaPlus extends Module
         }
         if (config.improve.commandWhitelist)
         {
-            cm.addCommand(new WhitelistCommand(this, i18n));
+            cm.addCommand(new WhitelistCommand(cm, i18n));
         }
     }
 

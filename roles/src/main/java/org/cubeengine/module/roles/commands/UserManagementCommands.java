@@ -24,6 +24,7 @@ import org.cubeengine.butler.parametric.Complete;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
@@ -52,9 +53,9 @@ public class UserManagementCommands extends ContainerCommand
     private RolesPermissionService service;
     private I18n i18n;
 
-    public UserManagementCommands(Roles module, RolesPermissionService service, I18n i18n)
+    public UserManagementCommands(CommandManager base, RolesPermissionService service, I18n i18n)
     {
-        super(module);
+        super(base, Roles.class);
         this.service = service;
         this.i18n = i18n;
     }
@@ -93,7 +94,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = {"remURole", "manUDel"})
     @Command(desc = "Removes a role from the player")
-    public void remove(CommandSource ctx, @Default Player player, RoleSubject role)
+    public void remove(CommandSource ctx, @Default User player, RoleSubject role)
     {
         if (!role.canAssignAndRemove(ctx))
         {
@@ -113,7 +114,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = {"clearURole", "manUClear"})
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in context]")
-    public void clear(CommandSource ctx, @Default Player player)
+    public void clear(CommandSource ctx, @Default User player)
     {
         player.getSubjectData().clearParents(emptySet());
         i18n.sendTranslated(ctx, NEUTRAL, "Cleared the roles of {user}.", player);
@@ -131,7 +132,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = "setUPerm")
     @Command(alias = "setPerm", desc = "Sets a permission for this user [in context]")
-    public void setPermission(CommandSource ctx, @Default Player player, @Complete(PermissionCompleter.class) String permission, @Default Tristate value, @Named("in") @Default Context context)
+    public void setPermission(CommandSource ctx, @Default User player, @Complete(PermissionCompleter.class) String permission, @Default Tristate value, @Named("in") @Default Context context)
     {
         if (value == Tristate.UNDEFINED)
         {
@@ -153,7 +154,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = "resetUPerm")
     @Command(alias = "resetPerm", desc = "Resets a permission for this user [in context]")
-    public void resetPermission(CommandSource ctx, @Default Player player, String permission, @Named("in") @Default Context context)
+    public void resetPermission(CommandSource ctx, @Default User player, String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         if (player.getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED))
@@ -167,7 +168,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = {"setUOption","setUData"})
     @Command(alias = "setData", desc = "Sets options for this user [in context]")
-    public void setOption(CommandSource ctx, @Default Player player, String key, String value, @Named("in") @Default Context context)
+    public void setOption(CommandSource ctx, @Default User player, String key, String value, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         if (((OptionSubjectData)player.getSubjectData()).setOption(contexts, key, value))
@@ -180,7 +181,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = {"resetUOption","resetUData"})
     @Command(alias = {"resetData", "deleteOption", "deleteData"}, desc = "Resets options for this user [in context]")
-    public void resetOption(CommandSource ctx, @Default Player player, String key, @Named("in") @Default Context context)
+    public void resetOption(CommandSource ctx, @Default User player, String key, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         if (((OptionSubjectData)player.getSubjectData()).setOption(contexts, key, null))
@@ -193,7 +194,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = {"clearUOption","clearUData"})
     @Command(alias = "clearData", desc = "Resets options for this user [in context]")
-    public void clearOption(CommandSource ctx, @Default Player player, @Named("in") @Default Context context)
+    public void clearOption(CommandSource ctx, @Default User player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         if (((OptionSubjectData)player.getSubjectData()).clearOptions(contexts))

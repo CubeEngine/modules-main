@@ -25,7 +25,6 @@ import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.ModulePermissions;
 import org.cubeengine.libcube.service.Broadcaster;
 import org.spongepowered.api.Game;
 
@@ -46,7 +45,7 @@ public class KickBan extends Module
     @Inject private Game game;
     @Inject private FileManager fm;
     @Inject private I18n i18n;
-    @ModulePermissions private KickBanPerms perms;
+    @Inject private KickBanPerms perms;
     @ModuleConfig private KickBanConfig config;
 
 

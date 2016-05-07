@@ -17,11 +17,13 @@
  */
 package org.cubeengine.module.locker.commands;
 
+import javax.inject.Inject;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
@@ -43,9 +45,10 @@ public class LockerCreateCommands extends ContainerCommand
     private final LockManager manager;
     private I18n i18n;
 
-    public LockerCreateCommands(Locker module, LockManager manager, I18n i18n)
+    @Inject
+    public LockerCreateCommands(CommandManager base, LockManager manager, I18n i18n)
     {
-        super(module);
+        super(base, Locker.class);
         this.manager = manager;
         this.i18n = i18n;
     }

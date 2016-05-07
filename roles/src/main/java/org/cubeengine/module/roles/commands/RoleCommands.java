@@ -17,20 +17,16 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import java.util.Collections;
-import java.util.Set;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.module.roles.Roles;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.spongepowered.api.service.context.Context;
-
-import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
+import org.cubeengine.module.roles.Roles;
 
 @Command(name = "roles", desc = "Manages the roles")
 public class RoleCommands extends ContainerCommand
 {
-    public RoleCommands(Roles module)
+    public RoleCommands(CommandManager base)
     {
-        super(module);
+        super(base, Roles.class);
     }
 }

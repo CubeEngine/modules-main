@@ -27,7 +27,9 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import javax.inject.Inject;
 import de.cubeisland.engine.logscribe.Log;
+import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
 import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesConfig;
@@ -37,6 +39,7 @@ import org.cubeengine.module.roles.service.collection.UserCollection;
 import org.cubeengine.module.roles.service.data.DefaultSubjectData;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
@@ -52,30 +55,30 @@ import static org.cubeengine.libcube.util.ContextUtil.GLOBAL;
 import static org.spongepowered.api.service.context.Context.WORLD_KEY;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
+@ServiceProvider(PermissionService.class)
 public class RolesPermissionService implements PermissionService
 {
     private final ConcurrentMap<String, SubjectCollection> collections = new ConcurrentHashMap<>();
     private final List<ContextCalculator<Subject>> calculators = new CopyOnWriteArrayList<>();
 
     private final DefaultSubjectData defaultData;
-    private Game game;
     private RolesConfig config;
     private Log logger;
 
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<String, PermissionDescription>();
     private Collection<PermissionDescription> descriptions;
 
-    public RolesPermissionService(Roles module, Reflector reflector, RolesConfig config, Game game, PermissionManager manager, Log permLogger)
+    @Inject
+    public RolesPermissionService(Roles module, Reflector reflector)
     {
-        this.game = game;
-        this.config = config;
-        logger = permLogger;
+        this.config = module.getConfiguration();
+        logger = module.getLog();
         defaultData = new DefaultSubjectData(this, config);
-        collections.put(SUBJECTS_USER, new UserCollection(this, game));
+        collections.put(SUBJECTS_USER, new UserCollection(this));
         collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, reflector));
         getGroupSubjects().reload();
-        collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM, game));
-        collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE, game));
+        collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM));
+        collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE));
     }
 
     @Override
@@ -128,7 +131,7 @@ public class RolesPermissionService implements PermissionService
     public Optional<Builder> newDescriptionBuilder(Object plugin)
     {
         // TODO somehow allow modules
-        Optional<PluginContainer> container = game.getPluginManager().fromInstance(plugin);
+        Optional<PluginContainer> container = Sponge.getPluginManager().fromInstance(plugin);
         return Optional.of(new RolesPermissionDescriptionBuilder(container.get(), this));
     }
 
@@ -153,9 +156,11 @@ public class RolesPermissionService implements PermissionService
         SubjectCollection subjects = getSubjects(SUBJECTS_ROLE_TEMPLATE); // TODO prevent infinite recursion
         roleAssignments.entrySet().forEach(e -> subjects.get(e.getKey()).getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), e.getValue()));
 
-        descriptionMap.put(desc.getId().toLowerCase(), desc);
+        if (descriptionMap.put(desc.getId().toLowerCase(), desc) == null)
+        {
+            logger.info(desc.getId().toLowerCase());
+        }
         descriptions = null;
-        logger.info(desc.getId().toLowerCase());
         return desc;
     }
 

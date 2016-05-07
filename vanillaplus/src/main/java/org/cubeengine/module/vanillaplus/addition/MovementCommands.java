@@ -21,6 +21,8 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
@@ -32,16 +34,16 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.data.key.Keys.*;
 
-public class MovementCommands extends PermissionContainer<VanillaPlus>
+public class MovementCommands extends PermissionContainer
 {
     private I18n i18n;
 
-    public final PermissionDescription COMMAND_FLY_OTHER = register("command.fly.other", "", null);
-    public final PermissionDescription COMMAND_WALKSPEED_OTHER = register("command.walkspeed.other", "Allows to change the walkspeed of other players", null);
+    public final Permission COMMAND_FLY_OTHER = register("command.fly.other", "", null);
+    public final Permission COMMAND_WALKSPEED_OTHER = register("command.walkspeed.other", "Allows to change the walkspeed of other players", null);
 
-    public MovementCommands(VanillaPlus module, I18n i18n)
+    public MovementCommands(PermissionManager pm, I18n i18n)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
     }
 

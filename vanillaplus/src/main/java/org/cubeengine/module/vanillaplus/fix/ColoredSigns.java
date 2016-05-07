@@ -17,6 +17,8 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.data.value.mutable.ListValue;
@@ -28,15 +30,15 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.serializer.TextSerializers;
 
-public class ColoredSigns extends PermissionContainer<VanillaPlus>
+public class ColoredSigns extends PermissionContainer
 {
-    public ColoredSigns(VanillaPlus module)
+    public ColoredSigns(PermissionManager pm)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
     }
 
-    public final PermissionDescription SIGN_COLORED = register("sign.colored", "", null);
-    public final PermissionDescription SIGN_STYLED = register("sign.styled", "", null);
+    public final Permission SIGN_COLORED = register("sign.colored", "", null);
+    public final Permission SIGN_STYLED = register("sign.styled", "", null);
 
     @Listener
     public void onSignChange(ChangeSignEvent event, @First Subject cause)

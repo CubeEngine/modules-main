@@ -29,6 +29,7 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.ConfigCurrency;
 import org.cubeengine.module.conomy.Conomy;
@@ -36,7 +37,7 @@ import org.cubeengine.module.conomy.ConomyService;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.command.readers.UserList;
+import org.cubeengine.libcube.service.command.readers.PlayerList;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
@@ -61,9 +62,9 @@ public class MoneyCommand extends ContainerCommand
     private ConomyService service;
     private I18n i18n;
 
-    public MoneyCommand(Conomy module, ConomyService conomy, I18n i18n)
+    public MoneyCommand(CommandManager base, Conomy module, ConomyService conomy, I18n i18n)
     {
-        super(module);
+        super(base, Conomy.class);
         this.module = module;
         this.service = conomy;
         this.i18n = i18n;
@@ -154,7 +155,7 @@ public class MoneyCommand extends ContainerCommand
 
     @Alias(value = "pay")
     @Command(alias = "give", desc = "Transfer the given amount to another account.")
-    public void pay(CommandSource context, @Label("*|<players>") UserList users, Double amount, @Default @Named("as") BaseAccount.Unique source)
+    public void pay(CommandSource context, @Label("*|<players>") PlayerList users, Double amount, @Default @Named("as") BaseAccount.Unique source)
     {
         if (amount < 0)
         {

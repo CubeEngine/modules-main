@@ -89,13 +89,13 @@ public class Portals extends Module
 
         this.portalsDir = Files.createDirectories(path.resolve("portals"));
 
-        PortalCommands portals = new PortalCommands(this, selector, reflector, i18n);
+        PortalCommands portals = new PortalCommands(cm, this, selector, reflector, i18n);
         cm.addCommand(portals);
-        portals.addCommand(new PortalModifyCommand(this, selector, game, i18n));
+        portals.addCommand(new PortalModifyCommand(cm, selector, game, i18n));
 
-        em.registerListener(this, new PortalListener(this, i18n));
+        em.registerListener(Portals.class, new PortalListener(this, i18n));
         this.loadPortals();
-        tm.runTimer(this, this::checkForEntitiesInPortals, 5, 5);
+        tm.runTimer(Portals.class, this::checkForEntitiesInPortals, 5, 5);
     }
 
     public void setRandomDestinationSetting(World world, Integer radius, Chunk center)

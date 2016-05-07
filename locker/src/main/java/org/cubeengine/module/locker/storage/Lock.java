@@ -38,6 +38,8 @@ import org.jooq.Result;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -130,22 +132,24 @@ public class Lock
 
     public void showCreatedMessage(Player user)
     {
+        int size = getLocations().size();
+        size = size == 0 ? 1 : size;
         switch (this.getLockType())
         {
         case PRIVATE:
-            i18n.sendTranslated(user, POSITIVE, "Private Lock created!");
+            i18n.sendTranslatedN(user, POSITIVE, size, "Private Lock created!", "Private Lock created! ({amount} blocks)", size);
             break;
         case PUBLIC:
-            i18n.sendTranslated(user, POSITIVE, "Public Lock created!");
+            i18n.sendTranslatedN(user, POSITIVE, size, "Public Lock created!", "Public Lock created! ({amount} blocks)", size);
             break;
         case GUARDED:
-            i18n.sendTranslated(user, POSITIVE, "Guarded Lock created!");
+            i18n.sendTranslatedN(user, POSITIVE, size, "Guarded Lock created!", "Guarded Lock created! ({amount} blocks)", size);
             break;
         case DONATION:
-            i18n.sendTranslated(user, POSITIVE, "Donation Lock created!");
+            i18n.sendTranslatedN(user, POSITIVE, size, "Donation Lock created!", "Donation Lock created! ({amount} blocks)", size);
             break;
         case FREE:
-            i18n.sendTranslated(user, POSITIVE, "Free Lock created!");
+            i18n.sendTranslatedN(user, POSITIVE, size, "Free Lock created!", "Free Lock created! ({amount} blocks)", size);
             break;
         }
     }
@@ -190,7 +194,7 @@ public class Lock
             i18n.sendTranslated(player, NEGATIVE, "Could not create KeyBook! You need to hold a book in your hand in order to do this!");
             return;
         }
-        ItemStack item = module.getGame().getRegistry().createBuilder(ItemStack.Builder.class).itemType(ENCHANTED_BOOK).quantity(1).build();
+        ItemStack item = Sponge.getRegistry().createBuilder(ItemStack.Builder.class).itemType(ENCHANTED_BOOK).quantity(1).build();
         item.offer(Keys.DISPLAY_NAME, KeyBook.TITLE.toBuilder().append(Text.of(TextColors.DARK_GRAY, getId())).build());
         item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(player, NEUTRAL, "This book can"),
                 i18n.getTranslation(player, NEUTRAL, "unlock a magically"),
@@ -363,11 +367,13 @@ public class Lock
         if (this.getLockType() == PUBLIC)
         {
             this.doorUse(user, clickedDoor);
+            event.setCancelled(true);
             return; // Allow everything
         }
         if (this.handleAccess(user, clickedDoor, event))
         {
             this.doorUse(user, clickedDoor);
+            event.setCancelled(true);
             return;
         }
         if (event.isCancelled()) return;
@@ -399,6 +405,7 @@ public class Lock
             return;
         } // else has access
         this.doorUse(user, clickedDoor);
+        event.setCancelled(true);
     }
 
     private AccessListModel getAccess(User user)
@@ -476,7 +483,7 @@ public class Lock
             {
                 inventoryGuardFactory.blockTakeOutAll();
             }
-            inventoryGuardFactory.submitInventory(this.manager.module, false);
+            inventoryGuardFactory.submitInventory(Locker.class, false);
 
             this.notifyUsage(user);
             updateAccess();
@@ -870,10 +877,18 @@ public class Lock
 
         for (Location door : locations)
         {
-            if (door.get(Keys.PORTION_TYPE).get() == PortionTypes.TOP)
+            BlockState block = door.getBlock();
+            Optional<? extends Enum<?>> halfTrait = block.getTraitValue(EnumTraits.WOODEN_DOOR_HALF);
+            if (halfTrait.isPresent() && halfTrait.get().name().equals("UPPER"))
             {
                 continue;
             }
+            /*
+            if (door.get(Keys.PORTION_TYPE).get() == PortionTypes.TOP) // TODO use once implemented
+            {
+                continue;
+            }
+            */
             if (open)
             {
                 door.offer(Keys.OPEN, false);
@@ -885,7 +900,7 @@ public class Lock
                 user.playSound(SoundTypes.DOOR_OPEN, door.getPosition(), 1);
             }
         }
-        if (taskId != null) module.getTaskManager().cancelTask(this.manager.module, taskId);
+        if (taskId != null) module.getTaskManager().cancelTask(Locker.class, taskId);
         if (!open)
         {
             this.scheduleAutoClose();
@@ -898,7 +913,7 @@ public class Lock
         if (this.hasFlag(ProtectionFlag.AUTOCLOSE))
         {
             if (!this.manager.module.getConfig().autoCloseEnable) return;
-            taskId = module.getTaskManager().runTaskDelayed(this.manager.module, () -> {
+            taskId = module.getTaskManager().runTaskDelayed(Locker.class, () -> {
                 int n = locations.size() / 2;
                 for (Location location : locations)
                 {

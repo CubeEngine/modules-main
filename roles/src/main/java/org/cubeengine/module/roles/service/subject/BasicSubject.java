@@ -23,6 +23,7 @@ import java.util.Set;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.BaseSubjectData;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -31,13 +32,11 @@ import org.spongepowered.api.service.permission.SubjectCollection;
 public class BasicSubject extends BaseSubject<BaseSubjectData>
 {
     private String identifier;
-    private Game game;
 
-    public BasicSubject(String identifier, SubjectCollection collection, RolesPermissionService service, Game game)
+    public BasicSubject(String identifier, SubjectCollection collection, RolesPermissionService service)
     {
         super(collection, service, new BaseSubjectData(service));
         this.identifier = identifier;
-        this.game = game;
     }
 
     @Override
@@ -51,7 +50,7 @@ public class BasicSubject extends BaseSubject<BaseSubjectData>
     {
         if (identifier.equals("Server"))
         {
-            return Optional.of(game.getServer().getConsole());
+            return Optional.of(Sponge.getServer().getConsole());
         }
         if (identifier.equals("RCON"))
         {

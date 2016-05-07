@@ -20,12 +20,14 @@ package org.cubeengine.module.vanillaplus.addition;
 import java.util.Collection;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.libcube.service.command.readers.UserList;
+import org.cubeengine.libcube.service.command.readers.PlayerList;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -34,22 +36,22 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
-public class HealCommand extends PermissionContainer<VanillaPlus>
+public class HealCommand extends PermissionContainer
 {
     private I18n i18n;
     private Broadcaster bc;
 
-    public HealCommand(VanillaPlus module, I18n i18n, Broadcaster bc)
+    public HealCommand(PermissionManager pm, I18n i18n, Broadcaster bc)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
         this.bc = bc;
     }
 
-    public final PermissionDescription COMMAND_HEAL_OTHER = register("command.heal.other", "", null);
+    public final Permission COMMAND_HEAL_OTHER = register("command.heal.other", "", null);
 
     @Command(desc = "Heals a player")
-    public void heal(CommandSource context, @Optional UserList players)
+    public void heal(CommandSource context, @Optional PlayerList players)
     {
         if (players == null)
         {

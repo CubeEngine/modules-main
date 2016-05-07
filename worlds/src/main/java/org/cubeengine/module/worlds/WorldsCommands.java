@@ -23,12 +23,14 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import javax.inject.Inject;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableMap;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
@@ -73,9 +75,10 @@ public class WorldsCommands extends ContainerCommand
 {
     private I18n i18n;
 
-    public WorldsCommands(Worlds module, I18n i18n)
+    @Inject
+    public WorldsCommands(CommandManager cm, I18n i18n)
     {
-        super(module);
+        super(cm, Worlds.class);
         this.i18n = i18n;
     }
 

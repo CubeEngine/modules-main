@@ -25,6 +25,8 @@ import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;
@@ -55,9 +57,9 @@ public class BankCommand extends ContainerCommand
     private BankConomyService service;
     private I18n i18n;
 
-    public BankCommand(Conomy module, BankConomyService service, I18n i18n)
+    public BankCommand(CommandManager base, BankConomyService service, I18n i18n)
     {
-        super(module);
+        super(base, Conomy.class);
         this.service = service;
         this.i18n = i18n;
     }

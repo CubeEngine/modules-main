@@ -25,18 +25,16 @@ import org.spongepowered.api.service.permission.option.OptionSubject;
 public class BasicSubjectCollection  extends BaseSubjectCollection<OptionSubject>
 {
     private RolesPermissionService service;
-    private Game game;
 
-    public BasicSubjectCollection(RolesPermissionService service, String identifier, Game game)
+    public BasicSubjectCollection(RolesPermissionService service, String identifier)
     {
         super(identifier);
         this.service = service;
-        this.game = game;
     }
 
     @Override
     protected OptionSubject createSubject(String identifier)
     {
-        return new BasicSubject(identifier, this, service, game);
+        return new BasicSubject(identifier, this, service);
     }
 }

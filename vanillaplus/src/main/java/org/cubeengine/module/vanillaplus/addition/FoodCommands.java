@@ -20,12 +20,14 @@ package org.cubeengine.module.vanillaplus.addition;
 import java.util.Collection;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.libcube.service.command.readers.UserList;
+import org.cubeengine.libcube.service.command.readers.PlayerList;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
@@ -37,24 +39,24 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.text.format.TextColors.GREEN;
 import static org.spongepowered.api.text.format.TextFormat.NONE;
 
-public class FoodCommands extends PermissionContainer<VanillaPlus>
+public class FoodCommands extends PermissionContainer
 {
 
     private I18n i18n;
     private Broadcaster bc;
 
-    public final PermissionDescription COMMAND_FEED_OTHER = register("command.feed.other", "", null);
-    public final PermissionDescription COMMAND_STARVE_OTHER = register("command.starve.other", "", null);
+    public final Permission COMMAND_FEED_OTHER = register("command.feed.other", "", null);
+    public final Permission COMMAND_STARVE_OTHER = register("command.starve.other", "", null);
 
-    public FoodCommands(VanillaPlus module, I18n i18n, Broadcaster bc)
+    public FoodCommands(PermissionManager pm, I18n i18n, Broadcaster bc)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
         this.bc = bc;
     }
 
     @Command(desc = "Refills your hunger bar")
-    public void feed(CommandSource context, @Optional UserList players)
+    public void feed(CommandSource context, @Optional PlayerList players)
     {
         if (players == null)
         {
@@ -102,7 +104,7 @@ public class FoodCommands extends PermissionContainer<VanillaPlus>
     }
 
     @Command(desc = "Empties the hunger bar")
-    public void starve(CommandSource context, @Optional UserList players)
+    public void starve(CommandSource context, @Optional PlayerList players)
     {
         if (players == null)
         {

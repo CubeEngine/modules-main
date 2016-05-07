@@ -20,6 +20,8 @@ package org.cubeengine.module.vanillaplus.improvement;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
@@ -32,15 +34,15 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.data.key.Keys.GAME_MODE;
 import static org.spongepowered.api.entity.living.player.gamemode.GameModes.*;
 
-public class GameModeCommand extends PermissionContainer<VanillaPlus>
+public class GameModeCommand extends PermissionContainer
 {
     private I18n i18n;
 
-    public final PermissionDescription COMMAND_GAMEMODE_OTHER = register("command.gamemode.other", "Allows to change the game-mode of other players too", null);
+    public final Permission COMMAND_GAMEMODE_OTHER = register("command.gamemode.other", "Allows to change the game-mode of other players too");
 
-    public GameModeCommand(VanillaPlus module, I18n i18n)
+    public GameModeCommand(PermissionManager pm, I18n i18n)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
     }
 

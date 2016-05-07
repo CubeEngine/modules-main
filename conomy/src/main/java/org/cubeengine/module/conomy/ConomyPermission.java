@@ -17,20 +17,24 @@
  */
 package org.cubeengine.module.conomy;
 
+import javax.inject.Inject;
+import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.spongepowered.api.service.permission.PermissionDescription;
 
 @SuppressWarnings("all")
-public class ConomyPermission extends PermissionContainer<Conomy>
+public class ConomyPermission extends PermissionContainer
 {
-    public ConomyPermission(Conomy module)
+    @Inject
+    public ConomyPermission(PermissionManager pm)
     {
-        super(module);
+        super(pm, Conomy.class);
     }
 
-    private final PermissionDescription ALLOWUNDERMIN = register("account.user.allow-under-min", "", null);
+    private final Permission ALLOWUNDERMIN = register("account.user.allow-under-min", "", null);
 
-    private final PermissionDescription ACCESS = register("access.other.player", "Grants full access to all player accounts", null);
-    public final PermissionDescription ACCESS_WITHDRAW = register("withdraw", "Allows transfering money from anothers players account", ACCESS);
-    public final PermissionDescription ACCESS_SEE = register("seehidden", "Allows seeing hidden player accounts", ACCESS, ACCESS_WITHDRAW);
+    private final Permission ACCESS = register("access.other.player", "Grants full access to all player accounts", null);
+    public final Permission ACCESS_WITHDRAW = register("withdraw", "Allows transfering money from anothers players account", ACCESS);
+    public final Permission ACCESS_SEE = register("seehidden", "Allows seeing hidden player accounts", ACCESS, ACCESS_WITHDRAW);
 }

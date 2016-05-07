@@ -17,6 +17,8 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.entity.living.player.Player;
@@ -30,14 +32,17 @@ import org.spongepowered.api.service.permission.PermissionDescription;
  * <p></p>
  * Prevents placing overstacked items into anvil or brewingstands
  */
-public class OverstackedListener extends PermissionContainer<VanillaPlus>
+public class OverstackedListener extends PermissionContainer
 {
-    public OverstackedListener(VanillaPlus module)
+    private final VanillaPlus module;
+
+    public OverstackedListener(PermissionManager pm, VanillaPlus module)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
+        this.module = module;
     }
 
-    public final PermissionDescription OVERSTACKED_ANVIL_AND_BREWING = register("allow-overstacked-anvil-and-brewing", "", null);
+    public final Permission OVERSTACKED_ANVIL_AND_BREWING = register("allow-overstacked-anvil-and-brewing", "", null);
 
 
 

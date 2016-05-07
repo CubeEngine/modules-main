@@ -25,6 +25,7 @@ import org.cubeengine.butler.parameter.FixedValues;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.portals.config.Destination;
@@ -51,9 +52,9 @@ public class PortalCommands extends ContainerCommand
     private Reflector reflector;
     private I18n i18n;
 
-    public PortalCommands(Portals module, Selector selector, Reflector reflector, I18n i18n)
+    public PortalCommands(CommandManager base, Portals module, Selector selector, Reflector reflector, I18n i18n)
     {
-        super(module);
+        super(base, Portals.class);
         this.module = module;
         this.selector = selector;
         this.reflector = reflector;

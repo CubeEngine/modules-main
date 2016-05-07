@@ -27,6 +27,8 @@ import org.cubeengine.butler.exception.SilentException;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.DefaultValue;
 import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
@@ -57,29 +59,29 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.text.format.TextFormat.NONE;
 
-public class LivingFilterReader extends PermissionContainer<VanillaPlus> implements ArgumentReader<LivingFilter>, DefaultValue<LivingFilter>
+public class LivingFilterReader extends PermissionContainer implements ArgumentReader<LivingFilter>, DefaultValue<LivingFilter>
 {
     private I18n i18n;
     private StringMatcher sm;
 
-    public LivingFilterReader(VanillaPlus module, I18n i18n, StringMatcher sm)
+    public LivingFilterReader(PermissionManager pm, I18n i18n, StringMatcher sm)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
         this.sm = sm;
     }
 
-    private final PermissionDescription BASEPERM_FLAG = register("command.butcher.flag", "", null);
-    public final PermissionDescription PERM_HOSTILE = register("hostile", "", BASEPERM_FLAG);
-    public final PermissionDescription PERM_MONSTER = register("monster", "", BASEPERM_FLAG);
-    public final PermissionDescription PERM_BOSS = register("boss", "", BASEPERM_FLAG);
-    public final PermissionDescription PERM_ANIMAL = register("animal", "", BASEPERM_FLAG);
-    public final PermissionDescription PERM_NPC = register("npc", "", BASEPERM_FLAG);
-    public final PermissionDescription PERM_PET = register("pet", "", BASEPERM_FLAG);
-    public final PermissionDescription PERM_GOLEM = register("golem", "", BASEPERM_FLAG);
-    public final PermissionDescription PERM_AMBIENT = register("ambient", "", BASEPERM_FLAG);
+    private final Permission BASEPERM_FLAG = register("command.butcher.flag", "", null);
+    public final Permission PERM_HOSTILE = register("hostile", "", BASEPERM_FLAG);
+    public final Permission PERM_MONSTER = register("monster", "", BASEPERM_FLAG);
+    public final Permission PERM_BOSS = register("boss", "", BASEPERM_FLAG);
+    public final Permission PERM_ANIMAL = register("animal", "", BASEPERM_FLAG);
+    public final Permission PERM_NPC = register("npc", "", BASEPERM_FLAG);
+    public final Permission PERM_PET = register("pet", "", BASEPERM_FLAG);
+    public final Permission PERM_GOLEM = register("golem", "", BASEPERM_FLAG);
+    public final Permission PERM_AMBIENT = register("ambient", "", BASEPERM_FLAG);
 
-    public final PermissionDescription PERM_ALLTYPE = register("command.butcher.alltypes", "", null);
+    public final Permission PERM_ALLTYPE = register("command.butcher.alltypes", "", null);
 
     private final Predicate<Entity> FILTER_HOSTILE = entity -> entity instanceof Hostile;
     private final Predicate<Entity> FILTER_MONSTER = entity -> entity instanceof Hostile && !(entity instanceof Boss);
@@ -90,7 +92,7 @@ public class LivingFilterReader extends PermissionContainer<VanillaPlus> impleme
     private final Predicate<Entity> FILTER_GOLEM = entity -> entity instanceof Golem;
     private final Predicate<Entity> FILTER_AMBIENT = entity -> entity instanceof Ambient;
 
-    private Map<Predicate<Entity>, PermissionDescription> predicatePerms = new HashMap<>();
+    private Map<Predicate<Entity>, Permission> predicatePerms = new HashMap<>();
 
     {
         predicatePerms.put(FILTER_HOSTILE, PERM_HOSTILE);
@@ -103,7 +105,7 @@ public class LivingFilterReader extends PermissionContainer<VanillaPlus> impleme
         predicatePerms.put(FILTER_AMBIENT, PERM_AMBIENT);
     }
 
-    private Map<EntityType, PermissionDescription> typePerms = new HashMap<>();
+    private Map<EntityType, Permission> typePerms = new HashMap<>();
 
     {
         for (EntityType type : Sponge.getRegistry().getAllOf(EntityType.class))
@@ -192,7 +194,7 @@ public class LivingFilterReader extends PermissionContainer<VanillaPlus> impleme
                     throw new SilentException();
                 }
                 EntityType type = map.get(match);
-                PermissionDescription perm = typePerms.get(type);
+                Permission perm = typePerms.get(type);
                 if (!source.hasPermission(perm.getId()))
                 {
                     throw new PermissionDeniedException(perm);
@@ -205,7 +207,7 @@ public class LivingFilterReader extends PermissionContainer<VanillaPlus> impleme
             else
             {
                 Predicate<Entity> predicate = groupMap.get(match);
-                PermissionDescription perm = predicatePerms.get(predicate);
+                Permission perm = predicatePerms.get(predicate);
                 if (!source.hasPermission(perm.getId()))
                 {
                     throw new PermissionDeniedException(perm);

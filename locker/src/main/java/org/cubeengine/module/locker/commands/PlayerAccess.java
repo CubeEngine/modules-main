@@ -25,6 +25,7 @@ import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -46,13 +47,6 @@ public class PlayerAccess
 
     public static class PlayerAccessReader implements ArgumentReader<PlayerAccess>, Completer
     {
-        private Game game;
-
-        public PlayerAccessReader(Game game)
-        {
-            this.game = game;
-        }
-
         @Override
         public PlayerAccess read(Class clazz, CommandInvocation invocation) throws ReaderException
         {
@@ -62,9 +56,9 @@ public class PlayerAccess
 
             token = admin || !add ? token.substring(1) : token;
 
-            User user = game.getServer().getPlayer(token)
-                    .map(User.class::cast)
-                    .orElse(game.getServiceManager().provideUnchecked(UserStorageService.class).get(token)
+            User user = Sponge.getServer().getPlayer(token)
+                              .map(User.class::cast)
+                              .orElse(Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(token)
                             .orElse(null));
 
             if (user == null)
@@ -102,7 +96,7 @@ public class PlayerAccess
 
                 final String name = token;
                 final String pre = prefix;
-                list.addAll(game.getServer().getOnlinePlayers().stream()
+                list.addAll(Sponge.getServer().getOnlinePlayers().stream()
                         .map(Player::getName)
                         .filter(p -> p.startsWith(name))
                         .map(p -> join + pre + p)

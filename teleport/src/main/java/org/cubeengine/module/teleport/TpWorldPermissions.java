@@ -19,9 +19,10 @@ package org.cubeengine.module.teleport;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.World;
 
@@ -29,33 +30,33 @@ import org.spongepowered.api.world.World;
  * Dynamically registered Permissions for each world.
  */
 @SuppressWarnings("all")
-public class TpWorldPermissions extends PermissionContainer<Teleport>
+public class TpWorldPermissions extends PermissionContainer
 {
-    private final Map<String, PermissionDescription> permissions = new HashMap<>();
+    private final Map<String, Permission> permissions = new HashMap<>();
     private TeleportPerm perm;
     private PermissionManager pm;
 
-    public TpWorldPermissions(Teleport module, TeleportPerm perm, Game game, PermissionManager pm)
+    public TpWorldPermissions(TeleportPerm perm, PermissionManager pm)
     {
-        super(module);
+        super(pm, Teleport.class);
         this.perm = perm;
         this.pm = pm;
-        for (final World world : game.getServer().getWorlds())
+        for (final World world : Sponge.getServer().getWorlds())
         {
             initWorldPermission(world.getName());
         }
     }
 
-    private PermissionDescription initWorldPermission(String world)
+    private Permission initWorldPermission(String world)
     {
-        PermissionDescription worldPerm = register("tpworld." + world, "", perm.COMMAND);
+        Permission worldPerm = register("tpworld." + world, "", perm.COMMAND);
         permissions.put(world, worldPerm);
         return worldPerm;
     }
 
-    public PermissionDescription getPermission(String world)
+    public Permission getPermission(String world)
     {
-        PermissionDescription perm = permissions.get(world);
+        Permission perm = permissions.get(world);
         if (perm == null)
         {
             perm = initWorldPermission(world);

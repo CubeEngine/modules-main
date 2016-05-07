@@ -65,6 +65,8 @@ import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -88,22 +90,23 @@ public class Roles extends Module
     @Inject private Log logger;
     @Inject private CommandManager cm;
     @Inject private FileManager fm;
-    @Inject private Game game;
     @Inject private I18n i18n;
-    @Inject private PermissionManager manager;
 
     @Inject private LogFactory factory;
     @Inject private ThreadFactory threadFactory;
-
-    private RolesPermissionService service;
+    @Inject private PluginContainer plugin;
 
     private Log permLogger;
+    private RolesPermissionService service;
+
+    public Roles()
+    {
+        Sponge.getDataManager().register(PermissionData.class, ImmutablePermissionData.class, new PermissionDataBuilder());
+    }
 
     @Setup
     public void onSetup()
     {
-        game.getDataManager().register(PermissionData.class, ImmutablePermissionData.class, new PermissionDataBuilder());
-
         cm.getProviderManager().getExceptionHandler().addHandler(new RolesExceptionHandler(i18n));
         this.permLogger = factory.getLog(LogFactory.class, "Permissions");
         this.permLogger.addTarget(new AsyncFileTarget(getLogFile(fm, "Permissions"), getFileFormat(false, false), false, getCycler(), threadFactory));
@@ -114,21 +117,10 @@ public class Roles extends Module
 
         this.config = fm.loadConfig(this, RolesConfig.class);
 
-        service = new RolesPermissionService(this, reflector, config, game, manager, permLogger);
+        service = (RolesPermissionService)getModularity().provide(PermissionService.class);
 
-        ValueProvider<SettableInvocationHandler> provider = new InvocationHandlerProvider(new SettableInvocationHandler());
-        getModularity().registerProvider(SettableInvocationHandler.class, provider);
-
-        SettableInvocationHandler handler = getProvided(SettableInvocationHandler.class).with(service);
-        handler.meta.forEach(service::registerContextCalculator); // read contextcalculators
-
-        Optional<PermissionService> previous = game.getServiceManager().provide(PermissionService.class);
-
-        PermissionService proxy = (PermissionService)Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{PermissionService.class}, handler);
-
-        Object plugin = game.getPluginManager().getPlugin("org.cubeengine").get().getInstance().get();
-
-        game.getServiceManager().setProvider(plugin, PermissionService.class, proxy);
+        Optional<PermissionService> previous = Sponge.getServiceManager().provide(PermissionService.class);
+        Sponge.getServiceManager().setProvider(plugin.getInstance().get(), PermissionService.class, service);
         if (previous.isPresent())
         {
             if (!previous.get().getClass().getName().equals(RolesPermissionService.class.getName()))
@@ -147,22 +139,16 @@ public class Roles extends Module
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
         cm.getProviderManager().register(this, new PermissionCompleter(service));
 
-        RoleCommands cmdRoles = new RoleCommands(this);
+        RoleCommands cmdRoles = new RoleCommands(cm);
         cm.addCommand(cmdRoles);
-        RoleManagementCommands cmdRole = new RoleManagementCommands(this, service, i18n);
+        RoleManagementCommands cmdRole = new RoleManagementCommands(cm, service, i18n);
         cmdRoles.addCommand(cmdRole);
-        cm.addCommands(cmdRole, this, new RoleInformationCommands(this, service, i18n));
+        cm.addCommands(cmdRole, this, new RoleInformationCommands(cm, service, i18n));
 
-        UserManagementCommands cmdUsers = new UserManagementCommands(this, service, i18n);
+        UserManagementCommands cmdUsers = new UserManagementCommands(cm, service, i18n);
         cmdRoles.addCommand(cmdUsers);
-        cm.addCommands(cmdUsers, this, new UserInformationCommands(this, i18n, service));
-        cmdRoles.addCommand(new ManagementCommands(this, service, i18n));
-    }
-
-    @Disable
-    public void onDisable()
-    {
-        getProvided(SettableInvocationHandler.class).with(null).and(service.getContextCalculators());
+        cm.addCommands(cmdUsers, this, new UserInformationCommands(cm, i18n, service));
+        cmdRoles.addCommand(new ManagementCommands(cm, this, service, i18n));
     }
 
     public RolesConfig getConfiguration()
@@ -173,52 +159,5 @@ public class Roles extends Module
     public Log getLog()
     {
         return logger;
-    }
-
-    private static class SettableInvocationHandler implements InvocationHandler
-    {
-        private Object target;
-        private List<ContextCalculator<Subject>> meta = Collections.emptyList();
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable
-        {
-            try
-            {
-                return method.invoke(target, args);
-            }
-            catch (InvocationTargetException e)
-            {
-                throw e.getCause();
-            }
-        }
-
-        public SettableInvocationHandler with(Object target)
-        {
-            this.target = target;
-            return this;
-        }
-
-        public SettableInvocationHandler and(List<ContextCalculator<Subject>> meta)
-        {
-            this.meta = meta;
-            return this;
-        }
-    }
-
-    private static class InvocationHandlerProvider implements ValueProvider<SettableInvocationHandler>
-    {
-        private SettableInvocationHandler handler;
-
-        public InvocationHandlerProvider(SettableInvocationHandler handler)
-        {
-            this.handler = handler;
-        }
-
-        @Override
-        public SettableInvocationHandler get(LifeCycle lifeCycle, Modularity modularity)
-        {
-            return handler;
-        }
     }
 }

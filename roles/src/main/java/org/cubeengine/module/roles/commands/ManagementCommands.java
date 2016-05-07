@@ -20,6 +20,7 @@ package org.cubeengine.module.roles.commands;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
@@ -42,9 +43,9 @@ public class ManagementCommands extends ContainerCommand
     private RolesPermissionService service;
     private I18n i18n;
 
-    public ManagementCommands(Roles module, RolesPermissionService service, I18n i18n)
+    public ManagementCommands(CommandManager base, Roles module, RolesPermissionService service, I18n i18n)
     {
-        super(module);
+        super(base, Roles.class);
         this.module = module;
         this.service = service;
         this.i18n = i18n;

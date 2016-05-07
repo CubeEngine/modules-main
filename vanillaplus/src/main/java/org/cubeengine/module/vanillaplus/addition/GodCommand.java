@@ -19,6 +19,8 @@ package org.cubeengine.module.vanillaplus.addition;
 
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
@@ -32,15 +34,15 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 /**
  * Provides Gamemodelike Protection
  */
-public class GodCommand extends PermissionContainer<VanillaPlus>
+public class GodCommand extends PermissionContainer
 {
     private I18n i18n;
-    public final PermissionDescription COMMAND_GOD_OTHER = register("command.god.other",
-                                                                    "Allows to enable god-mode for other players", null);
+    public final Permission COMMAND_GOD_OTHER = register("command.god.other",
+                                                         "Allows to enable god-mode for other players", null);
 
-    public GodCommand(VanillaPlus module, I18n i18n)
+    public GodCommand(PermissionManager pm, I18n i18n)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
     }
 

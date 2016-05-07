@@ -22,8 +22,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import de.cubeisland.engine.modularity.core.LifeCycle;
+import de.cubeisland.engine.modularity.core.Modularity;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
@@ -41,28 +44,29 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.text.format.TextColors.GREEN;
 import static org.spongepowered.api.text.format.TextColors.RESET;
 
-public class PluginCommands extends PermissionContainer<VanillaPlus>
+public class PluginCommands extends PermissionContainer
 {
     private I18n i18n;
+    private Modularity modularity;
 
-    public PluginCommands(I18n i18n, VanillaPlus module)
+    public PluginCommands(I18n i18n, PermissionManager pm, Modularity modularity)
     {
-        super(module);
+        super(pm, VanillaPlus.class);
         this.i18n = i18n;
+        this.modularity = modularity;
     }
 
-    private final PermissionDescription COMMAND_VERSION_PLUGINS = register("command.version.plugins", "", null);
+    private final Permission COMMAND_VERSION_PLUGINS = register("command.version.plugins", "", null);
 
     @Command(desc = "Lists all loaded plugins")
     public void plugins(CommandSource context)
     {
         Collection<PluginContainer> plugins = Sponge.getPluginManager().getPlugins();
-        Set<LifeCycle> modules = this.module.getModularity().getModules();
+        Set<LifeCycle> modules = modularity.getModules();
 
-        i18n.sendTranslated(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:",
-                            plugins.size(), modules.size());
+        i18n.sendTranslated(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:", plugins.size(), modules.size());
         context.sendMessage(Text.EMPTY);
-        context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", RESET, " (" + module.getInformation().getVersion() + ")"));
+        // TODO context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", RESET, " (" + module.getInformation().getVersion() + ")"));
 
         for (LifeCycle m : modules)
         {
@@ -99,7 +103,7 @@ public class PluginCommands extends PermissionContainer<VanillaPlus>
             i18n.sendTranslated(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getApi().getVersion());
             i18n.sendTranslated(context, NEUTRAL, "implemented by {input#name} {input#version:color=INDIGO}", platform.getImplementation().getName(), platform.getImplementation().getVersion());
             context.sendMessage(Text.EMPTY);
-            i18n.sendTranslated(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", module.getInformation().getVersion());
+            // TODO i18n.sendTranslated(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", module.getInformation().getVersion());
             return;
         }
         if (context.hasPermission(COMMAND_VERSION_PLUGINS.getId()))

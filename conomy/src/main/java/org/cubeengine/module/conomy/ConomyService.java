@@ -274,7 +274,7 @@ public class ConomyService implements EconomyService, CatalogRegistryModule<Curr
     public void registerCommands(CommandManager cm, I18n i18n)
     {
         cm.getProviderManager().register(module, new UniqueAccountReader(module, this, i18n), BaseAccount.Unique.class);
-        cm.addCommand(new MoneyCommand(module, this, i18n));
-        cm.addCommand(new EcoCommand(module, this, i18n));
+        cm.addCommand(new MoneyCommand(cm, module, this, i18n));
+        cm.addCommand(new EcoCommand(cm, this, i18n));
     }
 }
