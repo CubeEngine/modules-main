@@ -154,4 +154,20 @@ public class LockerAdminCommands extends ContainerCommand
     {
         // find & show all protections of a user/selection
     }
+
+    // TODO reload cmd
+     /*
+        this.onDisable();
+        this.config = this.loadConfig(LockerConfig.class);
+        Database db = this.getCore().getDB();
+        db.registerTable(TableLocks.class);
+        db.registerTable(TableLockLocations.class);
+        db.registerTable(TableAccessList.class);
+        manager = new LockManager(this);
+        LockerCommands lockerCmd = new LockerCommands(this, manager);
+        this.getCore().getCommandManager().addCommand(lockerCmd);
+        lockerCmd.addCommand(new LockerCreateCommands(this, manager));
+        lockerCmd.addCommand(new LockerAdminCommands(this, manager));
+        listener = new LockerListener(this, manager);
+        */
 }

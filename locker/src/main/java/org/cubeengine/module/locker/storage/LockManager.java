@@ -59,13 +59,12 @@ import org.jooq.Batch;
 import org.jooq.Condition;
 import org.jooq.Result;
 import org.jooq.types.UInteger;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.Hinge;
-import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
@@ -104,7 +103,6 @@ public class LockManager
 
     protected TaskManager tm;
     private I18n i18n;
-    private org.spongepowered.api.Game game;
     private final StringMatcher stringMatcher;
     protected Log logger;
     public final CommandListener commandListener;
@@ -131,13 +129,12 @@ public class LockManager
     private Future<?> unloadFuture = null;
 
     @Inject
-    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, TaskManager tm, I18n i18n, Game game)
+    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, TaskManager tm, I18n i18n)
     {
         this.stringMatcher = stringMatcher;
         this.database = database;
         this.tm = tm;
         this.i18n = i18n;
-        this.game = game;
         logger = module.getProvided(Log.class);
         this.module = module;
         loadExecutor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));
@@ -242,7 +239,7 @@ public class LockManager
         for (LockModel model : models)
         {
             Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
-            Lock lock = new Lock(this, model, i18n, lockLoc, game);
+            Lock lock = new Lock(this, model, i18n, lockLoc);
             addLoadedLocationLock(lock);
             System.out.print("Lock loaded at: " + lock.getFirstLocation().getPosition() + "\n");
         }
@@ -391,7 +388,7 @@ public class LockManager
                                                                       TABLE_LOCK.ENTITY_UID_MOST.eq(uniqueId.getMostSignificantBits())).fetchOne();
             if (model != null)
             {
-                lock = new Lock(this, model, i18n, game);
+                lock = new Lock(this, model, i18n);
                 this.loadedEntityLocks.put(uniqueId, lock);
             }
         }
@@ -591,7 +588,7 @@ public class LockManager
                               .map(loc -> database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(model, loc))
                               .map(AsyncRecord::insertAsync).toArray(CompletableFuture[]::new))
               .thenApply((v) -> {
-            Lock lock = new Lock(this, model, i18n, locations, game);
+            Lock lock = new Lock(this, model, i18n, locations);
             this.addLoadedLocationLock(lock);
             lock.showCreatedMessage(user);
             lock.attemptCreatingKeyBook(user, createKeyBook);
@@ -615,7 +612,7 @@ public class LockManager
         LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(entity.getType()), entity.getUniqueId());
         model.createPassword(this, password);
         return model.insertAsync().thenApply(m -> {
-            Lock lock = new Lock(this, model, i18n, game);
+            Lock lock = new Lock(this, model, i18n);
             this.loadedEntityLocks.put(entity.getUniqueId(), lock);
             this.locksById.put(lock.getId(), lock);
             lock.showCreatedMessage(user);
@@ -715,9 +712,9 @@ public class LockManager
                                                       .fetch();
             if (fetch.isEmpty())
             {
-                return new Lock(this, lockModel, i18n, game);
+                return new Lock(this, lockModel, i18n);
             }
-            return new Lock(this, lockModel, i18n, fetch, game);
+            return new Lock(this, lockModel, i18n, fetch);
         }
         return null;
     }
@@ -777,7 +774,7 @@ public class LockManager
 
         loadedChunks.clear();
 
-        for (World world : game.getServer().getWorlds())
+        for (World world : Sponge.getServer().getWorlds())
         {
             for (Chunk chunk : world.getLoadedChunks())
             {

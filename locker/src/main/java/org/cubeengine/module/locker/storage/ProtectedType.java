@@ -26,15 +26,16 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.monster.Monster;
 
+import static org.cubeengine.module.locker.storage.ProtectionFlag.*;
 import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.entity.EntityTypes.*;
 
 public enum ProtectedType
 {
-    CONTAINER(1, ProtectionFlag.HOPPER_IN, ProtectionFlag.HOPPER_MINECART_IN, ProtectionFlag.HOPPER_MINECART_OUT, ProtectionFlag.HOPPER_OUT),
-    DOOR(2, ProtectionFlag.BLOCK_REDSTONE, ProtectionFlag.AUTOCLOSE),
-    BLOCK(3, ProtectionFlag.BLOCK_REDSTONE),
-    ENTITY_CONTAINER(4, ProtectionFlag.HOPPER_IN, ProtectionFlag.HOPPER_MINECART_IN, ProtectionFlag.HOPPER_MINECART_OUT, ProtectionFlag.HOPPER_OUT),
+    CONTAINER(1, HOPPER_IN, HOPPER_MINECART_IN, HOPPER_MINECART_OUT, HOPPER_OUT, BLOCK_REDSTONE),
+    DOOR(2, BLOCK_REDSTONE, AUTOCLOSE),
+    BLOCK(3, BLOCK_REDSTONE),
+    ENTITY_CONTAINER(4, HOPPER_IN, HOPPER_MINECART_IN, HOPPER_MINECART_OUT, HOPPER_OUT),
     ENTITY_LIVING(5),
     ENTITY_VEHICLE(6),
     ENTITY(7),

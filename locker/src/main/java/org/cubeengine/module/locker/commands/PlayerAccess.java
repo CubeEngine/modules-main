@@ -24,6 +24,7 @@ import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
 import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.libcube.util.StringUtils;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -74,7 +75,7 @@ public class PlayerAccess
         public List<String> getSuggestions(CommandInvocation invocation)
         {
             List<String> list = new ArrayList<>();
-            String[] parts = invocation.currentToken().split(",");
+            String[] parts = StringUtils.explode(",", invocation.currentToken(), true);
 
             String token = parts[parts.length - 1];
 
@@ -85,7 +86,7 @@ public class PlayerAccess
             }
             else
             {
-                String join = String.join(",", Arrays.copyOfRange(parts, 0, parts.length - 2)) + ",";
+                String join = String.join(",", Arrays.copyOfRange(parts, 0, parts.length - 1));
 
                 String prefix = "";
                 if (token.startsWith("-") || token.startsWith("@"))
@@ -95,6 +96,10 @@ public class PlayerAccess
                 }
 
                 final String name = token;
+                if (!join.isEmpty())
+                {
+                    prefix = "," + prefix;
+                }
                 final String pre = prefix;
                 list.addAll(Sponge.getServer().getOnlinePlayers().stream()
                         .map(Player::getName)

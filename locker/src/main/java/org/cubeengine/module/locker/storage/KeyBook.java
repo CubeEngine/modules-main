@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.data.LockerData;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -125,11 +126,29 @@ public class KeyBook
             {
                 i18n.sendTranslated(holder, POSITIVE, "As you approach with your KeyBook the magic lock disappears!");
             }
-            holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
-            holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, (float) 1.5);
+
+            TaskManager tm = module.getTaskManager();
+            playUnlockSound(holder, effectLocation, tm);
+
             lock.notifyKeyUsage(holder);
         }
         return true;
+    }
+
+    public static void playUnlockSound(Player holder, final Location effectLocation, TaskManager tm)
+    {
+        holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
+        holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, (float) 1.5);
+
+        tm.runTaskDelayed(Locker.class, new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
+                holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, (float)1.5);
+            }
+        }, 3);
     }
 
     public void invalidate()

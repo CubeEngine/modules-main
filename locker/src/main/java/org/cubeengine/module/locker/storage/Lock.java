@@ -40,6 +40,7 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.trait.EnumTraits;
+import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -80,7 +81,6 @@ public class Lock
     protected final LockModel model;
     protected final ArrayList<Location<World>> locations = new ArrayList<>();
     private final Database db;
-    private Game game;
 
     private UUID taskId = null; // for autoclosing doors
     private I18n i18n;
@@ -91,9 +91,8 @@ public class Lock
      * @param manager
      * @param model
      */
-    public Lock(LockManager manager, LockModel model, I18n i18n, Game game)
+    public Lock(LockManager manager, LockModel model, I18n i18n)
     {
-        this.game = game;
         this.i18n = i18n;
         this.db = manager.getDB();
         this.module = manager.module;
@@ -109,16 +108,16 @@ public class Lock
      * @param model
      * @param lockLocs
      */
-    public Lock(LockManager manager, LockModel model, I18n i18n, Result<LockLocationModel> lockLocs, Game game)
+    public Lock(LockManager manager, LockModel model, I18n i18n, Result<LockLocationModel> lockLocs)
     {
-        this(manager, model, i18n, game);
+        this(manager, model, i18n);
         this.locations.addAll(lockLocs.stream().map(this::getLocation).collect(toList()));
         this.isValidType = false;
     }
 
-    public Lock(LockManager manager, LockModel model, I18n i18n, List<Location<World>> locations, Game game)
+    public Lock(LockManager manager, LockModel model, I18n i18n, List<Location<World>> locations)
     {
-        this(manager, model, i18n, game);
+        this(manager, model, i18n);
         this.locations.addAll(locations);
         this.isValidType = false;
     }
@@ -199,12 +198,11 @@ public class Lock
         item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(player, NEUTRAL, "This book can"),
                 i18n.getTranslation(player, NEUTRAL, "unlock a magically"),
                 i18n.getTranslation(player, NEUTRAL, "locked protection")));
-        item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCK.PASSWORD), game.getRegistry().getValueFactory()));
+        item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCK.PASSWORD), Sponge.getRegistry().getValueFactory()));
         player.setItemInHand(item);
         if (itemStack != null && itemStack.getQuantity() != 0)
         {
             InventoryTransactionResult result = player.getInventory().offer(itemStack);// TODO check response
-            System.out.println(result.getType());
             if (itemStack.getQuantity() != 0)
             {
                 Location<World> loc = player.getLocation();
@@ -834,8 +832,7 @@ public class Lock
             {
                 i18n.sendTranslated(user, POSITIVE,
                                     "Upon hearing the right passphrase the magic surrounding the container gets thinner and lets you pass!");
-                user.playSound(SoundTypes.PISTON_EXTEND, soundLoc.getPosition(), 1, 2);
-                user.playSound(SoundTypes.PISTON_EXTEND, soundLoc.getPosition(), 1, (float)1.5);
+                KeyBook.playUnlockSound(user, soundLoc, module.getTaskManager());
 
                 manager.addUnlock(user, this);
             }

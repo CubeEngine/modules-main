@@ -148,6 +148,7 @@ public class LockerConfig extends ReflectedYaml
             entityProtections.add(new EntityLockConfig(HORSE).autoProtect(PRIVATE));
             entityProtections.add(new EntityLockConfig(CHESTED_MINECART));
             entityProtections.add(new EntityLockConfig(HOPPER_MINECART));
+            entityProtections.add(new EntityLockConfig(ITEM_FRAME));
         }
 
         if (this.protectWhenOnlyOffline && this.protectWhenOnlyOnline)

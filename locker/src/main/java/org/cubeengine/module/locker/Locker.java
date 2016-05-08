@@ -65,31 +65,18 @@ import org.spongepowered.api.text.Text;
 public class Locker extends Module
 {
     @ModuleConfig private LockerConfig config;
-    private Log logger;
-
-    @Inject private Database db;
-    @Inject private CommandManager cm;
-    @Inject private EventManager em;
-
-    @Inject private StringMatcher sm;
-
     @Inject private TaskManager tm;
-    @Inject private I18n i18n;
-
     @Inject private LockManager manager;
     @Inject @ModuleCommand private LockerCommands lockerCmd;
     @Inject @ModuleCommand(LockerCommands.class) private LockerCreateCommands lockerCreateCmds;
     @Inject @ModuleCommand(LockerCommands.class) private LockerAdminCommands lockerAdminCmds;
-
-    private LockerPerm perms;
-
+    @Inject private LockerPerm perms;
     @Inject @ModuleListener private LockerListener listener;
     @Inject @ModuleListener private LockerBlockListener blockListener;
 
     @Inject
     public Locker(Reflector reflector, EntityMatcher entityMatcher, Log logger, MaterialMatcher mm, CommandManager cm)
     {
-        this.logger = logger;
         Sponge.getDataManager().register(LockerData.class, ImmutableLockerData.class, new LockerDataBuilder(Sponge.getRegistry().getValueFactory()));
 
         ConverterManager cManager = reflector.getDefaultConverterManager();
@@ -99,49 +86,10 @@ public class Locker extends Module
         cm.getProviderManager().register(this, new PlayerAccess.PlayerAccessReader(), PlayerAccess.class);
     }
 
-
-    @Enable
-    @Inject
-    public void onEnable(LockerPerm perms)
-    {
-        this.perms = perms;
-        /*
-        manager = new LockManager(this, em, sm, db, tm, i18n, game);
-        LockerCommands lockerCmd = new LockerCommands(this, manager, i18n, sm);
-        cm.addCommand(lockerCmd);
-        lockerCmd.addCommand(new LockerCreateCommands(this, manager, i18n));
-        lockerCmd.addCommand(new LockerAdminCommands(this, manager, i18n));
-        perms = new LockerPerm(this, lockerCmd);
-        */
-
-        //em.registerListener(Locker.class, new LockerListener(this, manager, i18n));
-        //em.registerListener(Locker.class, new LockerBlockListener(this, manager, i18n, game));
-    }
-
     @Disable
     public void onDisable()
     {
         this.manager.saveAll();
-    }
-
-    public void reload()
-    {
-        // TODO add possibility in modularity
-        // full reload is impossible because of Sponge not allowing registration of DataBuilders after bootup
-        /*
-        this.onDisable();
-        this.config = this.loadConfig(LockerConfig.class);
-        Database db = this.getCore().getDB();
-        db.registerTable(TableLocks.class);
-        db.registerTable(TableLockLocations.class);
-        db.registerTable(TableAccessList.class);
-        manager = new LockManager(this);
-        LockerCommands lockerCmd = new LockerCommands(this, manager);
-        this.getCore().getCommandManager().addCommand(lockerCmd);
-        lockerCmd.addCommand(new LockerCreateCommands(this, manager));
-        lockerCmd.addCommand(new LockerAdminCommands(this, manager));
-        listener = new LockerListener(this, manager);
-        */
     }
 
     public LockerConfig getConfig()
@@ -163,13 +111,13 @@ public class Locker extends Module
     /*
     Features:
       lock leashknot / or fence from leashing on it
-    lock beacon effects?
-    golden masterKey for Admin/Mod to open all chests (explode in hand if no perm)
-    masterKeys to open all chests of one user
-    multiKeys to open multiple chests
-    buttons to door-protection to open door for x-sec = autoclose time BUT deny redstone so ONLY that button can open the door/doubledoor
-    implement usage of separate access-level for in & out in containers
-    name a protection
+      lock beacon effects?
+      golden masterKey for Admin/Mod to open all chests (explode in hand if no perm)
+      masterKeys to open all chests of one user
+      multiKeys to open multiple chests
+      buttons to door-protection to open door for x-sec = autoclose time BUT deny redstone so ONLY that button can open the door/doubledoor
+      implement usage of separate access-level for in & out in containers
+      name a protection
      */
 
 }
