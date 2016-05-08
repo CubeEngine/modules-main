@@ -37,6 +37,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
@@ -86,9 +87,9 @@ public class LockerListener
             {
                 inv = ((Carrier)block.getTileEntity().get()).getInventory();
             }
-            catch (Exception e)
+            catch (AbstractMethodError e)
             {
-                e.printStackTrace(); // TODO wait for Carrier impl
+                //e.printStackTrace(); // TODO wait for Carrier impl
             }
             lock.handleInventoryOpen(event, inv, block, player);
         }
@@ -257,19 +258,24 @@ public class LockerListener
     }
 
     @Listener
-    public void onEntityDeath(DestructEntityEvent event) // Cleanup Locks in case Entity dies
+    public void onEntityDeath(DestructEntityEvent event, @First EntityDamageSource source) // Cleanup Locks in case Entity dies
     {
-        //System.out.print(event.getCause() + "\n");
-        // TODO this is not working. https://github.com/SpongePowered/SpongeCommon/issues/707
         Entity target = event.getTargetEntity();
         Lock lock = this.manager.getLockForEntityUID(target.getUniqueId());
         if (lock == null) return;
-
-        Player user = event.getCause().first(Player.class)
-                .orElse(target.get(DamageableData.class)
-                        .map(d -> d.lastAttacker().get().orElse(null))
-                        .map(e -> e instanceof Player ? Player.class.cast(e) : null)
-                        .orElse(null));
-        lock.handleEntityDeletion(user); // Delete Lock and notify user that destroyed Lock
+        Player player;
+        if (source.getSource() instanceof Player)
+        {
+            player = ((Player)source.getSource());
+        }
+        else if (source instanceof IndirectEntityDamageSource && ((IndirectEntityDamageSource)source).getIndirectSource() instanceof Player)
+        {
+            player = ((Player)((IndirectEntityDamageSource)source).getIndirectSource());
+        }
+        else
+        {
+            return;
+        }
+        lock.handleEntityDeletion(player); // Delete Lock and notify user that destroyed Lock
     }
 }
