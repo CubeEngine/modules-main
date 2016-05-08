@@ -28,6 +28,7 @@ import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.libcube.service.task.thread.TrackedThread;
 import org.cubeengine.libcube.util.ConfirmManager;
 import org.cubeengine.module.travel.Travel;
@@ -41,10 +42,12 @@ import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.text.format.TextColors.BLUE;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 @Command(name = "warp", desc = "Teleport to a warp")
@@ -245,7 +248,7 @@ public class WarpCommand extends ContainerCommand
     @Command(desc = "List warps of a player")
     public void list(CommandSource context, @Optional Player owner)
     {
-        if (!owner.equals(context))
+        if (!context.equals(owner))
         {
             CommandUtil.ensurePermission(context, module.getPermissions().WARP_LIST_OTHER);
         }
@@ -258,19 +261,23 @@ public class WarpCommand extends ContainerCommand
         i18n.sendTranslatedN(context, POSITIVE, warps.size(), "There is one warp set:", "There are {amount} warps set:", warps.size());
         for (Warp warp : warps)
         {
-            if (warp.isOwner(owner))
+            Text teleport = i18n.getTranslation(context, MessageType.NONE, "(tp)").toBuilder().color(BLUE)
+                                .onClick(TextActions.runCommand("/warp tp " + warp.name))
+                                .onHover(TextActions.showText(i18n.getTranslation(context, POSITIVE, "Click to teleport to {name}", warp.name)))
+                                .build();
+            if (warp.isOwner(context))
             {
-                context.sendMessage(Text.of(YELLOW, "  ", warp.name));
+                context.sendMessage(Text.of(YELLOW, "  ", warp.name, " ", teleport));
             }
             else
             {
-                context.sendMessage(Text.of(YELLOW, "  ", warp.getOwner().getName(), ":", warp.name));
+                context.sendMessage(Text.of(YELLOW, "  ", warp.getOwner().getName(), ":", warp.name, " ", teleport));
             }
         }
     }
 
     @Alias(value = "clearwarps")
-    @Command(desc = "Clear all warps (of a player)")
+    @Command(desc = "Clear all warps [of a player]")
     public void clear(final CommandSource context, @Optional Player owner)
     {
         if (this.module.getConfig().clearOnlyFromConsole && !(context instanceof ConsoleSource))
@@ -280,11 +287,11 @@ public class WarpCommand extends ContainerCommand
         }
         if (owner != null)
         {
-            i18n.sendTranslated(context, NEUTRAL, "Are you sure you want to delete all warps ever created by {user}?", owner);
+            i18n.sendTranslated(context, NEGATIVE, "Are you sure you want to delete all warps ever created by {user}?", owner);
         }
         else
         {
-            i18n.sendTranslated(context, NEUTRAL, "Are you sure you want to delete all warps ever created on this server!?");
+            i18n.sendTranslated(context, NEGATIVE, "Are you sure you want to delete all warps ever created on this server!?");
         }
         Text confirmText = i18n.getTranslation(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the warps");
         ConfirmManager.requestConfirmation(i18n, confirmText, context, () -> {

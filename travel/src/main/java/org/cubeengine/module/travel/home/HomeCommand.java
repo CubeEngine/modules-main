@@ -35,6 +35,7 @@ import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.butler.result.CommandResult;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.util.ConfirmManager;
 import org.cubeengine.libcube.util.math.Cuboid;
@@ -56,14 +57,16 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static java.util.stream.Collectors.toSet;
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.text.format.TextColors.YELLOW;
+import static org.spongepowered.api.text.format.TextColors.*;
 
 @Command(name = "home", desc = "Teleport to your home")
 public class HomeCommand extends ContainerCommand
@@ -318,19 +321,23 @@ public class HomeCommand extends ContainerCommand
 
         for (Home home : homes)
         {
+            Text teleport = i18n.getTranslation(sender, MessageType.NONE, "(tp)").toBuilder().color(BLUE)
+                .onClick(TextActions.runCommand("/home tp " + home.name + " " + home.getOwner().getName()))
+                .onHover(TextActions.showText(i18n.getTranslation(sender, POSITIVE, "Click to teleport to {name}", home.name)))
+                .build();
             if (home.isOwner(sender))
             {
-                sender.sendMessage(Text.of(YELLOW, "  ", home.name));
+                sender.sendMessage(Text.of("  - ", GOLD, home.name, " ", teleport));
             }
             else
             {
-                sender.sendMessage(Text.of(YELLOW, "  ", home.getOwner().getName(), ":", home.name));
+                sender.sendMessage(Text.of("  - ", GOLD, home.getOwner().getName(), ":", home.name, " ", teleport));
             }
         }
     }
 
     @Command(name = "ilist", alias = "invited", desc = "List all players invited to your homes")
-    public void invitedList(CommandSource sender, @Default Player owner)
+    public void invitedList(CommandSource sender, @Default User owner)
     {
         if (!owner.equals(sender) && !sender.hasPermission(module.getPermissions().HOME_LIST_OTHER.getId()))
         {
@@ -363,7 +370,11 @@ public class HomeCommand extends ContainerCommand
             for (UUID invite : home.invites)
             {
                 String name = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(invite).get().getName();
-                sender.sendMessage(Text.of("    ", TextColors.DARK_GREEN, name));
+                Text uninvite = Text.of("(-)").toBuilder().color(RED)
+                    .onHover(TextActions.showText(i18n.getTranslation(sender, NEUTRAL, "Click to uninvite {user} from {name}", name, home.name)))
+                    .onClick(TextActions.runCommand("/home uninvite " + name + " " + home.name))
+                    .build();
+                sender.sendMessage(Text.of("    ", DARK_GREEN, name, " ", uninvite));
             }
         }
     }
@@ -402,7 +413,7 @@ public class HomeCommand extends ContainerCommand
 
     @Restricted(Player.class)
     @Command(desc = "Uninvite a player from one of your homes")
-    public void unInvite(Player sender, Player player, @Optional String home )
+    public void unInvite(Player sender, User player, @Optional String home )
     {
         home = home == null ? "home" : home;
         Home h = this.manager.get(sender, home).orElse(null);
@@ -422,13 +433,16 @@ public class HomeCommand extends ContainerCommand
             return;
         }
         h.invites.remove(player.getUniqueId());
-        i18n.sendTranslated(player, NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.name);
+        if (player.isOnline())
+        {
+            i18n.sendTranslated(player.getPlayer().get(), NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.name);
+        }
         i18n.sendTranslated(sender, POSITIVE, "{user} is no longer invited to your home {name}", player, h.name);
     }
 
     @Alias(value = {"clearhomes"})
-    @Command(desc = "Clear all homes (of an user)")
-    public void clear(final CommandSource context, @Optional final Player owner,
+    @Command(desc = "Clear all homes [of a player]")
+    public void clear(final CommandSource context, @Optional final User owner,
                                @Flag(name = "sel", longName = "selection") final boolean selection)
     {
         if (this.module.getConfig().clearOnlyFromConsole && !(context instanceof ConsoleSource))
@@ -461,12 +475,12 @@ public class HomeCommand extends ContainerCommand
             secondPoint = selector.getSecondPoint((Player)context);
             if (owner != null)
             {
-                i18n.sendTranslated(context, NEUTRAL,
+                i18n.sendTranslated(context, NEGATIVE,
                                       "Are you sure you want to delete all homes created by {user} in your current selection?", owner);
             }
             else
             {
-                i18n.sendTranslated(context, NEUTRAL,
+                i18n.sendTranslated(context, NEGATIVE,
                                       "Are you sure you want to delete all homes created in your current selection?");
             }
         }
@@ -476,12 +490,12 @@ public class HomeCommand extends ContainerCommand
             secondPoint = null;
             if (owner != null)
             {
-                i18n.sendTranslated(context, NEUTRAL,
+                i18n.sendTranslated(context, NEGATIVE,
                                       "Are you sure you want to delete all homes ever created by {user}?", owner);
             }
             else
             {
-                i18n.sendTranslated(context, NEUTRAL,
+                i18n.sendTranslated(context, NEGATIVE,
                                       "Are you sure you want to delete all homes ever created on this server?");
             }
         }
