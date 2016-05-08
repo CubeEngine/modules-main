@@ -87,7 +87,11 @@ public class MultiverseListener
     public void onQuit(ClientConnectionEvent.Disconnect event)
     {
         Player player = event.getTargetEntity();
-        MultiverseData data = player.get(MultiverseData.class).get();
+        MultiverseData data = player.get(MultiverseData.class).orElse(null);
+        if (data == null)
+        {
+            // TODO how?
+        }
         String universe = module.getUniverse(player.getWorld());
         data.from(universe, player.getWorld()).applyFromPlayer(player);
         player.offer(data);

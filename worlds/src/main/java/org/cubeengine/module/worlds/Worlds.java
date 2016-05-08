@@ -29,13 +29,5 @@ import org.spongepowered.api.Game;
 @ModuleInfo(name = "Worlds", description = "easy lightweight worldmanagement")
 public class Worlds extends Module
 {
-    @Inject private CommandManager cm;
-    @Inject private I18n i18n;
     @Inject @ModuleCommand private WorldsCommands wc;
-
-    @Enable
-    public void onLoad()
-    {
-        // TODO this.cm.addCommand(new WorldsCommands(cm, i18n));
-    }
 }

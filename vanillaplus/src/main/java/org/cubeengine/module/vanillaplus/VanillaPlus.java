@@ -72,6 +72,7 @@ import org.cubeengine.libcube.service.matcher.WorldMatcher;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.service.Broadcaster;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.plugin.PluginContainer;
 
 /**
  * A module to improve vanilla commands:
@@ -135,6 +136,7 @@ public class VanillaPlus extends Module
     @ModuleConfig private VanillaPlusConfig config;
     @Inject private EventManager evm;
     @Inject private StringMatcher sm;
+    @Inject private PluginContainer plugin;
 
     public VanillaPlus()
     {
@@ -185,7 +187,7 @@ public class VanillaPlus extends Module
         }
         if (config.add.commandsPlugins)
         {
-            cm.addCommands(this, new PluginCommands(i18n, pm, getModularity()));
+            cm.addCommands(this, new PluginCommands(i18n, pm, getModularity(), plugin));
         }
         if (config.add.commandStash)
         {

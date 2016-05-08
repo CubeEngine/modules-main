@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import de.cubeisland.engine.modularity.core.LifeCycle;
 import de.cubeisland.engine.modularity.core.Modularity;
+import de.cubeisland.engine.modularity.core.graph.meta.ModuleMetadata;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.permission.Permission;
@@ -48,12 +49,14 @@ public class PluginCommands extends PermissionContainer
 {
     private I18n i18n;
     private Modularity modularity;
+    private PluginContainer plugin;
 
-    public PluginCommands(I18n i18n, PermissionManager pm, Modularity modularity)
+    public PluginCommands(I18n i18n, PermissionManager pm, Modularity modularity, PluginContainer plugin)
     {
         super(pm, VanillaPlus.class);
         this.i18n = i18n;
         this.modularity = modularity;
+        this.plugin = plugin;
     }
 
     private final Permission COMMAND_VERSION_PLUGINS = register("command.version.plugins", "", null);
@@ -66,16 +69,21 @@ public class PluginCommands extends PermissionContainer
 
         i18n.sendTranslated(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:", plugins.size(), modules.size());
         context.sendMessage(Text.EMPTY);
-        // TODO context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", RESET, " (" + module.getInformation().getVersion() + ")"));
+        context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", RESET, " (" + plugin.getVersion().orElse("unknown") + ")"));
 
         for (LifeCycle m : modules)
         {
-            context.sendMessage(Text.of("   - ", m.getInformation().getIdentifier().name(), RESET, " (" + m.getInformation().getVersion() + ")"));
+            String name = m.getInformation() instanceof ModuleMetadata ? ((ModuleMetadata)m.getInformation()).getName() : m.getInformation().getClassName();
+            context.sendMessage(Text.of("   - ", GREEN, name, RESET, " (" + m.getInformation().getVersion() + ")"));
         }
 
         for (PluginContainer plugin : plugins)
         {
-            context.sendMessage(Text.of(" - ", GREEN, plugin.getName(), ChatFormat.RESET, " (" + plugin.getVersion() + ")"));
+            if (plugin == this.plugin)
+            {
+                continue;
+            }
+            context.sendMessage(Text.of(" - ", GREEN, plugin.getName(), RESET, " (" + plugin.getVersion().orElse("unknown") + ")"));
         }
     }
 
@@ -88,22 +96,21 @@ public class PluginCommands extends PermissionContainer
             switch (platform.getType())
             {
                 case CLIENT:
-                    i18n.sendTranslated(context, NEUTRAL, "This client is running {name#server}",
-                                        platform.getMinecraftVersion().getName());
+                    i18n.sendTranslated(context, NEUTRAL, "This client is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
+                                        platform.getImplementation().getName(), platform.getMinecraftVersion().getName(), platform.getImplementation().getVersion().orElse(""));
                     break;
                 case SERVER:
-                    i18n.sendTranslated(context, NEUTRAL, "This server is running {name#server}",
-                                        platform.getMinecraftVersion().getName());
+                    i18n.sendTranslated(context, NEUTRAL, "This server is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
+                                        platform.getImplementation().getName(), platform.getMinecraftVersion().getName(), platform.getImplementation().getVersion().orElse(""));
                     break;
                 case UNKNOWN:
-                    i18n.sendTranslated(context, NEUTRAL, "Unknown platform running {name#server}",
-                                        platform.getMinecraftVersion().getName());
+                    i18n.sendTranslated(context, NEUTRAL, "Unknown platform running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
+                                        platform.getImplementation().getName(), platform.getMinecraftVersion().getName(), platform.getImplementation().getVersion().orElse(""));
             }
 
-            i18n.sendTranslated(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getApi().getVersion());
-            i18n.sendTranslated(context, NEUTRAL, "implemented by {input#name} {input#version:color=INDIGO}", platform.getImplementation().getName(), platform.getImplementation().getVersion());
+            i18n.sendTranslated(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getApi().getVersion().orElse("unknown"));
             context.sendMessage(Text.EMPTY);
-            // TODO i18n.sendTranslated(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", module.getInformation().getVersion());
+            i18n.sendTranslated(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.plugin.getVersion().orElse("unknown"));
             return;
         }
         if (context.hasPermission(COMMAND_VERSION_PLUGINS.getId()))

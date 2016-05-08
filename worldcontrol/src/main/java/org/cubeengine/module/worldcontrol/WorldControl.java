@@ -30,6 +30,7 @@ import org.spongepowered.api.event.entity.SpawnEntityEvent;
 @ModuleInfo(name = "WorldControl", description = "Control what happens in your world")
 public class WorldControl extends Module
 {
+    // TODO implementation...
     @ModuleConfig private WorldControlConfig config;
 
     @Enable
