@@ -17,24 +17,40 @@
  */
 package org.cubeengine.module.roles.commands;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Consumer;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Complete;
+import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.roles.Roles;
+import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.option.OptionSubjectData;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
+import static org.spongepowered.api.text.format.TextColors.DARK_RED;
+import static org.spongepowered.api.text.format.TextColors.GOLD;
 
 @Command(name = "admin", desc = "Manages the module", alias = "manadmin")
 public class ManagementCommands extends ContainerCommand
@@ -78,5 +94,31 @@ public class ManagementCommands extends ContainerCommand
         }
 
         i18n.sendTranslated(context, POSITIVE, "{text:Roles} all configurations saved!");
+    }
+
+    @Command(desc = "Searches for registered Permissions")
+    public void findPermission(CommandSource sender, @Complete(PermissionCompleter.class) String permission)
+    {
+        PermissionDescription perm = service.getDescription(permission).orElse(null);
+        if (perm == null)
+        {
+            i18n.sendTranslated(sender, NEGATIVE, "Permission {name} not found!", permission);
+        }
+        else
+        {
+            i18n.sendTranslated(sender, POSITIVE, "Permission {name} found:", permission);
+            sender.sendMessage(perm.getDescription().toBuilder().color(GOLD).build());
+            Map<Subject, Boolean> roles = perm.getAssignedSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE);
+            if (!roles.isEmpty())
+            {
+                i18n.sendTranslated(sender, POSITIVE, "Permission is assigned to the following templates:");
+                for (Entry<Subject, Boolean> entry : roles.entrySet())
+                {
+                    sender.sendMessage(Text.of("  - ", GOLD, entry.getKey().getIdentifier(), ": ",
+                                                entry.getValue() ? DARK_GREEN : DARK_RED,
+                                                entry.getValue() ? "true" : "false")); // TODO translate
+                }
+            }
+        }
     }
 }
