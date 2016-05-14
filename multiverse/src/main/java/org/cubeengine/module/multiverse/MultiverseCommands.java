@@ -56,6 +56,7 @@ public class MultiverseCommands extends ContainerCommand
     @Command(desc = "Moves a world into another universe")
     public void move(CommandSource context, World world, String universe)
     {
+        // TODO old universe is not removed
         String previous = module.getUniverse(world);
         if (previous.equals(universe))
         {

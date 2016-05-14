@@ -25,6 +25,7 @@ import java.util.Map.Entry;
 import javax.inject.Inject;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
+import de.cubeisland.engine.modularity.core.Maybe;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.module.multiverse.player.ImmutableMultiverseData;
@@ -36,6 +37,8 @@ import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.world.World;
 
 /**
@@ -69,10 +72,12 @@ public class Multiverse extends Module
     }
 
     @Enable
-    public void onEnable() throws IOException
+    @Inject
+    public void onEnable(Maybe<PermissionService> ps) throws IOException
     {
         cm.addCommand(new MultiverseCommands(cm, this, i18n));
         em.registerListener(Multiverse.class, new MultiverseListener(this));
+        ps.onAvailable(s -> s.registerContextCalculator(new MultiverseContextCalculator(this)));
     }
 
     public MultiverseConfig getConfig()
