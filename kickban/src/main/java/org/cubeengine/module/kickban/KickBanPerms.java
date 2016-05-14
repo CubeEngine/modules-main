@@ -17,11 +17,13 @@
  */
 package org.cubeengine.module.kickban;
 
+import javax.inject.Inject;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 public class KickBanPerms extends PermissionContainer
 {
+    @Inject
     public KickBanPerms(PermissionManager pm)
     {
         super(pm, KickBan.class);
