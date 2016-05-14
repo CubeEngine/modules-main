@@ -158,7 +158,10 @@ public class RolesPermissionService implements PermissionService
 
         if (descriptionMap.put(desc.getId().toLowerCase(), desc) == null)
         {
-            logger.info(desc.getId().toLowerCase());
+            if (config.debug)
+            {
+                logger.debug(desc.getId().toLowerCase());
+            }
         }
         descriptions = null;
         return desc;

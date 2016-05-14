@@ -37,4 +37,7 @@ public class RolesConfig extends ReflectedYaml
                  "default:\n" +
                  "      - guest\n")
     public List<String> defaultRoles = new ArrayList<>();
+
+    @Comment("When enabled provides a lot of additional logging")
+    public boolean debug = false;
 }
