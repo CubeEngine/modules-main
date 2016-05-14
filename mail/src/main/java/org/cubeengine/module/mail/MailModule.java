@@ -43,8 +43,8 @@ public class MailModule extends Module
     @Enable
     public void onEnable()
     {
-        MailCommand cmd = new MailCommand(this, tm, db, i18n);
+        MailCommand cmd = new MailCommand(cm, this, tm, db, i18n);
         cm.addCommand(cmd);
-        em.registerListener(this, cmd);
+        em.registerListener(MailModule.class, cmd);
     }
 }

@@ -48,7 +48,6 @@ public class KickBan extends Module
     @Inject private KickBanPerms perms;
     @ModuleConfig private KickBanConfig config;
 
-
     @Enable
     public void onEnable()
     {

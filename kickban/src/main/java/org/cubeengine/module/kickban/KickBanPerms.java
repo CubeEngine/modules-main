@@ -17,14 +17,14 @@
  */
 package org.cubeengine.module.kickban;
 
+import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.spongepowered.api.service.permission.PermissionDescription;
-
-public class KickBanPerms extends PermissionContainer<KickBan>
+import org.cubeengine.libcube.service.permission.PermissionManager;
+public class KickBanPerms extends PermissionContainer
 {
-    public KickBanPerms(KickBan module)
+    public KickBanPerms(PermissionManager pm)
     {
-        super(module);
+        super(pm, KickBan.class);
     }
 
     private final Permission COMMAND = register("command", "Base Commands Permission", null);

@@ -29,6 +29,7 @@ import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.mail.storage.Mail;
 import org.cubeengine.module.mail.storage.TableMail;
@@ -60,9 +61,9 @@ public class MailCommand extends ContainerCommand
 
     private Map<UUID, PlayerMails> mails = new HashMap<>();
 
-    public MailCommand(MailModule module, TaskManager taskManager, Database db, I18n i18n)
+    public MailCommand(CommandManager base, MailModule module, TaskManager taskManager, Database db, I18n i18n)
     {
-        super(module);
+        super(base, MailModule.class);
         this.module = module;
         this.taskManager = taskManager;
         this.db = db;
@@ -171,7 +172,7 @@ public class MailCommand extends ContainerCommand
             getMails(user).addMail(context, message);
             alreadySend.add(user.getUniqueId());
         }
-        taskManager.runAsynchronousTaskDelayed(this.module, () ->
+        taskManager.runAsynchronousTaskDelayed(MailModule.class, () ->
             Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll().stream()
                 .filter(p -> alreadySend.contains(p.getUniqueId()))
                 .forEach(p -> new PlayerMails(p.getUniqueId(), db).addMail(context, message)), 0);

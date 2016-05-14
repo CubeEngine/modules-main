@@ -29,6 +29,7 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.util.TimeConversionException;
@@ -180,7 +181,7 @@ public class KickBanCommands
         bc.broadcastMessageWithPerm(NONE, reason, module.perms().BAN_RECEIVEMESSAGE.getId());
     }
 
-    private String parseReason(String reason, PermissionDescription permission, CommandSource sender)
+    private String parseReason(String reason, Permission permission, CommandSource sender)
     {
         if (reason == null)
         {
