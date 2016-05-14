@@ -119,6 +119,7 @@ import org.spongepowered.api.plugin.PluginContainer;
  * /kill (for players) {@link KillCommands#kill}
  * /suicide (kill self) {@link KillCommands#suicide}
  */
+
 @ModuleInfo(name = "VanillaPlus", description = "Improved Vanilla")
 public class VanillaPlus extends Module
 {
