@@ -32,6 +32,7 @@ import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.module.roles.service.subject.UserSubject;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.context.Context;
@@ -76,6 +77,9 @@ public class ManagementCommands extends ContainerCommand
         service.getUserSubjects().reload();
 
         service.getConfig().reload();
+
+        service.getDefaultData().load();
+
         // TODO remove cached data ; needed?
         i18n.sendTranslated(context, POSITIVE, "{text:Roles} reload complete!");
     }

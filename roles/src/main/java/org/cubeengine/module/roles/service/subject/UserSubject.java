@@ -39,16 +39,21 @@ import org.spongepowered.api.util.Tristate;
 
 public class UserSubject extends BaseSubject<UserSubjectData>
 {
-    private User user;
     private final UUID uuid;
+    boolean defaultsApplied = false;
 
     public UserSubject(RolesPermissionService service, UUID uuid)
     {
         super(service.getUserSubjects(), service, new UserSubjectData(service, uuid));
         this.uuid = uuid;
+        applyDefault();
+    }
 
-        SubjectData defaultData = service.getDefaultData();
+    private void applyDefault()
+    {
+        defaultsApplied = true;
         OptionSubjectData transientData = getTransientSubjectData();
+        SubjectData defaultData = service.getDefaultData();
         for (Entry<Set<Context>, Map<String, Boolean>> entry : defaultData.getAllPermissions().entrySet())
         {
             for (Entry<String, Boolean> perm : entry.getValue().entrySet())
@@ -66,6 +71,32 @@ public class UserSubject extends BaseSubject<UserSubjectData>
     }
 
     @Override
+    public List<Subject> getParents(Set<Context> contexts)
+    {
+        List<Subject> parents = super.getParents(contexts);
+        if (!parents.isEmpty() && defaultsApplied)
+        {
+            OptionSubjectData transientData = getTransientSubjectData();
+            SubjectData defaultData = service.getDefaultData();
+            for (Entry<Set<Context>, Map<String, Boolean>> entry : defaultData.getAllPermissions().entrySet())
+            {
+                for (Entry<String, Boolean> perm : entry.getValue().entrySet())
+                {
+                    transientData.setPermission(entry.getKey(), perm.getKey(), Tristate.UNDEFINED);
+                }
+            }
+            for (Entry<Set<Context>, List<Subject>> entry : defaultData.getAllParents().entrySet())
+            {
+                for (Subject subject : entry.getValue())
+                {
+                    transientData.removeParent(entry.getKey(), subject);
+                }
+            }
+        }
+        return parents;
+    }
+
+    @Override
     public String getIdentifier()
     {
         return uuid.toString();
@@ -74,16 +105,15 @@ public class UserSubject extends BaseSubject<UserSubjectData>
     @Override
     public Optional<CommandSource> getCommandSource()
     {
-        return getUser().getPlayer().map(CommandSource.class::cast);
+        return Sponge.getServer().getPlayer(uuid).map(CommandSource.class::cast);
     }
 
-    public User getUser()
+    public void reload()
     {
-        if (user == null)
-        {
-            Optional<Player> player = Sponge.getServer().getPlayer(uuid);
-            user = player.map(User.class::cast).orElse(Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid).orElse(null));
-        }
-        return user;
+        this.getSubjectData().reload();
+        this.getTransientSubjectData().clearOptions();
+        this.getTransientSubjectData().clearParents();
+        this.getTransientSubjectData().clearPermissions();
+        applyDefault();
     }
 }

@@ -206,7 +206,7 @@ public class BaseSubjectData implements OptionSubjectData
     {
         checkForCircularDependency(contexts, parent, 0);
 
-        if (contexts.isEmpty() && parents.get(GLOBAL).contains(parent))
+        if (contexts.isEmpty() && parents.get(GLOBAL) != null && parents.get(GLOBAL).contains(parent))
         {
             return false;
         }

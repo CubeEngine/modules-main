@@ -20,7 +20,6 @@ package org.cubeengine.module.roles.service.collection;
 import java.util.UUID;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.UserSubject;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 
@@ -56,6 +55,9 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
 
     public void reload()
     {
-        this.subjects.clear();
+        for (UserSubject subject : subjects.values())
+        {
+            subject.reload();
+        }
     }
 }

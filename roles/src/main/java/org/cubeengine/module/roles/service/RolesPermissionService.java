@@ -73,12 +73,15 @@ public class RolesPermissionService implements PermissionService
     {
         this.config = module.getConfiguration();
         logger = module.getLog();
-        defaultData = new DefaultSubjectData(this, config);
         collections.put(SUBJECTS_USER, new UserCollection(this));
         collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, reflector));
+
+        defaultData = new DefaultSubjectData(this, config);
+
         getGroupSubjects().reload();
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM));
         collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE));
+
     }
 
     @Override

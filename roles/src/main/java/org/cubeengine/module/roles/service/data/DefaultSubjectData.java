@@ -17,17 +17,66 @@
  */
 package org.cubeengine.module.roles.service.data;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.Subject;
+
+import static org.cubeengine.libcube.util.ContextUtil.GLOBAL;
 
 public class DefaultSubjectData extends BaseSubjectData
 {
+    private RolesConfig config;
+
     public DefaultSubjectData(RolesPermissionService service, RolesConfig config)
     {
         super(service);
-        for (String role : config.defaultRoles)
+        this.config = config;
+        this.load();
+    }
+
+    @Override
+    public boolean addParent(Set<Context> contexts, Subject parent)
+    {
+        if (super.addParent(contexts, parent))
         {
-            addParent(GLOBAL_CONTEXT, service.getGroupSubjects().get(role));
+            config.defaultRoles.add(parent.getIdentifier());
+            config.save();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean removeParent(Set<Context> contexts, Subject parent)
+    {
+        config.defaultRoles.remove(parent.getIdentifier());
+        config.save();
+        return super.removeParent(contexts, parent);
+    }
+
+    @Override
+    public boolean clearParents(Set<Context> contexts)
+    {
+        config.defaultRoles.clear();
+        config.save();
+        return super.clearParents(contexts);
+    }
+
+    public void load()
+    {
+        parents.clear();
+        List<Subject> list = new ArrayList<>();
+        parents.put(GLOBAL, list);
+        for (String name : config.defaultRoles)
+        {
+            RoleSubject role = service.getGroupSubjects().get(name);
+            list.add(role);
         }
     }
 
