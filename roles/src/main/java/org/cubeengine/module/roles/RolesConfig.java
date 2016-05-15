@@ -32,9 +32,9 @@ public class RolesConfig extends ReflectedYaml
     @Name("disable-permission-in-offlinemode")
     @Comment("If this is set to true no permissions will be assigned to any user if the server runs in offline mode")
     public boolean doNotAssignPermIfOffline = true;
-    @Name("default.roles")
+    @Name("default-roles")
     @Comment("The list of roles a user will get when first joining the server.\n" +
-                 "default:\n" +
+                 "default-roles:\n" +
                  "      - guest\n")
     public List<String> defaultRoles = new ArrayList<>();
 
