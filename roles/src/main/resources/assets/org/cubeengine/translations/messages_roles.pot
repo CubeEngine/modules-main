@@ -1,0 +1,734 @@
+# This file is part of CubeEngine.
+# CubeEngine is licensed under the GNU General Public License Version 3.
+# 
+# CubeEngine is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# CubeEngine is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: de.cubeisland.engine.module:roles:1.0.0-SNAPSHOT\n"
+"Report-Msgid-Bugs-To: development@cubeisland.de\n"
+"POT-Creation-Date: 2015-03-15 23:03:36+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_US\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:165
+msgid "Adds a parent role to given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:49
+msgid "Assign a role to the player [in world] [-temp]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:159
+msgid "Checks for metadata of a user [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:72
+msgid "Checks for permissions of a user [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:80
+msgid "Checks the permission in given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:124
+msgid "Clears all roles from the player and sets the defaultroles [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:145
+msgid "Clears the metadata for given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:350
+msgid "Creates a new role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:375
+msgid "Deletes a role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:130
+msgid "List permission assigned to a user in a world"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:272
+msgid "Lists all default roles [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:183
+msgid "Lists all metadata of given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:222
+msgid "Lists all parents of given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:137
+msgid "Lists all permissions of given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:48
+msgid "Lists all roles in a world or globally"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:186
+msgid "Lists assigned metadata from a user [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:49
+msgid "Lists roles of a user [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/ManagementCommands.java:56
+msgid "Overrides all configs with current settings"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/ManagementCommands.java:46
+msgid "Reloads all roles from config"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:219
+msgid "Removes a parent role from given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:96
+msgid "Removes a role from the player [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:261
+msgid "Removes all parent roles from given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:314
+msgid "Renames given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:172
+msgid "Resets a permission for this user [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:196
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:208
+msgid "Resets metadata for this user [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:136
+msgid "Resets the metadata for given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:150
+msgid "Sets a permission for this user [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:184
+msgid "Sets metadata for this user [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/ManagementCommands.java:67
+msgid "Sets or resets the current default world"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:103
+msgid "Sets the metadata for given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:53
+msgid "Sets the permission for given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:281
+msgid "Sets the priority of given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:255
+msgid "Show the priority of given role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:395
+msgid "Toggles whether given role is a default role [in world]"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/role/UserDatabaseStore.java:262
+msgid ""
+"The server is currently running in offline mode. Permissions will not be "
+"applied until logging in! Contact an Administrator if you think this is an "
+"error."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/role/UserDatabaseStore.java:312
+#: de/cubeisland/engine/module/roles/role/UserDatabaseStore.java:317
+msgid "You should report this to an administrator!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/role/UserDatabaseStore.java:316
+msgid "Your role {name} is not available in {world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/role/UserDatabaseStore.java:311
+msgid "Your temporary role {name} is not available in {world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleCommands.java:24
+msgid "Manages the roles"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:81
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:138
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:184
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:223
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:256
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:54
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:104
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:137
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:146
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:166
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:220
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:262
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:282
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:315
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:376
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:396
+msgid "[g:]role"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:39
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:44
+msgid "Manage roles"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:40
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:40
+msgid "Manage users"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/ManagementCommands.java:34
+msgid "Manages the module"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:167
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:221
+msgid "[g:]parentrole"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:316
+msgid "new name"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:213
+msgid "(Including inherited metadata)"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:167
+msgid "(Including inherited permissions)"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:80
+msgid "Added the role {name} temporarily to {user} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:89
+msgid "Added the role {name} to {user} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:207
+msgid "Added {name#role} as parent role for the global role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:210
+msgid "Added {name#role} as parent role for the role {name} in {world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:274
+msgid "All parent roles of the global role {name} cleared!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:277
+msgid "All parent roles of the role {name} in {world} cleared!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/ManagementCommands.java:76
+msgid "All your roles commands will now have {world} as default world!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:214
+msgid "Circular Dependency! {name#role} depends on the role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:138
+msgid "Cleared the roles of {user} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:181
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:235
+msgid "Could not find the global parent role {name}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleCommandHelper.java:96
+msgid "Could not find the global role {name}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:184
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:238
+msgid "Could not find the parent role {name} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleCommandHelper.java:101
+msgid "Could not find the role {name} in {world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:61
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:104
+msgid "Could not find the role {name} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/ManagementCommands.java:72
+msgid "Current world for roles resetted!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:141
+msgid "Default roles assigned:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:391
+msgid "Deleted the role {name} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:360
+msgid "Global role {name} created!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:388
+msgid "Global role {name} deleted!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:335
+msgid "Global role {name} renamed to {name#new}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:158
+msgid "Metadata cleared for the global role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:161
+msgid "Metadata cleared for the role {name} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:205
+msgid "Metadata of the global role {name}:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:209
+msgid "Metadata of the role {name} in {world}:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:216
+msgid "Metadata of {user} cleared in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:198
+msgid "Metadata of {user} in {world}:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:204
+msgid "Metadata {input#key} of {user} removed in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:192
+msgid "Metadata {input#key} of {user} set to {input#value} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:121
+msgid "Metadata {input#key} reset for the global role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:124
+msgid "Metadata {input#key} reset for the role {name} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:129
+msgid "Metadata {input#key} set to {input#value} for the global role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:132
+msgid ""
+"Metadata {input#key} set to {input#value} for the role {name} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:197
+msgid "No metadata set for the global role {name}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:200
+msgid "No metadata set for the role {name} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:151
+msgid "No permissions set for the global role {name}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:154
+msgid "No permissions set for the role {name} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleCommandHelper.java:79
+msgid ""
+"Or you can define a default world with {text:/roles admin defaultworld "
+"<world>}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:179
+msgid "Origin: {name#role}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:182
+msgid "Origin: {text:directly assigned}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:124
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:120
+msgid "Permission inherited from:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:98
+msgid "Permission {input} neither set nor registered!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:102
+msgid "Permission {input} not set but default is: {name#default}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:161
+msgid "Permission {input} of {user} reset!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:180
+msgid "Permission {input} of {user} resetted!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:167
+msgid "Permission {input} of {user} set to false!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:164
+msgid "Permission {input} of {user} set to true!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:159
+msgid "Permissions of the global role {name}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:163
+msgid "Permissions of the role {name} in {world}:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:151
+msgid "Permissions of {user} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserCommandHelper.java:81
+msgid "Please provide a world."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:301
+msgid "Priority of the global role {name} set to {input#priority}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:304
+msgid "Priority of the role {name} set to {input#priority} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:246
+msgid "Removed the parent role {name} from the global role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:249
+msgid "Removed the parent role {name} from the role {name} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:117
+msgid "Removed the role {name} from {user} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:343
+msgid "Renaming failed! The role global {name} already exists!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:346
+msgid "Renaming failed! The role {name} already exists in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:363
+msgid "Role {name} created!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:59
+msgid "Roles of {user} in {world}:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:90
+msgid "SuperPerm Node: {bool}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:67
+msgid "The following global roles are available:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:71
+msgid "The following roles are available in {world}:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:284
+msgid "The following roles are default roles in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:243
+msgid "The global role {name} has following parent roles:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:235
+msgid "The global role {name} has no parent roles."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:94
+msgid "The permission {name} is not assigned to the global role {name}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:97
+msgid "The permission {name} is not assigned to the role {name} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:108
+msgid "The player {user} does have access to {input#permission} in {world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:112
+msgid ""
+"The player {user} does not have access to {input#permission} in {world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:266
+msgid "The priority of the global role {name} is: {integer#priority}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:269
+msgid "The priority of the role {name} in {world} is: {integer#priority}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:247
+msgid "The role {name} in {world} has following parent roles:"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:238
+msgid "The role {name} in {world} has no parent roles."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:281
+msgid "There are no default roles set for {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:59
+msgid "There are no global roles!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:62
+msgid "There are no roles in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:368
+msgid "There is already a global role named {name}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:371
+msgid "There is already a role named {name} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:328
+msgid "These are the same names!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:66
+msgid "You are not allowed to assign the role {name} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:109
+msgid "You are not allowed to remove the role {name} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleCommandHelper.java:71
+#: de/cubeisland/engine/module/roles/commands/RoleCommandHelper.java:84
+#: de/cubeisland/engine/module/roles/commands/UserCommandHelper.java:75
+#: de/cubeisland/engine/module/roles/commands/UserCommandHelper.java:86
+msgid "You are using {world} as current world."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserCommandHelper.java:82
+msgid "You can define a world with {text:/roles admin defaultworld <world>}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:74
+msgid "You cannot assign a temporary role to a offline player!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleCommandHelper.java:78
+msgid "You have to provide a world with {text:in world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:173
+msgid "{input#key} is not set for {user} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:176
+msgid "{input#key}: {input#value} is set for {user} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:123
+msgid "{input#permission} directly assigned to the user!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:126
+msgid "{input#permission} in the role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:308
+msgid "{input#priority} is not a valid priority!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:70
+msgid "{name#permission} has been reset for the global role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:74
+msgid "{name#permission} has been reset for the role {name} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:127
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:131
+msgid "{name#permission} in the role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:115
+msgid ""
+"{name#permission} is set to {text:false:color=DARK_RED} for the global role "
+"{name}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:119
+msgid ""
+"{name#permission} is set to {text:false:color=DARK_RED} for the role {name} "
+"in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:104
+msgid ""
+"{name#permission} is set to {text:true:color=DARK_GREEN} for the global role "
+"{name}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleInformationCommands.java:108
+msgid ""
+"{name#permission} is set to {text:true:color=DARK_GREEN} for the role {name} "
+"in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:90
+msgid ""
+"{name#permission} set to {text:false:color=DARK_RED} for the global role "
+"{name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:94
+msgid ""
+"{name#permission} set to {text:false:color=DARK_RED} for the role {name} in "
+"{world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:80
+msgid ""
+"{name#permission} set to {text:true:color=DARK_GREEN} for the global role "
+"{name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:84
+msgid ""
+"{name#permission} set to {text:true:color=DARK_GREEN} for the role {name} in "
+"{world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:204
+msgid ""
+"{name#role} is a global role and cannot inherit from a non-global role!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:193
+msgid "{name#role} is already parent role of the global role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:196
+msgid "{name#role} is already parent role of the role {name} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:410
+msgid "{name#role} is no longer a default role in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:254
+msgid "{name#role} is not a parent role of the global role {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:257
+msgid "{name#role} is not a parent role of the role {name} in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:407
+msgid "{name#role} is now a default role in {world}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/RoleManagementCommands.java:338
+msgid "{name#role} renamed to {name#new} in {world}"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/ManagementCommands.java:62
+msgid "{text:Roles} all configurations saved!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/ManagementCommands.java:52
+msgid "{text:Roles} reload complete!"
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:83
+msgid "{user} already had the role {name} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:92
+msgid "{user} already has the role {name} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserManagementCommands.java:120
+msgid "{user} did not have the role {name} in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:148
+msgid "{user} has no permissions set directly in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:145
+msgid "{user} has no permissions set in {world}."
+msgstr ""
+
+#: de/cubeisland/engine/module/roles/commands/UserInformationCommands.java:85
+msgid "{user} is op!"
+msgstr ""

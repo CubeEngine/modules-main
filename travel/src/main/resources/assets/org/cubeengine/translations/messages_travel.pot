@@ -1,0 +1,701 @@
+# This file is part of CubeEngine.
+# CubeEngine is licensed under the GNU General Public License Version 3.
+# 
+# CubeEngine is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# CubeEngine is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: de.cubeisland.engine.module:travel:1.0.0-SNAPSHOT\n"
+"Report-Msgid-Bugs-To: development@cubeisland.de\n"
+"POT-Creation-Date: 2015-02-04 23:53:19+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_US\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:493
+msgid "Clear all homes (of an user)"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:116
+msgid "Create a warp"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:367
+msgid "Invite a user to one of your homes"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:301
+msgid "List all available warps"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:323
+msgid "List all players invited to your homes"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:447
+msgid "Make a users warp public"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:436
+msgid "Make one of your homes private"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:464
+msgid "Make one of your homes public"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:191
+msgid "Move a home"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:180
+msgid "Move a warp"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:221
+msgid "Remove a home"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:205
+msgid "Remove a warp"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:227
+msgid "Rename a warp"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:156
+msgid "Set the welcome message of homes"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:130
+msgid "Set your home"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:475
+msgid "Clear all warps (of a player)"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:420
+msgid "Make a players warp private"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:403
+msgid "Uninvite a player from one of your homes"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:122
+msgid "Some warps must be deleted for new ones to be made"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:121
+msgid "The server have reached its maximum number of warps!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:431
+msgid "You are no longer invited to {user}'s home {name#home}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:384
+msgid "You cannot invite yourself to your own home!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:137
+#: de/cubeisland/engine/module/travel/home/HomeListener.java:72
+msgid "You have reached your maximum number of homes!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:138
+#: de/cubeisland/engine/module/travel/home/HomeListener.java:73
+msgid "You have to delete a home to make a new one"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeListener.java:77
+msgid "Your home has been created!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeListener.java:66
+msgid "Your home has been set!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:142
+msgid "Your warp {name} has been created!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:389
+msgid "{user} is already invited to your home!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/TpPointCommand.java:56
+msgid "  {name#tppoint} ({text:private})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/TpPointCommand.java:45
+msgid "  {name#tppoint} ({text:public})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/TpPointCommand.java:60
+msgid "  {user}:{name#tppoint} ({text:private})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/TpPointCommand.java:49
+msgid "  {user}:{name#tppoint} ({text:public})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:127
+msgid "A warp by that name already exist!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:265
+msgid "Could not rename the home to {name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:257
+msgid "Could not rename the warp to {name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:258
+msgid ""
+"Homes may not have names that are longer than 32 characters or contain "
+"colon(:)'s!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:355
+msgid "Invite a user to one of your warps"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:314
+msgid "List all players invited to your warps"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:278
+msgid "Lists homes a player can access"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:243
+msgid "Rename a home"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:145
+msgid "Set the welcome message of warps"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:81
+msgid "Teleport to a home"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:52
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:76
+msgid "Teleport to a warp"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:349
+msgid "The following homes of {user} have players invited to them:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:216
+msgid "The home {name} of {user} has been moved to your current location"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:240
+msgid "The home {name} of {user} has been removed"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:273
+msgid "The home {name} of {user} has been renamed to {name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:592
+msgid "The home {name} of {user} is in a world that no longer exists!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:461
+msgid "The home {name} of {user} is now private"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:489
+msgid "The home {name} of {user} is now public"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:112
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:97
+msgid "The teleportation got aborted!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:138
+msgid "The warp already exists! You can move it with {text:/warp move}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:200
+msgid "The warp {name} of {user} has been moved to your current location"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:224
+msgid "The warp {name} of {user} has been removed"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:253
+msgid "The warp {name} of {user} has been renamed to {name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:539
+msgid "The warp {name} of {user} is in a world that no longer exists!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:444
+msgid "The warp {name} of {user} is now private"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:471
+msgid "The warp {name} of {user} is now public"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:184
+msgid "The welcome message for the home {name} of {user} is now set to:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:173
+msgid "The welcome message for the warp {name} of {user} is now set to:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:180
+msgid "The welcome message for your home {name} is now set to:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:169
+msgid "The welcome message for your warp {name} is now set to:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:316
+msgid "There are no homes set."
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:307
+msgid "There are no warps set."
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:319
+msgid "There is one home set:"
+msgid_plural "There are {amount} homes set:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:310
+msgid "There is one warp set:"
+msgid_plural "There are {amount} warps set:"
+msgstr[0] ""
+msgstr[1] ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:452
+msgid "This home is already private!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:480
+msgid "This home is already public!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:415
+msgid "This home is public. Make it private to disallow others to access it."
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:435
+msgid "This warp is already private!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:462
+msgid "This warp is already public!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:399
+msgid "This warp is public. Make it private to disallow others to access it."
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:388
+msgid "Uninvite a player from one of your warps"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:89
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:199
+msgid "Use {text:/sethome} to set your home"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:132
+msgid ""
+"Warps may not have names that are longer than 32 characters nor contain "
+"colon(:)'s!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:242
+msgid ""
+"Warps may not have names that are longer than 32 characters or contain "
+"colon(:)'s!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:415
+msgid "You are no longer invited to {user}'s warp {name#warp}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:379
+msgid "You can't invite a person to a public home."
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:366
+msgid "You can't invite a person to a public warp."
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:371
+msgid "You cannot invite yourself to your own warp!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:420
+msgid "You cannot uninvite yourself from your own home!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:404
+msgid "You cannot uninvite yourself from your own warp!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:374
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:410
+msgid "You do not own a home named {name#home}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:361
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:394
+msgid "You do not own a warp named {name#warp}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:125
+msgid "You have been teleported to the home {name} of {user}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:110
+msgid "You have been teleported to the warp {name} of {user}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:122
+msgid "You have been teleported to your home {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:107
+msgid "You have been teleported to your warp {name}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:600
+msgid "You have no home named {name#home}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:337
+msgid "You have no homes with players invited to them!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:547
+msgid "You have no warp named {name#warp}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:345
+msgid "Your following homes have players invited to them:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:213
+msgid "Your home {name} has been moved to your current location!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:237
+msgid "Your home {name} has been removed!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:270
+msgid "Your home {name} has been renamed to {name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:588
+msgid "Your home {name} is in a world that no longer exists!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:458
+msgid "Your home {name} is now private"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:486
+msgid "Your home {name} is now public"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:197
+msgid "Your warp {name} has been moved to your current location!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:221
+msgid "Your warp {name} has been removed"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:250
+msgid "Your warp {name} has been renamed to {name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:535
+msgid "Your warp {name} is in a world that no longer exists!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:441
+msgid "Your warp {name} is now private"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:468
+msgid "Your warp {name} is now public"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:604
+msgid "{user} has no home named {name#home}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:340
+msgid "{user} has no homes with players invited to them!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:551
+msgid "{user} has no warp named {name#warp}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:382
+msgid ""
+"{user} invited you to their private warp. To teleport to it use: /warp "
+"{name#warp} {user}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:376
+msgid "{user} is already invited to your warp!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:433
+msgid "{user} is no longer invited to your home {name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:417
+msgid "{user} is no longer invited to your warp {name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:425
+msgid "{user} is not invited to your home!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:409
+msgid "{user} is not invited to your warp!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:399
+msgid "{user} is now invited to your home {name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:384
+msgid "{user} is now invited to your warp {name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:366
+#| msgid "The following homes of {user} have players invited to them:"
+msgid "How about making a phone call to invite someone instead?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:190
+msgid "I am calling the moving company right now!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:260
+msgid "List warps of a player"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:310
+#| msgid "No homes are available to {user}!"
+msgid "Lists all homes"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:131
+msgid "Ok so I'll need your new address then. No seriously this won't work!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:57
+msgid "Teleport to your home"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:244
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:228
+msgid "new name"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:159
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:147
+msgid "welcome message"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:395
+msgid ""
+"{user} invited you to their home. To teleport to it use: /home {name#home} "
+"{name}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:292
+msgid "  {name#warp} ({text:private})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:282
+msgid "  {name#warp} ({text:public})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:296
+msgid "  {user}:{name#warp} ({text:private})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:286
+msgid "  {user}:{name#warp} ({text:public})"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:493
+msgid ""
+"Are you sure you want to delete all private warps ever created by {user}?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:508
+msgid ""
+"Are you sure you want to delete all private warps ever created on this "
+"server?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:489
+msgid ""
+"Are you sure you want to delete all public warps ever created by {user}?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:504
+msgid ""
+"Are you sure you want to delete all public warps ever created on this "
+"server!?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:497
+msgid "Are you sure you want to delete all warps ever created by {user}?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:512
+msgid ""
+"Are you sure you want to delete all warps ever created on this server!?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:540
+msgid ""
+"Are you sure you want to delete all {input#public|private}homes created by "
+"{user} in your current selection?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:544
+msgid ""
+"Are you sure you want to delete all {input#public|private}homes created in "
+"your current selection?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:553
+msgid ""
+"Are you sure you want to delete all {input#public|private}homes ever created "
+"by {user}?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:557
+msgid ""
+"Are you sure you want to delete all {input#public|private}homes ever created "
+"on this server?"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:560
+msgid ""
+"Confirm with: {text:/confirm} before 30 seconds have passed to delete the "
+"homes"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:515
+msgid ""
+"Confirm with: {text:/confirm} before 30 seconds have passed to delete the "
+"warps"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:144
+msgid ""
+"Homes may not have names that are longer then 32 characters nor contain "
+"colon(:)'s!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:533
+msgid "Invalid selection!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:293
+msgid "No homes are available to you!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:296
+msgid "No homes are available to {user}!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:272
+msgid "No warps are available to you!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:301
+msgid "The following homes are available to you:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:305
+msgid "The following homes are available to {user}:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:275
+msgid "The following warps are available to you:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:336
+msgid "The following warps of {user} have players invited to them:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:149
+msgid "The home already exists! You can move it with {text:/home move}"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:501
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:482
+msgid "This command has been disabled for ingame use via the configuration"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:324
+msgid "You have no warps with players invited to them!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:526
+msgid "You have to be in game to use the selection flag"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:521
+msgid "You need to use the Selector module to delete homes in a selection!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:332
+msgid "Your following warps have players invited to them:"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/home/HomeCommand.java:153
+msgid "Your home {name} has been created!"
+msgstr ""
+
+#: de/cubeisland/engine/module/travel/warp/WarpCommand.java:327
+msgid "{user} has no warps with players invited to them!"
+msgstr ""
