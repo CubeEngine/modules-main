@@ -1,0 +1,235 @@
+# This file is part of CubeEngine.
+# CubeEngine is licensed under the GNU General Public License Version 3.
+# 
+# CubeEngine is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# CubeEngine is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: org.cubeengine.module:teleport:1.0.0-SNAPSHOT\n"
+"Report-Msgid-Bugs-To: development@cubeisland.de\n"
+"POT-Creation-Date: 2016-05-17 23:36:40+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_US\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:124
+msgid "Accepts any pending teleport request."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/SpawnCommands.java:67
+msgid "Changes the global respawnpoint"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:170
+msgid "Denies any pending teleport request."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/TeleportCommands.java:220
+msgid "Direct teleport to a coordinate."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.filter.Restricted:msg
+#: org/cubeengine/module/teleport/MovementCommands.java:166
+msgid "Jumping in the console is not allowed! Go play outside!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/MovementCommands.java:165
+#: org/cubeengine/module/teleport/MovementCommands.java:180
+msgid "Jumps to the position you are looking at."
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Annotation
+#. 	Name: org.cubeengine.butler.filter.Restricted:msg
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:125
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:171
+msgid "No one wants to teleport to you!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.filter.Restricted:msg
+#: org/cubeengine/module/teleport/MovementCommands.java:181
+msgid ""
+"Passing through firewalls in the console is not allowed! Go play outside!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/MovementCommands.java:247
+msgid "Places a player to the position you are looking at."
+msgstr ""
+
+#. Extracted by:
+#. 1, 2, 3, 4. Annotation
+#. 	Name: org.cubeengine.butler.filter.Restricted:msg
+#: org/cubeengine/module/teleport/MovementCommands.java:89
+#: org/cubeengine/module/teleport/MovementCommands.java:98
+#: org/cubeengine/module/teleport/MovementCommands.java:137
+#: org/cubeengine/module/teleport/SpawnCommands.java:127
+msgid "Pro Tip: Teleport does not work IRL!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:90
+msgid "Requests to teleport a player to you."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:55
+msgid "Requests to teleport to a player."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/MovementCommands.java:262
+msgid "Swaps you and another players position"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/TeleportCommands.java:161
+msgid "Teleport a player directly to you."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/TeleportCommands.java:66
+msgid "Teleport directly to a player."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/TeleportCommands.java:188
+msgid "Teleport every player directly to you."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/SpawnCommands.java:103
+msgid "Teleports a player to spawn"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/SpawnCommands.java:88
+msgid "Teleports all players to spawn"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/TeleportCommands.java:127
+msgid "Teleports everyone directly to a player."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/MovementCommands.java:88
+msgid "Teleports to the highest point at your position."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/MovementCommands.java:61
+msgid ""
+"Teleports you X amount of blocks into the air and puts a glass block beneath "
+"you."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/MovementCommands.java:136
+msgid "Teleports you to the next safe spot downwards."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/MovementCommands.java:97
+msgid "Teleports you to the next safe spot upwards."
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/SpawnCommands.java:126
+msgid "Teleports you to the spawn of given world"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/teleport/MovementCommands.java:195
+msgid "Teleports you to your last location"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.filter.Restricted:msg
+#: org/cubeengine/module/teleport/MovementCommands.java:197
+msgid ""
+"Unfortunately teleporting is still not implemented in the game {text:"
+"'Life'}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Label:value
+#: org/cubeengine/module/teleport/MovementCommands.java:263
+msgid "player"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2, 3, 4. Annotation
+#. 	Name: org.cubeengine.butler.filter.Restricted:msg
+#: org/cubeengine/module/teleport/TeleportCommands.java:162
+#: org/cubeengine/module/teleport/TeleportCommands.java:189
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:56
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:91
+msgid "{text:Pro Tip}: Teleport does not work IRL!"
+msgstr ""
