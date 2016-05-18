@@ -13,16 +13,20 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
-#, fuzzy
+# Translators:
+# Faithcaio <Faithcaio@cubeisland.de>, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: org.cubeengine.module:vanillaplus:1.0.0-SNAPSHOT\n"
+"Project-Id-Version: CubeEngine\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
 "POT-Creation-Date: 2016-05-18 21:22:14+0200\n"
+"PO-Revision-Date: 2016-05-18 19:23+0000\n"
+"Last-Translator: Faithcaio <Faithcaio@cubeisland.de>\n"
+"Language-Team: German (http://www.transifex.com/quick_wango/cubeengine/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en_US\n"
+"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Extracted by:
@@ -30,210 +34,213 @@ msgstr ""
 #. 	Name: org.cubeengine.butler.parametric.Label:value
 #: org/cubeengine/module/vanillaplus/improvement/summon/SpawnMobCommand.java:57
 msgid "<mob>[:data][,<ridingmob>[:data]]"
-msgstr ""
+msgstr "<mob>[:data][,<ridingmob>[:data]]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/WhitelistCommand.java:81
 msgid "Adds a player to the whitelist."
-msgstr ""
+msgstr "Fügt einen Spieler zur Whitelist hinzu."
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/ItemModifyCommands.java:132
 msgid "Adds an Enchantment to the item in your hand"
-msgstr ""
+msgstr "Fügt eine Verzauberung dem Item in deiner Hand hinzu."
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/WhitelistCommand.java:50
 msgid "Allows you to manage your whitelist"
-msgstr ""
+msgstr "Erlaubt es dir, die Whitelist zu verwalten"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/InvseeCommand.java:62
 msgid "Allows you to see into the inventory of someone else."
-msgstr ""
+msgstr "Erlaubt dir das Inventar von einem anderen Spieler zu sehen"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/addition/ItemDBCommand.java:80
 msgid "Best Matched {input#item} {integer#id} for {input}"
-msgstr ""
+msgstr "Beste Übereinstimmung {input#item} {integer#id} für {input}"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/ItemModifyCommands.java:115
 msgid "Changes a skull to a players skin."
-msgstr ""
+msgstr "Ändert einen Schädel zu dem eines Spielers"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/DifficultyCommand.java:40
 msgid "Changes the difficulty level of the server"
-msgstr ""
+msgstr "Ändert das Schwierigkeitslevel auf dem Server"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/ItemModifyCommands.java:68
 msgid "Changes the display name of the item in your hand."
-msgstr ""
+msgstr "Ändert den Names eines Items in deiner Hand"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/GameModeCommand.java:49
 msgid "Changes the gamemode"
-msgstr ""
+msgstr "Ändert den Spielemodus"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/ItemModifyCommands.java:93
 msgid "Changes the lore of the item in your hand."
-msgstr ""
+msgstr "Ändert die Untertitel eines Items in deiner Hand"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/TimeCommands.java:62
 msgid "Changes the time of a world"
-msgstr ""
+msgstr "Ändert die Zeit einer Welt"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/WeatherCommands.java:50
 msgid "Changes the weather"
-msgstr ""
+msgstr "Ändert das Wetter"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/MovementCommands.java:50
 msgid "Changes your walkspeed."
-msgstr ""
+msgstr "Ändert die Laufgeschwindigkeit"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/ClearInventoryCommand.java:64
 msgid "Clears the inventory"
-msgstr ""
+msgstr "Leert ein Inventar"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/improvement/ItemCommands.java:99
 msgid "Did you try to use {text:/give} on your new I-Tem?"
-msgstr ""
+msgstr "Schon versucht {text:/give} auf deinem neuen I-Tem zu nutzen?"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/WhitelistCommand.java:157
 msgid "Disables the whitelisting"
-msgstr ""
+msgstr "Deaktiviert die Whitelist"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/PlayerListCommand.java:78
 msgid "Displays all the online players."
-msgstr ""
+msgstr "Zeigt alle Spieler an, die online sind."
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:291
 msgid "Displays chunk, memory and world information."
-msgstr ""
+msgstr "Zeigt Chunk, Speicher und Welten Informationen"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/PlayerInfoCommands.java:82
 msgid "Displays informations from a player!"
-msgstr ""
+msgstr "Zeigt Spielerinformationen"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:158
 msgid "Displays near players(entities/mobs) to you."
-msgstr ""
+msgstr "Zeigt nahe Spieler (Entities/Monster) an"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:93
 msgid "Displays the biome type you are standing in."
-msgstr ""
+msgstr "Zeigt den Biomtyp an"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:129
 msgid "Displays the direction in which you are looking."
-msgstr ""
+msgstr "Zeigt die Blickrichtung an."
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:115
 msgid "Displays the seed of a world."
-msgstr ""
+msgstr "Zeigt den Seed einer Welt an"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/PluginCommands.java:90
 msgid "Displays the version of the server or a given plugin"
-msgstr ""
+msgstr "Zeigt die Version des Servers oder des Plugins"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:137
 msgid "Displays your current depth."
-msgstr ""
+msgstr "Zeigt die aktuelle Tiefe an"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:150
 msgid "Displays your current location."
-msgstr ""
+msgstr "Zeigt die aktuelle Position"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/FoodCommands.java:106
 msgid "Empties the hunger bar"
-msgstr ""
+msgstr "Leert die Hungerleiste"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/WhitelistCommand.java:145
 msgid "Enables the whitelisting"
-msgstr ""
+msgstr "Aktiviert die Whitelist"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/BorderCommands.java:41
 msgid "Generates the chunks located in the border"
-msgstr ""
+msgstr "Generiert die Chunks die in der Begrenzung liegen."
 
 #. Extracted by:
 #. 1. Annotation
@@ -242,338 +249,353 @@ msgstr ""
 msgid ""
 "Gets rid of mobs close to you. Valid types are:\n"
 "monster, animal, pet, golem, boss, other, creeper, skeleton, spider etc."
-msgstr ""
+msgstr "Entfernt Monster in deiner Nähe. Gültige Typen sind:\nmonster, animal, pet, golem, boss, other, creeper, skeleton, spider etc."
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/ItemCommands.java:75
 msgid "Gives the specified Item to a player"
-msgstr ""
+msgstr "Gibt einem Spieler ein Item"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/ItemCommands.java:98
 msgid "Gives the specified Item to you"
-msgstr ""
+msgstr "Erschafft ein Item"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/UnlimitedItems.java:46
 msgid "Grants unlimited items"
-msgstr ""
+msgstr "Ermöglicht unlimitierte Items"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/HealCommand.java:53
 msgid "Heals a player"
-msgstr ""
+msgstr "Heilt einen Spieler"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/improvement/ItemModifyCommands.java:198
 msgid "If you do this you'll loose your warranty!"
-msgstr ""
+msgstr "Wenn du das tust, verlierst du deine Garantie!"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/KillCommands.java:69
 msgid "Kills a player"
-msgstr ""
+msgstr "Tötet einen Spieler"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/KillCommands.java:134
 msgid "Kills yourself"
-msgstr ""
+msgstr "Suicid begehen"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/MovementCommands.java:88
 msgid "Lets you fly away"
-msgstr ""
+msgstr "Schaltet den Flugmodus um"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/PluginCommands.java:64
 msgid "Lists all loaded plugins"
-msgstr ""
+msgstr "Listet alle geladenen plugins auf"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/WhitelistCommand.java:105
 msgid "Lists all the whitelisted players"
-msgstr ""
+msgstr "Listet alle Spieler auf der Whitelist auf"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/ItemDBCommand.java:66
 msgid "Looks up an item for you!"
-msgstr ""
+msgstr "Sucht nach einem Item"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/SudoCommand.java:43
 msgid "Makes a player send a message (including commands)"
-msgstr ""
+msgstr "Zwingt einen Spieler eine Nachricht oder Befehl zu versenden"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/improvement/ItemCommands.java:186
 msgid "No stacking for you."
-msgstr ""
+msgstr "Kein Stapeln für dich."
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:278
 msgid "Pong!"
-msgstr ""
+msgstr "Pong!"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/ItemCommands.java:141
 msgid "Refills the stack in hand"
-msgstr ""
+msgstr "Füllt den Stapel Items in der Hand auf"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/FoodCommands.java:58
 msgid "Refills your hunger bar"
-msgstr ""
+msgstr "Füllt die Hungerleiste auf"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/WhitelistCommand.java:93
 msgid "Removes a player from the whitelist."
-msgstr ""
+msgstr "Entfernt einen Spieler von der Whitelist"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/removal/RemoveCommands.java:64
 msgid "Removes entities in a radius"
-msgstr ""
+msgstr "Entfernt Einheiten in einem Radius"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/removal/RemoveCommands.java:58
 msgid "Removes entities in a world"
-msgstr ""
+msgstr "Entfernt Einheiten in einer Welt"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/ItemModifyCommands.java:197
 msgid "Repairs your items"
-msgstr ""
+msgstr "Repariert Items"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/SaveCommands.java:45
 msgid "Saves all or a specific world to disk."
-msgstr ""
+msgstr "Speichert Welten ab"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/PlayerInfoCommands.java:61
 msgid "Shows when given player was online the last time"
-msgstr ""
+msgstr "Zeigt an wann ein Spieler letztes mal online war"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/StopCommand.java:39
 msgid "Shuts down the server"
-msgstr ""
+msgstr "Fährt den Sever herunter"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/summon/SpawnMobCommand.java:110
 msgid "Spawned {amount} {input#message}!"
-msgstr ""
+msgstr "{amount} gespawnt: {input#message}!"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/summon/SpawnMobCommand.java:56
 msgid "Spawns the specified Mob"
-msgstr ""
+msgstr "Spawnt ein Mob"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/ItemCommands.java:185
 msgid "Stacks your items up to 64"
-msgstr ""
+msgstr "Stapelt gleiche Items zusammen"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/StashCommand.java:46
 msgid "Stashes or unstashes your inventory to reuse later"
-msgstr ""
+msgstr "Versteckt dein Inventar"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/WhitelistCommand.java:127
 msgid "The following players are whitelisted"
-msgstr ""
+msgstr "Die folgenden Spieler stehen auf der Whitelist:"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/addition/InvseeCommand.java:63
 msgid "This command can only be used by a player!"
-msgstr ""
+msgstr "Dieser Befehl kann nur von einem Spieler benutzt werden!"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/improvement/WhitelistCommand.java:170
 msgid "This command is too dangerous for users!"
-msgstr ""
+msgstr "Dieser Befehl ist zu gefährlich für Spieler!"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/improvement/ItemModifyCommands.java:116
 msgid "This will you only give headaches!"
-msgstr ""
+msgstr "Das wird dir bloß Kopfschmerzen bereiten!"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/addition/GodCommand.java:50
 msgid "Toggles the god-mode!"
-msgstr ""
+msgstr "Wechselt den Gottmodus"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/improvement/ItemModifyCommands.java:69
 msgid "Trying to give your {text:toys} a name?"
-msgstr ""
+msgstr "Versuchst du deinen {text:Spielzeugen} einen Namen zu geben?"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/improvement/ItemModifyCommands.java:133
 msgid "Want to be Harry Potter?"
-msgstr ""
+msgstr "Versuchst du Harry Potter zu sein?"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/WhitelistCommand.java:169
 msgid "Wipes the whitelist completely"
-msgstr ""
+msgstr "Leert die Whitelist komplett"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/addition/StashCommand.java:47
 msgid "Yeah you better put it away!"
-msgstr ""
+msgstr "Ja packs lieber schnell weg!"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/improvement/ItemCommands.java:142
 msgid "You can't get enough of it, can you?"
-msgstr ""
+msgstr "Du kannst nicht genug davon bekommen, oder?"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:138
 msgid "You dug too deep!"
-msgstr ""
+msgstr "Du hast zu tief gegraben!"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/improvement/KillCommands.java:135
 msgid ""
-"You want to kill yourself? {text:The command for that is stop!:color="
-"BRIGHT_GREEN}"
-msgstr ""
+"You want to kill yourself? {text:The command for that is "
+"stop!:color=BRIGHT_GREEN}"
+msgstr "Du willst dich umbringen? {text:Der Befehl dazu ist stop!:color=BRIGHT_GREEN}"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:151
 msgid "Your position: {text:Right in front of your screen!:color=RED}"
-msgstr ""
+msgstr "Deine Position: {text:Right in front of your screen!:color=RED}"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/removal/LivingFilterReader.java:175
 msgid "ambient"
-msgstr ""
+msgstr "ambient"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/removal/LivingFilterReader.java:171
 msgid "animal"
-msgstr ""
+msgstr "Tier"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:96
 msgid "block-x"
-msgstr ""
+msgstr "Block-X"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:97
 msgid "block-z"
-msgstr ""
+msgstr "Block-Z"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/vanillaplus/improvement/BorderCommands.java:25
 msgid "border commands"
-msgstr ""
+msgstr "Grenzbefehle"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/removal/LivingFilterReader.java:170
 msgid "boss"
-msgstr ""
+msgstr "Boss"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
 #: org/cubeengine/module/vanillaplus/improvement/ItemCommands.java:103
 msgid "enchantment[:level]"
-msgstr ""
+msgstr "Verzauberung[:Level]"
 
 #. Extracted by:
 #. 1, 2. Annotation
@@ -581,28 +603,37 @@ msgstr ""
 #: org/cubeengine/module/vanillaplus/improvement/removal/RemoveCommands.java:59
 #: org/cubeengine/module/vanillaplus/improvement/removal/RemoveCommands.java:65
 msgid "entityType[:itemMaterial]"
-msgstr ""
+msgstr "EinheitenTyp[:ItemMaterial]"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/addition/PlayerInfoCommands.java:155
 msgid "for ever"
-msgstr ""
+msgstr "für immer"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/removal/LivingFilterReader.java:174
 msgid "golem"
-msgstr ""
+msgstr "Golem"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/removal/LivingFilterReader.java:168
 msgid "hostile"
-msgstr ""
+msgstr "Feindselig"
 
 #. Extracted by:
 #. 1, 2. Annotation
@@ -610,62 +641,79 @@ msgstr ""
 #: org/cubeengine/module/vanillaplus/improvement/ItemCommands.java:76
 #: org/cubeengine/module/vanillaplus/improvement/ItemCommands.java:101
 msgid "material[:data]"
-msgstr ""
+msgstr "Material[:data]"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/removal/LivingFilterReader.java:169
 msgid "monster"
-msgstr ""
+msgstr "Monster"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/removal/LivingFilterReader.java:172
 msgid "npc"
-msgstr ""
+msgstr "NPC"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/removal/LivingFilterReader.java:173
 msgid "pet"
-msgstr ""
+msgstr "Haustier"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:203
 msgid "player"
-msgstr ""
+msgstr "Spieler"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
 #: org/cubeengine/module/vanillaplus/improvement/removal/ButcherCommand.java:65
 msgid "types..."
-msgstr ""
+msgstr "Typen..."
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/improvement/summon/SpawnMobCommand.java:108
 msgid "{input#entity} riding {input}"
-msgstr ""
+msgstr "{input#entity} reitet {input}"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
 #: org/cubeengine/module/vanillaplus/addition/InformationCommands.java:130
 msgid "{text:ProTip}: I assume you are looking right at your screen, right?"
-msgstr ""
+msgstr "{text:ProTip}: Ich denke mal, dass du geradeaus auf deinen Bildschirm siehst, stimmt's?"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/vanillaplus/addition/ItemDBCommand.java:85
-#, fuzzy
 #| msgid "Matched {input#item} ({integer#id} for {input}"
 msgid "Matched {input#item} {integer#id} for {input}"
-msgstr ""
+msgstr "Übereinstimmung {input#item} {integer#id} für {input}"

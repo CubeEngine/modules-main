@@ -13,59 +13,67 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
-#, fuzzy
+# Translators:
+# Faithcaio <Faithcaio@cubeisland.de>, 2015-2016
+# Faithcaio <Faithcaio@cubeisland.de>, 2015
 msgid ""
 msgstr ""
-"Project-Id-Version: org.cubeengine.module:roles:1.0.0-SNAPSHOT\n"
+"Project-Id-Version: CubeEngine\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
 "POT-Creation-Date: 2016-05-18 21:22:03+0200\n"
+"PO-Revision-Date: 2016-05-18 19:24+0000\n"
+"Last-Translator: Faithcaio <Faithcaio@cubeisland.de>\n"
+"Language-Team: German (http://www.transifex.com/quick_wango/cubeengine/language/de/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: en_US\n"
+"Language: de\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:80
 msgid "(+)"
-msgstr ""
+msgstr "(+)"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:119
 msgid "Adds a parent role to given role [in context]"
-msgstr ""
+msgstr "Fügt einer Rolle eine Vorgängerrolle [in Kontext] hinzu"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/UserManagementCommands.java:64
 msgid "Assign a role to the player [-temp]"
-msgstr ""
+msgstr "Weist einem Spieler [-temp] eine Rolle zu"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:185
 msgid "Checks for options of a user [in context]"
-msgstr ""
+msgstr "Prüft auf Metadaten eines Spielers [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:120
 msgid "Checks for permissions of a user [in context]"
-msgstr ""
+msgstr "Prüft Rechte eines Spielers [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleInformationCommands.java:93
 msgid "Checks the permission in given role [in context]"
-msgstr ""
+msgstr "Prüft die Rechte einer Rolle [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
@@ -73,91 +81,100 @@ msgstr ""
 #: org/cubeengine/module/roles/commands/UserManagementCommands.java:116
 msgid ""
 "Clears all roles from the player and sets the defaultroles [in context]"
-msgstr ""
+msgstr "Löscht alle Rollen eines Spielers [in Kontext] und setzt die Standart Rollen"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:111
 msgid "Clears the options for given role [in context]"
-msgstr ""
+msgstr "Löscht die Metadaten einer Rolle [in Kontext]"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:93
 msgid "Click to add role"
-msgstr ""
+msgstr "Klicke um Rolle hinzuzufügen"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:99
 msgid "Click to remove role."
-msgstr ""
+msgstr "Klicke um Rolle zu entfernen."
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:105
 msgid "Confirm"
-msgstr ""
+msgstr "Bestätigen"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:191
 msgid "Creates a new role"
-msgstr ""
+msgstr "Erstelle eine neue Rolle"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:205
 msgid "Deletes a role"
-msgstr ""
+msgstr "Löscht eine Rolle"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:154
 msgid "List permission assigned to a user [in context]"
-msgstr ""
+msgstr "Listet einem Spieler zugewiesene Rechte [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleInformationCommands.java:155
 msgid "Lists all options of given role [in context]"
-msgstr ""
+msgstr "Listet alle Metadaten einer Rolle [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleInformationCommands.java:184
 msgid "Lists all parents of given role [in context]"
-msgstr ""
+msgstr "Listet alle Vorgängerrollen einer Rolle [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleInformationCommands.java:118
 msgid "Lists all permissions of given role [in context]"
-msgstr ""
+msgstr "Listet alle Berechtigungen einer Rolle [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleInformationCommands.java:72
 msgid "Lists all roles"
-msgstr ""
+msgstr "Listet alle Rollen auf"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:209
 msgid "Lists assigned options from a user [in context]"
-msgstr ""
+msgstr "Listet alle einem Spieler zugwiesene Metadaten [in Kontext] auf"
 
 #. Extracted by:
 #. 1, 2. Annotation
@@ -165,7 +182,7 @@ msgstr ""
 #: org/cubeengine/module/roles/commands/RoleInformationCommands.java:58
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:50
 msgid "Manage roles"
-msgstr ""
+msgstr "Verwaltet Rollen"
 
 #. Extracted by:
 #. 1, 2. Annotation
@@ -173,77 +190,80 @@ msgstr ""
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:57
 #: org/cubeengine/module/roles/commands/UserManagementCommands.java:50
 msgid "Manage users"
-msgstr ""
+msgstr "Verwaltet Benutzer"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/ManagementCommands.java:56
 msgid "Manages the module"
-msgstr ""
+msgstr "Verwaltet das Roles Modul"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleCommands.java:25
 msgid "Manages the roles"
-msgstr ""
+msgstr "Verwaltet die Rollen"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/ManagementCommands.java:88
 msgid "Overrides all configs with current settings"
-msgstr ""
+msgstr "Überschreibt alle Konfigurationen mit den aktuellen Einstellungen"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/roles/RolesUtil.java:179
 msgid "Permission not registered"
-msgstr ""
+msgstr "Berechtigung nicht registriert"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/ManagementCommands.java:72
 msgid "Reloads all roles from config"
-msgstr ""
+msgstr "Lädt alle Rollen von den Konfigurationen neu"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:132
 msgid "Removes a parent role from given role [in context]"
-msgstr ""
+msgstr "Entfernt eine Vorgängerrolle von einer Rolle [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/UserManagementCommands.java:96
 msgid "Removes a role from the player"
-msgstr ""
+msgstr "Entfernt eine Rolle von einem Spieler"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:144
 msgid "Removes all parent roles from given role [in context]"
-msgstr ""
+msgstr "Enfernt alle Vorgängerrollen einer Rolle [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:173
 msgid "Renames given role"
-msgstr ""
+msgstr "Benennt eine Rolle um"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/UserManagementCommands.java:156
 msgid "Resets a permission for this user [in context]"
-msgstr ""
+msgstr "Setzt eine Berechtigung für diesen Spieler [in Kontext] zurück"
 
 #. Extracted by:
 #. 1, 2. Annotation
@@ -251,111 +271,119 @@ msgstr ""
 #: org/cubeengine/module/roles/commands/UserManagementCommands.java:183
 #: org/cubeengine/module/roles/commands/UserManagementCommands.java:196
 msgid "Resets options for this user [in context]"
-msgstr ""
+msgstr "Setzt Metadaten für diesen Spieler [in Kontext] zurück"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:104
 msgid "Resets the options for given role [in context]"
-msgstr ""
+msgstr "Setzt die Metadaten für eine Rolle [in Kontext] zurück"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:76
 msgid "Roles of {user}:"
-msgstr ""
+msgstr "Rollen von {user}:"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/ManagementCommands.java:103
 msgid "Searches for registered Permissions"
-msgstr ""
+msgstr "Suche nach registrierten Berechtigungen"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/UserManagementCommands.java:134
 msgid "Sets a permission for this user [in context]"
-msgstr ""
+msgstr "Setzt eine Berechtigung für diesen Spieler [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:91
 msgid "Sets an option for given role [in context]"
-msgstr ""
+msgstr "Setzt Metadaten für eine Rolle [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/UserManagementCommands.java:170
 msgid "Sets options for this user [in context]"
-msgstr ""
+msgstr "Setzt Metadaten für diesen Spieler [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:64
 msgid "Sets the permission for given role [in context]"
-msgstr ""
+msgstr "Setzt die Berechtigung für eine Rolle [in Kontext]"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:156
 msgid "Sets the priority of given role"
-msgstr ""
+msgstr "Setzt die Priorität einer Rolle"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleInformationCommands.java:200
 msgid "Show the priority of given role"
-msgstr ""
+msgstr "Zeigt die Priorität einer Rolle"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:216
 msgid "Toggles whether given role is a default role"
-msgstr ""
+msgstr "Schaltet Standartrolle um"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/roles/commands/RoleInformationCommands.java:141
 msgid "false"
-msgstr ""
+msgstr "falsch"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
 #: org/cubeengine/module/roles/commands/RoleManagementCommands.java:174
 msgid "new name"
-msgstr ""
+msgstr "neuer Name"
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
 #: org/cubeengine/module/roles/commands/RoleInformationCommands.java:140
 msgid "true"
-msgstr ""
+msgstr "wahr"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/RoleInformationCommands.java:207
 msgid "Lists all default roles"
-msgstr ""
+msgstr "Listet alle Standartrollen"
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
 #: org/cubeengine/module/roles/commands/UserInformationCommands.java:71
-#, fuzzy
 #| msgid "Lists roles of a user [in context]"
 msgid "Lists roles of a user"
-msgstr ""
+msgstr "Listet die Rollen eines Spielers auf"

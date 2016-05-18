@@ -1,0 +1,273 @@
+# This file is part of CubeEngine.
+# CubeEngine is licensed under the GNU General Public License Version 3.
+# 
+# CubeEngine is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# CubeEngine is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
+# Translators:
+# Auge59 <Auge59@gmx.de>, 2013
+# Faithcaio <Faithcaio@cubeisland.de>, 2015-2016
+# Larson März <larson@protonmail.ch>, 2016
+# Sebastian Raupach <s.raupach92@googlemail.com>, 2013-2014
+msgid ""
+msgstr ""
+"Project-Id-Version: CubeEngine\n"
+"Report-Msgid-Bugs-To: development@cubeisland.de\n"
+"POT-Creation-Date: 2016-05-17 23:36:36+0200\n"
+"PO-Revision-Date: 2016-05-18 19:02+0000\n"
+"Last-Translator: Faithcaio <Faithcaio@cubeisland.de>\n"
+"Language-Team: German (http://www.transifex.com/quick_wango/cubeengine/language/de/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Extracted by:
+#. 1, 2. Method
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:324
+#: org/cubeengine/module/travel/warp/WarpCommand.java:264
+msgid "(tp)"
+msgstr "(tp)"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:444
+msgid "Clear all homes [of a player]"
+msgstr "Löscht alle Homepunkte [eines Spielers]"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/warp/WarpCommand.java:280
+msgid "Clear all warps [of a player]"
+msgstr "Löscht alle Warppunkte [eines Spielers]"
+
+#. Extracted by:
+#. 1, 2. Method
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:326
+#: org/cubeengine/module/travel/warp/WarpCommand.java:266
+msgid "Click to teleport to {name}"
+msgstr "Klicke um zu {name} zu teleportieren"
+
+#. Extracted by:
+#. 1. Method
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.util.Locale,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
+#: org/cubeengine/module/travel/TpPointFormatter.java:47
+msgid "Click to teleport to {}"
+msgstr "Klicke um zu {} zu teleportieren"
+
+#. Extracted by:
+#. 1. Method
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:374
+msgid "Click to uninvite {user} from {name}"
+msgstr "Klicke um {user} von {name} zu entladen"
+
+#. Extracted by:
+#. 1. Method
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:502
+msgid "Confirm before 30 seconds have passed to delete the homes"
+msgstr "Bestätigte innerhalb von 30 Sekunden um die Homepunkte zu löschen"
+
+#. Extracted by:
+#. 1. Method
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:296
+msgid "Confirm before 30 seconds have passed to delete the warps"
+msgstr "Bestätige innerhalb von 30 Sekunden um die Warppunkte zu löschen"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/warp/WarpCommand.java:110
+msgid "Create a warp"
+msgstr "Erstellt einen Warppunkt"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.filter.Restricted:msg
+#: org/cubeengine/module/travel/home/HomeCommand.java:382
+msgid "How about making a phone call to invite someone instead?"
+msgstr "Warum rufst du nicht jemanden an um Ihn einzuladen?"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.filter.Restricted:msg
+#: org/cubeengine/module/travel/home/HomeCommand.java:201
+msgid "I am calling the moving company right now!"
+msgstr "Ich ruf den Umszugsdienst jetzt an!"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:383
+msgid "Invite a user to one of your homes"
+msgstr "Lädt einen Spieler zu Homepunkt ein"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:339
+msgid "List all players invited to your homes"
+msgstr "Listet alle Spieler die zu Homepunkten eingeladen sind auf"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/warp/WarpCommand.java:248
+msgid "List warps of a player"
+msgstr "Listet die Warppunkt von Spielern"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:289
+msgid "Lists homes a player can access"
+msgstr "Listet alle verfügbaren Homepunkte"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:202
+msgid "Move a home"
+msgstr "Bewegt einen Homepunkt"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/warp/WarpCommand.java:171
+msgid "Move a warp"
+msgstr "Bewegt einen Warppunkt"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.filter.Restricted:msg
+#: org/cubeengine/module/travel/home/HomeCommand.java:142
+msgid "Ok so I'll need your new address then. No seriously this won't work!"
+msgstr "Ok ich brauch dann diene Adresse. Ne wirklich das wird nicht klappen!"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:231
+msgid "Remove a home"
+msgstr "Löscht einen Homepunkt"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/warp/WarpCommand.java:195
+msgid "Remove a warp"
+msgstr "Löscht einen Warppunkt"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:254
+msgid "Rename a home"
+msgstr "Benennt einen Homepunkt um"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/warp/WarpCommand.java:217
+msgid "Rename a warp"
+msgstr "Benennt einen Warppunkt um"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:168
+msgid "Set the welcome message of homes"
+msgstr "Setzt die Willkommensnachricht für einen Homepunkt"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/warp/WarpCommand.java:138
+msgid "Set the welcome message of warps"
+msgstr "Setzt die Willkommensnachricht von einen Warppunkt"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:141
+msgid "Set your home"
+msgstr "Setzt einen Homepunkt"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:106
+msgid "Teleport to a home"
+msgstr "Teleportiert zu einem Homepunkt"
+
+#. Extracted by:
+#. 1, 2. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/warp/WarpCommand.java:53
+#: org/cubeengine/module/travel/warp/WarpCommand.java:79
+msgid "Teleport to a warp"
+msgstr "Teleportiert zu einem Warppunkt"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:71
+msgid "Teleport to your home"
+msgstr "Teleportiert zu Homepunkten"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/travel/home/HomeCommand.java:415
+msgid "Uninvite a player from one of your homes"
+msgstr "Entlädt einen Spieler von einem Homepunkt"
+
+#. Extracted by:
+#. 1, 2. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Label:value
+#: org/cubeengine/module/travel/home/HomeCommand.java:255
+#: org/cubeengine/module/travel/warp/WarpCommand.java:218
+msgid "new name"
+msgstr "neuer name"
+
+#. Extracted by:
+#. 1, 2. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Label:value
+#: org/cubeengine/module/travel/home/HomeCommand.java:171
+#: org/cubeengine/module/travel/warp/WarpCommand.java:140
+msgid "welcome message"
+msgstr "Willkommensnachricht"

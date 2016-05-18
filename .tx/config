@@ -2,38 +2,78 @@
 host = https://www.transifex.com
 type = PO
 
-[cubeengine.basics]
-file_filter = basics/src/main/resources/translations/<lang>.po
-source_file = basics/src/main/resources/translations/messages.pot
+[cubeengine.conomy]
+file_filter = conomy/src/main/resources/assets/org/cubeengine/translations/<lang>_conomy.po
+source_file = conomy/src/main/resources/assets/org/cubeengine/translations/messages_conomy.pot
 source_lang = en_US
 
-[cubeengine.conomy]
-file_filter = conomy/src/main/resources/translations/<lang>.po
-source_file = conomy/src/main/resources/translations/messages.pot
+[cubeengine.contextmirror]
+file_filter = contextmirror/src/main/resources/assets/org/cubeengine/translations/<lang>_contextmirror.po
+source_file = contextmirror/src/main/resources/assets/org/cubeengine/translations/messages_contextmirror.pot
+source_lang = en_US
+
+[cubeengine.kickban]
+file_filter = kickban/src/main/resources/assets/org/cubeengine/translations/<lang>_kickban.po
+source_file = kickban/src/main/resources/assets/org/cubeengine/translations/messages_kickban.pot
 source_lang = en_US
 
 [cubeengine.locker]
-file_filter = locker/src/main/resources/translations/<lang>.po
-source_file = locker/src/main/resources/translations/messages.pot
+file_filter = locker/src/main/resources/assets/org/cubeengine/translations/<lang>_locker.po
+source_file = locker/src/main/resources/assets/org/cubeengine/translations/messages_locker.pot
+source_lang = en_US
+
+[cubeengine.mail]
+file_filter = mail/src/main/resources/assets/org/cubeengine/translations/<lang>_mail.po
+source_file = mail/src/main/resources/assets/org/cubeengine/translations/messages_mail.pot
+source_lang = en_US
+
+[cubeengine.multiverse]
+file_filter = multiverse/src/main/resources/assets/org/cubeengine/translations/<lang>_multiverse.po
+source_file = multiverse/src/main/resources/assets/org/cubeengine/translations/messages_multiverse.pot
+source_lang = en_US
+
+[cubeengine.netherportals]
+file_filter = netherportals/src/main/resources/assets/org/cubeengine/translations/<lang>_netherportals.po
+source_file = netherportals/src/main/resources/assets/org/cubeengine/translations/messages_netherportals.pot
 source_lang = en_US
 
 [cubeengine.portals]
-file_filter = portals/src/main/resources/translations/<lang>.po
-source_file = portals/src/main/resources/translations/messages.pot
+file_filter = portals/src/main/resources/assets/org/cubeengine/translations/<lang>_portals.po
+source_file = portals/src/main/resources/assets/org/cubeengine/translations/messages_portals.pot
 source_lang = en_US
 
 [cubeengine.roles]
-file_filter = roles/src/main/resources/translations/<lang>.po
-source_file = roles/src/main/resources/translations/messages.pot
+file_filter = roles/src/main/resources/assets/org/cubeengine/translations/<lang>_roles.po
+source_file = roles/src/main/resources/assets/org/cubeengine/translations/messages_roles.pot
+source_lang = en_US
+
+[cubeengine.teleport]
+file_filter = teleport/src/main/resources/assets/org/cubeengine/translations/<lang>_teleport.po
+source_file = teleport/src/main/resources/assets/org/cubeengine/translations/messages_teleport.pot
 source_lang = en_US
 
 [cubeengine.travel]
-file_filter = travel/src/main/resources/translations/<lang>.po
-source_file = travel/src/main/resources/translations/messages.pot
+file_filter = travel/src/main/resources/assets/org/cubeengine/translations/<lang>_travel.po
+source_file = travel/src/main/resources/assets/org/cubeengine/translations/messages_travel.pot
+source_lang = en_US
+
+[cubeengine.vanillaplus]
+file_filter = vanillaplus/src/main/resources/assets/org/cubeengine/translations/<lang>_vanillaplus.po
+source_file = vanillaplus/src/main/resources/assets/org/cubeengine/translations/messages_vanillaplus.pot
+source_lang = en_US
+
+[cubeengine.worldcontrol]
+file_filter = worldcontrol/src/main/resources/assets/org/cubeengine/translations/<lang>_worldcontrol.po
+source_file = worldcontrol/src/main/resources/assets/org/cubeengine/translations/messages_worldcontrol.pot
 source_lang = en_US
 
 [cubeengine.worlds]
-file_filter = worlds/src/main/resources/translations/<lang>.po
-source_file = worlds/src/main/resources/translations/messages.pot
+file_filter = worlds/src/main/resources/assets/org/cubeengine/translations/<lang>_worlds.po
+source_file = worlds/src/main/resources/assets/org/cubeengine/translations/messages_worlds.pot
+source_lang = en_US
+
+[cubeengine.xxx]
+file_filter = xxx/src/main/resources/assets/org/cubeengine/translations/<lang>_.po
+source_file = xxx/src/main/resources/assets/org/cubeengine/translations/messages_.pot
 source_lang = en_US
 

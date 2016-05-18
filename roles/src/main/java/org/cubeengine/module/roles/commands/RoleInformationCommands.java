@@ -18,6 +18,7 @@
 package org.cubeengine.module.roles.commands;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -203,16 +204,16 @@ public class RoleInformationCommands extends ContainerCommand
         i18n.sendTranslated(ctx, NEUTRAL, "The priority of the role {role} is: {integer#priority}", role, priority.value);
     }
 
-    @Command(alias = {"default","defaultRoles","listDefRoles"}, desc = "Lists all default roles [in context]")
-    public void listDefaultRoles(CommandSource cContext, @Named("in") @Default Context context) // TODO
+    @Command(alias = {"default","defaultRoles","listDefRoles"}, desc = "Lists all default roles")
+    public void listDefaultRoles(CommandSource cContext)
     {
-        List<Subject> parents = service.getDefaultData().getParents(toSet(context));
+        List<Subject> parents = service.getDefaultData().getParents(Collections.emptySet());
         if (parents.isEmpty())
         {
-            i18n.sendTranslated(cContext, NEGATIVE, "There are no default roles set for {context}!", context);
+            i18n.sendTranslated(cContext, NEGATIVE, "There are no default roles set!");
             return;
         }
-        i18n.sendTranslated(cContext, POSITIVE, "The following roles are default roles in {context}!", context);
+        i18n.sendTranslated(cContext, POSITIVE, "The following roles are default roles:");
         for (Subject role : parents)
         {
             cContext.sendMessage(Text.of("- ", YELLOW, role.getIdentifier()));

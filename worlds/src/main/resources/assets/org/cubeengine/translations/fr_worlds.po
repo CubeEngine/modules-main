@@ -1,0 +1,113 @@
+# This file is part of CubeEngine.
+# CubeEngine is licensed under the GNU General Public License Version 3.
+# 
+# CubeEngine is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# CubeEngine is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: CubeEngine\n"
+"Report-Msgid-Bugs-To: development@cubeisland.de\n"
+"POT-Creation-Date: 2016-05-17 23:36:39+0200\n"
+"PO-Revision-Date: 2016-05-18 18:18+0000\n"
+"Last-Translator: Faithcaio <Faithcaio@cubeisland.de>\n"
+"Language-Team: French (http://www.transifex.com/quick_wango/cubeengine/language/fr/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: fr\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/worlds/WorldsCommands.java:85
+msgid "Creates a new world"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/worlds/WorldsCommands.java:250
+msgid "Lists all worlds"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/worlds/WorldsCommands.java:343
+msgid "Lists the players in a world"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/worlds/WorldsCommands.java:153
+msgid "Loads a world"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#getTranslation(org.spongepowered.api.text.channel.MessageReceiver,
+#. org.spongepowered.api.text.format.TextFormat, java.lang.String,
+#. java.lang.Object[])
+#: org/cubeengine/module/worlds/WorldsCommands.java:212
+msgid "Main world unloading. Flee!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/worlds/WorldsCommands.java:230
+msgid "Remove a world"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/worlds/WorldsCommands.java:282
+msgid "Show info about a world"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/worlds/WorldsCommands.java:177
+msgid "Unload a loaded world"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/worlds/WorldsCommands.java:73
+msgid "Worlds commands"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#translate(java.util.Locale,
+#. java.lang.String)
+#: org/cubeengine/module/worlds/WorldsCommands.java:259
+msgid "not enabled"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#.         Name:
+#. org.cubeengine.libcube.service.i18n.I18n#translate(java.util.Locale,
+#. java.lang.String)
+#: org/cubeengine/module/worlds/WorldsCommands.java:258
+msgid "not loaded"
+msgstr ""

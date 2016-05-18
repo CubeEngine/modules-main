@@ -77,12 +77,12 @@ public class ItemDBCommand
             }
             List<Text> lines = new ArrayList<>();
             ItemStack key = itemList.get(0);
-            lines.add(i18n.getTranslation(context, POSITIVE, "Best Matched {input#item} ({integer#id} for {input}",
+            lines.add(i18n.getTranslation(context, POSITIVE, "Best Matched {input#item} {integer#id} for {input}",
                                           materialMatcher.getNameFor(key), key.getItem().getId(), item));
             itemList.remove(0);
             for (ItemStack stack : itemList)
             {
-                lines.add(i18n.getTranslation(context, POSITIVE, "Matched {input#item} ({integer#id} for {input}",
+                lines.add(i18n.getTranslation(context, POSITIVE, "Matched {input#item} {integer#id} for {input}",
                                               materialMatcher.getNameFor(stack), stack.getItem().getId(), item));
             }
             Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder()

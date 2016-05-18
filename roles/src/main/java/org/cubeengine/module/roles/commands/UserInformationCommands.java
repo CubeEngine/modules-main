@@ -68,7 +68,7 @@ public class UserInformationCommands extends ContainerCommand
     }
 
     @Alias(value = "listuroles")
-    @Command(desc = "Lists roles of a user [in context]")
+    @Command(desc = "Lists roles of a user")
     public void list(CommandSource ctx, @Default User player)
     {
         List<Subject> parents = player.getSubjectData().getParents(GLOBAL_CONTEXT);
