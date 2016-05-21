@@ -113,6 +113,8 @@ public class VanillaPlusConfig extends ReflectedYaml
         @Comment("Improves /whitelist")
         public boolean commandWhitelist = true;
 
+        @Comment("Improves /worldborder")
+        public boolean commandBorder = true;
     }
 
     public static class Additions implements Section

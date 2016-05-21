@@ -42,6 +42,7 @@ import org.cubeengine.module.vanillaplus.fix.PaintingListener;
 import org.cubeengine.module.vanillaplus.fix.SafeLoginData;
 import org.cubeengine.module.vanillaplus.fix.SafeLoginDataBuilder;
 import org.cubeengine.module.vanillaplus.fix.TamedListener;
+import org.cubeengine.module.vanillaplus.improvement.BorderCommands;
 import org.cubeengine.module.vanillaplus.improvement.ClearInventoryCommand;
 import org.cubeengine.module.vanillaplus.improvement.DifficultyCommand;
 import org.cubeengine.module.vanillaplus.improvement.GameModeCommand;
@@ -295,6 +296,10 @@ public class VanillaPlus extends Module
         if (config.improve.commandWhitelist)
         {
             cm.addCommand(new WhitelistCommand(cm, i18n));
+        }
+        if (config.improve.commandBorder)
+        {
+            cm.addCommand(new BorderCommands(i18n, cm, plugin));
         }
     }
 

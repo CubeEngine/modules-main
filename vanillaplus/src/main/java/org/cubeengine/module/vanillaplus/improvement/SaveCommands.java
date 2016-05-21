@@ -40,7 +40,7 @@ public class SaveCommands
         this.i18n = i18n;
     }
 
-    // todo integrate /saveoff and /saveon and provide aliases
+    // TODO integrate /saveoff and /saveon and provide aliases
     @Alias(value = "save-all")
     @Command(desc = "Saves all or a specific world to disk.")
     public void saveall(CommandSource context, @Optional World world)
@@ -63,6 +63,4 @@ public class SaveCommands
         i18n.sendTranslated(context, POSITIVE, "All worlds have been saved to disk!");
         i18n.sendTranslated(context, POSITIVE, "The saving took {integer#time} milliseconds.", Profiler.endProfiling("save-worlds", MILLISECONDS));
     }
-
-
 }

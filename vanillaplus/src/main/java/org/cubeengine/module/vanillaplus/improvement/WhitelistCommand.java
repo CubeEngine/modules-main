@@ -30,12 +30,15 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.whitelist.WhitelistService;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
 
 /**
  * All Whitelist related commands:
@@ -79,7 +82,7 @@ public class WhitelistCommand extends ContainerCommand
     }
 
     @Command(desc = "Adds a player to the whitelist.")
-    public void add(CommandSource context, Player player)
+    public void add(CommandSource context, User player)
     {
         WhitelistService service = getWhitelistService();
         if (service.addProfile(player.getProfile()))
@@ -91,7 +94,7 @@ public class WhitelistCommand extends ContainerCommand
     }
 
     @Command(alias = "rm", desc = "Removes a player from the whitelist.")
-    public void remove(CommandSource context, Player player)
+    public void remove(CommandSource context, User player)
     {
         WhitelistService service = getWhitelistService();
         if (service.removeProfile(player.getProfile()))
@@ -125,7 +128,7 @@ public class WhitelistCommand extends ContainerCommand
 
             Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder()
                 .title(i18n.getTranslation(context, NEUTRAL, "The following players are whitelisted"))
-                .contents(list.stream().map(p -> Text.of(" - ", p.getName())).collect(Collectors.toList()))
+                .contents(list.stream().map(p -> Text.of(" - ", DARK_GREEN, p.getName().orElse("??"))).collect(Collectors.toList()))
                 .sendTo(context);
         }
 

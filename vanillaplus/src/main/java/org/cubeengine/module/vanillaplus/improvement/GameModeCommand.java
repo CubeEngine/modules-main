@@ -46,6 +46,7 @@ public class GameModeCommand extends PermissionContainer
         this.i18n = i18n;
     }
 
+    // TODO completer
     @Command(alias = "gm", desc = "Changes the gamemode")
     public void gamemode(CommandSource context, @Optional String gamemode, @Default User player)
     {

@@ -217,7 +217,7 @@ public class TimeCommands extends PermissionContainer
             i18n.sendTranslated(context, POSITIVE, "Your time was set to {input#time} ({input#neartime})!", format, nearTime);
         }
     }
-    */
+    //*/
 
     private void setTime(World world, long time)
     {

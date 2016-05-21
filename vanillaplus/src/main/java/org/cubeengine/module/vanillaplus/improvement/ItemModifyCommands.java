@@ -209,9 +209,13 @@ public class ItemModifyCommands extends PermissionContainer
                     if (item.supports(DurabilityData.class))
                     {
                         Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
+                        if (!max.equals(item.get(Keys.ITEM_DURABILITY).orElse(0)))
+                        {
+                            repaired++;
+                        }
                         item.offer(Keys.ITEM_DURABILITY, max);
-                        repaired++;
                     }
+                    slot.set(item);
                 }
             }
             if (repaired == 0)
@@ -222,7 +226,12 @@ public class ItemModifyCommands extends PermissionContainer
             i18n.sendTranslated(context, POSITIVE, "Repaired {amount} items!", repaired);
             return;
         }
-        ItemStack item = context.getItemInHand().get();
+        ItemStack item = context.getItemInHand().orElse(null);
+        if (item == null)
+        {
+            i18n.sendTranslated(context, NEGATIVE, "No item in hand!");
+            return;
+        }
         if (item.supports(DurabilityData.class))
         {
             Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
@@ -232,6 +241,7 @@ public class ItemModifyCommands extends PermissionContainer
                 return;
             }
             item.offer(Keys.ITEM_DURABILITY, max);
+            context.setItemInHand(item);
             i18n.sendTranslated(context, POSITIVE, "Item repaired!");
             return;
         }

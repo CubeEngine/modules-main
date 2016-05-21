@@ -23,9 +23,11 @@ import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 /**
@@ -85,12 +87,12 @@ public class WeatherCommands
 
     public enum PlayerWeather
     {
-        CLEAR, DOWNFALL, RESET
+        SUN, RAIN, RESET
     }
 
-    /* TODO wait for https://github.com/SpongePowered/SpongeAPI/issues/1059
+    /* TODO wait for https://github.com/SpongePowered/SpongeAPI/issues/393
     @Command(alias = "playerweather", desc = "Changes your weather")
-    public void pweather(CommandContext context, PlayerWeather weather, @Default @Named("player") Player player)
+    public void pweather(CommandSource context, PlayerWeather weather, @Default @Named("player") Player player)
     {
         if (!player.isOnline())
         {
@@ -99,7 +101,7 @@ public class WeatherCommands
         }
         switch (weather)
         {
-            case CLEAR:
+            case SUN:
                 player.setPlayerWeather(Weathers.CLEAR);
                 if (context.getSource().equals(player))
                 {
@@ -111,7 +113,7 @@ public class WeatherCommands
                     i18n.sendTranslated(context, POSITIVE, "{user}s weather is now clear!", player);
                 }
                 return;
-            case DOWNFALL:
+            case RAIN:
                 player.setPlayerWeather(Weathers.RAIN);
                 if (context.getSource().equals(player))
                 {
@@ -138,5 +140,5 @@ public class WeatherCommands
         }
         throw new IncorrectUsageException("You did something wrong!");
     }
-    */
+    //*/
 }

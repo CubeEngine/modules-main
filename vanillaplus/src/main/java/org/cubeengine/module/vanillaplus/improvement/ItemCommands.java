@@ -162,12 +162,14 @@ public class ItemCommands extends PermissionContainer
             return;
         }
 
-        if (!context.getItemInHand().isPresent())
+        java.util.Optional<ItemStack> item = context.getItemInHand();
+        if (!item.isPresent())
         {
             i18n.sendTranslated(context, NEUTRAL, "More nothing is still nothing!");
             return;
         }
-        context.getItemInHand().get().setQuantity(64);
+        item.get().setQuantity(item.get().getMaxStackQuantity());
+        context.setItemInHand(item.get());
         if (amount == 1)
         {
             i18n.sendTranslated(context, POSITIVE, "Refilled stack in hand!");
@@ -175,7 +177,7 @@ public class ItemCommands extends PermissionContainer
         }
         for (int i = 1; i < amount; ++i)
         {
-            context.getInventory().offer(context.getItemInHand().get());
+            context.getInventory().offer(item.get());
         }
         i18n.sendTranslated(context, POSITIVE, "Refilled {amount} stacks in hand!", amount);
     }
