@@ -42,7 +42,6 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.CommandContext;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
-import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
@@ -73,14 +72,12 @@ public class InformationCommands extends PermissionContainer
 {
     private final PeriodFormatter formatter;
     private VanillaPlus module;
-    private MaterialMatcher materialMatcher;
     private I18n i18n;
 
-    public InformationCommands(PermissionManager pm, VanillaPlus module, MaterialMatcher materialMatcher, I18n i18n)
+    public InformationCommands(PermissionManager pm, VanillaPlus module, I18n i18n)
     {
         super(pm, VanillaPlus.class);
         this.module = module;
-        this.materialMatcher = materialMatcher;
         this.i18n = i18n;
         this.formatter = new PeriodFormatterBuilder().appendWeeks().appendSuffix(" week"," weeks").appendSeparator(" ")
                                                      .appendDays().appendSuffix(" day", " days").appendSeparator(" ")

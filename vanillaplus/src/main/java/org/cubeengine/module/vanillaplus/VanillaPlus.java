@@ -165,7 +165,7 @@ public class VanillaPlus extends Module
         }
         if (config.add.commandsInformation)
         {
-            cm.addCommands(this, new InformationCommands(pm, this, mm, i18n));
+            cm.addCommands(this, new InformationCommands(pm, this, i18n));
         }
         if (config.add.commandInvsee)
         {

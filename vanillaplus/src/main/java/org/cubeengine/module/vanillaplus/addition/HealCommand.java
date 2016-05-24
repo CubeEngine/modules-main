@@ -94,12 +94,4 @@ public class HealCommand extends PermissionContainer
             user.offer(Keys.HEALTH, user.get(Keys.MAX_HEALTH).get());
         }
     }
-
-
-
-
-
-
-
-
 }

@@ -69,6 +69,7 @@ import static org.spongepowered.api.text.format.TextColors.*;
  *
  * TODO autosave?
  * TODO custom Generators
+ * TODO alias for worlds
  */
 @Command(name = "worlds", desc = "Worlds commands")
 public class WorldsCommands extends ContainerCommand

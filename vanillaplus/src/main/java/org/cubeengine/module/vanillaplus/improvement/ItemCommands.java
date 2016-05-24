@@ -102,6 +102,7 @@ public class ItemCommands extends PermissionContainer
                      @Optional Integer amount,
                      @Named("ench") @Label("enchantment[:level]") String enchantmentString)
     {
+        // TODO spawn_egg data
         amount = amount == null ? item.getMaxStackQuantity() : amount;
         if (amount <= 0)
         {

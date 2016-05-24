@@ -59,7 +59,7 @@ public class PlayerInfoCommands
     private static final long SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
     @Command(desc = "Shows when given player was online the last time")
-    public void seen(CommandSource context, Player player)
+    public void seen(CommandSource context, User player)
     {
         if (player.isOnline())
         {
