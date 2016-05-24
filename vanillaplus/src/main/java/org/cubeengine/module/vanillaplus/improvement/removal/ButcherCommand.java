@@ -27,6 +27,7 @@ import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.libcube.util.CauseUtil;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -84,7 +85,7 @@ public class ButcherCommand extends PermissionContainer
         Predicate<Entity> filter = radius == -1 ? types :
            types.and(e -> e.getTransform().getPosition().distance(((Player)context).getLocation().getPosition()) <= rSquared);
 
-        Cause lightningCause = Cause.of(NamedCause.source(context));
+        Cause lightningCause = CauseUtil.spawnCause(context);
         Collection<Entity> remove = world.getEntities(filter);
         for (Entity entity : remove)
         {

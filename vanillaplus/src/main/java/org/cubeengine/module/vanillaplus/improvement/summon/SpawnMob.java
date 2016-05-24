@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import org.cubeengine.butler.parameter.IncorrectUsageException;
+import org.cubeengine.libcube.util.CauseUtil;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
@@ -33,6 +34,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
@@ -93,7 +95,7 @@ public class SpawnMob
         {
             //CreatureSpawnEvent
             Optional<Entity> entity = loc.getExtent().createEntity(entityType, loc.getPosition());
-            loc.getExtent().spawnEntity(entity.get(), Cause.of(NamedCause.source(context)));
+            loc.getExtent().spawnEntity(entity.get(), CauseUtil.spawnCause(context));
             spawnedMobs[i] = entity.get();
             if (ridingOn != null)
             {

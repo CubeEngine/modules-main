@@ -26,6 +26,7 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.libcube.util.CauseUtil;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.readers.UserListInSight;
@@ -115,10 +116,10 @@ public class KillCommands extends PermissionContainer
         }
         if (lightning)
         {
-            player.getWorld().spawnEntity(player.getWorld().createEntity(LIGHTNING, player.getLocation().getPosition()).get(), Cause.of(source(context)));
+            player.getWorld().spawnEntity(player.getWorld().createEntity(LIGHTNING, player.getLocation().getPosition()).get(), CauseUtil.spawnCause(context));
         }
 
-        player.damage(player.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build(), Cause.of(source(context)));
+        player.damage(player.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build(), CauseUtil.spawnCause(context));
         if (showMessage)
         {
             i18n.sendTranslated(context, POSITIVE, "You killed {user}!", player);

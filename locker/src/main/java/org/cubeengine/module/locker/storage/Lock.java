@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.libcube.util.CauseUtil;
 import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.commands.PlayerAccess;
@@ -209,7 +210,7 @@ public class Lock
                 Optional<Entity> entity = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
                 entity.ifPresent(e -> {
                     e.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
-                    loc.getExtent().spawnEntity(e, Cause.of(NamedCause.source(player)));
+                    loc.getExtent().spawnEntity(e, CauseUtil.spawnCause(player));
                 });
             }
         }
