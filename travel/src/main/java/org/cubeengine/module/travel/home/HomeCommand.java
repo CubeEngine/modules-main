@@ -299,6 +299,11 @@ public class HomeCommand extends ContainerCommand
                 throw new PermissionDeniedException(new RawPermission(otherPerm.getId(), otherPerm.getDesc()));
             }
         }
+        if (!owned && !invited)
+        {
+            owned = true;
+            invited = true;
+        }
         Set<Home> homes = this.manager.list(owner, owned, invited);
         if (homes.isEmpty())
         {
