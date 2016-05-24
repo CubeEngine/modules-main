@@ -93,7 +93,7 @@ public class TeleportCommands
         } // else equals tp -> no need to check tp perm
         if (!context.equals(target))
         {
-            if (target.hasPermission(module.perms().TELEPORT_PREVENT_TPTO.getId())) // teleport to the target
+            if (!force && target.hasPermission(module.perms().TELEPORT_PREVENT_TPTO.getId())) // teleport to the target
             {
                 if (context.hasPermission(module.perms().COMMAND_TP_FORCE.getId()))
                 {
