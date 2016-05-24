@@ -64,7 +64,7 @@ public class TeleportCommands
     }
 
     @Command(desc = "Teleport directly to a player.")
-    public void tp(CommandSource context, Player player, @Optional Player target, @Flag boolean force, @Flag boolean unsafe)
+    public void tp(CommandSource context, Player player, @Optional Player target, @Flag boolean force)
     {
         if (target == null)
         {
@@ -114,18 +114,12 @@ public class TeleportCommands
             i18n.sendTranslated(context, NEUTRAL, "You just teleported {user} to {user}... Not very useful right?", player, player);
             return;
         }
-        if (!unsafe || player.setLocationSafely(target.getLocation()))
-        {
-            if (unsafe)
-            {
-                player.setLocation(target.getLocation());
-            }
-            i18n.sendTranslated(context, POSITIVE, "You teleported to {user}!", target);
-        }
+        player.setLocation(target.getLocation());
+        i18n.sendTranslated(context, POSITIVE, "You teleported to {user}!", target);
     }
 
     @Command(desc = "Teleports everyone directly to a player.")
-    public void tpall(CommandSource context, Player player, @Flag boolean force, @Flag boolean unsafe)
+    public void tpall(CommandSource context, Player player, @Flag boolean force)
     {
         force = force && context.hasPermission(module.perms().COMMAND_TPALL_FORCE.getId());
         if (!force && player.hasPermission(module.perms().TELEPORT_PREVENT_TPTO.getId()))
@@ -142,14 +136,7 @@ public class TeleportCommands
                 continue;
             }
             Location target = player.getLocation();
-            if (unsafe)
-            {
-                p.getPlayer().get().setLocation(target);
-            }
-            else if (!p.getPlayer().get().setLocationSafely(target))
-            {
-                noTp.add(p.getName());
-            }
+            p.getPlayer().get().setLocation(target);
         }
         bc.broadcastTranslated(POSITIVE, "Teleporting everyone to {user}", player);
         if (!noTp.isEmpty())
@@ -160,7 +147,7 @@ public class TeleportCommands
 
     @Command(desc = "Teleport a player directly to you.")
     @Restricted(value = Player.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
-    public void tphere(Player context, Player player, @Flag boolean force, @Flag boolean unsafe)
+    public void tphere(Player context, Player player, @Flag boolean force)
     {
         force = force && context.hasPermission(module.perms().COMMAND_TPHERE_FORCE.getId());
         if ( context.equals(player))
@@ -174,20 +161,14 @@ public class TeleportCommands
             return;
         }
 
-        if (!unsafe || player.setLocationSafely(context.getLocation()))
-        {
-            if (unsafe)
-            {
-                player.setLocation(context.getLocation());
-            }
-            i18n.sendTranslated(context, POSITIVE, "You teleported {user} to you!", player);
-            i18n.sendTranslated(player, POSITIVE, "You were teleported to {sender}", context);
-        }
+        player.setLocation(context.getLocation());
+        i18n.sendTranslated(context, POSITIVE, "You teleported {user} to you!", player);
+        i18n.sendTranslated(player, POSITIVE, "You were teleported to {sender}", context);
     }
 
     @Command(desc = "Teleport every player directly to you.")
     @Restricted(value = Player.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
-    public void tphereall(Player context, @Flag boolean force, @Flag boolean unsafe)
+    public void tphereall(Player context, @Flag boolean force)
     {
         force = force && context.hasPermission(module.perms().COMMAND_TPHEREALL_FORCE.getId());
         ArrayList<String> noTp = new ArrayList<>();
@@ -199,14 +180,7 @@ public class TeleportCommands
                 noTp.add(p.getName());
                 continue;
             }
-            if (unsafe)
-            {
-                p.getPlayer().get().setLocation(target);
-            }
-            else if (!p.getPlayer().get().setLocationSafely(target))
-            {
-                noTp.add(p.getName());
-            }
+            p.getPlayer().get().setLocation(target);
         }
         i18n.sendTranslated(context, POSITIVE, "You teleported everyone to you!");
         bc.broadcastTranslated(POSITIVE, "Teleporting everyone to {sender}", context);
