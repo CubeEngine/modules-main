@@ -27,6 +27,7 @@ import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.config.EntityLockConfig;
 import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.spongepowered.api.block.BlockTypes;
 
 import static org.cubeengine.module.locker.storage.LockType.PRIVATE;
 import static org.cubeengine.module.locker.storage.ProtectionFlag.*;
@@ -137,9 +138,19 @@ public class LockerConfig extends ReflectedYaml
             blockprotections.add(new BlockLockConfig(STANDING_SIGN));
             blockprotections.add(new BlockLockConfig(WALL_SIGN));
             blockprotections.add(new BlockLockConfig(WOODEN_DOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(BIRCH_DOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(JUNGLE_DOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(ACACIA_DOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(DARK_OAK_DOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
             blockprotections.add(new BlockLockConfig(IRON_DOOR));
             blockprotections.add(new BlockLockConfig(TRAPDOOR).defaultFlags(BLOCK_REDSTONE, AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(IRON_TRAPDOOR).defaultFlags(BLOCK_REDSTONE));
             blockprotections.add(new BlockLockConfig(FENCE_GATE).defaultFlags(AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(SPRUCE_FENCE_GATE).defaultFlags(AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(BIRCH_FENCE_GATE).defaultFlags(AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(JUNGLE_FENCE_GATE).defaultFlags(AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(DARK_OAK_FENCE_GATE).defaultFlags(AUTOCLOSE));
+            blockprotections.add(new BlockLockConfig(ACACIA_FENCE_GATE).defaultFlags(AUTOCLOSE));
             blockprotections.add(new BlockLockConfig(HOPPER).defaultFlags(HOPPER_IN, HOPPER_OUT));
         }
         if (protEntityEnable && (entityProtections == null || entityProtections.isEmpty()))
