@@ -162,10 +162,10 @@ public class ItemModifyCommands extends PermissionContainer
             List<ItemEnchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
             list.add(ench);
             item.offer(Keys.ITEM_ENCHANTMENTS, list);
-
+            context.setItemInHand(item);
             i18n.sendTranslated(context, POSITIVE,
                                    "Added unsafe enchantment: {input#enchantment} {integer#level} to your item!",
-                                   enchantment.getTranslation(), level);
+                                   enchantment.getName(), level); // TODO getTranslation
             return;
         }
 
@@ -176,8 +176,9 @@ public class ItemModifyCommands extends PermissionContainer
                 List<ItemEnchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
                 list.add(ench);
                 item.offer(Keys.ITEM_ENCHANTMENTS, list);
+                context.setItemInHand(item);
                 i18n.sendTranslated(context, POSITIVE, "Added enchantment: {input#enchantment} {integer#level} to your item!",
-                                    enchantment.getTranslation(), level);
+                                    enchantment.getName(), level);  // TODO getTranslation
                 return;
             }
             i18n.sendTranslated(context, NEGATIVE, "This enchantment level is not allowed!");
