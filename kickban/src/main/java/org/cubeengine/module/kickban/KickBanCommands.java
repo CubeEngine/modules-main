@@ -341,21 +341,26 @@ public class KickBanCommands
     }
 
     @Command(desc = "View all players banned from this server")
-    public void banlist(CommandSource context, BanListType type)
+    public void banlist(CommandSource context, BanListType type, @Optional String filter)
     {
+        // TODO clickable list
+        //  -- current search --
+        // <- abcdefg...0123...
+
         // TODO paging
         switch (type)
         {
             case PLAYERS:
-                banlistPlayer(context);
+                banlistPlayer(context, filter);
                 return;
             case IPS:
-                banlistIps(context);
+                banlistIps(context, filter);
         }
     }
 
-    private void banlistIps(CommandSource context)
+    private void banlistIps(CommandSource context, String filter)
     {
+        // TODO filter
         Collection<Ip> ipbans = this.banService.getIpBans();
         if (ipbans.isEmpty())
         {
@@ -373,8 +378,9 @@ public class KickBanCommands
         // TODO implode on Text
     }
 
-    private void banlistPlayer(CommandSource context)
+    private void banlistPlayer(CommandSource context, String filter)
     {
+        // TODO filter
         Collection<Ban.Profile> userBans = this.banService.getProfileBans();
         if (userBans.isEmpty())
         {
