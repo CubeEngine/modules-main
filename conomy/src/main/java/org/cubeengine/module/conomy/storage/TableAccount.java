@@ -26,7 +26,7 @@ import org.jooq.impl.SQLDataType;
 public class TableAccount extends Table<AccountModel>
 {
     public static TableAccount TABLE_ACCOUNT;
-    public final TableField<AccountModel, String> ID = createField("id", SQLDataType.VARCHAR.length(64), this);
+    public final TableField<AccountModel, String> ID = createField("id", SQLDataType.VARCHAR.length(64).nullable(false), this);
     public final TableField<AccountModel, String> NAME = createField("name", SQLDataType.VARCHAR.length(64), this);
     public final TableField<AccountModel, Byte> MASK = createField("mask", SQLDataType.TINYINT, this);
 
