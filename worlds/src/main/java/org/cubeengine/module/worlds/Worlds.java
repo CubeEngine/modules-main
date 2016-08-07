@@ -21,13 +21,22 @@ import javax.inject.Inject;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
+import de.cubeisland.engine.reflect.Reflector;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ModuleCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 @ModuleInfo(name = "Worlds", description = "easy lightweight worldmanagement")
 public class Worlds extends Module
 {
     @Inject @ModuleCommand private WorldsCommands wc;
+    @Inject private CommandManager cm;
+
+    @Enable
+    public void onEnable()
+    {
+        cm.getProviderManager().register(this, new WorldGeneratorModifierReader(), WorldGeneratorModifier.class);
+    }
 }

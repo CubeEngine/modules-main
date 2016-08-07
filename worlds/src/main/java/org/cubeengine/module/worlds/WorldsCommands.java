@@ -92,6 +92,7 @@ public class WorldsCommands extends ContainerCommand
                        @Default @Named({"structure", "struct"}) boolean generateStructures,
                        @Default @Named({"gamemode", "mode"}) GameMode gamemode,
                        @Default @Named({"difficulty", "diff"}) Difficulty difficulty,
+                       @org.cubeengine.butler.parametric.Optional @Named({"generator","gen"}) WorldGeneratorModifier generator,
                        @Flag boolean recreate,
                        @Flag boolean noload,
                        @Flag boolean spawnInMemory)
