@@ -17,7 +17,12 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import java.util.Set;
+import static java.util.Collections.emptySet;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.util.ContextUtil.toSet;
+
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Complete;
@@ -25,26 +30,22 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
-import static java.util.Collections.emptySet;
-import static org.cubeengine.libcube.util.ContextUtil.toSet;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import java.util.Set;
 
 @Alias("manuser")
 @Command(name = "user", desc = "Manage users")
@@ -118,7 +119,7 @@ public class UserManagementCommands extends ContainerCommand
     {
         player.getSubjectData().clearParents(emptySet());
         i18n.sendTranslated(ctx, NEUTRAL, "Cleared the roles of {user}.", player);
-        SubjectData defaultData = service.getDefaultData();
+        SubjectData defaultData = service.getDefaults().getSubjectData();
         if (defaultData.getParents(emptySet()).isEmpty())
         {
             i18n.sendTranslated(ctx, NEUTRAL, "Default roles assigned:");
@@ -171,7 +172,7 @@ public class UserManagementCommands extends ContainerCommand
     public void setOption(CommandSource ctx, @Default User player, String key, String value, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        if (((OptionSubjectData)player.getSubjectData()).setOption(contexts, key, value))
+        if (player.getSubjectData().setOption(contexts, key, value))
         {
             i18n.sendTranslated(ctx, POSITIVE, "Options {input#key} of {user} set to {input#value} in {context}!", key, player, value, context);
             return;
@@ -184,7 +185,7 @@ public class UserManagementCommands extends ContainerCommand
     public void resetOption(CommandSource ctx, @Default User player, String key, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        if (((OptionSubjectData)player.getSubjectData()).setOption(contexts, key, null))
+        if (player.getSubjectData().setOption(contexts, key, null))
         {
             i18n.sendTranslated(ctx, NEUTRAL, "Options {input#key} of {user} removed in {context}!", key, player, context);
             return;
@@ -197,7 +198,7 @@ public class UserManagementCommands extends ContainerCommand
     public void clearOption(CommandSource ctx, @Default User player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        if (((OptionSubjectData)player.getSubjectData()).clearOptions(contexts))
+        if (player.getSubjectData().clearOptions(contexts))
         {
             i18n.sendTranslated(ctx, NEUTRAL, "Options of {user} cleared in {context}!", player, context);
             return;

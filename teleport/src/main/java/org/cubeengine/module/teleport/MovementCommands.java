@@ -30,6 +30,8 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
@@ -79,7 +81,7 @@ public class MovementCommands
         }
         if (loc.getBlockType() == AIR)
         {
-            loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS);
+            loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS, Cause.of(NamedCause.source(context)));
         }
         context.setLocation(loc);
         i18n.sendTranslated(context, POSITIVE, "You have just been lifted!");

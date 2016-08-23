@@ -91,7 +91,7 @@ public class ButcherCommand extends PermissionContainer
         {
             if (lightning)
             {
-                world.spawnEntity(world.createEntity(EntityTypes.LIGHTNING, entity.getLocation().getPosition()).get(), lightningCause);
+                world.spawnEntity(world.createEntity(EntityTypes.LIGHTNING, entity.getLocation().getPosition()), lightningCause);
             }
             entity.remove();
         }

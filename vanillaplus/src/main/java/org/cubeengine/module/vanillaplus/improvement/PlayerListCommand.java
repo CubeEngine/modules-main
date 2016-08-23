@@ -35,7 +35,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
@@ -59,11 +58,7 @@ public class PlayerListCommand
         for (Player player : users)
         {
             Subject subject = Sponge.getServiceManager().provideUnchecked(PermissionService.class).getUserSubjects().get(player.getUniqueId().toString());
-            String listGroup = "&6Players";
-            if (subject instanceof OptionSubject)
-            {
-                listGroup = ((OptionSubject)subject).getOption("list-group").orElse(listGroup);
-            }
+            String listGroup = subject.getOption("list-group").orElse("&6Players");
             Set<Player> assigned = grouped.get(listGroup);
             if (assigned == null)
             {

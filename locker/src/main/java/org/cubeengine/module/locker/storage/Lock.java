@@ -43,6 +43,7 @@ import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.PortionTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Entity;
@@ -184,12 +185,12 @@ public class Lock
         {
             return;
         }
-        ItemStack itemStack = player.getItemInHand().orElse(null);
+        ItemStack itemStack = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
         if (itemStack != null && itemStack.getItem() == ItemTypes.BOOK)
         {
             itemStack.setQuantity(itemStack.getQuantity() - 1);
         }
-        if (player.getItemInHand().map(ItemStack::getItem).orElse(null) != ItemTypes.BOOK)
+        if (player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(null) != ItemTypes.BOOK)
         {
             i18n.sendTranslated(player, NEGATIVE, "Could not create KeyBook! You need to hold a book in your hand in order to do this!");
             return;
@@ -200,18 +201,16 @@ public class Lock
                 i18n.getTranslation(player, NEUTRAL, "unlock a magically"),
                 i18n.getTranslation(player, NEUTRAL, "locked protection")));
         item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCK.PASSWORD), Sponge.getRegistry().getValueFactory()));
-        player.setItemInHand(item);
+        player.setItemInHand(HandTypes.MAIN_HAND, item);
         if (itemStack != null && itemStack.getQuantity() != 0)
         {
             InventoryTransactionResult result = player.getInventory().offer(itemStack);// TODO check response
             if (itemStack.getQuantity() != 0)
             {
                 Location<World> loc = player.getLocation();
-                Optional<Entity> entity = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
-                entity.ifPresent(e -> {
-                    e.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
-                    loc.getExtent().spawnEntity(e, CauseUtil.spawnCause(player));
-                });
+                Entity entity = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
+                entity.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
+                loc.getExtent().spawnEntity(entity, CauseUtil.spawnCause(player));
             }
         }
     }
@@ -316,7 +315,7 @@ public class Lock
      */
     public Boolean checkForKeyBook(Player user, Location effectLocation)
     {
-        KeyBook keyBook = KeyBook.getKeyBook(user.getItemInHand(), user, this.manager.module, i18n);
+        KeyBook keyBook = KeyBook.getKeyBook(user.getItemInHand(HandTypes.MAIN_HAND), user, this.manager.module, i18n);
         if (keyBook != null)
         {
             return keyBook.check(this, effectLocation);
@@ -890,12 +889,12 @@ public class Lock
             if (open)
             {
                 door.offer(Keys.OPEN, false);
-                user.playSound(SoundTypes.DOOR_CLOSE, door.getPosition(), 1);
+                user.playSound(SoundTypes.BLOCK_WOODEN_DOOR_OPEN, door.getPosition(), 1);
             }
             else
             {
                 door.offer(Keys.OPEN, true);
-                user.playSound(SoundTypes.DOOR_OPEN, door.getPosition(), 1);
+                user.playSound(SoundTypes.BLOCK_WOODEN_DOOR_OPEN, door.getPosition(), 1);
             }
         }
         if (taskId != null) module.getTaskManager().cancelTask(Locker.class, taskId);
@@ -917,7 +916,7 @@ public class Lock
                 {
                     if (n-- > 0)
                     {
-                        ((World)location.getExtent()).playSound(SoundTypes.DOOR_CLOSE, location.getPosition(), 1);
+                        ((World)location.getExtent()).playSound(SoundTypes.BLOCK_WOODEN_DOOR_CLOSE, location.getPosition(), 1);
                     }
                     location.offer(Keys.OPEN, false);
                 }

@@ -222,4 +222,10 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         }
         return null;
     }
+
+    @Override
+    public Subject getDefaults()
+    {
+        return service.getDefaults();
+    }
 }

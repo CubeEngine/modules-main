@@ -29,7 +29,6 @@ import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -50,7 +49,7 @@ public class BankManageCommand extends ContainerCommand
     @Command(desc = "Sets the access level for a player in a bank")
     public void access(CommandSource context, User player, AccessLevel level, @Default BaseAccount.Virtual bank)
     {
-        ((OptionSubjectData) player.getSubjectData()).setOption(bank.getActiveContexts(),
+        player.getSubjectData().setOption(bank.getActiveContexts(),
                 "conomy.bank.access-level." + bank.getIdentifier(), String.valueOf(level.value));
         switch (level)
         {

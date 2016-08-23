@@ -91,7 +91,7 @@ public class EntityFilterReader implements ArgumentReader<EntityFilter>
                 i18n.sendTranslated(cmdSource, NEGATIVE, "Invalid entity-type!");
                 i18n.sendTranslated(cmdSource, NEUTRAL, "Try using one of those instead:");
 
-                cmdSource.sendMessage(Text.joinWith(Text.of(YELLOW, ", "), asList(ITEM, ARROW, RIDEABLE_MINECART,
+                cmdSource.sendMessage(Text.joinWith(Text.of(YELLOW, ", "), asList(ITEM, /*,TODO ARROW */ RIDEABLE_MINECART,
                                                                                   PAINTING, ITEM_FRAME, EXPERIENCE_ORB).stream().map(
                     EntityType::getTranslation).map(t -> Text.of(t)).iterator()));
                 throw new SilentException();

@@ -95,16 +95,16 @@ public class SpawnMobCommand
             return;
         }
         EntitySnapshot entitySpawned = entitiesSpawned[0].createSnapshot();
-        if (!entitySpawned.get(Keys.PASSENGER).isPresent())
+        if (!entitySpawned.get(Keys.PASSENGERS).isPresent())
         {
             i18n.sendTranslated(context, POSITIVE, "Spawned {amount} {input#entity}!", amount, entitySpawned.getType().getName());
         }
         else
         {
             Text message = Text.of(entitySpawned.getType().getTranslation());
-            while (entitySpawned.get(Keys.PASSENGER).isPresent())
+            while (entitySpawned.get(Keys.PASSENGERS).isPresent())
             {
-                entitySpawned = entitySpawned.get(Keys.PASSENGER).get();
+                entitySpawned = entitySpawned.get(Keys.PASSENGERS).get().get(0);
                 message = i18n.getTranslation(context, NONE, "{input#entity} riding {input}", entitySpawned.getType().getName(), message);
             }
             message = i18n.getTranslation(context, POSITIVE, "Spawned {amount} {input#message}!", amount, message);

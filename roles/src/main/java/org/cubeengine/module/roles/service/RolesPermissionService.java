@@ -36,10 +36,14 @@ import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.service.collection.BasicSubjectCollection;
 import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
+import org.cubeengine.module.roles.service.data.BaseSubjectData;
 import org.cubeengine.module.roles.service.data.DefaultSubjectData;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.module.roles.service.subject.BaseSubject;
+import org.cubeengine.module.roles.service.subject.DefaultSubject;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
@@ -48,6 +52,7 @@ import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.module.roles.service.subject.RoleSubject.SEPARATOR;
@@ -62,6 +67,7 @@ public class RolesPermissionService implements PermissionService
     private final List<ContextCalculator<Subject>> calculators = new CopyOnWriteArrayList<>();
 
     private final DefaultSubjectData defaultData;
+    private final Subject defaultSubject;
     private RolesConfig config;
     private Log logger;
 
@@ -73,10 +79,12 @@ public class RolesPermissionService implements PermissionService
     {
         this.config = module.getConfiguration();
         logger = module.getLog();
+        collections.put("default", new BasicSubjectCollection(this, "default"));
         collections.put(SUBJECTS_USER, new UserCollection(this));
         collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, reflector));
 
         defaultData = new DefaultSubjectData(this, config);
+        defaultSubject = new DefaultSubject("default", getSubjects("default"), this, defaultData);
 
         getGroupSubjects().reload();
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM));
@@ -96,10 +104,11 @@ public class RolesPermissionService implements PermissionService
         return (RoleCollection)collections.get(SUBJECTS_GROUP);
     }
 
+
     @Override
-    public DefaultSubjectData getDefaultData()
+    public Subject getDefaults()
     {
-        return defaultData;
+        return defaultSubject;
     }
 
     @Override

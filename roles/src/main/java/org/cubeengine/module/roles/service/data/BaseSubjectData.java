@@ -31,7 +31,7 @@ import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.unmodifiableList;
@@ -43,7 +43,7 @@ import static org.spongepowered.api.service.context.Context.WORLD_KEY;
 /**
  * The Base for Roles OptionSubjectData without persistence
  */
-public class BaseSubjectData implements OptionSubjectData
+public class BaseSubjectData implements SubjectData
 {
     protected final Map<Context, Map<String, String>> options = new ConcurrentHashMap<>();
     protected final Map<Context, Map<String, Boolean>> permissions = new ConcurrentHashMap<>();

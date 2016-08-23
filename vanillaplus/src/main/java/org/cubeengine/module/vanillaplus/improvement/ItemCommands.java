@@ -32,6 +32,7 @@ import org.cubeengine.libcube.service.matcher.EnchantMatcher;
 import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -163,14 +164,14 @@ public class ItemCommands extends PermissionContainer
             return;
         }
 
-        java.util.Optional<ItemStack> item = context.getItemInHand();
+        java.util.Optional<ItemStack> item = context.getItemInHand(HandTypes.MAIN_HAND);
         if (!item.isPresent())
         {
             i18n.sendTranslated(context, NEUTRAL, "More nothing is still nothing!");
             return;
         }
         item.get().setQuantity(item.get().getMaxStackQuantity());
-        context.setItemInHand(item.get());
+        context.setItemInHand(HandTypes.MAIN_HAND, item.get());
         if (amount == 1)
         {
             i18n.sendTranslated(context, POSITIVE, "Refilled stack in hand!");

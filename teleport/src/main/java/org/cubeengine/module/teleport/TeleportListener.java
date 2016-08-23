@@ -27,13 +27,15 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.data.property.AbstractProperty;
 import org.spongepowered.api.data.property.block.MatterProperty;
+import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.blockray.BlockRay;
@@ -64,9 +66,12 @@ public class TeleportListener
     }
 
     @Listener
-    public void onTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event)
+    public void onTeleport(MoveEntityEvent.Teleport event)
     {
-        lastLocations.put(event.getTargetEntity().getUniqueId(), event.getFromTransform());
+        if (event.getTargetEntity() instanceof Player)
+        {
+            lastLocations.put(event.getTargetEntity().getUniqueId(), event.getFromTransform());
+        }
     }
 
     @Listener
@@ -91,7 +96,7 @@ public class TeleportListener
             // TODO remove when include works as intended
             return;
         }
-        if (player.getItemInHand().map(ItemStack::getItem).orElse(null) != COMPASS
+        if (player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(null) != COMPASS
                 || !player.hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
         {
             return;
@@ -133,7 +138,7 @@ public class TeleportListener
             // TODO remove when include works as intended
             return;
         }
-        if (player.getItemInHand().map(ItemStack::getItem).orElse(null) != COMPASS
+        if (player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(null) != COMPASS
                 || !player.hasPermission(module.perms().COMPASS_JUMPTO_RIGHT.getId()))
         {
             return;

@@ -116,7 +116,7 @@ public class KillCommands extends PermissionContainer
         }
         if (lightning)
         {
-            player.getWorld().spawnEntity(player.getWorld().createEntity(LIGHTNING, player.getLocation().getPosition()).get(), CauseUtil.spawnCause(context));
+            player.getWorld().spawnEntity(player.getWorld().createEntity(LIGHTNING, player.getLocation().getPosition()), CauseUtil.spawnCause(context));
         }
 
         player.damage(player.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build(), CauseUtil.spawnCause(context));

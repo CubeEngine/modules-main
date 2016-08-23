@@ -94,12 +94,12 @@ public class SpawnMob
         for (int i = 0; i < amount; ++i)
         {
             //CreatureSpawnEvent
-            Optional<Entity> entity = loc.getExtent().createEntity(entityType, loc.getPosition());
-            loc.getExtent().spawnEntity(entity.get(), CauseUtil.spawnCause(context));
-            spawnedMobs[i] = entity.get();
+            Entity entity = loc.getExtent().createEntity(entityType, loc.getPosition());
+            loc.getExtent().spawnEntity(entity, CauseUtil.spawnCause(context));
+            spawnedMobs[i] = entity;
             if (ridingOn != null)
             {
-                ridingOn[i].setPassenger(spawnedMobs[i]);
+                ridingOn[i].addPassenger(spawnedMobs[i]);
             }
         }
         applyDataToMob(entityData, spawnedMobs);

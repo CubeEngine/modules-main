@@ -33,6 +33,7 @@ import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.config.WorldTransform;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -149,7 +150,7 @@ public class HomeManager
     {
         if (event.getTargetBlock().getState().getType() != BlockTypes.BED
             || !player.get(SneakingData.class).isPresent()
-            || player.getItemInHand().isPresent())
+            || player.getItemInHand(HandTypes.MAIN_HAND).isPresent())
         {
             return;
         }

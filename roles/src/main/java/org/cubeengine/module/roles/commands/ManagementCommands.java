@@ -17,41 +17,31 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.function.Consumer;
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Complete;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.module.roles.Roles;
-import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
-import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.module.roles.service.subject.UserSubject;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.PermissionDescription;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.world.World;
-
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
 import static org.spongepowered.api.text.format.TextColors.DARK_RED;
 import static org.spongepowered.api.text.format.TextColors.GOLD;
+
+import org.cubeengine.butler.alias.Alias;
+import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Complete;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.module.roles.Roles;
+import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
+import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.data.DefaultSubjectData;
+import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.text.Text;
+
+import java.util.Map;
+import java.util.Map.Entry;
 
 @Command(name = "admin", desc = "Manages the module", alias = "manadmin")
 public class ManagementCommands extends ContainerCommand
@@ -78,7 +68,7 @@ public class ManagementCommands extends ContainerCommand
 
         service.getConfig().reload();
 
-        service.getDefaultData().load();
+        ((DefaultSubjectData) service.getDefaults().getSubjectData()).load();
 
         // TODO remove cached data ; needed?
         i18n.sendTranslated(context, POSITIVE, "{text:Roles} reload complete!");

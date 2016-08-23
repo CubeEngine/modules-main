@@ -28,6 +28,7 @@ import org.cubeengine.libcube.service.matcher.EnchantMatcher;
 import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.pagination.PaginationService;
@@ -94,12 +95,12 @@ public class ItemDBCommand
             throw new TooFewArgumentsException();
         }
         Player sender = (Player)context;
-        if (!sender.getItemInHand().isPresent())
+        if (!sender.getItemInHand(HandTypes.MAIN_HAND).isPresent())
         {
             i18n.sendTranslated(context, NEUTRAL, "You hold nothing in your hands!");
             return;
         }
-        ItemStack aItem = sender.getItemInHand().get();
+        ItemStack aItem = sender.getItemInHand(HandTypes.MAIN_HAND).get();
         String found = materialMatcher.getNameFor(aItem);
         if (found == null)
         {

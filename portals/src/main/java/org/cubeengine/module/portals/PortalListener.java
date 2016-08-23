@@ -23,7 +23,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
@@ -41,11 +41,14 @@ public class PortalListener
     }
 
     @Listener
-    public void onTeleport(DisplaceEntityEvent.Teleport.TargetPlayer event)
+    public void onTeleport(MoveEntityEvent.Teleport event)
     {
         Transform<World> target = event.getToTransform();
-        Player player = event.getTargetEntity();
-        onTeleport(target, player);
+        Entity player = event.getTargetEntity();
+        if (player instanceof Player)
+        {
+            onTeleport(target, ((Player) player)); // TODO event listener parameter
+        }
     }
 
     private void onTeleport(Transform<World> target, Player player)
@@ -72,7 +75,7 @@ public class PortalListener
     }
 
     @Listener
-    public void onEntityTeleport(DisplaceEntityEvent.Teleport event)
+    public void onEntityTeleport(MoveEntityEvent.Teleport event)
     {
         if (event.getTargetEntity() instanceof Player)
         {
@@ -99,8 +102,15 @@ public class PortalListener
     }
 
     @Listener
-    public void onMove(DisplaceEntityEvent.Move.TargetPlayer event)
+    public void onMove(MoveEntityEvent event)
     {
+        if (!(event.getTargetEntity() instanceof Player))
+        {
+            return;
+        }
+        Player player = ((Player) event.getTargetEntity());
+
+
         if (event.getFromTransform().getExtent() != event.getToTransform().getExtent()
             || (event.getFromTransform().getLocation().getBlockX() == event.getToTransform().getLocation().getBlockX()
             && event.getFromTransform().getLocation().getBlockY() == event.getToTransform().getLocation().getBlockY()
@@ -109,7 +119,6 @@ public class PortalListener
             return;
         }
         List<Portal> portals = module.getPortalsInChunk(event.getToTransform().getLocation());
-        Player player = event.getTargetEntity();
         PortalsAttachment attachment = module.getPortalsAttachment(player.getUniqueId());
         if (portals != null)
         {

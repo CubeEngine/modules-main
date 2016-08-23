@@ -44,7 +44,6 @@ import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -274,7 +273,7 @@ public class BankCommand extends ContainerCommand
 
         for (Subject subject : Sponge.getServiceManager().provideUnchecked(PermissionService.class).getUserSubjects().getAllSubjects())
         {
-            Optional<String> option = ((OptionSubject) subject).getOption(bank.getActiveContexts(), "conomy.bank.access-level." + bank.getIdentifier());
+            Optional<String> option = subject.getOption(bank.getActiveContexts(), "conomy.bank.access-level." + bank.getIdentifier());
             if (option.isPresent())
             {
                 // TODO list players highlight granted access

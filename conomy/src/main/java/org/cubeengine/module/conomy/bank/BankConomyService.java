@@ -43,10 +43,8 @@ import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.database.Database;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.service.economy.account.Account;
-import org.spongepowered.api.service.economy.account.VirtualAccount;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
 
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
 
@@ -115,11 +113,7 @@ public class BankConomyService extends ConomyService
     public List<BaseAccount.Virtual> getBanks(Subject user, AccessLevel level)
     {
         SubjectData data = user.getSubjectData();
-        if (!(data instanceof OptionSubjectData))
-        {
-            return Collections.emptyList();
-        }
-        Map<String, String> options = ((OptionSubjectData) data).getOptions(user.getActiveContexts());
+        Map<String, String> options = data.getOptions(user.getActiveContexts());
 
         List<String> manage = new ArrayList<>();
         List<String> withdraw = new ArrayList<>();
@@ -229,7 +223,7 @@ public class BankConomyService extends ConomyService
                 }
                 break;
         }
-        Map<String, String> options = ((OptionSubjectData) context.getSubjectData()).getOptions(context.getActiveContexts());
+        Map<String, String> options = context.getSubjectData().getOptions(context.getActiveContexts());
         return Integer.valueOf(options.get("conomy.bank.access-level." + bank.getIdentifier())) >= level.value;
     }
 }

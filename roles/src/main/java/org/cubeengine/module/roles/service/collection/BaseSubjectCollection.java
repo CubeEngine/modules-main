@@ -26,12 +26,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.option.OptionSubject;
 import org.spongepowered.api.util.Tristate;
 
 import static org.spongepowered.api.util.Tristate.UNDEFINED;
 
-public abstract class BaseSubjectCollection<T extends OptionSubject> implements SubjectCollection
+public abstract class BaseSubjectCollection<T extends Subject> implements SubjectCollection
 {
     private final String identifier;
 

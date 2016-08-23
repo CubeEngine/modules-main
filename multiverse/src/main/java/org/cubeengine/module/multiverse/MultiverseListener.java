@@ -23,7 +23,7 @@ import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.world.World;
@@ -38,7 +38,7 @@ public class MultiverseListener
     }
 
     @Listener
-    public void onWorldChange(DisplaceEntityEvent event)
+    public void onWorldChange(MoveEntityEvent.Teleport event)
     {
         World from = event.getFromTransform().getExtent();
         World to = event.getToTransform().getExtent();

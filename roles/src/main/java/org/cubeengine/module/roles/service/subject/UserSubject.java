@@ -17,25 +17,21 @@
  */
 package org.cubeengine.module.roles.service.subject;
 
+import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.data.UserSubjectData;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.util.Tristate;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.data.UserSubjectData;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.util.Tristate;
 
 public class UserSubject extends BaseSubject<UserSubjectData>
 {
@@ -52,8 +48,8 @@ public class UserSubject extends BaseSubject<UserSubjectData>
     private void applyDefault()
     {
         defaultsApplied = true;
-        OptionSubjectData transientData = getTransientSubjectData();
-        SubjectData defaultData = service.getDefaultData();
+        SubjectData transientData = getTransientSubjectData();
+        SubjectData defaultData = service.getDefaults().getSubjectData(); // TODO transient too?
         for (Entry<Set<Context>, Map<String, Boolean>> entry : defaultData.getAllPermissions().entrySet())
         {
             for (Entry<String, Boolean> perm : entry.getValue().entrySet())
@@ -76,8 +72,8 @@ public class UserSubject extends BaseSubject<UserSubjectData>
         List<Subject> parents = super.getParents(contexts);
         if (!parents.isEmpty() && defaultsApplied)
         {
-            OptionSubjectData transientData = getTransientSubjectData();
-            SubjectData defaultData = service.getDefaultData();
+            SubjectData transientData = getTransientSubjectData();
+            SubjectData defaultData = service.getDefaults().getSubjectData(); // TODO transient too?
             for (Entry<Set<Context>, Map<String, Boolean>> entry : defaultData.getAllPermissions().entrySet())
             {
                 for (Entry<String, Boolean> perm : entry.getValue().entrySet())

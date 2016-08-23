@@ -216,7 +216,7 @@ public class RoleManagementCommands extends ContainerCommand
     @Command(alias = {"toggleDefault", "toggleDef"}, desc = "Toggles whether given role is a default role")
     public void toggleDefaultRole(CommandSource ctx, RoleSubject role)
     {
-        SubjectData defaultData = service.getDefaultData();
+        SubjectData defaultData = service.getDefaults().getSubjectData();
         if (defaultData.getParents(GLOBAL_CONTEXT).contains(role))
         {
             defaultData.removeParent(GLOBAL_CONTEXT, role);

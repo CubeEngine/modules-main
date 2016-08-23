@@ -60,4 +60,10 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
             subject.reload();
         }
     }
+
+    @Override
+    public Subject getDefaults()
+    {
+        return service.getDefaults();
+    }
 }

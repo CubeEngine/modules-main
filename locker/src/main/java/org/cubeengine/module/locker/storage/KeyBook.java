@@ -29,6 +29,8 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
+import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
@@ -100,8 +102,8 @@ public class KeyBook
             if (!lock.isOwner(holder))
             {
                 i18n.sendTranslated(holder, NEUTRAL, "You try to open the container with your KeyBook but nothing happens!");
-                holder.playSound(BLAZE_HIT, effectLocation.getPosition(), 1, 1);
-                holder.playSound(BLAZE_HIT, effectLocation.getPosition(), 1, (float)0.8);
+                holder.playSound(ENTITY_BLAZE_HURT, effectLocation.getPosition(), 1, 1);
+                holder.playSound(ENTITY_BLAZE_HURT, effectLocation.getPosition(), 1, (float)0.8);
             }
             return false;
         }
@@ -110,7 +112,7 @@ public class KeyBook
             i18n.sendTranslated(holder, NEGATIVE, "You try to open the container with your KeyBook");
             i18n.sendTranslated(holder, NEGATIVE, "but you get forcefully pushed away!");
             this.invalidate();
-            holder.playSound(GHAST_SCREAM, effectLocation.getPosition(), 1, 1);
+            holder.playSound(ENTITY_GHAST_SCREAM, effectLocation.getPosition(), 1, 1);
 
             final Vector3d userDirection = holder.getRotation();
 
@@ -137,17 +139,12 @@ public class KeyBook
 
     public static void playUnlockSound(Player holder, final Location effectLocation, TaskManager tm)
     {
-        holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
-        holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, (float) 1.5);
+        holder.playSound(BLOCK_PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
+        holder.playSound(BLOCK_PISTON_EXTEND, effectLocation.getPosition(), 1, (float) 1.5);
 
-        tm.runTaskDelayed(Locker.class, new Runnable()
-        {
-            @Override
-            public void run()
-            {
-                holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
-                holder.playSound(PISTON_EXTEND, effectLocation.getPosition(), 1, (float)1.5);
-            }
+        tm.runTaskDelayed(Locker.class, () -> {
+            holder.playSound(BLOCK_PISTON_EXTEND, effectLocation.getPosition(), 1, 2);
+            holder.playSound(BLOCK_PISTON_EXTEND, effectLocation.getPosition(), 1, (float)1.5);
         }, 3);
     }
 
@@ -160,7 +157,7 @@ public class KeyBook
                                             i18n.getTranslation(holder, NEUTRAL, "won't let you"),
                                             i18n.getTranslation(holder, NEUTRAL, "open any containers!")));
         item = Sponge.getRegistry().createBuilder(ItemStack.Builder.class).fromItemStack(item).itemType(PAPER).build();
-        holder.setItemInHand(item);
+        holder.setItemInHand(HandTypes.MAIN_HAND, item);
     }
 
     public boolean isValidFor(Lock lock)

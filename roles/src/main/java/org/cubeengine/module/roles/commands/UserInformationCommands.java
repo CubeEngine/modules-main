@@ -42,7 +42,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -217,7 +216,7 @@ public class UserInformationCommands extends ContainerCommand
         }
         else
         {
-            options.putAll(((OptionSubjectData)player.getSubjectData()).getOptions(contexts));
+            options.putAll((player.getSubjectData()).getOptions(contexts));
         }
         if (all)
         {

@@ -30,8 +30,6 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.service.permission.option.OptionSubject;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
 import org.spongepowered.api.text.Text;
 
 import static java.util.stream.Collectors.toList;
@@ -135,7 +133,7 @@ public class RolesUtil
         return implicits;
     }
 
-    public static Optional<FoundOption> getOption(OptionSubject subject, OptionSubjectData data, String key, Set<Context> contexts)
+    public static Optional<FoundOption> getOption(Subject subject, SubjectData data, String key, Set<Context> contexts)
     {
         String result = data.getOptions(contexts).get(key);
         if (result != null)
@@ -144,19 +142,16 @@ public class RolesUtil
         }
         for (Subject parent : data.getParents(contexts))
         {
-            if (parent instanceof OptionSubject)
+            Optional<FoundOption> option = getOption(parent, key, contexts);
+            if (option.isPresent())
             {
-                Optional<FoundOption> option = getOption(((OptionSubject)parent), key, contexts);
-                if (option.isPresent())
-                {
-                    return option;
-                }
+                return option;
             }
         }
         return Optional.empty();
     }
 
-    public static Optional<FoundOption> getOption(OptionSubject subject, String key, Set<Context> contexts)
+    public static Optional<FoundOption> getOption(Subject subject, String key, Set<Context> contexts)
     {
         Optional<FoundOption> option = getOption(subject, subject.getTransientSubjectData(), key, contexts);
         if (!option.isPresent())
@@ -232,7 +227,7 @@ public class RolesUtil
         }
     }
 
-    public static void fillOptions(OptionSubject subject, Set<Context> contexts, Map<String, String> data)
+    public static void fillOptions(Subject subject, Set<Context> contexts, Map<String, String> data)
     {
         for (Entry<String, String> entry : subject.getSubjectData().getOptions(contexts).entrySet())
         {
@@ -241,10 +236,7 @@ public class RolesUtil
 
         for (Subject parent : subject.getParents())
         {
-            if (parent instanceof OptionSubject)
-            {
-                fillOptions(((OptionSubject)parent), contexts, data);
-            }
+            fillOptions(parent, contexts, data);
         }
     }
 }

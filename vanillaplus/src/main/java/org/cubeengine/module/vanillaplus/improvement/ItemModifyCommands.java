@@ -37,6 +37,7 @@ import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
 import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.property.item.UseLimitProperty;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -69,12 +70,12 @@ public class ItemModifyCommands extends PermissionContainer
     @Restricted(value = Player.class, msg = "Trying to give your {text:toys} a name?")
     public void rename(Player context, String name, @Optional @Greed(INFINITE) String... lore)
     {
-        if (!context.getItemInHand().isPresent())
+        if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
         {
             i18n.sendTranslated(context, NEGATIVE, "You need to hold an item to rename in your hand!");
             return;
         }
-        ItemStack item = context.getItemInHand().get();
+        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).get();
 
         item.offer(Keys.DISPLAY_NAME, FORMATTING_CODE.deserialize(name));
         if (lore != null)
@@ -86,7 +87,7 @@ public class ItemModifyCommands extends PermissionContainer
             }
             item.offer(Keys.ITEM_LORE, list);
         }
-        context.setItemInHand(item);
+        context.setItemInHand(HandTypes.MAIN_HAND, item);
         i18n.sendTranslated(context, POSITIVE, "You now hold {input#name} in your hands!", name);
     }
 
@@ -94,12 +95,12 @@ public class ItemModifyCommands extends PermissionContainer
     @Restricted(value = Player.class)
     public void lore(Player context, @Greed(INFINITE) String... lore)
     {
-        if (!context.getItemInHand().isPresent())
+        if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
         {
             i18n.sendTranslated(context, NEGATIVE, "You need to hold an item to change the lore of in your hand!");
             return;
         }
-        ItemStack item = context.getItemInHand().get();
+        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).get();
 
         List<Text> list = new ArrayList<>();
         for (String line : lore)
@@ -107,7 +108,7 @@ public class ItemModifyCommands extends PermissionContainer
             list.add(FORMATTING_CODE.deserialize(line));
         }
         item.offer(Keys.ITEM_LORE, list);
-        context.setItemInHand(item);
+        context.setItemInHand(HandTypes.MAIN_HAND, item);
         i18n.sendTranslated(context, POSITIVE, "You changed the lore.");
     }
 
@@ -116,7 +117,7 @@ public class ItemModifyCommands extends PermissionContainer
     @Restricted(value = Player.class, msg = "This will you only give headaches!")
     public void headchange(Player context, @Optional String name) throws ExecutionException, InterruptedException
     {
-        ItemStack item = context.getItemInHand().orElse(null);
+        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
         if (item == null || item.getItem() != SKULL)
         {
             i18n.sendTranslated(context, NEGATIVE, "You are not holding a head.");
@@ -125,7 +126,7 @@ public class ItemModifyCommands extends PermissionContainer
 
         item.offer(Keys.REPRESENTED_PLAYER, Sponge.getServer().getGameProfileManager().get(name).get());
 
-        context.setItemInHand(item);
+        context.setItemInHand(HandTypes.MAIN_HAND, item);
         i18n.sendTranslated(context, POSITIVE, "You now hold {user}'s head in your hands!", name);
     }
 
@@ -134,12 +135,12 @@ public class ItemModifyCommands extends PermissionContainer
     public void enchant(Player context, @Default Enchantment enchantment, @Optional Integer level,
                         @ParameterPermission @Flag boolean unsafe)
     {
-        if (!context.getItemInHand().isPresent())
+        if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
         {
             i18n.sendTranslated(context, NEUTRAL, "{text:ProTip}: You cannot enchant your fists!");
             return;
         }
-        ItemStack item = context.getItemInHand().get();
+        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).get();
 
         level = level == null ? enchantment.getMaximumLevel() : level;
         if (level <= 0)
@@ -162,7 +163,7 @@ public class ItemModifyCommands extends PermissionContainer
             List<ItemEnchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
             list.add(ench);
             item.offer(Keys.ITEM_ENCHANTMENTS, list);
-            context.setItemInHand(item);
+            context.setItemInHand(HandTypes.MAIN_HAND, item);
             i18n.sendTranslated(context, POSITIVE,
                                    "Added unsafe enchantment: {input#enchantment} {integer#level} to your item!",
                                    enchantment.getName(), level); // TODO getTranslation
@@ -176,7 +177,7 @@ public class ItemModifyCommands extends PermissionContainer
                 List<ItemEnchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
                 list.add(ench);
                 item.offer(Keys.ITEM_ENCHANTMENTS, list);
-                context.setItemInHand(item);
+                context.setItemInHand(HandTypes.MAIN_HAND, item);
                 i18n.sendTranslated(context, POSITIVE, "Added enchantment: {input#enchantment} {integer#level} to your item!",
                                     enchantment.getName(), level);  // TODO getTranslation
                 return;
@@ -227,7 +228,7 @@ public class ItemModifyCommands extends PermissionContainer
             i18n.sendTranslated(context, POSITIVE, "Repaired {amount} items!", repaired);
             return;
         }
-        ItemStack item = context.getItemInHand().orElse(null);
+        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
         if (item == null)
         {
             i18n.sendTranslated(context, NEGATIVE, "No item in hand!");
@@ -242,7 +243,7 @@ public class ItemModifyCommands extends PermissionContainer
                 return;
             }
             item.offer(Keys.ITEM_DURABILITY, max);
-            context.setItemInHand(item);
+            context.setItemInHand(HandTypes.MAIN_HAND, item);
             i18n.sendTranslated(context, POSITIVE, "Item repaired!");
             return;
         }

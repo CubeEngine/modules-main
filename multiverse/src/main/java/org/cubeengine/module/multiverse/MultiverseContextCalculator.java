@@ -18,11 +18,10 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.Set;
-import org.spongepowered.api.command.source.LocatedSource;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.world.Locatable;
 
 public class MultiverseContextCalculator implements ContextCalculator<Subject> // TODO for User is should be possible to get the world too
 {
@@ -37,18 +36,18 @@ public class MultiverseContextCalculator implements ContextCalculator<Subject> /
     @Override
     public void accumulateContexts(Subject subject, Set<Context> set)
     {
-        if (subject instanceof LocatedSource)
+        if (subject instanceof Locatable)
         {
-            set.add(new Context(TYPE, module.getUniverse(((LocatedSource)subject).getWorld())));
+            set.add(new Context(TYPE, module.getUniverse(((Locatable)subject).getWorld())));
         }
     }
 
     @Override
     public boolean matches(Context context, Subject subject)
     {
-        if (subject instanceof LocatedSource && context.getType().equals(TYPE))
+        if (subject instanceof Locatable && context.getType().equals(TYPE))
         {
-            return module.getUniverse(((LocatedSource)subject).getWorld()).equals(context.getValue());
+            return module.getUniverse(((Locatable)subject).getWorld()).equals(context.getValue());
         }
         return false;
     }

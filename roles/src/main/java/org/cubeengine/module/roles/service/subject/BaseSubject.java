@@ -30,14 +30,12 @@ import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.option.OptionSubject;
-import org.spongepowered.api.service.permission.option.OptionSubjectData;
+import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.unmodifiableList;
-import static java.util.stream.StreamSupport.stream;
 
-public abstract class BaseSubject<T extends OptionSubjectData> implements OptionSubject
+public abstract class BaseSubject<T extends SubjectData> implements Subject
 {
     private BaseSubjectData transientData;
     private final SubjectCollection collection;
@@ -59,7 +57,7 @@ public abstract class BaseSubject<T extends OptionSubjectData> implements Option
     }
 
     @Override
-    public OptionSubjectData getTransientSubjectData()
+    public SubjectData getTransientSubjectData()
     {
         return transientData;
     }

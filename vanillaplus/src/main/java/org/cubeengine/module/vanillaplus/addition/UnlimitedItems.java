@@ -24,6 +24,7 @@ import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
@@ -70,11 +71,11 @@ public class UnlimitedItems
     {
         if (this.unlimitedPlayers.contains(player.getUniqueId()))
         {
-            ItemStack item = player.getItemInHand().orElse(null);
+            ItemStack item = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
             if (item != null)
             {
                 item.setQuantity(item.getQuantity() + 1);
-                player.setItemInHand(item);
+                player.setItemInHand(HandTypes.MAIN_HAND, item);
             }
         }
     }

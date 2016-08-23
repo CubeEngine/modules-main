@@ -19,10 +19,9 @@ package org.cubeengine.module.roles.service.collection;
 
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.BasicSubject;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.service.permission.option.OptionSubject;
+import org.spongepowered.api.service.permission.Subject;
 
-public class BasicSubjectCollection  extends BaseSubjectCollection<OptionSubject>
+public class BasicSubjectCollection extends BaseSubjectCollection<Subject>
 {
     private RolesPermissionService service;
 
@@ -33,8 +32,13 @@ public class BasicSubjectCollection  extends BaseSubjectCollection<OptionSubject
     }
 
     @Override
-    protected OptionSubject createSubject(String identifier)
+    protected Subject createSubject(String identifier)
     {
         return new BasicSubject(identifier, this, service);
+    }
+
+    @Override
+    public Subject getDefaults() {
+        return service.getDefaults();
     }
 }

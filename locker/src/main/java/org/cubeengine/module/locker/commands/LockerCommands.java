@@ -40,6 +40,7 @@ import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.spongepowered.api.block.tileentity.TileEntity;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -80,7 +81,7 @@ public class LockerCommands extends ContainerCommand
         {
             this.persist(context);
         }
-        KeyBook keyBook = KeyBook.getKeyBook((context).getItemInHand(), context, this.module, i18n);
+        KeyBook keyBook = KeyBook.getKeyBook((context).getItemInHand(HandTypes.MAIN_HAND), context, this.module, i18n);
         if (keyBook != null)
         {
             Lock lock = this.manager.getLockById(keyBook.lockID);

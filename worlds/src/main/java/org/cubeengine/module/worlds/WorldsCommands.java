@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.worlds;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
@@ -47,7 +48,7 @@ import org.spongepowered.api.text.TextTemplate;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.WorldCreationSettings;
+import org.spongepowered.api.world.WorldArchetype;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -122,9 +123,8 @@ public class WorldsCommands extends ContainerCommand
             i18n.sendTranslated(context, POSITIVE, "Old world moved to {name#folder}", newName);
         }
 
-        WorldCreationSettings.Builder builder = WorldCreationSettings.builder();
+        WorldArchetype.Builder builder = WorldArchetype.builder();
         builder.keepsSpawnLoaded(spawnInMemory);
-        builder.name(name);
         builder.loadsOnStartup(!noload);
         if (seed != null)
         {
@@ -142,14 +142,18 @@ public class WorldsCommands extends ContainerCommand
         builder.dimension(dimension);
         builder.usesMapFeatures(generateStructures);
         builder.gameMode(gamemode);
-        Optional<WorldProperties> properties = Sponge.getServer().createWorldProperties(builder.build());
-        if (properties.isPresent())
+        builder.difficulty(difficulty);
+        try
         {
-            properties.get().setDifficulty(difficulty);
+            WorldProperties properties = Sponge.getServer().createWorldProperties(name, builder.build("org.cubeengine.customworld:" + name, name));
             i18n.sendTranslated(context, POSITIVE, "World successfully created!");
-            return;
+            // TODO loading the world
         }
-        i18n.sendTranslated(context, NEGATIVE, "Could not create world!");
+        catch (IOException e)
+        {
+            i18n.sendTranslated(context, NEGATIVE, "Could not create world!");
+            throw new IllegalStateException(e); // TODO handle exception better
+        }
     }
 
     @Command(desc = "Loads a world")
