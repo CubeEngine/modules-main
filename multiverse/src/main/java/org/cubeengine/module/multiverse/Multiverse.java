@@ -91,7 +91,7 @@ public class Multiverse extends Module
         {
             for (ConfigWorld cWorld : entry.getValue())
             {
-                if (cWorld.getWorld().equals(world))
+                if (world.equals(cWorld.getWorld()))
                 {
                     return entry.getKey();
                 }
