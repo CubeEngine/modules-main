@@ -73,10 +73,13 @@ public class DefaultSubjectData extends BaseSubjectData
         parents.clear();
         List<Subject> list = new ArrayList<>();
         parents.put(GLOBAL, list);
-        for (String name : config.defaultRoles)
+        if (config.defaultRoles != null)
         {
-            RoleSubject role = service.getGroupSubjects().get(name);
-            list.add(role);
+            for (String name : config.defaultRoles)
+            {
+                RoleSubject role = service.getGroupSubjects().get(name);
+                list.add(role);
+            }
         }
     }
 
