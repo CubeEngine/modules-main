@@ -81,7 +81,7 @@ public class MovementCommands
         }
         if (loc.getBlockType() == AIR)
         {
-            loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS, Cause.of(NamedCause.source(context)));
+            loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS, Cause.of(NamedCause.source(context))); // TODO plugin must be root of cause
         }
         context.setLocation(loc);
         i18n.sendTranslated(context, POSITIVE, "You have just been lifted!");

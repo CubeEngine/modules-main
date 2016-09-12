@@ -139,6 +139,7 @@ public class LockerListener
         if (!(event.getTargetInventory() instanceof CarriedInventory)
          || !((CarriedInventory) event.getTargetInventory()).getCarrier().isPresent())
         {
+            // TODO how do i get the viewed CarriedInventory?
             return;
         }
         Object carrier = ((CarriedInventory) event.getTargetInventory()).getCarrier().get();
