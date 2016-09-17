@@ -17,11 +17,17 @@
  */
 package org.cubeengine.module.multiverse.player;
 
+import static org.spongepowered.api.data.DataQuery.of;
+import static org.spongepowered.api.data.key.KeyFactory.makeMapKey;
+import static org.spongepowered.api.data.key.KeyFactory.makeSingleKey;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -38,8 +44,14 @@ import org.spongepowered.api.world.World;
 
 public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiverseData> implements IMultiverseData
 {
-    public static final Key<Value<String>> WORLD = KeyFactory.makeSingleKey(String.class, BaseValue.class, DataQuery.of("current"));
-    public static final Key<MapValue<String, DataContainer>> DATA = KeyFactory.makeMapKey(String.class, DataContainer.class, DataQuery.of("playerdata"));
+    private static TypeToken<String> TT_String = new TypeToken<String>() {};
+    private static TypeToken<Value<String>> TTV_String = new TypeToken<Value<String>>() {};
+
+    private static TypeToken<Map<String, DataContainer>> TTM_Data = new TypeToken<Map<String, DataContainer>>() {};
+    private static TypeToken<MapValue<String, DataContainer>> TTMV_Data = new TypeToken<MapValue<String, DataContainer>>() {};
+
+    public static final Key<Value<String>> WORLD = makeSingleKey(TT_String, TTV_String, of("current"), "cubeengine:multiverse:data-world", "World");
+    public static final Key<MapValue<String, DataContainer>> DATA = makeMapKey(TTM_Data, TTMV_Data, of("playerdata"), "cubeengine:multiverse:data-container", "DataContainer");
 
     public String currentUniverse;
     private Map<String, PlayerData> playerData;
@@ -108,12 +120,6 @@ public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiv
     public ImmutableMultiverseData asImmutable()
     {
         return new ImmutableMultiverseData(currentUniverse, playerData);
-    }
-
-    @Override
-    public int compareTo(MultiverseData o)
-    {
-        return IMultiverseData.compareTo(this, o);
     }
 
     @Override

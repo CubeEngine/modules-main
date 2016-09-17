@@ -79,12 +79,6 @@ public class ImmutableMultiverseData extends AbstractImmutableData<ImmutableMult
     }
 
     @Override
-    public int compareTo(ImmutableMultiverseData o)
-    {
-        return IMultiverseData.compareTo(this, o);
-    }
-
-    @Override
     public int getContentVersion()
     {
         return 1;

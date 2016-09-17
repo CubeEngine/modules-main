@@ -20,68 +20,34 @@ package org.cubeengine.module.roles.data;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.spongepowered.api.data.DataQuery;
+
+import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.KeyFactory;
+import org.spongepowered.api.data.property.BooleanProperty;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.MapValue;
 
 import static java.util.stream.Collectors.toMap;
+import static org.spongepowered.api.data.DataQuery.of;
 
 public interface IPermissionData
 {
-    Key<ListValue<String>> PARENTS = KeyFactory.makeListKey(String.class, DataQuery.of("parents"));
-    Key<MapValue<String, Boolean>> PERMISSIONS = KeyFactory.makeMapKey(String.class, Boolean.class, DataQuery.of("permissions"));
-    Key<MapValue<String, String>> OPTIONS = KeyFactory.makeMapKey(String.class, String.class, DataQuery.of("options"));
+
+    TypeToken<List<String>> TTL_String = new TypeToken<List<String>>() {};
+    TypeToken<ListValue<String>> TTLV_String = new TypeToken<ListValue<String>>() {};
+    TypeToken<Map<String, Boolean>> TTM_StringBool = new TypeToken<Map<String, Boolean>>() {};
+    TypeToken<MapValue<String, Boolean>> TTMV_StringBool = new TypeToken<MapValue<String, Boolean>>() {};
+    TypeToken<Map<String, String>> TTM_StringString = new TypeToken<Map<String, String>>() {};
+    TypeToken<MapValue<String, String>> TTMV_StringString = new TypeToken<MapValue<String, String>>() {};
+
+    Key<ListValue<String>> PARENTS = KeyFactory.makeListKey(TTL_String, TTLV_String, of("parents"), "cubeengine:roles:permission-parent","Parents");
+    Key<MapValue<String, Boolean>> PERMISSIONS = KeyFactory.makeMapKey(TTM_StringBool, TTMV_StringBool, of("permissions"), "cubeengine:roles:permission-perms","Permission");
+    Key<MapValue<String, String>> OPTIONS = KeyFactory.makeMapKey(TTM_StringString, TTMV_StringString, of("options"), "cubeengine:roles:permission-opts","Options");
 
     List<String> getParents();
     Map<String, Boolean> getPermissions();
     Map<String, String> getOptions();
-
-    static <E extends IPermissionData> int compareTo(E o1, E o2)
-    {
-        int compare = Integer.compare(o1.getParents().size(), o2.getParents().size());
-        if (compare != 0)
-        {
-            return compare;
-        }
-        for (int i = 0; i < o1.getParents().size(); i++)
-        {
-            compare = o1.getParents().get(i).compareTo(o2.getParents().get(i));
-            if (compare != 0)
-            {
-                return compare;
-            }
-        }
-
-        compare = Integer.compare(o1.getPermissions().size(), o2.getPermissions().size());
-        if (compare != 0)
-        {
-            return compare;
-        }
-
-        compare = Boolean.compare(o1.getPermissions().entrySet().containsAll(o2.getPermissions().entrySet()),
-                o2.getPermissions().entrySet().containsAll(o1.getPermissions().entrySet()));
-        if (compare != 0)
-        {
-            return compare;
-        }
-
-        compare = Integer.compare(o1.getOptions().size(), o2.getOptions().size());
-        if (compare != 0)
-        {
-            return compare;
-        }
-
-        compare = Boolean.compare(o1.getOptions().entrySet().containsAll(o2.getOptions().entrySet()),
-                o2.getOptions().entrySet().containsAll(o1.getOptions().entrySet()));
-        if (compare != 0)
-        {
-            return compare;
-        }
-
-        return 0;
-    }
 
     static <T> Optional<Map<String, T>> replaceKeys(Optional<Map<String, T>> opt, String orig, String repl)
     {

@@ -24,28 +24,4 @@ public interface IMultiverseData
 {
     Map<String, DataContainer> getPlayerData();
     String getCurrentUniverse();
-
-    static <E extends IMultiverseData> int compareTo(E o1, E o2)
-    {
-        int compare = o1.getCurrentUniverse().compareTo(o2.getCurrentUniverse());
-        if (compare != 0)
-        {
-            return compare;
-        }
-
-        compare = Integer.compare(o1.getPlayerData().size(), o2.getPlayerData().size());
-        if (compare != 0)
-        {
-            return compare;
-        }
-
-        compare = Boolean.compare(o1.getPlayerData().entrySet().containsAll(o2.getPlayerData().entrySet()),
-                                  o2.getPlayerData().entrySet().containsAll(o1.getPlayerData().entrySet()));
-        if (compare != 0)
-        {
-            return compare;
-        }
-
-        return 0;
-    }
 }

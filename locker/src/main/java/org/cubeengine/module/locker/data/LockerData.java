@@ -17,10 +17,15 @@
  */
 package org.cubeengine.module.locker.data;
 
+import static org.spongepowered.api.data.DataQuery.of;
+import static org.spongepowered.api.data.key.KeyFactory.makeSingleKey;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -35,8 +40,14 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
 {
-    public static Key<Value<Long>> LOCK_ID = KeyFactory.makeSingleKey(Long.class, Value.class, DataQuery.of("LockID"));
-    public static Key<ListValue<Byte>> LOCK_PASS = KeyFactory.makeListKey(Byte.class, DataQuery.of("LockPass"));
+    private static TypeToken<Long> TT_Long = new TypeToken<Long>() {};
+    private static TypeToken<Value<Long>> TTV_Long = new TypeToken<Value<Long>>() {};
+
+    private static TypeToken<List<Byte>> TTL_Byte = new TypeToken<List<Byte>>() {};
+    private static TypeToken<ListValue<Byte>> TTLV_Byte = new TypeToken<ListValue<Byte>>() {};
+
+    public static Key<Value<Long>> LOCK_ID = makeSingleKey(TT_Long, TTV_Long, of("LockID"), "cubeengine:locker:data-id", "ID");
+    public static Key<ListValue<Byte>> LOCK_PASS = KeyFactory.makeListKey(TTL_Byte, TTLV_Byte, of("LockPass"), "cubeengine:locker:data-pass", "Password");
 
     private long lockID;
     private byte[] pass;
@@ -169,12 +180,6 @@ public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
     public ImmutableLockerData asImmutable()
     {
         return new ImmutableLockerData(lockID, pass, valueFactory);
-    }
-
-    @Override
-    public int compareTo(LockerData o)
-    {
-        return Long.compare(lockID, o.lockID);
     }
 
     @Override

@@ -76,12 +76,6 @@ public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLo
     }
 
     @Override
-    public int compareTo(ImmutableLockerData o)
-    {
-        return Long.compare(lockID, o.lockID);
-    }
-
-    @Override
     public DataContainer toContainer()
     {
         MemoryDataContainer container = new MemoryDataContainer();

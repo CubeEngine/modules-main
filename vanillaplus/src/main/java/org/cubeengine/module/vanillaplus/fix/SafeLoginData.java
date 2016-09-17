@@ -18,6 +18,8 @@
 package org.cubeengine.module.vanillaplus.fix;
 
 import java.util.Optional;
+
+import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
@@ -29,7 +31,12 @@ import org.spongepowered.api.data.value.mutable.Value;
 
 public class SafeLoginData extends AbstractBooleanData<SafeLoginData, ImmutableSafeLoginData>
 {
-    public final static Key<Value<Boolean>> FLYMODE = KeyFactory.makeSingleKey(Boolean.class, Value.class, DataQuery.of("flymode"));
+
+    public final static Key<Value<Boolean>> FLYMODE = KeyFactory.makeSingleKey(
+            new TypeToken<Boolean>() {},
+            new TypeToken<Value<Boolean>>() {},
+            DataQuery.of("flymode"),
+            "cubeengine:vanillaplus:flymode", "Flymode on Login");
 
     public SafeLoginData(Boolean value)
     {

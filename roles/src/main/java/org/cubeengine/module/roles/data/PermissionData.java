@@ -166,12 +166,6 @@ public class PermissionData extends AbstractData<PermissionData, ImmutablePermis
     }
 
     @Override
-    public int compareTo(PermissionData o)
-    {
-        return IPermissionData.compareTo(this, o);
-    }
-
-    @Override
     public DataContainer toContainer()
     {
         DataContainer result = super.toContainer();

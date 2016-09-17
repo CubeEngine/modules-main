@@ -22,6 +22,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+
+import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
@@ -45,22 +48,37 @@ import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.world.World;
 
 import static java.util.Collections.emptyList;
+import static org.spongepowered.api.data.DataQuery.of;
+import static org.spongepowered.api.data.key.KeyFactory.makeListKey;
+import static org.spongepowered.api.data.key.KeyFactory.makeMapKey;
+import static org.spongepowered.api.data.key.KeyFactory.makeSingleKey;
 
 public class PlayerData implements DataSerializable
 {
-    public static final Key<Value<Integer>> HELD_ITEM = KeyFactory.makeSingleKey(Integer.class, BaseValue.class, DataQuery.of("heldItemSlot"));
-    public static final Key<Value<Double>> HEALTH = KeyFactory.makeSingleKey(Double.class, BaseValue.class, DataQuery.of("health"));
-    public static final Key<Value<Double>> MAX_HEALTH = KeyFactory.makeSingleKey(Double.class, BaseValue.class, DataQuery.of("maxHealth"));
-    public static final Key<Value<Integer>> FOOD = KeyFactory.makeSingleKey(Integer.class, BaseValue.class, DataQuery.of("foodLevel"));
-    public static final Key<Value<Double>> SATURATION = KeyFactory.makeSingleKey(Double.class, BaseValue.class, DataQuery.of("saturation"));
-    public static final Key<Value<Double>> EXHAUSTION = KeyFactory.makeSingleKey(Double.class, BaseValue.class, DataQuery.of("exhaustion"));
-    public static final Key<Value<Integer>> EXP = KeyFactory.makeSingleKey(Integer.class, BaseValue.class, DataQuery.of("exp"));
-    public static final Key<Value<Integer>> LVL = KeyFactory.makeSingleKey(Integer.class, BaseValue.class, DataQuery.of("lvl"));
-    public static final Key<Value<Integer>> FIRE_TICKS = KeyFactory.makeSingleKey(Integer.class, BaseValue.class, DataQuery.of("fireticks"));
-    public static final Key<ListValue<PotionEffect>> ACTIVE_EFFECTS = KeyFactory.makeListKey(PotionEffect.class, DataQuery.of("activeEffects"));
-    public static final Key<MapValue<Integer, ItemStack>> INVENTORY = KeyFactory.makeMapKey(Integer.class, ItemStack.class, DataQuery.of("inventory"));
-    public static final Key<MapValue<Integer, ItemStack>> ENDER_INVENTORY = KeyFactory.makeMapKey(Integer.class, ItemStack.class, DataQuery.of("enderInventory"));
-    public static final Key<Value<String>> GAMEMODE = KeyFactory.makeSingleKey(String.class, BaseValue.class, DataQuery.of("gamemode"));
+    private static TypeToken<Integer> TT_Int = new TypeToken<Integer>() {};
+    private static TypeToken<Value<Integer>> TTV_Int = new TypeToken<Value<Integer>>() {};
+    private static TypeToken<Double> TT_Double = new TypeToken<Double>() {};
+    private static TypeToken<Value<Double>> TTV_Double = new TypeToken<Value<Double>>() {};
+    private static TypeToken<String> TT_String = new TypeToken<String>() {};
+    private static TypeToken<Value<String>> TTV_String = new TypeToken<Value<String>>() {};
+    private static TypeToken<List<PotionEffect>> TTL_PotionEffect = new TypeToken<List<PotionEffect>>() {};
+    private static TypeToken<ListValue<PotionEffect>> TTLV_PotionEffect = new TypeToken<ListValue<PotionEffect>>() {};
+    private static TypeToken<Map<Integer, ItemStack>> TTM_Inventory = new TypeToken<Map<Integer, ItemStack>>() {};
+    private static TypeToken<MapValue<Integer, ItemStack>> TTMV_Inventory = new TypeToken<MapValue<Integer, ItemStack>>() {};
+
+    public static final Key<Value<Integer>> HELD_ITEM = makeSingleKey(TT_Int, TTV_Int, of("heldItemSlot"), "cubeengine:multiverse:player-helditem", "Held Item Index");
+    public static final Key<Value<Double>> HEALTH = makeSingleKey(TT_Double, TTV_Double, of("health"), "cubeengine:multiverse:player-health", "Health");
+    public static final Key<Value<Double>> MAX_HEALTH = makeSingleKey(TT_Double, TTV_Double, of("maxHealth"), "cubeengine:multiverse:player-max-health", "Max Health");
+    public static final Key<Value<Integer>> FOOD = makeSingleKey(TT_Int, TTV_Int, of("foodLevel"), "cubeengine:multiverse:player-food", "Food");
+    public static final Key<Value<Double>> SATURATION = makeSingleKey(TT_Double, TTV_Double, of("saturation"), "cubeengine:multiverse:player-saturation", "Saturation");
+    public static final Key<Value<Double>> EXHAUSTION = makeSingleKey(TT_Double, TTV_Double, of("exhaustion"), "cubeengine:multiverse:player-exhaustion", "Exhaustion");
+    public static final Key<Value<Integer>> EXP = makeSingleKey(TT_Int, TTV_Int, of("exp"), "cubeengine:multiverse:player-exp", "Exp");
+    public static final Key<Value<Integer>> LVL = makeSingleKey(TT_Int, TTV_Int, of("lvl"), "cubeengine:multiverse:player-lvl", "Lvl");
+    public static final Key<Value<Integer>> FIRE_TICKS = makeSingleKey(TT_Int, TTV_Int, of("fireticks"), "cubeengine:multiverse:player-fireticks", "Fire-Ticks");
+    public static final Key<ListValue<PotionEffect>> ACTIVE_EFFECTS = makeListKey(TTL_PotionEffect, TTLV_PotionEffect, of("activeEffects"), "cubeengine:multiverse:player-effects", "Effects");
+    public static final Key<MapValue<Integer, ItemStack>> INVENTORY = makeMapKey(TTM_Inventory, TTMV_Inventory, of("inventory"), "cubeengine:multiverse:player-inventory", "Inventory");
+    public static final Key<MapValue<Integer, ItemStack>> ENDER_INVENTORY = makeMapKey(TTM_Inventory, TTMV_Inventory, of("enderInventory"), "cubeengine:multiverse:player-enderchest", "Enderchest");
+    public static final Key<Value<String>> GAMEMODE = makeSingleKey(TT_String, TTV_String, of("gamemode"), "cubeengine:multiverse:player-gamemode", "Gamemode");
 
     public int heldItemSlot = 0;
     public double health = 20;

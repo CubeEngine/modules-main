@@ -18,6 +18,7 @@
 package org.cubeengine.module.locker;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -382,12 +383,14 @@ public class LockerBlockListener
     public void onBlockExplode(ExplosionEvent.Detonate event)
     {
         if (!this.module.getConfig().protectBlockFromExplosion) return;
-        for (Transaction<BlockSnapshot> trans : event.getTransactions())
+
+        Iterator<Location<World>> it = event.getAffectedLocations().iterator();
+        while (it.hasNext())
         {
-            Location<World> location = trans.getOriginal().getLocation().get();
-            if (manager.getLock(location) != null)
+            Location<World> worldLocation = it.next();
+            if (manager.getLock(worldLocation) != null)
             {
-                trans.setValid(false);
+                it.remove(); // TODO let other blocks explode? Or cancel everything?
             }
         }
 
