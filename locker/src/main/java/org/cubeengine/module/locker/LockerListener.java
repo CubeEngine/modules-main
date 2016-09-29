@@ -82,16 +82,10 @@ public class LockerListener
                 return;
             }
             if (lock == null) return;
-            Inventory inv = null;
-            try
-            {
-                inv = ((Carrier)block.getTileEntity().get()).getInventory();
-            }
-            catch (AbstractMethodError e)
-            {
-                //e.printStackTrace(); // TODO wait for Carrier impl
-            }
-            lock.handleInventoryOpen(event, inv, block, player);
+
+            // Handled by InteractInventoryEvent.Open
+            //Inventory inv = ((Carrier)block.getTileEntity().get()).getInventory();;
+            //lock.handleInventoryOpen(event, inv, block, player);
         }
         else if (block.supports(Keys.OPEN))
         {
@@ -125,7 +119,7 @@ public class LockerListener
         if (lock == null) return;
         if (entity instanceof Carrier || (entity.getType() == HORSE && player.get(Keys.IS_SNEAKING).get()))
         {
-            lock.handleInventoryOpen(event, null, null, player);
+            // Handled by InteractInventoryEvent.Open lock.handleInventoryOpen(event, null, null, player);
         }
         else
         {
@@ -139,7 +133,6 @@ public class LockerListener
         if (!(event.getTargetInventory() instanceof CarriedInventory)
          || !((CarriedInventory) event.getTargetInventory()).getCarrier().isPresent())
         {
-            // TODO how do i get the viewed CarriedInventory?
             return;
         }
         Object carrier = ((CarriedInventory) event.getTargetInventory()).getCarrier().get();
