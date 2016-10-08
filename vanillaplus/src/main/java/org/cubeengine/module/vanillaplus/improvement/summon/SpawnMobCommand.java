@@ -68,7 +68,7 @@ public class SpawnMobCommand
         }
         else
         {
-            BlockRayHit<World> hit = BlockRay.from(((Player)context)).blockLimit(200).filter(onlyAirFilter()).end().orElse(null);
+            BlockRayHit<World> hit = BlockRay.from(((Player)context)).distanceLimit(200).stopFilter(onlyAirFilter()).end().orElse(null);
             if (hit == null)
             {
                 i18n.sendTranslated(context, NEGATIVE, "Cannot find Targetblock");

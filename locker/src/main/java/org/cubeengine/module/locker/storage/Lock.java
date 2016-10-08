@@ -44,7 +44,9 @@ import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.api.data.type.PortionTypes;
+import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
@@ -73,6 +75,7 @@ import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
+import static org.spongepowered.api.data.type.PortionTypes.TOP;
 import static org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK;
 import static org.spongepowered.api.text.format.TextColors.*;
 
@@ -471,17 +474,17 @@ public class Lock
             this.notifyUsage(user);
             if ((in && out) || user.hasPermission(module.perms().ACCESS_OTHER.getId())) return; // Has full access
             if (protectedInventory == null) return; // Just checking else do lock
-            InventoryGuardFactory inventoryGuardFactory = module.getModularity().provide(InventoryGuardFactory.class);
-            inventoryGuardFactory.prepareInv(protectedInventory, user.getUniqueId());
+            InventoryGuardFactory igf = module.getModularity().provide(InventoryGuardFactory.class);
+            igf.prepareInv(protectedInventory, user.getUniqueId());
             if (!in)
             {
-                inventoryGuardFactory.blockPutInAll();
+                igf.blockPutInAll();
             }
             if (!out)
             {
-                inventoryGuardFactory.blockTakeOutAll();
+                igf.blockTakeOutAll();
             }
-            inventoryGuardFactory.submitInventory(Locker.class, false);
+            igf.submitInventory(Locker.class, false);
 
             this.notifyUsage(user);
             updateAccess();
@@ -872,28 +875,16 @@ public class Lock
         }
         boolean open = doorClicked.get(Keys.OPEN).get();
 
-        for (Location door : locations)
+        for (Location<World> door : locations)
         {
-            BlockState block = door.getBlock();
-            Optional<? extends Enum<?>> halfTrait = block.getTraitValue(EnumTraits.WOODEN_DOOR_HALF);
-            if (halfTrait.isPresent() && halfTrait.get().name().equals("UPPER"))
-            {
-                continue;
-            }
-            /*
-            if (door.get(Keys.PORTION_TYPE).get() == PortionTypes.TOP) // TODO use once implemented
-            {
-                continue;
-            }
-            */
             if (open)
             {
-                door.offer(Keys.OPEN, false);
-                user.playSound(SoundTypes.BLOCK_WOODEN_DOOR_OPEN, door.getPosition(), 1);
+                door.setBlock(door.getBlock().with(Keys.OPEN, false).get(), Cause.source(module.getPlugin()).build()); // TODO add user
+                user.playSound(SoundTypes.BLOCK_WOODEN_DOOR_CLOSE, door.getPosition(), 1);
             }
             else
             {
-                door.offer(Keys.OPEN, true);
+                door.setBlock(door.getBlock().with(Keys.OPEN, true).get(), Cause.source(module.getPlugin()).build()); // TODO add user
                 user.playSound(SoundTypes.BLOCK_WOODEN_DOOR_OPEN, door.getPosition(), 1);
             }
         }
@@ -918,7 +909,7 @@ public class Lock
                     {
                         ((World)location.getExtent()).playSound(SoundTypes.BLOCK_WOODEN_DOOR_CLOSE, location.getPosition(), 1);
                     }
-                    location.offer(Keys.OPEN, false);
+                    location.setBlock(location.getBlock().with(Keys.OPEN, false).get(), Cause.source(manager.module.getPlugin()).build());
                 }
             }, this.manager.module.getConfig().autoCloseSeconds * 20);
         }

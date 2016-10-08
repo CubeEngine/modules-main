@@ -55,6 +55,7 @@ import org.cubeengine.libcube.service.task.TaskManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandMapping;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
 
@@ -73,6 +74,7 @@ public class Locker extends Module
     @Inject private LockerPerm perms;
     @Inject @ModuleListener private LockerListener listener;
     @Inject @ModuleListener private LockerBlockListener blockListener;
+    @Inject private PluginContainer plugin;
 
     @Inject
     public Locker(Reflector reflector, EntityMatcher entityMatcher, Log logger, MaterialMatcher mm, CommandManager cm)
@@ -105,6 +107,11 @@ public class Locker extends Module
     public LockerPerm perms()
     {
         return perms;
+    }
+
+    public PluginContainer getPlugin()
+    {
+        return plugin;
     }
 
 
