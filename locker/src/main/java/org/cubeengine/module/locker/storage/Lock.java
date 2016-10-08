@@ -77,6 +77,7 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
 import static org.spongepowered.api.data.type.PortionTypes.TOP;
 import static org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK;
+import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 import static org.spongepowered.api.text.format.TextColors.*;
 
 public class Lock
@@ -195,14 +196,15 @@ public class Lock
         }
         if (player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(null) != ItemTypes.BOOK)
         {
-            i18n.sendTranslated(player, NEGATIVE, "Could not create KeyBook! You need to hold a book in your hand in order to do this!");
+            // TODO allow creative with empty hand?
+            i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "You need to hold a book in your hand in order to create a KeyBook!");
             return;
         }
         ItemStack item = Sponge.getRegistry().createBuilder(ItemStack.Builder.class).itemType(ENCHANTED_BOOK).quantity(1).build();
         item.offer(Keys.DISPLAY_NAME, KeyBook.TITLE.toBuilder().append(Text.of(TextColors.DARK_GRAY, getId())).build());
         item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(player, NEUTRAL, "This book can"),
-                i18n.getTranslation(player, NEUTRAL, "unlock a magically"),
-                i18n.getTranslation(player, NEUTRAL, "locked protection")));
+                                                 i18n.getTranslation(player, NEUTRAL, "unlock a magically"),
+                                                 i18n.getTranslation(player, NEUTRAL, "locked protection")));
         item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCK.PASSWORD), Sponge.getRegistry().getValueFactory()));
         player.setItemInHand(HandTypes.MAIN_HAND, item);
         if (itemStack != null && itemStack.getQuantity() != 0)
@@ -253,7 +255,7 @@ public class Lock
     }
 
     /**
-     * Sets multiple acceslevels
+     * Sets multiple access-levels
      *
      * @param user the user modifying
      * @param list
@@ -262,12 +264,12 @@ public class Lock
     {
         if (!this.isOwner(user) && !this.hasAdmin(user) && !user.hasPermission(module.perms().CMD_MODIFY_OTHER.getId()))
         {
-            i18n.sendTranslated(user, NEGATIVE, "You are not allowed to modify the access list of this protection!");
+            i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "You are not allowed to modify the access list of this protection!");
             return;
         }
         if (this.isPublic())
         {
-            i18n.sendTranslated(user, NEUTRAL, "This protection is public and so is accessible to everyone");
+            i18n.sendTranslated(ACTION_BAR, user, NEUTRAL, "This protection is public and so is accessible to everyone");
             return;
         }
         for (PlayerAccess access : list)
@@ -294,7 +296,7 @@ public class Lock
             }
             else if (!access.add)
             {
-                i18n.sendTranslated(user, POSITIVE, "{user} had no access to this protection!", access.user);
+                i18n.sendTranslated(ACTION_BAR, user, POSITIVE, "{user} had no access to this protection!", access.user);
             }
             else if (access.admin)
             {
@@ -397,11 +399,11 @@ public class Lock
             event.setCancelled(true);
             if (user.hasPermission(module.perms().SHOW_OWNER.getId()))
             {
-                i18n.sendTranslated(user, NEGATIVE, "A magical lock from {user} prevents you from using this door!", this.getOwner());
+                i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "A magical lock from {user} prevents you from using this door!", this.getOwner());
             }
             else
             {
-                i18n.sendTranslated(user, NEGATIVE, "A magical lock prevents you from using this door!");
+                i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "A magical lock prevents you from using this door!");
             }
             return;
         } // else has access
@@ -429,7 +431,7 @@ public class Lock
     {
         if (soundLocation != null && user.hasPermission(module.perms().SHOW_OWNER.getId()))
         {
-            i18n.sendTranslated(user, NEUTRAL, "This inventory is protected by {user}", this.getOwner());
+            i18n.sendTranslated(ACTION_BAR, user, NEUTRAL, "This inventory is protected by {user}", this.getOwner());
         }
         if (this.handleAccess(user, soundLocation, event) || event.isCancelled()) return;
         boolean in;
@@ -457,11 +459,11 @@ public class Lock
             event.setCancelled(true); // private & no access
             if (user.hasPermission(module.perms().SHOW_OWNER.getId()))
             {
-                i18n.sendTranslated(user, NEGATIVE, "A magical lock from {user} prevents you from accessing this inventory!", this.getOwner());
+                i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "A magical lock from {user} prevents you from accessing this inventory!", this.getOwner());
             }
             else
             {
-                i18n.sendTranslated(user, NEGATIVE, "A magical lock prevents you from accessing this inventory!");
+                i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "A magical lock prevents you from accessing this inventory!");
             }
         }
         else // Has access access -> new InventoryGuard
@@ -495,7 +497,7 @@ public class Lock
     {
         if (user.hasPermission(module.perms().SHOW_OWNER.getId()))
         {
-            i18n.sendTranslated(user, NEUTRAL, "This entity is protected by {user}", this.getOwner());
+            i18n.sendTranslated(ACTION_BAR, user, NEUTRAL, "This entity is protected by {user}", this.getOwner());
         }
         if (this.getLockType() == PUBLIC) return;
         if (this.handleAccess(user, null, event))
@@ -513,11 +515,11 @@ public class Lock
             event.setCancelled(true); // private & no access
             if (user.hasPermission(module.perms().SHOW_OWNER.getId()))
             {
-                i18n.sendTranslated(user, NEGATIVE, "Magic from {user} repelled your attempts to reach this entity!", this.getOwner());
+                i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "Magic from {user} repelled your attempts to reach this entity!", this.getOwner());
             }
             else
             {
-                i18n.sendTranslated(user, NEGATIVE, "Magic repelled your attempts to reach this entity!");
+                i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "Magic repelled your attempts to reach this entity!");
             }
         }
         this.notifyUsage(user);
@@ -548,7 +550,7 @@ public class Lock
             return;
         }
         event.setCancelled(true);
-        i18n.sendTranslated(user, NEGATIVE, "Magic prevents you from breaking this protection!");
+        i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "Magic prevents you from breaking this protection!");
     }
 
 
@@ -556,7 +558,7 @@ public class Lock
     {
         if (user.hasPermission(module.perms().SHOW_OWNER.getId()))
         {
-            i18n.sendTranslated(user, NEUTRAL, "This block is protected by {user}", this.getOwner());
+            i18n.sendTranslated(ACTION_BAR, user, NEUTRAL, "This block is protected by {user}", this.getOwner());
         }
         if (this.getLockType() == PUBLIC) return;
         if (this.handleAccess(user, null, event))
@@ -565,7 +567,7 @@ public class Lock
             return;
         }
         event.setCancelled(true);
-        i18n.sendTranslated(user, NEGATIVE, "Magic prevents you from interacting with this block!");
+        i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "Magic prevents you from interacting with this block!");
     }
 
     public boolean handleEntityDamage(Player user)
@@ -573,12 +575,12 @@ public class Lock
         if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getUniqueId())
             || user.hasPermission(module.perms().BREAK_OTHER.getId()))
         {
-            i18n.sendTranslated(user, NEUTRAL, "The magic surrounding this entity quivers as you hit it!");
+            i18n.sendTranslated(ACTION_BAR, user, NEUTRAL, "The magic surrounding this entity quivers as you hit it!");
             return true;
         }
 
         // private & no access
-        i18n.sendTranslated(user, NEGATIVE, "Magic repelled your attempts to hit this entity!");
+        i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "Magic repelled your attempts to hit this entity!");
         return false;
     }
 
@@ -833,21 +835,21 @@ public class Lock
         {
             if (this.checkPass(pass))
             {
-                i18n.sendTranslated(user, POSITIVE,
-                                    "Upon hearing the right passphrase the magic surrounding the container gets thinner and lets you pass!");
+                i18n.sendTranslated(ACTION_BAR, user, POSITIVE, "Upon hearing the right passphrase the magic gets thinner and lets you pass!");
                 KeyBook.playUnlockSound(user, soundLoc, module.getTaskManager());
 
                 manager.addUnlock(user, this);
             }
             else
             {
-                i18n.sendTranslated(user, NEUTRAL, "Sudden pain makes you realize this was not the right passphrase!");
+                // TODO creative has no effect
+                i18n.sendTranslated(ACTION_BAR, user, NEUTRAL, "Sudden pain makes you realize this was not the right passphrase!");
                 user.damage(1, DamageSources.MAGIC, Cause.of(NamedCause.source(user)));
             }
         }
         else
         {
-            i18n.sendTranslated(user, NEUTRAL, "You try to open the container with a passphrase but nothing changes!");
+            i18n.sendTranslated(ACTION_BAR, user, NEUTRAL, "You try to open the container with a passphrase but nothing changes!");
         }
     }
 
@@ -862,12 +864,12 @@ public class Lock
     {
         if (doorClicked.getBlockType() == IRON_DOOR && !manager.module.getConfig().openIronDoorWithClick)
         {
-            i18n.sendTranslated(user, NEUTRAL, "You cannot open the heavy door!");
+            i18n.sendTranslated(ACTION_BAR, user, NEUTRAL, "You cannot open the heavy door!");
             return;
         }
         if (user.hasPermission(module.perms().SHOW_OWNER.getId()))
         {
-            i18n.sendTranslated(user, NEUTRAL, "This door is protected by {user}", this.getOwner());
+            i18n.sendTranslated(ACTION_BAR, user, NEUTRAL, "This door is protected by {user}", this.getOwner());
         }
         if (!doorClicked.supports(Keys.OPEN))
         {
