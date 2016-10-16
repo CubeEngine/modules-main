@@ -153,7 +153,7 @@ public class RoleInformationCommands extends ContainerCommand
 
     @Alias(value = {"listROption", "listRData"})
     @Command(alias = "listData", desc = "Lists all options of given role [in context]")
-    public void listOption(CommandSource ctx, RoleSubject role, @Flag boolean all, @Named("in") @Default Context context)
+    public void listOptions(CommandSource ctx, RoleSubject role, @Flag boolean all, @Named("in") @Default Context context)
     {
         Map<String, String> options = new HashMap<>();
         if (all)

@@ -133,23 +133,23 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = "setUPerm")
     @Command(alias = "setPerm", desc = "Sets a permission for this user [in context]")
-    public void setPermission(CommandSource ctx, @Default User player, @Complete(PermissionCompleter.class) String permission, @Default Tristate value, @Named("in") @Default Context context)
+    public void setPermission(CommandSource ctx, @Default User player, @Complete(PermissionCompleter.class) String permission, @Default Tristate type, @Named("in") @Default Context context)
     {
-        if (value == Tristate.UNDEFINED)
+        if (type == Tristate.UNDEFINED)
         {
             resetPermission(ctx, player, permission, context);
         }
         Set<Context> contexts = toSet(context);
-        if (!player.getSubjectData().setPermission(contexts, permission, value))
+        if (!player.getSubjectData().setPermission(contexts, permission, type))
         {
-            i18n.sendTranslated(ctx, NEGATIVE, "Permission {input} of {user} was already set to {bool} in {context}!", permission, player, value.asBoolean(), context);
+            i18n.sendTranslated(ctx, NEGATIVE, "Permission {input} of {user} was already set to {bool} in {context}!", permission, player, type.asBoolean(), context);
             return;
         }
-        switch (value)
+        switch (type)
         {
             case TRUE:
             case FALSE:
-                i18n.sendTranslated(ctx, POSITIVE, "Permission {input} of {user} set to {bool} in {context}!", permission, player, value.asBoolean(), context);
+                i18n.sendTranslated(ctx, POSITIVE, "Permission {input} of {user} set to {bool} in {context}!", permission, player, type.asBoolean(), context);
         }
     }
 

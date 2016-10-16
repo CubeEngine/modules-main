@@ -66,7 +66,7 @@ public class UserInformationCommands extends ContainerCommand
         this.service = service;
     }
 
-    @Alias(value = "listuroles")
+    @Alias(value = "listurole")
     @Command(desc = "Lists roles of a user")
     public void list(CommandSource ctx, @Default User player)
     {
@@ -117,7 +117,7 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "checkuperm")
     @Command(alias = "checkperm", desc = "Checks for permissions of a user [in context]")
-    public void checkpermission(CommandSource ctx, @Default User player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
+    public void checkPermission(CommandSource ctx, @Default User player, @Complete(PermissionCompleter.class) String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
 
@@ -151,7 +151,7 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = "listuperm")
     @Command(alias = "listperm", desc = "List permission assigned to a user [in context]")
-    public void listpermission(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
+    public void listPermission(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = toSet(context);
         Map<String, Boolean> permissions = new HashMap<>();
@@ -206,7 +206,7 @@ public class UserInformationCommands extends ContainerCommand
 
     @Alias(value = {"listUOption", "listUData"})
     @Command(alias = "listData", desc = "Lists assigned options from a user [in context]")
-    public void listOptions(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
+    public void listOption(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = toSet(context);
         Map<String, String> options = new HashMap<>();
