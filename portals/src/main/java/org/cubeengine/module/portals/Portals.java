@@ -98,7 +98,7 @@ public class Portals extends Module
         tm.runTimer(Portals.class, this::checkForEntitiesInPortals, 5, 5);
     }
 
-    public void setRandomDestinationSetting(World world, Integer radius, Chunk center)
+    public void setRandomDestinationSetting(World world, Integer radius, Chunk center) // TODO worldborder as default / config default?
     {
         this.randomDestinationSettings.put(world, new Pair<>(radius, center));
     }
