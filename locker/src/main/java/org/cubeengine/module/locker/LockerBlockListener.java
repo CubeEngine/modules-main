@@ -227,21 +227,21 @@ public class LockerBlockListener
         return false;
     }
 
-    /*  TODO use this instead of ugly mess below once available
     @Listener
-    public void onBlockPistonExtend(MoveBlockEvent event, @First Player player)
+    public void onBlockPistonExtend(ChangeBlockEvent.Pre event, @First Player player)
     {
         if (!this.module.getConfig().protectFromPistonMove) return;
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions())
+        for (Location<World> loc : event.getLocations())
         {
-            if (manager.getLockAtLocation(transaction.getOriginal().getLocation().get(), null) != null)
+            Lock lock = manager.getLock(loc);
+            if (lock != null)
             {
+                lock.handleBlockBreak(event, player);
                 event.setCancelled(true);
                 return;
             }
         }
     }
-    */
 
     @Listener
     public void onNotifyPiston(NotifyNeighborBlockEvent event, @First BlockSnapshot block)

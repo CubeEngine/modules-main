@@ -541,7 +541,7 @@ public class Lock
         return LockType.forByte(this.model.getValue(TABLE_LOCK.LOCK_TYPE));
     }
 
-    public void handleBlockBreak(ChangeBlockEvent.Break event, Player user)
+    public void handleBlockBreak(Cancellable event, Player user)
     {
         if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getUniqueId())
             || user.hasPermission(module.perms().BREAK_OTHER.getId()))

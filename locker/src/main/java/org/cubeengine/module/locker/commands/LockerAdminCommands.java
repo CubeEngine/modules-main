@@ -55,7 +55,7 @@ public class LockerAdminCommands extends ContainerCommand
     {
         if (id == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Invalid id!"); // TODO parameter reader
+            i18n.sendTranslated(context, NEGATIVE, "Invalid id!"); // TODO parameter reader ; default block you are looking at
             return null;
         }
         Lock lockById = this.manager.getLockById(UInteger.valueOf(id));
