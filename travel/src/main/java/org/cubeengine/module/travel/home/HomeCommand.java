@@ -252,32 +252,32 @@ public class HomeCommand extends ContainerCommand
     }
 
     @Command(desc = "Rename a home")
-    public void rename(CommandSource sender, String name, @Label("new name") String newName, @Default @Optional Player owner)
+    public void rename(CommandSource sender, String home, @Label("new name") String newName, @Default @Optional Player owner)
     {
-        Home home = manager.get(owner, name).orElse(null);
-        if (home == null)
+        Home h = manager.get(owner, home).orElse(null);
+        if (h == null)
         {
-            homeNotFoundMessage(sender, owner, name);
+            homeNotFoundMessage(sender, owner, home);
             return;
         }
-        if (!home.getOwner().equals(sender) && !sender.hasPermission(module.getPermissions().HOME_RENAME_OTHER.getId()))
+        if (!h.getOwner().equals(sender) && !sender.hasPermission(module.getPermissions().HOME_RENAME_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().HOME_RENAME_OTHER);
         }
-        if (name.contains(":") || name.length() >= 32)
+        if (home.contains(":") || home.length() >= 32)
         {
             i18n.sendTranslated(sender, NEGATIVE,
                                    "Homes may not have names that are longer than 32 characters or contain colon(:)'s!");
             return;
         }
-        String oldName = home.name;
+        String oldName = h.name;
 
-        if (!manager.rename(home, newName))
+        if (!manager.rename(h, newName))
         {
             i18n.sendTranslated(sender, POSITIVE, "Could not rename the home to {name}", newName);
             return;
         }
-        if (home.getOwner().equals(sender))
+        if (h.getOwner().equals(sender))
         {
             i18n.sendTranslated(sender, POSITIVE, "Your home {name} has been renamed to {name}", oldName, newName);
             return;
