@@ -17,29 +17,22 @@
  */
 package org.cubeengine.module.roles;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.ThreadFactory;
-import javax.inject.Inject;
+import static org.cubeengine.libcube.service.logging.LoggingUtil.getCycler;
+import static org.cubeengine.libcube.service.logging.LoggingUtil.getFileFormat;
+import static org.cubeengine.libcube.service.logging.LoggingUtil.getLogFile;
+
 import de.cubeisland.engine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.logscribe.LogFactory;
 import de.cubeisland.engine.logscribe.target.file.AsyncFileTarget;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.LifeCycle;
-import de.cubeisland.engine.modularity.core.Modularity;
 import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.ValueProvider;
-import de.cubeisland.engine.modularity.core.marker.Disable;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.marker.Setup;
 import de.cubeisland.engine.reflect.Reflector;
-
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.filesystem.FileManager;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.commands.ManagementCommands;
 import org.cubeengine.module.roles.commands.RoleCommands;
 import org.cubeengine.module.roles.commands.RoleInformationCommands;
@@ -60,19 +53,15 @@ import org.cubeengine.module.roles.data.PermissionDataBuilder;
 import org.cubeengine.module.roles.exception.RolesExceptionHandler;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.filesystem.FileManager;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
-import static org.cubeengine.libcube.service.logging.LoggingUtil.*;
+import java.util.Optional;
+import java.util.concurrent.ThreadFactory;
+
+import javax.inject.Inject;
 
 @ModuleInfo(name = "Roles", description = "Manages permissions of players and roles")
 /*

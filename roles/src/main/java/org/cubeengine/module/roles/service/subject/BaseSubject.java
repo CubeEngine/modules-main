@@ -89,6 +89,10 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     @Override
     public Tristate getPermissionValue(Set<Context> contexts, String permission)
     {
+        if (permission == null)
+        {
+            return Tristate.UNDEFINED;
+        }
         FoundPermission perm = RolesUtil.findPermission(service, this, permission, contexts);
         if (perm != null)
         {
