@@ -215,7 +215,7 @@ public class LockManager
 
         Chunk chunk = loadChunks.poll();
 
-        // TODO get view-distance if available / default to 10
+        // TODO get view-distance if available / default to 10 ; DedicatedServer.getIntProperty("view-distance", 10)
         int viewDistance = 10;
 
         Vector3i position = chunk.getPosition();

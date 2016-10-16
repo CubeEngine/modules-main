@@ -122,7 +122,7 @@ public class LockerBlockListener
                         Text click = i18n.getTranslation(player, NEUTRAL, "Click here to protect").toBuilder().color(TextColors.GOLD).style(TextStyles.ITALIC)
                                          .onClick(TextActions.executeCallback(s -> manager.createLock(loc, player, blockprotection.getAutoProtect(), null, false)))
                                          .build();
-                        i18n.sendTranslated(player, NEUTRAL, "Autoprotect is disabled while sneaking. {txt}", click); // TODO click to protect anyway
+                        i18n.sendTranslated(player, NEUTRAL, "Autoprotect is disabled while sneaking. {txt}", click);
 
                         return;
                     }
@@ -166,17 +166,10 @@ public class LockerBlockListener
                 return true;
             }
 
-            Optional<? extends Enum<?>> halfTrait = placed.getState().getTraitValue(EnumTraits.WOODEN_DOOR_HALF);
-            if (halfTrait.isPresent() && halfTrait.get().name().equals("UPPER"))
+            if (placed.get(Keys.PORTION_TYPE).get().equals(TOP))
             {
                 relative = location.getRelative(DOWN);
             }
-            /*
-            if (placed.get(Keys.PORTION_TYPE).get().equals(TOP)) // TODO use once implemented
-            {
-                relative = location.getRelative(DOWN);
-            }
-            */
             else
             {
                 relative = location.getRelative(UP);
@@ -270,7 +263,6 @@ public class LockerBlockListener
                         if (hasLock(piston.getRelative(direction), direction, new HashSet<>(), extend, 0))
                         {
                             event.setCancelled(true);
-                            // TODO filter once implemented event.filterDirections(d -> d == entry.getKey());
                         }
                     });
         }
@@ -390,7 +382,8 @@ public class LockerBlockListener
             Location<World> worldLocation = it.next();
             if (manager.getLock(worldLocation) != null)
             {
-                it.remove(); // TODO let other blocks explode? Or cancel everything?
+                event.getAffectedLocations().clear();
+                break;
             }
         }
 

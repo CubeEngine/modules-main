@@ -38,6 +38,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
+import org.spongepowered.api.event.entity.AttackEntityEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
@@ -151,7 +152,7 @@ public class LockerListener
     }
 
     @Listener
-    public void onEntityDamageEntity(DamageEntityEvent event, @First EntityDamageSource source)
+    public void onAttackEntity(AttackEntityEvent event, @First EntityDamageSource source)
     {
         Entity target = event.getTargetEntity();
         Player player = null;
@@ -169,11 +170,10 @@ public class LockerListener
         }
         else
         {
-            if (handleHanging(target, player))
+            if (handleHanging(target, player)) // TODO why is this not called?
             {
                 event.setCancelled(true);
             }
-            // TODO implement me
         }
     }
 
