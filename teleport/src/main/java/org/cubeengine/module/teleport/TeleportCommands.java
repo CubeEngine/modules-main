@@ -199,13 +199,15 @@ public class TeleportCommands
     {
         Location<World> loc = new Location<>(world, x, y, z).add(0.5, 0, 0.5);
         unsafe = unsafe && context.hasPermission(module.perms().COMMAND_TPPOS_UNSAFE.getId());
-        if (!unsafe || player.setLocationSafely(loc))
+        if (unsafe)
         {
-            if (unsafe)
-            {
-                player.setLocation(loc);
-            }
-            i18n.sendTranslated(context, POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new BlockVector3(x, y, z), world);
+            player.setLocation(loc);
         }
+        else if (!player.setLocationSafely(loc))
+        {
+            return;
+        }
+        i18n.sendTranslated(context, POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new BlockVector3(x, y, z), world);
     }
 }
+
