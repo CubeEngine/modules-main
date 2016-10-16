@@ -105,7 +105,7 @@ public class InformationCommands extends PermissionContainer
             x = loc.getBlockX();
             z = loc.getBlockZ();
         }
-        BiomeType biome = world.getBiome(x, z);
+        BiomeType biome = world.getBiome(x, 0, z);
         i18n.sendTranslated(context, NEUTRAL, "Biome at {vector:x\\=:z\\=}: {biome}", new BlockVector2(x, z), biome);
     }
 
