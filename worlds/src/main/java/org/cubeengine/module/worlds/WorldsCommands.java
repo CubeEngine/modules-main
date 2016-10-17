@@ -76,7 +76,6 @@ import javax.inject.Inject;
  * - listplayers
  *
  * TODO autosave?
- * TODO custom Generators
  * TODO alias for worlds
  */
 @Command(name = "worlds", desc = "Worlds commands")
