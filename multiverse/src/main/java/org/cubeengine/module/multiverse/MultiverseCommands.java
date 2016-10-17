@@ -83,6 +83,7 @@ public class MultiverseCommands extends ContainerCommand
     @Command(desc = "Lists all known universes")
     public void list(CommandSource context)
     {
+        // TODO hover & click features
         Set<Entry<String, Set<ConfigWorld>>> universes = module.getConfig().universes.entrySet();
         if (universes.isEmpty())
         {
