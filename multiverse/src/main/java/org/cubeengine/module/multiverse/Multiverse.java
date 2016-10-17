@@ -20,8 +20,11 @@ package org.cubeengine.module.multiverse;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
+
 import javax.inject.Inject;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
@@ -87,7 +90,7 @@ public class Multiverse extends Module
 
     public String getUniverse(World world)
     {
-        for (Entry<String, List<ConfigWorld>> entry : config.universes.entrySet())
+        for (Entry<String, Set<ConfigWorld>> entry : config.universes.entrySet())
         {
             for (ConfigWorld cWorld : entry.getValue())
             {
@@ -103,10 +106,10 @@ public class Multiverse extends Module
             if (world.getName().contains("_"))
             {
                 String name = world.getName().substring(0, world.getName().indexOf("_"));
-                List<ConfigWorld> list = config.universes.get(name);
+                Set<ConfigWorld> list = config.universes.get(name);
                 if (list == null)
                 {
-                    list = new ArrayList<>();
+                    list = new HashSet<>();
                     config.universes.put(name, list);
                 }
                 list.add(new ConfigWorld(world));
@@ -116,10 +119,10 @@ public class Multiverse extends Module
             }
         }
 
-        List<ConfigWorld> list = config.universes.get(UNKNOWN);
+        Set<ConfigWorld> list = config.universes.get(UNKNOWN);
         if (list == null)
         {
-            list = new ArrayList<>();
+            list = new HashSet<>();
             config.universes.put(UNKNOWN, list);
         }
         list.add(new ConfigWorld(world));
@@ -131,17 +134,14 @@ public class Multiverse extends Module
     public void setUniverse(World world, String universe)
     {
         ConfigWorld cWorld = new ConfigWorld(world);
-        for (List<ConfigWorld> list : config.universes.values())
+        config.universes.values().forEach(set -> set.remove(cWorld));
+        Set<ConfigWorld> set = config.universes.get(universe);
+        if (set == null)
         {
-            list.remove(cWorld);
+            set = new HashSet<>();
+            config.universes.put(universe, set);
         }
-        List<ConfigWorld> list = config.universes.get(universe);
-        if (list == null)
-        {
-            list = new ArrayList<>();
-            config.universes.put(universe, list);
-        }
-        list.add(cWorld);
+        set.add(cWorld);
         config.save();
     }
 }

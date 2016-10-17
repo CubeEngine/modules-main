@@ -32,6 +32,7 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
+import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.World;
 
@@ -72,7 +73,8 @@ public class MultiverseCommands extends ContainerCommand
                 data.from(previous, world).applyFromPlayer(p);
                 data.from(universe, world).applyToPlayer(p);
                 i18n.sendTranslated(p, NEUTRAL, "The sky opens up and sucks in the whole world.");
-                p.offer(Keys.POTION_EFFECTS, Arrays.asList(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, 2)));
+                p.playSound(SoundTypes.BLOCK_PORTAL_TRIGGER, p.getLocation().getPosition(), 1);
+                p.offer(Keys.POTION_EFFECTS, Arrays.asList(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, 2 * 20)));
                 i18n.sendTranslated(p, NEUTRAL, "When you open your eyes you now are in {input#univserse}.", universe);
                 p.offer(data);
             });
@@ -81,14 +83,14 @@ public class MultiverseCommands extends ContainerCommand
     @Command(desc = "Lists all known universes")
     public void list(CommandSource context)
     {
-        Set<Entry<String, List<ConfigWorld>>> universes = module.getConfig().universes.entrySet();
+        Set<Entry<String, Set<ConfigWorld>>> universes = module.getConfig().universes.entrySet();
         if (universes.isEmpty())
         {
             i18n.sendTranslated(context, NEUTRAL, "There is no universe yet.");
             return;
         }
         i18n.sendTranslated(context, POSITIVE, "The following univserses exits:");
-        for (Entry<String, List<ConfigWorld>> entry : universes)
+        for (Entry<String, Set<ConfigWorld>> entry : universes)
         {
             context.sendMessage(Text.of(entry.getKey(), ":"));
             for (ConfigWorld world : entry.getValue())
@@ -98,10 +100,25 @@ public class MultiverseCommands extends ContainerCommand
         }
     }
 
+    @Command(desc = "Removes a universe")
+    public void remove(CommandSource context, String universe)
+    {
+        Set<ConfigWorld> removed = module.getConfig().universes.remove(universe);
+        if (removed == null)
+        {
+            i18n.sendTranslated(context, NEGATIVE, "There is no universe named {}", universe);
+            return;
+        }
+        removed.stream().filter(cWorld -> cWorld.getWorld() != null)
+                        .forEach(cWorld -> module.setUniverse(cWorld.getWorld(), "unknown"));
+        module.getConfig().save();
+        i18n.sendTranslated(context, POSITIVE, "{name} was removed and {amount} universes moved to {name}", universe, removed.size(), "unknown");
+    }
+
     @Command(desc = "Renames a universe")
     public void rename(CommandSource context, String universe, String newName)
     {
-        List<ConfigWorld> worlds = module.getConfig().universes.remove(universe);
+        Set<ConfigWorld> worlds = module.getConfig().universes.remove(universe);
         if (worlds == null)
         {
             i18n.sendTranslated(context, NEGATIVE, "There is no universe named {}", universe);

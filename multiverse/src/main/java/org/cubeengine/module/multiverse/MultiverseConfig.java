@@ -20,12 +20,14 @@ package org.cubeengine.module.multiverse;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 
 @SuppressWarnings("all")
 public class MultiverseConfig extends ReflectedYaml
 {
-    public Map<String, List<ConfigWorld>> universes = new HashMap<>();
+    public Map<String, Set<ConfigWorld>> universes = new HashMap<>();
     public boolean autoDetectUnivserse = true;
 }
