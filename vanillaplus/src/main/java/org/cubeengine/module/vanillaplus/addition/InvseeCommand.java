@@ -30,7 +30,10 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 
 /**
@@ -63,23 +66,28 @@ public class InvseeCommand extends PermissionContainer
     @Restricted(value = Player.class, msg = "This command can only be used by a player!")
     public void invsee(Player context, User player,
                        @Flag boolean force,
-                       @Flag boolean quiet
-                       // TODO https://github.com/SpongePowered/SpongeAPI/issues/684 ,@Flag boolean ender
+                       @Flag boolean quiet,
+                       @Flag boolean ender
                       )
     {
         boolean denyModify = false;
         Inventory inv;
-        /*if (ender)
+        if (ender)
         {
             if (!context.hasPermission(COMMAND_INVSEE_ENDERCHEST.getId()))
             {
                 i18n.sendTranslated(context, NEGATIVE, "You are not allowed to look into enderchests!");
                 return;
             }
-            inv = player.get(Keys.End);
+            inv = player.getPlayer().map(p -> p.getEnderChestInventory()).orElse(null);
+            if (inv == null)
+            {
+                context.sendMessage(Text.of(TextColors.DARK_RED, "Offline Inventories are not yet supported! Waiting for API"));
+                // TODO Offline Enderchest
+                return;
+            }
         }
         else
-        */
         {
             inv = player.getInventory();
         }
@@ -95,11 +103,12 @@ public class InvseeCommand extends PermissionContainer
                 i18n.sendTranslated(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your inventory.", context);
             }
         }
-        InventoryGuardFactory guard = invGuard.prepareInv(inv);
+        InventoryGuardFactory guard = invGuard.prepareInv(inv, player.getUniqueId());
         if (denyModify)
         {
             guard.blockPutInAll().blockTakeOutAll();
         }
         guard.submitInventory(VanillaPlus.class, true);
+
     }
 }
