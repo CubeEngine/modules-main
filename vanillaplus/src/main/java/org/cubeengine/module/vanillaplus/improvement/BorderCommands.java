@@ -117,21 +117,21 @@ public class BorderCommands extends ContainerCommand
     }
 
     @Command(desc = "Sets the warning time")
-    public void warningTime(CommandSource context, Integer seconds, @Default @Named("in") World world)
+    public void warningTime(CommandSource context, Integer seconds, @Default World world)
     {
         world.getWorldBorder().setWarningTime(seconds);
         i18n.sendTranslated(context, POSITIVE, "Set world border of {world} warning to {} seconds away", world, seconds);
     }
 
     @Command(desc = "Sets the warning time")
-    public void warningDistance(CommandSource context, Integer blocks, @Default @Named("in") World world)
+    public void warningDistance(CommandSource context, Integer blocks, @Default World world)
     {
         world.getWorldBorder().setWarningDistance(blocks);
         i18n.sendTranslated(context, POSITIVE, "Set world border of {world} warning to {} blocks away", world, blocks);
     }
 
     @Command(desc = "Shows information about the world border", alias = "get")
-    public void info(CommandSource context, @Default @Named("in") World world)
+    public void info(CommandSource context, @Default World world)
     {
         WorldBorder border = world.getWorldBorder();
         double diameter = border.getDiameter();
@@ -157,14 +157,14 @@ public class BorderCommands extends ContainerCommand
     }
 
     @Command(desc = "Sets the world border damage per second per block")
-    public void damage(CommandSource context, Double damage, @Default @Named("in") World world)
+    public void damage(CommandSource context, Double damage, @Default World world)
     {
         world.getWorldBorder().setDamageAmount(damage);
         i18n.sendTranslated(context, POSITIVE, "Set world border of {world} damage to {} per block per second", world, damage);
     }
 
     @Command(desc = "Sets the world border damage buffer")
-    public void damageBuffer(CommandSource context, Integer blocks, @Default @Named("in") World world)
+    public void damageBuffer(CommandSource context, Integer blocks, @Default World world)
     {
         world.getWorldBorder().setDamageThreshold(blocks);
         i18n.sendTranslated(context, POSITIVE, "Set world border of {world} damage buffer to {} block", world, blocks);
