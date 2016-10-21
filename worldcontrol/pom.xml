@@ -9,7 +9,7 @@
 
   <groupId>org.cubeengine.module</groupId>
   <artifactId>worldcontrol</artifactId>
-  <name>worldcontrol</name>
+  <name>WorldControl</name>
   <version>1.0.0-SNAPSHOT</version>
   <description>Control what happens in your world</description>
 
