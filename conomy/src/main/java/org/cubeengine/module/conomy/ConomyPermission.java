@@ -36,5 +36,5 @@ public class ConomyPermission extends PermissionContainer
 
     private final Permission ACCESS = register("access.other.player", "Grants full access to all player accounts", null);
     public final Permission ACCESS_WITHDRAW = register("withdraw", "Allows transfering money from anothers players account", ACCESS);
-    public final Permission ACCESS_SEE = register("seehidden", "Allows seeing hidden player accounts", ACCESS, ACCESS_WITHDRAW);
+    public final Permission ACCESS_SEE = register("seehidden", "Allows seeing hidden player accounts", ACCESS);
 }
