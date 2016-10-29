@@ -54,14 +54,36 @@ public class RoleSubject extends BaseSubject<RoleSubjectData>
         return s instanceof RoleSubject ? ((RoleSubject)s).getUUID().toString() : s.getIdentifier();
     }
 
-    public static int compare(RoleSubject o1, RoleSubject o2)
+    public static int compare(Subject o1, Subject o2)
     {
-        if (o1 != null && o2 != null)
+        if (o1 instanceof RoleSubject && o2 instanceof RoleSubject) // Higher priority first
         {
-            // Higher priority first
-            return -Integer.compare(o1.getSubjectData().getConfig().priority.value, o2.getSubjectData().getConfig().priority.value);
+            return -Integer.compare(((RoleSubject) o1).getSubjectData().getConfig().priority.value,
+                                    ((RoleSubject) o2).getSubjectData().getConfig().priority.value);
         }
-        return 1;
+        if (o1 instanceof RoleSubject)
+        {
+            return 1;
+        }
+        if (o2 instanceof RoleSubject)
+        {
+            return -1;
+        }
+        if (o1 == null && o2 == null)
+        {
+            return 0;
+        }
+        if (o1 == null)
+        {
+            return -1;
+        }
+        if (o2 == null)
+        {
+            return 1;
+        }
+        String i1 = o1.getContainingCollection().getIdentifier() + o1.getIdentifier();
+        String i2 = o2.getContainingCollection().getIdentifier() + o2.getIdentifier();
+        return i1.compareTo(i2);
     }
 
     protected UUID getUUID()

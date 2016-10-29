@@ -40,18 +40,20 @@ import static org.spongepowered.api.service.permission.PermissionService.SUBJECT
 public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 {
     private final Path modulePath;
+    private String type;
     private Roles module;
     private RolesPermissionService service;
     private Reflector reflector;
     private Map<UUID, RoleSubject> subjectByUUID = new ConcurrentHashMap<>();
 
-    public RoleCollection(Roles module, RolesPermissionService service, Reflector reflector)
+    public RoleCollection(Roles module, RolesPermissionService service, Reflector reflector, String type)
     {
         super(SUBJECTS_GROUP);
         this.module = module;
         this.service = service;
         this.reflector = reflector;
         this.modulePath = module.getProvided(Path.class);
+        this.type = type;
     }
 
     private void loadRoles()
@@ -60,8 +62,8 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         this.subjectByUUID.clear();
         try
         {
-            createDirectories(modulePath.resolve("roles"));
-            for (Path configFile : newDirectoryStream(modulePath.resolve("roles"), YAML))
+            createDirectories(modulePath.resolve(this.type));
+            for (Path configFile : newDirectoryStream(modulePath.resolve(this.type), YAML))
             {
                 RoleConfig config = reflector.create(RoleConfig.class);
                 config.setFile(configFile.toFile());
@@ -105,7 +107,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
             RoleConfig config = reflector.create(RoleConfig.class);
             config.identifier = UUID.randomUUID();
             config.roleName = identifier;
-            config.setFile(modulePath.resolve("roles").resolve(identifier + YAML.getExtention()).toFile());
+            config.setFile(modulePath.resolve(this.type).resolve(identifier + YAML.getExtention()).toFile());
             return addSubject(module, service, config);
         }
     }
@@ -166,8 +168,6 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
                 userSubject.getSubjectData().removeParent(r.getActiveContexts(), r);
             }
         }
-
-        service.getConfig().defaultRoles.remove(r.getIdentifier());
 
         subjects.remove(r.getIdentifier());
         subjectByUUID.remove(r.getSubjectData().getConfig().identifier);

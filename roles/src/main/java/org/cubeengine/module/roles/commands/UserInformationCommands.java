@@ -43,7 +43,9 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextFormat;
 
@@ -123,30 +125,58 @@ public class UserInformationCommands extends ContainerCommand
 
         Text permText = RolesUtil.permText(ctx, permission, service, i18n);
         FoundPermission found = RolesUtil.findPermission(service, player, permission, contexts);
+        FoundPermission foundNow = RolesUtil.findPermission(service, player, permission, player.getActiveContexts());
 
-        if (found != null && found.value)
-        {
-            i18n.sendTranslated(ctx, POSITIVE, "The player {user} does have access to {txt#permission} in {context}", player, permText, context);
-        }
-        else
-        {
-            i18n.sendTranslated(ctx, NEGATIVE, "The player {user} does not have access to {txt#permission} in {context}", player, permText, context);
-        }
-
+        i18n.sendTranslated(ctx, NEUTRAL, "Player {user} permission check {txt#permission}", player, permText);
         if (found != null)
         {
-            if (found.subject == player)
+            Text from = getFromText(ctx, player, found);
+            if (found.value)
             {
-                i18n.sendTranslated(ctx, NEUTRAL, "Permission is directly assigned to the user!");
+                i18n.sendTranslated(ctx, POSITIVE, "Set to {text:true:color=DARK_GREEN} in {context} {txt#info}", context, from);
             }
             else
             {
-                i18n.sendTranslated(ctx, NEUTRAL, "Permission inherited from:");
-                i18n.sendTranslated(ctx, NEUTRAL, "{txt#permission} in the role {name}!",
-                                    RolesUtil.permText(ctx, found.permission, service, i18n),
-                                    found.subject.getIdentifier());
+                i18n.sendTranslated(ctx, NEGATIVE, "Set to {text:false:color=DARK_RED} in {context} {txt#info}", context, from);
             }
         }
+        else
+        {
+            i18n.sendTranslated(ctx, NEGATIVE, "Not set in {context}", context);
+        }
+        if (foundNow != null)
+        {
+            Text from = getFromText(ctx, player, foundNow);
+            if (foundNow.value)
+            {
+                i18n.sendTranslated(ctx, POSITIVE, "Set to {text:true:color=DARK_GREEN} in their active contexts {txt#info}", from);
+            }
+            else
+            {
+                i18n.sendTranslated(ctx, NEGATIVE, "Set to {text:false:color=DARK_RED} in their active contexts {txt#info}", from);
+            }
+        }
+        else
+        {
+            i18n.sendTranslated(ctx, NEGATIVE, "Not set in {context}", context);
+        }
+    }
+
+    private Text getFromText(CommandSource ctx, @Default User player, FoundPermission found)
+    {
+        Text from;
+        if (found.subject == player)
+        {
+            from = i18n.getTranslation(ctx, NEUTRAL, "Permission is directly assigned to the user!");
+        }
+        else
+        {
+            from = Text.of(i18n.getTranslation(ctx, NEUTRAL, "Permission inherited from:"), Text.NEW_LINE,
+                    TextColors.GOLD, RolesUtil.permText(ctx, found.permission, service, i18n), Text.NEW_LINE,
+                           i18n.getTranslation(ctx, NEUTRAL, "in the role {name}!", found.subject.getIdentifier()));
+        }
+        from = Text.of("(?)").toBuilder().onHover(TextActions.showText(from)).build();
+        return from;
     }
 
     @Alias(value = "listuperm")

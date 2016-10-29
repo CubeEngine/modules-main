@@ -17,11 +17,6 @@
  */
 package org.cubeengine.module.roles;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import de.cubeisland.engine.reflect.annotations.Comment;
 import de.cubeisland.engine.reflect.annotations.Name;
 import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
@@ -32,11 +27,6 @@ public class RolesConfig extends ReflectedYaml
     @Name("disable-permission-in-offlinemode")
     @Comment("If this is set to true no permissions will be assigned to any user if the server runs in offline mode")
     public boolean doNotAssignPermIfOffline = true;
-    @Name("default-roles")
-    @Comment("The list of roles a user will get when first joining the server.\n" +
-                 "default-roles:\n" +
-                 "      - guest\n")
-    public List<String> defaultRoles = new ArrayList<>();
 
     @Comment("When enabled provides a lot of additional logging")
     public boolean debug = false;

@@ -18,6 +18,8 @@
 package org.cubeengine.module.roles.service;
 
 import java.util.Map;
+
+import org.cubeengine.module.roles.RolesUtil;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -38,6 +40,7 @@ public class RolesPermissionDescription implements PermissionDescription
         this.id = id;
         this.description = description;
         this.owner = owner;
+        RolesUtil.allPermissions.add(id);
     }
 
     @Override

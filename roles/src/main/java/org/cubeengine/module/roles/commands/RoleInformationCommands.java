@@ -23,6 +23,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.StringJoiner;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
+
 import com.google.common.collect.ImmutableMap;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
@@ -47,6 +52,8 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.TextElement;
 import org.spongepowered.api.text.TextTemplate;
+import org.spongepowered.api.text.action.TextAction;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 
 import static org.cubeengine.module.roles.RolesUtil.permText;
@@ -83,9 +90,21 @@ public class RoleInformationCommands extends ContainerCommand
             return;
         }
         i18n.sendTranslated(cContext, POSITIVE, "The following roles are available:");
+        Text permClick = i18n.getTranslation(cContext, NEUTRAL, "Click to show permissions");
+        Text optClick = i18n.getTranslation(cContext, NEUTRAL, "Click to show options");
+        Text parentClick = i18n.getTranslation(cContext, NEUTRAL, "Click to show parents");
         for (Subject r : roles)
         {
-            cContext.sendMessage(Text.of("- ", YELLOW, r.getIdentifier()));
+            cContext.sendMessage(Text.of("- ", YELLOW, r.getIdentifier(), " ",
+                    Text.of("(?)").toBuilder().onHover(TextActions.showText(permClick))
+                            .onClick(TextActions.runCommand("/roles role listpermission " + r.getIdentifier()))
+                            .build(), " ",
+                    Text.of("(?)").toBuilder().onHover(TextActions.showText(optClick))
+                            .onClick(TextActions.runCommand("/roles role listoption " + r.getIdentifier()))
+                            .build(), " ",
+                    Text.of("(?)").toBuilder().onHover(TextActions.showText(parentClick))
+                            .onClick(TextActions.runCommand("/roles role listparent " + r.getIdentifier()))
+                            .build() ));
         }
     }
 
@@ -118,21 +137,32 @@ public class RoleInformationCommands extends ContainerCommand
     @Command(alias = "listPerm", desc = "Lists all permissions of given role [in context]")
     public void listPermission(CommandSource ctx, RoleSubject role, @Flag boolean all, @Named("in") @Default Context context)
     {
-        Map<String, Boolean> permissions = new HashMap<>();
+        i18n.sendTranslated(ctx, NEUTRAL, "Permission list for {role}", role);
+        Set<Context> contextSet = toSet(context);
         if (all)
         {
-            RolesUtil.fillPermissions(role, toSet(context), permissions);
+            listPermission(ctx, true, contextSet, RolesUtil.fillPermissions(role, contextSet, new TreeMap<>()));
+        }
+        else if (contextSet.isEmpty())
+        {
+            role.getSubjectData().getAllPermissions().entrySet()
+                    .forEach(e -> listPermission(ctx, false, e.getKey(), e.getValue()));
         }
         else
         {
-            permissions.putAll(role.getSubjectData().getPermissions(toSet(context)));
+            listPermission(ctx, false, contextSet, new TreeMap<>(role.getSubjectData().getPermissions(contextSet)));
         }
+    }
+
+    private void listPermission(CommandSource ctx, boolean all, Set<Context> context, Map<String, Boolean> permissions)
+    {
+        String ctxText = getContextString(context);
         if (permissions.isEmpty())
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "No permissions set for the role {role} in {context}.", role, context);
+            i18n.sendTranslated(ctx, NEGATIVE, "No permissions set in {input#context}.", ctxText);
             return;
         }
-        i18n.sendTranslated(ctx, POSITIVE, "Permissions of the role {role} in {context}:", role, context);
+        i18n.sendTranslated(ctx, POSITIVE, "in {input#context}:", ctxText);
         if (all)
         {
             i18n.sendTranslated(ctx, POSITIVE, "(Including inherited permissions)");
@@ -151,32 +181,53 @@ public class RoleInformationCommands extends ContainerCommand
         }
     }
 
+    private String getContextString(Set<Context> context)
+    {
+        String ctxText = context.stream().map(c -> c.getValue().isEmpty() ? c.getKey() : c.getKey() + "|" + c.getValue()).collect(Collectors.joining(" ; "));
+        if (context.isEmpty())
+        {
+            ctxText = "global";
+        }
+        return ctxText;
+    }
+
     @Alias(value = {"listROption", "listRData"})
     @Command(alias = "listData", desc = "Lists all options of given role [in context]")
-    public void listOptions(CommandSource ctx, RoleSubject role, @Flag boolean all, @Named("in") @Default Context context)
+    public void listOption(CommandSource ctx, RoleSubject role, @Flag boolean all, @Named("in") @Default Context context)
     {
-        Map<String, String> options = new HashMap<>();
+        i18n.sendTranslated(ctx, NEUTRAL, "Options list for {role}", role);
+        Set<Context> contextSet = toSet(context);
         if (all)
         {
-            RolesUtil.fillOptions(role, toSet(context), options);
+            listOption(ctx, true, contextSet, RolesUtil.fillOptions(role, contextSet, new HashMap<>()));
+        }
+        else if (contextSet.isEmpty())
+        {
+            role.getSubjectData().getAllOptions().entrySet().forEach(
+                    e -> listOption(ctx, false, e.getKey(), e.getValue()));
         }
         else
         {
-            options.putAll(role.getSubjectData().getOptions(toSet(context)));
+            listOption(ctx, false, contextSet, role.getSubjectData().getOptions(contextSet));
         }
+    }
+
+    private void listOption(CommandSource ctx, boolean all, Set<Context> context, Map<String, String> options)
+    {
+        String ctxText = getContextString(context);
         if (options.isEmpty())
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "No options set for the role {role} in {context}.", role, context);
+            i18n.sendTranslated(ctx, NEGATIVE, "No options set in {input#context}.", ctxText);
             return;
         }
-        i18n.sendTranslated(ctx, POSITIVE, "Options of the role {role} in {context}:", role, context);
+        i18n.sendTranslated(ctx, POSITIVE, "in {input#context}:", ctxText);
         if (all)
         {
             i18n.sendTranslated(ctx, POSITIVE, "(Including inherited options)");
         }
         for (Entry<String, String> entry : options.entrySet())
         {
-            ctx.sendMessage(Text.of("- ", YELLOW, entry.getKey(), WHITE, ": ", TextColors.GOLD, entry.getValue()));
+            ctx.sendMessage(Text.of("- ", YELLOW, entry.getKey(), WHITE, ": ", GOLD, entry.getValue()));
         }
     }
 
@@ -185,12 +236,13 @@ public class RoleInformationCommands extends ContainerCommand
     public void listParent(CommandSource ctx, RoleSubject role, @Named("in") @Default Context context)
     {
         List<Subject> parents = role.getSubjectData().getParents(toSet(context));
+        i18n.sendTranslated(ctx, NEUTRAL, "Parent list for {role}", role);
         if (parents.isEmpty())
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "The role {role} in {context} has no parent roles.", role, context);
+            i18n.sendTranslated(ctx, NEGATIVE, "No parent roles in {context}.", context);
             return;
         }
-        i18n.sendTranslated(ctx, NEUTRAL, "The role {role} in {context} has following parent roles:", role, context);
+        i18n.sendTranslated(ctx, POSITIVE, "in {context}:", context);
         for (Subject parent : parents)
         {
             ctx.sendMessage(Text.of("- ", YELLOW, parent.getIdentifier()));

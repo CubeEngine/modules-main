@@ -109,13 +109,28 @@ public class RoleSubjectData extends CachingSubjectData
         {
             for (Map.Entry<String, RoleConfig.ContextSetting> entry : config.settings.entrySet())
             {
-                List<RoleSubject> collect = entry.getValue().parents.stream()
-                                                .map(s -> roleCollection.getByInternalIdentifier(s, getConfig().roleName))
+                List<Subject> collect = entry.getValue().parents.stream()
+                                                .map(this::getParent)
                                                 .filter(Objects::nonNull)
                                                 .sorted(RoleSubject::compare)
                                                 .collect(toList());
                 parents.put(asContext(entry.getKey()), new ArrayList<>(collect));
             }
+        }
+    }
+
+    private Subject getParent(String id)
+    {
+        int index = id.indexOf(":");
+        if (index > 0)
+        {
+            String type = id.substring(0, index);
+            String name = id.substring(index + 1);
+            return service.getSubjects(type).get(name);
+        }
+        else
+        {
+            return roleCollection.getByInternalIdentifier(id, getConfig().roleName);
         }
     }
 

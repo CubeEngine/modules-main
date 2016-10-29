@@ -17,17 +17,8 @@
  */
 package org.cubeengine.module.roles.service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.CopyOnWriteArrayList;
-import javax.inject.Inject;
+import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
+
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
 import de.cubeisland.engine.reflect.Reflector;
@@ -36,38 +27,36 @@ import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.service.collection.BasicSubjectCollection;
 import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
-import org.cubeengine.module.roles.service.data.BaseSubjectData;
-import org.cubeengine.module.roles.service.data.DefaultSubjectData;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.module.roles.service.subject.BaseSubject;
-import org.cubeengine.module.roles.service.subject.DefaultSubject;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
-import static org.cubeengine.module.roles.service.subject.RoleSubject.SEPARATOR;
-import static org.cubeengine.libcube.util.ContextUtil.GLOBAL;
-import static org.spongepowered.api.service.context.Context.WORLD_KEY;
-import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.inject.Inject;
 
 @ServiceProvider(PermissionService.class)
 public class RolesPermissionService implements PermissionService
 {
+
+    public static final String DEFAULT_SUBJECTS = "default";
     private final ConcurrentMap<String, SubjectCollection> collections = new ConcurrentHashMap<>();
     private final List<ContextCalculator<Subject>> calculators = new CopyOnWriteArrayList<>();
 
-    private final DefaultSubjectData defaultData;
-    private final Subject defaultSubject;
     private RolesConfig config;
     private Log logger;
 
@@ -79,17 +68,14 @@ public class RolesPermissionService implements PermissionService
     {
         this.config = module.getConfiguration();
         logger = module.getLog();
-        collections.put("default", new BasicSubjectCollection(this, "default"));
+        collections.put(DEFAULT_SUBJECTS, new BasicSubjectCollection(this, DEFAULT_SUBJECTS));
         collections.put(SUBJECTS_USER, new UserCollection(this));
-        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, reflector));
-
-        defaultData = new DefaultSubjectData(this, config);
-        defaultSubject = new DefaultSubject("default", getSubjects("default"), this, defaultData);
+        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, reflector, SUBJECTS_GROUP));
 
         getGroupSubjects().reload();
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM));
         collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE));
-
+        // TODO persist other types than user/role
     }
 
     @Override
@@ -104,17 +90,24 @@ public class RolesPermissionService implements PermissionService
         return (RoleCollection)collections.get(SUBJECTS_GROUP);
     }
 
-
     @Override
     public Subject getDefaults()
     {
-        return defaultSubject;
+        // TODO make sure defaultdata is properly resolved
+        SubjectCollection collection = getSubjects(DEFAULT_SUBJECTS);
+        return collection.get(DEFAULT_SUBJECTS);
     }
 
     @Override
     public SubjectCollection getSubjects(String identifier)
     {
-        return collections.get(identifier);
+        SubjectCollection collection = collections.get(identifier);
+        if (collection == null)
+        {
+            collection = new BasicSubjectCollection(this, identifier);
+            collections.put(identifier, collection);
+        }
+        return collection;
     }
 
     @Override
@@ -177,33 +170,5 @@ public class RolesPermissionService implements PermissionService
         }
         descriptions = null;
         return desc;
-    }
-
-    protected final Context readMirror(String source)
-    {
-        if (!source.contains(SEPARATOR))
-        {
-            if (!GLOBAL.getType().equals(source))
-            {
-                return new Context(WORLD_KEY, source);
-            }
-        }
-        String[] split = source.split("\\|");
-        return new Context(split[0], split[1]);
-    }
-
-    protected final Map<Context, Context> readMirrors(Map<String, List<String>> config)
-    {
-        Map<Context, Context> mirrors = new HashMap<>();
-        for (Map.Entry<String, List<String>> roleMirror : config.entrySet())
-        {
-            Context source = readMirror(roleMirror.getKey());
-            for (String mirrored : roleMirror.getValue())
-            {
-                mirrors.put(readMirror(mirrored), source);
-            }
-            mirrors.put(source, source); // self-referencing mirror
-        }
-        return mirrors;
     }
 }

@@ -26,15 +26,19 @@ import static org.spongepowered.api.text.format.TextColors.GOLD;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Complete;
+import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
+import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.data.DefaultSubjectData;
+import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -42,6 +46,7 @@ import org.spongepowered.api.text.Text;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 @Command(name = "admin", desc = "Manages the module", alias = "manadmin")
 public class ManagementCommands extends ContainerCommand
@@ -49,13 +54,15 @@ public class ManagementCommands extends ContainerCommand
     private Roles module;
     private RolesPermissionService service;
     private I18n i18n;
+    private PluginContainer plugin;
 
-    public ManagementCommands(CommandManager base, Roles module, RolesPermissionService service, I18n i18n)
+    public ManagementCommands(CommandManager base, Roles module, RolesPermissionService service, I18n i18n, PluginContainer plugin)
     {
         super(base, Roles.class);
         this.module = module;
         this.service = service;
         this.i18n = i18n;
+        this.plugin = plugin;
     }
 
     @Alias(value = "manload")
@@ -63,12 +70,12 @@ public class ManagementCommands extends ContainerCommand
     public void reload(CommandSource context)
     {
         module.getConfiguration().reload();
-        service.getGroupSubjects().reload();
-        service.getUserSubjects().reload();
-
         service.getConfig().reload();
 
-        ((DefaultSubjectData) service.getDefaults().getSubjectData()).load();
+        service.getKnownSubjects().values().stream()
+                .filter(c -> c instanceof RoleCollection)
+                .map(RoleCollection.class::cast)
+                .forEach(RoleCollection::reload);
 
         // TODO remove cached data ; needed?
         i18n.sendTranslated(context, POSITIVE, "{text:Roles} reload complete!");
@@ -88,6 +95,31 @@ public class ManagementCommands extends ContainerCommand
         }
 
         i18n.sendTranslated(context, POSITIVE, "{text:Roles} all configurations saved!");
+    }
+
+    @Alias(value = "mandebug")
+    @Command(desc = "Toggles debug mode")
+    public void debug(CommandSource context, @Optional Integer seconds)
+    {
+        RolesUtil.debug = !RolesUtil.debug;
+        if (RolesUtil.debug)
+        {
+            if (seconds != null)
+            {
+                seconds = seconds > 60 ? 60 : seconds < 0 ? 1 : seconds; // Min 1 Max 60
+                i18n.sendTranslated(context, POSITIVE, "Debug enabled for {number} seconds", seconds);
+                Sponge.getScheduler().createTaskBuilder().delay(seconds, TimeUnit.SECONDS)
+                        .execute(() -> RolesUtil.debug = false).submit(plugin);
+            }
+            else
+            {
+                i18n.sendTranslated(context, POSITIVE, "Debug enabled");
+            }
+        }
+        else
+        {
+            i18n.sendTranslated(context, POSITIVE, "Debug disabled");
+        }
     }
 
     @Command(desc = "Searches for registered Permissions")

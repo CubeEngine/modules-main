@@ -69,24 +69,6 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     }
 
     @Override
-    public Optional<String> getOption(String key)
-    {
-        return getOption(getActiveContexts(), key);
-    }
-
-    @Override
-    public boolean hasPermission(Set<Context> contexts, String permission)
-    {
-        return getPermissionValue(contexts, permission) == Tristate.TRUE;
-    }
-
-    @Override
-    public boolean hasPermission(String permission)
-    {
-        return hasPermission(getActiveContexts(), permission);
-    }
-
-    @Override
     public Tristate getPermissionValue(Set<Context> contexts, String permission)
     {
         if (permission == null)
@@ -102,21 +84,9 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     }
 
     @Override
-    public boolean isChildOf(Subject parent)
-    {
-        return isChildOf(getActiveContexts(), parent);
-    }
-
-    @Override
     public boolean isChildOf(Set<Context> contexts, Subject parent)
     {
         return getTransientSubjectData().getParents(contexts).contains(parent) || getSubjectData().getParents(contexts).contains(parent);
-    }
-
-    @Override
-    public List<Subject> getParents()
-    {
-        return getParents(getActiveContexts());
     }
 
     @Override
@@ -137,10 +107,7 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     public Set<Context> getActiveContexts()
     {
         Set<Context> contexts = new HashSet<>();
-        for (ContextCalculator<Subject> calculator : service.getContextCalculators())
-        {
-            calculator.accumulateContexts(this, contexts);
-        }
+        service.getContextCalculators().forEach(c -> c.accumulateContexts(this, contexts));
         return contexts;
     }
 }

@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Set;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
+import org.cubeengine.module.roles.RolesUtil;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 
@@ -44,7 +45,7 @@ public class PermissionCompleter implements Completer
         Set<String> result = new HashSet<>();
         String token = invocation.currentToken();
 
-        for (String permission : ps.getDescriptions().stream().map(PermissionDescription::getId).filter(p -> p.startsWith(token)).collect(toList()))
+        for (String permission : RolesUtil.allPermissions.stream().filter(p -> p.startsWith(token)).collect(toList()))
         {
             String substring = permission.substring(token.length());
             int i = substring.indexOf(".");

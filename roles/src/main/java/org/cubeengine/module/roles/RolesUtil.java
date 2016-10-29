@@ -18,12 +18,14 @@
 package org.cubeengine.module.roles;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.module.roles.service.subject.UserSubject;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -32,24 +34,46 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.text.Text;
 
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.StreamSupport.stream;
 import static org.cubeengine.libcube.util.ContextUtil.GLOBAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.spongepowered.api.service.permission.PermissionService.SUBJECTS_ROLE_TEMPLATE;
 import static org.spongepowered.api.text.action.TextActions.showText;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 public class RolesUtil
 {
-    public static final String PERMISSION_TEMPLATE_PREFIX = "permission:";
+    public static boolean debug = false;
+    public static final Set<String> allPermissions = new HashSet<>();
 
     public static FoundPermission findPermission(PermissionService service, Subject subject, String permission, Set<Context> contexts)
     {
+        // remember permissions checked for tab-completion etc.
+        allPermissions.add(permission);
         // First search in transient data
-        FoundPermission foundTransient = findPermission(service, subject, subject.getTransientSubjectData(), permission, contexts, true);
+        FoundPermission found = findPermission(service, subject, subject.getTransientSubjectData(), permission, contexts, true);
         // Then search in persistent data
-        return foundTransient != null ? foundTransient : findPermission(service, subject, subject.getSubjectData(), permission, contexts, true);
+        found = found != null ? found : findPermission(service, subject, subject.getSubjectData(), permission, contexts, true);
+        // Then search in transient default data
+        Subject defaults = service.getDefaults();
+        found = found != null ? found : findPermission(service, subject, defaults.getTransientSubjectData(), permission, contexts, true);
+        // last search in persistent default data
+        found = found != null ? found : findPermission(service, subject, defaults.getSubjectData(), permission, contexts, true);
+        if (debug)
+        {
+            String name = subject.getIdentifier();
+            if (subject instanceof UserSubject)
+            {
+                name = subject.getCommandSource().get().getName();
+            }
+            if (found == null)
+            {
+                System.out.print("[PermCheck] " + name + " has not " + permission + "\n");
+            }
+            else
+            {
+                System.out.print("[PermCheck] " + name + " has " + permission + " set to " + found.value + " as " + found.permission + " in " + found.subject.getIdentifier() + "\n");
+            }
+        }
+        return found;
     }
 
     public static FoundPermission findPermission(PermissionService service, Subject subject, SubjectData data, String permission, Set<Context> contexts, boolean resolve)
@@ -64,28 +88,8 @@ public class RolesUtil
         if (resolve) // Do we want to resolve the permission?
         {
             // Resolving...
-            // Get implicit parent permissions
-            List<String> implicits = getImplicitParents(permission);
-            // Attempt to find explicit parent permissions
-            PermissionDescription permDesc = service.getDescription(permission).orElse(null);
-            if (permDesc != null)
-            {
-                // Get explicit parent permissions
-                List<String> explicits = getExplicitParents(service, data, permission);
-                for (String explicit : explicits)
-                {
-                    // Find the explicit permission-parent value
-                    // TODO prevent from looking up implicit permissions multiple times
-                    FoundPermission found = findPermission(service, subject, data, explicit, contexts, false); // recursive
-                    if (found != null)
-                    {
-                        return found;
-                    }
-                }
-            }
-            // else no explicit parents defined
             // Attempt to find implicit parent permissions
-            for (String implicit : implicits)
+            for (String implicit : getImplicitParents(permission))
             {
                 FoundPermission found = findPermission(service, subject, data, implicit, contexts, false); // not recursive (we got all already)
                 if (found != null)
@@ -105,16 +109,6 @@ public class RolesUtil
             }
         }
         return null;
-    }
-
-    private static List<String> getExplicitParents(PermissionService service, SubjectData startingData, String permission)
-    {
-        return stream(service.getSubjects(SUBJECTS_ROLE_TEMPLATE).getAllSubjects().spliterator(), false)
-                        .filter(s -> s.getSubjectData() != startingData)
-                        .filter(s -> s.getIdentifier().startsWith(PERMISSION_TEMPLATE_PREFIX))
-                        .map(s -> s.getIdentifier().substring(PERMISSION_TEMPLATE_PREFIX.length()))
-                        .filter(i -> i.equals(permission))
-                        .collect(toList());
     }
 
     public static List<String> getImplicitParents(String permission)
@@ -214,7 +208,7 @@ public class RolesUtil
         public final boolean value;
     }
 
-    public static void fillPermissions(Subject subject, Set<Context> contexts, Map<String, Boolean> data)
+    public static Map<String, Boolean> fillPermissions(Subject subject, Set<Context> contexts, Map<String, Boolean> data)
     {
         for (Entry<String, Boolean> entry : subject.getSubjectData().getPermissions(contexts).entrySet())
         {
@@ -225,9 +219,11 @@ public class RolesUtil
         {
             fillPermissions(parent, contexts, data);
         }
+
+        return data;
     }
 
-    public static void fillOptions(Subject subject, Set<Context> contexts, Map<String, String> data)
+    public static Map<String, String> fillOptions(Subject subject, Set<Context> contexts, Map<String, String> data)
     {
         for (Entry<String, String> entry : subject.getSubjectData().getOptions(contexts).entrySet())
         {
@@ -238,5 +234,7 @@ public class RolesUtil
         {
             fillOptions(parent, contexts, data);
         }
+
+        return data;
     }
 }
