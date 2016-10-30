@@ -28,7 +28,7 @@ import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
 public class TableBalance extends Table<BalanceModel>
 {
     public static TableBalance TABLE_BALANCE;
-    public final TableField<BalanceModel, String> ACCOUNT_ID = createField("id", SQLDataType.VARCHAR.length(64), this);
+    public final TableField<BalanceModel, String> ACCOUNT_ID = createField("id", SQLDataType.VARCHAR.length(64).nullable(false), this);
     public final TableField<BalanceModel, String> CURRENCY = createField("currency", SQLDataType.VARCHAR.length(64), this);
     public final TableField<BalanceModel, String> CONTEXT = createField("context", SQLDataType.VARCHAR.length(64), this);
     public final TableField<BalanceModel, Long> BALANCE = createField("balance", SQLDataType.BIGINT.nullable(false), this);
