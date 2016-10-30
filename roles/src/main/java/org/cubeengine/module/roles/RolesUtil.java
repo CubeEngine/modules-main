@@ -52,10 +52,17 @@ public class RolesUtil
         FoundPermission found = findPermission(service, subject, subject.getTransientSubjectData(), permission, contexts, true);
         // Then search in persistent data
         found = found != null ? found : findPermission(service, subject, subject.getSubjectData(), permission, contexts, true);
-        // Then search in transient default data
-        Subject defaults = service.getDefaults();
+        // collection default
+        Subject defaults = subject.getContainingCollection().getDefaults();
+        // transient collection default data
         found = found != null ? found : findPermission(service, subject, defaults.getTransientSubjectData(), permission, contexts, true);
-        // last search in persistent default data
+        // persistent collection default data
+        found = found != null ? found : findPermission(service, subject, defaults.getSubjectData(), permission, contexts, true);
+        // global default
+        defaults = service.getDefaults();
+        // transient global default data
+        found = found != null ? found : findPermission(service, subject, defaults.getTransientSubjectData(), permission, contexts, true);
+        // persistent global default data
         found = found != null ? found : findPermission(service, subject, defaults.getSubjectData(), permission, contexts, true);
         if (debug)
         {
