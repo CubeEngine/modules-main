@@ -27,7 +27,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
-import org.spongepowered.api.event.entity.DisplaceEntityEvent;
+import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.World;
 
@@ -37,14 +37,14 @@ public class Netherportals extends Module
     @ModuleConfig private NetherportalsConfig config;
 
     @Listener
-    public void onPortal(DisplaceEntityEvent.Teleport event, @First TeleportCause cause)
+    public void onPortal(MoveEntityEvent.Teleport event, @First TeleportCause cause)
     {
         WorldSection section = config.worldSettings.get(new ConfigWorld(event.getFromTransform().getExtent()));
         if (section != null && section.enablePortalRouting)
         {
             Transform<World> to = event.getToTransform();
             TeleportType type = cause.getTeleportType();
-            if (type == TeleportTypes.NETHER_PORTAL)
+            if (type == TeleportTypes.PORTAL)
             {
                 if (section.netherTarget != null)
                 {
@@ -55,7 +55,7 @@ public class Netherportals extends Module
                     // TODO PortalCreation?
                 }
             }
-            else if (type == TeleportTypes.END_PORTAL)
+            else if (type == TeleportTypes.PORTAL)
             {
                 if (section.endTarget != null)
                 {
