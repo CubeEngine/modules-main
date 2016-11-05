@@ -17,6 +17,69 @@
  */
 package org.cubeengine.module.locker.storage;
 
+import static java.util.concurrent.CompletableFuture.allOf;
+import static java.util.stream.Collectors.toList;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.util.BlockUtil.CARDINAL_DIRECTIONS;
+import static org.cubeengine.libcube.util.LocationUtil.getChunkKey;
+import static org.cubeengine.libcube.util.LocationUtil.getLocationKey;
+import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_ALL;
+import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_FULL;
+import static org.cubeengine.module.locker.storage.ProtectedType.getProtectedType;
+import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
+import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.spongepowered.api.block.BlockTypes.ACACIA_DOOR;
+import static org.spongepowered.api.block.BlockTypes.BIRCH_DOOR;
+import static org.spongepowered.api.block.BlockTypes.CHEST;
+import static org.spongepowered.api.block.BlockTypes.DARK_OAK_DOOR;
+import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
+import static org.spongepowered.api.block.BlockTypes.JUNGLE_DOOR;
+import static org.spongepowered.api.block.BlockTypes.SPRUCE_DOOR;
+import static org.spongepowered.api.block.BlockTypes.TRAPPED_CHEST;
+import static org.spongepowered.api.block.BlockTypes.WOODEN_DOOR;
+
+import com.flowpowered.math.vector.Vector3i;
+import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.libcube.service.database.AsyncRecord;
+import org.cubeengine.libcube.service.database.Database;
+import org.cubeengine.libcube.service.event.EventManager;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.StringMatcher;
+import org.cubeengine.libcube.service.task.TaskManager;
+import org.cubeengine.libcube.util.BlockUtil;
+import org.cubeengine.module.locker.Locker;
+import org.cubeengine.module.locker.commands.CommandListener;
+import org.cubeengine.module.locker.commands.PlayerAccess;
+import org.cubeengine.module.locker.config.BlockLockConfig;
+import org.cubeengine.module.locker.config.EntityLockConfig;
+import org.jooq.Batch;
+import org.jooq.Condition;
+import org.jooq.Result;
+import org.jooq.types.UInteger;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
+import org.spongepowered.api.block.trait.EnumTraits;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.type.Hinge;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.event.world.chunk.LoadChunkEvent;
+import org.spongepowered.api.event.world.chunk.UnloadChunkEvent;
+import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.type.CarriedInventory;
+import org.spongepowered.api.util.Direction;
+import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
+
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Timestamp;
@@ -40,60 +103,8 @@ import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import javax.inject.Inject;
-import com.flowpowered.math.vector.Vector3i;
-import de.cubeisland.engine.logscribe.Log;
-import org.cubeengine.libcube.util.BlockUtil;
-import org.cubeengine.module.locker.Locker;
-import org.cubeengine.module.locker.commands.CommandListener;
-import org.cubeengine.module.locker.commands.PlayerAccess;
-import org.cubeengine.module.locker.config.BlockLockConfig;
-import org.cubeengine.module.locker.config.EntityLockConfig;
-import org.cubeengine.libcube.service.database.AsyncRecord;
-import org.cubeengine.libcube.service.database.Database;
-import org.cubeengine.libcube.service.event.EventManager;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.matcher.StringMatcher;
-import org.cubeengine.libcube.service.task.TaskManager;
-import org.jooq.Batch;
-import org.jooq.Condition;
-import org.jooq.Result;
-import org.jooq.types.UInteger;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
-import org.spongepowered.api.block.trait.EnumTraits;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.Hinge;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.world.chunk.LoadChunkEvent;
-import org.spongepowered.api.event.world.chunk.UnloadChunkEvent;
-import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.type.CarriedInventory;
-import org.spongepowered.api.util.Direction;
-import org.spongepowered.api.world.Chunk;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
 
-import static java.util.concurrent.CompletableFuture.allOf;
-import static java.util.stream.Collectors.toList;
-import static org.cubeengine.libcube.util.BlockUtil.CARDINAL_DIRECTIONS;
-import static org.cubeengine.libcube.util.LocationUtil.getChunkKey;
-import static org.cubeengine.libcube.util.LocationUtil.getLocationKey;
-import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_ALL;
-import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_FULL;
-import static org.cubeengine.module.locker.storage.ProtectedType.getProtectedType;
-import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
-import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.block.BlockTypes.*;
-import static org.spongepowered.api.data.type.PortionTypes.BOTTOM;
-import static org.spongepowered.api.data.type.PortionTypes.TOP;
+import javax.inject.Inject;
 
 public class LockManager
 {
@@ -151,13 +162,7 @@ public class LockManager
         em.registerListener(Locker.class, this.commandListener);
         em.registerListener(Locker.class, this);
 
-        onEnable();
-    }
-
-    private void onEnable()
-    {
-        reloadLocks();
-
+        // Start Timer
         tm.runTimer(Locker.class, this::doLoadChunks, 5, 5); // 5 Ticks
         tm.runTimer(Locker.class, this::doUnloadChunks, 100, 100); // 100 Ticks - 5 seconds
     }
@@ -183,6 +188,12 @@ public class LockManager
     {
         Chunk chunk = event.getTargetChunk();
         queueChunk(chunk);
+    }
+
+    @Listener
+    public void onServerStarted(GameStartingServerEvent event)
+    {
+        reloadLocks();
     }
 
     private void queueChunk(Chunk chunk)

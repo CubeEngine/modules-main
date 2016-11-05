@@ -28,6 +28,7 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.service.Broadcaster;
+import org.spongepowered.api.event.Listener;
 
 /**
  * /setworldspawn 	Sets the world spawn.
@@ -53,8 +54,6 @@ public class Teleport extends Module
     @Enable
     public void onEnable()
     {
-        tpWorld = new TpWorldPermissions(perms, pm); // per world permissions
-
         TeleportListener tl = new TeleportListener(this, i18n);
         em.registerListener(Teleport.class, tl);
 
@@ -71,6 +70,10 @@ public class Teleport extends Module
 
     public TpWorldPermissions permsTpWorld()
     {
+        if (tpWorld == null)
+        {
+            tpWorld = new TpWorldPermissions(perms, pm);
+        }
         return tpWorld;
     }
 
