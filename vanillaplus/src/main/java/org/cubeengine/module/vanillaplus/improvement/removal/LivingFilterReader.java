@@ -175,7 +175,7 @@ public class LivingFilterReader extends PermissionContainer implements ArgumentR
         groupMap.put(i18n.getTranslation(source, NONE, "ambient").toPlain(), FILTER_AMBIENT);
 
         Map<String, EntityType> map = Sponge.getRegistry().getAllOf(EntityType.class).stream().filter(
-            type -> Living.class.isAssignableFrom(type.getEntityClass())).collect(
+            type -> Living.class.isAssignableFrom(type.getEntityClass())).distinct().collect(
             toMap(t -> t.getTranslation().get(source.getLocale()), identity()));
 
         for (String part : StringUtils.explode(",", token))
@@ -201,8 +201,8 @@ public class LivingFilterReader extends PermissionContainer implements ArgumentR
                 }
 
                 list.add(entity -> entity.getType().equals(type) &&
-                    entity.get(Keys.TAMED_OWNER).isPresent() &&
-                    source.hasPermission(PERM_PET.getId()));
+                        (!entity.get(Keys.TAMED_OWNER).isPresent() ||
+                    source.hasPermission(PERM_PET.getId())));
             }
             else
             {

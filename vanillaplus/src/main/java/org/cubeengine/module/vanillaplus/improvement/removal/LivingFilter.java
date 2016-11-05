@@ -34,7 +34,7 @@ public class LivingFilter extends EntityFilter
     {
         if (entity instanceof Living)
         {
-            super.test(entity);
+            return super.test(entity);
         }
         return false;
     }
