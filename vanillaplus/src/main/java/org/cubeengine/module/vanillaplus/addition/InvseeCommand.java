@@ -103,7 +103,7 @@ public class InvseeCommand extends PermissionContainer
                 i18n.sendTranslated(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your inventory.", context);
             }
         }
-        InventoryGuardFactory guard = invGuard.prepareInv(inv, player.getUniqueId());
+        InventoryGuardFactory guard = invGuard.prepareInv(inv, context.getUniqueId());
         if (denyModify)
         {
             guard.blockPutInAll().blockTakeOutAll();
