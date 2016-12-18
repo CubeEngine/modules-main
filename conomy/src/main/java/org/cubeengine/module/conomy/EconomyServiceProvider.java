@@ -30,6 +30,8 @@ public class EconomyServiceProvider implements Provider<EconomyService>
     @Override
     public EconomyService get()
     {
+        // Make sure Conomy is enabled
+        module.getModularity().getLifecycle(module.getInformation().getIdentifier()).enable();
         return module.getService();
     }
 }
