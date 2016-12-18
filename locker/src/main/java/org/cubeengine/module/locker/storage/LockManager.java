@@ -342,7 +342,10 @@ public class LockManager
                 {
                     locLockMap.remove(getLocationKey(loc));
                 }
-                lock.model.updateAsync(); // updates if changed (last_access timestamp)
+                if (lock.model.changed())
+                {
+                    lock.model.updateAsync(); // updates if changed (last_access timestamp)
+                }
             }
         }
         finally
