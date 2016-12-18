@@ -41,18 +41,16 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 {
     private final Path modulePath;
     private String type;
-    private Roles module;
     private RolesPermissionService service;
     private Reflector reflector;
     private Map<UUID, RoleSubject> subjectByUUID = new ConcurrentHashMap<>();
 
-    public RoleCollection(Roles module, RolesPermissionService service, Reflector reflector, String type)
+    public RoleCollection(Path modulePath, RolesPermissionService service, Reflector reflector, String type)
     {
         super(SUBJECTS_GROUP);
-        this.module = module;
         this.service = service;
         this.reflector = reflector;
-        this.modulePath = module.getProvided(Path.class);
+        this.modulePath = modulePath;
         this.type = type;
     }
 
@@ -68,7 +66,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
                 RoleConfig config = reflector.create(RoleConfig.class);
                 config.setFile(configFile.toFile());
                 config.reload(true); // and re-save
-                addSubject(module, service, config);
+                addSubject(service, config);
             }
         }
         catch (IOException e)
@@ -77,9 +75,9 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         }
     }
 
-    private RoleSubject addSubject(Roles module, RolesPermissionService service, RoleConfig config)
+    private RoleSubject addSubject(RolesPermissionService service, RoleConfig config)
     {
-        RoleSubject subject = new RoleSubject(module, service, this, config);
+        RoleSubject subject = new RoleSubject(service, this, config);
         subjects.put(subject.getIdentifier(), subject);
         subjectByUUID.put(subject.getSubjectData().getConfig().identifier, subject);
         return subject;
@@ -100,7 +98,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
             UUID uuid = UUID.fromString(identifier);
             RoleConfig config = reflector.create(RoleConfig.class);
             config.identifier = uuid;
-            return addSubject(module, service, config);
+            return addSubject(service, config);
         }
         catch (IllegalArgumentException e)
         {
@@ -108,7 +106,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
             config.identifier = UUID.randomUUID();
             config.roleName = identifier;
             config.setFile(modulePath.resolve(this.type).resolve(identifier + YAML.getExtention()).toFile());
-            return addSubject(module, service, config);
+            return addSubject(service, config);
         }
     }
 

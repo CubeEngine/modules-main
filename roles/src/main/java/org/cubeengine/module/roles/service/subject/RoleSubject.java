@@ -36,12 +36,10 @@ import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEX
 public class RoleSubject extends BaseSubject<RoleSubjectData>
 {
     public static final String SEPARATOR = "|";
-    private Roles module;
 
-    public RoleSubject(Roles module, RolesPermissionService service, RoleCollection collection, RoleConfig config)
+    public RoleSubject(RolesPermissionService service, RoleCollection collection, RoleConfig config)
     {
         super(collection, service, new RoleSubjectData(service, config));
-        this.module = module;
     }
 
     /**
@@ -111,7 +109,7 @@ public class RoleSubject extends BaseSubject<RoleSubjectData>
 
     public boolean canAssignAndRemove(CommandSource source)
     {
-        String perm = module.getModularity().provide(PermissionManager.class).getBasePermission(Roles.class).getId();
+        String perm = service.getPermissionManager().getBasePermission(Roles.class).getId();
         return source.hasPermission(perm + ".assign." + getIdentifier());
     }
 

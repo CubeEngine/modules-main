@@ -143,7 +143,7 @@ public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
         }
         else
         {
-            this.module.getLog().warn("Deleted Invalid PermissionTree!");
+            this.module.getService().getLog().warn("Deleted Invalid PermissionTree!");
         }
         return permTree;
     }

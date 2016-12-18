@@ -22,6 +22,8 @@ import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEX
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
 import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.libcube.service.filesystem.FileManager;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.service.collection.BasicSubjectCollection;
@@ -37,6 +39,7 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.util.Tristate;
 
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -52,7 +55,6 @@ import javax.inject.Inject;
 @ServiceProvider(PermissionService.class)
 public class RolesPermissionService implements PermissionService
 {
-
     public static final String DEFAULT_SUBJECTS = "default";
     private final ConcurrentMap<String, SubjectCollection> collections = new ConcurrentHashMap<>();
     private final List<ContextCalculator<Subject>> calculators = new CopyOnWriteArrayList<>();
@@ -62,15 +64,16 @@ public class RolesPermissionService implements PermissionService
 
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<String, PermissionDescription>();
     private Collection<PermissionDescription> descriptions;
+    @Inject private PermissionManager pm;
 
     @Inject
-    public RolesPermissionService(Roles module, Reflector reflector)
+    public RolesPermissionService(Roles module, FileManager fm, Reflector reflector)
     {
-        this.config = module.getConfiguration();
-        logger = module.getLog();
+        this.logger = module.getProvided(Log.class);
+        this.config = fm.loadConfig(module, RolesConfig.class);
         collections.put(DEFAULT_SUBJECTS, new BasicSubjectCollection(this, DEFAULT_SUBJECTS));
         collections.put(SUBJECTS_USER, new UserCollection(this));
-        collections.put(SUBJECTS_GROUP, new RoleCollection(module, this, reflector, SUBJECTS_GROUP));
+        collections.put(SUBJECTS_GROUP, new RoleCollection(module.getProvided(Path.class), this, reflector, SUBJECTS_GROUP));
 
         getGroupSubjects().reload();
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM));
@@ -170,5 +173,14 @@ public class RolesPermissionService implements PermissionService
         }
         descriptions = null;
         return desc;
+    }
+
+    public PermissionManager getPermissionManager()
+    {
+        return pm;
+    }
+
+    public Log getLog() {
+        return logger;
     }
 }

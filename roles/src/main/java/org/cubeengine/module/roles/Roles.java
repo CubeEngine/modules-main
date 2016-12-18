@@ -73,10 +73,6 @@ TODO lookup permissions (via Command?)
 */
 public class Roles extends Module
 {
-    private RolesConfig config;
-
-    @Inject private Reflector reflector;
-    @Inject private Log logger;
     @Inject private CommandManager cm;
     @Inject private FileManager fm;
     @Inject private I18n i18n;
@@ -88,9 +84,14 @@ public class Roles extends Module
     private Log permLogger;
     private RolesPermissionService service;
 
-    public Roles()
+    @Inject
+    public Roles(Reflector reflector)
     {
         Sponge.getDataManager().register(PermissionData.class, ImmutablePermissionData.class, new PermissionDataBuilder());
+
+        ConverterManager cManager = reflector.getDefaultConverterManager();
+        cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);
+        cManager.registerConverter(new PriorityConverter(), Priority.class);
     }
 
     @Setup
@@ -100,13 +101,7 @@ public class Roles extends Module
         this.permLogger = factory.getLog(LogFactory.class, "Permissions");
         this.permLogger.addTarget(new AsyncFileTarget(getLogFile(fm, "Permissions"), getFileFormat(false, false), false, getCycler(), threadFactory));
 
-        ConverterManager cManager = reflector.getDefaultConverterManager();
-        cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);
-        cManager.registerConverter(new PriorityConverter(), Priority.class);
-
-        this.config = fm.loadConfig(this, RolesConfig.class);
-
-        service = (RolesPermissionService)getModularity().provide(PermissionService.class);
+        this.service = ((RolesPermissionService) getModularity().provide(PermissionService.class));
 
         Optional<PermissionService> previous = Sponge.getServiceManager().provide(PermissionService.class);
         Sponge.getServiceManager().setProvider(plugin.getInstance().get(), PermissionService.class, service);
@@ -114,7 +109,7 @@ public class Roles extends Module
         {
             if (!previous.get().getClass().getName().equals(RolesPermissionService.class.getName()))
             {
-                logger.info("Replaced existing Permission Service: {}", previous.get().getClass().getName());
+                this.service.getLog().info("Replaced existing Permission Service: {}", previous.get().getClass().getName());
             }
         }
     }
@@ -142,11 +137,10 @@ public class Roles extends Module
 
     public RolesConfig getConfiguration()
     {
-        return this.config;
+        return this.service.getConfig();
     }
 
-    public Log getLog()
-    {
-        return logger;
+    public RolesPermissionService getService() {
+        return service;
     }
 }
