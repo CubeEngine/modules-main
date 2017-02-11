@@ -17,10 +17,13 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
+import org.cubeengine.butler.CommandInvocation;
+import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -30,6 +33,9 @@ import org.spongepowered.api.world.storage.WorldProperties;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Commands changing time. /time /ptime
  */
@@ -37,16 +43,31 @@ public class WeatherCommands
 {
     private I18n i18n;
 
-    public WeatherCommands(I18n i18n)
+    public WeatherCommands(I18n i18n, CommandManager cm)
     {
         this.i18n = i18n;
+        cm.getProviderManager().register(this, new WeatherCompleter(), Weather.class);
     }
-
-
 
     public enum Weather // TODO completer
     {
         SUN, RAIN, STORM
+    }
+
+    public class WeatherCompleter implements Completer
+    {
+        @Override
+        public List<String> getSuggestions(CommandInvocation invocation)
+        {
+            ArrayList<String> list = new ArrayList<>();
+            String token = invocation.currentToken();
+            for (Weather weather : Weather.values()) {
+                if (weather.name().toLowerCase().startsWith(token.toLowerCase())) {
+                    list.add(weather.name().toLowerCase());
+                }
+            }
+            return list;
+        }
     }
 
     @Command(desc = "Changes the weather")

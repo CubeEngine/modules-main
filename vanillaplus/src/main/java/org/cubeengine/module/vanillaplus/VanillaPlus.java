@@ -291,7 +291,7 @@ public class VanillaPlus extends Module
         }
         if (config.improve.commandWeather)
         {
-            cm.addCommands(this, new WeatherCommands(i18n));
+            cm.addCommands(this, new WeatherCommands(i18n, cm));
         }
         if (config.improve.commandWhitelist)
         {
