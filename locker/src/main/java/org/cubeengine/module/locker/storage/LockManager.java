@@ -252,7 +252,7 @@ public class LockManager
             Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
             Lock lock = new Lock(this, model, i18n, lockLoc);
             addLoadedLocationLock(lock);
-            System.out.print("Lock loaded at: " + lock.getFirstLocation().getPosition() + "\n");
+            // System.out.print("Lock loaded at: " + lock.getFirstLocation().getPosition() + "\n");
         }
 
         for (Integer xPo : xPos)
@@ -336,7 +336,7 @@ public class LockManager
             Map<Long, Lock> locLockMap = this.getLocLockMap(chunk.getWorld().getUniqueId());
             for (Lock lock : removed) // remove from chunks
             {
-                System.out.print("Lock unloaded at: " + lock.getFirstLocation().getPosition() + "\n");
+                // System.out.print("Lock unloaded at: " + lock.getFirstLocation().getPosition() + "\n");
                 this.locksById.remove(lock.getId());
                 for (Location loc : lock.getLocations())
                 {
