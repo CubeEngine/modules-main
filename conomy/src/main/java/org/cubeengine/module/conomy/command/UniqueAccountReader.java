@@ -51,7 +51,7 @@ public class UniqueAccountReader implements ArgumentReader<BaseAccount.Unique>, 
     @Override
     public BaseAccount.Unique read(Class type, CommandInvocation invocation) throws ReaderException
     {
-        String arg = invocation.consume(1);
+        String arg = invocation.currentToken();
         User user = (User)invocation.getManager().read(User.class, User.class, invocation);
         Optional<BaseAccount.Unique> target = getAccount(user).filter(a -> {
                 Object cmdSource = invocation.getCommandSource();
