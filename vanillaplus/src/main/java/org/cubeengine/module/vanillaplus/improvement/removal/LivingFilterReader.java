@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.exception.SilentException;
 import org.cubeengine.butler.parameter.reader.ArgumentReader;
@@ -48,8 +50,8 @@ import org.spongepowered.api.entity.living.Villager;
 import org.spongepowered.api.entity.living.animal.Animal;
 import org.spongepowered.api.entity.living.golem.Golem;
 import org.spongepowered.api.entity.living.monster.Boss;
-import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
@@ -57,7 +59,7 @@ import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.spongepowered.api.text.format.TextFormat.NONE;
+import static org.spongepowered.api.text.format.TextColors.WHITE;
 
 public class LivingFilterReader extends PermissionContainer implements ArgumentReader<LivingFilter>, DefaultValue<LivingFilter>
 {
@@ -165,14 +167,14 @@ public class LivingFilterReader extends PermissionContainer implements ArgumentR
         List<Predicate<Entity>> list = new ArrayList<>();
 
         Map<String, Predicate<Entity>> groupMap = new HashMap<>();
-        groupMap.put(i18n.getTranslation(source, NONE, "hostile").toPlain(), FILTER_HOSTILE);
-        groupMap.put(i18n.getTranslation(source, NONE, "monster").toPlain(), FILTER_MONSTER);
-        groupMap.put(i18n.getTranslation(source, NONE, "boss").toPlain(), FILTER_BOSS);
-        groupMap.put(i18n.getTranslation(source, NONE, "animal").toPlain(), FILTER_ANIMAL);
-        groupMap.put(i18n.getTranslation(source, NONE, "npc").toPlain(), FILTER_NPC);
-        groupMap.put(i18n.getTranslation(source, NONE, "pet").toPlain(), FILTER_PET);
-        groupMap.put(i18n.getTranslation(source, NONE, "golem").toPlain(), FILTER_GOLEM);
-        groupMap.put(i18n.getTranslation(source, NONE, "ambient").toPlain(), FILTER_AMBIENT);
+        groupMap.put(i18n.translate(source, "hostile"), FILTER_HOSTILE);
+        groupMap.put(i18n.translate(source, "monster"), FILTER_MONSTER);
+        groupMap.put(i18n.translate(source, "boss"), FILTER_BOSS);
+        groupMap.put(i18n.translate(source, "animal"), FILTER_ANIMAL);
+        groupMap.put(i18n.translate(source, "npc"), FILTER_NPC);
+        groupMap.put(i18n.translate(source, "pet"), FILTER_PET);
+        groupMap.put(i18n.translate(source, "golem"), FILTER_GOLEM);
+        groupMap.put(i18n.translate(source, "ambient"), FILTER_AMBIENT);
 
         Map<String, EntityType> map = Sponge.getRegistry().getAllOf(EntityType.class).stream().filter(
             type -> Living.class.isAssignableFrom(type.getEntityClass())).distinct().collect(
@@ -188,9 +190,11 @@ public class LivingFilterReader extends PermissionContainer implements ArgumentR
                 {
                     i18n.sendTranslated(source, NEGATIVE, "Could not find a living entity named {input}", part);
                     i18n.sendTranslated(source, NEUTRAL, "The following are valid entity groups:");
-                    source.sendMessage(Text.of(StringUtils.implode(", ", groupMap.keySet())));
+                    List<Text> groups = groupMap.keySet().stream().map(s -> Text.of(TextColors.GRAY, s)).collect(Collectors.toList());
+                    source.sendMessage(Text.joinWith(Text.of(WHITE, ", "), groups));
                     i18n.sendTranslated(source, NEUTRAL, "The following are valid entity types:");
-                    source.sendMessage(Text.of(StringUtils.implode(", ", map.keySet())));
+                    List<Text> types = map.keySet().stream().map(s -> Text.of(TextColors.GRAY, s)).collect(Collectors.toList());
+                    source.sendMessage(Text.joinWith(Text.of(WHITE, ", "),types));
                     throw new SilentException();
                 }
                 EntityType type = map.get(match);
