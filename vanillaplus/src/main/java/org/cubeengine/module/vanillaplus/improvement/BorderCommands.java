@@ -30,13 +30,12 @@ import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.world.ChunkPreGenerate;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
-import org.spongepowered.api.world.WorldBorder.ChunkPreGenerate;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
@@ -59,19 +58,21 @@ public class BorderCommands extends ContainerCommand
         this.plugin = plugin;
     }
 
-    private Task task;
+    private ChunkPreGenerate task;
 
     @Alias(value = "generateBorder")
     @Command(desc = "Generates the chunks located in the border")
     public void generate(CommandSource context, @Default World world, @Flag boolean fulltick)
     {
-        if (task != null && !task.cancel())
+        if (task != null)
         {
+            task.cancel();
+            task = null;
             i18n.sendTranslated(context, NEGATIVE, "Chunk generation is already running! Canceled.");
             return;
         }
 
-        ChunkPreGenerate generate = world.getWorldBorder().newChunkPreGenerate(world);
+        ChunkPreGenerate.Builder generate = world.getWorldBorder().newChunkPreGenerate(world);
         generate.owner(plugin.getInstance().get());
         if (fulltick)
         {
