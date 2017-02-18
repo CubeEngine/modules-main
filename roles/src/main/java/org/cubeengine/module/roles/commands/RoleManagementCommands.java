@@ -17,9 +17,9 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import de.cubeisland.engine.converter.ConversionException;
-import de.cubeisland.engine.converter.converter.ClassedConverter;
-import de.cubeisland.engine.converter.node.StringNode;
+import org.cubeengine.converter.ConversionException;
+import org.cubeengine.converter.converter.ClassedConverter;
+import org.cubeengine.converter.node.StringNode;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Complete;

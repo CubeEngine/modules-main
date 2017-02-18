@@ -22,13 +22,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ThreadFactory;
 import javax.inject.Inject;
-import javax.inject.Provider;
+
 import de.cubeisland.engine.logscribe.LogFactory;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
-import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.conomy.bank.BankConomyService;
 import org.cubeengine.module.conomy.bank.BankPermission;

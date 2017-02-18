@@ -21,13 +21,12 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Transient;
-import de.cubeisland.engine.reflect.annotations.Comment;
-import de.cubeisland.engine.reflect.annotations.Name;
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.cubeengine.reflect.annotations.Comment;
+import org.cubeengine.reflect.annotations.Name;
+import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.config.EntityLockConfig;
 import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.spongepowered.api.block.BlockTypes;
 
 import static org.cubeengine.module.locker.storage.LockType.PRIVATE;
 import static org.cubeengine.module.locker.storage.ProtectionFlag.*;

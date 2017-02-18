@@ -17,9 +17,9 @@
  */
 package org.cubeengine.module.roles;
 
-import de.cubeisland.engine.reflect.annotations.Comment;
-import de.cubeisland.engine.reflect.annotations.Name;
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.cubeengine.reflect.annotations.Comment;
+import org.cubeengine.reflect.annotations.Name;
+import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 
 @SuppressWarnings("all")
 public class RolesConfig extends ReflectedYaml

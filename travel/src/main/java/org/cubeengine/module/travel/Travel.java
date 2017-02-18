@@ -24,7 +24,7 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Maybe;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
-import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.reflect.Reflector;
 import org.cubeengine.module.travel.config.HomeConfig;
 import org.cubeengine.module.travel.config.TravelConfig;
 import org.cubeengine.module.travel.config.WarpConfig;

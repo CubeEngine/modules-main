@@ -18,13 +18,12 @@
 package org.cubeengine.module.locker;
 
 import javax.inject.Inject;
-import de.cubeisland.engine.converter.ConverterManager;
+import org.cubeengine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Disable;
-import de.cubeisland.engine.modularity.core.marker.Enable;
-import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.command.ModuleCommand;
 import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.module.locker.commands.LockerAdminCommands;
@@ -43,21 +42,13 @@ import org.cubeengine.module.locker.storage.TableAccessList;
 import org.cubeengine.module.locker.storage.TableLockLocations;
 import org.cubeengine.module.locker.storage.TableLocks;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.database.Database;
 import org.cubeengine.libcube.service.database.ModuleTables;
-import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
-import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.cubeengine.libcube.service.matcher.MaterialMatcher;
-import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.cubeengine.libcube.service.task.TaskManager;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.text.LiteralText;
-import org.spongepowered.api.text.Text;
 
 // TODO protect lines of redstone
 

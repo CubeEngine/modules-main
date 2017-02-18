@@ -18,7 +18,7 @@
 package org.cubeengine.module.portals;
 
 import java.util.Set;
-import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.reflect.Reflector;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parameter.FixedValues;

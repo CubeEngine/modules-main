@@ -18,12 +18,12 @@
 package org.cubeengine.module.portals.config;
 
 import java.util.Map;
-import de.cubeisland.engine.converter.ConversionException;
-import de.cubeisland.engine.converter.ConverterManager;
-import de.cubeisland.engine.converter.converter.SingleClassConverter;
-import de.cubeisland.engine.converter.node.MapNode;
-import de.cubeisland.engine.converter.node.Node;
-import de.cubeisland.engine.converter.node.StringNode;
+import org.cubeengine.converter.ConversionException;
+import org.cubeengine.converter.ConverterManager;
+import org.cubeengine.converter.converter.SingleClassConverter;
+import org.cubeengine.converter.node.MapNode;
+import org.cubeengine.converter.node.Node;
+import org.cubeengine.converter.node.StringNode;
 import org.cubeengine.module.portals.config.Destination.Type;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.config.WorldTransform;

@@ -21,7 +21,7 @@ import static org.cubeengine.libcube.service.logging.LoggingUtil.getCycler;
 import static org.cubeengine.libcube.service.logging.LoggingUtil.getFileFormat;
 import static org.cubeengine.libcube.service.logging.LoggingUtil.getLogFile;
 
-import de.cubeisland.engine.converter.ConverterManager;
+import org.cubeengine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.logscribe.LogFactory;
 import de.cubeisland.engine.logscribe.target.file.AsyncFileTarget;
@@ -29,7 +29,7 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.marker.Setup;
-import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.i18n.I18n;

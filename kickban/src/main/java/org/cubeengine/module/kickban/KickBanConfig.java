@@ -17,8 +17,8 @@
  */
 package org.cubeengine.module.kickban;
 
-import de.cubeisland.engine.reflect.annotations.Name;
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.cubeengine.reflect.annotations.Name;
+import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 
 @SuppressWarnings("all")
 public class KickBanConfig extends ReflectedYaml

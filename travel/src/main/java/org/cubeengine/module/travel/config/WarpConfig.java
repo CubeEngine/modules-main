@@ -19,7 +19,7 @@ package org.cubeengine.module.travel.config;
 
 import java.util.ArrayList;
 import java.util.List;
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 
 public class WarpConfig extends ReflectedYaml
 {

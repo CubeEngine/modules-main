@@ -19,12 +19,12 @@ package org.cubeengine.module.roles.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import de.cubeisland.engine.converter.ConversionException;
-import de.cubeisland.engine.converter.converter.SimpleConverter;
-import de.cubeisland.engine.converter.node.ListNode;
-import de.cubeisland.engine.converter.node.MapNode;
-import de.cubeisland.engine.converter.node.Node;
-import de.cubeisland.engine.converter.node.StringNode;
+import org.cubeengine.converter.ConversionException;
+import org.cubeengine.converter.converter.SimpleConverter;
+import org.cubeengine.converter.node.ListNode;
+import org.cubeengine.converter.node.MapNode;
+import org.cubeengine.converter.node.Node;
+import org.cubeengine.converter.node.StringNode;
 import org.cubeengine.module.roles.Roles;
 
 public class PermissionTreeConverter extends SimpleConverter<PermissionTree>

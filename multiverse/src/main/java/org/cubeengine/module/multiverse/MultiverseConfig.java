@@ -18,11 +18,10 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import de.cubeisland.engine.reflect.codec.yaml.ReflectedYaml;
+import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 
 @SuppressWarnings("all")

@@ -21,7 +21,7 @@ import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEX
 
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
-import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.roles.Roles;

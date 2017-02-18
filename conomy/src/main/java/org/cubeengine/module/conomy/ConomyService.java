@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import de.cubeisland.engine.reflect.Reflector;
+import org.cubeengine.reflect.Reflector;
 import org.cubeengine.module.conomy.command.EcoCommand;
 import org.cubeengine.module.conomy.command.MoneyCommand;
 import org.cubeengine.module.conomy.command.UniqueAccountReader;
@@ -53,7 +53,6 @@ import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
-import org.spongepowered.api.service.economy.account.VirtualAccount;
 import org.spongepowered.api.service.user.UserStorageService;
 
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
