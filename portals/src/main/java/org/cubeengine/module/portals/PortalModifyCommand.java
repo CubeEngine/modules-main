@@ -35,6 +35,7 @@ import org.cubeengine.libcube.service.config.WorldTransform;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -58,7 +59,7 @@ public class PortalModifyCommand extends ContainerCommand
     }
 
     @Command(desc = "Changes the owner of a portal")
-    public void owner(CommandSource context, Player owner, @Default Portal portal)
+    public void owner(CommandSource context, User owner, @Default Portal portal)
     {
         portal.config.owner = owner.getName();
         portal.config.save();
@@ -80,7 +81,7 @@ public class PortalModifyCommand extends ContainerCommand
     @Command(alias = "randdest", desc = "Changes the destination of the selected portal to a random position each time")
     public void randomDestination(CommandSource context, World world, @Default Portal portal)
     {
-        this.destination(context, new RandomDestination(game, world), portal);
+        this.destination(context, new RandomDestination(world), portal);
     }
 
     @Command(desc = "Changes a portals location")

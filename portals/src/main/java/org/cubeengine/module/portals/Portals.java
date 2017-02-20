@@ -31,6 +31,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import javax.inject.Inject;
+
+import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
@@ -75,7 +77,6 @@ public class Portals extends Module
     private final Map<String, Portal> portals = new HashMap<>();
     private final Map<Long, List<Portal>> chunksWithPortals = new HashMap<>();
     private final WeakHashMap<Portal, List<Entity>> entitesInPortals = new WeakHashMap<>();
-    private Map<World, Pair<Integer, Chunk>> randomDestinationSettings = new HashMap<>();
 
     private Map<UUID, PortalsAttachment> attachments = new HashMap<>();
 
@@ -98,19 +99,11 @@ public class Portals extends Module
         tm.runTimer(Portals.class, this::checkForEntitiesInPortals, 5, 5);
     }
 
-    public void setRandomDestinationSetting(World world, Integer radius, Chunk center) // TODO worldborder as default / config default?
+    public Pair<Integer, Vector3i> getRandomDestinationSetting(World world)
     {
-        this.randomDestinationSettings.put(world, new Pair<>(radius, center));
-    }
-
-    public Pair<Integer, Chunk> getRandomDestinationSetting(World world)
-    {
-        Pair<Integer, Chunk> setting = this.randomDestinationSettings.get(world);
-        if (setting == null)
-        {
-            setting = new Pair<>(30, world.loadChunk(world.getSpawnLocation().getBlockPosition(), false).get());
-        }
-        return setting;
+        Vector3i pos = world.getSpawnLocation().getBlockPosition();
+        Integer radius = Math.min((int)world.getWorldBorder().getDiameter() / 2, 60 * 16);
+        return new Pair<>(radius, pos);
     }
 
     private void loadPortals() throws IOException
