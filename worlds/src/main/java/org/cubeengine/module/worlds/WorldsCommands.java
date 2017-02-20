@@ -175,7 +175,7 @@ public class WorldsCommands extends ContainerCommand
         Optional<World> w = Sponge.getServer().getWorld(world.getUniqueId());
         if (w.isPresent())
         {
-            i18n.sendTranslated(context, POSITIVE, "The world {world} is already loaded!", w);
+            i18n.sendTranslated(context, POSITIVE, "The world {world} is already loaded!", w.get());
             return;
         }
 
