@@ -18,21 +18,23 @@
 package org.cubeengine.module.teleport;
 
 import java.util.Optional;
+
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.libcube.util.BlockUtil;
-import org.cubeengine.libcube.util.CauseUtil;
 import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.libcube.service.command.annotation.CommandPermission;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
@@ -41,6 +43,7 @@ import org.spongepowered.api.world.World;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.AIR;
 import static org.spongepowered.api.block.BlockTypes.GLASS;
+import static org.spongepowered.api.block.BlockTypes.SPONGE;
 import static org.spongepowered.api.util.Direction.DOWN;
 import static org.spongepowered.api.util.Direction.UP;
 
@@ -82,9 +85,9 @@ public class MovementCommands
         }
         if (loc.getBlockType() == AIR)
         {
-            loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS, Cause.of(NamedCause.source(context))); // TODO plugin must be root of cause
+            loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS, Cause.of(NamedCause.source(module.getModularity().provide(PluginContainer.class)), NamedCause.owner(context)));
         }
-        context.setLocation(loc);
+        context.setLocation(loc.getRelative(UP));
         i18n.sendTranslated(context, POSITIVE, "You have just been lifted!");
     }
 
@@ -93,7 +96,7 @@ public class MovementCommands
     public void top(Player context)
     {
         Location<World> loc = BlockUtil.getHighestBlockAt(context.getLocation()).add(.5, 0, .5);
-        context.setLocation(loc);
+        context.setLocation(loc.getRelative(UP));
         i18n.sendTranslated(context, POSITIVE, "You are now on top!");
     }
 
@@ -101,13 +104,13 @@ public class MovementCommands
     @Restricted(value = Player.class, msg = "Pro Tip: Teleport does not work IRL!")
     public void ascend(Player context)
     {
-        Location loc = context.getLocation();
-        Location curLoc = loc.add(0, 2, 0);
-        final int maxHeight = ((World)curLoc.getExtent()).getDimension().getBuildHeight();
+        Location<World> loc = context.getLocation();
+        Location<World> curLoc = loc.add(0, 2, 0);
+        final int maxHeight = curLoc.getExtent().getDimension().getBuildHeight();
         //go upwards until hitting solid blocks
         while (curLoc.getBlockType() == AIR && curLoc.getY() < maxHeight)
         {
-            Location rel = curLoc.getRelative(UP);
+            Location<World> rel = curLoc.getRelative(UP);
             if (rel.getY() < loc.getBlockY())
             {
                 i18n.sendTranslated(context, NEGATIVE, "You cannot ascend here");
@@ -117,9 +120,9 @@ public class MovementCommands
         }
         curLoc = curLoc.getRelative(UP);
         // go upwards until hitting 2 airblocks again
-        while (!(curLoc.getBlockType() == AIR && curLoc.getRelative(DOWN).getBlockType() == AIR) && curLoc.getY() < maxHeight)
+        while (!(curLoc.getBlockType() == AIR && curLoc.getRelative(UP).getBlockType() == AIR) && curLoc.getY() < maxHeight)
         {
-            Location rel = curLoc.getRelative(UP);
+            Location<World> rel = curLoc.getRelative(UP);
             if (rel.getY() == 0)
             {
                 break;
@@ -131,8 +134,8 @@ public class MovementCommands
             i18n.sendTranslated(context, NEGATIVE, "You cannot ascend here");
             return;
         }
-        loc = loc.add(0, ((World)loc.getExtent()).getDimension().getBuildHeight() - loc.getY() + 1, 0);
-        context.setLocation(loc);
+        curLoc = curLoc.add(0, - (curLoc.getY() - curLoc.getBlockY()), 0);
+        context.setLocation(curLoc);
         i18n.sendTranslated(context, POSITIVE, "Ascended a level!");
     }
 
@@ -141,7 +144,7 @@ public class MovementCommands
     public void descend(Player context)
     {
         final Location<World> userLocation = context.getLocation();
-        Location curLoc = userLocation;
+        Location<World> curLoc = userLocation;
         //go downwards until hitting solid blocks
         while (curLoc.getBlockType() == AIR && curLoc.getBlockY() > 0)
         {
@@ -153,7 +156,7 @@ public class MovementCommands
             && (curLoc.getRelative(DOWN).getBlockType() != AIR))
             && curLoc.getBlockY() > 0)
         {
-            curLoc = curLoc.add(0, -1, 0);
+            curLoc = curLoc.getRelative(DOWN);
         }
         if (curLoc.getY() <= 1)
         {
@@ -161,6 +164,7 @@ public class MovementCommands
             return;
         }
         //reached new location
+        curLoc = curLoc.add(0, - (curLoc.getY() - curLoc.getBlockY()), 0);
         context.setLocation(curLoc);
         i18n.sendTranslated(context, POSITIVE, "Descended a level!");
     }
@@ -169,14 +173,13 @@ public class MovementCommands
     @Restricted(value = Player.class, msg = "Jumping in the console is not allowed! Go play outside!")
     public void jumpTo(Player context)
     {
-        Optional<BlockRayHit<World>> end = BlockRay.from(context).end();
-        if (!end.isPresent())
+        Location<World> loc = LocationUtil.getBlockInSight(context);
+        if (loc == null)
         {
             i18n.sendTranslated(context, NEGATIVE, "No block in sight!");
             return;
         }
-        Location<World> loc = end.get().getLocation().add(0.5, 1, 0.5);
-        context.setLocation(loc);
+        context.setLocation(LocationUtil.getLocationUp(loc).add(0.5, 0, 0.5));
         i18n.sendTranslated(context, POSITIVE, "You just jumped!");
     }
 
@@ -226,22 +229,26 @@ public class MovementCommands
         }
         if (backPerm)
         {
-            Transform<World> loc = tl.getLastLocation(context);
-            if (loc == null)
+            Transform<World> trans = tl.getLastLocation(context);
+            if (trans == null)
             {
                 i18n.sendTranslated(context, NEGATIVE, "You never teleported!");
                 return;
             }
 
-            if (!unsafe || context.setLocationSafely(loc.getLocation()))
+            Location<World> loc = trans.getLocation();
+            if (!unsafe)
             {
-                if (unsafe)
-                {
-                    context.setLocation(loc.getLocation());
-                }
-                i18n.sendTranslated(context, POSITIVE, "Teleported to your last location!");
+                loc = Sponge.getGame().getTeleportHelper().getSafeLocation(loc, 5, 20).orElse(null);
             }
-            context.setRotation(loc.getRotation());
+            if (loc == null)
+            {
+                i18n.sendTranslated(context, POSITIVE, "Target is unsafe! Use the -unsafe flag to teleport anyways.");
+                return;
+            }
+            context.setLocation(loc);
+            i18n.sendTranslated(context, POSITIVE, "Teleported to your last location!");
+            context.setRotation(trans.getRotation());
             return;
         }
         i18n.sendTranslated(context, NEGATIVE, "You are not allowed to teleport back!");
@@ -251,13 +258,14 @@ public class MovementCommands
     @Restricted(value = Player.class)
     public void place(Player context, Player player)
     {
-        Optional<BlockRayHit<World>> end = BlockRay.from(context).end();
-        if (!end.isPresent())
+        Location<World> block = LocationUtil.getBlockInSight(player);
+        if (block == null)
         {
             i18n.sendTranslated(context, NEGATIVE, "No block in sight!");
             return;
         }
-        player.setLocation(end.get().getLocation().add(0.5, 1, 0.5));
+
+        player.setLocation(LocationUtil.getLocationUp(block).add(0.5, 0, 0.5));
         i18n.sendTranslated(context, POSITIVE, "You just placed {user} where you were looking!", player);
         i18n.sendTranslated(player, POSITIVE, "You were placed somewhere!");
     }

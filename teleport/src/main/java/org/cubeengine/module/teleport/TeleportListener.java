@@ -102,29 +102,12 @@ public class TeleportListener
             return;
         }
 
-        Iterator<BlockRayHit<World>> it = BlockRay.from(player).iterator();
-        Optional<BlockRayHit<World>> end = Optional.empty();
-        while (it.hasNext())
-        {
-            BlockRayHit<World> hit = it.next();
-            BlockType blockType = hit.getExtent().getBlockType(hit.getBlockX(), hit.getBlockY(), hit.getBlockZ());
-            if (blockType.getProperty(MatterProperty.class).map(AbstractProperty::getValue).orElse(null) == SOLID)
-            {
-                end = Optional.of(hit);
-                break;
-            }
-        }
-        if (!end.isPresent())
+        Location<World> loc = LocationUtil.getBlockInSight(player);
+        if (loc == null)
         {
             return;
         }
-        Location<World> loc = end.get().getLocation();
-        while (loc.getBlockType().getProperty(MatterProperty.class).map(AbstractProperty::getValue).orElse(null) == SOLID)
-        {
-            loc = loc.add(0, 1, 0);
-        }
-        loc = loc.add(0.5, 0.5, 0.5); // middle of block + a bit higher for fences
-        player.setLocation(loc);
+        player.setLocation(LocationUtil.getLocationUp(loc).add(0.5, 0, 0.5));
         i18n.sendTranslated(player, NEUTRAL, "Poof!");
         event.setCancelled(true);
     }
