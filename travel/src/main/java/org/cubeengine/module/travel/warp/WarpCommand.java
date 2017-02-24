@@ -17,12 +17,14 @@
  */
 package org.cubeengine.module.travel.warp;
 
+import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Complete;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Label;
@@ -32,6 +34,7 @@ import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.libcube.service.task.thread.TrackedThread;
 import org.cubeengine.libcube.util.ConfirmManager;
 import org.cubeengine.module.travel.Travel;
+import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.module.travel.config.Warp;
 import org.cubeengine.libcube.service.command.CommandUtil;
 import org.cubeengine.libcube.service.command.ContainerCommand;
@@ -75,9 +78,17 @@ public class WarpCommand extends ContainerCommand
         return super.selfExecute(invocation);
     }
 
+    @Override
+    public List<String> getSuggestions(CommandInvocation invocation)
+    {
+        List<String> list = super.getSuggestions(invocation);
+        list.addAll(invocation.getManager().getCompleter(Warp.class).getSuggestions(invocation));
+        return list;
+    }
+
     @Restricted(Player.class)
     @Command(desc = "Teleport to a warp")
-    public void tp(Player sender, String warp)
+    public void tp(Player sender, @Complete(WarpCompleter.class) String warp)
     {
         // TODO find close match and display as click cmd
         Warp w = manager.get(warp).orElse(null);
@@ -136,7 +147,7 @@ public class WarpCommand extends ContainerCommand
     }
 
     @Command(desc = "Set the welcome message of warps", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
-    public void greeting(CommandSource sender, String warp,
+    public void greeting(CommandSource sender, @Complete(WarpCompleter.class) String warp,
                          @Label("welcome message") @Greed(INFINITE) @Optional String message,
                          @Flag boolean append)
     {
@@ -169,7 +180,7 @@ public class WarpCommand extends ContainerCommand
 
     @Restricted(Player.class)
     @Command(desc = "Move a warp")
-    public void move(Player sender, String warp)
+    public void move(Player sender, @Complete(WarpCompleter.class) String warp)
     {
         Warp w = manager.get(warp).orElse(null);
         if (w == null)
@@ -193,7 +204,7 @@ public class WarpCommand extends ContainerCommand
 
     @Alias(value = {"removewarp", "deletewarp", "delwarp", "remwarp"})
     @Command(alias = "delete", desc = "Remove a warp")
-    public void remove(CommandSource sender, String warp)
+    public void remove(CommandSource sender, @Complete(WarpCompleter.class) String warp)
     {
         Warp w = manager.get(warp).orElse(null);
         if (w == null)
@@ -215,7 +226,7 @@ public class WarpCommand extends ContainerCommand
     }
 
     @Command(desc = "Rename a warp")
-    public void rename(CommandSource sender, String warp, @Label("new name") String newName)
+    public void rename(CommandSource sender, @Complete(WarpCompleter.class) String warp, @Label("new name") String newName)
     {
         Warp w = manager.get(warp).orElse(null);
         if (w == null)

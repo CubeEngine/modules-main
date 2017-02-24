@@ -24,6 +24,10 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Maybe;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
+import org.cubeengine.module.travel.config.Home;
+import org.cubeengine.module.travel.config.Warp;
+import org.cubeengine.module.travel.home.HomeCompleter;
+import org.cubeengine.module.travel.warp.WarpCompleter;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.module.travel.config.HomeConfig;
 import org.cubeengine.module.travel.config.TravelConfig;
@@ -60,8 +64,10 @@ public class Travel extends Module
         i18n.getCompositor().registerFormatter(new TpPointFormatter(i18n));
 
         this.homeManager = new HomeManager(this, i18n, reflector.load(HomeConfig.class, getProvided(Path.class).resolve("homes.yml").toFile()));
+        this.cm.getProviderManager().register(this, new HomeCompleter(homeManager), Home.class);
         this.em.registerListener(Travel.class, this.homeManager);
         this.warpManager = new WarpManager(reflector.load(WarpConfig.class, getProvided(Path.class).resolve("warps.yml").toFile()));
+        this.cm.getProviderManager().register(this, new WarpCompleter(warpManager), Warp.class);
 
         cm.addCommand(new HomeCommand(cm, this, selector, i18n));
         cm.addCommand(new WarpCommand(cm, this, i18n));

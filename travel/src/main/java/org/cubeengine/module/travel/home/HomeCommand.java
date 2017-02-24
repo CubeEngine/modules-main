@@ -27,6 +27,7 @@ import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Complete;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
@@ -98,13 +99,14 @@ public class HomeCommand extends ContainerCommand
     @Override
     public List<String> getSuggestions(CommandInvocation invocation)
     {
-        // TODO get my homes
-        return super.getSuggestions(invocation);
+        List<String> list = super.getSuggestions(invocation);
+        list.addAll(invocation.getManager().getCompleter(Home.class).getSuggestions(invocation));
+        return list;
     }
 
     @Restricted(Player.class)
     @Command(desc = "Teleport to a home")
-    public void tp(Player sender, @Optional String home, @Default User owner)
+    public void tp(Player sender, @Complete(HomeCompleter.class) @Optional String home, @Default User owner)
     {
         home = home == null ? "home" : home;
         // TODO find close match and display as click cmd
@@ -112,7 +114,7 @@ public class HomeCommand extends ContainerCommand
         if (h == null)
         {
             homeNotFoundMessage(sender, owner, home);
-            i18n.sendTranslated(sender, NEUTRAL, "Use {text:/sethome} to set your home");
+            i18n.sendTranslated(sender, NEUTRAL, "Use {text:/sethome} to set your home"); // TODO create on click
             return;
         }
         if (!h.isInvited(sender) && !owner.equals(sender))
@@ -167,7 +169,7 @@ public class HomeCommand extends ContainerCommand
 
     @Command(desc = "Set the welcome message of homes", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
     public void greeting(CommandSource sender,
-                         String home,
+                         @Complete(HomeCompleter.class) String home,
                          @Optional @Label("welcome message") @Greed(INFINITE) String message,
                          @Default @Named("owner") User owner,
                          @Flag boolean append)
@@ -200,14 +202,14 @@ public class HomeCommand extends ContainerCommand
 
     @Restricted(value = Player.class, msg = "I am calling the moving company right now!")
     @Command(alias = "replace", desc = "Move a home")
-    public void move(Player sender, @Optional String name, @Default User owner)
+    public void move(Player sender, @Complete(HomeCompleter.class) @Optional String name, @Default User owner)
     {
         name = name == null ? "home" : name;
         Home home = this.manager.get(owner, name).orElse(null);
         if (home == null)
         {
             homeNotFoundMessage(sender, owner, name);
-            i18n.sendTranslated(sender, NEUTRAL, "Use {text:/sethome} to set your home");
+            i18n.sendTranslated(sender, NEUTRAL, "Use {text:/sethome} to set your home"); // TODO create on click
             return;
         }
         if (!home.isInvited(sender))
@@ -229,7 +231,7 @@ public class HomeCommand extends ContainerCommand
 
     @Alias(value = {"remhome", "removehome", "delhome", "deletehome"})
     @Command(alias = {"delete", "rem", "del"}, desc = "Remove a home")
-    public void remove(CommandSource sender, @Optional String name, @Default @Optional Player owner)
+    public void remove(CommandSource sender, @Complete(HomeCompleter.class) @Optional String name, @Default @Optional Player owner)
     {
         name = name == null ? "home" : name;
         Home home = this.manager.get(owner, name).orElse(null);
@@ -252,7 +254,7 @@ public class HomeCommand extends ContainerCommand
     }
 
     @Command(desc = "Rename a home")
-    public void rename(CommandSource sender, String home, @Label("new name") String newName, @Default @Optional Player owner)
+    public void rename(CommandSource sender, @Complete(HomeCompleter.class) String home, @Label("new name") String newName, @Default @Optional Player owner)
     {
         Home h = manager.get(owner, home).orElse(null);
         if (h == null)
@@ -386,7 +388,7 @@ public class HomeCommand extends ContainerCommand
 
     @Restricted(value = Player.class, msg = "How about making a phone call to invite someone instead?")
     @Command(desc = "Invite a user to one of your homes")
-    public void invite(Player sender, User player, @Optional String home)
+    public void invite(Player sender, User player, @Complete(HomeCompleter.class) @Optional String home)
     {
         home = home == null ? "home" : home;
         Home h = this.manager.get(sender, home).orElse(null);
@@ -418,7 +420,7 @@ public class HomeCommand extends ContainerCommand
 
     @Restricted(Player.class)
     @Command(desc = "Uninvite a player from one of your homes")
-    public void unInvite(Player sender, User player, @Optional String home )
+    public void unInvite(Player sender, User player, @Complete(HomeCompleter.class) @Optional String home )
     {
         home = home == null ? "home" : home;
         Home h = this.manager.get(sender, home).orElse(null);
