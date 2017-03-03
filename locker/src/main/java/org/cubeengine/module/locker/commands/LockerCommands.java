@@ -20,6 +20,8 @@ package org.cubeengine.module.locker.commands;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
+
+import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.completer.Completer;
@@ -30,7 +32,6 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.KeyBook;
 import org.cubeengine.module.locker.storage.Lock;
@@ -91,7 +92,7 @@ public class LockerCommands extends ContainerCommand
                 if (lock.isBlockLock())
                 {
                     Location loc = lock.getFirstLocation();
-                    i18n.sendTranslated(context, POSITIVE, "The protection corresponding to this book is located at {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
+                    i18n.sendTranslated(context, POSITIVE, "The protection corresponding to this book is located at {vector} in {world}", loc.getBlockPosition(), loc.getExtent());
                 }
                 else
                 {
@@ -100,7 +101,7 @@ public class LockerCommands extends ContainerCommand
                         if (entity.getUniqueId().equals(lock.getEntityUID()))
                         {
                             Location loc = entity.getLocation();
-                            i18n.sendTranslated(context, POSITIVE, "The entity protection corresponding to this book is located at {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
+                            i18n.sendTranslated(context, POSITIVE, "The entity protection corresponding to this book is located at {vector} in {world}", loc.getBlockPosition(), loc.getExtent());
                             return;
                         }
                     }

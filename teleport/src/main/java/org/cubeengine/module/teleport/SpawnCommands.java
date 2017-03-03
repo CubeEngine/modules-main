@@ -25,7 +25,6 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.Broadcaster;
@@ -82,7 +81,7 @@ public class SpawnCommands
         }
         em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location<>(world, x, y, z), direction, context));
         world.getProperties().setSpawnPosition(new Vector3i(x, y, z));
-        i18n.sendTranslated(context, POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new BlockVector3(x, y, z));
+        i18n.sendTranslated(context, POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new Vector3i(x, y, z));
     }
 
     @Command(desc = "Teleports all players to spawn")

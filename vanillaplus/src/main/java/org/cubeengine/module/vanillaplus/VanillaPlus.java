@@ -297,9 +297,9 @@ public class VanillaPlus extends Module
         {
             cm.addCommand(new WhitelistCommand(cm, i18n));
         }
-        if (config.improve.commandBorder)
+        if (config.improve.commandBorderEnable)
         {
-            cm.addCommand(new BorderCommands(i18n, cm, plugin));
+            cm.addCommand(new BorderCommands(i18n, cm, plugin, config.improve.commandBorderMax));
         }
     }
 

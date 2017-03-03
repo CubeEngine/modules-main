@@ -17,13 +17,13 @@
  */
 package org.cubeengine.module.portals;
 
+import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Desc;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.portals.config.Destination;
 import org.cubeengine.module.portals.config.RandomDestination;
@@ -96,8 +96,8 @@ public class PortalModifyCommand extends ContainerCommand
         Location<World> p1 = selector.getFirstPoint(context);
         Location<World> p2 = selector.getSecondPoint(context);
         portal.config.world = new ConfigWorld(p1.getExtent());
-        portal.config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
-        portal.config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
+        portal.config.location.from = new Vector3i(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
+        portal.config.location.to = new Vector3i(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
         portal.config.save();
         i18n.sendTranslated(context, POSITIVE, "Portal {name} updated to your current selection!", portal.getName());
     }

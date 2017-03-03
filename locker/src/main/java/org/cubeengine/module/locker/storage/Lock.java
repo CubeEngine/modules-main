@@ -17,43 +17,46 @@
  */
 package org.cubeengine.module.locker.storage;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import static java.util.stream.Collectors.toList;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_ADMIN;
+import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_ALL;
+import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_FULL;
+import static org.cubeengine.module.locker.storage.LockType.PUBLIC;
+import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
+import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
+import static org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK;
+import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
+import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
+import static org.spongepowered.api.text.format.TextColors.GOLD;
+import static org.spongepowered.api.text.format.TextColors.GRAY;
+import static org.spongepowered.api.text.format.TextColors.GREEN;
+import static org.spongepowered.api.text.format.TextColors.YELLOW;
+
+import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.logscribe.Log;
-import org.cubeengine.libcube.util.CauseUtil;
-import org.cubeengine.libcube.util.math.BlockVector3;
-import org.cubeengine.module.locker.Locker;
-import org.cubeengine.module.locker.commands.PlayerAccess;
-import org.cubeengine.module.locker.data.LockerData;
 import org.cubeengine.libcube.service.database.Database;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
+import org.cubeengine.libcube.util.CauseUtil;
+import org.cubeengine.module.locker.Locker;
+import org.cubeengine.module.locker.commands.PlayerAccess;
+import org.cubeengine.module.locker.data.LockerData;
 import org.jooq.Result;
 import org.jooq.types.UInteger;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.block.BlockState;
-import org.spongepowered.api.block.trait.EnumTraits;
-import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.data.type.PortionType;
-import org.spongepowered.api.data.type.PortionTypes;
-import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
@@ -67,18 +70,15 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static java.util.stream.Collectors.toList;
-import static org.cubeengine.module.locker.storage.AccessListModel.*;
-import static org.cubeengine.module.locker.storage.LockType.PUBLIC;
-import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
-import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
-import static org.spongepowered.api.data.type.PortionTypes.TOP;
-import static org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK;
-import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
-import static org.spongepowered.api.text.format.TextColors.*;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class Lock
 {
@@ -673,7 +673,7 @@ public class Lock
                     {
                         i18n.sendTranslated(player, NEUTRAL, "{user} accessed one your protection with the id {integer}!", user, this.getId());
                         Location loc = this.getFirstLocation();
-                        i18n.sendTranslated(player, NEUTRAL, "which is located at {vector} in {world}!", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
+                        i18n.sendTranslated(player, NEUTRAL, "which is located at {vector} in {world}!", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
                     }
                     else
                     {
@@ -683,7 +683,7 @@ public class Lock
                             {
                                 i18n.sendTranslated(player, NEUTRAL, "{user} accessed one of your protected entities!", user);
                                 Location loc = entity.getLocation();
-                                i18n.sendTranslated(player, NEUTRAL, "which is located at {vector} in {world}",  new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
+                                i18n.sendTranslated(player, NEUTRAL, "which is located at {vector} in {world}",  new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
                                 return;
                             }
                         }

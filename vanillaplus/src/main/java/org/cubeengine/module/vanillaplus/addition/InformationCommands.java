@@ -26,7 +26,15 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import com.flowpowered.math.imaginary.Quaterniond;
+import com.flowpowered.math.vector.Vector2i;
+import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parameter.TooFewArgumentsException;
 import org.cubeengine.butler.parametric.Command;
@@ -36,8 +44,6 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.Pair;
-import org.cubeengine.libcube.util.math.BlockVector2;
-import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.CommandContext;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -55,6 +61,7 @@ import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.Text.Builder;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextFormat;
@@ -106,7 +113,7 @@ public class InformationCommands extends PermissionContainer
             z = loc.getBlockZ();
         }
         BiomeType biome = world.getBiome(x, 0, z);
-        i18n.sendTranslated(context, NEUTRAL, "Biome at {vector:x\\=:z\\=}: {biome}", new BlockVector2(x, z), biome);
+        i18n.sendTranslated(context, NEUTRAL, "Biome at {vector:x\\=:z\\=}: {biome}", new Vector2i(x, z), biome);
     }
 
     @Command(desc = "Displays the seed of a world.")
@@ -127,8 +134,9 @@ public class InformationCommands extends PermissionContainer
     @Restricted(value = Player.class, msg = "{text:ProTip}: I assume you are looking right at your screen, right?")
     public void compass(Player context)
     {
-        i18n.sendTranslated(context, NEUTRAL, "You are looking to {input#direction}!", getClosest(
-            context.getRotation()).name()); // TODO translation of direction
+        Vector3d rotation = context.getRotation();
+        Vector3d direction = Quaterniond.fromAxesAnglesDeg(rotation.getX(), -rotation.getY(), rotation.getZ()).getDirection();
+        i18n.sendTranslated(context, NEUTRAL, "You are looking to {input#direction}!", getClosest(direction).name()); // TODO translation of direction
     }
 
     @Command(desc = "Displays your current depth.")
@@ -149,7 +157,7 @@ public class InformationCommands extends PermissionContainer
     public void getPos(Player context)
     {
         final Location loc = context.getLocation();
-        i18n.sendTranslated(context, NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+        i18n.sendTranslated(context, NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
     }
 
     @Command(desc = "Displays near players(entities/mobs) to you.")
@@ -191,7 +199,7 @@ public class InformationCommands extends PermissionContainer
             {
                 if (i <= 10)
                 {
-                    this.addNearInformation(outputlist, e, Math.sqrt(dist));
+                    this.addNearInformation(context, outputlist, e, Math.sqrt(dist));
                     continue;
                 }
                 Text key;
@@ -228,14 +236,13 @@ public class InformationCommands extends PermissionContainer
         {
             builder.append(Text.NEW_LINE)
                    .append(Text.of(GOLD, groupedEntities.get(key).getRight())).append(Text.of("x ")).append(key)
-                   .append(Text.of(WHITE, " (", GOLD, Math.round(groupedEntities.get(key).getLeft()), "m", WHITE, ")"));
+                   .append(Text.of(WHITE, " (", GOLD, groupedEntities.get(key).getLeft().intValue(), "m", WHITE, ")"));
         }
         if (outputlist.isEmpty())
         {
             i18n.sendTranslated(context, NEGATIVE, "Nothing detected nearby!");
             return;
         }
-
         Text result = Text.of(Text.joinWith(Text.of(WHITE, ", "), outputlist), builder.build());
         if (context.equals(player))
         {
@@ -247,7 +254,7 @@ public class InformationCommands extends PermissionContainer
         context.sendMessage(result);
     }
 
-    private void addNearInformation(List<Text> list, Entity entity, double distance)
+    private void addNearInformation(CommandSource context, List<Text> list, Entity entity, double distance)
     {
         Text s;
         if (entity instanceof Player)
@@ -269,7 +276,16 @@ public class InformationCommands extends PermissionContainer
                 s = Text.of(GRAY, entity.getType().getTranslation());
             }
         }
-        list.add(Text.of(s, WHITE, " (" + GOLD, distance + "m", WHITE + ")"));
+        s = s.toBuilder()
+                .onHover(TextActions.showText(i18n.getTranslation(context, NEUTRAL, "Click here to teleport")))
+                .onClick(TextActions.executeCallback(c -> {
+                    if (c instanceof Player)
+                    {
+                        ((Player) c).setLocation(entity.getLocation());
+                    }
+                }))
+                .build();
+        list.add(Text.of(s, WHITE, " (", GOLD, (int)distance + "m", WHITE, ")"));
     }
 
     @Command(alias = "pong", desc = "Pong!")
@@ -278,7 +294,7 @@ public class InformationCommands extends PermissionContainer
         final String label = context.getInvocation().getLabels().get(0).toLowerCase(ENGLISH);
         if (context.isSource(Player.class))
         {
-            i18n.sendTranslated(context.getSource(), MessageType.NONE, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}",
+            i18n.sendTranslated(context.getSource(), MessageType.NEUTRAL, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}",
                                 ((Player)context.getSource()).getConnection().getLatency());
             return;
         }
@@ -330,7 +346,29 @@ public class InformationCommands extends PermissionContainer
             }
             int entities = world.getEntities().size();
             i18n.sendTranslated(context, POSITIVE, "{world} ({input#environment}): {amount} chunks {amount} entities", world, type, loadedChunks, entities);
+
+            Stream<Map.Entry<Vector3i, List<Entity>>> stream =
+                    world.getEntities().stream().collect(Collectors.groupingBy(e -> e.getLocation().getChunkPosition()))
+                            .entrySet().stream().filter(e -> e.getValue().size() > 50);
+            Text.Builder builder = Text.builder();
+            stream.forEach(e -> {
+                Text pos = Text.of(TextColors.GOLD, e.getKey().getX(), TextColors.GRAY, ":", TextColors.GOLD, e.getKey().getZ());
+                pos = pos.toBuilder()
+                        .onHover(TextActions.showText(i18n.getTranslation(context, NEUTRAL, "Click here to teleport")))
+                        .onClick(TextActions.executeCallback(c -> {
+                            if (c instanceof Player)
+                            {
+                                ((Player) c).setLocation(e.getValue().get(0).getLocation());
+                            }
+                        })).build();
+                builder.append(pos, Text.of(" "));
+            });
+            if (!builder.build().isEmpty())
+            {
+                i18n.sendTranslated(context, NEUTRAL, "High entity count in Chunks: {txt#list}", builder.build());
+            }
         }
+
     }
 
     /* TODO handle duplicate cmd registrations

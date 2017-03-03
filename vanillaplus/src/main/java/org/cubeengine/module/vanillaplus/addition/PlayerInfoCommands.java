@@ -17,23 +17,19 @@
  */
 package org.cubeengine.module.vanillaplus.addition;
 
-import java.text.DateFormat;
-import java.time.Instant;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.FormatStyle;
-import java.util.Date;
-import java.util.Optional;
+import static java.text.DateFormat.SHORT;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NONE;
+
+import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.libcube.util.TimeUtil;
-import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.util.TimeUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.entity.InvulnerabilityData;
 import org.spongepowered.api.data.manipulator.mutable.entity.JoinData;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -43,9 +39,13 @@ import org.spongepowered.api.util.ban.Ban.Profile;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static java.text.DateFormat.SHORT;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NONE;
+import java.text.DateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
+import java.util.Date;
+import java.util.Optional;
 
 public class PlayerInfoCommands
 {
@@ -99,7 +99,7 @@ public class PlayerInfoCommands
             if (player.isOnline())
             {
                 Location<World> loc = player.getPlayer().get().getLocation();
-                i18n.sendTranslated(context, NEUTRAL, "Position: {vector} in {world}", new BlockVector3(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
+                i18n.sendTranslated(context, NEUTRAL, "Position: {vector} in {world}", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
             }
             if (player.isOnline())
             {

@@ -18,6 +18,8 @@
 package org.cubeengine.module.portals;
 
 import java.util.Set;
+
+import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
@@ -26,7 +28,6 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.portals.config.Destination;
 import org.cubeengine.module.portals.config.PortalConfig;
@@ -79,8 +80,8 @@ public class PortalCommands extends ContainerCommand
         Location p1 = selector.getFirstPoint(context);
         Location p2 = selector.getSecondPoint(context);
         PortalConfig config = reflector.create(PortalConfig.class);
-        config.location.from = new BlockVector3(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
-        config.location.to = new BlockVector3(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
+        config.location.from = new Vector3i(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
+        config.location.to = new Vector3i(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
         config.location.destination = new WorldTransform(context.getLocation(), context.getRotation());
         config.owner = context.getName();
         config.world = new ConfigWorld((World)p1.getExtent());

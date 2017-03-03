@@ -114,7 +114,10 @@ public class VanillaPlusConfig extends ReflectedYaml
         public boolean commandWhitelist = true;
 
         @Comment("Improves /worldborder")
-        public boolean commandBorder = true;
+        public boolean commandBorderEnable = true;
+
+        @Comment("Maximum world border diameter for generation")
+        public int commandBorderMax = 5000;
     }
 
     public static class Additions implements Section

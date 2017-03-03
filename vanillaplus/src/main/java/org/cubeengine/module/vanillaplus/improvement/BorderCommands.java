@@ -38,6 +38,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 // TODO border cmds
@@ -50,12 +51,14 @@ public class BorderCommands extends ContainerCommand
 {
     private I18n i18n;
     private PluginContainer plugin;
+    private int commandBorderMax;
 
-    public BorderCommands(I18n i18n, CommandManager cm, PluginContainer plugin)
+    public BorderCommands(I18n i18n, CommandManager cm, PluginContainer plugin, int commandBorderMax)
     {
         super(cm, VanillaPlus.class);
         this.i18n = i18n;
         this.plugin = plugin;
+        this.commandBorderMax = commandBorderMax;
     }
 
     private ChunkPreGenerate task;
@@ -64,7 +67,7 @@ public class BorderCommands extends ContainerCommand
     @Command(desc = "Generates the chunks located in the border")
     public void generate(CommandSource context, @Default World world, @Flag boolean fulltick)
     {
-        if (task != null)
+        if (task != null && !task.isCancelled())
         {
             task.cancel();
             task = null;
@@ -72,6 +75,13 @@ public class BorderCommands extends ContainerCommand
             return;
         }
 
+        if (world.getWorldBorder().getDiameter() > this.commandBorderMax)
+        {
+            i18n.sendTranslated(context, NEUTRAL,
+                    "Generation will not run for WorldBorder diameter bigger than {number} blocks.");
+            i18n.sendTranslated(context, POSITIVE, "You can change this value in the configuration");
+            return;
+        }
         ChunkPreGenerate.Builder generate = world.getWorldBorder().newChunkPreGenerate(world);
         generate.owner(plugin.getInstance().get());
         if (fulltick)

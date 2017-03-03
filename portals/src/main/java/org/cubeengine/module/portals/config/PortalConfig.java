@@ -17,10 +17,10 @@
  */
 package org.cubeengine.module.portals.config;
 
+import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.reflect.Section;
 import org.cubeengine.reflect.annotations.Comment;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
-import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.config.WorldTransform;
 
@@ -37,8 +37,8 @@ public class PortalConfig extends ReflectedYaml
 
     public class PortalRegion implements Section
     {
-        public BlockVector3 from;
-        public BlockVector3 to;
+        public Vector3i from;
+        public Vector3i to;
 
         @Comment("When linking another portal to this one a player will be teleported to this location")
         public WorldTransform destination;

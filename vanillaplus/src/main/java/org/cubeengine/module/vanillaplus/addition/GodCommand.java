@@ -64,7 +64,7 @@ public class GodCommand extends PermissionContainer
         Integer invTime = player.get(Keys.INVULNERABILITY_TICKS).orElse(0);
         if (invTime > 0)
         {
-            player.remove(Keys.INVULNERABILITY_TICKS);
+            player.offer(Keys.INVULNERABILITY_TICKS, 0);
             if (!other)
             {
                 i18n.sendTranslated(context, NEUTRAL, "You are no longer invincible!");

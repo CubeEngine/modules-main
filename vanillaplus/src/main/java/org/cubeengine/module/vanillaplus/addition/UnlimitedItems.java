@@ -22,10 +22,12 @@ import java.util.Set;
 import java.util.UUID;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
+import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
@@ -46,8 +48,12 @@ public class UnlimitedItems
 
     @Command(desc = "Grants unlimited items")
     @Restricted(Player.class)
-    public void unlimited(Player context, @Optional boolean unlimited)
+    public void unlimited(Player context, @Optional Boolean unlimited)
     {
+        if (unlimited == null)
+        {
+            unlimited = !unlimitedPlayers.contains(context.getUniqueId());
+        }
         if (unlimited)
         {
             i18n.sendTranslated(context, POSITIVE, "You now have unlimited items to build!");
@@ -71,6 +77,10 @@ public class UnlimitedItems
     {
         if (this.unlimitedPlayers.contains(player.getUniqueId()))
         {
+            if (player.getGameModeData().type().get() == GameModes.CREATIVE)
+            {
+                return;
+            }
             ItemStack item = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
             if (item != null)
             {

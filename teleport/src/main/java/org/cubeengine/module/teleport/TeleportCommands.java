@@ -18,6 +18,8 @@
 package org.cubeengine.module.teleport;
 
 import java.util.ArrayList;
+
+import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
@@ -25,7 +27,6 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.util.StringUtils;
-import org.cubeengine.libcube.util.math.BlockVector3;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.Broadcaster;
 import org.spongepowered.api.Game;
@@ -207,7 +208,7 @@ public class TeleportCommands
         {
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new BlockVector3(x, y, z), world);
+        i18n.sendTranslated(context, POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new Vector3i(x, y, z), world);
     }
 }
 

@@ -19,8 +19,10 @@ package org.cubeengine.module.portals;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.libcube.util.Pair;
-import org.cubeengine.libcube.util.math.BlockVector3;
+import org.cubeengine.libcube.util.math.MathHelper;
 import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
@@ -55,9 +57,9 @@ public class Portal
     public boolean has(Location location)
     {
         return ((World)location.getExtent()).getName().equals(config.world.getName()) &&
-            isBetween(config.location.from.x, config.location.to.x, location.getBlockX()) &&
-            isBetween(config.location.from.y, config.location.to.y, location.getBlockY()) &&
-            isBetween(config.location.from.z, config.location.to.z, location.getBlockZ());
+            isBetween(config.location.from.getX(), config.location.to.getX(), location.getBlockX()) &&
+            isBetween(config.location.from.getY(), config.location.to.getY(), location.getBlockY()) &&
+            isBetween(config.location.from.getZ(), config.location.to.getZ(), location.getBlockZ());
     }
 
     private static boolean isBetween(int a, int b, int x)
@@ -85,8 +87,8 @@ public class Portal
     {
         if (this.config.location.destination == null)
         {
-            BlockVector3 midpoint = this.config.location.to.midpoint(this.config.location.from);
-            return new Location<World>(this.config.world.getWorld(), midpoint.x + 0.5, midpoint.y, midpoint.z + 0.5);
+            Vector3i midpoint = MathHelper.midpoint(this.config.location.to, this.config.location.from);
+            return new Location<World>(this.config.world.getWorld(), midpoint.getX() + 0.5, midpoint.getY(), midpoint.getZ() + 0.5);
         }
         return this.config.location.destination.getLocationIn(this.config.world.getWorld()); // TODO rotation
     }
@@ -110,8 +112,8 @@ public class Portal
         }
         i18n.sendTranslated(user, POSITIVE, "{user} is the owner of this portal", this.config.owner);
         i18n.sendTranslated(user, POSITIVE, "Location: {vector} to {vector} in {name#world}",
-                            new BlockVector3(this.config.location.from.x, this.config.location.from.y, this.config.location.from.z),
-                            new BlockVector3(this.config.location.to.x, this.config.location.to.y, this.config.location.to.z), this.config.world.getName());
+                            new Vector3i(this.config.location.from.getX(), this.config.location.from.getY(), this.config.location.from.getZ()),
+                            new Vector3i(this.config.location.to.getX(), this.config.location.to.getY(), this.config.location.to.getZ()), this.config.world.getName());
         if (this.config.destination == null)
         {
             i18n.sendTranslated(user, POSITIVE, "This portal has no destination yet");
@@ -128,7 +130,7 @@ public class Portal
                 break;
             case LOCATION:
                 i18n.sendTranslated(user, POSITIVE, "This portal teleports to {vector} in {name#world}",
-                    new BlockVector3((int)config.destination.location.x, (int)config.destination.location.y, (int)config.destination.location.z), config.destination.world.getName());
+                    new Vector3i((int)config.destination.location.x, (int)config.destination.location.y, (int)config.destination.location.z), config.destination.world.getName());
                 break;
             }
 
@@ -138,10 +140,10 @@ public class Portal
     public List<Pair<Integer,Integer>> getChunks()
     {
         List<Pair<Integer,Integer>> result = new ArrayList<>();
-        int chunkXFrom = config.location.from.x >> 4;
-        int chunkZFrom =  config.location.from.z >> 4;
-        int chunkXTo =  config.location.to.x >> 4;
-        int chunkZTo = config.location.to.z >> 4;
+        int chunkXFrom = config.location.from.getX() >> 4;
+        int chunkZFrom =  config.location.from.getZ() >> 4;
+        int chunkXTo =  config.location.to.getX() >> 4;
+        int chunkZTo = config.location.to.getZ() >> 4;
         if (chunkXFrom > chunkXTo) // if from is greater swap
         {
             chunkXFrom = chunkXFrom + chunkXTo;

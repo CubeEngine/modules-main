@@ -17,10 +17,16 @@
  */
 package org.cubeengine.module.travel.home;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Predicate;
+import static java.util.stream.Collectors.toSet;
+import static org.cubeengine.butler.parameter.Parameter.INFINITE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.text.format.TextColors.BLUE;
+import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
+import static org.spongepowered.api.text.format.TextColors.GOLD;
+import static org.spongepowered.api.text.format.TextColors.RED;
+
 import com.flowpowered.math.vector.Vector3d;
 import de.cubeisland.engine.modularity.core.Maybe;
 import org.cubeengine.butler.CommandInvocation;
@@ -34,40 +40,36 @@ import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.butler.result.CommandResult;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.i18n.formatter.MessageType;
-import org.cubeengine.libcube.service.permission.Permission;
-import org.cubeengine.libcube.util.ConfirmManager;
-import org.cubeengine.libcube.util.math.Cuboid;
-import org.cubeengine.libcube.util.math.Vector3;
-import org.cubeengine.libcube.util.math.shape.Shape;
-import org.cubeengine.module.travel.Travel;
-import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.libcube.service.Selector;
+import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
 import org.cubeengine.libcube.service.command.property.RawPermission;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.formatter.MessageType;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.util.ConfirmManager;
+import org.cubeengine.libcube.util.math.shape.Cuboid;
+import org.cubeengine.libcube.util.math.shape.Shape;
+import org.cubeengine.module.travel.Travel;
+import org.cubeengine.module.travel.config.Home;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import static java.util.stream.Collectors.toSet;
-import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.text.format.TextColors.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Predicate;
 
 @Command(name = "home", desc = "Teleport to your home")
 public class HomeCommand extends ContainerCommand
@@ -515,13 +517,13 @@ public class HomeCommand extends ContainerCommand
             }
             if (selection)
             {
-                Cuboid cuboid = new Cuboid(new Vector3(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ()), new Vector3(
+                Cuboid cuboid = new Cuboid(new Vector3d(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ()), new Vector3d(
                     secondPoint.getX(), secondPoint.getY(), secondPoint.getZ()));
                 predicate = predicate.and(
                     h -> {
                         Vector3d chp = h.transform.getPosition();
                         return h.world.getWorld().equals(firstPoint.getExtent())
-                            && cuboid.contains(new Vector3(chp.getX(), chp.getY(), chp.getZ()));
+                            && cuboid.contains(new Vector3d(chp.getX(), chp.getY(), chp.getZ()));
                     });
                 manager.massDelete(predicate);
                 if (owner != null)

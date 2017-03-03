@@ -26,6 +26,7 @@ import static org.spongepowered.api.text.format.TextColors.GOLD;
 import static org.spongepowered.api.text.format.TextColors.RED;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
+import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
@@ -37,7 +38,6 @@ import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.util.math.BlockVector3;
 import org.spongepowered.api.Platform.Type;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -367,7 +367,7 @@ public class WorldsCommands extends ContainerCommand
             i18n.sendTranslated(context, NEUTRAL, "This world will not load automatically on startup!");
         }
         Vector3i spawn = world.getSpawnPosition();
-        i18n.sendTranslated(context, NEUTRAL, "This worlds spawn is at {vector}", new BlockVector3(spawn.getX(), spawn.getY(), spawn.getZ()));
+        i18n.sendTranslated(context, NEUTRAL, "This worlds spawn is at {vector}", new Vector3i(spawn.getX(), spawn.getY(), spawn.getZ()));
         if (showGameRules && !world.getGameRules().isEmpty()) // Show gamerules
         {
             i18n.sendTranslated(context, NEUTRAL, "The following game-rules are set:");
