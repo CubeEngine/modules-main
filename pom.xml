@@ -39,6 +39,7 @@
     <module>multiverse</module>
     <module>worldcontrol</module>
     <module>netherportals</module>
+    <module>protector</module>
   </modules>
 
   <build>
