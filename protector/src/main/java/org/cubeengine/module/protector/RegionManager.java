@@ -20,12 +20,13 @@ package org.cubeengine.module.protector;
 import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
+import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -40,38 +41,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class RegionManager
 {
+    private final Path modulePath;
+    private final Reflector reflector;
     public Map<UUID, Map<String, Region>> byName = new HashMap<>();
     public Map<UUID, Map<Vector2i, List<Region>>> byChunk = new HashMap<>();
 
     public Map<UUID, Region> activeRegion = new HashMap<>(); // playerUUID -> Region
 
-    public RegionManager(Path modulePath, Reflector reflector) throws IOException
+    public RegionManager(Path modulePath, Reflector reflector)
     {
-        Path regionsPath = modulePath.resolve("region");
-        Files.createDirectories(regionsPath);
-        for (Path worldPath : Files.newDirectoryStream(regionsPath))
-        {
-            if (Files.isDirectory(worldPath))
-            {
-                for (Path configPath : Files.newDirectoryStream(worldPath, FileExtensionFilter.YAML))
-                {
-                    RegionConfig config = reflector.load(RegionConfig.class, configPath.toFile());
-                    Region region = new Region(config);
-                    byName.computeIfAbsent(config.world.getUniqueId(), k -> new HashMap<>()).put(config.name, region);
+        this.modulePath = modulePath;
+        this.reflector = reflector;
+    }
 
-                    Vector3d max = region.getCuboid().getMaximumPoint();
-                    Vector3d min = region.getCuboid().getMinimumPoint();
-                    Map<Vector2i, List<Region>> chunkMap = byChunk.computeIfAbsent(config.world.getUniqueId(), k -> new HashMap<>());
-                    for (Vector2i chunkLoc : getChunks(min.toInt(), max.toInt()))
-                    {
-                        chunkMap.computeIfAbsent(chunkLoc, k -> new ArrayList<>()).add(region);
-                    }
-                }
-            }
+    private Region loadRegion(Region region)
+    {
+        byName.computeIfAbsent(region.getWorld().getUniqueId(), k -> new HashMap<>()).put(region.getName().toLowerCase(), region);
+
+        Vector3d max = region.getCuboid().getMaximumPoint();
+        Vector3d min = region.getCuboid().getMinimumPoint();
+        Map<Vector2i, List<Region>> chunkMap = byChunk.computeIfAbsent(region.getWorld().getUniqueId(), k -> new HashMap<>());
+        for (Vector2i chunkLoc : getChunks(min.toInt(), max.toInt()))
+        {
+            chunkMap.computeIfAbsent(chunkLoc, k -> new ArrayList<>()).add(region);
         }
+        return region;
     }
 
     public List<Vector2i> getChunks(Vector3i from, Vector3i to)
@@ -107,10 +105,12 @@ public class RegionManager
     {
         int chunkX = loc.getBlockX() >> 4;
         int chunkZ = loc.getBlockZ() >> 4;
-        List<Region> list = byChunk.getOrDefault(loc.getExtent().getUniqueId(), Collections.emptyMap())
-                                   .getOrDefault(new Vector2i(chunkX, chunkZ), Collections.emptyList());
-        list.sort(Comparator.comparingInt(Region::getPriority));
-        return list;
+        List<Region> regions = byChunk.getOrDefault(loc.getExtent().getUniqueId(), Collections.emptyMap())
+                .getOrDefault(new Vector2i(chunkX, chunkZ), Collections.emptyList());
+        return regions.stream()
+                      .filter(r -> r.contains(loc))
+                      .sorted(Comparator.comparingInt(Region::getPriority))
+                      .collect(Collectors.toList());
     }
 
     public Region getActiveRegion(CommandSource src)
@@ -130,11 +130,78 @@ public class RegionManager
 
     public Map<String, Region> getRegions(UUID world)
     {
-        return this.byName.get(world);
+        return this.byName.getOrDefault(world, Collections.emptyMap());
     }
 
     public Map<UUID, Map<String,Region>> getRegions()
     {
         return this.byName;
+    }
+
+    public Region newRegion(World world, Cuboid boundingCuboid, String name)
+    {
+        Path folder = modulePath.resolve("region").resolve(world.getName());
+        try {
+            Files.createDirectories(folder);
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException(e);
+        }
+        RegionConfig config = reflector.load(RegionConfig.class, folder.resolve(name + FileExtensionFilter.YAML.getExtention()).toFile());
+        config.name = name;
+        config.world = new ConfigWorld(world);
+        config.corner1 = boundingCuboid.getMinimumPoint().toInt();
+        config.corner2 = boundingCuboid.getMaximumPoint().toInt();
+        config.save();
+        return loadRegion(new Region(config));
+    }
+
+    public void reload()
+    {
+        try
+        {
+            Path regionsPath = modulePath.resolve("region");
+            Files.createDirectories(regionsPath);
+            for (Path worldPath : Files.newDirectoryStream(regionsPath))
+            {
+                if (Files.isDirectory(worldPath))
+                {
+                    for (Path configPath : Files.newDirectoryStream(worldPath, FileExtensionFilter.YAML))
+                    {
+                        RegionConfig config = reflector.load(RegionConfig.class, configPath.toFile());
+                        loadRegion(new Region(config));
+                    }
+                }
+            }
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public int getRegionCount()
+    {
+        return this.byName.values().stream().mapToInt(Map::size).sum();
+    }
+
+    public boolean hasRegion(World world, String name)
+    {
+        return getRegions(world.getUniqueId()).containsKey(name.toLowerCase());
+    }
+
+    public void changeRegion(Region region, Cuboid cuboid)
+    {
+        for (Map<Vector2i, List<Region>> map : this.byChunk.values())
+        {
+            for (Map.Entry<Vector2i, List<Region>> entry : map.entrySet())
+            {
+                entry.getValue().remove(region);
+            }
+        }
+        region.setCuboid(cuboid);
+        region.save();
+        this.loadRegion(region);
     }
 }

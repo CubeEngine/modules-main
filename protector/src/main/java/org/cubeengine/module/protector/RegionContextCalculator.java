@@ -38,9 +38,9 @@ public class RegionContextCalculator implements ContextCalculator<Subject>
     @Override
     public void accumulateContexts(Subject subject, Set<Context> set)
     {
-        if (subject instanceof Locatable)
+        if (subject.getCommandSource().isPresent() && subject.getCommandSource().get() instanceof Locatable)
         {
-            List<Region> regions = manager.getRegionsAt(((Locatable) subject).getLocation());
+            List<Region> regions = manager.getRegionsAt(((Locatable) subject.getCommandSource().get()).getLocation());
             regions.stream().map(Region::getContext).forEach(set::add);
         }
     }

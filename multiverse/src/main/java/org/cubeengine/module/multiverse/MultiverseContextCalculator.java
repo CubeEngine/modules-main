@@ -36,9 +36,9 @@ public class MultiverseContextCalculator implements ContextCalculator<Subject> /
     @Override
     public void accumulateContexts(Subject subject, Set<Context> set)
     {
-        if (subject instanceof Locatable)
+        if (subject.getCommandSource().isPresent() && subject.getCommandSource().get() instanceof Locatable)
         {
-            set.add(new Context(TYPE, module.getUniverse(((Locatable)subject).getWorld())));
+            set.add(new Context(TYPE, module.getUniverse(((Locatable)subject.getCommandSource().get()).getWorld())));
         }
     }
 

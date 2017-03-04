@@ -59,25 +59,10 @@ public class SettingsCommands extends ContainerCommand
     }
 
     @Command(desc = "Controls movement")
-    public void move(CommandSource context, Set<MoveListener.MoveType> types, Tristate set,
+    public void move(CommandSource context, MoveListener.MoveType type, Tristate set,
             @Default @Named("in") Region region,
             @Named("bypass") String role) // TODO role completer/reader
     {
-        for (MoveListener.MoveType type : types)
-        {
-            if (set == Tristate.UNDEFINED)
-            {
-                region.getSettings().move.remove(type);
-            }
-            else
-            {
-                region.getSettings().move.put(type, set);
-            }
-        }
-
-        region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region Move Settings updated");
-
         if (role != null)
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
@@ -86,11 +71,28 @@ public class SettingsCommands extends ContainerCommand
                 return;
             }
             Subject subject = ps.getGroupSubjects().get(role);
-            for (MoveListener.MoveType type : types)
+            //for (MoveListener.MoveType type : types)
             {
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), ml.permissions.get(type).getId(), set);
             }
-            i18n.sendTranslated(context, POSITIVE, "and bypass permissions set!");
+            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+        }
+        else
+        {
+            //for (MoveListener.MoveType type : types)
+            {
+                if (set == Tristate.UNDEFINED)
+                {
+                    region.getSettings().move.remove(type);
+                }
+                else
+                {
+                    region.getSettings().move.put(type, set);
+                }
+            }
+
+            region.save();
+            i18n.sendTranslated(context, POSITIVE,"Region Move Settings updated");
         }
 
     }

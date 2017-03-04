@@ -24,6 +24,7 @@ import org.cubeengine.module.protector.region.Region;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.util.Tristate;
 
@@ -48,10 +49,10 @@ public class MoveListener
     }
 
     @Listener
-    public void onMove(MoveEntityEvent event, @Root Player player)
+    public void onMove(MoveEntityEvent event, @Getter("getTargetEntity") Player player)
     {
         List<Region> from = manager.getRegionsAt(event.getFromTransform().getLocation());
-        List<Region> to = manager.getRegionsAt(event.getFromTransform().getLocation());
+        List<Region> to = manager.getRegionsAt(event.getToTransform().getLocation());
         if (from.isEmpty() && to.isEmpty())
         {
             return;
@@ -69,11 +70,11 @@ public class MoveListener
                 return; // Teleport in denied
             }
         }
-        else
+        else if (event.getCause().root() instanceof Player)
         {
             if (checkMove(event, player, from, to, MoveType.MOVE, false))
             {
-                return; // Move in from denied
+               return; // Move in from denied
             }
 
             if (checkMove(event, player, from, to, MoveType.EXIT, true))

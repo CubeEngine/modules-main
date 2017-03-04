@@ -18,12 +18,14 @@
 package org.cubeengine.module.protector.region;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.module.protector.listener.MoveListener;
 import org.cubeengine.reflect.Section;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.World;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class RegionConfig extends ReflectedYaml
@@ -32,7 +34,7 @@ public class RegionConfig extends ReflectedYaml
 
     public Vector3i corner1;
     public Vector3i corner2;
-    public World world;
+    public ConfigWorld world;
 
     public int priority = 0;
 
@@ -40,6 +42,6 @@ public class RegionConfig extends ReflectedYaml
 
     public static class Settings implements Section
     {
-        public Map<MoveListener.MoveType, Tristate> move;
+        public Map<MoveListener.MoveType, Tristate> move = new HashMap<>();
     }
 }

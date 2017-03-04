@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.protector;
 
+import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
@@ -27,9 +28,9 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.command.RegionCommands;
 import org.cubeengine.module.protector.command.SettingsCommands;
-import org.cubeengine.module.protector.region.Region;
-import org.cubeengine.module.protector.region.RegionReader;
 import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.service.permission.PermissionService;
 
 import java.io.IOException;
@@ -52,13 +53,22 @@ public class Protector extends Module
     private RegionManager manager;
 
     @Enable
-    public void onEnable() throws IOException
+    public void onEnable()
     {
         manager = new RegionManager(modulePath, reflector);
         ps.registerContextCalculator(new RegionContextCalculator(manager));
-        RegionCommands regionCmd = new RegionCommands(cm, selector);
+        RegionCommands regionCmd = new RegionCommands(cm, selector, manager, i18n);
         cm.addCommand(regionCmd);
         SettingsCommands settingsCmd = new SettingsCommands(manager, i18n, ps, pm, em, cm);
         regionCmd.addCommand(settingsCmd);
+        em.registerListener(Protector.class, this);
+    }
+
+    @Listener
+    public void onServerStarted(GameStartingServerEvent event)
+    {
+        getProvided(Log.class).info("Loading Regions...");
+        manager.reload();
+        getProvided(Log.class).info("{} Regions loaded", manager.getRegionCount());
     }
 }

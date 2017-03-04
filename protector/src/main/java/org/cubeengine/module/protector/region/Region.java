@@ -17,7 +17,9 @@
  */
 package org.cubeengine.module.protector.region;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
+import org.cubeengine.module.protector.RegionManager;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -25,26 +27,22 @@ import org.spongepowered.api.world.World;
 public class Region
 {
     private Cuboid cuboid;
-    private Location<World> origin;
     private RegionConfig config;
     private Context context;
-
-    public Region(Location<World> origin, Cuboid cuboid)
-    {
-        this.origin = origin;
-        this.cuboid = cuboid;
-    }
 
     public Region(RegionConfig config)
     {
         this.config = config;
-        this.origin = new Location<>(config.world, config.corner1);
-        this.cuboid = new Cuboid(config.corner1.toDouble(), config.corner2.min(config.corner1).toDouble());
+        this.cuboid = new Cuboid(config.corner1.toDouble(), config.corner2.sub(config.corner1).toDouble());
     }
 
     public boolean contains(Location<World> loc)
     {
-        return loc.getExtent().equals(this.origin.getExtent()) && this.cuboid.contains(loc.getPosition());
+        Vector3d pos = loc.getPosition();
+        return loc.getExtent().equals(this.config.world.getWorld())
+                && (this.cuboid.contains(pos.toInt().toDouble())
+                 || this.cuboid.contains(pos.add(0,1,0).toInt().toDouble())
+                 || this.cuboid.contains(pos.add(0,1.8,0).toInt().toDouble()));
     }
 
     public RegionConfig.Settings getSettings()
@@ -71,6 +69,11 @@ public class Region
         return config.name;
     }
 
+    public World getWorld()
+    {
+        return this.config.world.getWorld();
+    }
+
     public Context getContext()
     {
         if (this.context == null)
@@ -78,5 +81,12 @@ public class Region
             this.context = new Context("region", this.config.world.getName() + "." + this.config.name);
         }
         return this.context;
+    }
+
+    public void setCuboid(Cuboid cuboid)
+    {
+        this.cuboid = cuboid;
+        this.config.corner1 = cuboid.getMinimumPoint().toInt();
+        this.config.corner2 = cuboid.getMaximumPoint().toInt();
     }
 }

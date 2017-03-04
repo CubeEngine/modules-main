@@ -17,41 +17,89 @@
  */
 package org.cubeengine.module.protector.command;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.module.protector.Protector;
+import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.region.Region;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 @Command(name = "region", desc = "Manages the regions")
 public class RegionCommands extends ContainerCommand
 {
-
     private Selector selector;
+    private RegionManager manager;
+    private I18n i18n;
 
-    public RegionCommands(CommandManager base, Selector selector)
+    public RegionCommands(CommandManager base, Selector selector, RegionManager manager, I18n i18n)
     {
         super(base, Protector.class);
         this.selector = selector;
+        this.manager = manager;
+        this.i18n = i18n;
     }
 
-    public void define(CommandSource context, String name)
+    @Command(desc = "Defines a new Region")
+    public void define(Player context, String name)
     {
-
+        Shape shape = selector.getSelection(context);
+        if (shape == null)
+        {
+            i18n.sendTranslated(context, NEGATIVE, "Nothing selected!");
+            return;
+        }
+        World world = selector.getFirstPoint(context).getExtent();
+        if (manager.hasRegion(world, name))
+        {
+            i18n.sendTranslated(context, NEGATIVE, "There is already a Region named {name}", name);
+            return;
+        }
+        Region region = manager.newRegion(world, shape.getBoundingCuboid(), name);
+        manager.setActiveRegion(context, region);
+        i18n.sendTranslated(context, POSITIVE, "Region {name} created!", region.getName());
     }
 
-    public void redefine(CommandSource context, @Default Region region)
+    @Command(desc = "Redefines an existing Region")
+    public void redefine(Player context, @Default Region region)
     {
-
+        Shape shape = selector.getSelection(context);
+        if (shape == null)
+        {
+            i18n.sendTranslated(context, NEGATIVE, "Nothing selected!");
+            return;
+        }
+        World world = selector.getFirstPoint(context).getExtent();
+        if (!region.getWorld().equals(world))
+        {
+            i18n.sendTranslated(context, NEGATIVE, "This region is in another world!");
+            return;
+        }
+        manager.changeRegion(region, shape.getBoundingCuboid());
+        i18n.sendTranslated(context, POSITIVE, "Region {name} updated!", region.getName());
     }
 
+    @Command(desc = "Selects a Region")
     public void select(CommandSource context, Region region)
     {
-
+        manager.setActiveRegion(context, region);
+        if (context instanceof Player)
+        {
+            selector.setFirstPoint(((Player) context), new Location<>(region.getWorld(), region.getCuboid().getMinimumPoint()));
+            selector.setSecondPoint(((Player) context), new Location<>(region.getWorld(), region.getCuboid().getMaximumPoint()));
+        }
+        i18n.sendTranslated(context, POSITIVE, "Region {name} selected!", region.getName());
     }
 
     public void list(CommandSource context, @Optional String match)
