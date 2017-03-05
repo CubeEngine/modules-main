@@ -120,7 +120,7 @@ public class RegionManager
 
     private UUID toUUID(CommandSource src)
     {
-        return src instanceof Identifiable ? ((Identifiable) src).getUniqueId() : UUID.fromString(src.getIdentifier());
+        return src instanceof Identifiable ? ((Identifiable) src).getUniqueId() : UUID.nameUUIDFromBytes(src.getIdentifier().getBytes());
     }
 
     public void setActiveRegion(CommandSource src, Region region)

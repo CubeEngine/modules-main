@@ -52,7 +52,7 @@ public class RegionReader implements ArgumentReader<Region>, Completer, DefaultV
     @Override
     public List<String> getSuggestions(CommandInvocation invocation)
     {
-        String token = invocation.currentToken();
+        String token = invocation.currentToken().toLowerCase();
         List<String> list = new ArrayList<>();
         World world = null;
         if (invocation.getCommandSource() instanceof Locatable)
@@ -90,7 +90,7 @@ public class RegionReader implements ArgumentReader<Region>, Completer, DefaultV
     @Override
     public Region read(Class aClass, CommandInvocation invocation) throws ReaderException
     {
-        String token = invocation.consume(1);
+        String token = invocation.consume(1).toLowerCase();
         if (invocation.getCommandSource() instanceof Locatable)
         {
             World world = ((Locatable) invocation.getCommandSource()).getWorld();

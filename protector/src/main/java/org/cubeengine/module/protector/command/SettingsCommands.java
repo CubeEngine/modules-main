@@ -31,7 +31,7 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.RegionManager;
-import org.cubeengine.module.protector.listener.MoveListener;
+import org.cubeengine.module.protector.listener.PlayerSettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionReader;
 import org.spongepowered.api.command.CommandSource;
@@ -39,14 +39,12 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
-import java.util.Set;
-
 @Command(name = "settings", alias = "set", desc = "Manages the region settings")
 public class SettingsCommands extends ContainerCommand
 {
     private I18n i18n;
     private PermissionService ps;
-    private MoveListener ml;
+    private PlayerSettingsListener psl;
 
     public SettingsCommands(RegionManager manager, I18n i18n, PermissionService ps, PermissionManager pm, EventManager em, CommandManager cm)
     {
@@ -54,12 +52,12 @@ public class SettingsCommands extends ContainerCommand
         cm.getProviderManager().register(this, new RegionReader(manager, i18n), Region.class);
         this.i18n = i18n;
         this.ps = ps;
-        this.ml = new MoveListener(manager, pm.getBasePermission(Protector.class), pm);
-        em.registerListener(Protector.class, this.ml);
+        this.psl = new PlayerSettingsListener(manager, pm.getBasePermission(Protector.class), pm, i18n);
+        em.registerListener(Protector.class, this.psl);
     }
 
     @Command(desc = "Controls movement")
-    public void move(CommandSource context, MoveListener.MoveType type, Tristate set,
+    public void move(CommandSource context, PlayerSettingsListener.MoveType type, Tristate set,
             @Default @Named("in") Region region,
             @Named("bypass") String role) // TODO role completer/reader
     {
@@ -73,7 +71,7 @@ public class SettingsCommands extends ContainerCommand
             Subject subject = ps.getGroupSubjects().get(role);
             //for (MoveListener.MoveType type : types)
             {
-                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), ml.permissions.get(type).getId(), set);
+                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.movePerms.get(type).getId(), set);
             }
             i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
         }
@@ -92,8 +90,31 @@ public class SettingsCommands extends ContainerCommand
             }
 
             region.save();
-            i18n.sendTranslated(context, POSITIVE,"Region Move Settings updated");
+            i18n.sendTranslated(context, POSITIVE,"Region {name}: Move Settings updated", region.getName());
         }
+    }
 
+    @Command(desc = "Controls player building")
+    public void build(CommandSource context, Tristate set,
+            @Default @Named("in") Region region,
+            @Named("bypass") String role) // TODO role completer/reader
+    {
+        if (role != null)
+        {
+            if (!ps.getGroupSubjects().hasRegistered(role))
+            {
+                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                return;
+            }
+            Subject subject = ps.getGroupSubjects().get(role);
+            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.buildPerm.getId(), set);
+            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+        }
+        else
+        {
+            region.getSettings().build = set;
+            region.save();
+            i18n.sendTranslated(context, POSITIVE,"Region {name}: Build Settings updated", region.getName());
+        }
     }
 }

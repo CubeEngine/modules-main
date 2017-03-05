@@ -19,14 +19,20 @@ package org.cubeengine.module.protector.region;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.module.protector.listener.MoveListener;
+import org.cubeengine.module.protector.listener.PlayerSettingsListener;
 import org.cubeengine.reflect.Section;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
+import org.spongepowered.api.block.BlockState;
+import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.world.World;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class RegionConfig extends ReflectedYaml
 {
@@ -38,10 +44,20 @@ public class RegionConfig extends ReflectedYaml
 
     public int priority = 0;
 
-    public Settings settings;
+    public Settings settings = new Settings();
 
     public static class Settings implements Section
     {
-        public Map<MoveListener.MoveType, Tristate> move = new HashMap<>();
+        public Map<PlayerSettingsListener.MoveType, Tristate> move = new HashMap<>();
+        public Tristate build = Tristate.UNDEFINED;
+        public BlockUsage blockUsage = new BlockUsage();
+        public static class BlockUsage implements Section
+        {
+            public Map<BlockType, Tristate> block = new HashMap<>();
+            public Map<ItemType, Tristate> item = new HashMap<>();
+        }
+
     }
+
+
 }
