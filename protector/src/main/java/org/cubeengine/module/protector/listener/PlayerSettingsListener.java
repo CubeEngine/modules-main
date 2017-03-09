@@ -17,11 +17,13 @@
  */
 package org.cubeengine.module.protector.listener;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 import static org.spongepowered.api.util.Tristate.UNDEFINED;
 
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.RegionManager;
@@ -33,7 +35,6 @@ import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -41,6 +42,7 @@ import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -48,17 +50,11 @@ import org.spongepowered.api.world.World;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
-
-import javax.inject.Provider;
 
 public class PlayerSettingsListener
 {
-
-
     private RegionManager manager;
     private PermissionManager pm;
     private I18n i18n;
@@ -208,27 +204,27 @@ public class PlayerSettingsListener
     @Listener
     public void onUse(InteractBlockEvent.Secondary event, @Root Player player)
     {
-        Location<World> loc = event.getTargetBlock().getLocation().get();
+        event.getTargetBlock().getLocation().ifPresent(loc -> { // cause when the player tries to place a block and it cannot the client will not send the clicked location
+            List<Region> regionsAt = manager.getRegionsAt(loc);
+            BlockType type = event.getTargetBlock().getState().getType();
+            ItemStack item = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
 
-        List<Region> regionsAt = manager.getRegionsAt(loc);
-        BlockType type = event.getTargetBlock().getState().getType();
-        ItemStack item = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
+            Permission blockPerm = pm.register(PlayerSettingsListener.class, type.getId(), "Allows interacting with a " + type.getTranslation().get() + " Block", useBlockPerm);
 
-        Permission blockPerm = pm.register(PlayerSettingsListener.class, type.getId(), "Allows interacting with a " + type.getTranslation().get() + " Block", useBlockPerm);
-
-        if (checkSetting(event, player, regionsAt, () -> blockPerm, (s) -> s.blockUsage.block.getOrDefault(type, UNDEFINED)))
-        {
-            i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "You are not allowed interact with that here.");
-            return;
-        }
-
-        if (item != null)
-        {
-            Permission usePerm = pm.register(PlayerSettingsListener.class, type.getId(), "Allows interacting with a " + type.getTranslation().get() + " Item in hand", useItemPerm);
-            if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.blockUsage.item.getOrDefault(item, UNDEFINED)))
+            if (checkSetting(event, player, regionsAt, () -> blockPerm, (s) -> s.blockUsage.block.getOrDefault(type, UNDEFINED)))
             {
-                i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "You are not allowed use that here.");
+                i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to interact with this here.");
+                return;
             }
-        }
+
+            if (item != null)
+            {
+                Permission usePerm = pm.register(PlayerSettingsListener.class, type.getId(), "Allows interacting with a " + type.getTranslation().get() + " Item in hand", useItemPerm);
+                if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.blockUsage.item.getOrDefault(item.getItem(), UNDEFINED)))
+                {
+                    i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to use this here.");
+                }
+            }
+        });
     }
 }

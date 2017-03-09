@@ -34,7 +34,9 @@ import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.listener.PlayerSettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionReader;
+import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
@@ -113,6 +115,68 @@ public class SettingsCommands extends ContainerCommand
         else
         {
             region.getSettings().build = set;
+            region.save();
+            i18n.sendTranslated(context, POSITIVE,"Region {name}: Build Settings updated", region.getName());
+        }
+    }
+
+    @Command(desc = "Controls player interacting with blocks")
+    public void use(CommandSource context, BlockType type, Tristate set,
+            @Default @Named("in") Region region,
+            @Named("bypass") String role) // TODO role completer/reader
+    {
+        if (role != null)
+        {
+            if (!ps.getGroupSubjects().hasRegistered(role))
+            {
+                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                return;
+            }
+            Subject subject = ps.getGroupSubjects().get(role);
+            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useBlockPerm.getId(), set);
+            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+        }
+        else
+        {
+            if (set == Tristate.UNDEFINED)
+            {
+                region.getSettings().blockUsage.block.remove(type);
+            }
+            else
+            {
+                region.getSettings().blockUsage.block.put(type, set);
+            }
+            region.save();
+            i18n.sendTranslated(context, POSITIVE,"Region {name}: Build Settings updated", region.getName());
+        }
+    }
+
+    @Command(desc = "Controls player interactive with items")
+    public void useItem(CommandSource context, ItemType type, Tristate set,
+            @Default @Named("in") Region region,
+            @Named("bypass") String role) // TODO role completer/reader
+    {
+        if (role != null)
+        {
+            if (!ps.getGroupSubjects().hasRegistered(role))
+            {
+                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                return;
+            }
+            Subject subject = ps.getGroupSubjects().get(role);
+            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useItemPerm.getId(), set);
+            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+        }
+        else
+        {
+            if (set == Tristate.UNDEFINED)
+            {
+                region.getSettings().blockUsage.item.remove(type);
+            }
+            else
+            {
+                region.getSettings().blockUsage.item.put(type, set);
+            }
             region.save();
             i18n.sendTranslated(context, POSITIVE,"Region {name}: Build Settings updated", region.getName());
         }
