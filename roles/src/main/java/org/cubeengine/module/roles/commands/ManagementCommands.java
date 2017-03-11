@@ -77,6 +77,8 @@ public class ManagementCommands extends ContainerCommand
                 .map(RoleCollection.class::cast)
                 .forEach(RoleCollection::reload);
 
+        service.getUserSubjects().reload();
+
         // TODO remove cached data ; needed?
         i18n.sendTranslated(context, POSITIVE, "{text:Roles} reload complete!");
     }
