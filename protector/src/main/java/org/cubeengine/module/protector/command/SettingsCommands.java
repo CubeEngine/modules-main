@@ -19,6 +19,7 @@ package org.cubeengine.module.protector.command;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
 
 import com.google.common.collect.ImmutableSet;
 import org.cubeengine.butler.parametric.Command;
@@ -31,11 +32,13 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.RegionManager;
-import org.cubeengine.module.protector.listener.PlayerSettingsListener;
+import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
+import org.cubeengine.module.protector.region.RegionConfig;
 import org.cubeengine.module.protector.region.RegionReader;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -46,7 +49,7 @@ public class SettingsCommands extends ContainerCommand
 {
     private I18n i18n;
     private PermissionService ps;
-    private PlayerSettingsListener psl;
+    private SettingsListener psl;
 
     public SettingsCommands(RegionManager manager, I18n i18n, PermissionService ps, PermissionManager pm, EventManager em, CommandManager cm)
     {
@@ -54,12 +57,15 @@ public class SettingsCommands extends ContainerCommand
         cm.getProviderManager().register(this, new RegionReader(manager, i18n), Region.class);
         this.i18n = i18n;
         this.ps = ps;
-        this.psl = new PlayerSettingsListener(manager, pm.getBasePermission(Protector.class), pm, i18n);
+        this.psl = new SettingsListener(manager, pm.getBasePermission(Protector.class), pm, i18n);
         em.registerListener(Protector.class, this.psl);
+
+        this.addCommand(new BlockDamageSettingsCommands(cm, i18n, psl, ps));
+
     }
 
     @Command(desc = "Controls movement")
-    public void move(CommandSource context, PlayerSettingsListener.MoveType type, Tristate set,
+    public void move(CommandSource context, SettingsListener.MoveType type, Tristate set,
             @Default @Named("in") Region region,
             @Named("bypass") String role) // TODO role completer/reader
     {
@@ -76,24 +82,14 @@ public class SettingsCommands extends ContainerCommand
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.movePerms.get(type).getId(), set);
             }
             i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            return;
         }
-        else
+        //for (MoveListener.MoveType type : types)
         {
-            //for (MoveListener.MoveType type : types)
-            {
-                if (set == Tristate.UNDEFINED)
-                {
-                    region.getSettings().move.remove(type);
-                }
-                else
-                {
-                    region.getSettings().move.put(type, set);
-                }
-            }
-
-            region.save();
-            i18n.sendTranslated(context, POSITIVE,"Region {name}: Move Settings updated", region.getName());
+            setOrUnset(region.getSettings().move, type, set);
         }
+        region.save();
+        i18n.sendTranslated(context, POSITIVE,"Region {name}: Move Settings updated", region.getName());
     }
 
     @Command(desc = "Controls player building")
@@ -111,13 +107,11 @@ public class SettingsCommands extends ContainerCommand
             Subject subject = ps.getGroupSubjects().get(role);
             subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.buildPerm.getId(), set);
             i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            return;
         }
-        else
-        {
-            region.getSettings().build = set;
-            region.save();
-            i18n.sendTranslated(context, POSITIVE,"Region {name}: Build Settings updated", region.getName());
-        }
+        region.getSettings().build = set;
+        region.save();
+        i18n.sendTranslated(context, POSITIVE,"Region {name}: Build Settings updated", region.getName());
     }
 
     @Command(desc = "Controls player interacting with blocks")
@@ -135,20 +129,11 @@ public class SettingsCommands extends ContainerCommand
             Subject subject = ps.getGroupSubjects().get(role);
             subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useBlockPerm.getId(), set);
             i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            return;
         }
-        else
-        {
-            if (set == Tristate.UNDEFINED)
-            {
-                region.getSettings().blockUsage.block.remove(type);
-            }
-            else
-            {
-                region.getSettings().blockUsage.block.put(type, set);
-            }
-            region.save();
-            i18n.sendTranslated(context, POSITIVE,"Region {name}: Build Settings updated", region.getName());
-        }
+        setOrUnset(region.getSettings().blockUsage.block, type, set);
+        region.save();
+        i18n.sendTranslated(context, POSITIVE,"Region {name}: Use Block Settings updated", region.getName());
     }
 
     @Command(desc = "Controls player interactive with items")
@@ -166,19 +151,53 @@ public class SettingsCommands extends ContainerCommand
             Subject subject = ps.getGroupSubjects().get(role);
             subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useItemPerm.getId(), set);
             i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            return;
         }
-        else
-        {
-            if (set == Tristate.UNDEFINED)
-            {
-                region.getSettings().blockUsage.item.remove(type);
-            }
-            else
-            {
-                region.getSettings().blockUsage.item.put(type, set);
-            }
-            region.save();
-            i18n.sendTranslated(context, POSITIVE,"Region {name}: Build Settings updated", region.getName());
-        }
+        setOrUnset(region.getSettings().blockUsage.item, type, set);
+        region.save();
+        i18n.sendTranslated(context, POSITIVE,"Region {name}: Use Item Settings updated", region.getName());
     }
+
+    @Command(desc = "Controls spawning of entities")
+    // TODO completer for SpawnType & EntityType
+    public void spawn(CommandSource context, SettingsListener.SpawnType type, EntityType what, Tristate set,
+            @Default @Named("in") Region region, @Named("bypass") String role)
+    {
+        if (role != null)
+        {
+            if (!ps.getGroupSubjects().hasRegistered(role))
+            {
+                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                return;
+            }
+            switch (type)
+            {
+                case NATURALLY:
+                case PLUGIN:
+                    i18n.sendTranslated(context, NEGATIVE, "There is no bypass permission for natural or plugin only spawning.");
+                    return;
+                case PLAYER:
+                    Subject subject = ps.getGroupSubjects().get(role);
+                    subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.spawnEntityPlayerPerm.getId(), set);
+                    i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+                    break;
+            }
+            return;
+        }
+        switch (type)
+        {
+            case NATURALLY:
+                setOrUnset(region.getSettings().spawn.naturally, what, set);
+                break;
+            case PLAYER:
+                setOrUnset(region.getSettings().spawn.player, what, set);
+                break;
+            case PLUGIN:
+                setOrUnset(region.getSettings().spawn.plugin, what, set);
+                break;
+        }
+        region.save();
+        i18n.sendTranslated(context, POSITIVE,"Region {name}: Spawn Settings updated", region.getName());
+    }
+
 }

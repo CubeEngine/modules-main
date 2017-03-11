@@ -78,7 +78,7 @@ public class Region
     {
         if (this.context == null)
         {
-            this.context = new Context("region", this.config.world.getName() + "." + this.config.name);
+            this.context = new Context("region", this.config.world.getName().toLowerCase() + "." + this.config.name.toLowerCase());
         }
         return this.context;
     }

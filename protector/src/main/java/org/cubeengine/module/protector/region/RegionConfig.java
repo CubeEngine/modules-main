@@ -19,20 +19,17 @@ package org.cubeengine.module.protector.region;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.module.protector.listener.PlayerSettingsListener;
+import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.reflect.Section;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
-import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class RegionConfig extends ReflectedYaml
 {
@@ -48,16 +45,44 @@ public class RegionConfig extends ReflectedYaml
 
     public static class Settings implements Section
     {
-        public Map<PlayerSettingsListener.MoveType, Tristate> move = new HashMap<>();
+
+        public Map<SettingsListener.MoveType, Tristate> move = new HashMap<>();
         public Tristate build = Tristate.UNDEFINED;
         public BlockUsage blockUsage = new BlockUsage();
         public static class BlockUsage implements Section
         {
             public Map<BlockType, Tristate> block = new HashMap<>();
+
             public Map<ItemType, Tristate> item = new HashMap<>();
         }
+        public Spawn spawn = new Spawn();
+        public static class Spawn implements Section
+        {
 
+            public Map<EntityType, Tristate> naturally = new HashMap<>();
+            public Map<EntityType, Tristate> player = new HashMap<>();
+            public Map<EntityType, Tristate> plugin = new HashMap<>();
+        }
+        public BlockDamage blockDamage = new BlockDamage();
+
+        public static class BlockDamage implements Section
+        {
+            public Tristate allExplosion = Tristate.UNDEFINED;
+            public Tristate playerExplosion = Tristate.UNDEFINED;
+            public Map<BlockType, Tristate> block = new HashMap<>();
+            public Tristate monster = Tristate.UNDEFINED;
+        }
     }
 
-
+    public static <T> void setOrUnset(Map<T, Tristate> map, T key, Tristate set)
+    {
+        if (set == Tristate.UNDEFINED)
+        {
+            map.remove(key);
+        }
+        else
+        {
+            map.put(key, set);
+        }
+    }
 }
