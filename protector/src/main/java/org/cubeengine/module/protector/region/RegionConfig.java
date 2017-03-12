@@ -29,7 +29,9 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class RegionConfig extends ReflectedYaml
 {
@@ -72,6 +74,9 @@ public class RegionConfig extends ReflectedYaml
             public Map<BlockType, Tristate> block = new HashMap<>();
             public Tristate monster = Tristate.UNDEFINED;
         }
+
+        public Map<String, Tristate> blockedCommands = new HashMap<>();
+        public Tristate deadCircuit = Tristate.UNDEFINED;
     }
 
     public static <T> void setOrUnset(Map<T, Tristate> map, T key, Tristate set)

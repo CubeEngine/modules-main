@@ -45,9 +45,9 @@ public class BlockDamageSettingsCommands extends ContainerCommand
     }
 
     @Command(desc = "Controls blocks breaking blocks")
-    public void block(CommandSource context, BlockType type, Tristate set, @Default @Named("in") Region region)
+    public void block(CommandSource context, BlockType by, Tristate set, @Default @Named("in") Region region)
     {
-        setOrUnset(region.getSettings().blockDamage.block, type, set);
+        setOrUnset(region.getSettings().blockDamage.block, by, set);
         region.save();
         i18n.sendTranslated(context, POSITIVE,"Region {name}: BlockDamage by Block Settings updated", region.getName());
     }

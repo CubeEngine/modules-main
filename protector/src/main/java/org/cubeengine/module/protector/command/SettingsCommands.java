@@ -18,12 +18,14 @@
 package org.cubeengine.module.protector.command;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
 
 import com.google.common.collect.ImmutableSet;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
+import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
@@ -36,7 +38,9 @@ import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
 import org.cubeengine.module.protector.region.RegionReader;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.ItemType;
@@ -200,4 +204,38 @@ public class SettingsCommands extends ContainerCommand
         i18n.sendTranslated(context, POSITIVE,"Region {name}: Spawn Settings updated", region.getName());
     }
 
+    @Command(desc = "Controls executing commands")
+    // TODO completer for commands
+    public void command(CommandSource context, String command, Tristate set,
+            @Default @Named("in") Region region, @Named("bypass") String role,
+            @Flag boolean force)
+    {
+        CommandMapping mapping = Sponge.getGame().getCommandManager().get(command).orElse(null);
+        if (mapping == null)
+        {
+            i18n.sendTranslated(context, NEGATIVE, "The command {name} is not a registered command", command);
+            if (!force)
+            {
+                i18n.sendTranslated(context, NEUTRAL, "Use the -force Flag to block it anyways");
+                return;
+            }
+        }
+        // Block primary alias instead of parameter if found
+        setOrUnset(region.getSettings().blockedCommands, mapping == null ? command : mapping.getPrimaryAlias(), set);
+        if (set == Tristate.UNDEFINED)
+        {
+            region.getSettings().blockedCommands.remove(command);
+        }
+        region.save();
+        i18n.sendTranslated(context, POSITIVE,"Region {name}: Command Settings updated", region.getName());
+    }
+
+
+    @Command(desc = "Controls redstone circuits commands")
+    public void deadCircuit(CommandSource context, Tristate set, @Default @Named("in") Region region)
+    {
+        region.getSettings().deadCircuit = set;
+        region.save();
+        i18n.sendTranslated(context, POSITIVE,"Region {name}: Dead Circuit Settings updated", region.getName());
+    }
 }

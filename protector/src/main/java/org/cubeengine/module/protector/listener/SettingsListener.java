@@ -19,6 +19,8 @@ package org.cubeengine.module.protector.listener;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.spongepowered.api.block.trait.BooleanTraits.DROPPER_TRIGGERED;
+import static org.spongepowered.api.block.trait.BooleanTraits.POWERED_REPEATER_LOCKED;
 import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 import static org.spongepowered.api.util.Tristate.FALSE;
 import static org.spongepowered.api.util.Tristate.TRUE;
@@ -30,10 +32,15 @@ import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.trait.BooleanTraits;
+import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.data.Transaction;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
@@ -43,10 +50,12 @@ import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
+import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
@@ -55,6 +64,7 @@ import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
@@ -80,8 +90,9 @@ public class SettingsListener
     public final Permission useBlockPerm;
     public final Permission useItemPerm;
     public final Permission spawnEntityPlayerPerm;
-    public final Permission spawnEntityPluginPerm;
     public final Permission explodePlayer;
+    public final Permission command;
+    private boolean isRedstoneChange;
 
     public SettingsListener(RegionManager manager, Permission base, PermissionManager pm, I18n i18n)
     {
@@ -97,8 +108,8 @@ public class SettingsListener
         useBlockPerm = pm.register(SettingsListener.class, "bypass.use", "", base);
         useItemPerm = pm.register(SettingsListener.class, "bypass.use-item", "", base);
         spawnEntityPlayerPerm = pm.register(SettingsListener.class, "bypass.spawn.player", "", base);
-        spawnEntityPluginPerm = pm.register(SettingsListener.class, "bypass.spawn.plugin", "", base);
         explodePlayer = pm.register(SettingsListener.class, "bypass.blockdamage.explode.player", "", base);
+        command = pm.register(SettingsListener.class, "bypass.command", "", base);
     }
 
     @Listener
@@ -220,7 +231,7 @@ public class SettingsListener
                 break;
             }
         }
-        return Tristate.UNDEFINED;
+        return allow;
     }
 
     @Listener
@@ -281,7 +292,7 @@ public class SettingsListener
             {
                 if (player.isPresent())
                 {
-                    Permission usePerm = pm.register(SettingsListener.class, type.getId(), "Allows spawning a " + type.getTranslation().get(), spawnEntityPluginPerm);
+                    Permission usePerm = pm.register(SettingsListener.class, type.getId(), "Allows spawning a " + type.getTranslation().get(), spawnEntityPlayerPerm);
                     if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED)) == FALSE)
                     {
                         i18n.sendTranslated(ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");
@@ -320,6 +331,10 @@ public class SettingsListener
                 List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
                 this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.allExplosion);
                 Player player = event.getCause().get(NamedCause.OWNER, Player.class).orElse(null);
+                if (player == null)
+                {
+                    player = event.getCause().get(NamedCause.IGNITER, Player.class).orElse(null);
+                }
                 if (rootCause instanceof Player)
                 {
                     player = ((Player) rootCause);
@@ -332,7 +347,7 @@ public class SettingsListener
                     }
                     else if (event.isCancelled())
                     {
-                        i18n.sendTranslated(player, NEGATIVE, "You are not allowed to let stuff explode here!");
+                        i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to let stuff explode here!");
                     }
                 }
                 if (event.isCancelled())
@@ -357,7 +372,66 @@ public class SettingsListener
             for (Transaction<BlockSnapshot> trans : event.getTransactions())
             {
                 List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
-                this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.block.getOrDefault(((LocatableBlock) rootCause).getBlockState().getType() , UNDEFINED));
+                this.checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(((LocatableBlock) rootCause).getBlockState().getType() , UNDEFINED));
+            }
+        }
+    }
+
+    @Listener
+    public void onCommand(SendCommandEvent event, @Root Player player)
+    {
+        List<Region> regionsAt = manager.getRegionsAt(player.getLocation());
+        if (this.checkSetting(event, player, regionsAt, () -> command, s -> {
+            CommandMapping mapping = Sponge.getGame().getCommandManager().get(event.getCommand()).get();
+            Tristate value = UNDEFINED;
+            // TODO subcommands?
+            // TODO register commands as aliascommand
+            for (String alias : mapping.getAllAliases())
+            {
+                value = value.and(s.blockedCommands.getOrDefault(alias.toLowerCase(), UNDEFINED));
+                if (value != UNDEFINED)
+                {
+                    break;
+                }
+            }
+            return value;
+        }) == FALSE)
+        {
+            i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to execute this command here!");
+        }
+    }
+
+    private boolean isRedstoneChange(BlockState block)
+    {
+        return block.get(Keys.POWERED).isPresent() // Levers etc.
+            || block.get(Keys.POWER).isPresent() // Redstone
+            || block.getType() == BlockTypes.REDSTONE_LAMP // Lamp
+            || block.getType() == BlockTypes.LIT_REDSTONE_LAMP
+            || block.getType() == BlockTypes.POWERED_REPEATER // Repeater
+            || block.getType() == BlockTypes.UNPOWERED_REPEATER
+            || block.getType() == BlockTypes.POWERED_COMPARATOR // Comparator
+            || block.getType() == BlockTypes.UNPOWERED_COMPARATOR
+            || block.get(Keys.OPEN).isPresent() // Doors etc.
+            || block.get(Keys.EXTENDED).isPresent() // Pistons
+            || block.getTraitValue(DROPPER_TRIGGERED).isPresent() // Dropper / Dispenser
+            || block.getType() == BlockTypes.TNT // Tnt
+                // TODO other activateable blocks
+                ;
+    }
+
+    @Listener
+    public void onRedstoneChangeNotify(NotifyNeighborBlockEvent event, @Root LocatableBlock block)
+    {
+        for (Map.Entry<Direction, BlockState> entry : event.getOriginalNeighbors().entrySet())
+        {
+            Location<World> loc = block.getLocation().getRelative(entry.getKey());
+            List<Region> regionsAt = manager.getRegionsAt(loc);
+            if (isRedstoneChange(entry.getValue()))
+            {
+                if (checkSetting(event, null, regionsAt, () -> null, s -> s.deadCircuit) == FALSE)
+                {
+                    return;
+                }
             }
         }
     }
