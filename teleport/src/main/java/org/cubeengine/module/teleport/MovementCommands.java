@@ -258,7 +258,7 @@ public class MovementCommands
     @Restricted(value = Player.class)
     public void place(Player context, Player player)
     {
-        Location<World> block = LocationUtil.getBlockInSight(player);
+        Location<World> block = LocationUtil.getBlockInSight(context);
         if (block == null)
         {
             i18n.sendTranslated(context, NEGATIVE, "No block in sight!");
