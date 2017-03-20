@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,7 +62,7 @@ public class TimeCommands extends PermissionContainer
 
     @Command(desc = "Changes the time of a world")
     public void time(CommandSource context, @Optional String time,
-                     @Named({ "w", "worlds", "in"}) String worlds, // TODO worldlist reader // TODO NParams static label reader
+                     @Named("in") String worlds, // TODO worldlist reader // TODO NParams static label reader
                      @Flag boolean lock)
     {
         Collection<World> worldList;
@@ -95,11 +96,16 @@ public class TimeCommands extends PermissionContainer
         }
         if (time != null)
         {
-            final Long lTime = tm.matchTimeValue(time);
+            Long lTime = tm.matchTimeValue(time);
             if (lTime == null)
             {
-                i18n.sendTranslated(context, NEGATIVE, "The time you entered is not valid!");
-                return;
+                lTime = tm.parseTime(time);
+                if (lTime == null)
+                {
+                    i18n.sendTranslated(context, NEGATIVE, "The time you entered is not valid!");
+                    return;
+                }
+
             }
             String timeNumeric = tm.format(lTime);
             String timeName = tm.matchTimeName(lTime);

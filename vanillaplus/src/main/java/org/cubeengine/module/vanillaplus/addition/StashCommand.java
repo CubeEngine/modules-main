@@ -59,7 +59,11 @@ public class StashCommand
             Iterator<ItemStack> it = replaced.items.iterator();
             for (Inventory inventory : context.getInventory().slots())
             {
-                inventory.offer(it.next());
+                ItemStack next = it.next();
+                if (next != null)
+                {
+                    inventory.offer(next);
+                }
             }
         }
 

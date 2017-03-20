@@ -380,9 +380,14 @@ public class SettingsListener
     @Listener
     public void onCommand(SendCommandEvent event, @Root Player player)
     {
+        CommandMapping mapping = Sponge.getGame().getCommandManager().get(event.getCommand()).orElse(null);
+        if (mapping == null)
+        {
+            return;
+        }
         List<Region> regionsAt = manager.getRegionsAt(player.getLocation());
         if (this.checkSetting(event, player, regionsAt, () -> command, s -> {
-            CommandMapping mapping = Sponge.getGame().getCommandManager().get(event.getCommand()).get();
+
             Tristate value = UNDEFINED;
             // TODO subcommands?
             // TODO register commands as aliascommand

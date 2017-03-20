@@ -183,7 +183,8 @@ public class WorldsCommands extends ContainerCommand
         {
             world.setEnabled(true);
         }
-
+        i18n.sendTranslated(context, NEGATIVE, "Loading...", world);
+        // TODO async me?
         Optional<World> loaded = Sponge.getServer().loadWorld(world);
         if (!loaded.isPresent())
         {

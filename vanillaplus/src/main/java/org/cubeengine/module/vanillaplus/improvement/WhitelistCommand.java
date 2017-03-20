@@ -99,10 +99,10 @@ public class WhitelistCommand extends ContainerCommand
         WhitelistService service = getWhitelistService();
         if (service.removeProfile(player.getProfile()))
         {
-            i18n.sendTranslated(context, NEUTRAL, "{user} is not whitelisted.", player);
+            i18n.sendTranslated(context, POSITIVE, "{user} is not whitelisted anymore.", player.getName());
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "{user} is not whitelisted anymore.", player.getName());
+        i18n.sendTranslated(context, NEUTRAL, "{user} is not whitelisted.", player);
     }
 
     @Command(desc = "Lists all the whitelisted players")

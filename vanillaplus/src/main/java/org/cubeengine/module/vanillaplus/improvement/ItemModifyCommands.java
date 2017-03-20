@@ -38,6 +38,7 @@ import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
 import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.property.item.UseLimitProperty;
 import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.data.type.SkullTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -124,6 +125,7 @@ public class ItemModifyCommands extends PermissionContainer
             return;
         }
 
+        item.offer(Keys.SKULL_TYPE, SkullTypes.PLAYER);
         item.offer(Keys.REPRESENTED_PLAYER, Sponge.getServer().getGameProfileManager().get(name).get());
 
         context.setItemInHand(HandTypes.MAIN_HAND, item);

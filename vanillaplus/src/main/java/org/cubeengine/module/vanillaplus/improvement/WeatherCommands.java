@@ -71,7 +71,7 @@ public class WeatherCommands
     }
 
     @Command(desc = "Changes the weather")
-    public void weather(CommandSource context, Weather weather, @Optional Integer duration, @Default @Named({"in", "world"}) World world)
+    public void weather(CommandSource context, Weather weather, @Optional Integer duration, @Default @Named("in") World world)
     {
         boolean sunny = true;
         boolean noThunder = true;

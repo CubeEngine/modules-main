@@ -136,7 +136,7 @@ public class ItemCommands extends PermissionContainer
             }
         }
         item.setQuantity(amount);
-        context.getInventory().offer(item);
+        context.getInventory().offer(item.copy());
         i18n.sendTranslated(context, NEUTRAL, "Received: {amount} {input#item}", amount, materialMatcher.getNameFor(item));
     }
 

@@ -120,6 +120,11 @@ public class KillCommands extends PermissionContainer
         }
 
         player.damage(player.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build(), CauseUtil.spawnCause(context));
+
+        if (force)
+        {
+            player.offer(Keys.HEALTH, 0d);
+        }
         if (showMessage)
         {
             i18n.sendTranslated(context, POSITIVE, "You killed {user}!", player);
@@ -137,6 +142,7 @@ public class KillCommands extends PermissionContainer
     public void suicide(Player context)
     {
         context.damage(context.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build(), Cause.of(source(context)));
-        i18n.sendTranslated(context, NEGATIVE, "You ended your life. Why? {text:\\:(:color=DARK_RED}");
+        context.offer(Keys.HEALTH, 0d);
+        i18n.sendTranslated(context, NEGATIVE, "You ended your life. Why? {text::(:color=DARK_RED}");
     }
 }
