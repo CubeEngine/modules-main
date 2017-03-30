@@ -36,7 +36,6 @@ import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
-import org.cubeengine.module.protector.region.RegionConfig;
 import org.cubeengine.module.protector.region.RegionReader;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
@@ -68,6 +67,12 @@ public class SettingsCommands extends ContainerCommand
 
     }
 
+    @Command(desc = "Controls teleport movement")
+    public void teleport(CommandSource context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
+    {
+        this.move(context, SettingsListener.MoveType.TELEPORT, set, region, role);
+    }
+
     @Command(desc = "Controls movement")
     public void move(CommandSource context, SettingsListener.MoveType type, Tristate set,
             @Default @Named("in") Region region,
@@ -96,6 +101,7 @@ public class SettingsCommands extends ContainerCommand
         i18n.sendTranslated(context, POSITIVE,"Region {name}: Move Settings updated", region.getName());
     }
 
+
     @Command(desc = "Controls player building")
     public void build(CommandSource context, Tristate set,
             @Default @Named("in") Region region,
@@ -118,8 +124,46 @@ public class SettingsCommands extends ContainerCommand
         i18n.sendTranslated(context, POSITIVE,"Region {name}: Build Settings updated", region.getName());
     }
 
+    @Command(desc = "Controls players interacting with blocks")
+    public void useAll(CommandSource context, SettingsListener.UseType type, Tristate set,
+            @Default @Named("in") Region region, @Named("bypass") String role)
+    {
+        if (role != null)
+        {
+            if (!ps.getGroupSubjects().hasRegistered(role))
+            {
+                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                return;
+            }
+            Subject subject = ps.getGroupSubjects().get(role);
+            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.usePermission.get(type).getId(), set);
+            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            return;
+        }
+        switch (type)
+        {
+            case ITEM:
+                region.getSettings().use.all.item = set;
+                break;
+            case BLOCK:
+                region.getSettings().use.all.block = set;
+                break;
+            case CONTAINER:
+                region.getSettings().use.all.container = set;
+                break;
+            case OPEN:
+                region.getSettings().use.all.open = set;
+                break;
+            case REDSTONE:
+                region.getSettings().use.all.redstone = set;
+                break;
+        }
+        region.save();
+        i18n.sendTranslated(context, POSITIVE,"Region {name}: Use Settings updated", region.getName());
+    }
+
     @Command(desc = "Controls player interacting with blocks")
-    public void use(CommandSource context, BlockType type, Tristate set,
+    public void useBlock(CommandSource context, BlockType type, Tristate set,
             @Default @Named("in") Region region,
             @Named("bypass") String role) // TODO role completer/reader
     {
@@ -135,7 +179,7 @@ public class SettingsCommands extends ContainerCommand
             i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
-        setOrUnset(region.getSettings().blockUsage.block, type, set);
+        setOrUnset(region.getSettings().use.block, type, set);
         region.save();
         i18n.sendTranslated(context, POSITIVE,"Region {name}: Use Block Settings updated", region.getName());
     }
@@ -157,7 +201,7 @@ public class SettingsCommands extends ContainerCommand
             i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
-        setOrUnset(region.getSettings().blockUsage.item, type, set);
+        setOrUnset(region.getSettings().use.item, type, set);
         region.save();
         i18n.sendTranslated(context, POSITIVE,"Region {name}: Use Item Settings updated", region.getName());
     }

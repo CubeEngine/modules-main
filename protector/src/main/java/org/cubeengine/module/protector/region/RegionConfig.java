@@ -24,14 +24,11 @@ import org.cubeengine.reflect.Section;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.event.cause.entity.damage.source.BlockDamageSource;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class RegionConfig extends ReflectedYaml
 {
@@ -50,12 +47,23 @@ public class RegionConfig extends ReflectedYaml
 
         public Map<SettingsListener.MoveType, Tristate> move = new HashMap<>();
         public Tristate build = Tristate.UNDEFINED;
-        public BlockUsage blockUsage = new BlockUsage();
-        public static class BlockUsage implements Section
+        public Use use = new Use();
+        public static class Use implements Section
         {
             public Map<BlockType, Tristate> block = new HashMap<>();
 
             public Map<ItemType, Tristate> item = new HashMap<>();
+
+            public All all = new All();
+
+            public static class All implements Section
+            {
+                public Tristate block = Tristate.UNDEFINED;
+                public Tristate item = Tristate.UNDEFINED;
+                public Tristate container = Tristate.UNDEFINED;
+                public Tristate open = Tristate.UNDEFINED;
+                public Tristate redstone = Tristate.UNDEFINED;
+            }
         }
         public Spawn spawn = new Spawn();
         public static class Spawn implements Section

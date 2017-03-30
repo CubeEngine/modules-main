@@ -20,7 +20,6 @@ package org.cubeengine.module.protector.listener;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.spongepowered.api.block.trait.BooleanTraits.DROPPER_TRIGGERED;
-import static org.spongepowered.api.block.trait.BooleanTraits.POWERED_REPEATER_LOCKED;
 import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 import static org.spongepowered.api.util.Tristate.FALSE;
 import static org.spongepowered.api.util.Tristate.TRUE;
@@ -37,7 +36,6 @@ import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.block.trait.BooleanTraits;
 import org.spongepowered.api.command.CommandMapping;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
@@ -63,13 +61,13 @@ import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.explosion.Explosion;
 
 import java.util.HashMap;
 import java.util.List;
@@ -92,7 +90,7 @@ public class SettingsListener
     public final Permission spawnEntityPlayerPerm;
     public final Permission explodePlayer;
     public final Permission command;
-    private boolean isRedstoneChange;
+    public final Map<UseType, Permission> usePermission = new HashMap<>();
 
     public SettingsListener(RegionManager manager, Permission base, PermissionManager pm, I18n i18n)
     {
@@ -110,6 +108,11 @@ public class SettingsListener
         spawnEntityPlayerPerm = pm.register(SettingsListener.class, "bypass.spawn.player", "", base);
         explodePlayer = pm.register(SettingsListener.class, "bypass.blockdamage.explode.player", "", base);
         command = pm.register(SettingsListener.class, "bypass.command", "", base);
+        usePermission.put(UseType.BLOCK, pm.register(SettingsListener.class, "bypass.use-all.block", "", base));
+        usePermission.put(UseType.CONTAINER, pm.register(SettingsListener.class, "bypass.use-all.container", "", base));
+        usePermission.put(UseType.ITEM, pm.register(SettingsListener.class, "bypass.use-all.item", "", base));
+        usePermission.put(UseType.OPEN, pm.register(SettingsListener.class, "bypass.use-all.open", "", base));
+        usePermission.put(UseType.REDSTONE, pm.register(SettingsListener.class, "bypass.use-all.redstone", "", base));
     }
 
     @Listener
@@ -185,6 +188,11 @@ public class SettingsListener
         return false;
     }
 
+    public enum UseType
+    {
+        ITEM, BLOCK, CONTAINER, OPEN, REDSTONE
+    }
+
     public enum MoveType
     {
         MOVE, ENTER, EXIT, TELEPORT
@@ -201,7 +209,7 @@ public class SettingsListener
         {
             transaction.getOriginal().getLocation().ifPresent(loc -> {
                 List<Region> regionsAt = manager.getRegionsAt(loc);
-                if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.build) == FALSE)
+                if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.build, UNDEFINED) == FALSE)
                 {
                     i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "You are not allowed to build here.");
                     return;
@@ -210,11 +218,12 @@ public class SettingsListener
         }
     }
 
-    public Tristate checkSetting(Cancellable event, Player player, List<Region> regionsAt, Supplier<Permission> perm, Function<RegionConfig.Settings, Tristate> func)
+    public Tristate checkSetting(Cancellable event, Player player, List<Region> regionsAt, Supplier<Permission> perm, Function<RegionConfig.Settings, Tristate> func, Tristate defaultTo)
     {
         Permission permission = perm.get();
         if (permission != null && player.hasPermission(permission.getId()))
         {
+            event.setCancelled(false);
             return Tristate.TRUE;
         }
         Tristate allow = UNDEFINED;
@@ -231,6 +240,14 @@ public class SettingsListener
                 break;
             }
         }
+        if (allow == TRUE)
+        {
+            event.setCancelled(false);
+        }
+        if (allow == UNDEFINED)
+        {
+            return defaultTo;
+        }
         return allow;
     }
 
@@ -245,7 +262,31 @@ public class SettingsListener
 
         Permission blockPerm = pm.register(SettingsListener.class, type.getId(), "Allows interacting with a " + type.getTranslation().get() + " Block", useBlockPerm);
 
-        if (checkSetting(event, player, regionsAt, () -> blockPerm, (s) -> s.blockUsage.block.getOrDefault(type, UNDEFINED)) == FALSE)
+        Tristate set = UNDEFINED;
+        if (type != BlockTypes.AIR)
+        {
+            set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.BLOCK), s -> s.use.all.block, set);
+        }
+        if (type.getDefaultState().supports(Keys.OPEN))
+        {
+            set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.OPEN), s -> s.use.all.open, set);
+        }
+        if (type.getDefaultState().supports(Keys.POWERED))
+        {
+            set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.REDSTONE), s -> s.use.all.redstone, set);
+        }
+
+        if (event.getTargetBlock().getLocation().isPresent() && event.getTargetBlock().getLocation().get().getTileEntity().isPresent())
+        {
+            if (event.getTargetBlock().getLocation().get().getTileEntity().get() instanceof Carrier)
+            {
+                // TODO check if this is right
+                set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.CONTAINER), s -> s.use.all.container, set);
+            }
+        }
+
+        set = checkSetting(event, player, regionsAt, () -> blockPerm, (s) -> s.use.block.getOrDefault(type, UNDEFINED), set);
+        if (set == FALSE)
         {
             i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to interact with this here.");
             return;
@@ -253,8 +294,11 @@ public class SettingsListener
 
         if (item != null)
         {
+            // Check all items
+            set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ITEM), s -> s.use.all.item, UNDEFINED);
             Permission usePerm = pm.register(SettingsListener.class, item.getItem().getId(), "Allows interacting with a " + item.getItem().getTranslation().get() + " Item in hand", useItemPerm);
-            if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.blockUsage.item.getOrDefault(item.getItem(), UNDEFINED)) == FALSE)
+            // Then check individual item
+            if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item.getItem(), UNDEFINED), set) == FALSE)
             {
                 i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to use this here.");
             }
@@ -267,7 +311,8 @@ public class SettingsListener
         ItemType item = event.getItemStack().getType();
         List<Region> regionsAt = manager.getRegionsAt(player.getLocation());
         Permission usePerm = pm.register(SettingsListener.class, item.getId(), "Allows interacting with a " + item.getTranslation().get() + " Item in hand", useItemPerm);
-        if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.blockUsage.item.getOrDefault(item, UNDEFINED)) == FALSE)
+        Tristate set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ITEM), s -> s.use.all.item, UNDEFINED);
+        if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item, UNDEFINED), set) == FALSE)
         {
             i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to use this here.");
         }
@@ -293,13 +338,13 @@ public class SettingsListener
                 if (player.isPresent())
                 {
                     Permission usePerm = pm.register(SettingsListener.class, type.getId(), "Allows spawning a " + type.getTranslation().get(), spawnEntityPlayerPerm);
-                    if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED)) == FALSE)
+                    if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
                     {
                         i18n.sendTranslated(ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");
                         return;
                     }
                 }
-                else if (checkSetting(event, null, regionsAt, () -> null, (s) -> s.spawn.plugin.getOrDefault(type, UNDEFINED)) == FALSE)
+                else if (checkSetting(event, null, regionsAt, () -> null, (s) -> s.spawn.plugin.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
                 {
                     return;
                 }
@@ -307,13 +352,13 @@ public class SettingsListener
             else if (player.isPresent())
             {
                 Permission usePerm = pm.register(SettingsListener.class, type.getId(), "Allows spawning a " + type.getTranslation().get(), spawnEntityPlayerPerm);
-                if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED)) == FALSE)
+                if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
                 {
                     i18n.sendTranslated(ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");
                     return;
                 }
             }
-            else if (checkSetting(event, null, regionsAt, () -> null, (s) -> s.spawn.naturally.getOrDefault(type, UNDEFINED)) == FALSE)
+            else if (checkSetting(event, null, regionsAt, () -> null, (s) -> s.spawn.naturally.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
             {
                 return; // natural
             }
@@ -329,7 +374,7 @@ public class SettingsListener
             for (Transaction<BlockSnapshot> trans : event.getTransactions())
             {
                 List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
-                this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.allExplosion);
+                this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.allExplosion, UNDEFINED);
                 Player player = event.getCause().get(NamedCause.OWNER, Player.class).orElse(null);
                 if (player == null)
                 {
@@ -341,7 +386,7 @@ public class SettingsListener
                 }
                 if (player != null)
                 {
-                    if (this.checkSetting(event, player, regionsAt, () -> explodePlayer, (s) -> s.blockDamage.playerExplosion) == TRUE)
+                    if (this.checkSetting(event, player, regionsAt, () -> explodePlayer, (s) -> s.blockDamage.playerExplosion, UNDEFINED) == TRUE)
                     {
                         event.setCancelled(false);
                     }
@@ -363,7 +408,7 @@ public class SettingsListener
             for (Transaction<BlockSnapshot> trans : event.getTransactions())
             {
                 List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
-                this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.monster);
+                this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.monster, UNDEFINED);
             }
         }
 
@@ -372,7 +417,8 @@ public class SettingsListener
             for (Transaction<BlockSnapshot> trans : event.getTransactions())
             {
                 List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
-                this.checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(((LocatableBlock) rootCause).getBlockState().getType() , UNDEFINED));
+                this.checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(((LocatableBlock) rootCause).getBlockState().getType() , UNDEFINED),
+                        UNDEFINED);
             }
         }
     }
@@ -400,7 +446,7 @@ public class SettingsListener
                 }
             }
             return value;
-        }) == FALSE)
+        }, UNDEFINED) == FALSE)
         {
             i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to execute this command here!");
         }
@@ -433,7 +479,7 @@ public class SettingsListener
             List<Region> regionsAt = manager.getRegionsAt(loc);
             if (isRedstoneChange(entry.getValue()))
             {
-                if (checkSetting(event, null, regionsAt, () -> null, s -> s.deadCircuit) == FALSE)
+                if (checkSetting(event, null, regionsAt, () -> null, s -> s.deadCircuit, UNDEFINED) == FALSE)
                 {
                     return;
                 }
