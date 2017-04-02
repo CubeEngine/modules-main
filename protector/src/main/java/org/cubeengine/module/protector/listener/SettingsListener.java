@@ -369,6 +369,7 @@ public class SettingsListener
     public void onChangeBlock(ChangeBlockEvent event)
     {
         Object rootCause = event.getCause().root();
+        // Check Explosions first...
         if (event instanceof ExplosionEvent)
         {
             for (Transaction<BlockSnapshot> trans : event.getTransactions())
@@ -386,11 +387,8 @@ public class SettingsListener
                 }
                 if (player != null)
                 {
-                    if (this.checkSetting(event, player, regionsAt, () -> explodePlayer, (s) -> s.blockDamage.playerExplosion, UNDEFINED) == TRUE)
-                    {
-                        event.setCancelled(false);
-                    }
-                    else if (event.isCancelled())
+                    this.checkSetting(event, player, regionsAt, () -> explodePlayer, (s) -> s.blockDamage.playerExplosion, UNDEFINED);
+                    if (event.isCancelled())
                     {
                         i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to let stuff explode here!");
                     }
@@ -403,22 +401,29 @@ public class SettingsListener
             return;
         }
 
+        // Hostile Mob causes BlockChange?
         if (rootCause instanceof Hostile)
         {
             for (Transaction<BlockSnapshot> trans : event.getTransactions())
             {
                 List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
-                this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.monster, UNDEFINED);
+                if (this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.monster, UNDEFINED) == FALSE)
+                {
+                    return;
+                }
             }
         }
 
+        // Block causes BlockChange?
         if (rootCause instanceof LocatableBlock)
         {
             for (Transaction<BlockSnapshot> trans : event.getTransactions())
             {
                 List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
-                this.checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(((LocatableBlock) rootCause).getBlockState().getType() , UNDEFINED),
-                        UNDEFINED);
+                if (this.checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(((LocatableBlock) rootCause).getBlockState().getType() , UNDEFINED), UNDEFINED) == FALSE)
+                {
+                    return;
+                }
             }
         }
     }
@@ -479,9 +484,19 @@ public class SettingsListener
             List<Region> regionsAt = manager.getRegionsAt(loc);
             if (isRedstoneChange(entry.getValue()))
             {
+                // Redstone is disabled entirely?
                 if (checkSetting(event, null, regionsAt, () -> null, s -> s.deadCircuit, UNDEFINED) == FALSE)
                 {
                     return;
+                }
+                // Redstone is disabled for player?
+                Optional<Player> player = event.getCause().get(NamedCause.NOTIFIER, Player.class);
+                if (player.isPresent())
+                {
+                    if (checkSetting(event, player.get(), regionsAt, () -> usePermission.get(UseType.REDSTONE), s -> s.use.all.redstone,UNDEFINED) == FALSE)
+                    {
+                        return;
+                    }
                 }
             }
         }
