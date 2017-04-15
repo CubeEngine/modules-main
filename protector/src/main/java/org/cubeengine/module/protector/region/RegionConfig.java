@@ -85,6 +85,16 @@ public class RegionConfig extends ReflectedYaml
 
         public Map<String, Tristate> blockedCommands = new HashMap<>();
         public Tristate deadCircuit = Tristate.UNDEFINED;
+
+        public EntityDamage entityDamage = new EntityDamage();
+
+        public static class EntityDamage implements Section
+        {
+            public Tristate all = Tristate.UNDEFINED;
+            public Tristate pvp = Tristate.UNDEFINED;
+            public Tristate byLiving = Tristate.UNDEFINED;
+            public Map<EntityType, Tristate> byEntity = new HashMap<>();
+        }
     }
 
     public static <T> void setOrUnset(Map<T, Tristate> map, T key, Tristate set)

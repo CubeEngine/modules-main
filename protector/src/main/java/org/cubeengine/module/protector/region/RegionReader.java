@@ -25,17 +25,18 @@ import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.libcube.service.command.TranslatedReaderException;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
-import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.protector.RegionManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class RegionReader implements ArgumentReader<Region>, Completer, DefaultValue<Region>
@@ -55,7 +56,8 @@ public class RegionReader implements ArgumentReader<Region>, Completer, DefaultV
         String token = invocation.currentToken().toLowerCase();
         List<String> list = new ArrayList<>();
         World world = null;
-        if (invocation.getCommandSource() instanceof Locatable)
+        boolean isLocatable = invocation.getCommandSource() instanceof Locatable;
+        if (isLocatable)
         {
             world = ((Locatable) invocation.getCommandSource()).getWorld();
             Map<String, Region> regions = manager.getRegions(world.getUniqueId());
@@ -75,14 +77,30 @@ public class RegionReader implements ArgumentReader<Region>, Completer, DefaultV
             {
                 continue; // Skip if already without world ; except when token starts with world
             }
-            for (Map.Entry<String, Region> entry : perWorld.getValue().entrySet())
+            if (token.contains(".") || !isLocatable) // Skip if without dot and locatable
             {
-                String value = entry.getValue().getContext().getValue();
-                if (value.startsWith(token))
+                String worldName = Sponge.getServer().getWorldProperties(perWorld.getKey()).get().getWorldName();
+                if ((worldName + ".world").startsWith(token))
                 {
-                    list.add(value);
+                    list.add(worldName + ".world");
+                }
+                for (Map.Entry<String, Region> entry : perWorld.getValue().entrySet())
+                {
+                    String value = entry.getValue().getContext().getValue();
+                    if (value.startsWith(token))
+                    {
+                        list.add(value);
+                    }
                 }
             }
+        }
+        if ("global".startsWith(token))
+        {
+            list.add("global");
+        }
+        if (isLocatable && "world".startsWith(token))
+        {
+            list.add("world");
         }
         return list;
     }
@@ -99,6 +117,14 @@ public class RegionReader implements ArgumentReader<Region>, Completer, DefaultV
             {
                 return region;
             }
+            if ("world".equals(token))
+            {
+                region = manager.getWorldRegion(world.getUniqueId());
+                if (region != null)
+                {
+                    return region;
+                }
+            }
         }
         for (Map.Entry<UUID, Map<String, Region>> perWorld : manager.getRegions().entrySet())
         {
@@ -110,6 +136,26 @@ public class RegionReader implements ArgumentReader<Region>, Completer, DefaultV
                 }
             }
         }
+        if (token.endsWith(".world"))
+        {
+            String worldName = token.replaceAll(".world$", "");
+            Optional<WorldProperties> worldProp = Sponge.getServer().getWorldProperties(worldName);
+            if (worldProp.isPresent())
+            {
+                return manager.getWorldRegion(worldProp.get().getUniqueId());
+            }
+            else
+            {
+                throw new TranslatedReaderException(
+                        i18n.getTranslation(invocation.getContext(Locale.class), MessageType.NEGATIVE,
+                                "Unknown World {name} for world-region", token, worldName));
+            }
+        }
+        if ("global".equals(token))
+        {
+            return manager.getGlobalRegion();
+        }
+
         throw new TranslatedReaderException(
                 i18n.getTranslation(invocation.getContext(Locale.class), MessageType.NEGATIVE,
                                     "There is no such Region as {name}", token));

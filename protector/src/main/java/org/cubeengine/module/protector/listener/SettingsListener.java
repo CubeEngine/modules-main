@@ -43,6 +43,7 @@ import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Hostile;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
@@ -51,9 +52,13 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.command.SendCommandEvent;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
@@ -83,14 +88,17 @@ public class SettingsListener
     private PermissionManager pm;
     private I18n i18n;
     public final Map<MoveType, Permission> movePerms = new HashMap<>();
-
     public final Permission buildPerm;
+
     public final Permission useBlockPerm;
     public final Permission useItemPerm;
     public final Permission spawnEntityPlayerPerm;
     public final Permission explodePlayer;
     public final Permission command;
     public final Map<UseType, Permission> usePermission = new HashMap<>();
+    public final Permission entityDamageAll;
+    public final Permission entityDamagePVP;
+    public final Permission entityDamageLiving;
 
     public SettingsListener(RegionManager manager, Permission base, PermissionManager pm, I18n i18n)
     {
@@ -113,6 +121,9 @@ public class SettingsListener
         usePermission.put(UseType.ITEM, pm.register(SettingsListener.class, "bypass.use-all.item", "", base));
         usePermission.put(UseType.OPEN, pm.register(SettingsListener.class, "bypass.use-all.open", "", base));
         usePermission.put(UseType.REDSTONE, pm.register(SettingsListener.class, "bypass.use-all.redstone", "", base));
+        entityDamageAll = pm.register(SettingsListener.class, "bypass.entity-damage.all", "", base);
+        entityDamagePVP = pm.register(SettingsListener.class, "bypass.entity-damage.pvp", "", base);
+        entityDamageLiving = pm.register(SettingsListener.class, "bypass.entity-damage.living", "", base);
     }
 
     @Listener
@@ -221,7 +232,7 @@ public class SettingsListener
     public Tristate checkSetting(Cancellable event, Player player, List<Region> regionsAt, Supplier<Permission> perm, Function<RegionConfig.Settings, Tristate> func, Tristate defaultTo)
     {
         Permission permission = perm.get();
-        if (permission != null && player.hasPermission(permission.getId()))
+        if (player != null && permission != null && player.hasPermission(permission.getId()))
         {
             event.setCancelled(false);
             return Tristate.TRUE;
@@ -499,6 +510,47 @@ public class SettingsListener
                     }
                 }
             }
+        }
+    }
+
+    @Listener
+    public void onEntityDamage(DamageEntityEvent event)
+    {
+        DamageSource source = event.getCause().first(DamageSource.class).get();
+        Entity entitySource = null;
+        if (source instanceof EntityDamageSource)
+        {
+            entitySource = ((EntityDamageSource) source).getSource();
+            if (source instanceof IndirectEntityDamageSource)
+            {
+                entitySource = ((IndirectEntityDamageSource) source).getIndirectSource();
+            }
+        }
+        Player playerSource = null;
+        if (entitySource instanceof Player)
+        {
+            playerSource = ((Player) entitySource);
+        }
+
+        List<Region> regionsAt = manager.getRegionsAt(event.getTargetEntity().getLocation());
+
+        Tristate defaultTo = this.checkSetting(event, playerSource, regionsAt, () -> entityDamageAll, s -> s.entityDamage.all, UNDEFINED);
+
+        if (event.getTargetEntity() instanceof Player && entitySource instanceof Player)
+        {
+            if (this.checkSetting(event, playerSource, regionsAt, () -> entityDamagePVP, s -> s.entityDamage.pvp, defaultTo) == FALSE)
+            {
+                return;
+            }
+        }
+        if (entitySource instanceof Living)
+        {
+            defaultTo = this.checkSetting(event, playerSource, regionsAt, () -> entityDamageLiving, s -> s.entityDamage.byLiving, defaultTo);
+        }
+        if (entitySource != null)
+        {
+            EntityType type = entitySource.getType();
+            this.checkSetting(event, null, regionsAt, () -> null, s -> s.entityDamage.byEntity.getOrDefault(type, UNDEFINED), defaultTo);
         }
     }
 }

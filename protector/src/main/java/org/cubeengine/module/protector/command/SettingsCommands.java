@@ -64,6 +64,7 @@ public class SettingsCommands extends ContainerCommand
         em.registerListener(Protector.class, this.psl);
 
         this.addCommand(new BlockDamageSettingsCommands(cm, i18n, psl, ps));
+        this.addCommand(new EntityDamageSettingsCommands(cm, i18n, psl, ps));
 
     }
 

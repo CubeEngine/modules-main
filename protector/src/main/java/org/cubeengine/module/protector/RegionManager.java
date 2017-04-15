@@ -26,10 +26,14 @@ import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
 import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -40,6 +44,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -49,6 +54,8 @@ public class RegionManager
     private final Reflector reflector;
     public Map<UUID, Map<String, Region>> byName = new HashMap<>();
     public Map<UUID, Map<Vector2i, List<Region>>> byChunk = new HashMap<>();
+    public Map<UUID, Region> worldRegions = new HashMap<>();
+    public Region globalRegion;
 
     public Map<UUID, Region> activeRegion = new HashMap<>(); // playerUUID -> Region
 
@@ -56,6 +63,17 @@ public class RegionManager
     {
         this.modulePath = modulePath;
         this.reflector = reflector;
+        Path path = modulePath.resolve("region");
+        try
+        {
+            Files.createDirectories(path);
+        }
+        catch (IOException e)
+        {
+            throw new IllegalStateException(e);
+        }
+        RegionConfig config = reflector.load(RegionConfig.class, path.resolve("global.yml").toFile());
+        this.globalRegion = new Region(config);
     }
 
     private Region loadRegion(Region region)
@@ -105,12 +123,15 @@ public class RegionManager
     {
         int chunkX = loc.getBlockX() >> 4;
         int chunkZ = loc.getBlockZ() >> 4;
-        List<Region> regions = byChunk.getOrDefault(loc.getExtent().getUniqueId(), Collections.emptyMap())
-                .getOrDefault(new Vector2i(chunkX, chunkZ), Collections.emptyList());
-        return regions.stream()
-                      .filter(r -> r.contains(loc))
-                      .sorted(Comparator.comparingInt(Region::getPriority))
-                      .collect(Collectors.toList());
+        List<Region> regions = new ArrayList<>();
+        regions.add(globalRegion);
+        regions.add(getWorldRegion(loc.getExtent().getUniqueId()));
+        regions.addAll(byChunk.getOrDefault(loc.getExtent().getUniqueId(), Collections.emptyMap())
+                .getOrDefault(new Vector2i(chunkX, chunkZ), Collections.emptyList())
+                            .stream().filter(r -> r.contains(loc))
+                .sorted(Comparator.comparingInt(Region::getPriority))
+                .collect(Collectors.toList()));
+        return regions;
     }
 
     public Region getActiveRegion(CommandSource src)
@@ -169,6 +190,10 @@ public class RegionManager
                 {
                     for (Path configPath : Files.newDirectoryStream(worldPath, FileExtensionFilter.YAML))
                     {
+                        if (configPath.getFileName().toString().equals("world.yml"))
+                        {
+                            continue;
+                        }
                         RegionConfig config = reflector.load(RegionConfig.class, configPath.toFile());
                         loadRegion(new Region(config));
                     }
@@ -203,5 +228,33 @@ public class RegionManager
         region.setCuboid(cuboid);
         region.save();
         this.loadRegion(region);
+    }
+
+    public Region getGlobalRegion() {
+        return globalRegion;
+    }
+
+    public Region getWorldRegion(UUID world)
+    {
+        if (!this.worldRegions.containsKey(world))
+        {
+            Optional<WorldProperties> prop = Sponge.getServer().getWorldProperties(world);
+            Path path = modulePath.resolve("region").resolve(prop.get().getWorldName());
+            try
+            {
+                Files.createDirectories(path);
+            }
+            catch (IOException e)
+            {
+                throw new IllegalStateException(e);
+            }
+            RegionConfig config = reflector.load(RegionConfig.class, path.resolve("world.yml").toFile());
+            config.world = new ConfigWorld(prop.get().getWorldName());
+            config.save();
+            this.worldRegions.put(world, new Region(config));
+        }
+        return this.worldRegions.get(world);
+
+
     }
 }

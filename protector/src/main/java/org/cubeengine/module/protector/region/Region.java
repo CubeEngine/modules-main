@@ -33,16 +33,19 @@ public class Region
     public Region(RegionConfig config)
     {
         this.config = config;
-        this.cuboid = new Cuboid(config.corner1.toDouble(), config.corner2.sub(config.corner1).toDouble());
+        if (config.corner1 != null && config.corner2 != null)
+        {
+            this.cuboid = new Cuboid(config.corner1.toDouble(), config.corner2.sub(config.corner1).toDouble());
+        }
     }
 
     public boolean contains(Location<World> loc)
     {
         Vector3d pos = loc.getPosition();
-        return loc.getExtent().equals(this.config.world.getWorld())
-                && (this.cuboid.contains(pos.toInt().toDouble())
+        return (this.config.world == null || loc.getExtent().equals(this.config.world.getWorld()))
+                && (this.cuboid == null || (this.cuboid.contains(pos.toInt().toDouble())
                  || this.cuboid.contains(pos.add(0,1,0).toInt().toDouble())
-                 || this.cuboid.contains(pos.add(0,1.8,0).toInt().toDouble()));
+                 || this.cuboid.contains(pos.add(0,1.8,0).toInt().toDouble())));
     }
 
     public RegionConfig.Settings getSettings()
@@ -78,6 +81,14 @@ public class Region
     {
         if (this.context == null)
         {
+            if (this.config.world == null)
+            {
+                return new Context("region", "global");
+            }
+            if (this.config.name == null)
+            {
+                return new Context("region", this.config.world.getName().toLowerCase());
+            }
             this.context = new Context("region", this.config.world.getName().toLowerCase() + "." + this.config.name.toLowerCase());
         }
         return this.context;
