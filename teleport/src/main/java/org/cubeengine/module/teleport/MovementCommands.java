@@ -173,6 +173,7 @@ public class MovementCommands
     @Restricted(value = Player.class, msg = "Jumping in the console is not allowed! Go play outside!")
     public void jumpTo(Player context)
     {
+        // TODO this and compass jump can jump outside of worldborder
         Location<World> loc = LocationUtil.getBlockInSight(context);
         if (loc == null)
         {

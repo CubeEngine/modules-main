@@ -86,7 +86,6 @@ public class MoneyCommand extends ContainerCommand
     @Alias(value = {"balance", "moneybalance", "pmoney"})
     @Command(desc = "Shows your balance")
     public void balance(CommandSource context, @Default BaseAccount.Unique account)
-    // TODO message when no user found "If you are out of money, better go work than typing silly commands in the console."
     {
         Map<Currency, BigDecimal> balances = account.getBalances();
         if (balances.isEmpty())

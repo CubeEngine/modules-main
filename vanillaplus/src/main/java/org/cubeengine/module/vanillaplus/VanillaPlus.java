@@ -73,6 +73,7 @@ import org.cubeengine.libcube.service.matcher.WorldMatcher;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.service.Broadcaster;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.plugin.PluginContainer;
 
 /**
@@ -140,9 +141,14 @@ public class VanillaPlus extends Module
     @Inject private StringMatcher sm;
     @Inject private PluginContainer plugin;
 
-    public VanillaPlus()
+    @Inject
+    public VanillaPlus(PluginContainer plugin)
     {
-        Sponge.getDataManager().register(SafeLoginData.class, ImmutableSafeLoginData.class, new SafeLoginDataBuilder());
+        DataRegistration.<SafeLoginData, ImmutableSafeLoginData>builder()
+                .dataClass(SafeLoginData.class).immutableClass(ImmutableSafeLoginData.class)
+                .builder(new SafeLoginDataBuilder()).manipulatorId("safe_login")
+                .dataName("CubeEngine VanillaPlus Safe Login")
+                .buildAndRegister(plugin);
     }
 
     @Enable

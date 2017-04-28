@@ -42,12 +42,12 @@ public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
         Map<String, Object> easyMap = new LinkedHashMap<>();
         for (Map.Entry<String, Boolean> entry : permTree.getPermissions().entrySet())
         {
-            this.easyMapValue(easyMap, entry.getKey(), entry.getValue());
+            easyMapValue(easyMap, entry.getKey(), entry.getValue());
         }
-        return this.organizeTree(easyMap);
+        return organizeTree(easyMap);
     }
 
-    private ListNode organizeTree(Map<String, Object> baseMap)
+    public static ListNode organizeTree(Map<String, Object> baseMap)
     {
         ListNode result = ListNode.emptyList();
         for (Map.Entry<String, Object> entry : baseMap.entrySet())
@@ -60,7 +60,7 @@ public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
             {
                 @SuppressWarnings("unchecked")
                 Map<String, Object> baseValueMap = (Map<String, Object>)entry.getValue();
-                ListNode values = this.organizeTree(baseValueMap);
+                ListNode values = organizeTree(baseValueMap);
                 MapNode subMap = MapNode.emptyMap();
                 int size = baseValueMap.size();
                 if (size == 1)
@@ -97,9 +97,9 @@ public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
         return result;
     }
 
-    private void easyMapValue(Map<String, Object> map, String path, Boolean value)
+    public static void easyMapValue(Map<String, Object> map, String path, Boolean value)
     {
-        String base = this.getBasePath(path);
+        String base = getBasePath(path);
         if (base.isEmpty())
         {
             map.put(" " + path, value);
@@ -112,10 +112,10 @@ public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
             subMap = new LinkedHashMap<>();
             map.put(base, subMap);
         }
-        this.easyMapValue(subMap, this.getSubPath(path, base), value); // create map for subPath
+        easyMapValue(subMap, getSubPath(path, base), value); // create map for subPath
     }
 
-    private String getBasePath(String path)
+    public static String getBasePath(String path)
     {
         if (path.contains("."))
         {
@@ -124,7 +124,7 @@ public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
         return "";
     }
 
-    private String getSubPath(String path, String basePath)
+    public static String getSubPath(String path, String basePath)
     {
         if (path.contains(basePath))
         {

@@ -125,7 +125,7 @@ public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiv
     @Override
     public int getContentVersion()
     {
-        return 1;
+        return 2;
     }
 
     @Override

@@ -40,6 +40,8 @@ import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.world.World;
@@ -67,11 +69,20 @@ public class Multiverse extends Module
     @Inject private EventManager em;
     @Inject private I18n i18n;
     @Inject private Log log;
+    @Inject private PluginContainer plugin;
+
     @ModuleConfig private MultiverseConfig config;
 
-    public Multiverse()
+    @Inject
+    public Multiverse(PluginContainer plugin)
     {
-        Sponge.getDataManager().register(MultiverseData.class, ImmutableMultiverseData.class, new MultiverseDataBuilder());
+        DataRegistration<MultiverseData, ImmutableMultiverseData> dr = DataRegistration.<MultiverseData, ImmutableMultiverseData>builder()
+                .dataClass(MultiverseData.class).immutableClass(ImmutableMultiverseData.class)
+                .builder(new MultiverseDataBuilder()).manipulatorId("multiverse")
+                .dataName("CubeEngine Multiverse Data")
+                .buildAndRegister(plugin);
+
+        Sponge.getDataManager().registerLegacyManipulatorIds(MultiverseData.class.getName(), dr);
     }
 
     @Enable

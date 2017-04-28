@@ -48,6 +48,7 @@ import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.plugin.PluginContainer;
 
 // TODO protect lines of redstone
@@ -68,9 +69,17 @@ public class Locker extends Module
     @Inject private PluginContainer plugin;
 
     @Inject
-    public Locker(Reflector reflector, EntityMatcher entityMatcher, Log logger, MaterialMatcher mm, CommandManager cm)
+    public Locker(Reflector reflector, EntityMatcher entityMatcher, Log logger, MaterialMatcher mm, CommandManager cm, PluginContainer plugin)
     {
-        Sponge.getDataManager().register(LockerData.class, ImmutableLockerData.class, new LockerDataBuilder(Sponge.getRegistry().getValueFactory()));
+        DataRegistration<LockerData, ImmutableLockerData> dr =
+                DataRegistration.<LockerData, ImmutableLockerData>builder()
+                        .dataClass(LockerData.class).immutableClass(ImmutableLockerData.class)
+                        .builder(new LockerDataBuilder()).manipulatorId("locker")
+                        .dataName("CubeEngine Locker Data")
+                        .buildAndRegister(plugin);
+
+        Sponge.getDataManager().registerLegacyManipulatorIds(LockerData.class.getName(), dr);
+
 
         ConverterManager cManager = reflector.getDefaultConverterManager();
         cManager.registerConverter(new BlockLockerConfigConverter(logger, mm), BlockLockConfig.class);

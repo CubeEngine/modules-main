@@ -29,6 +29,7 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.marker.Setup;
+import org.cubeengine.module.roles.service.data.RoleSubjectData;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
@@ -54,6 +55,7 @@ import org.cubeengine.module.roles.exception.RolesExceptionHandler;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
@@ -85,9 +87,16 @@ public class Roles extends Module
     private RolesPermissionService service;
 
     @Inject
-    public Roles(Reflector reflector)
+    public Roles(Reflector reflector, PluginContainer plugin)
     {
-        Sponge.getDataManager().register(PermissionData.class, ImmutablePermissionData.class, new PermissionDataBuilder());
+        DataRegistration<PermissionData, ImmutablePermissionData> dr =
+                DataRegistration.<PermissionData, ImmutablePermissionData>builder()
+                        .dataClass(PermissionData.class).immutableClass(ImmutablePermissionData.class)
+                        .builder(new PermissionDataBuilder()).manipulatorId("permission")
+                        .dataName("CubeEngine Roles Permissions")
+                        .buildAndRegister(plugin);
+
+        Sponge.getDataManager().registerLegacyManipulatorIds(PermissionData.class.getName(), dr);
 
         ConverterManager cManager = reflector.getDefaultConverterManager();
         cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);

@@ -18,6 +18,8 @@
 package org.cubeengine.module.locker.data;
 
 import java.util.Optional;
+
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
@@ -29,10 +31,10 @@ public class LockerDataBuilder extends AbstractDataBuilder<LockerData> implement
 {
     private ValueFactory valueFactory;
 
-    public LockerDataBuilder(ValueFactory valueFactory)
+    public LockerDataBuilder()
     {
         super(LockerData.class, 1);
-        this.valueFactory = valueFactory;
+        this.valueFactory = Sponge.getRegistry().getValueFactory();
     }
 
     @Override

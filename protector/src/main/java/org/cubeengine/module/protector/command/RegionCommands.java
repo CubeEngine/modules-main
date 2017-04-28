@@ -28,6 +28,7 @@ import static org.spongepowered.api.text.format.TextColors.YELLOW;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
+import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.CommandManager;
@@ -42,7 +43,6 @@ import org.cubeengine.module.protector.region.RegionConfig;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
@@ -169,11 +169,25 @@ public class RegionCommands extends ContainerCommand
     @Command(desc = "Displays Region info")
     public void info(CommandSource context, @Default Region region, @Flag boolean allSettings)
     {
-        i18n.sendTranslated(context, POSITIVE, "Region {name} in {world}", region.getName(), region.getWorld());
+        if (region.getWorld() == null)
+        {
+            i18n.sendTranslated(context, POSITIVE, "Global region");
+        }
+        else if (region.getCuboid() == null)
+        {
+            i18n.sendTranslated(context, POSITIVE, "World region in {world}", region.getWorld());
+        }
+        else
+        {
+            i18n.sendTranslated(context, POSITIVE, "Region {name} in {world}", region.getName(), region.getWorld());
+        }
 
         Cuboid cuboid = region.getCuboid();
-        // TODO tp on click to center
-        i18n.sendTranslated(context, POSITIVE, "Inside Cuboid of {vector} to {vector}", cuboid.getMinimumPoint(), cuboid.getMaximumPoint());
+        if (cuboid != null)
+        {
+            // TODO tp on click to center
+            i18n.sendTranslated(context, POSITIVE, "Inside Cuboid of {vector} to {vector}", cuboid.getMinimumPoint(), cuboid.getMaximumPoint());
+        }
 
         // TODO priority
         i18n.sendTranslated(context, POSITIVE, "Settings:");
@@ -230,8 +244,8 @@ public class RegionCommands extends ContainerCommand
 
         if (values.size() > 0 || allSettings)
         {
-            Text trueText = Text.of(YELLOW, i18n.translate(cs, "Allowed"), " ", GOLD, pos);
-            Text falseText = Text.of(YELLOW, i18n.translate(cs, "Denied"), " ", GOLD, neg);
+            Text trueText = Text.of(YELLOW, i18n.translate(cs, "Enabled"), " ", GOLD, pos);
+            Text falseText = Text.of(YELLOW, i18n.translate(cs, "Disabled"), " ", GOLD, neg);
             cs.sendMessage(Text.of(YELLOW, name, ": ", trueText, " ", falseText));
             for (Map.Entry<?, Tristate> entry : values.entrySet())
             {
@@ -262,9 +276,9 @@ public class RegionCommands extends ContainerCommand
         switch (val)
         {
             case TRUE:
-                return Text.of(TextColors.DARK_GREEN, i18n.translate(cs,"Allowed"));
+                return Text.of(TextColors.DARK_GREEN, i18n.translate(cs,"Enabled"));
             case FALSE:
-                return Text.of(TextColors.DARK_RED, i18n.translate(cs,"Denied"));
+                return Text.of(TextColors.DARK_RED, i18n.translate(cs,"Disabled"));
             default:
                 return Text.of(TextColors.GOLD, i18n.translate(cs,"Undefined"));
         }

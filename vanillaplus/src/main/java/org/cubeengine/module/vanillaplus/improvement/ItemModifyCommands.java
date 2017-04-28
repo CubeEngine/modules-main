@@ -210,7 +210,7 @@ public class ItemModifyCommands extends PermissionContainer
                 if (slot.peek().isPresent())
                 {
                     ItemStack item = slot.peek().get();
-                    if (item.supports(DurabilityData.class))
+                    if (item.supports(DurabilityData.class)) // TODO mod-items that use Durability for different types
                     {
                         Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
                         if (!max.equals(item.get(Keys.ITEM_DURABILITY).orElse(0)))

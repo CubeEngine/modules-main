@@ -133,6 +133,6 @@ public class ImmutablePermissionData extends AbstractImmutableData<ImmutablePerm
     @Override
     public int getContentVersion()
     {
-        return 1;
+        return 2;
     }
 }

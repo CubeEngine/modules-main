@@ -74,6 +74,10 @@ public class Region
 
     public World getWorld()
     {
+        if (this.config.world == null)
+        {
+            return null;
+        }
         return this.config.world.getWorld();
     }
 

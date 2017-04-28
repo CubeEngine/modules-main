@@ -17,50 +17,60 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.StringJoiner;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.util.ContextUtil.toSet;
+import static org.cubeengine.libcube.util.StringUtils.repeat;
+import static org.cubeengine.module.roles.RolesUtil.permText;
+import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
+import static org.spongepowered.api.text.format.TextColors.DARK_RED;
+import static org.spongepowered.api.text.format.TextColors.GOLD;
+import static org.spongepowered.api.text.format.TextColors.GRAY;
+import static org.spongepowered.api.text.format.TextColors.WHITE;
+import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
-import com.google.common.collect.ImmutableMap;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Complete;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
+import org.cubeengine.converter.node.ListNode;
+import org.cubeengine.converter.node.MapNode;
+import org.cubeengine.converter.node.Node;
+import org.cubeengine.converter.node.StringNode;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.RolesUtil.FoundPermission;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
+import org.cubeengine.module.roles.config.PermissionTreeConverter;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.TextElement;
-import org.spongepowered.api.text.TextTemplate;
-import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextColor;
 
-import static org.cubeengine.module.roles.RolesUtil.permText;
-import static org.cubeengine.libcube.util.ContextUtil.toSet;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.text.TextTemplate.arg;
-import static org.spongepowered.api.text.format.TextColors.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.Stack;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 @Command(name = "role", desc = "Manage roles")
 public class RoleInformationCommands extends ContainerCommand
@@ -90,19 +100,22 @@ public class RoleInformationCommands extends ContainerCommand
             return;
         }
         i18n.sendTranslated(cContext, POSITIVE, "The following roles are available:");
-        Text permClick = i18n.getTranslation(cContext, NEUTRAL, "Click to show permissions");
-        Text optClick = i18n.getTranslation(cContext, NEUTRAL, "Click to show options");
-        Text parentClick = i18n.getTranslation(cContext, NEUTRAL, "Click to show parents");
+        String permTrans = i18n.translate("permissions");
+        String optTrans = i18n.translate("options");
+        String parentTrans = i18n.translate("parents");
+        Text permClick = i18n.getTranslation(cContext, NEUTRAL, "Click to show {input}", permTrans);
+        Text optClick = i18n.getTranslation(cContext, NEUTRAL, "Click to show {input}", optTrans);
+        Text parentClick = i18n.getTranslation(cContext, NEUTRAL, "Click to show {input}", parentTrans);
         for (Subject r : roles)
         {
-            cContext.sendMessage(Text.of("- ", YELLOW, r.getIdentifier(), " ",
-                    Text.of("(?)").toBuilder().onHover(TextActions.showText(permClick))
+            cContext.sendMessage(Text.of("- ", GOLD, r.getIdentifier(), " ",
+                    Text.of(GRAY, "[", YELLOW, permTrans, GRAY, "]").toBuilder().onHover(TextActions.showText(permClick))
                             .onClick(TextActions.runCommand("/roles role listpermission " + r.getIdentifier()))
                             .build(), " ",
-                    Text.of("(?)").toBuilder().onHover(TextActions.showText(optClick))
+                    Text.of(GRAY, "[", YELLOW, optTrans, GRAY, "]").toBuilder().onHover(TextActions.showText(optClick))
                             .onClick(TextActions.runCommand("/roles role listoption " + r.getIdentifier()))
                             .build(), " ",
-                    Text.of("(?)").toBuilder().onHover(TextActions.showText(parentClick))
+                    Text.of(GRAY, "[", YELLOW, parentTrans, GRAY, "]").toBuilder().onHover(TextActions.showText(parentClick))
                             .onClick(TextActions.runCommand("/roles role listparent " + r.getIdentifier()))
                             .build() ));
         }
@@ -159,7 +172,7 @@ public class RoleInformationCommands extends ContainerCommand
         String ctxText = getContextString(context);
         if (permissions.isEmpty())
         {
-            i18n.sendTranslated(ctx, NEGATIVE, "No permissions set in {input#context}.", ctxText);
+            //i18n.sendTranslated(ctx, NEGATIVE, "No permissions set in {input#context}.", ctxText);
             return;
         }
         i18n.sendTranslated(ctx, POSITIVE, "in {input#context}:", ctxText);
@@ -167,17 +180,52 @@ public class RoleInformationCommands extends ContainerCommand
         {
             i18n.sendTranslated(ctx, POSITIVE, "(Including inherited permissions)");
         }
-        TextTemplate trueTemplate = TextTemplate.of("- ", arg("perm").color(YELLOW), WHITE, ": ", DARK_GREEN, i18n.getTranslation(ctx, MessageType.NONE, "true"));
-        TextTemplate falseTemplate = TextTemplate.of("- ", arg("perm").color(YELLOW), WHITE, ": ", DARK_RED, i18n.getTranslation(ctx, MessageType.NONE, "false"));
-        for (Entry<String, Boolean> perm : permissions.entrySet())
+
+        Map<String, Object> easyMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Boolean> entry : permissions.entrySet())
         {
-            Map<String, TextElement> map = ImmutableMap.of("perm", permText(ctx, perm.getKey(), service, i18n));
-            if (perm.getValue())
+            PermissionTreeConverter.easyMapValue(easyMap, entry.getKey(), entry.getValue());
+        }
+
+        ListNode list = PermissionTreeConverter.organizeTree(easyMap);
+
+        listPermissions0(ctx, i18n.translate(ctx, "true"), i18n.translate(ctx, "false"), list, 0, new Stack<>());
+    }
+
+    private void listPermissions0(CommandSource ctx, String tT, String fT, ListNode list, int level, Stack<String> permStack)
+    {
+        int i = 0;
+        for (Node value : list.getValue())
+        {
+            i++;
+            String prefix = repeat("│", level);
+            if (value instanceof StringNode)
             {
-                ctx.sendMessage(trueTemplate, map);
-                continue;
+                String perm = ((StringNode) value).getValue();
+                boolean neg = false;
+                TextColor color = DARK_GREEN;
+                if (perm.startsWith("-"))
+                {
+                    neg = true;
+                    perm = perm.substring(1);
+                    color = DARK_RED;
+                }
+                permStack.push(perm);
+                Text permText = Text.of(perm).toBuilder().onHover(TextActions.showText(Text.of(YELLOW, StringUtils.implode(".", permStack)))).build();
+                String tree = prefix + (i == 1 && level != 0 ? (list.getValue().size() == 1 ? "-" : "┬") : "├") + " ";
+                ctx.sendMessage(Text.of(WHITE, tree, YELLOW, permText, WHITE, ": ", color, neg ? fT : tT));
             }
-            ctx.sendMessage(falseTemplate, map);
+            if (value instanceof MapNode)
+            {
+                for (Entry<String, Node> entry : ((MapNode) value).getMappedNodes().entrySet())
+                {
+                    String tree = prefix + (i == 1 ? "┬" : "├") + " ";
+                    ctx.sendMessage(Text.of(WHITE, tree, YELLOW, entry.getKey(), WHITE, ":"));
+                    permStack.push(entry.getKey());
+                    listPermissions0(ctx, tT, fT, ((ListNode) entry.getValue()), level + 1, permStack);
+                }
+            }
+            permStack.pop();
         }
     }
 
@@ -217,7 +265,7 @@ public class RoleInformationCommands extends ContainerCommand
         String ctxText = getContextString(context);
         if (options.isEmpty())
         {
-            i18n.sendTranslated(ctx, NEGATIVE, "No options set in {input#context}.", ctxText);
+            //i18n.sendTranslated(ctx, NEGATIVE, "No options set in {input#context}.", ctxText);
             return;
         }
         i18n.sendTranslated(ctx, POSITIVE, "in {input#context}:", ctxText);

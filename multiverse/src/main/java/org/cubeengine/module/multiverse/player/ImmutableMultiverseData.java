@@ -81,7 +81,7 @@ public class ImmutableMultiverseData extends AbstractImmutableData<ImmutableMult
     @Override
     public int getContentVersion()
     {
-        return 1;
+        return 2;
     }
 
 

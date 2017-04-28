@@ -208,6 +208,6 @@ public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
     @Override
     public int getContentVersion()
     {
-        return 1;
+        return 2;
     }
 }
