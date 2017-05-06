@@ -17,14 +17,6 @@
  */
 package org.cubeengine.module.vanillaplus.improvement.summon;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
@@ -32,13 +24,8 @@ import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.HorseColor;
 import org.spongepowered.api.data.type.HorseColors;
-import org.spongepowered.api.data.type.HorseStyle;
-import org.spongepowered.api.data.type.HorseStyles;
-import org.spongepowered.api.data.type.HorseVariant;
-import org.spongepowered.api.data.type.HorseVariants;
 import org.spongepowered.api.data.type.OcelotType;
 import org.spongepowered.api.data.type.OcelotTypes;
-import org.spongepowered.api.data.type.SkeletonTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.Ageable;
 import org.spongepowered.api.entity.living.Living;
@@ -50,7 +37,6 @@ import org.spongepowered.api.entity.living.animal.Sheep;
 import org.spongepowered.api.entity.living.animal.Wolf;
 import org.spongepowered.api.entity.living.monster.Creeper;
 import org.spongepowered.api.entity.living.monster.Enderman;
-import org.spongepowered.api.entity.living.monster.Skeleton;
 import org.spongepowered.api.entity.living.monster.Slime;
 import org.spongepowered.api.entity.living.monster.Zombie;
 import org.spongepowered.api.entity.living.monster.ZombiePigman;
@@ -59,6 +45,15 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.serializer.TextSerializers;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 
 public class EntityDataChanger<EntityInterface>
@@ -169,6 +164,7 @@ public class EntityDataChanger<EntityInterface>
              }
          });
 
+    /*
     public static final EntityDataChanger<Skeleton> SKELETON_TYPE =
         new EntityDataChanger<>(Skeleton.class,
          new BoolEntityChanger<Skeleton>("wither") {
@@ -178,6 +174,7 @@ public class EntityDataChanger<EntityInterface>
                  entity.offer(Keys.SKELETON_TYPE, input ? SkeletonTypes.WITHER : SkeletonTypes.NORMAL);
              }
          });
+     */
 
     public static final EntityDataChanger<Sheep> SHEEP_SHEARED =
         new EntityDataChanger<>(Sheep.class,
@@ -657,6 +654,7 @@ public class EntityDataChanger<EntityInterface>
                                     }
                                 });
 
+    /*
     public static final EntityDataChanger<Horse> HORSE_VARIANT =
         new EntityDataChanger<>(Horse.class,
                                 new MappedEntityChanger<Horse, HorseVariant>() {
@@ -696,7 +694,7 @@ public class EntityDataChanger<EntityInterface>
                                         entity.offer(Keys.HORSE_STYLE, input);
                                     }
                                 });
-
+    */
 
     private EntityDataChanger(Class<EntityInterface> clazz, EntityChanger<EntityInterface, ?> changer)
     {

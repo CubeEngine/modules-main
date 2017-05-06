@@ -42,6 +42,8 @@ import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.spongepowered.api.Platform.Component.API;
+import static org.spongepowered.api.Platform.Component.IMPLEMENTATION;
 import static org.spongepowered.api.text.format.TextColors.GREEN;
 import static org.spongepowered.api.text.format.TextColors.RESET;
 
@@ -93,22 +95,24 @@ public class PluginCommands extends PermissionContainer
         if (plugin == null)
         {
             Platform platform = Sponge.getGame().getPlatform();
+            PluginContainer impl = platform.getContainer(IMPLEMENTATION);
             switch (platform.getType())
             {
                 case CLIENT:
                     i18n.sendTranslated(context, NEUTRAL, "This client is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
-                                        platform.getImplementation().getName(), platform.getMinecraftVersion().getName(), platform.getImplementation().getVersion().orElse(""));
+                                        impl.getName(), platform.getMinecraftVersion().getName(), impl.getVersion().orElse(""));
                     break;
                 case SERVER:
                     i18n.sendTranslated(context, NEUTRAL, "This server is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
-                                        platform.getImplementation().getName(), platform.getMinecraftVersion().getName(), platform.getImplementation().getVersion().orElse(""));
+                                        impl.getName(), platform.getMinecraftVersion().getName(), impl.getVersion().orElse(""));
                     break;
                 case UNKNOWN:
-                    i18n.sendTranslated(context, NEUTRAL, "Unknown platform running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
-                                        platform.getImplementation().getName(), platform.getMinecraftVersion().getName(), platform.getImplementation().getVersion().orElse(""));
+                    i18n.sendTranslated(context, NEUTRAL, "Unknown platform running {name#server} {name#version:color=INDIGO} {name#version:color"
+                                    + "=INDIGO}",
+                                        impl.getName(), platform.getMinecraftVersion().getName(), impl.getVersion().orElse(""));
             }
 
-            i18n.sendTranslated(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getApi().getVersion().orElse("unknown"));
+            i18n.sendTranslated(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getContainer(API).getVersion().orElse("unknown"));
             context.sendMessage(Text.EMPTY);
             i18n.sendTranslated(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.plugin.getVersion().orElse("unknown"));
             return;
