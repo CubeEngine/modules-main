@@ -45,10 +45,13 @@ public class WorldControl extends Module
     @Listener
     public void onSpawnEntity(SpawnEntityEvent event)
     {
-        WorldSection section = config.worldSettings.get(new ConfigWorld(event.getTargetWorld()));
-        if (section != null)
+        if (!event.getEntities().isEmpty())
         {
+            WorldSection section = config.worldSettings.get(new ConfigWorld(event.getEntities().iterator().next().getWorld()));
+            if (section != null)
+            {
 
+            }
         }
     }
 }
