@@ -40,6 +40,7 @@ import static org.spongepowered.api.block.BlockTypes.JUNGLE_DOOR;
 import static org.spongepowered.api.block.BlockTypes.SPRUCE_DOOR;
 import static org.spongepowered.api.block.BlockTypes.TRAPPED_CHEST;
 import static org.spongepowered.api.block.BlockTypes.WOODEN_DOOR;
+import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 
 import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.logscribe.Log;
@@ -479,11 +480,11 @@ public class LockManager
             }
             if (user != null)
             {
-                i18n.sendTranslated(user, POSITIVE, "Removed Lock!");
+                i18n.sendTranslated(ACTION_BAR, user, POSITIVE, "Removed Lock!");
             }
             return;
         }
-        i18n.sendTranslated(user, NEGATIVE, "This protection is not yours!");
+        i18n.sendTranslated(ACTION_BAR, user, NEGATIVE, "This protection is not yours!");
     }
 
     /**
@@ -500,7 +501,7 @@ public class LockManager
     {
         if (getLock(block) != null)
         {
-            i18n.sendTranslated(player, NEUTRAL, "There is already protection here!");
+            i18n.sendTranslated(ACTION_BAR, player, NEUTRAL, "There is already protection here!");
             return null;
         }
 
@@ -751,23 +752,23 @@ public class LockManager
                 {
                     accessListModel = database.getDSL().newRecord(TABLE_ACCESS_LIST).newGlobalAccess(sender, access.user, accessType);
                     accessListModel.insertAsync();
-                    i18n.sendTranslated(sender, POSITIVE, "Global access for {user} set!", access.user);
+                    i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "Global access for {user} set!", access.user);
                 }
                 else
                 {
                     accessListModel.setValue(TABLE_ACCESS_LIST.LEVEL, accessType);
                     accessListModel.updateAsync();
-                    i18n.sendTranslated(sender, POSITIVE, "Updated global access level for {user}!", access.user);
+                    i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "Updated global access level for {user}!", access.user);
                 }
             }
             else if (accessListModel == null)
             {
-                i18n.sendTranslated(sender, NEUTRAL, "{user} had no global access!", access.user);
+                i18n.sendTranslated(ACTION_BAR, sender, NEUTRAL, "{user} had no global access!", access.user);
             }
             else
             {
                 accessListModel.deleteAsync();
-                i18n.sendTranslated(sender, POSITIVE, "Removed global access from {user}", access.user);
+                i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "Removed global access from {user}", access.user);
             }
 
         }

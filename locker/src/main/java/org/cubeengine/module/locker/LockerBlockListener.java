@@ -49,6 +49,8 @@ import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.chat.ChatType;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.util.Direction;
@@ -66,6 +68,7 @@ import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.data.property.block.MatterProperty.Matter.LIQUID;
 import static org.spongepowered.api.data.property.block.MatterProperty.Matter.SOLID;
 import static org.spongepowered.api.data.type.PortionTypes.TOP;
+import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 import static org.spongepowered.api.util.Direction.*;
 
 public class LockerBlockListener
@@ -107,8 +110,7 @@ public class LockerBlockListener
                     return;
                 }
             }
-            if (module.getConfig().disableAutoProtect.stream().map(ConfigWorld::getWorld).collect(toSet()).contains(
-                loc.getExtent()))
+            if (module.getConfig().disableAutoProtect.stream().map(ConfigWorld::getWorld).collect(toSet()).contains(loc.getExtent()))
             {
                 return;
             }
@@ -161,7 +163,7 @@ public class LockerBlockListener
         {
             if (!lock.validateTypeAt(relative))
             {
-                i18n.sendTranslated(player, NEUTRAL, "Nearby BlockProtection is not valid!");
+                i18n.sendTranslated(ACTION_BAR, player, NEUTRAL, "Nearby BlockProtection is not valid!");
                 lock.delete(player);
                 return true;
             }
@@ -180,12 +182,12 @@ public class LockerBlockListener
             {
                 this.manager.extendLock(lock, location);
                 this.manager.extendLock(lock, relative);
-                i18n.sendTranslated(player, POSITIVE, "Protection expanded to {amount} blocks!", lock.getLocations().size());
+                i18n.sendTranslated(ACTION_BAR, player, POSITIVE, "Protection expanded to {amount} blocks!", lock.getLocations().size());
             }
             else
             {
                 event.setCancelled(true);
-                i18n.sendTranslated(player, NEGATIVE, "The nearby door is protected by someone else!");
+                i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "The nearby door is protected by someone else!");
             }
             return true;
         }
@@ -209,18 +211,18 @@ public class LockerBlockListener
             }
             if (!lock.validateTypeAt(relativeLoc))
             {
-                i18n.sendTranslated(player, NEUTRAL, "Nearby BlockProtection is not valid!");
+                i18n.sendTranslated(ACTION_BAR, player, NEUTRAL, "Nearby BlockProtection is not valid!");
                 lock.delete(player);
             }
             else if (lock.isOwner(player) || lock.hasAdmin(player) || player.hasPermission(module.perms().EXPAND_OTHER.getId()))
             {
                 this.manager.extendLock(lock, placed);
-                i18n.sendTranslated(player, POSITIVE, "Protection expanded to {amount} blocks!", lock.getLocations().size());
+                i18n.sendTranslated(ACTION_BAR, player, POSITIVE, "Protection expanded to {amount} blocks!", lock.getLocations().size());
             }
             else
             {
                 event.setCancelled(true);
-                i18n.sendTranslated(player, NEGATIVE, "The nearby chest is protected by someone else!");
+                i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "The nearby chest is protected by someone else!");
             }
             return true;
         }

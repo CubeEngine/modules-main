@@ -142,19 +142,19 @@ public class Lock
         switch (this.getLockType())
         {
         case PRIVATE:
-            i18n.sendTranslatedN(user, POSITIVE, size, "Private Lock created!", "Private Lock created! ({amount} blocks)", size);
+            i18n.sendTranslatedN(ACTION_BAR, user, POSITIVE, size, "Private Lock created!", "Private Lock created! ({amount} blocks)", size);
             break;
         case PUBLIC:
-            i18n.sendTranslatedN(user, POSITIVE, size, "Public Lock created!", "Public Lock created! ({amount} blocks)", size);
+            i18n.sendTranslatedN(ACTION_BAR, user, POSITIVE, size, "Public Lock created!", "Public Lock created! ({amount} blocks)", size);
             break;
         case GUARDED:
-            i18n.sendTranslatedN(user, POSITIVE, size, "Guarded Lock created!", "Guarded Lock created! ({amount} blocks)", size);
+            i18n.sendTranslatedN(ACTION_BAR, user, POSITIVE, size, "Guarded Lock created!", "Guarded Lock created! ({amount} blocks)", size);
             break;
         case DONATION:
-            i18n.sendTranslatedN(user, POSITIVE, size, "Donation Lock created!", "Donation Lock created! ({amount} blocks)", size);
+            i18n.sendTranslatedN(ACTION_BAR, user, POSITIVE, size, "Donation Lock created!", "Donation Lock created! ({amount} blocks)", size);
             break;
         case FREE:
-            i18n.sendTranslatedN(user, POSITIVE, size, "Free Lock created!", "Free Lock created! ({amount} blocks)", size);
+            i18n.sendTranslatedN(ACTION_BAR, user, POSITIVE, size, "Free Lock created!", "Free Lock created! ({amount} blocks)", size);
             break;
         }
     }
