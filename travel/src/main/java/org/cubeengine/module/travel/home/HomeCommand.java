@@ -22,6 +22,7 @@ import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 import static org.spongepowered.api.text.format.TextColors.BLUE;
 import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
 import static org.spongepowered.api.text.format.TextColors.GOLD;
@@ -135,10 +136,10 @@ public class HomeCommand extends ContainerCommand
         }
         if (h.owner.equals(sender.getUniqueId()))
         {
-            i18n.sendTranslated(sender, POSITIVE, "You have been teleported to your home {name}!", h.name);
+            i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "You have been teleported to your home {name}!", h.name);
             return;
         }
-        i18n.sendTranslated(sender, POSITIVE, "You have been teleported to the home {name} of {user}!", h.name, h.getOwner());
+        i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "You have been teleported to the home {name} of {user}!", h.name, h.getOwner());
     }
 
     @Alias("sethome")

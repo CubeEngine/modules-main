@@ -46,10 +46,12 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 import static org.spongepowered.api.text.format.TextColors.BLUE;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
@@ -110,10 +112,10 @@ public class WarpCommand extends ContainerCommand
         }
         if (w.isOwner(sender))
         {
-            i18n.sendTranslated(sender, POSITIVE, "You have been teleported to your warp {name}!", w.name);
+            i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "You have been teleported to your warp {name}!", w.name);
             return;
         }
-        i18n.sendTranslated(sender, POSITIVE, "You have been teleported to the warp {name} of {user}!", w.name, w.getOwner());
+        i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "You have been teleported to the warp {name} of {user}!", w.name, w.getOwner());
     }
 
     @Restricted(Player.class)
