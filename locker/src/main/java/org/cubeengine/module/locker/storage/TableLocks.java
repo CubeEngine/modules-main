@@ -56,7 +56,7 @@ public class TableLocks extends AutoIncrementTable<LockModel, UInteger>
 
     public TableLocks(String prefix, Database db)
     {
-        super(prefix + "locks", new Version(1), db);
+        super(prefix + "locker_locks", new Version(1), db);
         this.setAIKey(ID);
         this.addUniqueKey(ENTITY_UID_LEAST, ENTITY_UID_MOST);
         this.addFields(ID, OWNER_ID, FLAGS, PROTECTED_TYPE, LOCK_TYPE, PASSWORD, ENTITY_UID_LEAST, ENTITY_UID_MOST,
