@@ -29,6 +29,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+
+import org.cubeengine.libcube.service.filesystem.FileUtil;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.module.conomy.command.EcoCommand;
 import org.cubeengine.module.conomy.command.MoneyCommand;
@@ -238,8 +240,8 @@ public class ConomyService implements EconomyService, CatalogRegistryModule<Curr
         SelectJoinStep<Record4<String, String, String, Long>> from = db.getDSL()
                 .select(TABLE_BALANCE.ACCOUNT_ID, TABLE_BALANCE.CURRENCY, TABLE_BALANCE.CONTEXT, TABLE_BALANCE.BALANCE)
                 .from(TABLE_BALANCE.join(TABLE_ACCOUNT).on(TABLE_BALANCE.ACCOUNT_ID.eq(TABLE_ACCOUNT.ID)));
-        Condition userCond = TABLE_ACCOUNT.MASK.bitAnd(((byte) 4)).eq(((byte) 4));
-        Condition bankCond = TABLE_ACCOUNT.MASK.bitAnd(((byte) 4)).eq(((byte) 0));
+        Condition userCond = TABLE_ACCOUNT.IS_UUID.eq(true);
+        Condition bankCond = TABLE_ACCOUNT.IS_UUID.eq(false);
         SelectConditionStep<Record4<String, String, String, Long>> where;
         if (!user && !bank)
         {
@@ -260,7 +262,7 @@ public class ConomyService implements EconomyService, CatalogRegistryModule<Curr
 
         if (!showHidden)
         {
-            where = where.and(TABLE_ACCOUNT.MASK.bitAnd((byte) 1).eq((byte) 0));
+            where = where.and(TABLE_ACCOUNT.HIDDEN.eq(false));
         }
         return where.orderBy(TABLE_BALANCE.BALANCE.desc()).limit(fromRank - 1, toRank - fromRank + 1).fetchInto(BalanceModel.class);
     }

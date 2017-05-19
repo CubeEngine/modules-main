@@ -227,4 +227,6 @@ public class EcoCommand extends ContainerCommand
 
     //@Command(desc = "Deletes a users account.")
     // TODO public void delete(CommandSource context, User player)
+
+    //TODO list currencies
 }
