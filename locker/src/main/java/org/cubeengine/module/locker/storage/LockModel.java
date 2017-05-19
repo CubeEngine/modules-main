@@ -46,8 +46,7 @@ public class LockModel extends AsyncRecord<LockModel>
         this.setValue(TABLE_LOCKS.PROTECTED_TYPE, type.id);
         if (entityUUID != null)
         {
-            this.setValue(TABLE_LOCKS.ENTITY_UID_LEAST, entityUUID.getLeastSignificantBits());
-            this.setValue(TABLE_LOCKS.ENTITY_UID_MOST, entityUUID.getMostSignificantBits());
+            this.setValue(TABLE_LOCKS.ENTITY_UUID, entityUUID);
         }
         this.setValue(TABLE_LOCKS.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
         this.setValue(TABLE_LOCKS.CREATED, new Timestamp(System.currentTimeMillis()));
@@ -60,8 +59,8 @@ public class LockModel extends AsyncRecord<LockModel>
     {
         if (this.uuid == null)
         {
-            if (this.getValue(TABLE_LOCKS.ENTITY_UID_LEAST) == null) return null;
-            this.uuid = new UUID(this.getValue(TABLE_LOCKS.ENTITY_UID_MOST), this.getValue(TABLE_LOCKS.ENTITY_UID_LEAST));
+            if (this.getValue(TABLE_LOCKS.ENTITY_UUID) == null) return null;
+            this.uuid = this.getValue(TABLE_LOCKS.ENTITY_UUID);
         }
         return this.uuid;
     }
