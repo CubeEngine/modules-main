@@ -17,26 +17,50 @@
  */
 package org.cubeengine.module.conomy.storage;
 
+import org.cubeengine.libcube.service.database.TableUpdateCreator;
 import org.cubeengine.libcube.util.Version;
 import org.cubeengine.libcube.service.database.Database;
 import org.cubeengine.libcube.service.database.Table;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 
-public class TableAccount extends Table<AccountModel>
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class TableAccount extends Table<AccountModel> implements TableUpdateCreator<AccountModel>
 {
     public static TableAccount TABLE_ACCOUNT;
     public final TableField<AccountModel, String> ID = createField("id", SQLDataType.VARCHAR.length(64).nullable(false), this);
     public final TableField<AccountModel, String> NAME = createField("name", SQLDataType.VARCHAR.length(64), this);
-    public final TableField<AccountModel, Byte> MASK = createField("mask", SQLDataType.TINYINT, this);
+    public final TableField<AccountModel, Boolean> HIDDEN = createField("hidden", SQLDataType.BOOLEAN, this);
+    public final TableField<AccountModel, Boolean> INVITE = createField("invite", SQLDataType.BOOLEAN, this);
+    public final TableField<AccountModel, Boolean> IS_UUID = createField("is_uuid", SQLDataType.BOOLEAN, this);
 
     public TableAccount(String prefix, Database database)
     {
-        super(prefix + "conomy_account", new Version(1), database);
+        super(prefix + "conomy_account", new Version(2), database);
         this.setPrimaryKey(ID);
         this.addUniqueKey(ID);
-        this.addFields(ID, NAME, MASK);
+        this.addFields(ID, NAME, HIDDEN, INVITE, IS_UUID);
         TABLE_ACCOUNT = this;
+    }
+
+    @Override
+    public void update(Connection connection, Version dbVersion) throws SQLException
+    {
+        if (new Version(1).equals(dbVersion)) // Update to Version 2
+        {
+            // Remove mask;
+            Statement stmt = connection.createStatement();
+            stmt.execute("ALTER TABLE `"+ getName()+ "` ADD"
+                    + "( HIDDEN BOOLEAN, INVITE BOOLEAN, IS_UUID BOOLEAN)");
+            stmt.execute("UPDATE TABLE `" + getName() + "` SET "
+                            + "HIDDEN = MASK & 1 = 1,"
+                            + "INVITE = MASK & 2 = 2,"
+                            + "IS_UUID = MASK & 4 = 4");
+            stmt.execute("ALTER TABLE `" + getName() +"` DROP COLUMN MASK");
+        }
     }
 
     @Override

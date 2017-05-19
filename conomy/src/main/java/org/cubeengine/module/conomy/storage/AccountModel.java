@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.conomy.storage;
 
+import java.util.BitSet;
 import java.util.Optional;
 import java.util.UUID;
 import org.cubeengine.libcube.service.database.AsyncRecord;
@@ -44,52 +45,35 @@ public class AccountModel extends AsyncRecord<AccountModel>
     {
         this.setValue(TABLE_ACCOUNT.ID, id);
         this.setValue(TABLE_ACCOUNT.NAME, name);
-        this.setValue(TABLE_ACCOUNT.MASK, (byte)((hidden ? 1 : 0) + (needsInvite ? 2 : 0) + (isUUID ? 4 : 0)));
+        this.setValue(TABLE_ACCOUNT.HIDDEN, hidden);
+        this.setValue(TABLE_ACCOUNT.INVITE, needsInvite);
+        this.setValue(TABLE_ACCOUNT.IS_UUID, isUUID);
         return this;
     }
 
     public boolean isUUID()
     {
-        return (this.getValue(TABLE_ACCOUNT.MASK) & 4) == 4;
+        return this.getValue(TABLE_ACCOUNT.IS_UUID);
     }
 
     public boolean isInvite()
     {
-        return (this.getValue(TABLE_ACCOUNT.MASK) & 2) == 2;
+        return this.getValue(TABLE_ACCOUNT.INVITE);
     }
 
     public boolean isHidden()
     {
-        return (this.getValue(TABLE_ACCOUNT.MASK) & 1) == 1;
+        return this.getValue(TABLE_ACCOUNT.HIDDEN);
     }
 
     public void setInvite(boolean set)
     {
-        byte mask = this.getValue(TABLE_ACCOUNT.MASK);
-        if (set)
-        {
-            mask |= 2;
-        }
-        else
-        {
-            mask &= ~2;
-        }
-        this.setValue(TABLE_ACCOUNT.MASK, mask);
+        this.setValue(TABLE_ACCOUNT.INVITE, set);
     }
 
     public void setHidden(boolean set)
     {
-        byte mask = this.getValue(TABLE_ACCOUNT.MASK);
-        if (set)
-        {
-            mask |= 1;
-        }
-        else
-        {
-            mask &= ~1;
-        }
-        this.setValue(TABLE_ACCOUNT.MASK, mask);
-        this.updateAsync();
+        this.setValue(TABLE_ACCOUNT.HIDDEN, set);
     }
 
     public Optional<UUID> getUUID()
