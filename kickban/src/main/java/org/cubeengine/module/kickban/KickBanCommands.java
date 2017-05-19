@@ -208,7 +208,14 @@ public class KickBanCommands
         if (banService.isBanned(player.getProfile()))
         {
             this.banService.pardon(player.getProfile());
-            i18n.sendTranslated(context, POSITIVE, "You unbanned {user}({name#uuid})!", player, player.getUniqueId().toString());
+            if (context instanceof Player)
+            {
+                i18n.sendTranslated(context, POSITIVE, "You unbanned {user}!", player);
+            }
+            else
+            {
+                i18n.sendTranslated(context, POSITIVE, "You unbanned {user}({name#uuid})!", player, player.getUniqueId().toString());
+            }
             return;
         }
         i18n.sendTranslated(context, NEGATIVE, "{user} is not banned, maybe you misspelled his name?", player);
