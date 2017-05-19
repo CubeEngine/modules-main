@@ -24,13 +24,13 @@ import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.service.database.AsyncRecord;
 import org.spongepowered.api.entity.living.player.User;
 
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
 
 public class LockModel extends AsyncRecord<LockModel>
 {
     public LockModel()
     {
-        super(TABLE_LOCK);
+        super(TABLE_LOCKS);
     }
 
     public LockModel newLock(User user, LockType lockType, ProtectedType type)
@@ -40,17 +40,17 @@ public class LockModel extends AsyncRecord<LockModel>
 
     public LockModel newLock(User user, LockType lockType, ProtectedType type, UUID entityUUID)
     {
-        this.setValue(TABLE_LOCK.OWNER_ID, user.getUniqueId());
-        this.setValue(TABLE_LOCK.LOCK_TYPE, lockType.id);
-        this.setValue(TABLE_LOCK.FLAGS, (short)0); // none
-        this.setValue(TABLE_LOCK.PROTECTED_TYPE, type.id);
+        this.setValue(TABLE_LOCKS.OWNER_ID, user.getUniqueId());
+        this.setValue(TABLE_LOCKS.LOCK_TYPE, lockType.id);
+        this.setValue(TABLE_LOCKS.FLAGS, (short)0); // none
+        this.setValue(TABLE_LOCKS.PROTECTED_TYPE, type.id);
         if (entityUUID != null)
         {
-            this.setValue(TABLE_LOCK.ENTITY_UID_LEAST, entityUUID.getLeastSignificantBits());
-            this.setValue(TABLE_LOCK.ENTITY_UID_MOST, entityUUID.getMostSignificantBits());
+            this.setValue(TABLE_LOCKS.ENTITY_UID_LEAST, entityUUID.getLeastSignificantBits());
+            this.setValue(TABLE_LOCKS.ENTITY_UID_MOST, entityUUID.getMostSignificantBits());
         }
-        this.setValue(TABLE_LOCK.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
-        this.setValue(TABLE_LOCK.CREATED, new Timestamp(System.currentTimeMillis()));
+        this.setValue(TABLE_LOCKS.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
+        this.setValue(TABLE_LOCKS.CREATED, new Timestamp(System.currentTimeMillis()));
         return this;
     }
 
@@ -60,8 +60,8 @@ public class LockModel extends AsyncRecord<LockModel>
     {
         if (this.uuid == null)
         {
-            if (this.getValue(TABLE_LOCK.ENTITY_UID_LEAST) == null) return null;
-            this.uuid = new UUID(this.getValue(TABLE_LOCK.ENTITY_UID_MOST), this.getValue(TABLE_LOCK.ENTITY_UID_LEAST));
+            if (this.getValue(TABLE_LOCKS.ENTITY_UID_LEAST) == null) return null;
+            this.uuid = new UUID(this.getValue(TABLE_LOCKS.ENTITY_UID_MOST), this.getValue(TABLE_LOCKS.ENTITY_UID_LEAST));
         }
         return this.uuid;
     }
@@ -81,12 +81,12 @@ public class LockModel extends AsyncRecord<LockModel>
             synchronized (manager.messageDigest)
             {
                 manager.messageDigest.reset();
-                this.setValue(TABLE_LOCK.PASSWORD, manager.messageDigest.digest(pass.getBytes()));
+                this.setValue(TABLE_LOCKS.PASSWORD, manager.messageDigest.digest(pass.getBytes()));
             }
         }
         else
         {
-            this.setValue(TABLE_LOCK.PASSWORD, StringUtils.randomString(new SecureRandom(), 4, "0123456789abcdefklmnor").getBytes());
+            this.setValue(TABLE_LOCKS.PASSWORD, StringUtils.randomString(new SecureRandom(), 4, "0123456789abcdefklmnor").getBytes());
         }
         return this;
     }

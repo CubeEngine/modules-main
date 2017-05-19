@@ -29,7 +29,6 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.jooq.types.UInteger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
-import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -41,13 +40,12 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.data.key.Keys.DISPLAY_NAME;
 import static org.spongepowered.api.data.key.Keys.ITEM_LORE;
 import static org.spongepowered.api.effect.sound.SoundTypes.*;
 import static org.spongepowered.api.item.ItemTypes.PAPER;
-import static org.spongepowered.api.item.ItemTypes.SPONGE;
 import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 
 public class KeyBook
@@ -162,7 +160,7 @@ public class KeyBook
 
     public boolean isValidFor(Lock lock)
     {
-        boolean b = Arrays.equals(pass, lock.model.getValue(TABLE_LOCK.PASSWORD));
+        boolean b = Arrays.equals(pass, lock.model.getValue(TABLE_LOCKS.PASSWORD));
         if (!b)
         {
             this.module.getProvided(Log.class).debug("Invalid KeyBook detected! {}", display);

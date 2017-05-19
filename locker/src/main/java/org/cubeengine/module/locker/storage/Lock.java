@@ -25,9 +25,9 @@ import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_ADMIN;
 import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_ALL;
 import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_FULL;
 import static org.cubeengine.module.locker.storage.LockType.PUBLIC;
-import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
-import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESSLIST;
+import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATIONS;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
 import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
 import static org.spongepowered.api.item.ItemTypes.ENCHANTED_BOOK;
 import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
@@ -205,7 +205,7 @@ public class Lock
         item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.getTranslation(player, NEUTRAL, "This book can"),
                                                  i18n.getTranslation(player, NEUTRAL, "unlock a magically"),
                                                  i18n.getTranslation(player, NEUTRAL, "locked protection")));
-        item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCK.PASSWORD), Sponge.getRegistry().getValueFactory()));
+        item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCKS.PASSWORD), Sponge.getRegistry().getValueFactory()));
         player.setItemInHand(HandTypes.MAIN_HAND, item);
         if (itemStack != null && itemStack.getQuantity() != 0)
         {
@@ -235,13 +235,13 @@ public class Lock
         {
             if (model == null)
             {
-                model = db.getDSL().newRecord(TABLE_ACCESS_LIST).newAccess(this.model, modifyUser);
-                model.setValue(TABLE_ACCESS_LIST.LEVEL, level);
+                model = db.getDSL().newRecord(TABLE_ACCESSLIST).newAccess(this.model, modifyUser);
+                model.setValue(TABLE_ACCESSLIST.LEVEL, level);
                 model.insertAsync();
             }
             else
             {
-                model.setValue(TABLE_ACCESS_LIST.LEVEL, level);
+                model.setValue(TABLE_ACCESSLIST.LEVEL, level);
                 model.updateAsync();
                 return false;
             }
@@ -335,14 +335,15 @@ public class Lock
         synchronized (this.manager.messageDigest)
         {
             this.manager.messageDigest.reset();
-            return Arrays.equals(this.manager.messageDigest.digest(pass.getBytes()), this.model.getValue(TABLE_LOCK.PASSWORD));
+            return Arrays.equals(this.manager.messageDigest.digest(pass.getBytes()), this.model.getValue(TABLE_LOCKS.PASSWORD));
         }
     }
 
     private Location<World> getLocation(LockLocationModel model)
     {
-        Optional<World> world = Sponge.getServer().getWorld(model.getValue(TABLE_LOCK_LOCATION.WORLD_ID));
-        return new Location<>(world.get(), model.getValue(TABLE_LOCK_LOCATION.X), model.getValue(TABLE_LOCK_LOCATION.Y), model.getValue(TABLE_LOCK_LOCATION.Z));
+        Optional<World> world = Sponge.getServer().getWorld(model.getValue(TABLE_LOCK_LOCATIONS.WORLD_ID));
+        return new Location<>(world.get(), model.getValue(TABLE_LOCK_LOCATIONS.X), model.getValue(TABLE_LOCK_LOCATIONS.Y), model.getValue(
+                TABLE_LOCK_LOCATIONS.Z));
     }
 
     public boolean isBlockLock()
@@ -381,7 +382,7 @@ public class Lock
         }
         if (event.isCancelled()) return;
 
-        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getUniqueId())) return; // Its the owner
+        if (this.model.getValue(TABLE_LOCKS.OWNER_ID).equals(user.getUniqueId())) return; // Its the owner
         switch (this.getLockType())
         {
             case PRIVATE: // block changes
@@ -413,16 +414,16 @@ public class Lock
 
     private AccessListModel getAccess(User user)
     {
-        AccessListModel model = db.getDSL().selectFrom(TABLE_ACCESS_LIST).
-            where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID)),
-                  TABLE_ACCESS_LIST.USER_ID.eq(user.getUniqueId())).fetchOne();
+        AccessListModel model = db.getDSL().selectFrom(TABLE_ACCESSLIST).
+            where(TABLE_ACCESSLIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCKS.ID)),
+                  TABLE_ACCESSLIST.USER_ID.eq(user.getUniqueId())).fetchOne();
         if (model == null)
         {
 
 
-            model = db.getDSL().selectFrom(TABLE_ACCESS_LIST).
-                where(TABLE_ACCESS_LIST.USER_ID.eq(user.getUniqueId()),
-                      TABLE_ACCESS_LIST.OWNER_ID.eq(this.model.getValue(TABLE_LOCK.OWNER_ID))).fetchOne();
+            model = db.getDSL().selectFrom(TABLE_ACCESSLIST).
+                where(TABLE_ACCESSLIST.USER_ID.eq(user.getUniqueId()),
+                      TABLE_ACCESSLIST.OWNER_ID.eq(this.model.getValue(TABLE_LOCKS.OWNER_ID))).fetchOne();
         }
         return model;
     }
@@ -533,17 +534,17 @@ public class Lock
 
     public ProtectedType getProtectedType()
     {
-        return ProtectedType.forByte(this.model.getValue(TABLE_LOCK.PROTECTED_TYPE));
+        return ProtectedType.forByte(this.model.getValue(TABLE_LOCKS.PROTECTED_TYPE));
     }
 
     public LockType getLockType()
     {
-        return LockType.forByte(this.model.getValue(TABLE_LOCK.LOCK_TYPE));
+        return LockType.forByte(this.model.getValue(TABLE_LOCKS.LOCK_TYPE));
     }
 
     public void handleBlockBreak(Cancellable event, Player user)
     {
-        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getUniqueId())
+        if (this.model.getValue(TABLE_LOCKS.OWNER_ID).equals(user.getUniqueId())
             || user.hasPermission(module.perms().BREAK_OTHER.getId()))
         {
             this.delete(user);
@@ -572,7 +573,7 @@ public class Lock
 
     public boolean handleEntityDamage(Player user)
     {
-        if (this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getUniqueId())
+        if (this.model.getValue(TABLE_LOCKS.OWNER_ID).equals(user.getUniqueId())
             || user.hasPermission(module.perms().BREAK_OTHER.getId()))
         {
             i18n.sendTranslated(ACTION_BAR, user, NEUTRAL, "The magic surrounding this entity quivers as you hit it!");
@@ -601,23 +602,23 @@ public class Lock
 
     public boolean isOwner(Player user)
     {
-        return this.model.getValue(TABLE_LOCK.OWNER_ID).equals(user.getUniqueId());
+        return this.model.getValue(TABLE_LOCKS.OWNER_ID).equals(user.getUniqueId());
     }
 
     public boolean hasAdmin(Player user)
     {
         AccessListModel access = this.getAccess(user);
-        return access != null && (access.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN;
+        return access != null && (access.getValue(TABLE_ACCESSLIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN;
     }
 
     public UInteger getId()
     {
-        return this.model.getValue(TABLE_LOCK.ID);
+        return this.model.getValue(TABLE_LOCKS.ID);
     }
 
     public boolean hasPass()
     {
-        return this.model.getValue(TABLE_LOCK.PASSWORD).length > 4;
+        return this.model.getValue(TABLE_LOCKS.PASSWORD).length > 4;
     }
 
     private Map<UUID, Long> lastKeyNotify;
@@ -628,7 +629,7 @@ public class Lock
         {
             this.lastKeyNotify = new HashMap<>();
         }
-        User owner = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(model.getValue(TABLE_LOCK.OWNER_ID)).get();
+        User owner = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(model.getValue(TABLE_LOCKS.OWNER_ID)).get();
         if (owner.equals(user))
         {
             return;
@@ -660,7 +661,7 @@ public class Lock
                 this.lastNotify = new HashMap<>();
             }
             User owner = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(this.model.getValue(
-                TABLE_LOCK.OWNER_ID)).get();
+                TABLE_LOCKS.OWNER_ID)).get();
             Long last = this.lastNotify.get(owner.getUniqueId());
             if (last == null || TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - last) > 60) // 60 sec config ?
             {
@@ -696,7 +697,7 @@ public class Lock
 
     public User getOwner()
     {
-        return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(this.model.getValue(TABLE_LOCK.OWNER_ID)).get();
+        return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(this.model.getValue(TABLE_LOCKS.OWNER_ID)).get();
     }
 
     public boolean isPublic()
@@ -706,7 +707,7 @@ public class Lock
 
     public boolean hasFlag(ProtectionFlag flag)
     {
-        return flag.flagValue == (this.model.getValue(TABLE_LOCK.FLAGS) & flag.flagValue);
+        return flag.flagValue == (this.model.getValue(TABLE_LOCKS.FLAGS) & flag.flagValue);
     }
 
     public void showInfo(Player user)
@@ -715,8 +716,9 @@ public class Lock
         {
             user.sendMessage(Text.of());
             i18n.sendTranslated(user, POSITIVE, "Protection: #{integer#id} Type: {input#type} by {user}", this.getId().longValue(), this.getLockType().name(), this.getOwner());
-            i18n.sendTranslated(user, POSITIVE, "protects {input#type} since {input#time}", this.getProtectedType().name(), this.model.getValue(TABLE_LOCK.CREATED).toString());
-            i18n.sendTranslated(user, POSITIVE, "last access was {input#time}", this.model.getValue(TABLE_LOCK.LAST_ACCESS).toString());
+            i18n.sendTranslated(user, POSITIVE, "protects {input#type} since {input#time}", this.getProtectedType().name(), this.model.getValue(
+                    TABLE_LOCKS.CREATED).toString());
+            i18n.sendTranslated(user, POSITIVE, "last access was {input#time}", this.model.getValue(TABLE_LOCKS.LAST_ACCESS).toString());
             if (this.hasPass())
             {
                 if (manager.hasUnlocked(user, this))
@@ -754,8 +756,8 @@ public class Lock
                 Text format = Text.of(" ", GRAY, "- ", DARK_GREEN);
                 for (AccessListModel listModel : accessors)
                 {
-                    User accessor = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(listModel.getValue(TABLE_ACCESS_LIST.USER_ID)).get();
-                    if ((listModel.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN)
+                    User accessor = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(listModel.getValue(TABLE_ACCESSLIST.USER_ID)).get();
+                    if ((listModel.getValue(TABLE_ACCESSLIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN)
                     {
                         user.sendMessage(Text.of(format, GREEN, accessor.getName(), GOLD, " [Admin]"));
                     }
@@ -825,8 +827,8 @@ public class Lock
 
     public List<AccessListModel> getAccessors()
     {
-        return db.getDSL().selectFrom(TABLE_ACCESS_LIST).
-            where(TABLE_ACCESS_LIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCK.ID))).fetch();
+        return db.getDSL().selectFrom(TABLE_ACCESSLIST).
+            where(TABLE_ACCESSLIST.LOCK_ID.eq(this.model.getValue(TABLE_LOCKS.ID))).fetch();
     }
 
     public void unlock(Player user, Location<World> soundLoc, String pass)
@@ -937,19 +939,19 @@ public class Lock
 
     public void setOwner(User owner)
     {
-        this.model.setValue(TABLE_LOCK.OWNER_ID, owner.getUniqueId());
+        this.model.setValue(TABLE_LOCKS.OWNER_ID, owner.getUniqueId());
         this.model.updateAsync();
     }
 
     public void setFlags(short flags)
     {
-        this.model.setValue(TABLE_LOCK.FLAGS, flags);
+        this.model.setValue(TABLE_LOCKS.FLAGS, flags);
         this.model.updateAsync();
     }
 
     public short getFlags()
     {
-        return this.model.getValue(TABLE_LOCK.FLAGS);
+        return this.model.getValue(TABLE_LOCKS.FLAGS);
     }
 
     public UUID getEntityUID()
@@ -959,7 +961,7 @@ public class Lock
 
     public void updateAccess()
     {
-        model.setValue(TABLE_LOCK.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
+        model.setValue(TABLE_LOCKS.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
         model.updateAsync();
     }
 }

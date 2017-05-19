@@ -25,12 +25,12 @@ import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
 import static org.jooq.impl.SQLDataType.INTEGER;
 
 public class TableLockLocations extends AutoIncrementTable<LockLocationModel, UInteger>
 {
-    public static TableLockLocations TABLE_LOCK_LOCATION;
+    public static TableLockLocations TABLE_LOCK_LOCATIONS;
     public final TableField<LockLocationModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
     public final TableField<LockLocationModel, UUID> WORLD_ID = createField("world_id", SQLDataType.UUID.length(36).nullable(false), this);
     public final TableField<LockLocationModel, Integer> X = createField("x", INTEGER.nullable(false), this);
@@ -46,9 +46,9 @@ public class TableLockLocations extends AutoIncrementTable<LockLocationModel, UI
         this.setAIKey(ID);
         this.addIndex(CHUNKX, CHUNKZ);
         this.addUniqueKey(WORLD_ID, X, Y, Z);
-        this.addForeignKey(TABLE_LOCK.getPrimaryKey(), LOCK_ID);
+        this.addForeignKey(TABLE_LOCKS.getPrimaryKey(), LOCK_ID);
         this.addFields(ID, WORLD_ID, X, Y, Z, CHUNKX, CHUNKZ, LOCK_ID);
-        TABLE_LOCK_LOCATION = this;
+        TABLE_LOCK_LOCATIONS = this;
     }
 
     @Override

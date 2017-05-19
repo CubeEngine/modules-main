@@ -31,7 +31,7 @@ import static org.jooq.util.mysql.MySQLDataType.DATETIME;
 
 public class TableLocks extends AutoIncrementTable<LockModel, UInteger>
 {
-    public static TableLocks TABLE_LOCK;
+    public static TableLocks TABLE_LOCKS;
     public final TableField<LockModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
     public final TableField<LockModel, UUID> OWNER_ID = createField("owner_id", SQLDataType.UUID.length(36).nullable(false), this);
     /**
@@ -49,8 +49,7 @@ public class TableLocks extends AutoIncrementTable<LockModel, UInteger>
     // eg. /cguarded [pass <password>] (flag to create pw book/key?)
     public final TableField<LockModel, byte[]> PASSWORD = createField("password", VARBINARY.length(128).nullable(false), this);
     // optional for entity protection:
-    public final TableField<LockModel, Long> ENTITY_UID_LEAST = createField("entity_uid_least", BIGINT, this);
-    public final TableField<LockModel, Long> ENTITY_UID_MOST = createField("entity_uid_most", BIGINT, this);
+    public final TableField<LockModel, UUID> ENTITY_UUID = createField("entity_uuid", SQLDataType.UUID.length(36), this);
     public final TableField<LockModel, Timestamp> LAST_ACCESS = createField("last_access", DATETIME.nullable(false), this);
     public final TableField<LockModel, Timestamp> CREATED = createField("created", DATETIME.nullable(false), this);
 
@@ -58,10 +57,9 @@ public class TableLocks extends AutoIncrementTable<LockModel, UInteger>
     {
         super(prefix + "locker_locks", new Version(1), db);
         this.setAIKey(ID);
-        this.addUniqueKey(ENTITY_UID_LEAST, ENTITY_UID_MOST);
-        this.addFields(ID, OWNER_ID, FLAGS, PROTECTED_TYPE, LOCK_TYPE, PASSWORD, ENTITY_UID_LEAST, ENTITY_UID_MOST,
-                       LAST_ACCESS, CREATED);
-        TABLE_LOCK = this;
+        this.addUniqueKey(ENTITY_UUID);
+        this.addFields(ID, OWNER_ID, FLAGS, PROTECTED_TYPE, LOCK_TYPE, PASSWORD, ENTITY_UUID, LAST_ACCESS, CREATED);
+        TABLE_LOCKS = this;
     }
 
     @Override

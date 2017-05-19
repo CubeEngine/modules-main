@@ -28,9 +28,9 @@ import static org.cubeengine.libcube.util.LocationUtil.getLocationKey;
 import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_ALL;
 import static org.cubeengine.module.locker.storage.AccessListModel.ACCESS_FULL;
 import static org.cubeengine.module.locker.storage.ProtectedType.getProtectedType;
-import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
-import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATION;
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESSLIST;
+import static org.cubeengine.module.locker.storage.TableLockLocations.TABLE_LOCK_LOCATIONS;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
 import static org.spongepowered.api.block.BlockTypes.ACACIA_DOOR;
 import static org.spongepowered.api.block.BlockTypes.BIRCH_DOOR;
 import static org.spongepowered.api.block.BlockTypes.CHEST;
@@ -237,20 +237,20 @@ public class LockManager
         List<Integer> xPos = IntStream.range(chunkX - viewDistance, chunkX + viewDistance).mapToObj(Integer.class::cast).collect(toList());
         List<Integer> zPos = IntStream.range(chunkZ - viewDistance, chunkZ + viewDistance).mapToObj(Integer.class::cast).collect(toList());
 
-        Condition condChunkX = TABLE_LOCK_LOCATION.CHUNKX.in(xPos);
-        Condition condChunkZ = TABLE_LOCK_LOCATION.CHUNKZ.in(zPos);
-        Condition condNotLoaded = TABLE_LOCK_LOCATION.LOCK_ID.notIn(locksById.keySet());
+        Condition condChunkX = TABLE_LOCK_LOCATIONS.CHUNKX.in(xPos);
+        Condition condChunkZ = TABLE_LOCK_LOCATIONS.CHUNKZ.in(zPos);
+        Condition condNotLoaded = TABLE_LOCK_LOCATIONS.LOCK_ID.notIn(locksById.keySet());
 
-        Result<LockModel> models = this.database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.in(
-                this.database.getDSL().select(TABLE_LOCK_LOCATION.LOCK_ID).from(
-                        TABLE_LOCK_LOCATION).where(TABLE_LOCK_LOCATION.WORLD_ID.eq(chunk.getWorld().getUniqueId()), condChunkX, condChunkZ, condNotLoaded))).fetch();
+        Result<LockModel> models = this.database.getDSL().selectFrom(TABLE_LOCKS).where(TABLE_LOCKS.ID.in(
+                this.database.getDSL().select(TABLE_LOCK_LOCATIONS.LOCK_ID).from(
+                        TABLE_LOCK_LOCATIONS).where(TABLE_LOCK_LOCATIONS.WORLD_ID.eq(chunk.getWorld().getUniqueId()), condChunkX, condChunkZ, condNotLoaded))).fetch();
         Map<UInteger, Result<LockLocationModel>> locations = LockManager.
-            this.database.getDSL().selectFrom(TABLE_LOCK_LOCATION).where(
-            TABLE_LOCK_LOCATION.LOCK_ID.in(
-            models.getValues(TABLE_LOCK.ID))).fetch().intoGroups(TABLE_LOCK_LOCATION.LOCK_ID);
+            this.database.getDSL().selectFrom(TABLE_LOCK_LOCATIONS).where(
+            TABLE_LOCK_LOCATIONS.LOCK_ID.in(
+            models.getValues(TABLE_LOCKS.ID))).fetch().intoGroups(TABLE_LOCK_LOCATIONS.LOCK_ID);
         for (LockModel model : models)
         {
-            Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCK.ID));
+            Result<LockLocationModel> lockLoc = locations.get(model.getValue(TABLE_LOCKS.ID));
             Lock lock = new Lock(this, model, i18n, lockLoc);
             addLoadedLocationLock(lock);
             // System.out.print("Lock loaded at: " + lock.getFirstLocation().getPosition() + "\n");
@@ -399,8 +399,7 @@ public class LockManager
         Lock lock = this.loadedEntityLocks.get(uniqueId);
         if (lock == null)
         {
-            LockModel model = database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ENTITY_UID_LEAST.eq(uniqueId.getLeastSignificantBits()),
-                                                                      TABLE_LOCK.ENTITY_UID_MOST.eq(uniqueId.getMostSignificantBits())).fetchOne();
+            LockModel model = database.getDSL().selectFrom(TABLE_LOCKS).where(TABLE_LOCKS.ENTITY_UUID.eq(uniqueId)).fetchOne();
             if (model != null)
             {
                 lock = new Lock(this, model, i18n);
@@ -442,7 +441,7 @@ public class LockManager
             throw new IllegalStateException("Cannot extend Lock onto another!");
         }
         lock.locations.add(location);
-        LockLocationModel model = database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(lock.model, location);
+        LockLocationModel model = database.getDSL().newRecord(TABLE_LOCK_LOCATIONS).newLocation(lock.model, location);
         model.insertAsync();
         this.getLocLockMap(location.getExtent().getUniqueId()).put(getLocationKey(location), lock);
     }
@@ -506,7 +505,7 @@ public class LockManager
         }
 
         BlockType material = block.getBlockType();
-        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(player, lockType, getProtectedType(material));
+        LockModel model = database.getDSL().newRecord(TABLE_LOCKS).newLock(player, lockType, getProtectedType(material));
         for (BlockLockConfig blockProtection : this.module.getConfig().blockprotections)
         {
             if (blockProtection.isType(material))
@@ -514,7 +513,7 @@ public class LockManager
                 short flags = blockProtection.getFlags();
                 if (flags != 0)
                 {
-                    model.setValue(TABLE_LOCK.FLAGS, (short)(model.getValue(TABLE_LOCK.FLAGS) | flags));
+                    model.setValue(TABLE_LOCKS.FLAGS, (short)(model.getValue(TABLE_LOCKS.FLAGS) | flags));
                 }
                 break;
             }
@@ -600,7 +599,7 @@ public class LockManager
     private CompletableFuture<Lock> insertLockLocs(Player user, boolean createKeyBook, LockModel model, List<Location<World>> locations)
     {
         return allOf(locations.parallelStream()
-                              .map(loc -> database.getDSL().newRecord(TABLE_LOCK_LOCATION).newLocation(model, loc))
+                              .map(loc -> database.getDSL().newRecord(TABLE_LOCK_LOCATIONS).newLocation(model, loc))
                               .map(AsyncRecord::insertAsync).toArray(CompletableFuture[]::new))
               .thenApply((v) -> {
             Lock lock = new Lock(this, model, i18n, locations);
@@ -624,7 +623,7 @@ public class LockManager
     public CompletableFuture<Lock> createLock(Entity entity, Player user, LockType lockType, String password, boolean createKeyBook)
     {
 
-        LockModel model = database.getDSL().newRecord(TABLE_LOCK).newLock(user, lockType, getProtectedType(entity.getType()), entity.getUniqueId());
+        LockModel model = database.getDSL().newRecord(TABLE_LOCKS).newLock(user, lockType, getProtectedType(entity.getType()), entity.getUniqueId());
         model.createPassword(this, password);
         return model.insertAsync().thenApply(m -> {
             Lock lock = new Lock(this, model, i18n);
@@ -719,11 +718,11 @@ public class LockManager
         {
             return lock;
         }
-        LockModel lockModel = database.getDSL().selectFrom(TABLE_LOCK).where(TABLE_LOCK.ID.eq(lockID)).fetchOne();
+        LockModel lockModel = database.getDSL().selectFrom(TABLE_LOCKS).where(TABLE_LOCKS.ID.eq(lockID)).fetchOne();
         if (lockModel != null)
         {
-            Result<LockLocationModel> fetch = database.getDSL().selectFrom(TABLE_LOCK_LOCATION)
-                                                      .where(TABLE_LOCK_LOCATION.LOCK_ID.eq(lockModel.getValue(TABLE_LOCK.ID)))
+            Result<LockLocationModel> fetch = database.getDSL().selectFrom(TABLE_LOCK_LOCATIONS)
+                                                      .where(TABLE_LOCK_LOCATIONS.LOCK_ID.eq(lockModel.getValue(TABLE_LOCKS.ID)))
                                                       .fetch();
             if (fetch.isEmpty())
             {
@@ -743,20 +742,20 @@ public class LockManager
             {
                 accessType = ACCESS_ALL; // with AdminAccess
             }
-            AccessListModel accessListModel = database.getDSL().selectFrom(TABLE_ACCESS_LIST).where(
-                    TABLE_ACCESS_LIST.USER_ID.eq(access.user.getUniqueId()),
-                    TABLE_ACCESS_LIST.OWNER_ID.eq(sender.getUniqueId())).fetchOne();
+            AccessListModel accessListModel = database.getDSL().selectFrom(TABLE_ACCESSLIST).where(
+                    TABLE_ACCESSLIST.USER_ID.eq(access.user.getUniqueId()),
+                    TABLE_ACCESSLIST.OWNER_ID.eq(sender.getUniqueId())).fetchOne();
             if (access.add)
             {
                 if (accessListModel == null)
                 {
-                    accessListModel = database.getDSL().newRecord(TABLE_ACCESS_LIST).newGlobalAccess(sender, access.user, accessType);
+                    accessListModel = database.getDSL().newRecord(TABLE_ACCESSLIST).newGlobalAccess(sender, access.user, accessType);
                     accessListModel.insertAsync();
                     i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "Global access for {user} set!", access.user);
                 }
                 else
                 {
-                    accessListModel.setValue(TABLE_ACCESS_LIST.LEVEL, accessType);
+                    accessListModel.setValue(TABLE_ACCESSLIST.LEVEL, accessType);
                     accessListModel.updateAsync();
                     i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "Updated global access level for {user}!", access.user);
                 }
@@ -805,8 +804,8 @@ public class LockManager
     public CompletableFuture<Integer> purgeLocksFrom(User user)
     {
         logger.info("Purging Locks from {}", user.getName());
-        CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCK)
-            .where(TABLE_LOCK.OWNER_ID.eq(user.getUniqueId())));
+        CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCKS)
+            .where(TABLE_LOCKS.OWNER_ID.eq(user.getUniqueId())));
         future.thenAccept(integer -> {
             if (integer != 0)
             {
@@ -821,8 +820,8 @@ public class LockManager
     {
         Timestamp timestamp = new Timestamp(System.currentTimeMillis() - module.getConfig().cleanupAge * 24 * 60 * 60 * 1000);
         logger.info("Purging old Locks from {}", new Date(timestamp.getTime()));
-        CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCK)
-            .where(TABLE_LOCK.LAST_ACCESS.lessThan(timestamp)));
+        CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCKS)
+            .where(TABLE_LOCKS.LAST_ACCESS.lessThan(timestamp)));
         future.thenAccept(i -> {
             if (i != 0)
             {

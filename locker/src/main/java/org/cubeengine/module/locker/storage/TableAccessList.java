@@ -25,12 +25,12 @@ import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
 import org.jooq.types.UInteger;
 
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
 import static org.jooq.impl.SQLDataType.SMALLINT;
 
 public class TableAccessList extends AutoIncrementTable<AccessListModel, UInteger>
 {
-    public static TableAccessList TABLE_ACCESS_LIST;
+    public static TableAccessList TABLE_ACCESSLIST;
     public final TableField<AccessListModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
     public final TableField<AccessListModel, UUID> USER_ID = createField("user_id", SQLDataType.UUID.length(36).nullable(false), this);
     public final TableField<AccessListModel, UInteger> LOCK_ID = createField("lock_id", U_INTEGER, this);
@@ -44,9 +44,9 @@ public class TableAccessList extends AutoIncrementTable<AccessListModel, UIntege
         this.setAIKey(ID);
         this.addUniqueKey(USER_ID, LOCK_ID);
         this.addUniqueKey(USER_ID, OWNER_ID);
-        this.addForeignKey(TABLE_LOCK.getPrimaryKey(), LOCK_ID);
+        this.addForeignKey(TABLE_LOCKS.getPrimaryKey(), LOCK_ID);
         this.addFields(ID, USER_ID, LOCK_ID, LEVEL, OWNER_ID);
-        TABLE_ACCESS_LIST = this;
+        TABLE_ACCESSLIST = this;
     }
 
     @Override

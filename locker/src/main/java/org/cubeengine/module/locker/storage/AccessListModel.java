@@ -20,41 +20,41 @@ package org.cubeengine.module.locker.storage;
 import org.cubeengine.libcube.service.database.AsyncRecord;
 import org.spongepowered.api.entity.living.player.User;
 
-import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESS_LIST;
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableAccessList.TABLE_ACCESSLIST;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
 
 public class AccessListModel extends AsyncRecord<AccessListModel>
 {
     public AccessListModel()
     {
-        super(TABLE_ACCESS_LIST);
+        super(TABLE_ACCESSLIST);
     }
 
     public AccessListModel newAccess(LockModel model, User modifyUser)
     {
-        this.setValue(TABLE_ACCESS_LIST.LOCK_ID, model.getValue(TABLE_LOCK.ID));
-        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getUniqueId());
-        this.setValue(TABLE_ACCESS_LIST.LEVEL, ACCESS_FULL);
+        this.setValue(TABLE_ACCESSLIST.LOCK_ID, model.getValue(TABLE_LOCKS.ID));
+        this.setValue(TABLE_ACCESSLIST.USER_ID, modifyUser.getUniqueId());
+        this.setValue(TABLE_ACCESSLIST.LEVEL, ACCESS_FULL);
         return this;
     }
 
     public AccessListModel newGlobalAccess(User sender, User modifyUser, short accessType)
     {
-        this.setValue(TABLE_ACCESS_LIST.LOCK_ID, null);
-        this.setValue(TABLE_ACCESS_LIST.USER_ID, modifyUser.getUniqueId());
-        this.setValue(TABLE_ACCESS_LIST.LEVEL, accessType);
-        this.setValue(TABLE_ACCESS_LIST.OWNER_ID, sender.getUniqueId());
+        this.setValue(TABLE_ACCESSLIST.LOCK_ID, null);
+        this.setValue(TABLE_ACCESSLIST.USER_ID, modifyUser.getUniqueId());
+        this.setValue(TABLE_ACCESSLIST.LEVEL, accessType);
+        this.setValue(TABLE_ACCESSLIST.OWNER_ID, sender.getUniqueId());
         return this;
     }
 
     public boolean canIn()
     {
-        return (this.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_PUT) == ACCESS_PUT;
+        return (this.getValue(TABLE_ACCESSLIST.LEVEL) & ACCESS_PUT) == ACCESS_PUT;
     }
 
     public boolean canOut()
     {
-        return (this.getValue(TABLE_ACCESS_LIST.LEVEL) & ACCESS_TAKE) == ACCESS_TAKE;
+        return (this.getValue(TABLE_ACCESSLIST.LEVEL) & ACCESS_TAKE) == ACCESS_TAKE;
     }
 
     public static final short ACCESS_TAKE = 1; // put items in chest

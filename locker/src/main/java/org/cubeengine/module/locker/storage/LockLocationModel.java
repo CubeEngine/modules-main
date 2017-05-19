@@ -20,29 +20,29 @@ package org.cubeengine.module.locker.storage;
 import org.cubeengine.libcube.service.database.AsyncRecord;
 import org.spongepowered.api.world.Location;
 
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCK;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
 
 public class LockLocationModel extends AsyncRecord<LockLocationModel>
 {
     public LockLocationModel()
     {
-        super(TableLockLocations.TABLE_LOCK_LOCATION);
+        super(TableLockLocations.TABLE_LOCK_LOCATIONS);
     }
 
     public LockLocationModel newLocation(LockModel model, Location location)
     {
         this.setLocation(location);
-        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.LOCK_ID, model.getValue(TABLE_LOCK.ID));
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATIONS.LOCK_ID, model.getValue(TABLE_LOCKS.ID));
         return this;
     }
 
     private void setLocation(Location location)
     {
-        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.WORLD_ID, location.getExtent().getUniqueId());
-        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.X, location.getBlockX());
-        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.Y, location.getBlockY());
-        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.Z, location.getBlockZ());
-        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.CHUNKX, location.getBlockX() >> 4);
-        this.setValue(TableLockLocations.TABLE_LOCK_LOCATION.CHUNKZ, location.getBlockZ() >> 4);
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATIONS.WORLD_ID, location.getExtent().getUniqueId());
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATIONS.X, location.getBlockX());
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATIONS.Y, location.getBlockY());
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATIONS.Z, location.getBlockZ());
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATIONS.CHUNKX, location.getBlockX() >> 4);
+        this.setValue(TableLockLocations.TABLE_LOCK_LOCATIONS.CHUNKZ, location.getBlockZ() >> 4);
     }
 }
