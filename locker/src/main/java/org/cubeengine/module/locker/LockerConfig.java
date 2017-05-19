@@ -20,7 +20,6 @@ package org.cubeengine.module.locker;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import javax.persistence.Transient;
 import org.cubeengine.reflect.annotations.Comment;
 import org.cubeengine.reflect.annotations.Name;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
@@ -168,8 +167,7 @@ public class LockerConfig extends ReflectedYaml
         detachableEntityCount = -1;
     }
 
-    @Transient
-    private int detachableEntityCount = -1;
+    private transient int detachableEntityCount = -1;
 
     public boolean protectsDetachableEntities()
     {
