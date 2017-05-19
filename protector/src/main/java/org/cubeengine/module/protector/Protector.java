@@ -39,6 +39,8 @@ import java.nio.file.Path;
 
 import javax.inject.Inject;
 
+// TODO protect items from explosion
+
 @ModuleInfo(name = "Protector", description = "Protects your worlds")
 public class Protector extends Module
 {
