@@ -38,6 +38,7 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.util.blockray.BlockRay;
 import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
@@ -47,6 +48,7 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.data.property.block.MatterProperty.Matter.SOLID;
 import static org.spongepowered.api.item.ItemTypes.COMPASS;
+import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 
 public class TeleportListener
 {
@@ -108,7 +110,7 @@ public class TeleportListener
             return;
         }
         player.setLocation(LocationUtil.getLocationUp(loc).add(0.5, 0, 0.5));
-        i18n.sendTranslated(player, NEUTRAL, "Poof!");
+        i18n.sendTranslated(ACTION_BAR, player, NEUTRAL, "Poof!");
         event.setCancelled(true);
     }
 
