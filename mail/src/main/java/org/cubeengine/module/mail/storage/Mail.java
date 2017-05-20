@@ -19,11 +19,8 @@ package org.cubeengine.module.mail.storage;
 
 import java.util.Optional;
 import java.util.UUID;
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import org.cubeengine.libcube.service.database.AsyncRecord;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
 import org.spongepowered.api.text.Text;
@@ -31,8 +28,6 @@ import org.spongepowered.api.text.Text;
 import static org.cubeengine.module.mail.storage.TableMail.TABLE_MAIL;
 import static org.spongepowered.api.text.format.TextColors.*;
 
-@Entity
-@Table(name = "mail")
 public class Mail extends AsyncRecord<Mail>
 {
     public Mail()
