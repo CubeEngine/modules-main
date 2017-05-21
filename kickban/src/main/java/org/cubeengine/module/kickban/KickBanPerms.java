@@ -38,6 +38,6 @@ public class KickBanPerms extends PermissionContainer
     public final Permission COMMAND_IPBAN_NOREASON = register("ipban.noreason", "Allows banning without providing a reason",COMMAND);
     public final Permission COMMAND_TEMPBAN_NOREASON = register("tempban.noreason", "Allows banning without providing a reason",COMMAND);
 
-    public final Permission KICK_RECEIVEMESSAGE = register("kick.receivemessage", "Enables notification when a player gets kicked", COMMAND);
-    public final Permission BAN_RECEIVEMESSAGE = register("ban.receivemessage", "Enables notification when a player gets banned", COMMAND);
+    public final Permission KICK_RECEIVEMESSAGE = register("kick.notify", "Enables notification when a player gets kicked", COMMAND);
+    public final Permission BAN_RECEIVEMESSAGE = register("ban.notify", "Enables notification when a player gets banned", COMMAND);
 }
