@@ -18,6 +18,7 @@
 package org.cubeengine.module.roles.service.data;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +30,7 @@ import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
+import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
@@ -107,7 +109,9 @@ public class BaseSubjectData implements SubjectData
     @Override
     public List<Subject> getParents(Set<Context> contexts)
     {
-        return unmodifiableList(accumulate(contexts, parents, new ArrayList<>(), List::addAll));
+        List<Subject> list = accumulate(contexts, parents, new ArrayList<>(), List::addAll);
+        list.sort(RoleSubject::compare);
+        return unmodifiableList(list);
     }
 
     @Override
