@@ -200,7 +200,7 @@ public class MovementCommands
     }
 
     @Command(desc = "Teleports you to your last location")
-    @CommandPermission(checkPermission = false)
+    @CommandPermission(checkPermission = false) // TODO make the command usage make sense
     @Restricted(value = Player.class, msg = "Unfortunately teleporting is still not implemented in the game {text:'Life'}!")
     public void back(Player context, @Flag boolean unsafe)
     {

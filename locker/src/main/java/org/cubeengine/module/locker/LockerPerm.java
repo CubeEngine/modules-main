@@ -53,7 +53,7 @@ public class LockerPerm extends PermissionContainer
     public final Permission CMD_GIVE_OTHER = register("locker.give.other", "", COMMAND);
 
     public final Permission CMD_INFO_OTHER = register("locker.info.other", "", COMMAND);
-    public final Permission CMD_INFO_SHOW_OWNER =  register("locker.info.show-owner", "", null);
+    public final Permission CMD_INFO_SHOW_OWNER =  register("locker.info.show-owner", "", COMMAND);
 
     // TODO Locker grouping Perms on commands
     /*
