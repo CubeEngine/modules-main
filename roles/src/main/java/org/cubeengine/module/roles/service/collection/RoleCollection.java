@@ -186,7 +186,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         subjects.remove(subject.getIdentifier());
         subjects.put(name, subject);
         config.roleName = name;
-        config.setFile(modulePath.resolve("roles").resolve(name + YAML.getExtention()).toFile());
+        config.setFile(modulePath.resolve(this.type).resolve(name + YAML.getExtention()).toFile());
         subject.getSubjectData().save(true);
     }
 

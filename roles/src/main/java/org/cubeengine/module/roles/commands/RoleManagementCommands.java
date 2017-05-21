@@ -134,10 +134,10 @@ public class RoleManagementCommands extends ContainerCommand
     {
         if (role.getSubjectData().removeParent(toSet(context), parentRole))
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "{role} is not a parent role of the role {role} in {context}!", parentRole, role, context);
+            i18n.sendTranslated(ctx, POSITIVE, "Removed the parent role {role} from the role {role} in {context}!", parentRole, role, context);
             return;
         }
-        i18n.sendTranslated(ctx, POSITIVE, "Removed the parent role {role} from the role {role} in {context}!", parentRole, role, context);
+        i18n.sendTranslated(ctx, NEUTRAL, "{role} is not a parent role of the role {role} in {context}!", parentRole, role, context);
     }
 
     @Alias(value = "clearRParent")
