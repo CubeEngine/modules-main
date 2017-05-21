@@ -121,7 +121,7 @@ public class RoleManagementCommands extends ContainerCommand
     {
         if (role.getSubjectData().addParent(toSet(context), parentRole))
         {
-            i18n.sendTranslated(ctx, POSITIVE, "Added {name#role} as parent role for the role {role} in {context}", parentRole, role, context);
+            i18n.sendTranslated(ctx, POSITIVE, "Added {role} as parent role for the role {role} in {context}", parentRole, role, context);
             return;
         }
         i18n.sendTranslated(ctx, NEUTRAL, "{name#role} is already parent role of the role {role} in {context}!", parentRole, role, context);
