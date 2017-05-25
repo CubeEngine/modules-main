@@ -18,7 +18,7 @@
 package org.cubeengine.module.roles.commands.provider;
 
 import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.reader.DefaultValue;
+import org.cubeengine.butler.parameter.argument.DefaultValue;
 import org.spongepowered.api.util.Tristate;
 
 public class DefaultPermissionValueProvider implements DefaultValue<Tristate>

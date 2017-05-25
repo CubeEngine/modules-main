@@ -21,21 +21,19 @@ import static java.util.stream.Collectors.toList;
 
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.ReaderException;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-public class WorldGeneratorModifierReader implements ArgumentReader<WorldGeneratorModifier>, Completer
+public class WorldGeneratorModifierParser implements ArgumentParser<WorldGeneratorModifier>, Completer
 {
     @Override
-    public WorldGeneratorModifier read(Class aClass, CommandInvocation invocation) throws ReaderException
+    public WorldGeneratorModifier parse(Class aClass, CommandInvocation invocation) throws ReaderException
     {
         String token = invocation.currentToken();
         Optional<WorldGeneratorModifier> generator = Sponge.getRegistry().getType(WorldGeneratorModifier.class, token);
@@ -48,7 +46,7 @@ public class WorldGeneratorModifierReader implements ArgumentReader<WorldGenerat
     }
 
     @Override
-    public List<String> getSuggestions(CommandInvocation invocation)
+    public List<String> suggest(CommandInvocation invocation)
     {
         String token = invocation.currentToken();
         return Sponge.getRegistry().getAllOf(WorldGeneratorModifier.class).stream()

@@ -21,22 +21,22 @@ import java.util.ArrayList;
 import java.util.List;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.DefaultValue;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.DefaultValue;
+import org.cubeengine.butler.parameter.argument.ReaderException;
 import org.spongepowered.api.entity.living.player.Player;
 
-public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal>, Completer
+public class PortalParser implements ArgumentParser<Portal>, DefaultValue<Portal>, Completer
 {
     private Portals module;
 
-    public PortalReader(Portals module)
+    public PortalParser(Portals module)
     {
         this.module = module;
     }
 
     @Override
-    public Portal read(Class type, CommandInvocation invocation) throws ReaderException
+    public Portal parse(Class type, CommandInvocation invocation) throws ReaderException
     {
         String portalName = invocation.consume(1);
         Portal portal = this.module.getPortal(portalName);
@@ -63,7 +63,7 @@ public class PortalReader implements ArgumentReader<Portal>, DefaultValue<Portal
     }
 
     @Override
-    public List<String> getSuggestions(CommandInvocation invocation)
+    public List<String> suggest(CommandInvocation invocation)
     {
         List<String> list = new ArrayList<>();
         String token = invocation.currentToken();

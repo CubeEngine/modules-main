@@ -85,7 +85,7 @@ public class Locker extends Module
         cManager.registerConverter(new BlockLockerConfigConverter(logger, mm), BlockLockConfig.class);
         cManager.registerConverter(new EntityLockerConfigConverter(logger, entityMatcher), EntityLockConfig.class);
 
-        cm.getProviderManager().register(this, new PlayerAccess.PlayerAccessReader(), PlayerAccess.class);
+        cm.getProviderManager().register(this, new PlayerAccess.PlayerAccessParser(), PlayerAccess.class);
     }
 
     @Disable

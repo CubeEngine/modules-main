@@ -37,7 +37,7 @@ public class WarpCompleter implements Completer
     }
 
     @Override
-    public List<String> getSuggestions(CommandInvocation invocation)
+    public List<String> suggest(CommandInvocation invocation)
     {
         List<String> list = new ArrayList<>();
         if (invocation.getCommandSource() instanceof Player)

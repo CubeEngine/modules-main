@@ -21,23 +21,23 @@ import java.util.ArrayList;
 import java.util.List;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.ReaderException;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.spongepowered.api.service.permission.Subject;
 
-public class RoleReader implements ArgumentReader<RoleSubject>, Completer
+public class RoleParser implements ArgumentParser<RoleSubject>, Completer
 {
     private RolesPermissionService service;
 
-    public RoleReader(RolesPermissionService service)
+    public RoleParser(RolesPermissionService service)
     {
         this.service = service;
     }
 
     @Override
-    public RoleSubject read(Class type, CommandInvocation invocation) throws ReaderException
+    public RoleSubject parse(Class type, CommandInvocation invocation) throws ReaderException
     {
         String token = invocation.consume(1);
         if (service.getGroupSubjects().hasRegistered(token))
@@ -48,7 +48,7 @@ public class RoleReader implements ArgumentReader<RoleSubject>, Completer
     }
 
     @Override
-    public List<String> getSuggestions(CommandInvocation invocation)
+    public List<String> suggest(CommandInvocation invocation)
     {
         ArrayList<String> result = new ArrayList<>();
         String token = invocation.currentToken().toLowerCase();

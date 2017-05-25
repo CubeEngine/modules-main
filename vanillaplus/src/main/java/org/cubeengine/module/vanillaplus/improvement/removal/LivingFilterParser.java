@@ -26,9 +26,9 @@ import java.util.stream.Collectors;
 
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.exception.SilentException;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.DefaultValue;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.DefaultValue;
+import org.cubeengine.butler.parameter.argument.ReaderException;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.StringUtils;
@@ -61,12 +61,12 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.text.format.TextColors.WHITE;
 
-public class LivingFilterReader extends PermissionContainer implements ArgumentReader<LivingFilter>, DefaultValue<LivingFilter>
+public class LivingFilterParser extends PermissionContainer implements ArgumentParser<LivingFilter>, DefaultValue<LivingFilter>
 {
     private I18n i18n;
     private StringMatcher sm;
 
-    public LivingFilterReader(PermissionManager pm, I18n i18n, StringMatcher sm)
+    public LivingFilterParser(PermissionManager pm, I18n i18n, StringMatcher sm)
     {
         super(pm, VanillaPlus.class);
         this.i18n = i18n;
@@ -151,7 +151,7 @@ public class LivingFilterReader extends PermissionContainer implements ArgumentR
     }
 
     @Override
-    public LivingFilter read(Class aClass, CommandInvocation invocation) throws ReaderException
+    public LivingFilter parse(Class aClass, CommandInvocation invocation) throws ReaderException
     {
         CommandSource source = (CommandSource)invocation.getCommandSource();
         String token = invocation.consume(1);

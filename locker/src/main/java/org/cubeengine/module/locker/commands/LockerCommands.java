@@ -333,7 +333,7 @@ public class LockerCommands extends ContainerCommand
     public static class FlagCompleter implements Completer
     {
         @Override
-        public List<String> getSuggestions(CommandInvocation invocation)
+        public List<String> suggest(CommandInvocation invocation)
         {
             String subToken = invocation.currentToken();
             if (subToken.contains(","))

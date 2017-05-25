@@ -36,7 +36,7 @@ import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
-import org.cubeengine.module.protector.region.RegionReader;
+import org.cubeengine.module.protector.region.RegionParser;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.CommandMapping;
@@ -57,7 +57,7 @@ public class SettingsCommands extends ContainerCommand
     public SettingsCommands(RegionManager manager, I18n i18n, PermissionService ps, PermissionManager pm, EventManager em, CommandManager cm)
     {
         super(cm, Protector.class);
-        cm.getProviderManager().register(this, new RegionReader(manager, i18n), Region.class);
+        cm.getProviderManager().register(this, new RegionParser(manager, i18n), Region.class);
         this.i18n = i18n;
         this.ps = ps;
         this.psl = new SettingsListener(manager, pm.getBasePermission(Protector.class), pm, i18n);

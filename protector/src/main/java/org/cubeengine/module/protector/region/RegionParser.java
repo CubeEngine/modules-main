@@ -19,9 +19,9 @@ package org.cubeengine.module.protector.region;
 
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.DefaultValue;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.DefaultValue;
+import org.cubeengine.butler.parameter.argument.ReaderException;
 import org.cubeengine.libcube.service.command.TranslatedReaderException;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
@@ -39,19 +39,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-public class RegionReader implements ArgumentReader<Region>, Completer, DefaultValue<Region>
+public class RegionParser implements ArgumentParser<Region>, Completer, DefaultValue<Region>
 {
     private RegionManager manager;
     private I18n i18n;
 
-    public RegionReader(RegionManager manager, I18n i18n)
+    public RegionParser(RegionManager manager, I18n i18n)
     {
         this.manager = manager;
         this.i18n = i18n;
     }
 
     @Override
-    public List<String> getSuggestions(CommandInvocation invocation)
+    public List<String> suggest(CommandInvocation invocation)
     {
         String token = invocation.currentToken().toLowerCase();
         List<String> list = new ArrayList<>();
@@ -106,7 +106,7 @@ public class RegionReader implements ArgumentReader<Region>, Completer, DefaultV
     }
 
     @Override
-    public Region read(Class aClass, CommandInvocation invocation) throws ReaderException
+    public Region parse(Class aClass, CommandInvocation invocation) throws ReaderException
     {
         String token = invocation.consume(1).toLowerCase();
         if (invocation.getCommandSource() instanceof Locatable)

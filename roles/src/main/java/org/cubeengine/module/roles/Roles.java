@@ -29,7 +29,6 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import de.cubeisland.engine.modularity.core.marker.Setup;
-import org.cubeengine.module.roles.service.data.RoleSubjectData;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
@@ -43,7 +42,7 @@ import org.cubeengine.module.roles.commands.UserManagementCommands;
 import org.cubeengine.module.roles.commands.provider.DefaultPermissionValueProvider;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.commands.provider.RoleFormatter;
-import org.cubeengine.module.roles.commands.provider.RoleReader;
+import org.cubeengine.module.roles.commands.provider.RoleParser;
 import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.PermissionTreeConverter;
 import org.cubeengine.module.roles.config.Priority;
@@ -128,7 +127,7 @@ public class Roles extends Module
     {
         i18n.getCompositor().registerFormatter(new RoleFormatter());
 
-        cm.getProviderManager().register(this, new RoleReader(service), RoleSubject.class);
+        cm.getProviderManager().register(this, new RoleParser(service), RoleSubject.class);
         cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
         cm.getProviderManager().register(this, new PermissionCompleter(service));
 

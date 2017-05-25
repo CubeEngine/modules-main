@@ -22,9 +22,9 @@ import java.util.Locale;
 import java.util.Optional;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.DefaultValue;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.DefaultValue;
+import org.cubeengine.butler.parameter.argument.ReaderException;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyService;
@@ -35,13 +35,13 @@ import org.spongepowered.api.service.permission.Subject;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
-public class UniqueAccountReader implements ArgumentReader<BaseAccount.Unique>, DefaultValue<BaseAccount.Unique>, Completer
+public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, DefaultValue<BaseAccount.Unique>, Completer
 {
     private Conomy module;
     private final ConomyService service;
     private final I18n i18n;
 
-    public UniqueAccountReader(Conomy module, ConomyService service, I18n i18n)
+    public UniqueAccountParser(Conomy module, ConomyService service, I18n i18n)
     {
         this.module = module;
         this.service = service;
@@ -49,7 +49,7 @@ public class UniqueAccountReader implements ArgumentReader<BaseAccount.Unique>, 
     }
 
     @Override
-    public BaseAccount.Unique read(Class type, CommandInvocation invocation) throws ReaderException
+    public BaseAccount.Unique parse(Class type, CommandInvocation invocation) throws ReaderException
     {
         String arg = invocation.currentToken();
         User user = (User)invocation.getManager().read(User.class, User.class, invocation);
@@ -92,8 +92,8 @@ public class UniqueAccountReader implements ArgumentReader<BaseAccount.Unique>, 
     }
 
     @Override
-    public List<String> getSuggestions(CommandInvocation invocation)
+    public List<String> suggest(CommandInvocation invocation)
     {
-        return invocation.getManager().getCompleter(User.class).getSuggestions(invocation);
+        return invocation.getManager().getCompleter(User.class).suggest(invocation);
     }
 }

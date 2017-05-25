@@ -23,8 +23,8 @@ import java.util.Locale;
 import java.util.function.Predicate;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.exception.SilentException;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.ReaderException;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
@@ -43,13 +43,13 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.entity.EntityTypes.*;
 
-public class EntityFilterReader implements ArgumentReader<EntityFilter>
+public class EntityFilterParser implements ArgumentParser<EntityFilter>
 {
     private I18n i18n;
     private EntityMatcher em;
     private MaterialMatcher mm;
 
-    public EntityFilterReader(I18n i18n, EntityMatcher em, MaterialMatcher mm)
+    public EntityFilterParser(I18n i18n, EntityMatcher em, MaterialMatcher mm)
     {
         this.i18n = i18n;
         this.em = em;
@@ -57,7 +57,7 @@ public class EntityFilterReader implements ArgumentReader<EntityFilter>
     }
 
     @Override
-    public EntityFilter read(Class aClass, CommandInvocation invocation) throws ReaderException
+    public EntityFilter parse(Class aClass, CommandInvocation invocation) throws ReaderException
     {
         CommandSource cmdSource = (CommandSource)invocation.getCommandSource();
         String token = invocation.consume(1);

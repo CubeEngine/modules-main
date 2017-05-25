@@ -20,8 +20,8 @@ package org.cubeengine.module.portals.config;
 import java.util.Optional;
 import java.util.Random;
 import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.ReaderException;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -29,20 +29,20 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
-public class DestinationReader implements ArgumentReader<Destination>
+public class DestinationParser implements ArgumentParser<Destination>
 {
     private final Portals module;
     private I18n i18n;
     private final Random random = new Random();
 
-    public DestinationReader(Portals module, I18n i18n)
+    public DestinationParser(Portals module, I18n i18n)
     {
         this.module = module;
         this.i18n = i18n;
     }
 
     @Override
-    public Destination read(Class type, CommandInvocation invocation) throws ReaderException
+    public Destination parse(Class type, CommandInvocation invocation) throws ReaderException
     {
         String token = invocation.consume(1);
         if ("here".equalsIgnoreCase(token))

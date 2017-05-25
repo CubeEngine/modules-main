@@ -103,7 +103,7 @@ public class HomeCommand extends ContainerCommand
     public List<String> getSuggestions(CommandInvocation invocation)
     {
         List<String> list = super.getSuggestions(invocation);
-        list.addAll(invocation.getManager().getCompleter(Home.class).getSuggestions(invocation));
+        list.addAll(invocation.getManager().getCompleter(Home.class).suggest(invocation));
         return list;
     }
 

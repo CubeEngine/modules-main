@@ -36,7 +36,7 @@ import org.cubeengine.module.conomy.ConomyService;
 import org.cubeengine.module.conomy.bank.command.BankCommand;
 import org.cubeengine.module.conomy.bank.command.BankManageCommand;
 import org.cubeengine.module.conomy.bank.command.EcoBankCommand;
-import org.cubeengine.module.conomy.bank.command.VirtualAccountReader;
+import org.cubeengine.module.conomy.bank.command.VirtualAccountParser;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.database.Database;
@@ -185,7 +185,7 @@ public class BankConomyService extends ConomyService
     {
         super.registerCommands(cm, i18n);
         ((Dispatcher) cm.getCommand("eco")).addCommand(new EcoBankCommand(cm, this, i18n));
-        cm.getProviderManager().register(module, new VirtualAccountReader(this, i18n), BaseAccount.Virtual.class);
+        cm.getProviderManager().register(module, new VirtualAccountParser(this, i18n), BaseAccount.Virtual.class);
         BankCommand bankCommand = new BankCommand(cm, this, i18n);
         cm.addCommand(bankCommand);
         bankCommand.addCommand(new BankManageCommand(cm, this, i18n));

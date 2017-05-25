@@ -31,10 +31,8 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
-import org.cubeengine.libcube.service.task.thread.TrackedThread;
 import org.cubeengine.libcube.util.ConfirmManager;
 import org.cubeengine.module.travel.Travel;
-import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.module.travel.config.Warp;
 import org.cubeengine.libcube.service.command.CommandUtil;
 import org.cubeengine.libcube.service.command.ContainerCommand;
@@ -46,7 +44,6 @@ import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
@@ -84,7 +81,7 @@ public class WarpCommand extends ContainerCommand
     public List<String> getSuggestions(CommandInvocation invocation)
     {
         List<String> list = super.getSuggestions(invocation);
-        list.addAll(invocation.getManager().getCompleter(Warp.class).getSuggestions(invocation));
+        list.addAll(invocation.getManager().getCompleter(Warp.class).suggest(invocation));
         return list;
     }
 

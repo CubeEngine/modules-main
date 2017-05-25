@@ -19,8 +19,6 @@ package org.cubeengine.module.travel.home;
 
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.ReaderException;
 import org.cubeengine.module.travel.config.Home;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -37,7 +35,7 @@ public class HomeCompleter implements Completer
     }
 
     @Override
-    public List<String> getSuggestions(CommandInvocation invocation)
+    public List<String> suggest(CommandInvocation invocation)
     {
         List<String> list = new ArrayList<>();
         if (invocation.getCommandSource() instanceof Player)

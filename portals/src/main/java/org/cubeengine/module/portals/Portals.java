@@ -43,7 +43,7 @@ import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.libcube.util.Pair;
 import org.cubeengine.module.portals.config.Destination;
 import org.cubeengine.module.portals.config.DestinationConverter;
-import org.cubeengine.module.portals.config.DestinationReader;
+import org.cubeengine.module.portals.config.DestinationParser;
 import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.CommandManager;
@@ -85,8 +85,8 @@ public class Portals extends Module
     {
         reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(), Destination.class);
         ProviderManager rManager = cm.getProviderManager();
-        rManager.register(this, new PortalReader(this), Portal.class);
-        rManager.register(this, new DestinationReader(this, i18n), Destination.class);
+        rManager.register(this, new PortalParser(this), Portal.class);
+        rManager.register(this, new DestinationParser(this, i18n), Destination.class);
 
         this.portalsDir = Files.createDirectories(path.resolve("portals"));
 

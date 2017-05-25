@@ -30,7 +30,6 @@ import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.matcher.EnchantMatcher;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
@@ -46,7 +45,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.libcube.service.command.readers.EnchantmentReader.getPossibleEnchantments;
+import static org.cubeengine.libcube.service.command.readers.EnchantmentParser.getPossibleEnchantments;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.item.ItemTypes.SKULL;
 import static org.spongepowered.api.text.serializer.TextSerializers.FORMATTING_CODE;

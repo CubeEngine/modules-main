@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.DefaultValue;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.DefaultValue;
+import org.cubeengine.butler.parameter.argument.ReaderException;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.bank.BankConomyService;
@@ -33,19 +33,19 @@ import org.spongepowered.api.entity.living.player.User;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
-public class VirtualAccountReader implements ArgumentReader<BaseAccount.Virtual>, DefaultValue<BaseAccount.Virtual>
+public class VirtualAccountParser implements ArgumentParser<BaseAccount.Virtual>, DefaultValue<BaseAccount.Virtual>
 {
     private final BankConomyService service;
     private final I18n i18n;
 
-    public VirtualAccountReader(BankConomyService service, I18n i18n)
+    public VirtualAccountParser(BankConomyService service, I18n i18n)
     {
         this.service = service;
         this.i18n = i18n;
     }
 
     @Override
-    public BaseAccount.Virtual read(Class type, CommandInvocation invocation) throws ReaderException
+    public BaseAccount.Virtual parse(Class type, CommandInvocation invocation) throws ReaderException
     {
         String arg = invocation.consume(1);
         Optional<BaseAccount.Virtual> target = Optional.empty();

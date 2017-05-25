@@ -40,7 +40,7 @@ public class PermissionCompleter implements Completer
     }
 
     @Override
-    public List<String> getSuggestions(CommandInvocation invocation)
+    public List<String> suggest(CommandInvocation invocation)
     {
         Set<String> result = new HashSet<>();
         String token = invocation.currentToken();

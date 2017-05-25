@@ -22,10 +22,9 @@ import java.util.Arrays;
 import java.util.List;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
-import org.cubeengine.butler.parameter.reader.ArgumentReader;
-import org.cubeengine.butler.parameter.reader.ReaderException;
+import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.ReaderException;
 import org.cubeengine.libcube.util.StringUtils;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -46,10 +45,10 @@ public class PlayerAccess
         this.add = add;
     }
 
-    public static class PlayerAccessReader implements ArgumentReader<PlayerAccess>, Completer
+    public static class PlayerAccessParser implements ArgumentParser<PlayerAccess>, Completer
     {
         @Override
-        public PlayerAccess read(Class clazz, CommandInvocation invocation) throws ReaderException
+        public PlayerAccess parse(Class clazz, CommandInvocation invocation) throws ReaderException
         {
             String token = invocation.currentToken();
             boolean admin = token.startsWith("@");
@@ -72,7 +71,7 @@ public class PlayerAccess
         }
 
         @Override
-        public List<String> getSuggestions(CommandInvocation invocation)
+        public List<String> suggest(CommandInvocation invocation)
         {
             List<String> list = new ArrayList<>();
             String[] parts = StringUtils.explode(",", invocation.currentToken(), true);

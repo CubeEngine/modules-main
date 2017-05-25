@@ -38,8 +38,6 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -54,7 +52,7 @@ public class ButcherCommand extends PermissionContainer
         super(pm, VanillaPlus.class);
         this.module = module;
         this.i18n = i18n;
-        cm.getProviderManager().register(module, new LivingFilterReader(pm, i18n, sm), LivingFilter.class);
+        cm.getProviderManager().register(module, new LivingFilterParser(pm, i18n, sm), LivingFilter.class);
     }
 
     public final Permission COMMAND_BUTCHER_FLAG_LIGHTNING = register("command.butcher.lightning", "", null);

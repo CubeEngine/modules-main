@@ -57,7 +57,7 @@ public class WeatherCommands
     public class WeatherCompleter implements Completer
     {
         @Override
-        public List<String> getSuggestions(CommandInvocation invocation)
+        public List<String> suggest(CommandInvocation invocation)
         {
             ArrayList<String> list = new ArrayList<>();
             String token = invocation.currentToken();

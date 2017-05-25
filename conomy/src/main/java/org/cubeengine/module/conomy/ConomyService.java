@@ -30,11 +30,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.cubeengine.libcube.service.filesystem.FileUtil;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.module.conomy.command.EcoCommand;
 import org.cubeengine.module.conomy.command.MoneyCommand;
-import org.cubeengine.module.conomy.command.UniqueAccountReader;
+import org.cubeengine.module.conomy.command.UniqueAccountParser;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.libcube.service.command.CommandManager;
@@ -274,7 +273,7 @@ public class ConomyService implements EconomyService, CatalogRegistryModule<Curr
 
     public void registerCommands(CommandManager cm, I18n i18n)
     {
-        cm.getProviderManager().register(module, new UniqueAccountReader(module, this, i18n), BaseAccount.Unique.class);
+        cm.getProviderManager().register(module, new UniqueAccountParser(module, this, i18n), BaseAccount.Unique.class);
         cm.addCommand(new MoneyCommand(cm, module, this, i18n));
         cm.addCommand(new EcoCommand(cm, this, i18n));
     }
