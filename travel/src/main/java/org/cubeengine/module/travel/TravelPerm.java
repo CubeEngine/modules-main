@@ -33,7 +33,7 @@ public class TravelPerm extends PermissionContainer
 
     private final Permission COMMAND = register("command", "Base Commands Permission", null);
 
-    public final Permission HOME_USER = register("home-user", "Home Permission Group for normal users", null);
+    //public final Permission HOME_USER = register("home-user", "Home Permission Group for normal users", null);
     /* TODO
     HOME_USER.attach(homeCmd.getPermission("tp"), homeCmd.getPermission("set"), homeCmd.getPermission("move"),
                          homeCmd.getPermission("remove"), homeCmd.getPermission("rename"), homeCmd.getPermission(
