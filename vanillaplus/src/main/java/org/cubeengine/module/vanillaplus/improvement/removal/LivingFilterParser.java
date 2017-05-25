@@ -28,7 +28,7 @@ import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.exception.SilentException;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
 import org.cubeengine.butler.parameter.argument.DefaultValue;
-import org.cubeengine.butler.parameter.argument.ReaderException;
+import org.cubeengine.butler.parameter.argument.ParserException;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.StringUtils;
@@ -151,7 +151,7 @@ public class LivingFilterParser extends PermissionContainer implements ArgumentP
     }
 
     @Override
-    public LivingFilter parse(Class aClass, CommandInvocation invocation) throws ReaderException
+    public LivingFilter parse(Class aClass, CommandInvocation invocation) throws ParserException
     {
         CommandSource source = (CommandSource)invocation.getCommandSource();
         String token = invocation.consume(1);

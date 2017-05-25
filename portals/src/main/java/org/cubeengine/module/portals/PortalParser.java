@@ -23,7 +23,7 @@ import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
 import org.cubeengine.butler.parameter.argument.DefaultValue;
-import org.cubeengine.butler.parameter.argument.ReaderException;
+import org.cubeengine.butler.parameter.argument.ParserException;
 import org.spongepowered.api.entity.living.player.Player;
 
 public class PortalParser implements ArgumentParser<Portal>, DefaultValue<Portal>, Completer
@@ -36,13 +36,13 @@ public class PortalParser implements ArgumentParser<Portal>, DefaultValue<Portal
     }
 
     @Override
-    public Portal parse(Class type, CommandInvocation invocation) throws ReaderException
+    public Portal parse(Class type, CommandInvocation invocation) throws ParserException
     {
         String portalName = invocation.consume(1);
         Portal portal = this.module.getPortal(portalName);
         if (portal == null)
         {
-            throw new ReaderException("Portal {input} not found", portalName);
+            throw new ParserException("Portal {input} not found", portalName);
         }
         return portal;
     }
@@ -57,13 +57,13 @@ public class PortalParser implements ArgumentParser<Portal>, DefaultValue<Portal
         }
         if (portal == null)
         {
-            throw new ReaderException("You need to define a portal to use");
+            throw new ParserException("You need to define a portal to use");
         }
         return portal;
     }
 
     @Override
-    public List<String> suggest(CommandInvocation invocation)
+    public List<String> suggest(Class type, CommandInvocation invocation)
     {
         List<String> list = new ArrayList<>();
         String token = invocation.currentToken();

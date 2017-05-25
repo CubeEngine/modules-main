@@ -25,7 +25,6 @@ import java.util.Set;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.module.roles.RolesUtil;
-import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 
 import static java.util.stream.Collectors.toList;
@@ -40,7 +39,7 @@ public class PermissionCompleter implements Completer
     }
 
     @Override
-    public List<String> suggest(CommandInvocation invocation)
+    public List<String> suggest(Class type, CommandInvocation invocation)
     {
         Set<String> result = new HashSet<>();
         String token = invocation.currentToken();

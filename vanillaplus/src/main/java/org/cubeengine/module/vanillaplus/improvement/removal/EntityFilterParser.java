@@ -24,7 +24,7 @@ import java.util.function.Predicate;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.exception.SilentException;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.ReaderException;
+import org.cubeengine.butler.parameter.argument.ParserException;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
@@ -57,7 +57,7 @@ public class EntityFilterParser implements ArgumentParser<EntityFilter>
     }
 
     @Override
-    public EntityFilter parse(Class aClass, CommandInvocation invocation) throws ReaderException
+    public EntityFilter parse(Class aClass, CommandInvocation invocation) throws ParserException
     {
         CommandSource cmdSource = (CommandSource)invocation.getCommandSource();
         String token = invocation.consume(1);

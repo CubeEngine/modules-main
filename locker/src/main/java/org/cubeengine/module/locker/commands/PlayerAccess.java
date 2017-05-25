@@ -23,7 +23,7 @@ import java.util.List;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.ReaderException;
+import org.cubeengine.butler.parameter.argument.ParserException;
 import org.cubeengine.libcube.util.StringUtils;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -48,7 +48,7 @@ public class PlayerAccess
     public static class PlayerAccessParser implements ArgumentParser<PlayerAccess>, Completer
     {
         @Override
-        public PlayerAccess parse(Class clazz, CommandInvocation invocation) throws ReaderException
+        public PlayerAccess parse(Class clazz, CommandInvocation invocation) throws ParserException
         {
             String token = invocation.currentToken();
             boolean admin = token.startsWith("@");
@@ -71,7 +71,7 @@ public class PlayerAccess
         }
 
         @Override
-        public List<String> suggest(CommandInvocation invocation)
+        public List<String> suggest(Class type, CommandInvocation invocation)
         {
             List<String> list = new ArrayList<>();
             String[] parts = StringUtils.explode(",", invocation.currentToken(), true);

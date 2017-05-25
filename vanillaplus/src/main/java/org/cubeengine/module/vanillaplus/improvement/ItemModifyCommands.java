@@ -45,7 +45,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.libcube.service.command.readers.EnchantmentParser.getPossibleEnchantments;
+import static org.cubeengine.libcube.service.command.parser.EnchantmentParser.getPossibleEnchantments;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.item.ItemTypes.SKULL;
 import static org.spongepowered.api.text.serializer.TextSerializers.FORMATTING_CODE;

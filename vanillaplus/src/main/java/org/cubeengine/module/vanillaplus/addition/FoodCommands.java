@@ -27,12 +27,11 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.libcube.service.command.readers.PlayerList;
+import org.cubeengine.libcube.service.command.parser.PlayerList;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;

@@ -21,7 +21,7 @@ import java.util.Optional;
 import java.util.Random;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.ReaderException;
+import org.cubeengine.butler.parameter.argument.ParserException;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -42,7 +42,7 @@ public class DestinationParser implements ArgumentParser<Destination>
     }
 
     @Override
-    public Destination parse(Class type, CommandInvocation invocation) throws ReaderException
+    public Destination parse(Class type, CommandInvocation invocation) throws ParserException
     {
         String token = invocation.consume(1);
         if ("here".equalsIgnoreCase(token))
@@ -51,7 +51,7 @@ public class DestinationParser implements ArgumentParser<Destination>
             {
                 return new Destination(((Player)invocation.getCommandSource()).getLocation(), ((Player)invocation.getCommandSource()).getRotation(), i18n);
             }
-            throw new ReaderException(
+            throw new ParserException(
                 "The Portal Agency will bring you your portal for just {text:$ 1337} within {input#amount} weeks",
                 String.valueOf(random.nextInt(51) + 1));
         }
@@ -60,7 +60,7 @@ public class DestinationParser implements ArgumentParser<Destination>
             Portal destPortal = module.getPortal(token.substring(2));
             if (destPortal == null)
             {
-                throw new ReaderException("Portal {input} not found!", token.substring(2));
+                throw new ParserException("Portal {input} not found!", token.substring(2));
             }
             return new Destination(destPortal);
         }
@@ -69,7 +69,7 @@ public class DestinationParser implements ArgumentParser<Destination>
             Optional<World> world = Sponge.getServer().getWorld(token);
             if (!world.isPresent())
             {
-                throw new ReaderException("World {input} not found!", token);
+                throw new ParserException("World {input} not found!", token);
             }
             return new Destination(world.get());
         }

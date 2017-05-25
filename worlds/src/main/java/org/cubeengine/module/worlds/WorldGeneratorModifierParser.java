@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.ReaderException;
+import org.cubeengine.butler.parameter.argument.ParserException;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
@@ -33,7 +33,7 @@ import java.util.Optional;
 public class WorldGeneratorModifierParser implements ArgumentParser<WorldGeneratorModifier>, Completer
 {
     @Override
-    public WorldGeneratorModifier parse(Class aClass, CommandInvocation invocation) throws ReaderException
+    public WorldGeneratorModifier parse(Class aClass, CommandInvocation invocation) throws ParserException
     {
         String token = invocation.currentToken();
         Optional<WorldGeneratorModifier> generator = Sponge.getRegistry().getType(WorldGeneratorModifier.class, token);
@@ -42,11 +42,11 @@ public class WorldGeneratorModifierParser implements ArgumentParser<WorldGenerat
             invocation.consume(1);
             return generator.get();
         }
-        throw new ReaderException("No Generator found for {}", token);
+        throw new ParserException("No Generator found for {}", token);
     }
 
     @Override
-    public List<String> suggest(CommandInvocation invocation)
+    public List<String> suggest(Class type, CommandInvocation invocation)
     {
         String token = invocation.currentToken();
         return Sponge.getRegistry().getAllOf(WorldGeneratorModifier.class).stream()

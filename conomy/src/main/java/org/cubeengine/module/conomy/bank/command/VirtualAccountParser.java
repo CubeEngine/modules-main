@@ -23,11 +23,11 @@ import java.util.Optional;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
 import org.cubeengine.butler.parameter.argument.DefaultValue;
-import org.cubeengine.butler.parameter.argument.ReaderException;
+import org.cubeengine.butler.parameter.argument.ParserException;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.bank.BankConomyService;
-import org.cubeengine.libcube.service.command.TranslatedReaderException;
+import org.cubeengine.libcube.service.command.TranslatedParserException;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.entity.living.player.User;
 
@@ -45,7 +45,7 @@ public class VirtualAccountParser implements ArgumentParser<BaseAccount.Virtual>
     }
 
     @Override
-    public BaseAccount.Virtual parse(Class type, CommandInvocation invocation) throws ReaderException
+    public BaseAccount.Virtual parse(Class type, CommandInvocation invocation) throws ParserException
     {
         String arg = invocation.consume(1);
         Optional<BaseAccount.Virtual> target = Optional.empty();
@@ -55,7 +55,7 @@ public class VirtualAccountParser implements ArgumentParser<BaseAccount.Virtual>
         }
         if (!target.isPresent())
         {
-            throw new TranslatedReaderException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE, "There is no bank account named {input#name}!", arg));
+            throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE, "There is no bank account named {input#name}!", arg));
         }
         return target.get();
     }
@@ -69,12 +69,12 @@ public class VirtualAccountParser implements ArgumentParser<BaseAccount.Virtual>
             List<BaseAccount.Virtual> banks = service.getBanks(user, AccessLevel.SEE);
             if (banks.isEmpty())
             {
-                throw new TranslatedReaderException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
+                throw new TranslatedParserException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
                         "You have no banks available!"));
             }
             return banks.get(0);
         }
-        throw new TranslatedReaderException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
+        throw new TranslatedParserException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
                 "You have to specify a bank!"));
     }
 }

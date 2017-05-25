@@ -26,11 +26,9 @@ import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 import java.util.ArrayList;
@@ -57,7 +55,7 @@ public class WeatherCommands
     public class WeatherCompleter implements Completer
     {
         @Override
-        public List<String> suggest(CommandInvocation invocation)
+        public List<String> suggest(Class type, CommandInvocation invocation)
         {
             ArrayList<String> list = new ArrayList<>();
             String token = invocation.currentToken();

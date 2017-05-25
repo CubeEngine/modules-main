@@ -81,7 +81,7 @@ public class WarpCommand extends ContainerCommand
     public List<String> getSuggestions(CommandInvocation invocation)
     {
         List<String> list = super.getSuggestions(invocation);
-        list.addAll(invocation.getManager().getCompleter(Warp.class).suggest(invocation));
+        list.addAll(invocation.getManager().getCompleter(Warp.class).suggest(Warp.class, invocation));
         return list;
     }
 

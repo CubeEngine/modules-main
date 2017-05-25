@@ -54,6 +54,7 @@ import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.config.Home;
+import org.cubeengine.module.travel.config.Warp;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
@@ -103,7 +104,7 @@ public class HomeCommand extends ContainerCommand
     public List<String> getSuggestions(CommandInvocation invocation)
     {
         List<String> list = super.getSuggestions(invocation);
-        list.addAll(invocation.getManager().getCompleter(Home.class).suggest(invocation));
+        list.addAll(invocation.getManager().getCompleter(Home.class).suggest(Home.class, invocation));
         return list;
     }
 

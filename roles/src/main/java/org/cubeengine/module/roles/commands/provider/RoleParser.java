@@ -22,7 +22,7 @@ import java.util.List;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.ReaderException;
+import org.cubeengine.butler.parameter.argument.ParserException;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.spongepowered.api.service.permission.Subject;
@@ -37,18 +37,18 @@ public class RoleParser implements ArgumentParser<RoleSubject>, Completer
     }
 
     @Override
-    public RoleSubject parse(Class type, CommandInvocation invocation) throws ReaderException
+    public RoleSubject parse(Class type, CommandInvocation invocation) throws ParserException
     {
         String token = invocation.consume(1);
         if (service.getGroupSubjects().hasRegistered(token))
         {
             return service.getGroupSubjects().get(token);
         }
-        throw new ReaderException("Could not find the role: {input#role}", token);
+        throw new ParserException("Could not find the role: {input#role}", token);
     }
 
     @Override
-    public List<String> suggest(CommandInvocation invocation)
+    public List<String> suggest(Class type, CommandInvocation invocation)
     {
         ArrayList<String> result = new ArrayList<>();
         String token = invocation.currentToken().toLowerCase();

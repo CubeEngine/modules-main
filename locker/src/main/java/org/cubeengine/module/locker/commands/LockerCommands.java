@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.completer.Completer;
@@ -333,7 +332,7 @@ public class LockerCommands extends ContainerCommand
     public static class FlagCompleter implements Completer
     {
         @Override
-        public List<String> suggest(CommandInvocation invocation)
+        public List<String> suggest(Class type, CommandInvocation invocation)
         {
             String subToken = invocation.currentToken();
             if (subToken.contains(","))

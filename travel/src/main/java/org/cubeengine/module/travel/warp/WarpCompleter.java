@@ -19,9 +19,7 @@ package org.cubeengine.module.travel.warp;
 
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
-import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.module.travel.config.Warp;
-import org.cubeengine.module.travel.home.HomeManager;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
@@ -37,7 +35,7 @@ public class WarpCompleter implements Completer
     }
 
     @Override
-    public List<String> suggest(CommandInvocation invocation)
+    public List<String> suggest(Class type, CommandInvocation invocation)
     {
         List<String> list = new ArrayList<>();
         if (invocation.getCommandSource() instanceof Player)

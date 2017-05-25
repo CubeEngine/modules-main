@@ -24,11 +24,11 @@ import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
 import org.cubeengine.butler.parameter.argument.DefaultValue;
-import org.cubeengine.butler.parameter.argument.ReaderException;
+import org.cubeengine.butler.parameter.argument.ParserException;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyService;
-import org.cubeengine.libcube.service.command.TranslatedReaderException;
+import org.cubeengine.libcube.service.command.TranslatedParserException;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.permission.Subject;
@@ -49,7 +49,7 @@ public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, 
     }
 
     @Override
-    public BaseAccount.Unique parse(Class type, CommandInvocation invocation) throws ReaderException
+    public BaseAccount.Unique parse(Class type, CommandInvocation invocation) throws ParserException
     {
         String arg = invocation.currentToken();
         User user = (User)invocation.getManager().read(User.class, User.class, invocation);
@@ -60,7 +60,7 @@ public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, 
             });
         if (!target.isPresent())
         {
-            throw new TranslatedReaderException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
+            throw new TranslatedParserException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
                     "No account found for {user}!", arg));
         }
         return target.get();
@@ -71,14 +71,14 @@ public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, 
     {
         if (!(invocation.getCommandSource() instanceof User))
         {
-            throw new TranslatedReaderException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
+            throw new TranslatedParserException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
                     "You have to specify a user!"));
         }
         User user = (User) invocation.getCommandSource();
         Optional<BaseAccount.Unique> account = getAccount(user);
         if (!account.isPresent())
         {
-            throw new TranslatedReaderException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
+            throw new TranslatedParserException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
                     "You have no account!"));
         }
         return account.get();
@@ -92,8 +92,8 @@ public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, 
     }
 
     @Override
-    public List<String> suggest(CommandInvocation invocation)
+    public List<String> suggest(Class type, CommandInvocation invocation)
     {
-        return invocation.getManager().getCompleter(User.class).suggest(invocation);
+        return invocation.getManager().getCompleter(User.class).suggest(type, invocation);
     }
 }

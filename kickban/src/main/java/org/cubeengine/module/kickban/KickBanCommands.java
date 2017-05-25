@@ -34,7 +34,7 @@ import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.libcube.service.command.readers.PlayerList;
+import org.cubeengine.libcube.service.command.parser.PlayerList;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.util.ChatFormat;

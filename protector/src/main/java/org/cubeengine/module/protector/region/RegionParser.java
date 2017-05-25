@@ -21,8 +21,8 @@ import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.completer.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
 import org.cubeengine.butler.parameter.argument.DefaultValue;
-import org.cubeengine.butler.parameter.argument.ReaderException;
-import org.cubeengine.libcube.service.command.TranslatedReaderException;
+import org.cubeengine.butler.parameter.argument.ParserException;
+import org.cubeengine.libcube.service.command.TranslatedParserException;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.module.protector.RegionManager;
@@ -51,7 +51,7 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
     }
 
     @Override
-    public List<String> suggest(CommandInvocation invocation)
+    public List<String> suggest(Class type, CommandInvocation invocation)
     {
         String token = invocation.currentToken().toLowerCase();
         List<String> list = new ArrayList<>();
@@ -106,7 +106,7 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
     }
 
     @Override
-    public Region parse(Class aClass, CommandInvocation invocation) throws ReaderException
+    public Region parse(Class aClass, CommandInvocation invocation) throws ParserException
     {
         String token = invocation.consume(1).toLowerCase();
         if (invocation.getCommandSource() instanceof Locatable)
@@ -146,7 +146,7 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
             }
             else
             {
-                throw new TranslatedReaderException(
+                throw new TranslatedParserException(
                         i18n.getTranslation(invocation.getContext(Locale.class), MessageType.NEGATIVE,
                                 "Unknown World {name} for world-region", token, worldName));
             }
@@ -156,7 +156,7 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
             return manager.getGlobalRegion();
         }
 
-        throw new TranslatedReaderException(
+        throw new TranslatedParserException(
                 i18n.getTranslation(invocation.getContext(Locale.class), MessageType.NEGATIVE,
                                     "There is no such Region as {name}", token));
     }
@@ -172,7 +172,7 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
                 return activeRegion;
             }
         }
-        throw new TranslatedReaderException(
+        throw new TranslatedParserException(
                 i18n.getTranslation(invocation.getContext(Locale.class), MessageType.NEGATIVE,
                                     "You need to provide a region"));
 
