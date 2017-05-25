@@ -64,15 +64,15 @@ public class Travel extends Module
         i18n.getCompositor().registerFormatter(new TpPointFormatter(i18n));
 
         this.homeManager = new HomeManager(this, i18n, reflector.load(HomeConfig.class, getProvided(Path.class).resolve("homes.yml").toFile()));
-        this.cm.getProviderManager().register(this, new HomeCompleter(homeManager), Home.class);
+        this.cm.getProviders().register(this, new HomeCompleter(homeManager), Home.class);
         this.em.registerListener(Travel.class, this.homeManager);
         this.warpManager = new WarpManager(reflector.load(WarpConfig.class, getProvided(Path.class).resolve("warps.yml").toFile()));
-        this.cm.getProviderManager().register(this, new WarpCompleter(warpManager), Warp.class);
+        this.cm.getProviders().register(this, new WarpCompleter(warpManager), Warp.class);
 
         cm.addCommand(new HomeCommand(cm, this, selector, i18n));
         cm.addCommand(new WarpCommand(cm, this, i18n));
 
-        cm.getProviderManager().getExceptionHandler().addHandler(new TravelExceptionHandler(i18n));
+        cm.getProviders().getExceptionHandler().addHandler(new TravelExceptionHandler(i18n));
     }
 
     public TravelConfig getConfig()

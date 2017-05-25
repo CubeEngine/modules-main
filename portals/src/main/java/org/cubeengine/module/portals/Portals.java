@@ -37,8 +37,8 @@ import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
+import org.cubeengine.butler.provider.Providers;
 import org.cubeengine.reflect.Reflector;
-import org.cubeengine.butler.provider.ProviderManager;
 import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.libcube.util.Pair;
 import org.cubeengine.module.portals.config.Destination;
@@ -84,7 +84,7 @@ public class Portals extends Module
     public void onEnable() throws IOException
     {
         reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(), Destination.class);
-        ProviderManager rManager = cm.getProviderManager();
+        Providers rManager = cm.getProviders();
         rManager.register(this, new PortalParser(this), Portal.class);
         rManager.register(this, new DestinationParser(this, i18n), Destination.class);
 

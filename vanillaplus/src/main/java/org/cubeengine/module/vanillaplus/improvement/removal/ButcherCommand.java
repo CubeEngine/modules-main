@@ -52,7 +52,7 @@ public class ButcherCommand extends PermissionContainer
         super(pm, VanillaPlus.class);
         this.module = module;
         this.i18n = i18n;
-        cm.getProviderManager().register(module, new LivingFilterParser(pm, i18n, sm), LivingFilter.class);
+        cm.getProviders().register(module, new LivingFilterParser(pm, i18n, sm), LivingFilter.class);
     }
 
     public final Permission COMMAND_BUTCHER_FLAG_LIGHTNING = register("command.butcher.lightning", "", null);

@@ -44,7 +44,7 @@ public class WeatherCommands
     public WeatherCommands(I18n i18n, CommandManager cm)
     {
         this.i18n = i18n;
-        cm.getProviderManager().register(this, new WeatherCompleter(), Weather.class);
+        cm.getProviders().register(this, new WeatherCompleter(), Weather.class);
     }
 
     public enum Weather // TODO completer

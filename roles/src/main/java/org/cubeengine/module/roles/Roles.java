@@ -105,7 +105,7 @@ public class Roles extends Module
     @Setup
     public void onSetup()
     {
-        cm.getProviderManager().getExceptionHandler().addHandler(new RolesExceptionHandler(i18n));
+        cm.getProviders().getExceptionHandler().addHandler(new RolesExceptionHandler(i18n));
         this.permLogger = factory.getLog(LogFactory.class, "Permissions");
         this.permLogger.addTarget(new AsyncFileTarget(getLogFile(fm, "Permissions"), getFileFormat(false, false), false, getCycler(), threadFactory));
 
@@ -127,9 +127,9 @@ public class Roles extends Module
     {
         i18n.getCompositor().registerFormatter(new RoleFormatter());
 
-        cm.getProviderManager().register(this, new RoleParser(service), RoleSubject.class);
-        cm.getProviderManager().register(this, new DefaultPermissionValueProvider(), Tristate.class);
-        cm.getProviderManager().register(this, new PermissionCompleter(service));
+        cm.getProviders().register(this, new RoleParser(service), RoleSubject.class);
+        cm.getProviders().register(this, new DefaultPermissionValueProvider(), Tristate.class);
+        cm.getProviders().register(this, new PermissionCompleter(service));
 
         RoleCommands cmdRoles = new RoleCommands(cm);
         cm.addCommand(cmdRoles);

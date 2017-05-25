@@ -52,7 +52,7 @@ public class RemoveCommands
     {
         this.i18n = i18n;
         this.module = module;
-        cm.getProviderManager().register(module, new EntityFilterParser(i18n, em, mm), EntityFilter.class);
+        cm.getProviders().register(module, new EntityFilterParser(i18n, em, mm), EntityFilter.class);
     }
 
     @Command(desc = "Removes entities in a world")

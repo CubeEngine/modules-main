@@ -34,6 +34,6 @@ public class Worlds extends Module
     @Enable
     public void onEnable()
     {
-        cm.getProviderManager().register(this, new WorldGeneratorModifierParser(), WorldGeneratorModifier.class);
+        cm.getProviders().register(this, new WorldGeneratorModifierParser(), WorldGeneratorModifier.class);
     }
 }
