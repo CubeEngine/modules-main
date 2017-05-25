@@ -1,0 +1,636 @@
+# This file is part of CubeEngine.
+# CubeEngine is licensed under the GNU General Public License Version 3.
+# 
+# CubeEngine is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# CubeEngine is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: org.cubeengine.module:protector:1.0.0-SNAPSHOT\n"
+"Report-Msgid-Bugs-To: development@cubeisland.de\n"
+"POT-Creation-Date: 2017-05-25 11:15:20+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en_US\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Extracted by:
+#. 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:95
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:69
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:89
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:109
+#: org/cubeengine/module/protector/command/SettingsCommands.java:94
+#: org/cubeengine/module/protector/command/SettingsCommands.java:120
+#: org/cubeengine/module/protector/command/SettingsCommands.java:141
+#: org/cubeengine/module/protector/command/SettingsCommands.java:180
+#: org/cubeengine/module/protector/command/SettingsCommands.java:202
+#: org/cubeengine/module/protector/command/SettingsCommands.java:231
+msgid "Bypass permissions set for the role {name}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:64
+msgid "Controls blocks breaking blocks"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:97
+msgid "Controls damage by living entities"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:56
+msgid "Controls entities breaking blocks"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:57
+msgid "Controls entity damage"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/SettingsCommands.java:252
+msgid "Controls executing commands"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:72
+msgid "Controls explosions breaking blocks"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:80
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:117
+msgid "Controls explosions caused by players breaking blocks"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:103
+msgid "Controls fire breaking blocks"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/SettingsCommands.java:77
+msgid "Controls movement"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/SettingsCommands.java:106
+msgid "Controls player building"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/SettingsCommands.java:166
+msgid "Controls player interacting with blocks"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/SettingsCommands.java:188
+msgid "Controls player interactive with items"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/SettingsCommands.java:128
+msgid "Controls players interacting with blocks"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:77
+msgid "Controls pvp damage"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/SettingsCommands.java:279
+msgid "Controls redstone circuits commands"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/SettingsCommands.java:210
+msgid "Controls spawning of entities"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/SettingsCommands.java:71
+msgid "Controls teleport movement"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/RegionCommands.java:74
+msgid "Defines a new Region"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:248
+#: org/cubeengine/module/protector/command/RegionCommands.java:281
+msgid "Disabled"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/RegionCommands.java:169
+msgid "Displays Region info"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:247
+#: org/cubeengine/module/protector/command/RegionCommands.java:279
+msgid "Enabled"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:174
+msgid "Global region"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:189
+msgid "Inside Cuboid of {vector} to {vector}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/RegionCommands.java:125
+msgid "Lists regions"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:41
+msgid "Manages the region block-damage settings"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:42
+msgid "Manages the region entity-damage settings"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/SettingsCommands.java:50
+msgid "Manages the region settings"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/RegionCommands.java:59
+msgid "Manages the regions"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:153
+msgid "No Regions found"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:80
+#: org/cubeengine/module/protector/command/RegionCommands.java:100
+msgid "Nothing selected!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/RegionCommands.java:94
+msgid "Redefines an existing Region"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:91
+msgid "Region {name} created!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:182
+msgid "Region {name} in {world}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:122
+msgid "Region {name} selected!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:110
+msgid "Region {name} updated!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:74
+msgid "Region {name}: All EntityDamage Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:69
+msgid "Region {name}: BlockDamage by Block Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:61
+msgid "Region {name}: BlockDamage by Entity Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:77
+msgid "Region {name}: BlockDamage by Explosion Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:100
+msgid "Region {name}: BlockDamage by Player-Explosion Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:125
+msgid "Region {name}: Build Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:275
+msgid "Region {name}: Command Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:284
+msgid "Region {name}: Dead Circuit Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:122
+msgid "Region {name}: EntityDamage by Entity Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:114
+msgid "Region {name}: EntityDamage by Living Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:102
+msgid "Region {name}: Move Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:94
+msgid "Region {name}: PVP Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:249
+msgid "Region {name}: Spawn Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:185
+msgid "Region {name}: Use Block Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:207
+msgid "Region {name}: Use Item Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:163
+msgid "Region {name}: Use Settings updated"
+msgstr ""
+
+#. Extracted by:
+#. 1. Annotation
+#. 	Name: org.cubeengine.butler.parametric.Command:desc
+#: org/cubeengine/module/protector/command/RegionCommands.java:113
+msgid "Selects a Region"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:193
+msgid "Settings:"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:261
+msgid "The command {name} is not a registered command"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:156
+msgid "The following regions were found:"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:86
+msgid "There is already a Region named {name}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:226
+msgid "There is no bypass permission for natural or plugin only spawning."
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/region/RegionReader.java:160
+msgid "There is no such Region as {name}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:106
+msgid "This region is in another world!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2, 3, 4, 5, 6, 7, 8, 9, 10. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/BlockDamageSettingsCommands.java:87
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:64
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:84
+#: org/cubeengine/module/protector/command/EntityDamageSettingsCommands.java:104
+#: org/cubeengine/module/protector/command/SettingsCommands.java:86
+#: org/cubeengine/module/protector/command/SettingsCommands.java:115
+#: org/cubeengine/module/protector/command/SettingsCommands.java:136
+#: org/cubeengine/module/protector/command/SettingsCommands.java:175
+#: org/cubeengine/module/protector/command/SettingsCommands.java:197
+#: org/cubeengine/module/protector/command/SettingsCommands.java:219
+msgid "This role does not exist"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:283
+msgid "Undefined"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/region/RegionReader.java:150
+msgid "Unknown World {name} for world-region"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/SettingsCommands.java:264
+msgid "Use the -force Flag to block it anyways"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/command/RegionCommands.java:178
+msgid "World region in {world}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/protector/region/RegionReader.java:176
+msgid "You need to provide a region"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:209
+msgid "blockdamage all explosion"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:211
+msgid "blockdamage block"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:212
+msgid "blockdamage monster"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:210
+msgid "blockdamage player explosion"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:214
+msgid "blocked commands"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:195
+msgid "build"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:216
+msgid "deadcircuit"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:196
+msgid "move"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:205
+msgid "spawn naturally"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:206
+msgid "spawn player"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:207
+msgid "spawn plugin"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:197
+msgid "use-block"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:198
+msgid "use-item"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:199
+msgid "useall blocks"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:201
+msgid "useall container"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:200
+msgid "useall items"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:202
+msgid "useall openables"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/protector/command/RegionCommands.java:203
+msgid "useall redstone"
+msgstr ""

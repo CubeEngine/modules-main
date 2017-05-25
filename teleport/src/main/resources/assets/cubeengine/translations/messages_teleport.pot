@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: org.cubeengine.module:teleport:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2016-05-17 23:36:40+0200\n"
+"POT-Creation-Date: 2017-05-25 11:15:13+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -35,7 +35,7 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/SpawnCommands.java:67
+#: org/cubeengine/module/teleport/SpawnCommands.java:66
 msgid "Changes the global respawnpoint"
 msgstr ""
 
@@ -49,22 +49,22 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/TeleportCommands.java:220
+#: org/cubeengine/module/teleport/TeleportCommands.java:195
 msgid "Direct teleport to a coordinate."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/teleport/MovementCommands.java:166
+#: org/cubeengine/module/teleport/MovementCommands.java:173
 msgid "Jumping in the console is not allowed! Go play outside!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/MovementCommands.java:165
-#: org/cubeengine/module/teleport/MovementCommands.java:180
+#: org/cubeengine/module/teleport/MovementCommands.java:172
+#: org/cubeengine/module/teleport/MovementCommands.java:187
 msgid "Jumps to the position you are looking at."
 msgstr ""
 
@@ -79,7 +79,7 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/teleport/MovementCommands.java:181
+#: org/cubeengine/module/teleport/MovementCommands.java:188
 msgid ""
 "Passing through firewalls in the console is not allowed! Go play outside!"
 msgstr ""
@@ -87,17 +87,17 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/MovementCommands.java:247
+#: org/cubeengine/module/teleport/MovementCommands.java:258
 msgid "Places a player to the position you are looking at."
 msgstr ""
 
 #. Extracted by:
 #. 1, 2, 3, 4. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/teleport/MovementCommands.java:89
-#: org/cubeengine/module/teleport/MovementCommands.java:98
-#: org/cubeengine/module/teleport/MovementCommands.java:137
-#: org/cubeengine/module/teleport/SpawnCommands.java:127
+#: org/cubeengine/module/teleport/MovementCommands.java:95
+#: org/cubeengine/module/teleport/MovementCommands.java:104
+#: org/cubeengine/module/teleport/MovementCommands.java:143
+#: org/cubeengine/module/teleport/SpawnCommands.java:126
 msgid "Pro Tip: Teleport does not work IRL!"
 msgstr ""
 
@@ -118,63 +118,63 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/MovementCommands.java:262
+#: org/cubeengine/module/teleport/MovementCommands.java:274
 msgid "Swaps you and another players position"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/TeleportCommands.java:161
+#: org/cubeengine/module/teleport/TeleportCommands.java:149
 msgid "Teleport a player directly to you."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/TeleportCommands.java:66
+#: org/cubeengine/module/teleport/TeleportCommands.java:67
 msgid "Teleport directly to a player."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/TeleportCommands.java:188
+#: org/cubeengine/module/teleport/TeleportCommands.java:170
 msgid "Teleport every player directly to you."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/SpawnCommands.java:103
+#: org/cubeengine/module/teleport/SpawnCommands.java:102
 msgid "Teleports a player to spawn"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/SpawnCommands.java:88
+#: org/cubeengine/module/teleport/SpawnCommands.java:87
 msgid "Teleports all players to spawn"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/TeleportCommands.java:127
+#: org/cubeengine/module/teleport/TeleportCommands.java:122
 msgid "Teleports everyone directly to a player."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/MovementCommands.java:88
+#: org/cubeengine/module/teleport/MovementCommands.java:94
 msgid "Teleports to the highest point at your position."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/MovementCommands.java:61
+#: org/cubeengine/module/teleport/MovementCommands.java:67
 msgid ""
 "Teleports you X amount of blocks into the air and puts a glass block beneath "
 "you."
@@ -183,35 +183,35 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/MovementCommands.java:136
+#: org/cubeengine/module/teleport/MovementCommands.java:142
 msgid "Teleports you to the next safe spot downwards."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/MovementCommands.java:97
+#: org/cubeengine/module/teleport/MovementCommands.java:103
 msgid "Teleports you to the next safe spot upwards."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/SpawnCommands.java:126
+#: org/cubeengine/module/teleport/SpawnCommands.java:125
 msgid "Teleports you to the spawn of given world"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/teleport/MovementCommands.java:195
+#: org/cubeengine/module/teleport/MovementCommands.java:202
 msgid "Teleports you to your last location"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/teleport/MovementCommands.java:197
+#: org/cubeengine/module/teleport/MovementCommands.java:204
 msgid ""
 "Unfortunately teleporting is still not implemented in the game {text:"
 "'Life'}!"
@@ -220,16 +220,459 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
-#: org/cubeengine/module/teleport/MovementCommands.java:263
+#: org/cubeengine/module/teleport/MovementCommands.java:275
 msgid "player"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2, 3, 4. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/teleport/TeleportCommands.java:162
-#: org/cubeengine/module/teleport/TeleportCommands.java:189
+#: org/cubeengine/module/teleport/TeleportCommands.java:150
+#: org/cubeengine/module/teleport/TeleportCommands.java:171
 #: org/cubeengine/module/teleport/TeleportRequestCommands.java:56
 #: org/cubeengine/module/teleport/TeleportRequestCommands.java:91
 msgid "{text:Pro Tip}: Teleport does not work IRL!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:139
+msgid "Ascended a level!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:169
+msgid "Descended a level!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:72
+msgid "Invalid height. The height has to be a whole number greater than 0!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:180
+#: org/cubeengine/module/teleport/MovementCommands.java:265
+#, fuzzy
+#| msgid "Jumps to the position you are looking at."
+msgid "No block in sight!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:213
+msgid "No death point found!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:195
+#: org/cubeengine/module/teleport/TeleportListener.java:135
+#, fuzzy
+#| msgid "Teleports you to your last location"
+msgid "Nothing to pass through!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:292
+msgid "Swapped position of {user} and {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:295
+msgid "Swapped position with {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:281
+msgid "Swapping positions with yourself!? Are you kidding me?"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:247
+#, fuzzy
+#| msgid "Places a player to the position you are looking at."
+msgid "Target is unsafe! Use the -unsafe flag to teleport anyways."
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:79
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:113
+msgid "Teleport request of {sender} timed out."
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:104
+msgid "Teleport request send to {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:69
+msgid "Teleport request sent to {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/SpawnCommands.java:137
+msgid "Teleported to the spawn of world {world}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:224
+msgid "Teleported to your death point!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:251
+msgid "Teleported to your last location!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:211
+msgid "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:61
+msgid "Teleporting you to yourself? Done."
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:96
+msgid "Teleporting yourself to you? Done."
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:142
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:155
+msgid "That player seems to have disappeared."
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:145
+#: org/cubeengine/module/teleport/TeleportCommands.java:190
+msgid "The following players were not teleported: \n"
+"{user#list}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/SpawnCommands.java:84
+msgid "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:284
+msgid "Truly a hero! Trying to swap a users position with himself..."
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:101
+msgid "Use the {text:-force (-f)} flag to teleport to this player."
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:66
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:101
+msgid "Use {text:/tpaccept} to accept or {text:/tpdeny} to deny the request!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:147
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:160
+msgid "You accepted a teleport to {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/SpawnCommands.java:115
+msgid "You are not allowed to spawn {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:255
+msgid "You are not allowed to teleport back!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:83
+msgid "You are not allowed to teleport other people!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/SpawnCommands.java:132
+msgid "You are not allowed to teleport to this world!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:103
+#: org/cubeengine/module/teleport/TeleportCommands.java:128
+msgid "You are not allowed to teleport to {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:91
+#: org/cubeengine/module/teleport/TeleportCommands.java:161
+#, fuzzy
+#| msgid "Teleport a player directly to you."
+msgid "You are not allowed to teleport {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:100
+msgid "You are now on top!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/SpawnCommands.java:122
+msgid "You are now standing at the spawn in {world}!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:116
+#: org/cubeengine/module/teleport/MovementCommands.java:134
+msgid "You cannot ascend here"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:163
+msgid "You cannot descend here"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:198
+msgid "You denied {user}'s teleport request"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:187
+msgid "You denied {user}'s teleport request!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:135
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:202
+msgid "You don't have any pending requests!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:112
+#: org/cubeengine/module/teleport/TeleportCommands.java:156
+msgid "You found yourself!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:91
+msgid "You have just been lifted!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:75
+msgid "You have to provide both players"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:184
+msgid "You just jumped!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:199
+msgid "You just passed the wall!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:270
+msgid "You just placed {user} where you were looking!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:115
+msgid "You just teleported {user} to {user}... Not very useful right?"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:236
+msgid "You never teleported!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportListener.java:140
+msgid "You passed through a wall"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:186
+msgid "You teleported everyone to you!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:119
+msgid "You teleported to {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:166
+msgid "You teleported {user} to you!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:271
+msgid "You were placed somewhere!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportCommands.java:167
+msgid "You were teleported to {sender}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/MovementCommands.java:83
+msgid "Your destination seems to be obstructed!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:65
+msgid "{sender} wants to teleport to you!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:100
+msgid "{sender} wants to teleport you to them!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:146
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:159
+msgid "{user} accepted your teleport request!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:197
+msgid "{user} denied your request!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:186
+msgid "{user} denied your teleport request!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:78
+#: org/cubeengine/module/teleport/TeleportRequestCommands.java:112
+msgid "{user} did not accept your teleport request."
 msgstr ""
