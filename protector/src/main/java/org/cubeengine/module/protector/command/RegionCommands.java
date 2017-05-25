@@ -153,6 +153,17 @@ public class RegionCommands extends ContainerCommand
             i18n.sendTranslated(context, NEGATIVE, "No Regions found");
             return;
         }
+
+        if (world == null)
+        {
+            list.add(manager.getGlobalRegion());
+            list.addAll(manager.getWorldRegions());
+        }
+        else
+        {
+            list.add(manager.getWorldRegion(world.getUniqueId()));
+        }
+
         i18n.sendTranslated(context, NEUTRAL, "The following regions were found:");
         for (Region region : list)
         {
