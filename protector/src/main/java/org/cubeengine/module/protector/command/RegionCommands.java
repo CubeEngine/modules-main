@@ -177,9 +177,12 @@ public class RegionCommands extends ContainerCommand
 
     }
 
+    // TODO region here / at / there? print all regions at position
+
     @Command(desc = "Displays Region info")
     public void info(CommandSource context, @Default Region region, @Flag boolean allSettings)
     {
+        // TODO default to region player is in when no active region is set
         if (region.getWorld() == null)
         {
             i18n.sendTranslated(context, POSITIVE, "Global region");
