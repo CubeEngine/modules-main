@@ -37,7 +37,7 @@ public class TableMail extends AutoIncrementTable<Mail, UInteger>
 
     public TableMail(String prefix, Database db)
     {
-        super(prefix + "mail", new Version(1), db);
+        super("mail", new Version(1), db);
         setAIKey(ID);
         addFields(ID, MESSAGE, USERID, SENDERID);
         TABLE_MAIL = this;

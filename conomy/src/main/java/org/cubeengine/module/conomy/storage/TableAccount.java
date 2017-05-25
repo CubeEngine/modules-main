@@ -39,7 +39,7 @@ public class TableAccount extends Table<AccountModel> implements TableUpdateCrea
 
     public TableAccount(String prefix, Database database)
     {
-        super(prefix + "conomy_account", new Version(2), database);
+        super("conomy_account", new Version(2), database);
         this.setPrimaryKey(ID);
         this.addUniqueKey(ID);
         this.addFields(ID, NAME, HIDDEN, INVITE, IS_UUID);

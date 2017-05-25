@@ -40,7 +40,7 @@ public class TableAccessList extends AutoIncrementTable<AccessListModel, UIntege
 
     public TableAccessList(String prefix, Database db)
     {
-        super(prefix + "locker_accesslist", new Version(1), db);
+        super("locker_accesslist", new Version(1), db);
         this.setAIKey(ID);
         this.addUniqueKey(USER_ID, LOCK_ID);
         this.addUniqueKey(USER_ID, OWNER_ID);

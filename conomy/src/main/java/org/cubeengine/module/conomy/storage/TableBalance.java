@@ -35,7 +35,7 @@ public class TableBalance extends Table<BalanceModel>
 
     public TableBalance(String prefix, Database database)
     {
-        super(prefix + "conomy_balance", new Version(1), database);
+        super("conomy_balance", new Version(1), database);
         this.setPrimaryKey(ACCOUNT_ID, CURRENCY, CONTEXT);
         this.addFields(ACCOUNT_ID, CURRENCY, CONTEXT, BALANCE);
         this.addForeignKey(TABLE_ACCOUNT.getPrimaryKey(), ACCOUNT_ID);

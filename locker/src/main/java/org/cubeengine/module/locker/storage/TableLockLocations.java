@@ -42,7 +42,7 @@ public class TableLockLocations extends AutoIncrementTable<LockLocationModel, UI
 
     public TableLockLocations(String prefix, Database db)
     {
-        super(prefix + "locker_locations", new Version(1), db);
+        super("locker_locations", new Version(1), db);
         this.setAIKey(ID);
         this.addIndex(CHUNKX, CHUNKZ);
         this.addUniqueKey(WORLD_ID, X, Y, Z);
