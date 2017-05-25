@@ -94,6 +94,6 @@ public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, 
     @Override
     public List<String> suggest(Class type, CommandInvocation invocation)
     {
-        return invocation.getManager().getCompleter(User.class).suggest(type, invocation);
+        return invocation.getManager().completers().get(User.class).suggest(type, invocation);
     }
 }
