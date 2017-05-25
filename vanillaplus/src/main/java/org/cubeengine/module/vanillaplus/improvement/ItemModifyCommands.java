@@ -135,7 +135,7 @@ public class ItemModifyCommands extends PermissionContainer
     @Command(desc = "Adds an Enchantment to the item in your hand")
     @Restricted(value = Player.class, msg = "Want to be Harry Potter?")
     public void enchant(Player context, @Default Enchantment enchantment, @Optional Integer level,
-                        @ParameterPermission @Flag boolean unsafe)
+                        @ParameterPermission @Flag boolean unsafe) // TODO are param permissions working????
     {
         if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
         {

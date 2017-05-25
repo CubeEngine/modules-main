@@ -110,7 +110,7 @@ public class RoleSubject extends BaseSubject<RoleSubjectData>
     public boolean canAssignAndRemove(CommandSource source)
     {
         String perm = service.getPermissionManager().getBasePermission(Roles.class).getId();
-        return source.hasPermission(perm + ".assign." + getIdentifier());
+        return source.hasPermission(perm + ".assign." + getIdentifier()); // TODO register permission + assign base
     }
 
     public void setPriorityValue(int value)

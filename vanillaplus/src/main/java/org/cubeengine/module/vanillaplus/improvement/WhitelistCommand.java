@@ -82,7 +82,7 @@ public class WhitelistCommand extends ContainerCommand
     }
 
     @Command(desc = "Adds a player to the whitelist.")
-    public void add(CommandSource context, User player)
+    public void add(CommandSource context, User player) // TODO allow players that never played on the server
     {
         WhitelistService service = getWhitelistService();
         if (service.addProfile(player.getProfile()))
