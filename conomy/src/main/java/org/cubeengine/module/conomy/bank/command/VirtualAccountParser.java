@@ -61,7 +61,7 @@ public class VirtualAccountParser implements ArgumentParser<BaseAccount.Virtual>
     }
 
     @Override
-    public BaseAccount.Virtual getDefault(CommandInvocation invocation)
+    public BaseAccount.Virtual provide(CommandInvocation invocation)
     {
         if (invocation.getCommandSource() instanceof User)
         {

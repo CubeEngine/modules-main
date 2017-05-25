@@ -23,7 +23,7 @@ import javax.inject.Inject;
 
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.completer.Completer;
+import org.cubeengine.butler.parameter.argument.Completer;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Complete;

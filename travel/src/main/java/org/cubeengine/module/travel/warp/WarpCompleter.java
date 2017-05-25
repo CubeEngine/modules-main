@@ -18,7 +18,7 @@
 package org.cubeengine.module.travel.warp;
 
 import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.completer.Completer;
+import org.cubeengine.butler.parameter.argument.Completer;
 import org.cubeengine.module.travel.config.Warp;
 import org.spongepowered.api.entity.living.player.Player;
 

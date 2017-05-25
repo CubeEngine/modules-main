@@ -24,7 +24,7 @@ import org.spongepowered.api.util.Tristate;
 public class DefaultPermissionValueProvider implements DefaultValue<Tristate>
 {
     @Override
-    public Tristate getDefault(CommandInvocation invocation)
+    public Tristate provide(CommandInvocation invocation)
     {
         return Tristate.TRUE;
     }

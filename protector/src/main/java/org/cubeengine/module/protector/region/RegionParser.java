@@ -18,7 +18,7 @@
 package org.cubeengine.module.protector.region;
 
 import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.completer.Completer;
+import org.cubeengine.butler.parameter.argument.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
 import org.cubeengine.butler.parameter.argument.DefaultValue;
 import org.cubeengine.butler.parameter.argument.ParserException;
@@ -162,7 +162,7 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
     }
 
     @Override
-    public Region getDefault(CommandInvocation invocation)
+    public Region provide(CommandInvocation invocation)
     {
         if (invocation.getCommandSource() instanceof CommandSource)
         {

@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.completer.Completer;
+import org.cubeengine.butler.parameter.argument.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
 import org.cubeengine.butler.parameter.argument.DefaultValue;
 import org.cubeengine.butler.parameter.argument.ParserException;
@@ -67,7 +67,7 @@ public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, 
     }
 
     @Override
-    public BaseAccount.Unique getDefault(CommandInvocation invocation)
+    public BaseAccount.Unique provide(CommandInvocation invocation)
     {
         if (!(invocation.getCommandSource() instanceof User))
         {

@@ -225,7 +225,7 @@ public class LivingFilterParser extends PermissionContainer implements ArgumentP
 
 
     @Override
-    public LivingFilter getDefault(CommandInvocation invocation)
+    public LivingFilter provide(CommandInvocation invocation)
     {
         CommandSource source = (CommandSource)invocation.getCommandSource();
         if (source.hasPermission(PERM_MONSTER.getId()))

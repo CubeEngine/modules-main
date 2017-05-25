@@ -20,7 +20,7 @@ package org.cubeengine.module.portals;
 import java.util.ArrayList;
 import java.util.List;
 import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.completer.Completer;
+import org.cubeengine.butler.parameter.argument.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
 import org.cubeengine.butler.parameter.argument.DefaultValue;
 import org.cubeengine.butler.parameter.argument.ParserException;
@@ -48,7 +48,7 @@ public class PortalParser implements ArgumentParser<Portal>, DefaultValue<Portal
     }
 
     @Override
-    public Portal getDefault(CommandInvocation invocation)
+    public Portal provide(CommandInvocation invocation)
     {
         Portal portal = null;
         if (invocation.getCommandSource() instanceof Player)
