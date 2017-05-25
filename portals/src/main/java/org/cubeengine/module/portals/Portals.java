@@ -38,7 +38,7 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.reflect.Reflector;
-import org.cubeengine.butler.ProviderManager;
+import org.cubeengine.butler.provider.ProviderManager;
 import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.libcube.util.Pair;
 import org.cubeengine.module.portals.config.Destination;
