@@ -52,7 +52,7 @@ public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, 
     public BaseAccount.Unique parse(Class type, CommandInvocation invocation) throws ParserException
     {
         String arg = invocation.currentToken();
-        User user = (User)invocation.getManager().read(User.class, User.class, invocation);
+        User user = (User)invocation.providers().read(User.class, User.class, invocation);
         Optional<BaseAccount.Unique> target = getAccount(user).filter(a -> {
                 Object cmdSource = invocation.getCommandSource();
                 return !(cmdSource instanceof Subject && a.isHidden()
@@ -94,6 +94,6 @@ public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, 
     @Override
     public List<String> suggest(Class type, CommandInvocation invocation)
     {
-        return invocation.getManager().completers().get(User.class).suggest(type, invocation);
+        return invocation.providers().completers().get(User.class).suggest(type, invocation);
     }
 }

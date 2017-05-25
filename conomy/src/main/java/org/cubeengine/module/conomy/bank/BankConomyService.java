@@ -185,7 +185,7 @@ public class BankConomyService extends ConomyService
     {
         super.registerCommands(cm, i18n);
         ((Dispatcher) cm.getCommand("eco")).addCommand(new EcoBankCommand(cm, this, i18n));
-        cm.getProviderManager().register(module, new VirtualAccountParser(this, i18n), BaseAccount.Virtual.class);
+        cm.getProviders().register(module, new VirtualAccountParser(this, i18n), BaseAccount.Virtual.class);
         BankCommand bankCommand = new BankCommand(cm, this, i18n);
         cm.addCommand(bankCommand);
         bankCommand.addCommand(new BankManageCommand(cm, this, i18n));
