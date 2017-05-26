@@ -110,7 +110,7 @@ public class UserSubjectData extends CachingSubjectData
         if (!parents.containsKey(ContextUtil.GLOBAL))
         {
             List<String> parentList = getData().map(PermissionData::getParents).orElse(Collections.emptyList());
-            List<Subject> list = parentList.stream()
+            List<Subject> list = parentList.stream().distinct()
                                            .map(s -> roleCollection.getByInternalIdentifier(s, uuid.toString()))
                                            .filter(Objects::nonNull)
                                            .sorted(RoleSubject::compare)

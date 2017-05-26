@@ -109,7 +109,7 @@ public class RoleSubjectData extends CachingSubjectData
         {
             for (Map.Entry<String, RoleConfig.ContextSetting> entry : config.settings.entrySet())
             {
-                List<Subject> collect = entry.getValue().parents.stream()
+                List<Subject> collect = entry.getValue().parents.stream().distinct()
                                                 .map(this::getParent)
                                                 .filter(Objects::nonNull)
                                                 .sorted(RoleSubject::compare)
