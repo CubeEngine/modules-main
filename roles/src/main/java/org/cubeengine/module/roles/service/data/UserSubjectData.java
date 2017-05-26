@@ -17,11 +17,12 @@
  */
 package org.cubeengine.module.roles.service.data;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
@@ -57,12 +58,7 @@ public class UserSubjectData extends CachingSubjectData
         User player = storage.get(uuid).get();
         player = player.getPlayer().map(User.class::cast).orElse(player); // TODO wait for User Data impl
 
-        Optional<PermissionData> permData = player.get(PermissionData.class);
-        if (permData.isPresent())
-        {
-            return permData;
-        }
-        return Optional.empty();
+        return player.get(PermissionData.class);
     }
 
     @Override
@@ -110,13 +106,23 @@ public class UserSubjectData extends CachingSubjectData
         if (!parents.containsKey(ContextUtil.GLOBAL))
         {
             List<String> parentList = getData().map(PermissionData::getParents).orElse(Collections.emptyList());
-            List<Subject> list = parentList.stream().distinct()
-                                           .map(s -> roleCollection.getByInternalIdentifier(s, uuid.toString()))
-                                           .filter(Objects::nonNull)
-                                           .sorted(RoleSubject::compare)
-                                           .map(Subject.class::cast)
-                                           .collect(toList());
+            boolean parentRemoved = false;
+            List<Subject> list = new ArrayList<>();
+            for (String s : new HashSet<>(parentList))
+            {
+                RoleSubject subject = roleCollection.getByInternalIdentifier(s, uuid.toString());
+                if (subject == null)
+                {
+                    parentRemoved = true;
+                }
+                list.add(subject);
+            }
+            list.sort(RoleSubject::compare);
             parents.put(ContextUtil.GLOBAL, list);
+            if (parentRemoved)
+            {
+                save(true);
+            }
         }
     }
 

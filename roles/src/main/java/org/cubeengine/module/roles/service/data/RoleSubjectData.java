@@ -17,17 +17,8 @@
  */
 package org.cubeengine.module.roles.service.data;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import static java.util.stream.Collectors.toList;
+
 import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.service.RolesPermissionService;
@@ -35,7 +26,12 @@ import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 
-import static java.util.stream.Collectors.toList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class RoleSubjectData extends CachingSubjectData
 {
@@ -87,14 +83,7 @@ public class RoleSubjectData extends CachingSubjectData
 
     private static RoleConfig.ContextSetting getContextSetting(RoleConfig config, Context context)
     {
-        String contextString = stringify(context);
-        RoleConfig.ContextSetting setting = config.settings.get(contextString);
-        if (setting == null)
-        {
-            setting = new RoleConfig.ContextSetting();
-            config.settings.put(contextString, setting);
-        }
-        return setting;
+        return config.settings.computeIfAbsent(stringify(context), k -> new RoleConfig.ContextSetting());
     }
 
     public RoleConfig getConfig()
@@ -109,12 +98,23 @@ public class RoleSubjectData extends CachingSubjectData
         {
             for (Map.Entry<String, RoleConfig.ContextSetting> entry : config.settings.entrySet())
             {
-                List<Subject> collect = entry.getValue().parents.stream().distinct()
-                                                .map(this::getParent)
-                                                .filter(Objects::nonNull)
-                                                .sorted(RoleSubject::compare)
-                                                .collect(toList());
-                parents.put(asContext(entry.getKey()), new ArrayList<>(collect));
+                boolean parentRemoved = false;
+                List<Subject> collect = new ArrayList<>();
+                for (String s : entry.getValue().parents)
+                {
+                    Subject subject = this.getParent(s);
+                    if (subject == null)
+                    {
+                        parentRemoved = true;
+                    }
+                    collect.add(subject);
+                }
+                collect.sort(RoleSubject::compare);
+                parents.put(asContext(entry.getKey()), collect);
+                if (parentRemoved)
+                {
+                    save(true);
+                }
             }
         }
     }
