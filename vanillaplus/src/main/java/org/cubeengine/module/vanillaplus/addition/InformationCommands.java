@@ -56,6 +56,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
@@ -72,6 +73,7 @@ import org.spongepowered.api.world.biome.BiomeType;
 
 import static java.util.Locale.ENGLISH;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.entity.EntityTypes.ITEM_FRAME;
 import static org.spongepowered.api.text.format.TextColors.*;
 import static org.spongepowered.api.util.Direction.getClosest;
 
@@ -348,7 +350,7 @@ public class InformationCommands extends PermissionContainer
             i18n.sendTranslated(context, POSITIVE, "{world} ({input#environment}): {amount} chunks {amount} entities", world, type, loadedChunks, entities);
 
             Stream<Map.Entry<Vector3i, List<Entity>>> stream =
-                    world.getEntities().stream().collect(Collectors.groupingBy(e -> e.getLocation().getChunkPosition()))
+                    world.getEntities().stream().filter(e -> e.getType() != ITEM_FRAME).collect(Collectors.groupingBy(e -> e.getLocation().getChunkPosition()))
                             .entrySet().stream().filter(e -> e.getValue().size() > 50);
             Text.Builder builder = Text.builder();
             stream.forEach(e -> {
