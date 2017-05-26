@@ -45,10 +45,4 @@ public class NetherportalsConfig extends ReflectedYaml
         @Comment("Sets the target of enderportals to this world")
         public ConfigWorld endTarget;
     }
-
-    @Override
-    public void onLoad()
-    {
-        worldSettings.put(new ConfigWorld(Sponge.getServer().getDefaultWorldName()), new WorldSection());
-    }
 }

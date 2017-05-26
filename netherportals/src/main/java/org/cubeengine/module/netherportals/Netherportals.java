@@ -19,6 +19,10 @@ package org.cubeengine.module.netherportals;
 
 import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
+import de.cubeisland.engine.modularity.core.marker.Enable;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.ModuleCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.netherportals.NetherportalsConfig.WorldSection;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.config.ConfigWorld;
@@ -29,15 +33,25 @@ import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.world.PortalAgent;
 import org.spongepowered.api.world.World;
+
+import javax.inject.Inject;
 
 @ModuleInfo(name = "Netherportals", description = "Modifies Vanilla Portal behaviours")
 public class Netherportals extends Module
 {
     @ModuleConfig private NetherportalsConfig config;
 
+    @Enable
+    @Inject
+    public void onEnable(CommandManager cm, I18n i18n)
+    {
+        cm.addCommand(new NetherportalsCommand(this, cm, i18n));
+    }
+
     @Listener
-    public void onPortal(MoveEntityEvent.Teleport event, @First TeleportCause cause)
+    public void onPortal(MoveEntityEvent.Teleport.Portal event, @First TeleportCause cause)
     {
         WorldSection section = config.worldSettings.get(new ConfigWorld(event.getFromTransform().getExtent()));
         if (section != null && section.enablePortalRouting)
@@ -49,6 +63,9 @@ public class Netherportals extends Module
                 if (section.netherTarget != null)
                 {
                     to = to.setExtent(section.netherTarget.getWorld());
+
+                    event.setPortalAgent(to.getExtent().getPortalAgent());
+
                     // TODO netherPortalScale
 
                     event.setToTransform(to);
@@ -61,11 +78,17 @@ public class Netherportals extends Module
                 {
                     to = to.setExtent(section.endTarget.getWorld());
                     // TODO endPortalTargetLocation?
+                    event.setPortalAgent(to.getExtent().getPortalAgent());
 
                     event.setToTransform(to);
                     // TODO cancel PortalCreation if not in end?
                 }
             }
         }
+    }
+
+    public NetherportalsConfig getConfig()
+    {
+        return config;
     }
 }
