@@ -115,7 +115,10 @@ public class UserSubjectData extends CachingSubjectData
                 {
                     parentRemoved = true;
                 }
-                list.add(subject);
+                else
+                {
+                    list.add(subject);
+                }
             }
             list.sort(RoleSubject::compare);
             parents.put(ContextUtil.GLOBAL, list);

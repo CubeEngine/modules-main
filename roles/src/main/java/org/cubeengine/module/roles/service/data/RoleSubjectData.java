@@ -107,7 +107,10 @@ public class RoleSubjectData extends CachingSubjectData
                     {
                         parentRemoved = true;
                     }
-                    collect.add(subject);
+                    else
+                    {
+                        collect.add(subject);
+                    }
                 }
                 collect.sort(RoleSubject::compare);
                 parents.put(asContext(entry.getKey()), collect);
