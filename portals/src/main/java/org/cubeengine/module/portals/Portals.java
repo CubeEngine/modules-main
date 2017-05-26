@@ -38,6 +38,7 @@ import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
 import de.cubeisland.engine.modularity.core.Module;
 import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.butler.provider.Providers;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.libcube.util.Pair;
@@ -79,6 +80,7 @@ public class Portals extends Module
     private final WeakHashMap<Portal, List<Entity>> entitesInPortals = new WeakHashMap<>();
 
     private Map<UUID, PortalsAttachment> attachments = new HashMap<>();
+    @ModuleConfig private PortalsConfig config;
 
     @Enable
     public void onEnable() throws IOException
@@ -231,5 +233,9 @@ public class Portals extends Module
             attachments.put(uuid, attachment);
         }
         return attachment;
+    }
+
+    public PortalsConfig getConfig() {
+        return config;
     }
 }
