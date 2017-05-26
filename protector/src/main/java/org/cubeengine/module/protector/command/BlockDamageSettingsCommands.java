@@ -58,7 +58,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
     {
         region.getSettings().blockDamage.monster = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: BlockDamage by Entity Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: BlockDamage by Entity Settings updated", region);
     }
 
     @Command(desc = "Controls blocks breaking blocks")
@@ -66,7 +66,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
     {
         setOrUnset(region.getSettings().blockDamage.block, by, set);
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: BlockDamage by Block Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: BlockDamage by Block Settings updated", region);
     }
 
     @Command(desc = "Controls explosions breaking blocks")
@@ -74,7 +74,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
     {
         region.getSettings().blockDamage.allExplosion = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: BlockDamage by Explosion Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: BlockDamage by Explosion Settings updated", region);
     }
 
     @Command(desc = "Controls explosions caused by players breaking blocks")
@@ -97,7 +97,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
         }
         region.getSettings().blockDamage.playerExplosion = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: BlockDamage by Player-Explosion Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: BlockDamage by Player-Explosion Settings updated", region);
     }
 
     @Command(desc = "Controls fire breaking blocks")

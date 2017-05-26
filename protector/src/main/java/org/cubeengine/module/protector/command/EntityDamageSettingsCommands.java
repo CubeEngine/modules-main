@@ -71,7 +71,7 @@ public class EntityDamageSettingsCommands extends ContainerCommand
         }
         region.getSettings().entityDamage.all = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: All EntityDamage Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: All EntityDamage Settings updated", region);
     }
 
     @Command(desc = "Controls pvp damage")
@@ -91,7 +91,7 @@ public class EntityDamageSettingsCommands extends ContainerCommand
         }
         region.getSettings().entityDamage.pvp = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: PVP Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: PVP Settings updated", region);
     }
 
     @Command(desc = "Controls damage by living entities")
@@ -111,7 +111,7 @@ public class EntityDamageSettingsCommands extends ContainerCommand
         }
         region.getSettings().entityDamage.byLiving = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: EntityDamage by Living Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: EntityDamage by Living Settings updated", region);
     }
 
     @Command(desc = "Controls explosions caused by players breaking blocks")
@@ -119,6 +119,6 @@ public class EntityDamageSettingsCommands extends ContainerCommand
     {
         setOrUnset(region.getSettings().entityDamage.byEntity, type, set);
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: EntityDamage by Entity Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: EntityDamage by Entity Settings updated", region);
     }
 }

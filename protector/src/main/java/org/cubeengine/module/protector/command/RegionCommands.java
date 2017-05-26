@@ -88,7 +88,7 @@ public class RegionCommands extends ContainerCommand
         }
         Region region = manager.newRegion(world, shape.getBoundingCuboid(), name);
         manager.setActiveRegion(context, region);
-        i18n.sendTranslated(context, POSITIVE, "Region {name} created!", region.getName());
+        i18n.sendTranslated(context, POSITIVE, "Region {region} created!", region);
     }
 
     @Command(desc = "Redefines an existing Region")
@@ -107,31 +107,32 @@ public class RegionCommands extends ContainerCommand
             return;
         }
         manager.changeRegion(region, shape.getBoundingCuboid());
-        i18n.sendTranslated(context, POSITIVE, "Region {name} updated!", region.getName());
+        i18n.sendTranslated(context, POSITIVE, "Region {region} updated!", region);
     }
 
     @Command(desc = "Selects a Region")
     public void select(CommandSource context, Region region)
     {
         manager.setActiveRegion(context, region);
-        if (context instanceof Player)
+        if (context instanceof Player && region.getWorld() != null && region.getName() != null)
         {
             selector.setFirstPoint(((Player) context), new Location<>(region.getWorld(), region.getCuboid().getMinimumPoint()));
             selector.setSecondPoint(((Player) context), new Location<>(region.getWorld(), region.getCuboid().getMaximumPoint()));
         }
-        i18n.sendTranslated(context, POSITIVE, "Region {name} selected!", region.getName());
+        i18n.sendTranslated(context, POSITIVE, "Region {region} selected!", region);
     }
 
     @Command(desc = "Lists regions")
     public void list(CommandSource context, @Optional String match, @Named("in") World world)
     {
+        World w = world;
         if (world == null && context instanceof Locatable)
         {
-            world = ((Locatable) context).getWorld();
+            w = ((Locatable) context).getWorld();
         }
         Map<UUID, Map<String, Region>> regions = manager.getRegions();
         List<Region> list = new ArrayList<>();
-        if (world == null)
+        if (w == null)
         {
             for (Map<String, Region> map : regions.values())
             {
@@ -140,18 +141,12 @@ public class RegionCommands extends ContainerCommand
         }
         else
         {
-            list.addAll(regions.getOrDefault(world.getUniqueId(), Collections.emptyMap()).values());
+            list.addAll(regions.getOrDefault(w.getUniqueId(), Collections.emptyMap()).values());
         }
 
         if (match != null)
         {
             list = list.stream().filter(r -> r.getName().matches(match) || r.getName().startsWith(match)).collect(toList());
-        }
-
-        if (list.isEmpty())
-        {
-            i18n.sendTranslated(context, NEGATIVE, "No Regions found");
-            return;
         }
 
         if (world == null)
@@ -164,10 +159,28 @@ public class RegionCommands extends ContainerCommand
             list.add(manager.getWorldRegion(world.getUniqueId()));
         }
 
+        if (list.isEmpty())
+        {
+            i18n.sendTranslated(context, NEGATIVE, "No Regions found");
+            return;
+        }
+
         i18n.sendTranslated(context, NEUTRAL, "The following regions were found:");
         for (Region region : list)
         {
-            context.sendMessage(Text.of(" - ", GOLD, region.getName(), WHITE, " (", GOLD, region.getWorld().getName(), WHITE, ")"));
+            if (region.getWorld() == null)
+            {
+                context.sendMessage(Text.of(" - ", GOLD, "global"));
+            }
+            else if (region.getName() == null)
+            {
+                context.sendMessage(Text.of(" - ", GOLD, region.getWorld().getName(), WHITE));
+            }
+            else
+            {
+                context.sendMessage(Text.of(" - ", GOLD, region.getWorld().getName(), WHITE, ".", GOLD, region.getName()));
+            }
+
         }
 
     }
@@ -193,7 +206,7 @@ public class RegionCommands extends ContainerCommand
         }
         else
         {
-            i18n.sendTranslated(context, POSITIVE, "Region {name} in {world}", region.getName(), region.getWorld());
+            i18n.sendTranslated(context, POSITIVE, "Region {region} in {world}", region, region.getWorld());
         }
 
         Cuboid cuboid = region.getCuboid();

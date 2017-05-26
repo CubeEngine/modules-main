@@ -99,7 +99,7 @@ public class SettingsCommands extends ContainerCommand
             setOrUnset(region.getSettings().move, type, set);
         }
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: Move Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: Move Settings updated", region);
     }
 
 
@@ -122,7 +122,7 @@ public class SettingsCommands extends ContainerCommand
         }
         region.getSettings().build = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: Build Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: Build Settings updated", region);
     }
 
     @Command(desc = "Controls players interacting with blocks")
@@ -160,7 +160,7 @@ public class SettingsCommands extends ContainerCommand
                 break;
         }
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: Use Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: Use Settings updated", region);
     }
 
     @Command(desc = "Controls player interacting with blocks")
@@ -182,7 +182,7 @@ public class SettingsCommands extends ContainerCommand
         }
         setOrUnset(region.getSettings().use.block, type, set);
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: Use Block Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: Use Block Settings updated", region);
     }
 
     @Command(desc = "Controls player interactive with items")
@@ -204,7 +204,7 @@ public class SettingsCommands extends ContainerCommand
         }
         setOrUnset(region.getSettings().use.item, type, set);
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: Use Item Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: Use Item Settings updated", region);
     }
 
     @Command(desc = "Controls spawning of entities")
@@ -246,7 +246,7 @@ public class SettingsCommands extends ContainerCommand
                 break;
         }
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: Spawn Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: Spawn Settings updated", region);
     }
 
     @Command(desc = "Controls executing commands")
@@ -272,7 +272,7 @@ public class SettingsCommands extends ContainerCommand
             region.getSettings().blockedCommands.remove(command);
         }
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: Command Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: Command Settings updated", region);
     }
 
 
@@ -281,6 +281,6 @@ public class SettingsCommands extends ContainerCommand
     {
         region.getSettings().deadCircuit = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {name}: Dead Circuit Settings updated", region.getName());
+        i18n.sendTranslated(context, POSITIVE,"Region {region}: Dead Circuit Settings updated", region);
     }
 }

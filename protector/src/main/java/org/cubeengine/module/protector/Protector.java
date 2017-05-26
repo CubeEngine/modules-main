@@ -29,6 +29,7 @@ import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.command.BlockDamageSettingsCommands;
 import org.cubeengine.module.protector.command.RegionCommands;
 import org.cubeengine.module.protector.command.SettingsCommands;
+import org.cubeengine.module.protector.region.RegionFormatter;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
@@ -61,6 +62,7 @@ public class Protector extends Module
         manager = new RegionManager(modulePath, reflector);
         ps.registerContextCalculator(new RegionContextCalculator(manager));
         RegionCommands regionCmd = new RegionCommands(cm, selector, manager, i18n);
+        i18n.getCompositor().registerFormatter(new RegionFormatter());
         cm.addCommand(regionCmd);
         SettingsCommands settingsCmd = new SettingsCommands(manager, i18n, ps, pm, em, cm);
         regionCmd.addCommand(settingsCmd);
