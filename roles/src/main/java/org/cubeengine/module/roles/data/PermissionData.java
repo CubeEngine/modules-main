@@ -20,6 +20,8 @@ package org.cubeengine.module.roles.data;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -39,7 +41,7 @@ public class PermissionData extends AbstractData<PermissionData, ImmutablePermis
 
     public PermissionData(List<String> parents, Map<String, Boolean> permissions, Map<String, String> options)
     {
-        this.parents = parents;
+        this.parents = parents.stream().distinct().collect(Collectors.toList());
         this.permissions = permissions;
         this.options = options;
         registerGettersAndSetters();
