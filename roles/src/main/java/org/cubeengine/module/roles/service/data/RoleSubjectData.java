@@ -48,6 +48,9 @@ public class RoleSubjectData extends CachingSubjectData
     {
         if (changed)
         {
+            cacheOptions();
+            cachePermissions();
+            cacheParents();
             config.settings = new HashMap<>();
             for (Map.Entry<Context, List<Subject>> entry : parents.entrySet())
             {

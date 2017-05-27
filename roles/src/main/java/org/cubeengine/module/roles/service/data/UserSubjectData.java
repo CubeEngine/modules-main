@@ -66,6 +66,9 @@ public class UserSubjectData extends CachingSubjectData
     {
         if (changed)
         {
+            cacheOptions();
+            cachePermissions();
+            cacheParents();
             // Serialize Data
             List<String> parents = serializeToList(this.parents);
             Map<String, Boolean> permissions = serializeToMap(this.permissions);

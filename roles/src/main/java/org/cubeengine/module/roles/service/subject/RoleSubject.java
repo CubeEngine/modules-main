@@ -17,21 +17,21 @@
  */
 package org.cubeengine.module.roles.service.subject;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
+
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.data.RoleSubjectData;
-import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 
-import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 public class RoleSubject extends BaseSubject<RoleSubjectData>
 {
