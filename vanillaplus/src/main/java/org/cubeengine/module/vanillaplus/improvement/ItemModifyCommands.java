@@ -186,7 +186,7 @@ public class ItemModifyCommands extends PermissionContainer
             i18n.sendTranslated(context, NEGATIVE, "This enchantment level is not allowed!");
             return;
         }
-        Text possibleEnchs = getPossibleEnchantments(Sponge.getRegistry(), item);
+        Text possibleEnchs = getPossibleEnchantments(item);
         if (possibleEnchs != null)
         {
             i18n.sendTranslated(context, NEGATIVE, "This enchantment is not allowed for this item!", possibleEnchs);
