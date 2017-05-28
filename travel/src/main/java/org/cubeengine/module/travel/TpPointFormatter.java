@@ -17,10 +17,10 @@
  */
 package org.cubeengine.module.travel;
 
-import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.module.travel.config.TeleportPoint;
 import org.cubeengine.libcube.service.i18n.I18n;

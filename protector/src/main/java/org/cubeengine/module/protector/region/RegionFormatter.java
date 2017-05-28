@@ -17,11 +17,11 @@
  */
 package org.cubeengine.module.protector.region;
 
-import org.cubeengine.dirigent.Component;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.Text;
+import org.cubeengine.dirigent.parser.component.Component;
 
 public class RegionFormatter extends AbstractFormatter<Region>
 {
