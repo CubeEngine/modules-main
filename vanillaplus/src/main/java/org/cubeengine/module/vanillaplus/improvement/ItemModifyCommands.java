@@ -72,7 +72,7 @@ public class ItemModifyCommands extends PermissionContainer
     {
         if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
         {
-            i18n.sendTranslated(context, NEGATIVE, "You need to hold an item to rename in your hand!");
+            i18n.send(context, NEGATIVE, "You need to hold an item to rename in your hand!");
             return;
         }
         ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).get();
@@ -88,7 +88,7 @@ public class ItemModifyCommands extends PermissionContainer
             item.offer(Keys.ITEM_LORE, list);
         }
         context.setItemInHand(HandTypes.MAIN_HAND, item);
-        i18n.sendTranslated(context, POSITIVE, "You now hold {input#name} in your hands!", name);
+        i18n.send(context, POSITIVE, "You now hold {input#name} in your hands!", name);
     }
 
     @Command(desc = "Changes the lore of the item in your hand.")
@@ -97,7 +97,7 @@ public class ItemModifyCommands extends PermissionContainer
     {
         if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
         {
-            i18n.sendTranslated(context, NEGATIVE, "You need to hold an item to change the lore of in your hand!");
+            i18n.send(context, NEGATIVE, "You need to hold an item to change the lore of in your hand!");
             return;
         }
         ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).get();
@@ -109,7 +109,7 @@ public class ItemModifyCommands extends PermissionContainer
         }
         item.offer(Keys.ITEM_LORE, list);
         context.setItemInHand(HandTypes.MAIN_HAND, item);
-        i18n.sendTranslated(context, POSITIVE, "You changed the lore.");
+        i18n.send(context, POSITIVE, "You changed the lore.");
     }
 
 
@@ -120,7 +120,7 @@ public class ItemModifyCommands extends PermissionContainer
         ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
         if (item == null || item.getItem() != SKULL)
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not holding a head.");
+            i18n.send(context, NEGATIVE, "You are not holding a head.");
             return;
         }
 
@@ -128,7 +128,7 @@ public class ItemModifyCommands extends PermissionContainer
         item.offer(Keys.REPRESENTED_PLAYER, Sponge.getServer().getGameProfileManager().get(name).get());
 
         context.setItemInHand(HandTypes.MAIN_HAND, item);
-        i18n.sendTranslated(context, POSITIVE, "You now hold {user}'s head in your hands!", name);
+        i18n.send(context, POSITIVE, "You now hold {user}'s head in your hands!", name);
     }
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
@@ -138,7 +138,7 @@ public class ItemModifyCommands extends PermissionContainer
     {
         if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
         {
-            i18n.sendTranslated(context, NEUTRAL, "{text:ProTip}: You cannot enchant your fists!");
+            i18n.send(context, NEUTRAL, "{text:ProTip}: You cannot enchant your fists!");
             return;
         }
         ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).get();
@@ -146,7 +146,7 @@ public class ItemModifyCommands extends PermissionContainer
         level = level == null ? enchantment.getMaximumLevel() : level;
         if (level <= 0)
         {
-            i18n.sendTranslated(context, NEGATIVE, "The enchantment level has to be a number greater than 0!");
+            i18n.send(context, NEGATIVE, "The enchantment level has to be a number greater than 0!");
             return;
         }
         ItemEnchantment ench = new ItemEnchantment(enchantment, level);
@@ -165,7 +165,7 @@ public class ItemModifyCommands extends PermissionContainer
             list.add(ench);
             item.offer(Keys.ITEM_ENCHANTMENTS, list);
             context.setItemInHand(HandTypes.MAIN_HAND, item);
-            i18n.sendTranslated(context, POSITIVE,
+            i18n.send(context, POSITIVE,
                                    "Added unsafe enchantment: {input#enchantment} {integer#level} to your item!",
                                    enchantment.getName(), level); // TODO getTranslation
             return;
@@ -179,22 +179,22 @@ public class ItemModifyCommands extends PermissionContainer
                 list.add(ench);
                 item.offer(Keys.ITEM_ENCHANTMENTS, list);
                 context.setItemInHand(HandTypes.MAIN_HAND, item);
-                i18n.sendTranslated(context, POSITIVE, "Added enchantment: {input#enchantment} {integer#level} to your item!",
+                i18n.send(context, POSITIVE, "Added enchantment: {input#enchantment} {integer#level} to your item!",
                                     enchantment.getName(), level);  // TODO getTranslation
                 return;
             }
-            i18n.sendTranslated(context, NEGATIVE, "This enchantment level is not allowed!");
+            i18n.send(context, NEGATIVE, "This enchantment level is not allowed!");
             return;
         }
         Text possibleEnchs = getPossibleEnchantments(item);
         if (possibleEnchs != null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "This enchantment is not allowed for this item!", possibleEnchs);
-            i18n.sendTranslated(context, NEUTRAL, "Try one of those instead:");
+            i18n.send(context, NEGATIVE, "This enchantment is not allowed for this item!", possibleEnchs);
+            i18n.send(context, NEUTRAL, "Try one of those instead:");
             context.sendMessage(possibleEnchs);
             return;
         }
-        i18n.sendTranslated(context, NEGATIVE, "You can not enchant this item!");
+        i18n.send(context, NEGATIVE, "You can not enchant this item!");
     }
 
     @Command(desc = "Repairs your items")
@@ -223,16 +223,16 @@ public class ItemModifyCommands extends PermissionContainer
             }
             if (repaired == 0)
             {
-                i18n.sendTranslated(context, NEUTRAL, "No items to repair!");
+                i18n.send(context, NEUTRAL, "No items to repair!");
                 return;
             }
-            i18n.sendTranslated(context, POSITIVE, "Repaired {amount} items!", repaired);
+            i18n.send(context, POSITIVE, "Repaired {amount} items!", repaired);
             return;
         }
         ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
         if (item == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "No item in hand!");
+            i18n.send(context, NEGATIVE, "No item in hand!");
             return;
         }
         if (item.supports(DurabilityData.class))
@@ -240,14 +240,14 @@ public class ItemModifyCommands extends PermissionContainer
             Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
             if (item.get(Keys.ITEM_DURABILITY).get().equals(max))
             {
-                i18n.sendTranslated(context, NEUTRAL, "No need to repair this!");
+                i18n.send(context, NEUTRAL, "No need to repair this!");
                 return;
             }
             item.offer(Keys.ITEM_DURABILITY, max);
             context.setItemInHand(HandTypes.MAIN_HAND, item);
-            i18n.sendTranslated(context, POSITIVE, "Item repaired!");
+            i18n.send(context, POSITIVE, "Item repaired!");
             return;
         }
-        i18n.sendTranslated(context, NEUTRAL, "Item cannot be repaired!");
+        i18n.send(context, NEUTRAL, "Item cannot be repaired!");
     }
 }

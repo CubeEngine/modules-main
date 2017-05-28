@@ -39,7 +39,6 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Type;
 import org.spongepowered.api.item.inventory.type.InventoryRow;
-import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.item.inventory.ItemStackComparators.ITEM_DATA;
@@ -79,21 +78,21 @@ public class ItemCommands extends PermissionContainer
         amount = amount == null ? item.getMaxStackQuantity() : amount;
         if (amount <= 0)
         {
-            i18n.sendTranslated(context, NEGATIVE, "The amount has to be a number greater than 0!");
+            i18n.send(context, NEGATIVE, "The amount has to be a number greater than 0!");
             return;
         }
         item.setQuantity(amount);
         if (player.getInventory().offer(item).getType() == Type.SUCCESS)
         {
             String matname = materialMatcher.getNameFor(item);
-            i18n.sendTranslated(context, POSITIVE, "You gave {user} {amount} {input#item}!", player, amount, matname);
+            i18n.send(context, POSITIVE, "You gave {user} {amount} {input#item}!", player, amount, matname);
             if (player.isOnline())
             {
-                i18n.sendTranslated(player.getPlayer().get(), POSITIVE, "{user} just gave you {amount} {input#item}!", context.getName(), amount, matname);
+                i18n.send(player.getPlayer().get(), POSITIVE, "{user} just gave you {amount} {input#item}!", context.getName(), amount, matname);
             }
             return;
         }
-        i18n.sendTranslated(context, NEGATIVE, "{user} had no place for the item.");
+        i18n.send(context, NEGATIVE, "{user} had no place for the item.");
     }
 
     @Command(alias = "i", desc = "Gives the specified Item to you")
@@ -107,7 +106,7 @@ public class ItemCommands extends PermissionContainer
         amount = amount == null ? item.getMaxStackQuantity() : amount;
         if (amount <= 0)
         {
-            i18n.sendTranslated(context, NEGATIVE, "The amount has to be a number greater than 0!");
+            i18n.send(context, NEGATIVE, "The amount has to be a number greater than 0!");
             return;
         }
 
@@ -137,7 +136,7 @@ public class ItemCommands extends PermissionContainer
         }
         item.setQuantity(amount);
         context.getInventory().offer(item.copy());
-        i18n.sendTranslated(context, NEUTRAL, "Received: {amount} {input#item}", amount, materialMatcher.getNameFor(item));
+        i18n.send(context, NEUTRAL, "Received: {amount} {input#item}", amount, materialMatcher.getNameFor(item));
     }
 
     @Command(desc = "Refills the stack in hand")
@@ -154,34 +153,34 @@ public class ItemCommands extends PermissionContainer
                     item.setQuantity(64);
                 }
             }
-            i18n.sendTranslated(context, POSITIVE, "Refilled all stacks!");
+            i18n.send(context, POSITIVE, "Refilled all stacks!");
             return;
         }
         amount = amount == null ? 1 : amount;
         if (amount < 1)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Invalid amount {input#amount}", amount);
+            i18n.send(context, NEGATIVE, "Invalid amount {input#amount}", amount);
             return;
         }
 
         java.util.Optional<ItemStack> item = context.getItemInHand(HandTypes.MAIN_HAND);
         if (!item.isPresent())
         {
-            i18n.sendTranslated(context, NEUTRAL, "More nothing is still nothing!");
+            i18n.send(context, NEUTRAL, "More nothing is still nothing!");
             return;
         }
         item.get().setQuantity(item.get().getMaxStackQuantity());
         context.setItemInHand(HandTypes.MAIN_HAND, item.get());
         if (amount == 1)
         {
-            i18n.sendTranslated(context, POSITIVE, "Refilled stack in hand!");
+            i18n.send(context, POSITIVE, "Refilled stack in hand!");
             return;
         }
         for (int i = 1; i < amount; ++i)
         {
             context.getInventory().offer(item.get());
         }
-        i18n.sendTranslated(context, POSITIVE, "Refilled {amount} stacks in hand!", amount);
+        i18n.send(context, POSITIVE, "Refilled {amount} stacks in hand!", amount);
     }
 
 
@@ -263,9 +262,9 @@ public class ItemCommands extends PermissionContainer
                     }
                 }
             }
-            i18n.sendTranslated(context, POSITIVE, "Items stacked together!");
+            i18n.send(context, POSITIVE, "Items stacked together!");
             return;
         }
-        i18n.sendTranslated(context, NEUTRAL, "Nothing to stack!");
+        i18n.send(context, NEUTRAL, "Nothing to stack!");
     }
 }

@@ -152,19 +152,19 @@ public class SettingsListener
         {
             if (checkMove(event, player, from, to, MoveType.MOVE, false))
             {
-                i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "You are not allowed to move in here.");
+                i18n.send(ACTION_BAR, player, NEGATIVE, "You are not allowed to move in here.");
                 return; // Move in from denied
             }
 
             if (checkMove(event, player, from, to, MoveType.EXIT, true))
             {
-                i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "You are not allowed to exit this area.");
+                i18n.send(ACTION_BAR, player, NEGATIVE, "You are not allowed to exit this area.");
                 return; // Move out of from denied
             }
 
             if (checkMove(event, player, to, from, MoveType.ENTER, true))
             {
-                i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "You are not allowed to enter this area.");
+                i18n.send(ACTION_BAR, player, NEGATIVE, "You are not allowed to enter this area.");
                 return; // Move into to denied
             }
         }
@@ -222,7 +222,7 @@ public class SettingsListener
                 List<Region> regionsAt = manager.getRegionsAt(loc);
                 if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.build, UNDEFINED) == FALSE)
                 {
-                    i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "You are not allowed to build here.");
+                    i18n.send(ACTION_BAR, player, NEGATIVE, "You are not allowed to build here.");
                     return;
                 }
             });
@@ -299,7 +299,7 @@ public class SettingsListener
         set = checkSetting(event, player, regionsAt, () -> blockPerm, (s) -> s.use.block.getOrDefault(type, UNDEFINED), set);
         if (set == FALSE)
         {
-            i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to interact with this here.");
+            i18n.send(ACTION_BAR, player, CRITICAL, "You are not allowed to interact with this here.");
             return;
         }
 
@@ -311,7 +311,7 @@ public class SettingsListener
             // Then check individual item
             if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item.getItem(), UNDEFINED), set) == FALSE)
             {
-                i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to use this here.");
+                i18n.send(ACTION_BAR, player, CRITICAL, "You are not allowed to use this here.");
             }
         }
     }
@@ -325,7 +325,7 @@ public class SettingsListener
         Tristate set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ITEM), s -> s.use.all.item, UNDEFINED);
         if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item, UNDEFINED), set) == FALSE)
         {
-            i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to use this here.");
+            i18n.send(ACTION_BAR, player, CRITICAL, "You are not allowed to use this here.");
         }
     }
 
@@ -351,7 +351,7 @@ public class SettingsListener
                     Permission usePerm = pm.register(SettingsListener.class, type.getId(), "Allows spawning a " + type.getTranslation().get(), spawnEntityPlayerPerm);
                     if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
                     {
-                        i18n.sendTranslated(ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");
+                        i18n.send(ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");
                         return;
                     }
                 }
@@ -365,7 +365,7 @@ public class SettingsListener
                 Permission usePerm = pm.register(SettingsListener.class, type.getId(), "Allows spawning a " + type.getTranslation().get(), spawnEntityPlayerPerm);
                 if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
                 {
-                    i18n.sendTranslated(ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");
+                    i18n.send(ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");
                     return;
                 }
             }
@@ -401,7 +401,7 @@ public class SettingsListener
                     this.checkSetting(event, player, regionsAt, () -> explodePlayer, (s) -> s.blockDamage.playerExplosion, UNDEFINED);
                     if (event.isCancelled())
                     {
-                        i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to let stuff explode here!");
+                        i18n.send(ACTION_BAR, player, CRITICAL, "You are not allowed to let stuff explode here!");
                     }
                 }
                 if (event.isCancelled())
@@ -464,7 +464,7 @@ public class SettingsListener
             return value;
         }, UNDEFINED) == FALSE)
         {
-            i18n.sendTranslated(ACTION_BAR, player, CRITICAL, "You are not allowed to execute this command here!");
+            i18n.send(ACTION_BAR, player, CRITICAL, "You are not allowed to execute this command here!");
         }
     }
 

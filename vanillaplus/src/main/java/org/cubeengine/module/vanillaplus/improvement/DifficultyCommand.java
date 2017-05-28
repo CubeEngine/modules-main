@@ -44,13 +44,13 @@ public class DifficultyCommand
         if (difficulty != null)
         {
             world.getProperties().setDifficulty(difficulty);
-            i18n.sendTranslated(context, POSITIVE, "The difficulty has been set to {input}!", difficulty.getTranslation());
+            i18n.send(context, POSITIVE, "The difficulty has been set to {input}!", difficulty.getTranslation());
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "Current difficulty level: {input}", world.getDifficulty().getName());
+        i18n.send(context, POSITIVE, "Current difficulty level: {input}", world.getDifficulty().getName());
         if (world.getProperties().isHardcore())
         {
-            i18n.sendTranslated(context, POSITIVE, "The world {world} has the hardcore mode enabled.", world);
+            i18n.send(context, POSITIVE, "The world {world} has the hardcore mode enabled.", world);
         }
     }
 }

@@ -83,7 +83,7 @@ public class SettingsCommands extends ContainerCommand
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
             Subject subject = ps.getGroupSubjects().get(role);
@@ -91,7 +91,7 @@ public class SettingsCommands extends ContainerCommand
             {
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.movePerms.get(type).getId(), set);
             }
-            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
         //for (MoveListener.MoveType type : types)
@@ -99,7 +99,7 @@ public class SettingsCommands extends ContainerCommand
             setOrUnset(region.getSettings().move, type, set);
         }
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: Move Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: Move Settings updated", region);
     }
 
 
@@ -112,17 +112,17 @@ public class SettingsCommands extends ContainerCommand
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
             Subject subject = ps.getGroupSubjects().get(role);
             subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.buildPerm.getId(), set);
-            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
         region.getSettings().build = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: Build Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: Build Settings updated", region);
     }
 
     @Command(desc = "Controls players interacting with blocks")
@@ -133,12 +133,12 @@ public class SettingsCommands extends ContainerCommand
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
             Subject subject = ps.getGroupSubjects().get(role);
             subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.usePermission.get(type).getId(), set);
-            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
         switch (type)
@@ -160,7 +160,7 @@ public class SettingsCommands extends ContainerCommand
                 break;
         }
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: Use Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: Use Settings updated", region);
     }
 
     @Command(desc = "Controls player interacting with blocks")
@@ -172,17 +172,17 @@ public class SettingsCommands extends ContainerCommand
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
             Subject subject = ps.getGroupSubjects().get(role);
             subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useBlockPerm.getId(), set);
-            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
         setOrUnset(region.getSettings().use.block, type, set);
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: Use Block Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: Use Block Settings updated", region);
     }
 
     @Command(desc = "Controls player interactive with items")
@@ -194,17 +194,17 @@ public class SettingsCommands extends ContainerCommand
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
             Subject subject = ps.getGroupSubjects().get(role);
             subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useItemPerm.getId(), set);
-            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
         setOrUnset(region.getSettings().use.item, type, set);
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: Use Item Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: Use Item Settings updated", region);
     }
 
     @Command(desc = "Controls spawning of entities")
@@ -216,19 +216,19 @@ public class SettingsCommands extends ContainerCommand
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
             switch (type)
             {
                 case NATURALLY:
                 case PLUGIN:
-                    i18n.sendTranslated(context, NEGATIVE, "There is no bypass permission for natural or plugin only spawning.");
+                    i18n.send(context, NEGATIVE, "There is no bypass permission for natural or plugin only spawning.");
                     return;
                 case PLAYER:
                     Subject subject = ps.getGroupSubjects().get(role);
                     subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.spawnEntityPlayerPerm.getId(), set);
-                    i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+                    i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
                     break;
             }
             return;
@@ -246,7 +246,7 @@ public class SettingsCommands extends ContainerCommand
                 break;
         }
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: Spawn Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: Spawn Settings updated", region);
     }
 
     @Command(desc = "Controls executing commands")
@@ -258,10 +258,10 @@ public class SettingsCommands extends ContainerCommand
         CommandMapping mapping = Sponge.getGame().getCommandManager().get(command).orElse(null);
         if (mapping == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "The command {name} is not a registered command", command);
+            i18n.send(context, NEGATIVE, "The command {name} is not a registered command", command);
             if (!force)
             {
-                i18n.sendTranslated(context, NEUTRAL, "Use the -force Flag to block it anyways");
+                i18n.send(context, NEUTRAL, "Use the -force Flag to block it anyways");
                 return;
             }
         }
@@ -272,7 +272,7 @@ public class SettingsCommands extends ContainerCommand
             region.getSettings().blockedCommands.remove(command);
         }
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: Command Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: Command Settings updated", region);
     }
 
 
@@ -281,6 +281,6 @@ public class SettingsCommands extends ContainerCommand
     {
         region.getSettings().deadCircuit = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: Dead Circuit Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: Dead Circuit Settings updated", region);
     }
 }

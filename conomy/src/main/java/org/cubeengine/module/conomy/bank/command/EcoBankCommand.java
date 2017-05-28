@@ -57,15 +57,15 @@ public class EcoBankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Text formatAmount = result.getCurrency().format(result.getAmount());
-                i18n.sendTranslated(context, POSITIVE, "You gave {txt#amount} to the bank {account}!",
+                i18n.send(context, POSITIVE, "You gave {txt#amount} to the bank {account}!",
                         formatAmount, bank);
                 Sponge.getServer().getOnlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
-                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} granted {input#amount} to your bank {account}!",
+                        .forEach(onlineUser -> i18n.send(onlineUser, POSITIVE, "{user} granted {input#amount} to your bank {account}!",
                                 onlineUser, formatAmount, bank));
                 break;
             default:
-                i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
+                i18n.send(context, NEGATIVE, "Transaction failed!");
                 break;
         }
     }
@@ -78,15 +78,15 @@ public class EcoBankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Text formatAmount = result.getCurrency().format(result.getAmount());
-                i18n.sendTranslated(context, POSITIVE, "You took {input#amount} from the bank {account}!",
+                i18n.send(context, POSITIVE, "You took {input#amount} from the bank {account}!",
                         formatAmount, bank);
                 Sponge.getServer().getOnlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
-                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} charged your bank {account} for {input#amount}!",
+                        .forEach(onlineUser -> i18n.send(onlineUser, POSITIVE, "{user} charged your bank {account} for {input#amount}!",
                                 onlineUser, bank, formatAmount));
                 break;
             default:
-                i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
+                i18n.send(context, NEGATIVE, "Transaction failed!");
                 break;
         }
 
@@ -100,15 +100,15 @@ public class EcoBankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Text formatAmount = result.getCurrency().format(result.getAmount());
-                i18n.sendTranslated(context, POSITIVE, "The account of the bank {account} got reset to {txt#balance}!",
+                i18n.send(context, POSITIVE, "The account of the bank {account} got reset to {txt#balance}!",
                         bank, formatAmount);
                 Sponge.getServer().getOnlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
-                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} reset the money of your bank {account} to {txt#balance}!",
+                        .forEach(onlineUser -> i18n.send(onlineUser, POSITIVE, "{user} reset the money of your bank {account} to {txt#balance}!",
                                 onlineUser, bank, formatAmount));
                 break;
             default:
-                i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
+                i18n.send(context, NEGATIVE, "Transaction failed!");
                 break;
         }
 
@@ -122,15 +122,15 @@ public class EcoBankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Text formatAmount = result.getCurrency().format(result.getAmount());
-                i18n.sendTranslated(context, POSITIVE, "The money of bank account {account} got set to {txt#balance}!",
+                i18n.send(context, POSITIVE, "The money of bank account {account} got set to {txt#balance}!",
                         bank, formatAmount);
                 Sponge.getServer().getOnlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
-                        .forEach(onlineUser -> i18n.sendTranslated(onlineUser, POSITIVE, "{user} set the money of your bank {account} to {txt#balance}!",
+                        .forEach(onlineUser -> i18n.send(onlineUser, POSITIVE, "{user} set the money of your bank {account} to {txt#balance}!",
                                 onlineUser, bank, formatAmount));
                 break;
             default:
-                i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
+                i18n.send(context, NEGATIVE, "Transaction failed!");
                 break;
         }
     }
@@ -140,11 +140,11 @@ public class EcoBankCommand extends ContainerCommand
     {
         if (bank.isHidden())
         {
-            i18n.sendTranslated(context, POSITIVE, "The bank {account} is already hidden!", bank);
+            i18n.send(context, POSITIVE, "The bank {account} is already hidden!", bank);
             return;
         }
         bank.setHidden(true);
-        i18n.sendTranslated(context, POSITIVE, "The bank {account} is now hidden!", bank);
+        i18n.send(context, POSITIVE, "The bank {account} is now hidden!", bank);
     }
 
     @Command(desc = "Unhides the account of given banks")
@@ -152,11 +152,11 @@ public class EcoBankCommand extends ContainerCommand
     {
         if (!bank.isHidden())
         {
-            i18n.sendTranslated(context, POSITIVE, "The bank {account} was not hidden!", bank);
+            i18n.send(context, POSITIVE, "The bank {account} was not hidden!", bank);
             return;
         }
         bank.setHidden(false);
-        i18n.sendTranslated(context, POSITIVE, "The bank {account} is no longer hidden!", bank);
+        i18n.send(context, POSITIVE, "The bank {account} is no longer hidden!", bank);
     }
 
     private static Cause causeOf(CommandSource context)

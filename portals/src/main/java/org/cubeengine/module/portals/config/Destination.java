@@ -73,7 +73,7 @@ public class Destination
             {
                 if (entity instanceof Player)
                 {
-                    i18n.sendTranslated(((Player)entity), NEGATIVE, "Destination portal {input} does not exist!", portal);
+                    i18n.send(((Player)entity), NEGATIVE, "Destination portal {input} does not exist!", portal);
                 }
                 return;
             }

@@ -56,17 +56,17 @@ public class HealCommand extends PermissionContainer
         {
             if (!(context instanceof Player))
             {
-                i18n.sendTranslated(context, NEGATIVE, "Only time can heal your wounds!");
+                i18n.send(context, NEGATIVE, "Only time can heal your wounds!");
                 return;
             }
             Player sender = (Player)context;
             sender.offer(Keys.HEALTH, sender.get(Keys.MAX_HEALTH).get());
-            i18n.sendTranslated(sender, POSITIVE, "You are now healed!");
+            i18n.send(sender, POSITIVE, "You are now healed!");
             return;
         }
         if (!context.hasPermission(COMMAND_HEAL_OTHER.getId()))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to heal other players!");
+            i18n.send(context, NEGATIVE, "You are not allowed to heal other players!");
             return;
         }
         Collection<Player> userList = players.list();
@@ -74,21 +74,21 @@ public class HealCommand extends PermissionContainer
         {
             if (userList.isEmpty())
             {
-                i18n.sendTranslated(context, NEGATIVE, "There are no players online at the moment!");
+                i18n.send(context, NEGATIVE, "There are no players online at the moment!");
                 return;
             }
-            i18n.sendTranslated(context, POSITIVE, "You healed everyone!");
+            i18n.send(context, POSITIVE, "You healed everyone!");
             bc.broadcastStatus(ChatFormat.BRIGHT_GREEN + "healed every player.", context);
         }
         else
         {
-            i18n.sendTranslated(context, POSITIVE, "Healed {amount} players!", userList.size());
+            i18n.send(context, POSITIVE, "Healed {amount} players!", userList.size());
         }
         for (Player user : userList)
         {
             if (!players.isAll())
             {
-                i18n.sendTranslated(user, POSITIVE, "You got healed by {sender}!", context);
+                i18n.send(user, POSITIVE, "You got healed by {sender}!", context);
             }
             user.offer(Keys.HEALTH, user.get(Keys.MAX_HEALTH).get());
         }

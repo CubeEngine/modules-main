@@ -83,12 +83,12 @@ public class MailCommand extends ContainerCommand
         {
             if (player == null)
             {
-                i18n.sendTranslated(context,  NEUTRAL, "Log into the game to check your mailbox!");
+                i18n.send(context,  NEUTRAL, "Log into the game to check your mailbox!");
 
                 return;
             }
-            i18n.sendTranslated(context,  NEUTRAL, "If you wanted to look into other players mail use: {text:/mail spy} {input#player}.", player);
-            i18n.sendTranslated(context,  NEGATIVE, "Otherwise be quiet!");
+            i18n.send(context,  NEUTRAL, "If you wanted to look into other players mail use: {text:/mail spy} {input#player}.", player);
+            i18n.send(context,  NEGATIVE, "Otherwise be quiet!");
             return;
         }
 
@@ -96,7 +96,7 @@ public class MailCommand extends ContainerCommand
         PlayerMails attachment = getMails(sender);
         if (attachment.countMail() == 0)
         {
-            i18n.sendTranslated(context,  NEUTRAL, "You do not have any mail!");
+            i18n.send(context,  NEUTRAL, "You do not have any mail!");
             return;
         }
         List<Mail> mails;
@@ -110,10 +110,10 @@ public class MailCommand extends ContainerCommand
         }
         if (mails.isEmpty()) // Mailbox is not empty but no message from that player
         {
-            i18n.sendTranslated(context,  NEUTRAL, "You do not have any mail from {user}.", player);
+            i18n.send(context,  NEUTRAL, "You do not have any mail from {user}.", player);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "Your mail:");
+        i18n.send(context, POSITIVE, "Your mail:");
         for (int i = 0; i < mails.size(); i++)
         {
             Mail mail = mails.get(i);
@@ -140,7 +140,7 @@ public class MailCommand extends ContainerCommand
         List<Mail> mails = getMails(player).getMails();
         if (mails.isEmpty()) // Mailbox is not empty but no message from that player
         {
-            i18n.sendTranslated(context,  NEUTRAL, "{user} does not have any mail!", player);
+            i18n.send(context,  NEUTRAL, "{user} does not have any mail!", player);
             return;
         }
         StringBuilder sb = new StringBuilder();
@@ -150,7 +150,7 @@ public class MailCommand extends ContainerCommand
             i++;
             sb.append("\n").append(ChatFormat.WHITE).append(i).append(": ").append(mail.getValue(TableMail.TABLE_MAIL.MESSAGE));
         }
-        i18n.sendTranslated(context,  NEUTRAL, "{user}'s mail: {input#mails}", player, ChatFormat.parseFormats(sb.toString()));
+        i18n.send(context,  NEUTRAL, "{user}'s mail: {input#mails}", player, ChatFormat.parseFormats(sb.toString()));
     }
 
     @Alias(value = "sendmail")
@@ -158,7 +158,7 @@ public class MailCommand extends ContainerCommand
     public void send(CommandSource context, User player, @Greed(INFINITE) String message)
     {
         this.mail(message, context, player);
-        i18n.sendTranslated(context,  POSITIVE, "Mail send to {user}!", player);
+        i18n.send(context,  POSITIVE, "Mail send to {user}!", player);
     }
 
     @Alias(value = "sendallmail")
@@ -176,7 +176,7 @@ public class MailCommand extends ContainerCommand
             Sponge.getServiceManager().provideUnchecked(UserStorageService.class).getAll().stream()
                 .filter(p -> alreadySend.contains(p.getUniqueId()))
                 .forEach(p -> new PlayerMails(p.getUniqueId(), db).addMail(context, message)), 0);
-        i18n.sendTranslated(context,  POSITIVE, "Sent mail to everyone!");
+        i18n.send(context,  POSITIVE, "Sent mail to everyone!");
     }
 
     @Command(desc = "Removes a single mail")
@@ -186,7 +186,7 @@ public class MailCommand extends ContainerCommand
         PlayerMails attachment = getMails(context);
         if (attachment.countMail() == 0)
         {
-            i18n.sendTranslated(context,  NEUTRAL, "You do not have any mail!");
+            i18n.send(context,  NEUTRAL, "You do not have any mail!");
             return;
         }
         try
@@ -194,11 +194,11 @@ public class MailCommand extends ContainerCommand
             Mail mail = attachment.getMails().get(mailId);
             db.getDSL().delete(TableMail.TABLE_MAIL).where(TableMail.TABLE_MAIL.ID.eq(mail.getValue(
                 TableMail.TABLE_MAIL.ID))).execute();
-            i18n.sendTranslated(context,  POSITIVE, "Deleted Mail #{integer#mailid}", mailId);
+            i18n.send(context,  POSITIVE, "Deleted Mail #{integer#mailid}", mailId);
         }
         catch (IndexOutOfBoundsException e)
         {
-            i18n.sendTranslated(context,  NEGATIVE, "Invalid Mail Id!");
+            i18n.send(context,  NEGATIVE, "Invalid Mail Id!");
         }
     }
 
@@ -209,11 +209,11 @@ public class MailCommand extends ContainerCommand
         if (player == null)
         {
             getMails(context).clearMail();
-            i18n.sendTranslated(context,  NEUTRAL, "Cleared all mails!");
+            i18n.send(context,  NEUTRAL, "Cleared all mails!");
             return;
         }
         getMails(context).clearMailFrom(player);
-        i18n.sendTranslated(context,  NEUTRAL, "Cleared all mail from {user}!", player instanceof User ? player : "console");
+        i18n.send(context,  NEUTRAL, "Cleared all mail from {user}!", player instanceof User ? player : "console");
     }
 
     private void mail(String message, CommandSource from, User... users)
@@ -223,7 +223,7 @@ public class MailCommand extends ContainerCommand
             getMails(user).addMail(from, message);
             if (user.isOnline())
             {
-                i18n.sendTranslated(user.getPlayer().get(), NEUTRAL, "You just got a mail from {user}!", from.getName());
+                i18n.send(user.getPlayer().get(), NEUTRAL, "You just got a mail from {user}!", from.getName());
             }
         }
     }
@@ -237,8 +237,8 @@ public class MailCommand extends ContainerCommand
         int amount = mails.countMail();
         if (amount > 0)
         {
-            i18n.sendTranslatedN(player, POSITIVE, amount, "You have a new mail!", "You have {amount} of mail!", amount);
-            i18n.sendTranslated(player, NEUTRAL, "Use {text:/mail read} to display them.");
+            i18n.sendN(player, POSITIVE, amount, "You have a new mail!", "You have {amount} of mail!", amount);
+            i18n.send(player, NEUTRAL, "Use {text:/mail read} to display them.");
         }
     }
 }

@@ -55,13 +55,13 @@ public class LockerAdminCommands extends ContainerCommand
     {
         if (id == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Invalid id!"); // TODO parameter reader ; default block you are looking at
+            i18n.send(context, NEGATIVE, "Invalid id!"); // TODO parameter reader ; default block you are looking at
             return null;
         }
         Lock lockById = this.manager.getLockById(UInteger.valueOf(id));
         if (lockById == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "There is no protection with the id {integer}", id);
+            i18n.send(context, NEGATIVE, "There is no protection with the id {integer}", id);
         }
         return lockById;
     }
@@ -86,11 +86,11 @@ public class LockerAdminCommands extends ContainerCommand
                 }
                 else
                 {
-                    i18n.sendTranslated(context, NEGATIVE, "The protection with the id {integer} is an entity and cannot be accessed from far away!", lock.getId());
+                    i18n.send(context, NEGATIVE, "The protection with the id {integer} is an entity and cannot be accessed from far away!", lock.getId());
                 }
                 return;
             default:
-                i18n.sendTranslated(context, NEGATIVE, "The protection with the id {integer} is not a container!", lock.getId());
+                i18n.send(context, NEGATIVE, "The protection with the id {integer} is not a container!", lock.getId());
         }
     }
 
@@ -115,7 +115,7 @@ public class LockerAdminCommands extends ContainerCommand
         }
         else
         {
-            i18n.sendTranslated(context, NEGATIVE, "You cannot teleport to an entity protection!");
+            i18n.send(context, NEGATIVE, "You cannot teleport to an entity protection!");
         }
     }
 
@@ -125,11 +125,11 @@ public class LockerAdminCommands extends ContainerCommand
         manager.purgeLocksFrom(player).thenAccept(i -> {
             if (i != 0)
             {
-              i18n.sendTranslated(context, POSITIVE, "All locks for {user} are now deleted!", player);
+              i18n.send(context, POSITIVE, "All locks for {user} are now deleted!", player);
             }
             else
             {
-              i18n.sendTranslated(context, NEUTRAL, "{user} had no locks!", player);
+              i18n.send(context, NEUTRAL, "{user} had no locks!", player);
             }
         });
     }
@@ -140,11 +140,11 @@ public class LockerAdminCommands extends ContainerCommand
         manager.purgeOldLocks().thenAccept(i -> {
             if (i != 0)
             {
-                i18n.sendTranslated(context, POSITIVE, "{amount} locks deleted!", i);
+                i18n.send(context, POSITIVE, "{amount} locks deleted!", i);
             }
             else
             {
-                i18n.sendTranslated(context, NEUTRAL, "No locks deleted!");
+                i18n.send(context, NEUTRAL, "No locks deleted!");
             }
         });
     }

@@ -26,7 +26,6 @@ import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntitySnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.blockray.BlockRay;
@@ -63,7 +62,7 @@ public class SpawnMobCommand
         }
         else if (!(context instanceof Player))
         {
-            i18n.sendTranslated(context, NEUTRAL, "Succesfully spawned some {text:bugs:color=RED} inside your server!");
+            i18n.send(context, NEUTRAL, "Succesfully spawned some {text:bugs:color=RED} inside your server!");
             return;
         }
         else
@@ -71,7 +70,7 @@ public class SpawnMobCommand
             BlockRayHit<World> hit = BlockRay.from(((Player)context)).distanceLimit(200).stopFilter(onlyAirFilter()).end().orElse(null);
             if (hit == null)
             {
-                i18n.sendTranslated(context, NEGATIVE, "Cannot find Targetblock");
+                i18n.send(context, NEGATIVE, "Cannot find Targetblock");
                 return;
             }
             loc = hit.getLocation();
@@ -80,12 +79,12 @@ public class SpawnMobCommand
 
         if (amount <= 0)
         {
-            i18n.sendTranslated(context, NEUTRAL, "And how am i supposed to know which mobs to despawn?");
+            i18n.send(context, NEUTRAL, "And how am i supposed to know which mobs to despawn?");
             return;
         }
         if (amount > module.getConfig().improve.spawnmobLimit)
         {
-            i18n.sendTranslated(context, NEGATIVE, "The serverlimit is set to {amount}, you cannot spawn more mobs at once!", module.getConfig().improve.spawnmobLimit);
+            i18n.send(context, NEGATIVE, "The serverlimit is set to {amount}, you cannot spawn more mobs at once!", module.getConfig().improve.spawnmobLimit);
             return;
         }
         loc = loc.add(0.5, 0, 0.5);
@@ -97,7 +96,7 @@ public class SpawnMobCommand
         Entity entitySpawned = entitiesSpawned[0];
         if (!entitySpawned.get(Keys.PASSENGERS).isPresent())
         {
-            i18n.sendTranslated(context, POSITIVE, "Spawned {amount} {input#entity}!", amount, entitySpawned.getType().getName());
+            i18n.send(context, POSITIVE, "Spawned {amount} {input#entity}!", amount, entitySpawned.getType().getName());
         }
         else
         {
@@ -105,9 +104,9 @@ public class SpawnMobCommand
             while (entitySpawned.get(Keys.PASSENGERS).isPresent())
             {
                 entitySpawned = entitySpawned.getLocation().getExtent().getEntity(entitySpawned.get(Keys.PASSENGERS).get().get(0)).get();
-                message = i18n.getTranslation(context, NONE, "{input#entity} riding {input}", entitySpawned.getType().getName(), message);
+                message = i18n.translate(context, NONE, "{input#entity} riding {input}", entitySpawned.getType().getName(), message);
             }
-            message = i18n.getTranslation(context, POSITIVE, "Spawned {amount} {input#message}!", amount, message);
+            message = i18n.translate(context, POSITIVE, "Spawned {amount} {input#message}!", amount, message);
             context.sendMessage(message);
         }
     }

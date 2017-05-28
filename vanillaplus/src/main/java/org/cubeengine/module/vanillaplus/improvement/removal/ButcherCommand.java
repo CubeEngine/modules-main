@@ -70,7 +70,7 @@ public class ButcherCommand extends PermissionContainer
         radius = radius == null ? module.getConfig().improve.commandButcherDefaultRadius : radius;
         if (radius < 0 && !(radius == -1 && context.hasPermission(COMMAND_BUTCHER_FLAG_ALL.getId())))
         {
-            i18n.sendTranslated(context, NEGATIVE, "The radius has to be a number greater than 0!");
+            i18n.send(context, NEGATIVE, "The radius has to be a number greater than 0!");
             return;
         }
         if (all && context.hasPermission(COMMAND_BUTCHER_FLAG_ALL.getId()))
@@ -96,11 +96,11 @@ public class ButcherCommand extends PermissionContainer
 
         if (remove.size() == 0)
         {
-            i18n.sendTranslated(context, NEUTRAL, "Nothing to butcher!");
+            i18n.send(context, NEUTRAL, "Nothing to butcher!");
         }
         else
         {
-            i18n.sendTranslated(context, POSITIVE, "You just slaughtered {amount} living entities!", remove.size());
+            i18n.send(context, POSITIVE, "You just slaughtered {amount} living entities!", remove.size());
         }
 
     }

@@ -77,18 +77,18 @@ public class RegionCommands extends ContainerCommand
         Shape shape = selector.getSelection(context);
         if (shape == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Nothing selected!");
+            i18n.send(context, NEGATIVE, "Nothing selected!");
             return;
         }
         World world = selector.getFirstPoint(context).getExtent();
         if (manager.hasRegion(world, name))
         {
-            i18n.sendTranslated(context, NEGATIVE, "There is already a Region named {name}", name);
+            i18n.send(context, NEGATIVE, "There is already a Region named {name}", name);
             return;
         }
         Region region = manager.newRegion(world, shape.getBoundingCuboid(), name);
         manager.setActiveRegion(context, region);
-        i18n.sendTranslated(context, POSITIVE, "Region {region} created!", region);
+        i18n.send(context, POSITIVE, "Region {region} created!", region);
     }
 
     @Command(desc = "Redefines an existing Region")
@@ -97,17 +97,17 @@ public class RegionCommands extends ContainerCommand
         Shape shape = selector.getSelection(context);
         if (shape == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Nothing selected!");
+            i18n.send(context, NEGATIVE, "Nothing selected!");
             return;
         }
         World world = selector.getFirstPoint(context).getExtent();
         if (!region.getWorld().equals(world))
         {
-            i18n.sendTranslated(context, NEGATIVE, "This region is in another world!");
+            i18n.send(context, NEGATIVE, "This region is in another world!");
             return;
         }
         manager.changeRegion(region, shape.getBoundingCuboid());
-        i18n.sendTranslated(context, POSITIVE, "Region {region} updated!", region);
+        i18n.send(context, POSITIVE, "Region {region} updated!", region);
     }
 
     @Command(desc = "Selects a Region")
@@ -119,7 +119,7 @@ public class RegionCommands extends ContainerCommand
             selector.setFirstPoint(((Player) context), new Location<>(region.getWorld(), region.getCuboid().getMinimumPoint()));
             selector.setSecondPoint(((Player) context), new Location<>(region.getWorld(), region.getCuboid().getMaximumPoint()));
         }
-        i18n.sendTranslated(context, POSITIVE, "Region {region} selected!", region);
+        i18n.send(context, POSITIVE, "Region {region} selected!", region);
     }
 
     @Command(desc = "Lists regions")
@@ -161,11 +161,11 @@ public class RegionCommands extends ContainerCommand
 
         if (list.isEmpty())
         {
-            i18n.sendTranslated(context, NEGATIVE, "No Regions found");
+            i18n.send(context, NEGATIVE, "No Regions found");
             return;
         }
 
-        i18n.sendTranslated(context, NEUTRAL, "The following regions were found:");
+        i18n.send(context, NEUTRAL, "The following regions were found:");
         for (Region region : list)
         {
             if (region.getWorld() == null)
@@ -198,49 +198,49 @@ public class RegionCommands extends ContainerCommand
         // TODO default to region player is in when no active region is set
         if (region.getWorld() == null)
         {
-            i18n.sendTranslated(context, POSITIVE, "Global region");
+            i18n.send(context, POSITIVE, "Global region");
         }
         else if (region.getCuboid() == null)
         {
-            i18n.sendTranslated(context, POSITIVE, "World region in {world}", region.getWorld());
+            i18n.send(context, POSITIVE, "World region in {world}", region.getWorld());
         }
         else
         {
-            i18n.sendTranslated(context, POSITIVE, "Region {region} in {world}", region, region.getWorld());
+            i18n.send(context, POSITIVE, "Region {region} in {world}", region, region.getWorld());
         }
 
         Cuboid cuboid = region.getCuboid();
         if (cuboid != null)
         {
             // TODO tp on click to center
-            i18n.sendTranslated(context, POSITIVE, "Inside Cuboid of {vector} to {vector}", cuboid.getMinimumPoint(), cuboid.getMaximumPoint());
+            i18n.send(context, POSITIVE, "Inside Cuboid of {vector} to {vector}", cuboid.getMinimumPoint(), cuboid.getMaximumPoint());
         }
 
         // TODO priority
-        i18n.sendTranslated(context, POSITIVE, "Settings:");
+        i18n.send(context, POSITIVE, "Settings:");
         RegionConfig.Settings settings = region.getSettings();
-        showSetting(context, i18n.translate(context, "build"), settings.build, allSettings);
-        showSetting(context, i18n.translate(context, "move"), settings.move, allSettings);
-        showSetting(context, i18n.translate(context, "use-block"), settings.use.block, allSettings);
-        showSetting(context, i18n.translate(context, "use-item"), settings.use.item, allSettings);
-        showSetting(context, i18n.translate(context, "useall blocks"), settings.use.all.block, allSettings);
-        showSetting(context, i18n.translate(context, "useall items"), settings.use.all.item, allSettings);
-        showSetting(context, i18n.translate(context, "useall container"), settings.use.all.container, allSettings);
-        showSetting(context, i18n.translate(context, "useall openables"), settings.use.all.open, allSettings);
-        showSetting(context, i18n.translate(context, "useall redstone"), settings.use.all.redstone, allSettings);
+        showSetting(context, i18n.getTranslation(context, "build"), settings.build, allSettings);
+        showSetting(context, i18n.getTranslation(context, "move"), settings.move, allSettings);
+        showSetting(context, i18n.getTranslation(context, "use-block"), settings.use.block, allSettings);
+        showSetting(context, i18n.getTranslation(context, "use-item"), settings.use.item, allSettings);
+        showSetting(context, i18n.getTranslation(context, "useall blocks"), settings.use.all.block, allSettings);
+        showSetting(context, i18n.getTranslation(context, "useall items"), settings.use.all.item, allSettings);
+        showSetting(context, i18n.getTranslation(context, "useall container"), settings.use.all.container, allSettings);
+        showSetting(context, i18n.getTranslation(context, "useall openables"), settings.use.all.open, allSettings);
+        showSetting(context, i18n.getTranslation(context, "useall redstone"), settings.use.all.redstone, allSettings);
 
-        showSetting(context, i18n.translate(context, "spawn naturally"), settings.spawn.naturally, allSettings);
-        showSetting(context, i18n.translate(context, "spawn player"), settings.spawn.player, allSettings);
-        showSetting(context, i18n.translate(context, "spawn plugin"), settings.spawn.plugin, allSettings);
+        showSetting(context, i18n.getTranslation(context, "spawn naturally"), settings.spawn.naturally, allSettings);
+        showSetting(context, i18n.getTranslation(context, "spawn player"), settings.spawn.player, allSettings);
+        showSetting(context, i18n.getTranslation(context, "spawn plugin"), settings.spawn.plugin, allSettings);
 
-        showSetting(context, i18n.translate(context, "blockdamage all explosion"), settings.blockDamage.allExplosion, allSettings);
-        showSetting(context, i18n.translate(context, "blockdamage player explosion"), settings.blockDamage.playerExplosion, allSettings);
-        showSetting(context, i18n.translate(context, "blockdamage block"), settings.blockDamage.block, allSettings);
-        showSetting(context, i18n.translate(context, "blockdamage monster"), settings.blockDamage.monster, allSettings);
+        showSetting(context, i18n.getTranslation(context, "blockdamage all explosion"), settings.blockDamage.allExplosion, allSettings);
+        showSetting(context, i18n.getTranslation(context, "blockdamage player explosion"), settings.blockDamage.playerExplosion, allSettings);
+        showSetting(context, i18n.getTranslation(context, "blockdamage block"), settings.blockDamage.block, allSettings);
+        showSetting(context, i18n.getTranslation(context, "blockdamage monster"), settings.blockDamage.monster, allSettings);
 
-        showSetting(context, i18n.translate(context, "blocked commands"), settings.blockedCommands, allSettings);
+        showSetting(context, i18n.getTranslation(context, "blocked commands"), settings.blockedCommands, allSettings);
 
-        showSetting(context, i18n.translate(context, "deadcircuit"), settings.deadCircuit, allSettings);
+        showSetting(context, i18n.getTranslation(context, "deadcircuit"), settings.deadCircuit, allSettings);
 
         // TODO remaining settings
     }
@@ -271,8 +271,8 @@ public class RegionCommands extends ContainerCommand
 
         if (values.size() > 0 || allSettings)
         {
-            Text trueText = Text.of(YELLOW, i18n.translate(cs, "Enabled"), " ", GOLD, pos);
-            Text falseText = Text.of(YELLOW, i18n.translate(cs, "Disabled"), " ", GOLD, neg);
+            Text trueText = Text.of(YELLOW, i18n.getTranslation(cs, "Enabled"), " ", GOLD, pos);
+            Text falseText = Text.of(YELLOW, i18n.getTranslation(cs, "Disabled"), " ", GOLD, neg);
             cs.sendMessage(Text.of(YELLOW, name, ": ", trueText, " ", falseText));
             for (Map.Entry<?, Tristate> entry : values.entrySet())
             {
@@ -303,11 +303,11 @@ public class RegionCommands extends ContainerCommand
         switch (val)
         {
             case TRUE:
-                return Text.of(TextColors.DARK_GREEN, i18n.translate(cs,"Enabled"));
+                return Text.of(TextColors.DARK_GREEN, i18n.getTranslation(cs,"Enabled"));
             case FALSE:
-                return Text.of(TextColors.DARK_RED, i18n.translate(cs,"Disabled"));
+                return Text.of(TextColors.DARK_RED, i18n.getTranslation(cs,"Disabled"));
             default:
-                return Text.of(TextColors.GOLD, i18n.translate(cs,"Undefined"));
+                return Text.of(TextColors.GOLD, i18n.getTranslation(cs,"Undefined"));
         }
     }
 

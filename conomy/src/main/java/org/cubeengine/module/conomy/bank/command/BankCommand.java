@@ -26,7 +26,6 @@ import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;
@@ -71,10 +70,10 @@ public class BankCommand extends ContainerCommand
 
         if (balances.isEmpty())
         {
-            i18n.sendTranslated(context, NEGATIVE, "No Balance for bank {account} found!", bank);
+            i18n.send(context, NEGATIVE, "No Balance for bank {account} found!", bank);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "Bank {account} Balance:", bank);
+        i18n.send(context, POSITIVE, "Bank {account} Balance:", bank);
         for (Map.Entry<Currency, BigDecimal> entry : balances.entrySet())
         {
             context.sendMessage(Text.of(" - ", GOLD, entry.getKey().format(entry.getValue())));
@@ -93,13 +92,13 @@ public class BankCommand extends ContainerCommand
         Optional<UniqueAccount> account = service.getOrCreateAccount(context.getUniqueId());
         if (!account.isPresent())
         {
-            i18n.sendTranslated(context, NEGATIVE, "You do not have an account!");
+            i18n.send(context, NEGATIVE, "You do not have an account!");
             return;
         }
 
         if (!service.hasAccess(bank, AccessLevel.DEPOSIT, context))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to deposit money into that bank!");
+            i18n.send(context, NEGATIVE, "You are not allowed to deposit money into that bank!");
             return;
         }
 
@@ -108,14 +107,14 @@ public class BankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Currency cur = result.getCurrency();
-                i18n.sendTranslated(context, POSITIVE, "Deposited {txt#amount} into {account}! New Balance: {txt#balance}",
+                i18n.send(context, POSITIVE, "Deposited {txt#amount} into {account}! New Balance: {txt#balance}",
                         cur.format(result.getAmount()), bank, cur.format(bank.getBalance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
-                i18n.sendTranslated(context, NEGATIVE, "You cannot afford to spend that much!");
+                i18n.send(context, NEGATIVE, "You cannot afford to spend that much!");
                 break;
             default:
-                i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
+                i18n.send(context, NEGATIVE, "Transaction failed!");
                 break;
         }
     }
@@ -127,13 +126,13 @@ public class BankCommand extends ContainerCommand
         Optional<UniqueAccount> account = service.getOrCreateAccount(context.getUniqueId());
         if (!account.isPresent())
         {
-            i18n.sendTranslated(context, NEGATIVE, "You do not have an account!");
+            i18n.send(context, NEGATIVE, "You do not have an account!");
             return;
         }
 
         if (!service.hasAccess(bank, AccessLevel.WITHDRAW, context))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to withdraw money from that bank!");
+            i18n.send(context, NEGATIVE, "You are not allowed to withdraw money from that bank!");
         }
 
         TransferResult result = account.get().transfer(bank, service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
@@ -141,14 +140,14 @@ public class BankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Currency cur = result.getCurrency();
-                i18n.sendTranslated(context, POSITIVE, "Withdrawn {txt#amount} from {account}! New Balance: {txt#balance}",
+                i18n.send(context, POSITIVE, "Withdrawn {txt#amount} from {account}! New Balance: {txt#balance}",
                         cur.format(result.getAmount()), bank, cur.format(bank.getBalance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
-                i18n.sendTranslated(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
+                i18n.send(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
                 break;
             default:
-                i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
+                i18n.send(context, NEGATIVE, "Transaction failed!");
                 break;
         }
 
@@ -159,13 +158,13 @@ public class BankCommand extends ContainerCommand
     {
         if (amount < 0)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Sorry but robbing a bank is not allowed!");
+            i18n.send(context, NEGATIVE, "Sorry but robbing a bank is not allowed!");
             return;
         }
 
         if (!service.hasAccess(bank, AccessLevel.WITHDRAW, context))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to make transaction from that bank!");
+            i18n.send(context, NEGATIVE, "You are not allowed to make transaction from that bank!");
             return;
         }
 
@@ -174,14 +173,14 @@ public class BankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Currency cur = result.getCurrency();
-                i18n.sendTranslated(context, POSITIVE, "Transferred {txt#amount} from {account} to {account} New Balance: {txt#balance}",
+                i18n.send(context, POSITIVE, "Transferred {txt#amount} from {account} to {account} New Balance: {txt#balance}",
                         cur.format(result.getAmount()), bank, otherBank, cur.format(bank.getBalance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
-                i18n.sendTranslated(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
+                i18n.send(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
                 break;
             default:
-                i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
+                i18n.send(context, NEGATIVE, "Transaction failed!");
                 break;
         }
     }
@@ -191,7 +190,7 @@ public class BankCommand extends ContainerCommand
     {
         if (!service.hasAccess(bank, AccessLevel.WITHDRAW, context))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to make transaction from that bank!");
+            i18n.send(context, NEGATIVE, "You are not allowed to make transaction from that bank!");
             return;
         }
 
@@ -200,14 +199,14 @@ public class BankCommand extends ContainerCommand
         {
             case SUCCESS:
                 Currency cur = result.getCurrency();
-                i18n.sendTranslated(context, POSITIVE, "Transferred {txt#amount} from {account} to {account#user}! New Balance: {txt#balance}",
+                i18n.send(context, POSITIVE, "Transferred {txt#amount} from {account} to {account#user}! New Balance: {txt#balance}",
                         cur.format(result.getAmount()), bank, user, cur.format(bank.getBalance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
-                i18n.sendTranslated(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
+                i18n.send(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
                 break;
             default:
-                i18n.sendTranslated(context, NEGATIVE, "Transaction failed!");
+                i18n.send(context, NEGATIVE, "Transaction failed!");
                 break;
         }
     }
@@ -223,10 +222,10 @@ public class BankCommand extends ContainerCommand
             List<BaseAccount.Virtual> namedAccounts = service.getBanks(owner, AccessLevel.MANAGE);
             if (namedAccounts.isEmpty())
             {
-                i18n.sendTranslated(context, POSITIVE, "{user} is not owner of any bank!", owner);
+                i18n.send(context, POSITIVE, "{user} is not owner of any bank!", owner);
                 return;
             }
-            i18n.sendTranslated(context, POSITIVE, "{user} is the owner of the following banks:", owner);
+            i18n.send(context, POSITIVE, "{user} is the owner of the following banks:", owner);
 
             for (BaseAccount.Virtual bank : namedAccounts)
             {
@@ -238,10 +237,10 @@ public class BankCommand extends ContainerCommand
         List<BaseAccount.Virtual> namedAccounts = service.getBanks(context, AccessLevel.SEE);
         if (namedAccounts.isEmpty())
         {
-            i18n.sendTranslated(context, NEUTRAL, "There are no banks currently!");
+            i18n.send(context, NEUTRAL, "There are no banks currently!");
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "The following banks are available:");
+        i18n.send(context, POSITIVE, "The following banks are available:");
         for (BaseAccount.Virtual bank : namedAccounts)
         {
             context.sendMessage(Text.of(" - ", TextColors.YELLOW, bank.getDisplayName()));
@@ -251,21 +250,21 @@ public class BankCommand extends ContainerCommand
     @Command(desc = "Shows bank information")
     public void info(CommandSource context, BaseAccount.Virtual bank)
     {
-        i18n.sendTranslated(context, POSITIVE, "Bank Information for {account}:", bank);
-        i18n.sendTranslated(context, POSITIVE, "Current Balance: {txt}", service.getDefaultCurrency().format(bank.getBalance(service.getDefaultCurrency())));
+        i18n.send(context, POSITIVE, "Bank Information for {account}:", bank);
+        i18n.send(context, POSITIVE, "Current Balance: {txt}", service.getDefaultCurrency().format(bank.getBalance(service.getDefaultCurrency())));
 
         this.listaccess(context, bank);
 
         if (bank.isHidden())
         {
-            i18n.sendTranslated(context, POSITIVE, "This bank is hidden for other players!");
+            i18n.send(context, POSITIVE, "This bank is hidden for other players!");
         }
     }
 
     @Command(desc = "Lists the access levels for a bank")
     public void listaccess(CommandSource context, @Default BaseAccount.Virtual bank)
     {
-        i18n.sendTranslated(context, POSITIVE, "Access Levels for {account}:", bank);
+        i18n.send(context, POSITIVE, "Access Levels for {account}:", bank);
 
         // TODO global access levels
         // Everyone can SEE(hidden) DEPOSIT(needInvite)

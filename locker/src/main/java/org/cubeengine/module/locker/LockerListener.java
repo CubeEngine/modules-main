@@ -19,14 +19,13 @@ package org.cubeengine.module.locker;
 
 import java.util.Optional;
 import javax.inject.Inject;
-import jdk.nashorn.internal.ir.annotations.Ignore;
+
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.entity.DamageableData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.hanging.Hanging;
 import org.spongepowered.api.entity.living.Living;
@@ -39,13 +38,11 @@ import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.AttackEntityEvent;
-import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Carrier;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -78,7 +75,7 @@ public class LockerListener
         {
             if (!player.hasPermission(module.perms().ALLOW_CONTAINER.getId()))
             {
-                i18n.sendTranslated(player, NEGATIVE, "Strong magic prevents you from accessing any inventory!");
+                i18n.send(player, NEGATIVE, "Strong magic prevents you from accessing any inventory!");
                 event.setCancelled(true);
                 return;
             }
@@ -92,7 +89,7 @@ public class LockerListener
         {
             if (!player.hasPermission(module.perms().ALLOW_DOOR.getId()))
             {
-                i18n.sendTranslated(player, NEGATIVE, "Strong magic prevents you from accessing any door!");
+                i18n.send(player, NEGATIVE, "Strong magic prevents you from accessing any door!");
                 event.setCancelled(true);
                 return;
             }
@@ -112,7 +109,7 @@ public class LockerListener
         Entity entity = event.getTargetEntity();
         if (!player.hasPermission(module.perms().ALLOW_ENTITY.getId()))
         {
-            i18n.sendTranslated(player, NEGATIVE, "Strong magic prevents you from reaching this entity!");
+            i18n.send(player, NEGATIVE, "Strong magic prevents you from reaching this entity!");
             event.setCancelled(true);
             return;
         }

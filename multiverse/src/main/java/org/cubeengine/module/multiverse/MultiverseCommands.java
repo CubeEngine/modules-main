@@ -18,7 +18,6 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import org.cubeengine.butler.parametric.Command;
@@ -61,21 +60,21 @@ public class MultiverseCommands extends ContainerCommand
         String previous = module.getUniverse(world);
         if (previous.equals(universe))
         {
-            i18n.sendTranslated(context, NEGATIVE, "{world} is already in the universe {name}", world, universe);
+            i18n.send(context, NEGATIVE, "{world} is already in the universe {name}", world, universe);
             return;
         }
         module.setUniverse(world, universe);
-        i18n.sendTranslated(context, POSITIVE, "{world} is now in the universe {input}!", world, universe);
+        i18n.send(context, POSITIVE, "{world} is now in the universe {input}!", world, universe);
 
         Sponge.getServer().getOnlinePlayers().stream().filter(player -> player.getWorld().equals(world)).forEach(
             p -> {
                 MultiverseData data = p.get(MultiverseData.class).get();
                 data.from(previous, world).applyFromPlayer(p);
                 data.from(universe, world).applyToPlayer(p);
-                i18n.sendTranslated(p, NEUTRAL, "The sky opens up and sucks in the whole world.");
+                i18n.send(p, NEUTRAL, "The sky opens up and sucks in the whole world.");
                 p.playSound(SoundTypes.BLOCK_PORTAL_TRIGGER, p.getLocation().getPosition(), 1);
                 p.offer(Keys.POTION_EFFECTS, Arrays.asList(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, 2 * 20)));
-                i18n.sendTranslated(p, NEUTRAL, "When you open your eyes you now are in {input#univserse}.", universe);
+                i18n.send(p, NEUTRAL, "When you open your eyes you now are in {input#univserse}.", universe);
                 p.offer(data);
             });
     }
@@ -87,10 +86,10 @@ public class MultiverseCommands extends ContainerCommand
         Set<Entry<String, Set<ConfigWorld>>> universes = module.getConfig().universes.entrySet();
         if (universes.isEmpty())
         {
-            i18n.sendTranslated(context, NEUTRAL, "There is no universe yet.");
+            i18n.send(context, NEUTRAL, "There is no universe yet.");
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "The following univserses exits:");
+        i18n.send(context, POSITIVE, "The following univserses exits:");
         for (Entry<String, Set<ConfigWorld>> entry : universes)
         {
             context.sendMessage(Text.of(entry.getKey(), ":"));
@@ -107,13 +106,13 @@ public class MultiverseCommands extends ContainerCommand
         Set<ConfigWorld> removed = module.getConfig().universes.remove(universe);
         if (removed == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "There is no universe named {}", universe);
+            i18n.send(context, NEGATIVE, "There is no universe named {}", universe);
             return;
         }
         removed.stream().filter(cWorld -> cWorld.getWorld() != null)
                         .forEach(cWorld -> module.setUniverse(cWorld.getWorld(), "unknown"));
         module.getConfig().save();
-        i18n.sendTranslated(context, POSITIVE, "{name} was removed and {amount} universes moved to {name}", universe, removed.size(), "unknown");
+        i18n.send(context, POSITIVE, "{name} was removed and {amount} universes moved to {name}", universe, removed.size(), "unknown");
     }
 
     @Command(desc = "Renames a universe")
@@ -122,10 +121,10 @@ public class MultiverseCommands extends ContainerCommand
         Set<ConfigWorld> worlds = module.getConfig().universes.remove(universe);
         if (worlds == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "There is no universe named {}", universe);
+            i18n.send(context, NEGATIVE, "There is no universe named {}", universe);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "Renamed universe {input} to {input}", universe, newName);
+        i18n.send(context, POSITIVE, "Renamed universe {input} to {input}", universe, newName);
         module.getConfig().universes.put(newName, worlds);
         module.getConfig().save();
     }

@@ -35,15 +35,12 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.util.blockray.BlockRay;
-import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.block.BlockTypes.AIR;
 import static org.spongepowered.api.block.BlockTypes.GLASS;
-import static org.spongepowered.api.block.BlockTypes.SPONGE;
 import static org.spongepowered.api.util.Direction.DOWN;
 import static org.spongepowered.api.util.Direction.UP;
 
@@ -69,7 +66,7 @@ public class MovementCommands
     {
         if (height < 0)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Invalid height. The height has to be a whole number greater than 0!");
+            i18n.send(context, NEGATIVE, "Invalid height. The height has to be a whole number greater than 0!");
             return;
         }
         Location<World> loc = context.getLocation().add(0, height - 1, 0);
@@ -80,7 +77,7 @@ public class MovementCommands
         Location up1 = loc.getRelative(UP);
         if (!(up1.getBlockType() == AIR && up1.getRelative(UP).getBlockType() == AIR))
         {
-            i18n.sendTranslated(context, NEGATIVE, "Your destination seems to be obstructed!");
+            i18n.send(context, NEGATIVE, "Your destination seems to be obstructed!");
             return;
         }
         if (loc.getBlockType() == AIR)
@@ -88,7 +85,7 @@ public class MovementCommands
             loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS, Cause.of(NamedCause.source(module.getModularity().provide(PluginContainer.class)), NamedCause.owner(context)));
         }
         context.setLocation(loc.getRelative(UP));
-        i18n.sendTranslated(context, POSITIVE, "You have just been lifted!");
+        i18n.send(context, POSITIVE, "You have just been lifted!");
     }
 
     @Command(desc = "Teleports to the highest point at your position.")
@@ -97,7 +94,7 @@ public class MovementCommands
     {
         Location<World> loc = BlockUtil.getHighestBlockAt(context.getLocation()).add(.5, 0, .5);
         context.setLocation(loc.getRelative(UP));
-        i18n.sendTranslated(context, POSITIVE, "You are now on top!");
+        i18n.send(context, POSITIVE, "You are now on top!");
     }
 
     @Command(desc = "Teleports you to the next safe spot upwards.")
@@ -113,7 +110,7 @@ public class MovementCommands
             Location<World> rel = curLoc.getRelative(UP);
             if (rel.getY() < loc.getBlockY())
             {
-                i18n.sendTranslated(context, NEGATIVE, "You cannot ascend here");
+                i18n.send(context, NEGATIVE, "You cannot ascend here");
                 return;
             }
             curLoc = rel;
@@ -131,12 +128,12 @@ public class MovementCommands
         }
         if (curLoc.getY() >= maxHeight)
         {
-            i18n.sendTranslated(context, NEGATIVE, "You cannot ascend here");
+            i18n.send(context, NEGATIVE, "You cannot ascend here");
             return;
         }
         curLoc = curLoc.add(0, - (curLoc.getY() - curLoc.getBlockY()), 0);
         context.setLocation(curLoc);
-        i18n.sendTranslated(context, POSITIVE, "Ascended a level!");
+        i18n.send(context, POSITIVE, "Ascended a level!");
     }
 
     @Command(desc = "Teleports you to the next safe spot downwards.")
@@ -160,13 +157,13 @@ public class MovementCommands
         }
         if (curLoc.getY() <= 1)
         {
-            i18n.sendTranslated(context, NEGATIVE, "You cannot descend here");
+            i18n.send(context, NEGATIVE, "You cannot descend here");
             return;
         }
         //reached new location
         curLoc = curLoc.add(0, - (curLoc.getY() - curLoc.getBlockY()), 0);
         context.setLocation(curLoc);
-        i18n.sendTranslated(context, POSITIVE, "Descended a level!");
+        i18n.send(context, POSITIVE, "Descended a level!");
     }
 
     @Command(alias = {"jump", "j"}, desc = "Jumps to the position you are looking at.")
@@ -177,11 +174,11 @@ public class MovementCommands
         Location<World> loc = LocationUtil.getBlockInSight(context);
         if (loc == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "No block in sight!");
+            i18n.send(context, NEGATIVE, "No block in sight!");
             return;
         }
         context.setLocation(LocationUtil.getLocationUp(loc).add(0.5, 0, 0.5));
-        i18n.sendTranslated(context, POSITIVE, "You just jumped!");
+        i18n.send(context, POSITIVE, "You just jumped!");
     }
 
     @Command(alias = "thru", desc = "Jumps to the position you are looking at.")
@@ -192,11 +189,11 @@ public class MovementCommands
                                                                this.module.getConfig().navigation.thru.maxWallThickness);
         if (!loc.isPresent())
         {
-            i18n.sendTranslated(context, NEGATIVE, "Nothing to pass through!");
+            i18n.send(context, NEGATIVE, "Nothing to pass through!");
             return;
         }
         context.setLocation(loc.get());
-        i18n.sendTranslated(context, POSITIVE, "You just passed the wall!");
+        i18n.send(context, POSITIVE, "You just passed the wall!");
     }
 
     @Command(desc = "Teleports you to your last location")
@@ -210,7 +207,7 @@ public class MovementCommands
             Transform<World> loc = tl.getDeathLocation(context);
             if (!backPerm && loc == null)
             {
-                i18n.sendTranslated(context, NEGATIVE, "No death point found!");
+                i18n.send(context, NEGATIVE, "No death point found!");
                 return;
             }
             if (loc != null)
@@ -221,7 +218,7 @@ public class MovementCommands
                     {
                         context.setLocation(loc.getLocation());
                     }
-                    i18n.sendTranslated(context, POSITIVE, "Teleported to your death point!");
+                    i18n.send(context, POSITIVE, "Teleported to your death point!");
                     tl.setDeathLocation(context, null); // reset after back
                 }
                 context.setRotation(loc.getRotation());
@@ -233,7 +230,7 @@ public class MovementCommands
             Transform<World> trans = tl.getLastLocation(context);
             if (trans == null)
             {
-                i18n.sendTranslated(context, NEGATIVE, "You never teleported!");
+                i18n.send(context, NEGATIVE, "You never teleported!");
                 return;
             }
 
@@ -244,15 +241,15 @@ public class MovementCommands
             }
             if (loc == null)
             {
-                i18n.sendTranslated(context, POSITIVE, "Target is unsafe! Use the -unsafe flag to teleport anyways.");
+                i18n.send(context, POSITIVE, "Target is unsafe! Use the -unsafe flag to teleport anyways.");
                 return;
             }
             context.setLocation(loc);
-            i18n.sendTranslated(context, POSITIVE, "Teleported to your last location!");
+            i18n.send(context, POSITIVE, "Teleported to your last location!");
             context.setRotation(trans.getRotation());
             return;
         }
-        i18n.sendTranslated(context, NEGATIVE, "You are not allowed to teleport back!");
+        i18n.send(context, NEGATIVE, "You are not allowed to teleport back!");
     }
 
     @Command(alias = "put", desc = "Places a player to the position you are looking at.")
@@ -262,13 +259,13 @@ public class MovementCommands
         Location<World> block = LocationUtil.getBlockInSight(context);
         if (block == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "No block in sight!");
+            i18n.send(context, NEGATIVE, "No block in sight!");
             return;
         }
 
         player.setLocation(LocationUtil.getLocationUp(block).add(0.5, 0, 0.5));
-        i18n.sendTranslated(context, POSITIVE, "You just placed {user} where you were looking!", player);
-        i18n.sendTranslated(player, POSITIVE, "You were placed somewhere!");
+        i18n.send(context, POSITIVE, "You just placed {user} where you were looking!", player);
+        i18n.send(player, POSITIVE, "You were placed somewhere!");
     }
 
     @Command(desc = "Swaps you and another players position")
@@ -278,10 +275,10 @@ public class MovementCommands
         {
             if (context instanceof Player)
             {
-                i18n.sendTranslated(context, NEGATIVE, "Swapping positions with yourself!? Are you kidding me?");
+                i18n.send(context, NEGATIVE, "Swapping positions with yourself!? Are you kidding me?");
                 return;
             }
-            i18n.sendTranslated(context, NEUTRAL, "Truly a hero! Trying to swap a users position with himself...");
+            i18n.send(context, NEUTRAL, "Truly a hero! Trying to swap a users position with himself...");
             return;
         }
         Location<World> userLoc = player.getLocation();
@@ -289,9 +286,9 @@ public class MovementCommands
         sender.setLocation(userLoc);
         if (!context.equals(sender))
         {
-            i18n.sendTranslated(context, POSITIVE, "Swapped position of {user} and {user}!", player, sender);
+            i18n.send(context, POSITIVE, "Swapped position of {user} and {user}!", player, sender);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "Swapped position with {user}!", player);
+        i18n.send(context, POSITIVE, "Swapped position with {user}!", player);
     }
 }

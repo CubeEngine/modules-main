@@ -47,7 +47,7 @@ public class TamedListener
         if (uuid.isPresent())
         {
             Optional<User> owner = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid.get());
-            i18n.sendTranslated(player, POSITIVE, "This {name#entity} belongs to {tamer}!",
+            i18n.send(player, POSITIVE, "This {name#entity} belongs to {tamer}!",
                                 event.getTargetEntity().getType().getName(), owner);
         }
     }

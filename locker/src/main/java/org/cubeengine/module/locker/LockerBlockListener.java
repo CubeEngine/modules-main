@@ -33,7 +33,6 @@ import org.spongepowered.api.Game;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.trait.EnumTraits;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.MatterProperty;
@@ -49,8 +48,6 @@ import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.chat.ChatType;
-import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.util.Direction;
@@ -121,10 +118,10 @@ public class LockerBlockListener
                     if (!blockprotection.isAutoProtect()) return;
                     if (player.get(Keys.IS_SNEAKING).orElse(false))
                     {
-                        Text click = i18n.getTranslation(player, NEUTRAL, "Click here to protect").toBuilder().color(TextColors.GOLD).style(TextStyles.ITALIC)
+                        Text click = i18n.translate(player, NEUTRAL, "Click here to protect").toBuilder().color(TextColors.GOLD).style(TextStyles.ITALIC)
                                          .onClick(TextActions.executeCallback(s -> manager.createLock(loc, player, blockprotection.getAutoProtect(), null, false)))
                                          .build();
-                        i18n.sendTranslated(player, NEUTRAL, "Autoprotect is disabled while sneaking. {txt}", click);
+                        i18n.send(player, NEUTRAL, "Autoprotect is disabled while sneaking. {txt}", click);
 
                         return;
                     }
@@ -163,7 +160,7 @@ public class LockerBlockListener
         {
             if (!lock.validateTypeAt(relative))
             {
-                i18n.sendTranslated(ACTION_BAR, player, NEUTRAL, "Nearby BlockProtection is not valid!");
+                i18n.send(ACTION_BAR, player, NEUTRAL, "Nearby BlockProtection is not valid!");
                 lock.delete(player);
                 return true;
             }
@@ -182,12 +179,12 @@ public class LockerBlockListener
             {
                 this.manager.extendLock(lock, location);
                 this.manager.extendLock(lock, relative);
-                i18n.sendTranslated(ACTION_BAR, player, POSITIVE, "Protection expanded to {amount} blocks!", lock.getLocations().size());
+                i18n.send(ACTION_BAR, player, POSITIVE, "Protection expanded to {amount} blocks!", lock.getLocations().size());
             }
             else
             {
                 event.setCancelled(true);
-                i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "The nearby door is protected by someone else!");
+                i18n.send(ACTION_BAR, player, NEGATIVE, "The nearby door is protected by someone else!");
             }
             return true;
         }
@@ -211,18 +208,18 @@ public class LockerBlockListener
             }
             if (!lock.validateTypeAt(relativeLoc))
             {
-                i18n.sendTranslated(ACTION_BAR, player, NEUTRAL, "Nearby BlockProtection is not valid!");
+                i18n.send(ACTION_BAR, player, NEUTRAL, "Nearby BlockProtection is not valid!");
                 lock.delete(player);
             }
             else if (lock.isOwner(player) || lock.hasAdmin(player) || player.hasPermission(module.perms().EXPAND_OTHER.getId()))
             {
                 this.manager.extendLock(lock, placed);
-                i18n.sendTranslated(ACTION_BAR, player, POSITIVE, "Protection expanded to {amount} blocks!", lock.getLocations().size());
+                i18n.send(ACTION_BAR, player, POSITIVE, "Protection expanded to {amount} blocks!", lock.getLocations().size());
             }
             else
             {
                 event.setCancelled(true);
-                i18n.sendTranslated(ACTION_BAR, player, NEGATIVE, "The nearby chest is protected by someone else!");
+                i18n.send(ACTION_BAR, player, NEGATIVE, "The nearby chest is protected by someone else!");
             }
             return true;
         }

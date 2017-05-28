@@ -63,7 +63,7 @@ public class PortalModifyCommand extends ContainerCommand
     {
         portal.config.owner = owner.getName();
         portal.config.save();
-        i18n.sendTranslated(context, POSITIVE, "{user} is now the owner of {name#portal}!", owner, portal.getName());
+        i18n.send(context, POSITIVE, "{user} is now the owner of {name#portal}!", owner, portal.getName());
     }
 
     @Alias(value = "mvpd")
@@ -74,7 +74,7 @@ public class PortalModifyCommand extends ContainerCommand
     {
         portal.config.destination = destination;
         portal.config.save();
-        i18n.sendTranslated(context, POSITIVE, "Portal destination set!");
+        i18n.send(context, POSITIVE, "Portal destination set!");
     }
 
     @Alias(value = "mvprd")
@@ -90,7 +90,7 @@ public class PortalModifyCommand extends ContainerCommand
     {
         if (!(selector.getSelection(context) instanceof Cuboid))
         {
-            i18n.sendTranslated(context, NEGATIVE, "Please select a cuboid first!");
+            i18n.send(context, NEGATIVE, "Please select a cuboid first!");
             return;
         }
         Location<World> p1 = selector.getFirstPoint(context);
@@ -99,7 +99,7 @@ public class PortalModifyCommand extends ContainerCommand
         portal.config.location.from = new Vector3i(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
         portal.config.location.to = new Vector3i(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
         portal.config.save();
-        i18n.sendTranslated(context, POSITIVE, "Portal {name} updated to your current selection!", portal.getName());
+        i18n.send(context, POSITIVE, "Portal {name} updated to your current selection!", portal.getName());
     }
 
     @Command(desc = "Modifies the location where a player exits when teleporting a portal")
@@ -110,12 +110,12 @@ public class PortalModifyCommand extends ContainerCommand
         if (portal.config.world.getWorld() != location.getExtent())
         {
             // TODO range check? range in config
-            i18n.sendTranslated(context, NEGATIVE, "A portals exit cannot be in an other world than its location!");
+            i18n.send(context, NEGATIVE, "A portals exit cannot be in an other world than its location!");
             return;
         }
         portal.config.location.destination = new WorldTransform(location, context.getRotation());
         portal.config.save();
-        i18n.sendTranslated(context, POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
+        i18n.send(context, POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
     }
 
     @Command(desc = "Toggles safe teleportation for this portal")
@@ -125,10 +125,10 @@ public class PortalModifyCommand extends ContainerCommand
         portal.config.save();
         if (portal.config.safeTeleport)
         {
-            i18n.sendTranslated(context, POSITIVE, "The portal {name} will not teleport to an unsafe destination", portal.getName());
+            i18n.send(context, POSITIVE, "The portal {name} will not teleport to an unsafe destination", portal.getName());
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "The portal {name} will also teleport to an unsafe destination", portal.getName());
+        i18n.send(context, POSITIVE, "The portal {name} will also teleport to an unsafe destination", portal.getName());
     }
 
     @Command(desc = "Toggles whether entities can teleport with this portal")
@@ -138,9 +138,9 @@ public class PortalModifyCommand extends ContainerCommand
         portal.config.save();
         if (portal.config.teleportNonPlayers)
         {
-            i18n.sendTranslated(context, POSITIVE, "The portal {name} will teleport entities too", portal.getName());
+            i18n.send(context, POSITIVE, "The portal {name} will teleport entities too", portal.getName());
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "The portal {name} will only teleport players", portal.getName());
+        i18n.send(context, POSITIVE, "The portal {name} will only teleport players", portal.getName());
     }
 }

@@ -23,7 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Optional;
+
 import org.cubeengine.butler.parameter.IncorrectUsageException;
 import org.cubeengine.libcube.util.CauseUtil;
 import org.cubeengine.libcube.util.StringUtils;
@@ -32,9 +32,6 @@ import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
@@ -87,7 +84,7 @@ public class SpawnMob
         }
         if (entityType == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Unknown mob-type: {input#entityname} not found!", entityName);
+            i18n.send(context, NEGATIVE, "Unknown mob-type: {input#entityname} not found!", entityName);
             return null;
         }
         Entity[] spawnedMobs = new Entity[amount];

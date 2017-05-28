@@ -72,7 +72,7 @@ public class PortalListener
                 attachment.setInPortal(true);
                 if (attachment.isDebug())
                 {
-                    i18n.sendTranslated(player, POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Teleported into portal: {name}", portal.getName());
+                    i18n.send(player, POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Teleported into portal: {name}", portal.getName());
                 }
                 return;
             }
@@ -136,11 +136,11 @@ public class PortalListener
                     {
                         if (attachment.isInPortal())
                         {
-                            i18n.sendTranslated(player, POSITIVE, "{text:[Portals] Debug} Move in portal: {name}", portal.getName());
+                            i18n.send(player, POSITIVE, "{text:[Portals] Debug} Move in portal: {name}", portal.getName());
                         }
                         else
                         {
-                            i18n.sendTranslated(player, POSITIVE, "{text:[Portals] Debug} Entered portal: {name}", portal.getName());
+                            i18n.send(player, POSITIVE, "{text:[Portals] Debug} Entered portal: {name}", portal.getName());
                             portal.showInfo(player);
                             attachment.setInPortal(true);
                         }

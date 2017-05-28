@@ -60,7 +60,7 @@ public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, 
             });
         if (!target.isPresent())
         {
-            throw new TranslatedParserException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
+            throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,
                     "No account found for {user}!", arg));
         }
         return target.get();
@@ -71,14 +71,14 @@ public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, 
     {
         if (!(invocation.getCommandSource() instanceof User))
         {
-            throw new TranslatedParserException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
+            throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,
                     "You have to specify a user!"));
         }
         User user = (User) invocation.getCommandSource();
         Optional<BaseAccount.Unique> account = getAccount(user);
         if (!account.isPresent())
         {
-            throw new TranslatedParserException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
+            throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,
                     "You have no account!"));
         }
         return account.get();

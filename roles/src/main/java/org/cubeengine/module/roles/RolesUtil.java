@@ -172,7 +172,7 @@ public class RolesUtil
         }
         else
         {
-            permText = permText.toBuilder().onHover(showText(i18n.getTranslation(cmdSource, NEGATIVE, "Permission not registered"))).build();
+            permText = permText.toBuilder().onHover(showText(i18n.translate(cmdSource, NEGATIVE, "Permission not registered"))).build();
         }
         return permText;
     }

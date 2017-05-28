@@ -79,7 +79,7 @@ public class KillCommands extends PermissionContainer
         {
             if (!context.hasPermission(COMMAND_KILL_ALL.getId()))
             {
-                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to kill everyone!");
+                i18n.send(context, NEGATIVE, "You are not allowed to kill everyone!");
                 return;
             }
             if (context instanceof Player)
@@ -96,10 +96,10 @@ public class KillCommands extends PermissionContainer
         }
         if (killed.isEmpty())
         {
-            i18n.sendTranslated(context, NEUTRAL, "No one was killed!");
+            i18n.send(context, NEUTRAL, "No one was killed!");
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "You killed {user#list}!", StringUtils.implode(",", killed));
+        i18n.send(context, POSITIVE, "You killed {user#list}!", StringUtils.implode(",", killed));
     }
 
 
@@ -109,7 +109,7 @@ public class KillCommands extends PermissionContainer
         {
             if (player.hasPermission(COMMAND_KILL_PREVENT.getId()) || player.get(Keys.INVULNERABILITY_TICKS).isPresent())
             {
-                i18n.sendTranslated(context, NEGATIVE, "You cannot kill {user}!", player);
+                i18n.send(context, NEGATIVE, "You cannot kill {user}!", player);
                 return false;
             }
         }
@@ -126,11 +126,11 @@ public class KillCommands extends PermissionContainer
         }
         if (showMessage)
         {
-            i18n.sendTranslated(context, POSITIVE, "You killed {user}!", player);
+            i18n.send(context, POSITIVE, "You killed {user}!", player);
         }
         if (!quiet && player.hasPermission(COMMAND_KILL_NOTIFY.getId()))
         {
-            i18n.sendTranslated(player, NEUTRAL, "You were killed by {user}", context);
+            i18n.send(player, NEUTRAL, "You were killed by {user}", context);
         }
         return true;
     }
@@ -142,6 +142,6 @@ public class KillCommands extends PermissionContainer
     {
         context.damage(context.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build(), Cause.of(source(context)));
         context.offer(Keys.HEALTH, 0d);
-        i18n.sendTranslated(context, NEGATIVE, "You ended your life. Why? {text::(:color=DARK_RED}");
+        i18n.send(context, NEGATIVE, "You ended your life. Why? {text::(:color=DARK_RED}");
     }
 }

@@ -81,7 +81,7 @@ public class SpawnCommands
         }
         em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location<>(world, x, y, z), direction, context));
         world.getProperties().setSpawnPosition(new Vector3i(x, y, z));
-        i18n.sendTranslated(context, POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new Vector3i(x, y, z));
+        i18n.send(context, POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new Vector3i(x, y, z));
     }
 
     @Command(desc = "Teleports all players to spawn")
@@ -112,14 +112,14 @@ public class SpawnCommands
         force = force && context.hasPermission(module.perms().CMD_SPAWN_FORCE.getId()) || context.equals( player);
         if (!force && player.hasPermission(module.perms().CMD_SPAWN_PREVENT.getId()))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to spawn {user}!", player);
+            i18n.send(context, NEGATIVE, "You are not allowed to spawn {user}!", player);
             return;
         }
         final Location<World> spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
         Vector3d rotation = player.getRotation();
         player.setLocation(spawnLocation);
         player.setRotation(rotation);
-        i18n.sendTranslated(context, POSITIVE, "You are now standing at the spawn in {world}!", world);
+        i18n.send(context, POSITIVE, "You are now standing at the spawn in {world}!", world);
     }
 
     @Command(desc = "Teleports you to the spawn of given world")
@@ -129,12 +129,12 @@ public class SpawnCommands
         final Location<World> spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
         if (!context.hasPermission(module.permsTpWorld().getPermission(world.getName()).getId()))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to teleport to this world!");
+            i18n.send(context, NEGATIVE, "You are not allowed to teleport to this world!");
             return;
         }
         Vector3d rotation = context.getRotation();
         context.setLocation(spawnLocation);
-        i18n.sendTranslated(context, POSITIVE, "Teleported to the spawn of world {world}!", world);
+        i18n.send(context, POSITIVE, "Teleported to the spawn of world {world}!", world);
         context.setRotation(rotation);
     }
 }

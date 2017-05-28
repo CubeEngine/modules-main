@@ -87,11 +87,11 @@ public class LockerCommands extends ContainerCommand
             Lock lock = this.manager.getLockById(keyBook.lockID);
             if (lock != null && keyBook.isValidFor(lock))
             {
-                i18n.sendTranslated(context, POSITIVE, "The strong magic surrounding this KeyBook allows you to access the designated protection");
+                i18n.send(context, POSITIVE, "The strong magic surrounding this KeyBook allows you to access the designated protection");
                 if (lock.isBlockLock())
                 {
                     Location loc = lock.getFirstLocation();
-                    i18n.sendTranslated(context, POSITIVE, "The protection corresponding to this book is located at {vector} in {world}", loc.getBlockPosition(), loc.getExtent());
+                    i18n.send(context, POSITIVE, "The protection corresponding to this book is located at {vector} in {world}", loc.getBlockPosition(), loc.getExtent());
                 }
                 else
                 {
@@ -100,16 +100,16 @@ public class LockerCommands extends ContainerCommand
                         if (entity.getUniqueId().equals(lock.getEntityUID()))
                         {
                             Location loc = entity.getLocation();
-                            i18n.sendTranslated(context, POSITIVE, "The entity protection corresponding to this book is located at {vector} in {world}", loc.getBlockPosition(), loc.getExtent());
+                            i18n.send(context, POSITIVE, "The entity protection corresponding to this book is located at {vector} in {world}", loc.getBlockPosition(), loc.getExtent());
                             return;
                         }
                     }
-                    i18n.sendTranslated(context, POSITIVE, "Your magic is not strong enough to locate the corresponding entity protection!");
+                    i18n.send(context, POSITIVE, "Your magic is not strong enough to locate the corresponding entity protection!");
                 }
             }
             else
             {
-                i18n.sendTranslated(context, NEUTRAL, "As you inspect the KeyBook closer you realize that its magic power has disappeared!");
+                i18n.send(context, NEUTRAL, "As you inspect the KeyBook closer you realize that its magic power has disappeared!");
                 keyBook.invalidate();
             }
             return;
@@ -117,7 +117,7 @@ public class LockerCommands extends ContainerCommand
         manager.commandListener.submitLockAction(context, (lock, loc, entity) -> {
             lock.showInfo(context);
         });
-        i18n.sendTranslated(context, POSITIVE, "Right click to show protection-info");
+        i18n.send(context, POSITIVE, "Right click to show protection-info");
     }
 
     @Alias(value = "cpersist")
@@ -127,10 +127,10 @@ public class LockerCommands extends ContainerCommand
     {
         if (this.manager.commandListener.persist(context))
         {
-            i18n.sendTranslated(context, POSITIVE, "Your commands will now persist!");
+            i18n.send(context, POSITIVE, "Your commands will now persist!");
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "Your commands will now no longer persist!");
+        i18n.send(context, POSITIVE, "Your commands will now no longer persist!");
     }
 
     @Alias(value = "cremove")
@@ -143,7 +143,7 @@ public class LockerCommands extends ContainerCommand
             this.persist(context);
         }
         this.manager.commandListener.submitLockAction(context, (lock, loc, entity) -> manager.removeLock(lock, context, false));
-        i18n.sendTranslated(context, POSITIVE, "Right click a protection to remove it!");
+        i18n.send(context, POSITIVE, "Right click a protection to remove it!");
     }
 
     @Alias(value = "cunlock")
@@ -156,7 +156,7 @@ public class LockerCommands extends ContainerCommand
             this.persist(context);
         }
         manager.commandListener.submitLockAction(context, (lock, loc, entity) -> lock.unlock(context, lock.getFirstLocation(), password));
-        i18n.sendTranslated(context, POSITIVE, "Right click to unlock a password protected chest!");
+        i18n.send(context, POSITIVE, "Right click to unlock a password protected chest!");
     }
 
     @Alias(value = "cmodify")
@@ -176,7 +176,7 @@ public class LockerCommands extends ContainerCommand
         else
         {
             this.manager.commandListener.submitLockAction(context, (lock, loc, entity) -> lock.modifyLock(context, players));
-            i18n.sendTranslated(context, POSITIVE, "Right click a protection to modify it!");
+            i18n.send(context, POSITIVE, "Right click a protection to modify it!");
         }
     }
 
@@ -193,12 +193,12 @@ public class LockerCommands extends ContainerCommand
             if (lock.isOwner(context) || player.hasPermission(module.perms().CMD_GIVE_OTHER.getId()))
             {
                 lock.setOwner(player);
-                i18n.sendTranslated(context, NEUTRAL, "{user} is now the owner of this protection.", player);
+                i18n.send(context, NEUTRAL, "{user} is now the owner of this protection.", player);
                 return;
             }
-            i18n.sendTranslated(context, NEGATIVE, "This is not your protection!");
+            i18n.send(context, NEGATIVE, "This is not your protection!");
         });
-        i18n.sendTranslated(context, POSITIVE, "Right click a protection to give it to {user}!", player);
+        i18n.send(context, POSITIVE, "Right click a protection to give it to {user}!", player);
     }
 
     @Alias(value = "ckey")
@@ -208,7 +208,7 @@ public class LockerCommands extends ContainerCommand
     {
         if (!this.module.getConfig().allowKeyBooks)
         {
-            i18n.sendTranslated(context, NEGATIVE, "KeyBooks are deactivated!");
+            i18n.send(context, NEGATIVE, "KeyBooks are deactivated!");
             return;
         }
         if (persist)
@@ -220,13 +220,13 @@ public class LockerCommands extends ContainerCommand
             this.manager.commandListener.submitLockAction(context, (lock, loc, entity) -> {
                 if (!lock.isOwner(context))
                 {
-                    i18n.sendTranslated(context, NEGATIVE, "This is not your protection!");
+                    i18n.send(context, NEGATIVE, "This is not your protection!");
                     return;
                 }
                 if (lock.hasPass())
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "You cannot invalidate KeyBooks for password protected locks.");
-                    i18n.sendTranslated(context, POSITIVE, "Change the password to invalidate them!");
+                    i18n.send(context, NEUTRAL, "You cannot invalidate KeyBooks for password protected locks.");
+                    i18n.send(context, POSITIVE, "Change the password to invalidate them!");
                     return;
                 }
                 lock.invalidateKeyBooks();
@@ -238,23 +238,23 @@ public class LockerCommands extends ContainerCommand
                     ((Carrier) te.get()).getInventory().<Container>query(Container.class).getViewers().forEach(p -> p.closeInventory(cause));
                 }
             });
-            i18n.sendTranslated(context, POSITIVE, "Right click a protection to invalidate old KeyBooks for it!");
+            i18n.send(context, POSITIVE, "Right click a protection to invalidate old KeyBooks for it!");
             return;
         }
         this.manager.commandListener.submitLockAction(context, (lock, loc, entity) -> {
             if (!lock.isOwner(context) && !context.hasPermission(module.perms().CMD_KEY_OTHER.getId()))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This is not your protection!");
+                i18n.send(context, NEGATIVE, "This is not your protection!");
                 return;
             }
             if (lock.isPublic())
             {
-                i18n.sendTranslated(context, NEUTRAL, "This protection is public!");
+                i18n.send(context, NEUTRAL, "This protection is public!");
                 return;
             }
             lock.attemptCreatingKeyBook(context, true);
         });
-        i18n.sendTranslated(context, POSITIVE, "Right click a protection to with a book to create a new KeyBook!");
+        i18n.send(context, POSITIVE, "Right click a protection to with a book to create a new KeyBook!");
     }
 
     @Alias(value = "cflag")
@@ -267,14 +267,14 @@ public class LockerCommands extends ContainerCommand
     {
         if (setFlags == null && unsetFlags == null)
         {
-            i18n.sendTranslated(context, NEUTRAL, "You need to define which flags to {text:set} or {text:unset}!");
-            i18n.sendTranslated(context, NEUTRAL, "The following flags are available:");
+            i18n.send(context, NEUTRAL, "You need to define which flags to {text:set} or {text:unset}!");
+            i18n.send(context, NEUTRAL, "The following flags are available:");
             Text format = Text.of("  ", TextColors.GRAY, "-", TextColors.GOLD);
             for (String flag : ProtectionFlag.getNames())
             {
                 context.sendMessage(Text.of(format, flag));
             }
-            i18n.sendTranslated(context, NEUTRAL, "You can also unset {text:all}");
+            i18n.send(context, NEUTRAL, "You can also unset {text:all}");
             return;
         }
         if (persist)
@@ -283,7 +283,7 @@ public class LockerCommands extends ContainerCommand
         }
         if (setFlags != null && unsetFlags != null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "You have cannot set and unset flags at the same time!");
+            i18n.send(context, NEGATIVE, "You have cannot set and unset flags at the same time!");
             return;
         }
         if (setFlags != null)
@@ -291,7 +291,7 @@ public class LockerCommands extends ContainerCommand
             this.manager.commandListener.submitLockAction(context, (lock, loc, entity) -> {
                 if (!lock.isOwner(context) && !lock.hasAdmin(context) && !context.hasPermission(module.perms().CMD_MODIFY_OTHER.getId()))
                 {
-                    i18n.sendTranslated(context, NEGATIVE, "You are not allowed to modify the flags for this protection!");
+                    i18n.send(context, NEGATIVE, "You are not allowed to modify the flags for this protection!");
                     return;
                 }
                 short flags = 0;
@@ -300,7 +300,7 @@ public class LockerCommands extends ContainerCommand
                     flags |= protectionFlag.flagValue;
                 }
                 lock.setFlags((short)(flags | lock.getFlags()));
-                i18n.sendTranslated(context, NEUTRAL, "Flags set!");
+                i18n.send(context, NEUTRAL, "Flags set!");
             });
         }
         else
@@ -308,13 +308,13 @@ public class LockerCommands extends ContainerCommand
             this.manager.commandListener.submitLockAction(context, (lock, loc, entity) -> {
                 if (!lock.isOwner(context) && !lock.hasAdmin(context) && !context.hasPermission(module.perms().CMD_MODIFY_OTHER.getId()))
                 {
-                    i18n.sendTranslated(context, NEGATIVE, "You are not allowed to modify the flags for this protection!");
+                    i18n.send(context, NEGATIVE, "You are not allowed to modify the flags for this protection!");
                     return;
                 }
                 if ("all".equalsIgnoreCase(unsetFlags))
                 {
                     lock.setFlags(ProtectionFlag.NONE);
-                    i18n.sendTranslated(context, POSITIVE, "All flags are now unset!");
+                    i18n.send(context, POSITIVE, "All flags are now unset!");
                     return;
                 }
                 short flags = 0;
@@ -323,10 +323,10 @@ public class LockerCommands extends ContainerCommand
                     flags |= protectionFlag.flagValue;
                 }
                 lock.setFlags((short) (lock.getFlags() & ~flags));
-                i18n.sendTranslated(context, NEUTRAL, "Flags unset!");
+                i18n.send(context, NEUTRAL, "Flags unset!");
             });
         }
-        i18n.sendTranslated(context, POSITIVE, "Right click a protection to change its flags!");
+        i18n.send(context, POSITIVE, "Right click a protection to change its flags!");
     }
 
     public static class FlagCompleter implements Completer

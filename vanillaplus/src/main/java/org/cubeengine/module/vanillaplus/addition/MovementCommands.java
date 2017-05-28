@@ -29,7 +29,6 @@ import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.data.key.Keys.*;
@@ -55,7 +54,7 @@ public class MovementCommands extends PermissionContainer
         {
             if (!context.hasPermission(COMMAND_WALKSPEED_OTHER.getId()))
             {
-                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to change the walk speed of an other player!");
+                i18n.send(context, NEGATIVE, "You are not allowed to change the walk speed of an other player!");
                 return;
             }
             other = true;
@@ -63,7 +62,7 @@ public class MovementCommands extends PermissionContainer
 
         if (!player.isOnline())
         {
-            i18n.sendTranslated(context, NEGATIVE, "{user} is offline!", player.getName());
+            i18n.send(context, NEGATIVE, "{user} is offline!", player.getName());
             return;
         }
         if (speed >= 0 && speed <= 10)
@@ -71,18 +70,18 @@ public class MovementCommands extends PermissionContainer
             player.offer(Keys.WALKING_SPEED, speed / 10.0);
             if (other)
             {
-                i18n.sendTranslated(player, POSITIVE, "{user} can now walk at {decimal:2}!", player, speed);
+                i18n.send(player, POSITIVE, "{user} can now walk at {decimal:2}!", player, speed);
                 return;
             }
-            i18n.sendTranslated(player, POSITIVE, "You can now walk at {decimal:2}!", speed);
+            i18n.send(player, POSITIVE, "You can now walk at {decimal:2}!", speed);
             return;
         }
         player.offer(Keys.WALKING_SPEED, 0.2);
         if (speed != null && speed > 9000)
         {
-            i18n.sendTranslated(player, NEGATIVE, "It's over 9000!");
+            i18n.send(player, NEGATIVE, "It's over 9000!");
         }
-        i18n.sendTranslated(player, NEUTRAL, "Walk speed has to be a Number between {text:0} and {text:10}!");
+        i18n.send(player, NEUTRAL, "Walk speed has to be a Number between {text:0} and {text:10}!");
     }
 
     @Command(desc = "Lets you fly away")
@@ -95,7 +94,7 @@ public class MovementCommands extends PermissionContainer
         // PermissionChecks
         if (!context.equals(player) && !context.hasPermission(COMMAND_FLY_OTHER.getId()))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to change the fly mode of other player!");
+            i18n.send(context, NEGATIVE, "You are not allowed to change the fly mode of other player!");
             return;
         }
         //I Believe I Can Fly ...
@@ -104,19 +103,19 @@ public class MovementCommands extends PermissionContainer
             if (flyspeed >= 0 && flyspeed <= 10)
             {
                 player.offer(FLYING_SPEED, flyspeed / 10d);
-                i18n.sendTranslated(player, POSITIVE, "You can now fly at {decimal#speed:2}!", flyspeed);
+                i18n.send(player, POSITIVE, "You can now fly at {decimal#speed:2}!", flyspeed);
                 if (!player.equals(context))
                 {
-                    i18n.sendTranslated(context, POSITIVE, "{player} can now fly at {decimal#speed:2}!", player, flyspeed);
+                    i18n.send(context, POSITIVE, "{player} can now fly at {decimal#speed:2}!", player, flyspeed);
                 }
             }
             else
             {
                 if (flyspeed > 9000)
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "It's over 9000!");
+                    i18n.send(context, NEUTRAL, "It's over 9000!");
                 }
-                i18n.sendTranslated(context, NEGATIVE, "FlySpeed has to be a Number between {text:0} and {text:10}!");
+                i18n.send(context, NEGATIVE, "FlySpeed has to be a Number between {text:0} and {text:10}!");
             }
             player.offer(CAN_FLY, true);
             player.offer(IS_FLYING, true);
@@ -126,18 +125,18 @@ public class MovementCommands extends PermissionContainer
         if (player.getValue(CAN_FLY).get().get())
         {
             player.offer(FLYING_SPEED, 0.1);
-            i18n.sendTranslated(player, POSITIVE, "You can now fly!");
+            i18n.send(player, POSITIVE, "You can now fly!");
             if (!player.equals(context))
             {
-                i18n.sendTranslated(context, POSITIVE, "{player} can now fly!", player);
+                i18n.send(context, POSITIVE, "{player} can now fly!", player);
             }
             return;
         }
         player.offer(IS_FLYING, false);
-        i18n.sendTranslated(player, NEUTRAL, "You cannot fly anymore!");
+        i18n.send(player, NEUTRAL, "You cannot fly anymore!");
         if (!player.equals(context))
         {
-            i18n.sendTranslated(context, POSITIVE, "{player} cannot fly anymore!", player);
+            i18n.send(context, POSITIVE, "{player} cannot fly anymore!", player);
         }
     }
 }

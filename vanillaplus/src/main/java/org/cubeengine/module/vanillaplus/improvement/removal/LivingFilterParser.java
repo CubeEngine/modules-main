@@ -167,14 +167,14 @@ public class LivingFilterParser extends PermissionContainer implements ArgumentP
         List<Predicate<Entity>> list = new ArrayList<>();
 
         Map<String, Predicate<Entity>> groupMap = new HashMap<>();
-        groupMap.put(i18n.translate(source, "hostile"), FILTER_HOSTILE);
-        groupMap.put(i18n.translate(source, "monster"), FILTER_MONSTER);
-        groupMap.put(i18n.translate(source, "boss"), FILTER_BOSS);
-        groupMap.put(i18n.translate(source, "animal"), FILTER_ANIMAL);
-        groupMap.put(i18n.translate(source, "npc"), FILTER_NPC);
-        groupMap.put(i18n.translate(source, "pet"), FILTER_PET);
-        groupMap.put(i18n.translate(source, "golem"), FILTER_GOLEM);
-        groupMap.put(i18n.translate(source, "ambient"), FILTER_AMBIENT);
+        groupMap.put(i18n.getTranslation(source, "hostile"), FILTER_HOSTILE);
+        groupMap.put(i18n.getTranslation(source, "monster"), FILTER_MONSTER);
+        groupMap.put(i18n.getTranslation(source, "boss"), FILTER_BOSS);
+        groupMap.put(i18n.getTranslation(source, "animal"), FILTER_ANIMAL);
+        groupMap.put(i18n.getTranslation(source, "npc"), FILTER_NPC);
+        groupMap.put(i18n.getTranslation(source, "pet"), FILTER_PET);
+        groupMap.put(i18n.getTranslation(source, "golem"), FILTER_GOLEM);
+        groupMap.put(i18n.getTranslation(source, "ambient"), FILTER_AMBIENT);
 
         Map<String, EntityType> map = Sponge.getRegistry().getAllOf(EntityType.class).stream().filter(
             type -> Living.class.isAssignableFrom(type.getEntityClass())).distinct().collect(
@@ -188,11 +188,11 @@ public class LivingFilterParser extends PermissionContainer implements ArgumentP
                 match = sm.matchString(part, map.keySet());
                 if (match == null)
                 {
-                    i18n.sendTranslated(source, NEGATIVE, "Could not find a living entity named {input}", part);
-                    i18n.sendTranslated(source, NEUTRAL, "The following are valid entity groups:");
+                    i18n.send(source, NEGATIVE, "Could not find a living entity named {input}", part);
+                    i18n.send(source, NEUTRAL, "The following are valid entity groups:");
                     List<Text> groups = groupMap.keySet().stream().map(s -> Text.of(TextColors.GRAY, s)).collect(Collectors.toList());
                     source.sendMessage(Text.joinWith(Text.of(WHITE, ", "), groups));
-                    i18n.sendTranslated(source, NEUTRAL, "The following are valid entity types:");
+                    i18n.send(source, NEUTRAL, "The following are valid entity types:");
                     List<Text> types = map.keySet().stream().map(s -> Text.of(TextColors.GRAY, s)).collect(Collectors.toList());
                     source.sendMessage(Text.joinWith(Text.of(WHITE, ", "),types));
                     throw new SilentException();

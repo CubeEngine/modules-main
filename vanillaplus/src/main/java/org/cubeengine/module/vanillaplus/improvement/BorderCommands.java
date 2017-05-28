@@ -32,7 +32,6 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.world.ChunkPreGenerate;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
@@ -71,15 +70,15 @@ public class BorderCommands extends ContainerCommand
         {
             task.cancel();
             task = null;
-            i18n.sendTranslated(context, NEGATIVE, "Chunk generation is already running! Canceled.");
+            i18n.send(context, NEGATIVE, "Chunk generation is already running! Canceled.");
             return;
         }
 
         if (world.getWorldBorder().getDiameter() > this.commandBorderMax)
         {
-            i18n.sendTranslated(context, NEUTRAL,
+            i18n.send(context, NEUTRAL,
                     "Generation will not run for WorldBorder diameter bigger than {number} blocks.");
-            i18n.sendTranslated(context, POSITIVE, "You can change this value in the configuration");
+            i18n.send(context, POSITIVE, "You can change this value in the configuration");
             return;
         }
         ChunkPreGenerate.Builder generate = world.getWorldBorder().newChunkPreGenerate(world);
@@ -89,7 +88,7 @@ public class BorderCommands extends ContainerCommand
             generate.tickPercentLimit(1);
         }
         generate.logger(plugin.getLogger());
-        i18n.sendTranslated(context, NEGATIVE, "Started Chunk generation for {world}. This may take a while.", world);
+        i18n.send(context, NEGATIVE, "Started Chunk generation for {world}. This may take a while.", world);
         this.task = generate.start();
     }
 
@@ -110,7 +109,7 @@ public class BorderCommands extends ContainerCommand
             }
         }
         world.getWorldBorder().setCenter(x + 0.5, z + 0.5);
-        i18n.sendTranslated(context, POSITIVE, "Set world border of {world} center to {}:{}", world, x, z);
+        i18n.send(context, POSITIVE, "Set world border of {world} center to {}:{}", world, x, z);
     }
 
     @Command(desc = "Sets the diameter of the worldborder", alias = "set")
@@ -119,7 +118,7 @@ public class BorderCommands extends ContainerCommand
         if (seconds == null)
         {
             world.getWorldBorder().setDiameter(size);
-            i18n.sendTranslated(context, POSITIVE, "Set world border of {world} to {} blocks wide", world, size);
+            i18n.send(context, POSITIVE, "Set world border of {world} to {} blocks wide", world, size);
         }
         else
         {
@@ -127,12 +126,12 @@ public class BorderCommands extends ContainerCommand
             world.getWorldBorder().setDiameter(size, seconds * 1000);
             if (size < prevDiameter)
             {
-                i18n.sendTranslated(context, POSITIVE, "Shrinking world border of {world} to {} blocks wide from {} over {} seconds",
+                i18n.send(context, POSITIVE, "Shrinking world border of {world} to {} blocks wide from {} over {} seconds",
                                     world, size, prevDiameter, seconds);
             }
             else
             {
-                i18n.sendTranslated(context, POSITIVE, "Growing world border of {world} to {} blocks wide from {} over {} seconds",
+                i18n.send(context, POSITIVE, "Growing world border of {world} to {} blocks wide from {} over {} seconds",
                                     world, size, prevDiameter, seconds);
             }
         }
@@ -148,14 +147,14 @@ public class BorderCommands extends ContainerCommand
     public void warningTime(CommandSource context, Integer seconds, @Default World world)
     {
         world.getWorldBorder().setWarningTime(seconds);
-        i18n.sendTranslated(context, POSITIVE, "Set world border of {world} warning to {} seconds away", world, seconds);
+        i18n.send(context, POSITIVE, "Set world border of {world} warning to {} seconds away", world, seconds);
     }
 
     @Command(desc = "Sets the warning time")
     public void warningDistance(CommandSource context, Integer blocks, @Default World world)
     {
         world.getWorldBorder().setWarningDistance(blocks);
-        i18n.sendTranslated(context, POSITIVE, "Set world border of {world} warning to {} blocks away", world, blocks);
+        i18n.send(context, POSITIVE, "Set world border of {world} warning to {} blocks away", world, blocks);
     }
 
     @Command(desc = "Shows information about the world border", alias = "get")
@@ -163,7 +162,7 @@ public class BorderCommands extends ContainerCommand
     {
         WorldBorder border = world.getWorldBorder();
         double diameter = border.getDiameter();
-        i18n.sendTranslated(context, POSITIVE, "The world border in {world} is currently {} blocks wide", world,
+        i18n.send(context, POSITIVE, "The world border in {world} is currently {} blocks wide", world,
                             diameter);
         long secondsRemaining = border.getTimeRemaining() / 1000;
         if (secondsRemaining != 0)
@@ -171,30 +170,30 @@ public class BorderCommands extends ContainerCommand
             double newDiameter = border.getNewDiameter();
             if (newDiameter < diameter)
             {
-                i18n.sendTranslated(context, POSITIVE, "Currently shrinking to {} blocks wide over {} seconds",
+                i18n.send(context, POSITIVE, "Currently shrinking to {} blocks wide over {} seconds",
                                     newDiameter, secondsRemaining);
             }
             else
             {
-                i18n.sendTranslated(context, POSITIVE, "Currently growing to {} blocks wide over {} seconds",
+                i18n.send(context, POSITIVE, "Currently growing to {} blocks wide over {} seconds",
                                     newDiameter, secondsRemaining);
             }
         }
-        i18n.sendTranslated(context, POSITIVE, "Warnings will show within {} seconds or {} blocks from the border", border.getWarningTime(), border.getWarningDistance());
-        i18n.sendTranslated(context, POSITIVE, "When more than {} blocks outside the border players will take {} damage per block per second", border.getDamageThreshold(), border.getDamageAmount());
+        i18n.send(context, POSITIVE, "Warnings will show within {} seconds or {} blocks from the border", border.getWarningTime(), border.getWarningDistance());
+        i18n.send(context, POSITIVE, "When more than {} blocks outside the border players will take {} damage per block per second", border.getDamageThreshold(), border.getDamageAmount());
     }
 
     @Command(desc = "Sets the world border damage per second per block")
     public void damage(CommandSource context, Double damage, @Default World world)
     {
         world.getWorldBorder().setDamageAmount(damage);
-        i18n.sendTranslated(context, POSITIVE, "Set world border of {world} damage to {} per block per second", world, damage);
+        i18n.send(context, POSITIVE, "Set world border of {world} damage to {} per block per second", world, damage);
     }
 
     @Command(desc = "Sets the world border damage buffer")
     public void damageBuffer(CommandSource context, Integer blocks, @Default World world)
     {
         world.getWorldBorder().setDamageThreshold(blocks);
-        i18n.sendTranslated(context, POSITIVE, "Set world border of {world} damage buffer to {} block", world, blocks);
+        i18n.send(context, POSITIVE, "Set world border of {world} damage buffer to {} block", world, blocks);
     }
 }

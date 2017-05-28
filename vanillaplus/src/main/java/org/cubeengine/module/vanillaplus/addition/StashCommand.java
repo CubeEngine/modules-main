@@ -67,7 +67,7 @@ public class StashCommand
             }
         }
 
-        i18n.sendTranslated(context, POSITIVE, "Swapped stashed Inventory!");
+        i18n.send(context, POSITIVE, "Swapped stashed Inventory!");
     }
 
     private class StashedInventory

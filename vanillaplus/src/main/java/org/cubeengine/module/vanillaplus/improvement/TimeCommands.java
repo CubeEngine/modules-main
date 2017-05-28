@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,7 +78,7 @@ public class TimeCommands extends PermissionContainer
                 {
                     if (world == null)
                     {
-                        i18n.sendTranslated(context, NEGATIVE, "Could not match all worlds! {input#worlds}", worlds);
+                        i18n.send(context, NEGATIVE, "Could not match all worlds! {input#worlds}", worlds);
                         return;
                     }
                 }
@@ -89,7 +88,7 @@ public class TimeCommands extends PermissionContainer
         {
             if (!(context instanceof Player))
             {
-                i18n.sendTranslated(context, NEGATIVE, "You have to specify a world when using this command from the console!");
+                i18n.send(context, NEGATIVE, "You have to specify a world when using this command from the console!");
                 return;
             }
             worldList = Collections.singletonList(((Player)context).getWorld());
@@ -102,7 +101,7 @@ public class TimeCommands extends PermissionContainer
                 lTime = tm.parseTime(time);
                 if (lTime == null)
                 {
-                    i18n.sendTranslated(context, NEGATIVE, "The time you entered is not valid!");
+                    i18n.send(context, NEGATIVE, "The time you entered is not valid!");
                     return;
                 }
 
@@ -111,19 +110,19 @@ public class TimeCommands extends PermissionContainer
             String timeName = tm.matchTimeName(lTime);
             if (worldList.size() == 1)
             {
-                i18n.sendTranslated(context, POSITIVE,
+                i18n.send(context, POSITIVE,
                                     "The time of {world} have been set to {input#time} ({input#neartime})!",
                                     worldList.iterator().next(), timeNumeric, timeName);
             }
             else if ("*".equals(worlds))
             {
-                i18n.sendTranslated(context, POSITIVE,
+                i18n.send(context, POSITIVE,
                                     "The time of all worlds have been set to {input#time} ({input#neartime})!",
                                     timeNumeric, timeName);
             }
             else
             {
-                i18n.sendTranslated(context, POSITIVE,
+                i18n.send(context, POSITIVE,
                                     "The time of {amount} worlds have been set to {input#time} ({input#neartime})!",
                                     worldList.size(), timeNumeric, timeName);
             }
@@ -145,11 +144,11 @@ public class TimeCommands extends PermissionContainer
             }
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "The current time is:");
+        i18n.send(context, POSITIVE, "The current time is:");
         for (World world : worldList)
         {
             long worldTime = world.getProperties().getWorldTime();
-            i18n.sendTranslated(context, NEUTRAL, "{input#time} ({input#neartime}) in {world}.", tm.format(worldTime), tm.matchTimeName(worldTime), world);
+            i18n.send(context, NEUTRAL, "{input#time} ({input#neartime}) in {world}.", tm.format(worldTime), tm.matchTimeName(worldTime), world);
         }
     }
 
@@ -158,12 +157,12 @@ public class TimeCommands extends PermissionContainer
         if (locked.containsKey(world.getUniqueId()))
         {
             tam.cancelTask(VanillaPlus.class, locked.remove(world.getUniqueId()));
-            i18n.sendTranslated(context, POSITIVE, "Time unlocked for {world}!", world);
+            i18n.send(context, POSITIVE, "Time unlocked for {world}!", world);
         }
         else
         {
             locked.put(world.getUniqueId(), tam.runTimer(VanillaPlus.class, () -> setTime(world, worldTime), 0, 10));
-            i18n.sendTranslated(context, POSITIVE, "Time locked for {world}!", world);
+            i18n.send(context, POSITIVE, "Time locked for {world}!", world);
         }
     }
 

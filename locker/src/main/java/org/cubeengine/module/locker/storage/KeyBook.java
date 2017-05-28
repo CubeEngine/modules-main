@@ -100,7 +100,7 @@ public class KeyBook
         {
             if (!lock.isOwner(holder))
             {
-                i18n.sendTranslated(ACTION_BAR, holder, NEUTRAL, "You try to open the container with your KeyBook but nothing happens!");
+                i18n.send(ACTION_BAR, holder, NEUTRAL, "You try to open the container with your KeyBook but nothing happens!");
                 holder.playSound(ENTITY_BLAZE_HURT, effectLocation.getPosition(), 1, 1);
                 holder.playSound(ENTITY_BLAZE_HURT, effectLocation.getPosition(), 1, (float)0.8);
             }
@@ -108,7 +108,7 @@ public class KeyBook
         }
         if (!this.isValidFor(lock))
         {
-            i18n.sendTranslated(ACTION_BAR, holder, NEGATIVE, "You try to open the container with your KeyBook but you get forcefully pushed away!");
+            i18n.send(ACTION_BAR, holder, NEGATIVE, "You try to open the container with your KeyBook but you get forcefully pushed away!");
             this.invalidate();
             holder.playSound(ENTITY_GHAST_SCREAM, effectLocation.getPosition(), 1, 1);
 
@@ -124,7 +124,7 @@ public class KeyBook
         {
             if (!lock.isOwner(holder))
             {
-                i18n.sendTranslated(ACTION_BAR, holder, POSITIVE, "As you approach with your KeyBook the magic lock disappears!");
+                i18n.send(ACTION_BAR, holder, POSITIVE, "As you approach with your KeyBook the magic lock disappears!");
             }
 
             TaskManager tm = module.getTaskManager();
@@ -149,11 +149,11 @@ public class KeyBook
     public void invalidate()
     {
         item.offer(DISPLAY_NAME, Text.of(TextColors.DARK_RED, "Broken KeyBook"));
-        item.offer(ITEM_LORE, Arrays.asList(i18n.getTranslation(holder, NEUTRAL, "This KeyBook"),
-                                            i18n.getTranslation(holder, NEUTRAL, "looks old and"),
-                                            i18n.getTranslation(holder, NEUTRAL, "used up. It"),
-                                            i18n.getTranslation(holder, NEUTRAL, "won't let you"),
-                                            i18n.getTranslation(holder, NEUTRAL, "open any containers!")));
+        item.offer(ITEM_LORE, Arrays.asList(i18n.translate(holder, NEUTRAL, "This KeyBook"),
+                                            i18n.translate(holder, NEUTRAL, "looks old and"),
+                                            i18n.translate(holder, NEUTRAL, "used up. It"),
+                                            i18n.translate(holder, NEUTRAL, "won't let you"),
+                                            i18n.translate(holder, NEUTRAL, "open any containers!")));
         item = Sponge.getRegistry().createBuilder(ItemStack.Builder.class).fromItemStack(item).itemType(PAPER).build();
         holder.setItemInHand(HandTypes.MAIN_HAND, item);
     }

@@ -71,14 +71,14 @@ public class EntityFilterParser implements ArgumentParser<EntityFilter>
                 type = em.any(entityString.substring(0, entityString.indexOf(":")), invocation.getContext(Locale.class));
                 if (!ITEM.equals(type))
                 {
-                    i18n.sendTranslated(cmdSource, NEGATIVE, "You can only specify data for removing items!");
+                    i18n.send(cmdSource, NEGATIVE, "You can only specify data for removing items!");
                     throw new SilentException();
                 }
                 String itemString = entityString.substring(entityString.indexOf(":") + 1);
                 itemType = mm.material(itemString);
                 if (itemType == null)
                 {
-                    i18n.sendTranslated(cmdSource, NEGATIVE, "Cannot find itemtype {input}", itemString);
+                    i18n.send(cmdSource, NEGATIVE, "Cannot find itemtype {input}", itemString);
                     throw new SilentException();
                 }
             }
@@ -88,8 +88,8 @@ public class EntityFilterParser implements ArgumentParser<EntityFilter>
             }
             if (type == null)
             {
-                i18n.sendTranslated(cmdSource, NEGATIVE, "Invalid entity-type!");
-                i18n.sendTranslated(cmdSource, NEUTRAL, "Try using one of those instead:");
+                i18n.send(cmdSource, NEGATIVE, "Invalid entity-type!");
+                i18n.send(cmdSource, NEUTRAL, "Try using one of those instead:");
 
                 cmdSource.sendMessage(Text.joinWith(Text.of(YELLOW, ", "), asList(ITEM, /*,TODO ARROW */ RIDEABLE_MINECART,
                                                                                   PAINTING, ITEM_FRAME, EXPERIENCE_ORB).stream().map(
@@ -98,7 +98,7 @@ public class EntityFilterParser implements ArgumentParser<EntityFilter>
             }
             if (Living.class.isAssignableFrom(type.getEntityClass()))
             {
-                i18n.sendTranslated(cmdSource, NEGATIVE, "To kill living entities use the {text:/butcher} command!");
+                i18n.send(cmdSource, NEGATIVE, "To kill living entities use the {text:/butcher} command!");
                 throw new SilentException();
             }
             final ItemType item = itemType;

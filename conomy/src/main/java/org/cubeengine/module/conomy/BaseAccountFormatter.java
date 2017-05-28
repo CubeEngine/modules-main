@@ -18,7 +18,6 @@
 package org.cubeengine.module.conomy;
 
 import org.cubeengine.dirigent.Component;
-import org.cubeengine.dirigent.formatter.Context;
 import org.cubeengine.dirigent.formatter.reflected.Format;
 import org.cubeengine.dirigent.formatter.reflected.Names;
 import org.cubeengine.dirigent.formatter.reflected.ReflectedFormatter;
@@ -32,13 +31,13 @@ import static org.spongepowered.api.text.format.TextColors.GOLD;
 public class BaseAccountFormatter extends ReflectedFormatter
 {
     @Format
-    public Component format(BaseAccount.Unique userAcc, Context context)
+    public Component format(BaseAccount.Unique userAcc)
     {
         return new StyledComponent(DARK_GREEN, new TextComponent(userAcc.getDisplayName()));
     }
 
     @Format
-    public Component format(BaseAccount.Virtual bankAcc, Context context)
+    public Component format(BaseAccount.Virtual bankAcc)
     {
         return new StyledComponent(GOLD, new TextComponent(bankAcc.getDisplayName()));
     }

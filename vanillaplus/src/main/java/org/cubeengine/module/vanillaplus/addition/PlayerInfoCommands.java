@@ -63,20 +63,20 @@ public class PlayerInfoCommands
     {
         if (player.isOnline())
         {
-            i18n.sendTranslated(context, NEUTRAL, "{user} is currently online!", player);
+            i18n.send(context, NEUTRAL, "{user} is currently online!", player);
             return;
         }
 
         Instant lastPlayed = player.get(Keys.FIRST_DATE_PLAYED).get();
         if (System.currentTimeMillis() - lastPlayed.toEpochMilli() <= SEVEN_DAYS) // If less than 7 days show timeframe instead of date
         {
-            i18n.sendTranslated(context, NEUTRAL, "{user} was last seen {input#date}.", player, TimeUtil.format(
+            i18n.send(context, NEUTRAL, "{user} was last seen {input#date}.", player, TimeUtil.format(
                 context.getLocale(), new Date(lastPlayed.toEpochMilli())));
             return;
         }
         Date date = new Date(lastPlayed.toEpochMilli());
         DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale());
-        i18n.sendTranslated(context, NEUTRAL, "{user} is offline since {input#time}", player, format.format(date));
+        i18n.send(context, NEUTRAL, "{user} is offline since {input#time}", player, format.format(date));
     }
 
     @Command(desc = "Displays informations from a player!")
@@ -84,39 +84,39 @@ public class PlayerInfoCommands
     {
         if (player.isOnline())
         {
-            i18n.sendTranslated(context, NEUTRAL, "Nickname: {user}", player);
+            i18n.send(context, NEUTRAL, "Nickname: {user}", player);
         }
         else
         {
-            i18n.sendTranslated(context, NEUTRAL, "Nickname: {user} ({text:offline})", player);
+            i18n.send(context, NEUTRAL, "Nickname: {user} ({text:offline})", player);
         }
         if (player.get(JoinData.class).isPresent() || player.isOnline())
         {
-            i18n.sendTranslated(context, NEUTRAL, "Life: {decimal:0}/{decimal#max:0}", player.get(Keys.HEALTH).get(), player.get(Keys.MAX_HEALTH).get());
-            i18n.sendTranslated(context, NEUTRAL, "Hunger: {integer#foodlvl:0}/{text:20} ({integer#saturation}/{integer#foodlvl:0})", player.get(Keys.FOOD_LEVEL).get(), player.get(Keys.SATURATION).get().intValue(), player.get(Keys.FOOD_LEVEL).get());
-            i18n.sendTranslated(context, NEUTRAL, "Level: {integer#level} + {integer#percent}%", player.get(Keys.EXPERIENCE_LEVEL).get(), player.get(Keys.EXPERIENCE_SINCE_LEVEL).get() * 100 / player.get(Keys.EXPERIENCE_FROM_START_OF_LEVEL).get());
+            i18n.send(context, NEUTRAL, "Life: {decimal:0}/{decimal#max:0}", player.get(Keys.HEALTH).get(), player.get(Keys.MAX_HEALTH).get());
+            i18n.send(context, NEUTRAL, "Hunger: {integer#foodlvl:0}/{text:20} ({integer#saturation}/{integer#foodlvl:0})", player.get(Keys.FOOD_LEVEL).get(), player.get(Keys.SATURATION).get().intValue(), player.get(Keys.FOOD_LEVEL).get());
+            i18n.send(context, NEUTRAL, "Level: {integer#level} + {integer#percent}%", player.get(Keys.EXPERIENCE_LEVEL).get(), player.get(Keys.EXPERIENCE_SINCE_LEVEL).get() * 100 / player.get(Keys.EXPERIENCE_FROM_START_OF_LEVEL).get());
 
             if (player.isOnline())
             {
                 Location<World> loc = player.getPlayer().get().getLocation();
-                i18n.sendTranslated(context, NEUTRAL, "Position: {vector} in {world}", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
+                i18n.send(context, NEUTRAL, "Position: {vector} in {world}", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
             }
             if (player.isOnline())
             {
-                i18n.sendTranslated(context, NEUTRAL, "IP: {input#ip}", player.getPlayer().get().getConnection().getAddress().getAddress().getHostAddress());
+                i18n.send(context, NEUTRAL, "IP: {input#ip}", player.getPlayer().get().getConnection().getAddress().getAddress().getHostAddress());
             }
             Optional<GameMode> gameMode = player.get(Keys.GAME_MODE);
             if (gameMode.isPresent())
             {
-                i18n.sendTranslated(context, NEUTRAL, "Gamemode: {input#gamemode}", gameMode.get().getTranslation());
+                i18n.send(context, NEUTRAL, "Gamemode: {input#gamemode}", gameMode.get().getTranslation());
             }
             if (player.get(Keys.CAN_FLY).orElse(false))
             {
-                i18n.sendTranslated(context, NEUTRAL, "Flymode: {text:true:color=BRIGHT_GREEN} {input#flying}", player.get(Keys.IS_FLYING).orElse(false) ? "flying" : "not flying");
+                i18n.send(context, NEUTRAL, "Flymode: {text:true:color=BRIGHT_GREEN} {input#flying}", player.get(Keys.IS_FLYING).orElse(false) ? "flying" : "not flying");
             }
             else
             {
-                i18n.sendTranslated(context, NEUTRAL, "Flymode: {text:false:color=RED}");
+                i18n.send(context, NEUTRAL, "Flymode: {text:false:color=RED}");
             }
             /* TODO
             if (player.isOp())
@@ -129,7 +129,7 @@ public class PlayerInfoCommands
                 Optional<InvulnerabilityData> data = player.get(InvulnerabilityData.class);
                 if (data.isPresent())
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "is invulnerable");
+                    i18n.send(context, NEUTRAL, "is invulnerable");
                 }
             }
             /*
@@ -141,7 +141,7 @@ public class PlayerInfoCommands
             String format = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(context.getLocale())
                                              .withZone(ZoneId.systemDefault())
                                              .format(player.get(Keys.FIRST_DATE_PLAYED).get());
-            i18n.sendTranslated(context, NEUTRAL, "First played: {input#date}", format);
+            i18n.send(context, NEUTRAL, "First played: {input#date}", format);
         }
         BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
         if (banService.isBanned(player.getProfile()))
@@ -152,13 +152,13 @@ public class PlayerInfoCommands
 
             if (!ban.getExpirationDate().isPresent())
             {
-                expires = i18n.getTranslation(context, NONE, "for ever");
+                expires = i18n.translate(context, NONE, "for ever");
             }
             else
             {
                 expires = Text.of(format.format(ban.getExpirationDate().get()));
             }
-            i18n.sendTranslated(context, NEUTRAL, "Banned by {user} on {input#date}: {input#reason} ({input#expire})",
+            i18n.send(context, NEUTRAL, "Banned by {user} on {input#date}: {input#reason} ({input#expire})",
                                 ban.getBanSource().map(Text::toPlain).orElse("?"), format.format(ban.getCreationDate()),
                                 ban.getReason(), expires);
         }

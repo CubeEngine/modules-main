@@ -42,7 +42,6 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
-import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
@@ -72,7 +71,7 @@ public class PaintingListener extends PermissionContainer
         {
             if (!player.hasPermission(CHANGEPAINTING.getId()))
             {
-                i18n.sendTranslated(player, NEGATIVE, "You are not allowed to change this painting.");
+                i18n.send(player, NEGATIVE, "You are not allowed to change this painting.");
                 return;
             }
             Painting painting = (Painting)event.getTargetEntity();
@@ -80,17 +79,17 @@ public class PaintingListener extends PermissionContainer
             Painting playerPainting = this.paintingChange.get(player.getUniqueId());
             if(playerPainting == null && this.paintingChange.containsValue(painting))
             {
-                i18n.sendTranslated(player, NEGATIVE, "This painting is being used by another player.");
+                i18n.send(player, NEGATIVE, "This painting is being used by another player.");
             }
             else if (playerPainting == null)
             {
                 this.paintingChange.put(player.getUniqueId(), painting);
-                i18n.sendTranslated(player, POSITIVE, "You can now cycle through the paintings using your mousewheel.");
+                i18n.send(player, POSITIVE, "You can now cycle through the paintings using your mousewheel.");
             }
             else
             {
                 this.paintingChange.remove(player.getUniqueId());
-                i18n.sendTranslated(player, POSITIVE, "Painting locked");
+                i18n.send(player, POSITIVE, "Painting locked");
             }
         }
     }
@@ -123,7 +122,7 @@ public class PaintingListener extends PermissionContainer
                             .distanceSquared(player.getLocation().getPosition()) > maxDistanceSquared)
                 {
                     this.paintingChange.remove(player.getUniqueId());
-                    i18n.sendTranslated(player, POSITIVE, "Painting locked");
+                    i18n.send(player, POSITIVE, "Painting locked");
                     return;
                 }
 
@@ -178,7 +177,7 @@ public class PaintingListener extends PermissionContainer
                 Optional<Player> player = Sponge.getServer().getPlayer(entry.getKey());
                 if (player.isPresent())
                 {
-                    i18n.sendTranslated(player.get(), NEGATIVE, "The painting broke");
+                    i18n.send(player.get(), NEGATIVE, "The painting broke");
                 }
                 paintingIterator.remove();
             }

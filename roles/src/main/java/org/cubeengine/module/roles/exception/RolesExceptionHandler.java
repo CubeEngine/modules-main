@@ -52,11 +52,11 @@ public class RolesExceptionHandler implements PriorityExceptionHandler
             int depth = ((CircularRoleDependencyException) t).getDepth();
             if (depth == 0)
             {
-                i18n.sendTranslated(sender, NEGATIVE, "Cannot assign role to itself");
+                i18n.send(sender, NEGATIVE, "Cannot assign role to itself");
             }
             else
             {
-                i18n.sendTranslated(sender, NEGATIVE, "Circular Dependency detected! Depth: {}", depth);
+                i18n.send(sender, NEGATIVE, "Circular Dependency detected! Depth: {}", depth);
             }
         }
         return false;

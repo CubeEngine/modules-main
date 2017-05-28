@@ -58,11 +58,11 @@ public class LockerCreateCommands extends ContainerCommand
         this.manager.commandListener.submitLockAction(sender, lockAction);
         if (createKeyBook)
         {
-            i18n.sendTranslated(sender, POSITIVE, "Right click the item you want to protect with a book in your hand!");
+            i18n.send(sender, POSITIVE, "Right click the item you want to protect with a book in your hand!");
         }
         else
         {
-            i18n.sendTranslated(sender, POSITIVE, "Right click the item you want to protect!");
+            i18n.send(sender, POSITIVE, "Right click the item you want to protect!");
         }
     }
 
@@ -79,7 +79,7 @@ public class LockerCreateCommands extends ContainerCommand
     {
         if (lock != null)
         {
-            i18n.sendTranslated(context, NEUTRAL, "There is already protection here!");
+            i18n.send(context, NEUTRAL, "There is already protection here!");
             return;
         }
         if (entity != null)
@@ -96,7 +96,7 @@ public class LockerCreateCommands extends ContainerCommand
     {
         if (!manager.canProtect(location.getBlockType()))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You cannot protect this block!");
+            i18n.send(context, NEGATIVE, "You cannot protect this block!");
             return;
         }
         if (canProtectCarrier(context, lockType, location.getTileEntity().map(te -> te instanceof Carrier).orElse(false))) return;
@@ -107,7 +107,7 @@ public class LockerCreateCommands extends ContainerCommand
     {
         if (!manager.canProtect(entity.getType()))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You cannot protect this entity!");
+            i18n.send(context, NEGATIVE, "You cannot protect this entity!");
             return;
         }
         if (canProtectCarrier(context, lockType, entity instanceof Carrier)) return;
@@ -118,7 +118,7 @@ public class LockerCreateCommands extends ContainerCommand
     {
         if (!isCarrier && (lockType == LockType.DONATION || lockType == LockType.FREE || lockType == LockType.GUARDED))
         {
-            i18n.sendTranslated(context, NEUTRAL, "You can only apply guarded, donation and free protections to inventory holders!");
+            i18n.send(context, NEUTRAL, "You can only apply guarded, donation and free protections to inventory holders!");
             return true;
         }
         return false;

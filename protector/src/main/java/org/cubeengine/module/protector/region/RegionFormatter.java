@@ -18,9 +18,10 @@
 package org.cubeengine.module.protector.region;
 
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
-import org.cubeengine.dirigent.formatter.Context;
-import org.cubeengine.dirigent.parser.component.Text;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
+import org.cubeengine.dirigent.parser.Text;
 
 public class RegionFormatter extends AbstractFormatter<Region>
 {
@@ -30,7 +31,7 @@ public class RegionFormatter extends AbstractFormatter<Region>
     }
 
     @Override
-    public Component format(Region region, Context context)
+    public Component format(Region region, Context context, Arguments args)
     {
         return new Text(region.getName() == null ? region.getWorld() == null ? "global" : region.getWorld().getName() : region.getName());
     }

@@ -67,7 +67,7 @@ public class RemoveCommands
         radius = radius == null ? module.getConfig().improve.commandRemoveDefaultRadius : radius;
         if (radius <= 0 && radius != RADIUS_INFINITE)
         {
-            i18n.sendTranslated(context, NEGATIVE, "The radius has to be a whole number greater than 0!");
+            i18n.send(context, NEGATIVE, "The radius has to be a whole number greater than 0!");
             return;
         }
         Location loc = context instanceof Player ? ((Player)context).getLocation() : null;
@@ -89,25 +89,25 @@ public class RemoveCommands
 
         if (entitiesRemoved == 0)
         {
-            i18n.sendTranslated(context, NEUTRAL, "No entities to remove!");
+            i18n.send(context, NEUTRAL, "No entities to remove!");
             return;
         }
         if ("*".equals(filters))
         {
             if (radius == RADIUS_INFINITE)
             {
-                i18n.sendTranslated(context, POSITIVE, "Removed all entities in {world}! ({amount})", world, entitiesRemoved);
+                i18n.send(context, POSITIVE, "Removed all entities in {world}! ({amount})", world, entitiesRemoved);
                 return;
             }
-            i18n.sendTranslated(context, POSITIVE, "Removed all entities around you! ({amount})", entitiesRemoved);
+            i18n.send(context, POSITIVE, "Removed all entities around you! ({amount})", entitiesRemoved);
             return;
         }
         if (radius == RADIUS_INFINITE)
         {
-            i18n.sendTranslated(context, POSITIVE, "Removed {amount} entities in {world}!", entitiesRemoved, world);
+            i18n.send(context, POSITIVE, "Removed {amount} entities in {world}!", entitiesRemoved, world);
             return;
         }
-        i18n.sendTranslatedN(context, POSITIVE, entitiesRemoved, "Removed one entity nearby!", "Removed {amount} entities nearby!", entitiesRemoved);
+        i18n.sendN(context, POSITIVE, entitiesRemoved, "Removed one entity nearby!", "Removed {amount} entities nearby!", entitiesRemoved);
     }
 
 

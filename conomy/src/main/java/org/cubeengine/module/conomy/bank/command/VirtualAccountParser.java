@@ -69,12 +69,12 @@ public class VirtualAccountParser implements ArgumentParser<BaseAccount.Virtual>
             List<BaseAccount.Virtual> banks = service.getBanks(user, AccessLevel.SEE);
             if (banks.isEmpty())
             {
-                throw new TranslatedParserException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
+                throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,
                         "You have no banks available!"));
             }
             return banks.get(0);
         }
-        throw new TranslatedParserException(i18n.getTranslation(invocation.getContext(Locale.class), NEGATIVE,
+        throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,
                 "You have to specify a bank!"));
     }
 }

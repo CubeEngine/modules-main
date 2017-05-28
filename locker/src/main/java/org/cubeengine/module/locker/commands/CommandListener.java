@@ -67,7 +67,7 @@ public class CommandListener
     {
         if (this.doesPersist(sender.getUniqueId()))
         {
-            i18n.sendTranslated(sender, NEUTRAL, "Persist mode is active. Your command will be repeated until reusing {text:/cpersist}");
+            i18n.send(sender, NEUTRAL, "Persist mode is active. Your command will be repeated until reusing {text:/cpersist}");
         }
     }
 

@@ -27,7 +27,6 @@ import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
@@ -55,7 +54,7 @@ public class GodCommand extends PermissionContainer
         {
             if (!context.hasPermission(COMMAND_GOD_OTHER.getId()))
             {
-                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to god others!");
+                i18n.send(context, NEGATIVE, "You are not allowed to god others!");
                 return;
             }
             other = true;
@@ -67,20 +66,20 @@ public class GodCommand extends PermissionContainer
             player.offer(Keys.INVULNERABILITY_TICKS, 0);
             if (!other)
             {
-                i18n.sendTranslated(context, NEUTRAL, "You are no longer invincible!");
+                i18n.send(context, NEUTRAL, "You are no longer invincible!");
                 return;
             }
-            i18n.sendTranslated(player, NEUTRAL, "You are no longer invincible!");
-            i18n.sendTranslated(context, NEUTRAL, "{user} is no longer invincible!", player);
+            i18n.send(player, NEUTRAL, "You are no longer invincible!");
+            i18n.send(context, NEUTRAL, "{user} is no longer invincible!", player);
             return;
         }
         player.offer(Keys.INVULNERABILITY_TICKS, Integer.MAX_VALUE);
         if (!other)
         {
-            i18n.sendTranslated(context, POSITIVE, "You are now invincible!");
+            i18n.send(context, POSITIVE, "You are now invincible!");
             return;
         }
-        i18n.sendTranslated(player, POSITIVE, "You are now invincible!");
-        i18n.sendTranslated(context, POSITIVE, "{user} is now invincible!", player);
+        i18n.send(player, POSITIVE, "You are now invincible!");
+        i18n.send(context, POSITIVE, "{user} is now invincible!", player);
     }
 }

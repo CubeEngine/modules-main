@@ -90,10 +90,10 @@ public class MoneyCommand extends ContainerCommand
         Map<Currency, BigDecimal> balances = account.getBalances();
         if (balances.isEmpty())
         {
-            i18n.sendTranslated(context, NEGATIVE, "No Balance for {account} found!", account);
+            i18n.send(context, NEGATIVE, "No Balance for {account} found!", account);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "{account}'s Balance:", account);
+        i18n.send(context, POSITIVE, "{account}'s Balance:", account);
         for (Map.Entry<Currency, BigDecimal> entry : balances.entrySet())
         {
             context.sendMessage(Text.of(" - ", GOLD, entry.getKey().format(entry.getValue())));
@@ -119,7 +119,7 @@ public class MoneyCommand extends ContainerCommand
             }
             catch (NumberFormatException e)
             {
-                i18n.sendTranslated(context, NEGATIVE, "Invalid rank!");
+                i18n.send(context, NEGATIVE, "Invalid rank!");
                 return;
             }
         }
@@ -132,11 +132,11 @@ public class MoneyCommand extends ContainerCommand
         pagination.padding(Text.of("-"));
         if (fromRank == 1)
         {
-            pagination.title(i18n.getTranslation(context, POSITIVE, "Top Balance ({amount})", models.size()));
+            pagination.title(i18n.translate(context, POSITIVE, "Top Balance ({amount})", models.size()));
         }
         else
         {
-            pagination.title(i18n.getTranslation(context, POSITIVE, "Top Balance from {integer} to {integer}",
+            pagination.title(i18n.translate(context, POSITIVE, "Top Balance from {integer} to {integer}",
                     fromRank, fromRank + models.size() - 1));
         }
         List<Text> texts = new ArrayList<>();
@@ -158,7 +158,7 @@ public class MoneyCommand extends ContainerCommand
     {
         if (amount < 0)
         {
-            i18n.sendTranslated(context, NEGATIVE, "What are you trying to do?");
+            i18n.send(context, NEGATIVE, "What are you trying to do?");
             return;
         }
 
@@ -167,7 +167,7 @@ public class MoneyCommand extends ContainerCommand
         {
             if (!context.hasPermission(module.perms().ACCESS_WITHDRAW.getId()))
             {
-                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to pay money as someone else!");
+                i18n.send(context, NEGATIVE, "You are not allowed to pay money as someone else!");
                 return;
             }
             asSomeOneElse = true;
@@ -177,13 +177,13 @@ public class MoneyCommand extends ContainerCommand
         {
             if (user.equals(source))
             {
-                i18n.sendTranslated(context, NEGATIVE, "Source and target are the same!", user);
+                i18n.send(context, NEGATIVE, "Source and target are the same!", user);
                 continue;
             }
             Account target = getUserAccount(user);
             if (target == null)
             {
-                i18n.sendTranslated(context, NEGATIVE, "{user} does not have an account!", user);
+                i18n.send(context, NEGATIVE, "{user} does not have an account!", user);
                 continue;
             }
             Currency cur = service.getDefaultCurrency();
@@ -194,29 +194,29 @@ public class MoneyCommand extends ContainerCommand
                 case SUCCESS:
                     if (asSomeOneElse)
                     {
-                        i18n.sendTranslated(context, POSITIVE, "{txt#amount} transferred from {account}'s to {user}'s account!", formatAmount, source, user);
+                        i18n.send(context, POSITIVE, "{txt#amount} transferred from {account}'s to {user}'s account!", formatAmount, source, user);
                     }
                     else
                     {
-                        i18n.sendTranslated(context, POSITIVE, "{txt#amount} transferred to {user}'s account!", formatAmount, user);
+                        i18n.send(context, POSITIVE, "{txt#amount} transferred to {user}'s account!", formatAmount, user);
                     }
                     if (user.isOnline())
                     {
-                        i18n.sendTranslated(user.getPlayer().get(), POSITIVE, "{account} just paid you {txt#amount}!", source, formatAmount);
+                        i18n.send(user.getPlayer().get(), POSITIVE, "{account} just paid you {txt#amount}!", source, formatAmount);
                     }
                     break;
                 case ACCOUNT_NO_FUNDS:
                     if (asSomeOneElse)
                     {
-                        i18n.sendTranslated(context, NEGATIVE, "{account} cannot afford {txt#amount}!", source, formatAmount);
+                        i18n.send(context, NEGATIVE, "{account} cannot afford {txt#amount}!", source, formatAmount);
                     }
                     else
                     {
-                        i18n.sendTranslated(context, NEGATIVE, "You cannot afford {txt#amount}!", formatAmount);
+                        i18n.send(context, NEGATIVE, "You cannot afford {txt#amount}!", formatAmount);
                     }
                     break;
                 default:
-                    i18n.sendTranslated(context, NEGATIVE, "The Transaction was not successful!");
+                    i18n.send(context, NEGATIVE, "The Transaction was not successful!");
                     break;
             }
         }

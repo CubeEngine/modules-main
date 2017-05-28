@@ -68,14 +68,14 @@ public class EcoCommand extends ContainerCommand
                 {
                     case SUCCESS:
 
-                        i18n.sendTranslated(context, POSITIVE, "You gave {txt} to {user}!", formatAmount, user.getName());
+                        i18n.send(context, POSITIVE, "You gave {txt} to {user}!", formatAmount, user.getName());
                         if (!context.equals(user) && user.isOnline())
                         {
-                            i18n.sendTranslated(user.getPlayer().get(), POSITIVE, "You were granted {txt}.", formatAmount);
+                            i18n.send(user.getPlayer().get(), POSITIVE, "You were granted {txt}.", formatAmount);
                         }
                         break;
                     default:
-                        i18n.sendTranslated(context, NEGATIVE, "Could not give the money to {user}!", user);
+                        i18n.send(context, NEGATIVE, "Could not give the money to {user}!", user);
                         break;
                 }
             }
@@ -89,7 +89,7 @@ public class EcoCommand extends ContainerCommand
                 .map(BaseAccount.Unique.class::cast).orElse(null);
         if (target == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "{user} does not have an account!", user);
+            i18n.send(context, NEGATIVE, "{user} does not have an account!", user);
         }
         return target;
     }
@@ -108,14 +108,14 @@ public class EcoCommand extends ContainerCommand
                 switch (result.getResult())
                 {
                     case SUCCESS:
-                        i18n.sendTranslated(context, POSITIVE, "You took {txt} from {user}!", formatAmount, user);
+                        i18n.send(context, POSITIVE, "You took {txt} from {user}!", formatAmount, user);
                         if (!context.equals(user) && user.isOnline())
                         {
-                            i18n.sendTranslated(user.getPlayer().get(), NEUTRAL, "Withdrew {txt} from your account.", formatAmount);
+                            i18n.send(user.getPlayer().get(), NEUTRAL, "Withdrew {txt} from your account.", formatAmount);
                         }
                         break;
                     default:
-                        i18n.sendTranslated(context, NEGATIVE, "Could not take the money from {user}!", user);
+                        i18n.send(context, NEGATIVE, "Could not take the money from {user}!", user);
                         break;
                 }
             }
@@ -141,14 +141,14 @@ public class EcoCommand extends ContainerCommand
                 switch (result.getResult())
                 {
                     case SUCCESS:
-                        i18n.sendTranslated(context, POSITIVE, "{user} account reset to {txt}!", user, formatAmount);
+                        i18n.send(context, POSITIVE, "{user} account reset to {txt}!", user, formatAmount);
                         if (!context.equals(user) && user.isOnline())
                         {
-                            i18n.sendTranslated(user.getPlayer().get(), NEUTRAL, "Your balance got reset to {txt}.", formatAmount);
+                            i18n.send(user.getPlayer().get(), NEUTRAL, "Your balance got reset to {txt}.", formatAmount);
                         }
                         break;
                     default:
-                        i18n.sendTranslated(context, NEGATIVE, "Could not reset the money from {user}!", user);
+                        i18n.send(context, NEGATIVE, "Could not reset the money from {user}!", user);
                         break;
                 }
             }
@@ -169,14 +169,14 @@ public class EcoCommand extends ContainerCommand
                 switch (result.getResult())
                 {
                     case SUCCESS:
-                        i18n.sendTranslated(context, POSITIVE, "{user} account set to {txt}!", user, formatAmount);
+                        i18n.send(context, POSITIVE, "{user} account set to {txt}!", user, formatAmount);
                         if (!context.equals(user) && user.isOnline())
                         {
-                            i18n.sendTranslated(user.getPlayer().get(), NEUTRAL, "Your balance got set to {txt}.", formatAmount);
+                            i18n.send(user.getPlayer().get(), NEUTRAL, "Your balance got set to {txt}.", formatAmount);
                         }
                         break;
                     default:
-                        i18n.sendTranslated(context, NEGATIVE, "Could not reset the money from {user}!", user);
+                        i18n.send(context, NEGATIVE, "Could not reset the money from {user}!", user);
                         break;
                 }
             }
@@ -193,12 +193,12 @@ public class EcoCommand extends ContainerCommand
             {
                 if (target.isHidden())
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "{user}'s account is already hidden!", user);
+                    i18n.send(context, NEUTRAL, "{user}'s account is already hidden!", user);
                 }
                 else
                 {
                     target.setHidden(true);
-                    i18n.sendTranslated(context, POSITIVE, "{user}'s account is now hidden!", user);
+                    i18n.send(context, POSITIVE, "{user}'s account is now hidden!", user);
                 }
             }
         }
@@ -215,11 +215,11 @@ public class EcoCommand extends ContainerCommand
                 if (target.isHidden())
                 {
                     target.setHidden(false);
-                    i18n.sendTranslated(context, POSITIVE, "{user}'s account is no longer hidden!", user);
+                    i18n.send(context, POSITIVE, "{user}'s account is no longer hidden!", user);
                 }
                 else
                 {
-                    i18n.sendTranslated(context, NEUTRAL, "{user}'s account was not hidden!", user);
+                    i18n.send(context, NEUTRAL, "{user}'s account was not hidden!", user);
                 }
             }
         }

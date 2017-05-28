@@ -46,14 +46,14 @@ public class SudoCommand
         if (!message.startsWith("/"))
         {
             player.getMessageChannel().send(player, Text.of(message));
-            i18n.sendTranslated(context, POSITIVE, "Forced {user} to chat: {input#message}", player, message);
+            i18n.send(context, POSITIVE, "Forced {user} to chat: {input#message}", player, message);
             return;
         }
         if (cm.runCommand(player, message.substring(1)))
         {
-            i18n.sendTranslated(context, POSITIVE, "Command {input#command} executed as {user}", message, player);
+            i18n.send(context, POSITIVE, "Command {input#command} executed as {user}", message, player);
             return;
         }
-        i18n.sendTranslated(context, NEGATIVE, "Command was not executed successfully!");
+        i18n.send(context, NEGATIVE, "Command was not executed successfully!");
     }
 }

@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.UUID;
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.data.type.HandTypes;
@@ -56,11 +55,11 @@ public class UnlimitedItems
         }
         if (unlimited)
         {
-            i18n.sendTranslated(context, POSITIVE, "You now have unlimited items to build!");
+            i18n.send(context, POSITIVE, "You now have unlimited items to build!");
         }
         else
         {
-            i18n.sendTranslated(context, NEUTRAL, "You no longer have unlimited items to build!");
+            i18n.send(context, NEUTRAL, "You no longer have unlimited items to build!");
         }
         if (unlimited)
         {

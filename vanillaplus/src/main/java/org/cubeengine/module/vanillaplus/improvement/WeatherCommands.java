@@ -93,11 +93,11 @@ public class WeatherCommands
         WorldProperties worldProp = world.getProperties();
         if (worldProp.isThundering() != noThunder && worldProp.isRaining() != sunny) // weather is not changing
         {
-            i18n.sendTranslated(context, POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather.name());
+            i18n.send(context, POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather.name());
         }
         else
         {
-            i18n.sendTranslated(context, POSITIVE, "Changed weather in {world} to {input#weather}!", world, weather.name());
+            i18n.send(context, POSITIVE, "Changed weather in {world} to {input#weather}!", world, weather.name());
         }
         worldProp.setRaining(!sunny);
         worldProp.setThundering(!noThunder);

@@ -28,7 +28,6 @@ import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.data.key.Keys.GAME_MODE;
@@ -53,7 +52,7 @@ public class GameModeCommand extends PermissionContainer
         if (!context.getIdentifier().equals(player.getIdentifier())
             && !context.hasPermission(COMMAND_GAMEMODE_OTHER.getId()))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to change the game mode of an other player!");
+            i18n.send(context, NEGATIVE, "You are not allowed to change the game mode of an other player!");
             return;
         }
         GameMode newMode = getGameMode(gamemode);
@@ -64,13 +63,13 @@ public class GameModeCommand extends PermissionContainer
         player.offer(GAME_MODE, newMode);
         if (context.equals(player))
         {
-            i18n.sendTranslated(context, POSITIVE, "You changed your game mode to {input#gamemode}!", newMode.getTranslation());
+            i18n.send(context, POSITIVE, "You changed your game mode to {input#gamemode}!", newMode.getTranslation());
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "You changed the game mode of {user} to {input#gamemode}!", player, newMode.getTranslation());
+        i18n.send(context, POSITIVE, "You changed the game mode of {user} to {input#gamemode}!", player, newMode.getTranslation());
         if (player.isOnline())
         {
-            i18n.sendTranslated(player.getPlayer().get(), NEUTRAL, "Your game mode has been changed to {input#gamemode}!", newMode.getName());
+            i18n.send(player.getPlayer().get(), NEUTRAL, "Your game mode has been changed to {input#gamemode}!", newMode.getName());
         }
 
     }

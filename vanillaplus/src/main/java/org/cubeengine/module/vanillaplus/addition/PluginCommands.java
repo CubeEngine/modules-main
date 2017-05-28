@@ -28,7 +28,6 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -37,7 +36,6 @@ import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
@@ -69,7 +67,7 @@ public class PluginCommands extends PermissionContainer
         Collection<PluginContainer> plugins = Sponge.getPluginManager().getPlugins();
         Set<LifeCycle> modules = modularity.getModules();
 
-        i18n.sendTranslated(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:", plugins.size(), modules.size());
+        i18n.send(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:", plugins.size(), modules.size());
         context.sendMessage(Text.EMPTY);
         context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", RESET, " (" + plugin.getVersion().orElse("unknown") + ")"));
 
@@ -99,22 +97,22 @@ public class PluginCommands extends PermissionContainer
             switch (platform.getType())
             {
                 case CLIENT:
-                    i18n.sendTranslated(context, NEUTRAL, "This client is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
+                    i18n.send(context, NEUTRAL, "This client is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
                                         impl.getName(), platform.getMinecraftVersion().getName(), impl.getVersion().orElse(""));
                     break;
                 case SERVER:
-                    i18n.sendTranslated(context, NEUTRAL, "This server is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
+                    i18n.send(context, NEUTRAL, "This server is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
                                         impl.getName(), platform.getMinecraftVersion().getName(), impl.getVersion().orElse(""));
                     break;
                 case UNKNOWN:
-                    i18n.sendTranslated(context, NEUTRAL, "Unknown platform running {name#server} {name#version:color=INDIGO} {name#version:color"
+                    i18n.send(context, NEUTRAL, "Unknown platform running {name#server} {name#version:color=INDIGO} {name#version:color"
                                     + "=INDIGO}",
                                         impl.getName(), platform.getMinecraftVersion().getName(), impl.getVersion().orElse(""));
             }
 
-            i18n.sendTranslated(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getContainer(API).getVersion().orElse("unknown"));
+            i18n.send(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getContainer(API).getVersion().orElse("unknown"));
             context.sendMessage(Text.EMPTY);
-            i18n.sendTranslated(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.plugin.getVersion().orElse("unknown"));
+            i18n.send(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.plugin.getVersion().orElse("unknown"));
             return;
         }
         if (context.hasPermission(COMMAND_VERSION_PLUGINS.getId()))
@@ -127,10 +125,10 @@ public class PluginCommands extends PermissionContainer
             List<PluginContainer> plugins = Sponge.getPluginManager().getPlugins().stream()
                   .filter(container -> container.getName().toLowerCase().startsWith(plugin.toLowerCase()))
                   .collect(Collectors.toList());
-            i18n.sendTranslated(context, NEGATIVE, "The given plugin doesn't seem to be loaded, have you typed it correctly (casing does matter)?");
+            i18n.send(context, NEGATIVE, "The given plugin doesn't seem to be loaded, have you typed it correctly (casing does matter)?");
             if (!plugins.isEmpty())
             {
-                i18n.sendTranslated(context, NEGATIVE, "You might want to try one of these:");
+                i18n.send(context, NEGATIVE, "You might want to try one of these:");
                 for (PluginContainer p : plugins)
                 {
                     context.sendMessage(Text.of(" - " + p.getName()));
@@ -138,10 +136,10 @@ public class PluginCommands extends PermissionContainer
             }
             return;
         }
-        i18n.sendTranslated(context, NEUTRAL, "{name#plugin} is currently running in version {input#version:color=INDIGO}.",
+        i18n.send(context, NEUTRAL, "{name#plugin} is currently running in version {input#version:color=INDIGO}.",
                                instance.get().getName(), instance.get().getVersion());
         context.sendMessage(Text.EMPTY);
-        i18n.sendTranslated(context, NEUTRAL, "Plugin information:");
+        i18n.send(context, NEUTRAL, "Plugin information:");
         context.sendMessage(Text.EMPTY);
     }
 

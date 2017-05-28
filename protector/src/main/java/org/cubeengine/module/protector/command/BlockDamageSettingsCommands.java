@@ -58,7 +58,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
     {
         region.getSettings().blockDamage.monster = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: BlockDamage by Entity Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: BlockDamage by Entity Settings updated", region);
     }
 
     @Command(desc = "Controls blocks breaking blocks")
@@ -66,7 +66,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
     {
         setOrUnset(region.getSettings().blockDamage.block, by, set);
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: BlockDamage by Block Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: BlockDamage by Block Settings updated", region);
     }
 
     @Command(desc = "Controls explosions breaking blocks")
@@ -74,7 +74,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
     {
         region.getSettings().blockDamage.allExplosion = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: BlockDamage by Explosion Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: BlockDamage by Explosion Settings updated", region);
     }
 
     @Command(desc = "Controls explosions caused by players breaking blocks")
@@ -84,7 +84,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
             Subject subject = ps.getGroupSubjects().get(role);
@@ -92,12 +92,12 @@ public class BlockDamageSettingsCommands extends ContainerCommand
             {
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.explodePlayer.getId(), set);
             }
-            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
         region.getSettings().blockDamage.playerExplosion = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: BlockDamage by Player-Explosion Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: BlockDamage by Player-Explosion Settings updated", region);
     }
 
     @Command(desc = "Controls fire breaking blocks")

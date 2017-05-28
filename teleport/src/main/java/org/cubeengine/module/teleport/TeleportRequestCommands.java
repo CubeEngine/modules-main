@@ -58,15 +58,15 @@ public class TeleportRequestCommands
     {
         if (player.getUniqueId().equals(context.getUniqueId()))
         {
-            i18n.sendTranslated(context, NEUTRAL, "Teleporting you to yourself? Done.");
+            i18n.send(context, NEUTRAL, "Teleporting you to yourself? Done.");
             return;
         }
         tl.removeRequestTask(context);
-        i18n.sendTranslated(player, POSITIVE, "{sender} wants to teleport to you!", context);
-        i18n.sendTranslated(player, NEUTRAL, "Use {text:/tpaccept} to accept or {text:/tpdeny} to deny the request!");
+        i18n.send(player, POSITIVE, "{sender} wants to teleport to you!", context);
+        i18n.send(player, NEUTRAL, "Use {text:/tpaccept} to accept or {text:/tpdeny} to deny the request!");
         tl.setToRequest(player, context);
         tl.removeFromRequest(player);
-        i18n.sendTranslated(context, POSITIVE, "Teleport request sent to {user}!", player);
+        i18n.send(context, POSITIVE, "Teleport request sent to {user}!", player);
         int waitTime = this.module.getConfig().teleportRequestWait * 20;
         if (waitTime > 0)
         {
@@ -75,8 +75,8 @@ public class TeleportRequestCommands
 
                 tl.removeRequestTask(player);
                 tl.removeToRequest(player);
-                i18n.sendTranslated(sendingUser, NEGATIVE, "{user} did not accept your teleport request.", player);
-                i18n.sendTranslated(player, NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
+                i18n.send(sendingUser, NEGATIVE, "{user} did not accept your teleport request.", player);
+                i18n.send(player, NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
             }, waitTime); // wait x - seconds
             UUID oldtaskID = tl.getRequestTask(player);
             if (oldtaskID != null)
@@ -93,15 +93,15 @@ public class TeleportRequestCommands
     {
         if (player.getUniqueId().equals(context.getUniqueId()))
         {
-            i18n.sendTranslated(context, NEUTRAL, "Teleporting yourself to you? Done.");
+            i18n.send(context, NEUTRAL, "Teleporting yourself to you? Done.");
             return;
         }
         tl.removeRequestTask(player);
-        i18n.sendTranslated(player, POSITIVE, "{sender} wants to teleport you to them!", context);
-        i18n.sendTranslated(player, NEUTRAL, "Use {text:/tpaccept} to accept or {text:/tpdeny} to deny the request!");
+        i18n.send(player, POSITIVE, "{sender} wants to teleport you to them!", context);
+        i18n.send(player, NEUTRAL, "Use {text:/tpaccept} to accept or {text:/tpdeny} to deny the request!");
         tl.setFromRequest(player, context);
         tl.removeToRequest(player);
-        i18n.sendTranslated(context, POSITIVE, "Teleport request send to {user}!", player);
+        i18n.send(context, POSITIVE, "Teleport request send to {user}!", player);
         int waitTime = this.module.getConfig().teleportRequestWait * 20;
         if (waitTime > 0)
         {
@@ -109,8 +109,8 @@ public class TeleportRequestCommands
             final UUID taskID = taskManager.runTaskDelayed(Teleport.class, () -> {
                 tl.removeRequestTask(player);
                 tl.removeFromRequest(player);
-                i18n.sendTranslated(sendingUser, NEGATIVE, "{user} did not accept your teleport request.", player);
-                i18n.sendTranslated(player, NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
+                i18n.send(sendingUser, NEGATIVE, "{user} did not accept your teleport request.", player);
+                i18n.send(player, NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
             }, waitTime); // wait x - seconds
             UUID oldtaskID = tl.getRequestTask(player);
             if (oldtaskID != null)
@@ -132,19 +132,19 @@ public class TeleportRequestCommands
             uuid = tl.getFromRequest(context);
             if (uuid == null)
             {
-                i18n.sendTranslated(context, NEGATIVE, "You don't have any pending requests!");
+                i18n.send(context, NEGATIVE, "You don't have any pending requests!");
                 return;
             }
             tl.removeFromRequest(context);
             Optional<Player> player = game.getServer().getPlayer(uuid);
             if (!player.isPresent())
             {
-                i18n.sendTranslated(context, NEGATIVE, "That player seems to have disappeared.");
+                i18n.send(context, NEGATIVE, "That player seems to have disappeared.");
                 return;
             }
             context.setLocation(player.get().getLocation());
-            i18n.sendTranslated(player.get(), POSITIVE, "{user} accepted your teleport request!", context);
-            i18n.sendTranslated(context, POSITIVE, "You accepted a teleport to {user}!", player.get());
+            i18n.send(player.get(), POSITIVE, "{user} accepted your teleport request!", context);
+            i18n.send(context, POSITIVE, "You accepted a teleport to {user}!", player.get());
         }
         else
         {
@@ -152,12 +152,12 @@ public class TeleportRequestCommands
             Optional<Player> player = game.getServer().getPlayer(uuid);
             if (!player.isPresent())
             {
-                i18n.sendTranslated(context, NEGATIVE, "That player seems to have disappeared.");
+                i18n.send(context, NEGATIVE, "That player seems to have disappeared.");
                 return;
             }
             player.get().setLocation(context.getLocation());
-            i18n.sendTranslated(player.get(), POSITIVE, "{user} accepted your teleport request!", context);
-            i18n.sendTranslated(context, POSITIVE, "You accepted a teleport to {user}!", player.get());
+            i18n.send(player.get(), POSITIVE, "{user} accepted your teleport request!", context);
+            i18n.send(context, POSITIVE, "You accepted a teleport to {user}!", player.get());
         }
         UUID taskID = tl.getRequestTask(context);
         if (taskID != null)
@@ -183,8 +183,8 @@ public class TeleportRequestCommands
             {
                 throw new IllegalStateException("Player saved in \"pendingTpToRequest\" was not found!");
             }
-            i18n.sendTranslated(player.get(), NEGATIVE, "{user} denied your teleport request!", sender);
-            i18n.sendTranslated(sender, NEGATIVE, "You denied {user}'s teleport request!", player.get());
+            i18n.send(player.get(), NEGATIVE, "{user} denied your teleport request!", sender);
+            i18n.send(sender, NEGATIVE, "You denied {user}'s teleport request!", player.get());
         }
         else if (tpahere != null)
         {
@@ -194,12 +194,12 @@ public class TeleportRequestCommands
             {
                 throw new IllegalStateException("User saved in \"pendingTpFromRequest\" was not found!");
             }
-            i18n.sendTranslated(player.get(), NEGATIVE, "{user} denied your request!", sender);
-            i18n.sendTranslated(sender, NEGATIVE, "You denied {user}'s teleport request", player.get());
+            i18n.send(player.get(), NEGATIVE, "{user} denied your request!", sender);
+            i18n.send(sender, NEGATIVE, "You denied {user}'s teleport request", player.get());
         }
         else
         {
-            i18n.sendTranslated(sender, NEGATIVE, "You don't have any pending requests!");
+            i18n.send(sender, NEGATIVE, "You don't have any pending requests!");
             return;
         }
         UUID taskID = tl.getRequestTask(sender);

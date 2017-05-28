@@ -56,7 +56,6 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.Item;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
@@ -104,7 +103,7 @@ public class InformationCommands extends PermissionContainer
     {
         if (!(context instanceof Player) && (world == null || z == null))
         {
-            i18n.sendTranslated(context, NEGATIVE, "Please provide a world and x and z coordinates!");
+            i18n.send(context, NEGATIVE, "Please provide a world and x and z coordinates!");
             return;
         }
         if (z == null)
@@ -115,7 +114,7 @@ public class InformationCommands extends PermissionContainer
             z = loc.getBlockZ();
         }
         BiomeType biome = world.getBiome(x, 0, z);
-        i18n.sendTranslated(context, NEUTRAL, "Biome at {vector:x\\=:z\\=}: {biome}", new Vector2i(x, z), biome);
+        i18n.send(context, NEUTRAL, "Biome at {vector:x\\=:z\\=}: {biome}", new Vector2i(x, z), biome);
     }
 
     @Command(desc = "Displays the seed of a world.")
@@ -129,7 +128,7 @@ public class InformationCommands extends PermissionContainer
             }
             world = ((Player)context).getWorld();
         }
-        i18n.sendTranslated(context, NEUTRAL, "Seed of {world} is {long#seed}", world, world.getProperties().getSeed());
+        i18n.send(context, NEUTRAL, "Seed of {world} is {long#seed}", world, world.getProperties().getSeed());
     }
 
     @Command(desc = "Displays the direction in which you are looking.")
@@ -138,7 +137,7 @@ public class InformationCommands extends PermissionContainer
     {
         Vector3d rotation = context.getRotation();
         Vector3d direction = Quaterniond.fromAxesAnglesDeg(rotation.getX(), -rotation.getY(), rotation.getZ()).getDirection();
-        i18n.sendTranslated(context, NEUTRAL, "You are looking to {input#direction}!", getClosest(direction).name()); // TODO translation of direction
+        i18n.send(context, NEUTRAL, "You are looking to {input#direction}!", getClosest(direction).name()); // TODO translation of direction
     }
 
     @Command(desc = "Displays your current depth.")
@@ -148,10 +147,10 @@ public class InformationCommands extends PermissionContainer
         final int height = context.getLocation().getBlockY();
         if (height > 62)
         {
-            i18n.sendTranslated(context, POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} above sealevel)", height, height - 62);
+            i18n.send(context, POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} above sealevel)", height, height - 62);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} below sealevel)", height, 62 - height);
+        i18n.send(context, POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} below sealevel)", height, 62 - height);
     }
 
     @Command(desc = "Displays your current location.")
@@ -159,7 +158,7 @@ public class InformationCommands extends PermissionContainer
     public void getPos(Player context)
     {
         final Location loc = context.getLocation();
-        i18n.sendTranslated(context, NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+        i18n.send(context, NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
     }
 
     @Command(desc = "Displays near players(entities/mobs) to you.")
@@ -207,7 +206,7 @@ public class InformationCommands extends PermissionContainer
                 Text key;
                 if (e instanceof Player)
                 {
-                    key = Text.of(TextColors.DARK_GREEN, i18n.getTranslation(context, TextFormat.NONE, "player"));
+                    key = Text.of(TextColors.DARK_GREEN, i18n.translate(context, TextFormat.NONE, "player"));
                 }
                 else if (e instanceof Living)
                 {
@@ -242,17 +241,17 @@ public class InformationCommands extends PermissionContainer
         }
         if (outputlist.isEmpty())
         {
-            i18n.sendTranslated(context, NEGATIVE, "Nothing detected nearby!");
+            i18n.send(context, NEGATIVE, "Nothing detected nearby!");
             return;
         }
         Text result = Text.of(Text.joinWith(Text.of(WHITE, ", "), outputlist), builder.build());
         if (context.equals(player))
         {
-            i18n.sendTranslated(context, NEUTRAL, "Found those nearby you:");
+            i18n.send(context, NEUTRAL, "Found those nearby you:");
             context.sendMessage(result);
             return;
         }
-        i18n.sendTranslated(context, NEUTRAL, "Found those nearby {user}:", player);
+        i18n.send(context, NEUTRAL, "Found those nearby {user}:", player);
         context.sendMessage(result);
     }
 
@@ -279,7 +278,7 @@ public class InformationCommands extends PermissionContainer
             }
         }
         s = s.toBuilder()
-                .onHover(TextActions.showText(i18n.getTranslation(context, NEUTRAL, "Click here to teleport")))
+                .onHover(TextActions.showText(i18n.translate(context, NEUTRAL, "Click here to teleport")))
                 .onClick(TextActions.executeCallback(c -> {
                     if (c instanceof Player)
                     {
@@ -296,24 +295,24 @@ public class InformationCommands extends PermissionContainer
         final String label = context.getInvocation().getLabels().get(0).toLowerCase(ENGLISH);
         if (context.isSource(Player.class))
         {
-            i18n.sendTranslated(context.getSource(), MessageType.NEUTRAL, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}",
+            i18n.send(context.getSource(), MessageType.NEUTRAL, ("ping".equals(label) ? "pong" : "ping") + "! Your latency: {integer#ping}",
                                 ((Player)context.getSource()).getConnection().getLatency());
             return;
         }
-        i18n.sendTranslated(context.getSource(), NEUTRAL, label + " in the console?");
+        i18n.send(context.getSource(), NEUTRAL, label + " in the console?");
     }
 
     @Command(desc = "Displays chunk, memory and world information.")
     public void lag(CommandSource context)
     {
         //Uptime:
-        i18n.sendTranslated(context, POSITIVE, "[{text:CubeEngine-Basics:color=RED}]");
+        i18n.send(context, POSITIVE, "[{text:CubeEngine-Basics:color=RED}]");
         DateFormat df = SimpleDateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT,
                                                              context.getLocale());
         Date start = new Date(ManagementFactory.getRuntimeMXBean().getStartTime());
         Duration dura = new Duration(start.getTime(), System.currentTimeMillis());
-        i18n.sendTranslated(context, POSITIVE, "Server has been running since {input#uptime}", df.format(start));
-        i18n.sendTranslated(context, POSITIVE, "Uptime: {input#uptime}", formatter.print(dura.toPeriod()));
+        i18n.send(context, POSITIVE, "Server has been running since {input#uptime}", df.format(start));
+        i18n.send(context, POSITIVE, "Uptime: {input#uptime}", formatter.print(dura.toPeriod()));
         //TPS:
         double tps = Sponge.getServer().getTicksPerSecond();
         TextColor color = tps == 20 ? DARK_GREEN :
@@ -321,14 +320,14 @@ public class InformationCommands extends PermissionContainer
                        tps > 10 ?  RED :
                        tps == 0 ?  YELLOW :
                                    DARK_RED;
-        i18n.sendTranslated(context, POSITIVE, "Current TPS: {txt}", Text.of(color, tps));
+        i18n.send(context, POSITIVE, "Current TPS: {txt}", Text.of(color, tps));
         //Memory
         long memUse = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576;
         long memCom = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getCommitted() / 1048576;
         long memMax = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getMax() / 1048576;
         long memUsePercent = 100 * memUse / memMax;
         color = memUsePercent > 90 ? memUsePercent > 95 ? DARK_RED : RED : memUsePercent > 60 ? YELLOW : DARK_GREEN;
-        i18n.sendTranslated(context, POSITIVE, "Memory Usage: {txt#memused}/{integer#memcom}/{integer#memMax} MB", Text.of(color, memUse), memCom, memMax);
+        i18n.send(context, POSITIVE, "Memory Usage: {txt#memused}/{integer#memcom}/{integer#memMax} MB", Text.of(color, memUse), memCom, memMax);
         //Worlds with loaded Chunks / Entities
         for (World world : Sponge.getServer().getWorlds())
         {
@@ -347,7 +346,7 @@ public class InformationCommands extends PermissionContainer
                 }
             }
             int entities = world.getEntities().size();
-            i18n.sendTranslated(context, POSITIVE, "{world} ({input#environment}): {amount} chunks {amount} entities", world, type, loadedChunks, entities);
+            i18n.send(context, POSITIVE, "{world} ({input#environment}): {amount} chunks {amount} entities", world, type, loadedChunks, entities);
 
             Stream<Map.Entry<Vector3i, List<Entity>>> stream =
                     world.getEntities().stream().filter(e -> e.getType() != ITEM_FRAME).collect(Collectors.groupingBy(e -> e.getLocation().getChunkPosition()))
@@ -356,7 +355,7 @@ public class InformationCommands extends PermissionContainer
             stream.forEach(e -> {
                 Text pos = Text.of(TextColors.GOLD, e.getKey().getX(), TextColors.GRAY, ":", TextColors.GOLD, e.getKey().getZ());
                 pos = pos.toBuilder()
-                        .onHover(TextActions.showText(i18n.getTranslation(context, NEUTRAL, "Click here to teleport")))
+                        .onHover(TextActions.showText(i18n.translate(context, NEUTRAL, "Click here to teleport")))
                         .onClick(TextActions.executeCallback(c -> {
                             if (c instanceof Player)
                             {
@@ -367,7 +366,7 @@ public class InformationCommands extends PermissionContainer
             });
             if (!builder.build().isEmpty())
             {
-                i18n.sendTranslated(context, NEUTRAL, "High entity count in Chunks: {txt#list}", builder.build());
+                i18n.send(context, NEUTRAL, "High entity count in Chunks: {txt#list}", builder.build());
             }
         }
 

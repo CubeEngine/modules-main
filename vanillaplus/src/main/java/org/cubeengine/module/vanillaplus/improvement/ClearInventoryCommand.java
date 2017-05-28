@@ -31,7 +31,6 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
 import org.spongepowered.api.item.inventory.type.InventoryRow;
-import org.spongepowered.api.service.permission.PermissionDescription;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
@@ -79,7 +78,7 @@ public class ClearInventoryCommand extends PermissionContainer
             if (player.hasPermission(COMMAND_CLEARINVENTORY_PREVENT.getId())
                 && !(force && context.hasPermission(COMMAND_CLEARINVENTORY_FORCE.getId())))
             {
-                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to clear the inventory of {user}", player);
+                i18n.send(context, NEGATIVE, "You are not allowed to clear the inventory of {user}", player);
                 return;
             }
         }
@@ -90,13 +89,13 @@ public class ClearInventoryCommand extends PermissionContainer
         }
         if (self)
         {
-            i18n.sendTranslated(context, POSITIVE, "Your inventory has been cleared!");
+            i18n.send(context, POSITIVE, "Your inventory has been cleared!");
             return;
         }
         if (player.isOnline() && player.hasPermission(COMMAND_CLEARINVENTORY_NOTIFY.getId()) && !quiet)
         {
-            i18n.sendTranslated(player.getPlayer().get(), NEUTRAL, "Your inventory has been cleared by {sender}!", context);
+            i18n.send(player.getPlayer().get(), NEUTRAL, "Your inventory has been cleared by {sender}!", context);
         }
-        i18n.sendTranslated(context, POSITIVE, "The inventory of {user} has been cleared!", player);
+        i18n.send(context, POSITIVE, "The inventory of {user} has been cleared!", player);
     }
 }

@@ -73,7 +73,7 @@ public class Portal
         {
             if (entity instanceof Player)
             {
-                i18n.sendTranslated(((Player)entity), NEUTRAL, "This portal {name} has no destination yet!", this.getName());
+                i18n.send(((Player)entity), NEUTRAL, "This portal {name} has no destination yet!", this.getName());
                 module.getPortalsAttachment(entity.getUniqueId()).setInPortal(true);
             }
         }
@@ -101,35 +101,35 @@ public class Portal
 
     public void showInfo(CommandSource user)
     {
-        i18n.sendTranslated(user, POSITIVE, "Portal Information for {name#portal}", this.getName());
+        i18n.send(user, POSITIVE, "Portal Information for {name#portal}", this.getName());
         if (this.config.safeTeleport)
         {
-            i18n.sendTranslated(user, POSITIVE, "This Portal has safe teleport enabled");
+            i18n.send(user, POSITIVE, "This Portal has safe teleport enabled");
         }
         if (this.config.teleportNonPlayers)
         {
-            i18n.sendTranslated(user, POSITIVE, "This Portal will teleport non-players too");
+            i18n.send(user, POSITIVE, "This Portal will teleport non-players too");
         }
-        i18n.sendTranslated(user, POSITIVE, "{user} is the owner of this portal", this.config.owner);
-        i18n.sendTranslated(user, POSITIVE, "Location: {vector} to {vector} in {name#world}",
+        i18n.send(user, POSITIVE, "{user} is the owner of this portal", this.config.owner);
+        i18n.send(user, POSITIVE, "Location: {vector} to {vector} in {name#world}",
                             new Vector3i(this.config.location.from.getX(), this.config.location.from.getY(), this.config.location.from.getZ()),
                             new Vector3i(this.config.location.to.getX(), this.config.location.to.getY(), this.config.location.to.getZ()), this.config.world.getName());
         if (this.config.destination == null)
         {
-            i18n.sendTranslated(user, POSITIVE, "This portal has no destination yet");
+            i18n.send(user, POSITIVE, "This portal has no destination yet");
         }
         else
         {
             switch (config.destination.type)
             {
             case PORTAL:
-                i18n.sendTranslated(user, POSITIVE, "This portal teleports to another portal: {name#portal}", config.destination.portal);
+                i18n.send(user, POSITIVE, "This portal teleports to another portal: {name#portal}", config.destination.portal);
                 break;
             case WORLD:
-                i18n.sendTranslated(user, POSITIVE, "This portal teleports to the spawn of {name#world}", config.destination.world.getName());
+                i18n.send(user, POSITIVE, "This portal teleports to the spawn of {name#world}", config.destination.world.getName());
                 break;
             case LOCATION:
-                i18n.sendTranslated(user, POSITIVE, "This portal teleports to {vector} in {name#world}",
+                i18n.send(user, POSITIVE, "This portal teleports to {vector} in {name#world}",
                     new Vector3i((int)config.destination.location.x, (int)config.destination.location.y, (int)config.destination.location.z), config.destination.world.getName());
                 break;
             }

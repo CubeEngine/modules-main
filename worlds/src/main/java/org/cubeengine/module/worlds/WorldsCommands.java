@@ -26,7 +26,6 @@ import static org.spongepowered.api.text.format.TextColors.GOLD;
 import static org.spongepowered.api.text.format.TextColors.RED;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
-import com.flowpowered.math.vector.Vector2i;
 import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
@@ -109,10 +108,10 @@ public class WorldsCommands extends ContainerCommand
         {
             if (recreate)
             {
-                i18n.sendTranslated(context, NEGATIVE, "You have to unload a world before recreating it!");
+                i18n.send(context, NEGATIVE, "You have to unload a world before recreating it!");
                 return;
             }
-            i18n.sendTranslated(context, NEGATIVE, "A world named {world} already exists and is loaded!", world.get());
+            i18n.send(context, NEGATIVE, "A world named {world} already exists and is loaded!", world.get());
             return;
         }
         Optional<WorldProperties> worldProperties = Sponge.getServer().getWorldProperties(name);
@@ -120,13 +119,13 @@ public class WorldsCommands extends ContainerCommand
         {
             if (!recreate)
             {
-                i18n.sendTranslated(context, NEGATIVE, "A world named {name#world} already exists but is not loaded!", name);
+                i18n.send(context, NEGATIVE, "A world named {name#world} already exists but is not loaded!", name);
                 return;
             }
             worldProperties.get().setEnabled(false);
             String newName = name + "_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
             Sponge.getServer().renameWorld(worldProperties.get(), newName);
-            i18n.sendTranslated(context, POSITIVE, "Old world moved to {name#folder}", newName);
+            i18n.send(context, POSITIVE, "Old world moved to {name#folder}", newName);
         }
 
         WorldArchetype.Builder builder = WorldArchetype.builder();
@@ -157,14 +156,14 @@ public class WorldsCommands extends ContainerCommand
         try
         {
             WorldProperties properties = Sponge.getServer().createWorldProperties(name, builder.build("org.cubeengine.customworld:" + name, name));
-            i18n.sendTranslated(context, POSITIVE, "World {name} successfully created!", name);
-            i18n.sendTranslated(context, NEUTRAL, "This world is not yet loaded! Click {txt#here} to load.",
-                    i18n.getTranslation(context, TextFormat.NONE, "here").toBuilder().onClick(TextActions.runCommand("/worlds load " + name)).build
+            i18n.send(context, POSITIVE, "World {name} successfully created!", name);
+            i18n.send(context, NEUTRAL, "This world is not yet loaded! Click {txt#here} to load.",
+                    i18n.translate(context, TextFormat.NONE, "here").toBuilder().onClick(TextActions.runCommand("/worlds load " + name)).build
                             ());
         }
         catch (IOException e)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Could not create world!");
+            i18n.send(context, NEGATIVE, "Could not create world!");
             throw new IllegalStateException(e); // TODO handle exception better
         }
     }
@@ -179,10 +178,10 @@ public class WorldsCommands extends ContainerCommand
         world.setLoadOnStartup(set);
         if (set)
         {
-            i18n.sendTranslated(context, POSITIVE, "{world} will now autoload.", world);
+            i18n.send(context, POSITIVE, "{world} will now autoload.", world);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "{world} will no longer autoload.", world);
+        i18n.send(context, POSITIVE, "{world} will no longer autoload.", world);
     }
 
     @Command(desc = "Loads a world")
@@ -191,7 +190,7 @@ public class WorldsCommands extends ContainerCommand
         Optional<World> w = Sponge.getServer().getWorld(world.getUniqueId());
         if (w.isPresent())
         {
-            i18n.sendTranslated(context, POSITIVE, "The world {world} is already loaded!", w.get());
+            i18n.send(context, POSITIVE, "The world {world} is already loaded!", w.get());
             return;
         }
 
@@ -199,15 +198,15 @@ public class WorldsCommands extends ContainerCommand
         {
             world.setEnabled(true);
         }
-        i18n.sendTranslated(context, NEGATIVE, "Loading...", world);
+        i18n.send(context, NEGATIVE, "Loading...", world);
         // TODO async me?
         Optional<World> loaded = Sponge.getServer().loadWorld(world);
         if (!loaded.isPresent())
         {
-            i18n.sendTranslated(context, NEGATIVE, "Could not load {name#world}", world);
+            i18n.send(context, NEGATIVE, "Could not load {name#world}", world);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "World {world} loaded!", loaded.get());
+        i18n.send(context, POSITIVE, "World {world} loaded!", loaded.get());
     }
 
     @Command(desc = "Unload a loaded world")
@@ -215,7 +214,7 @@ public class WorldsCommands extends ContainerCommand
     {
         if (Sponge.getServer().unloadWorld(world))
         {
-            i18n.sendTranslated(context, POSITIVE, "Unloaded the world {world}!", world);
+            i18n.send(context, POSITIVE, "Unloaded the world {world}!", world);
             return;
         }
 
@@ -225,18 +224,18 @@ public class WorldsCommands extends ContainerCommand
             if (!entities.isEmpty())
             {
                 int amount = entities.size();
-                i18n.sendTranslatedN(context, NEUTRAL, amount, "There is still one player on that map!",
+                i18n.sendN(context, NEUTRAL, amount, "There is still one player on that map!",
                         "There are still {amount} players on that map!", amount);
                 return;
             }
-            i18n.sendTranslated(context, NEGATIVE, "Could not unload {world}", world);
+            i18n.send(context, NEGATIVE, "Could not unload {world}", world);
             return;
         }
 
         Optional<WorldProperties> defWorld = Sponge.getServer().getDefaultWorld();
         if (!defWorld.isPresent())
         {
-            i18n.sendTranslated(context, NEUTRAL, "Could not unload {world}. No default world to evacuate to.", world);
+            i18n.send(context, NEUTRAL, "Could not unload {world}. No default world to evacuate to.", world);
             return;
         }
 
@@ -245,7 +244,7 @@ public class WorldsCommands extends ContainerCommand
         {
             world.getEntities(entity -> entity instanceof Player).stream()
                     .map(Player.class::cast)
-                    .forEach(p -> p.kick(i18n.getTranslation(p, NEGATIVE, "Main world unloading. Flee!")));
+                    .forEach(p -> p.kick(i18n.translate(p, NEGATIVE, "Main world unloading. Flee!")));
         }
         else
         {
@@ -254,13 +253,13 @@ public class WorldsCommands extends ContainerCommand
                     .forEach(p -> p.setLocationSafely(evacuation.getSpawnLocation()));
         }
 
-        i18n.sendTranslated(context, POSITIVE, "Teleported all players out of {world}", world);
+        i18n.send(context, POSITIVE, "Teleported all players out of {world}", world);
         if (Sponge.getServer().unloadWorld(world))
         {
-            i18n.sendTranslated(context, POSITIVE, "Unloaded the world {world}!", world);
+            i18n.send(context, POSITIVE, "Unloaded the world {world}!", world);
             return;
         }
-        i18n.sendTranslated(context, NEGATIVE, "Could not unload {world}", world);
+        i18n.send(context, NEGATIVE, "Could not unload {world}", world);
     }
 
     @Command(desc = "Remove a world", alias = "delete")
@@ -271,40 +270,40 @@ public class WorldsCommands extends ContainerCommand
         {
             if (!unload)
             {
-                i18n.sendTranslated(context, NEGATIVE, "You have to unload the world first!");
+                i18n.send(context, NEGATIVE, "You have to unload the world first!");
                 return;
             }
             if (!Sponge.getServer().unloadWorld(loadedWorld.get()))
             {
-                i18n.sendTranslated(context, NEGATIVE, "Could not unload {world}", world);
+                i18n.send(context, NEGATIVE, "Could not unload {world}", world);
                 return;
             }
         }
 
         if (folder)
         {
-            i18n.sendTranslated(context, POSITIVE, "Deleting the world {world} from disk...", world);
+            i18n.send(context, POSITIVE, "Deleting the world {world} from disk...", world);
             Sponge.getServer().deleteWorld(world).
-                thenAccept(b -> i18n.sendTranslated(context, POSITIVE, "Finished deleting the world {world} from disk", world));
+                thenAccept(b -> i18n.send(context, POSITIVE, "Finished deleting the world {world} from disk", world));
             return;
         }
         world.setEnabled(false);
-        i18n.sendTranslated(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
+        i18n.send(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
     }
 
     @Command(desc = "Lists all worlds")
     @Alias("listworlds")
     public void list(CommandSource context)
     {
-        i18n.sendTranslated(context, POSITIVE, "The following worlds do exist:");
-        String tNotLoaded = i18n.translate(context.getLocale(), "not loaded");
-        String tNotEnabled = i18n.translate(context.getLocale(), "not enabled");
+        i18n.send(context, POSITIVE, "The following worlds do exist:");
+        String tNotLoaded = i18n.getTranslation(context.getLocale(), "not loaded");
+        String tNotEnabled = i18n.getTranslation(context.getLocale(), "not enabled");
         Sponge.getServer().getAllWorldProperties().stream().sorted((o1, o2) -> o1.getWorldName().compareTo(o2.getWorldName())).forEach(prop ->
         {
             Text.Builder builder = Text.of(" - ", GOLD, prop.getWorldName(), " ", DARK_AQUA, prop.getDimensionType().getName()).toBuilder();
 
             Text infoText = Text.of(YELLOW, "(?)").toBuilder().onClick(TextActions.runCommand("/worlds info " + prop.getWorldName()))
-                    .onHover(TextActions.showText(i18n.getTranslation(context, TextFormat.NONE, "Click to show world info")))
+                    .onHover(TextActions.showText(i18n.translate(context, TextFormat.NONE, "Click to show world info")))
                     .build();
 
             if (!Sponge.getServer().getWorld(prop.getWorldName()).isPresent())
@@ -313,7 +312,7 @@ public class WorldsCommands extends ContainerCommand
                 if (prop.isEnabled())
                 {
                     builder.append(Text.of(RED, tNotLoaded)).append(Text.of(" "))
-                            .append(Text.of(YELLOW, "(", i18n.getTranslation(context, TextFormat.NONE, "load"), ")").toBuilder()
+                            .append(Text.of(YELLOW, "(", i18n.translate(context, TextFormat.NONE, "load"), ")").toBuilder()
                                     .onClick(TextActions.runCommand("/worlds load " + prop.getWorldName())).build());
                 }
                 else
@@ -330,50 +329,50 @@ public class WorldsCommands extends ContainerCommand
     public void info(CommandSource context, @Default WorldProperties world, @Flag boolean showGameRules)
     {
         context.sendMessage(Text.EMPTY);
-        i18n.sendTranslated(context, POSITIVE, "World information for {world}:", world);
+        i18n.send(context, POSITIVE, "World information for {world}:", world);
 
         if (!world.isEnabled())
         {
-            i18n.sendTranslated(context, NEUTRAL, "This world is disabled.");
+            i18n.send(context, NEUTRAL, "This world is disabled.");
         }
         else if (!Sponge.getServer().getWorld(world.getUniqueId()).isPresent())
         {
-            Text load = Text.of("(", i18n.getTranslation(context, TextFormat.NONE, "load"), ")").toBuilder()
+            Text load = Text.of("(", i18n.translate(context, TextFormat.NONE, "load"), ")").toBuilder()
                     .onClick(TextActions.runCommand("/worlds load " + world.getWorldName())).build();
-            i18n.sendTranslated(context, NEGATIVE, "This world is not loaded. {txt#load}", load);
+            i18n.send(context, NEGATIVE, "This world is not loaded. {txt#load}", load);
         }
         if (!world.isInitialized())
         {
-            i18n.sendTranslated(context, NEUTRAL, "This world has not been initialized.");
+            i18n.send(context, NEUTRAL, "This world has not been initialized.");
         }
-        i18n.sendTranslated(context, NEUTRAL, "Gamemode: {input}", world.getGameMode().getTranslation());
-        i18n.sendTranslated(context, NEUTRAL, "DimensionType: {input}", world.getDimensionType().getName());
+        i18n.send(context, NEUTRAL, "Gamemode: {input}", world.getGameMode().getTranslation());
+        i18n.send(context, NEUTRAL, "DimensionType: {input}", world.getDimensionType().getName());
         if (world.usesMapFeatures())
         {
-            i18n.sendTranslated(context, NEUTRAL, "WorldType: {input} with structures", world.getGeneratorType().getName());
+            i18n.send(context, NEUTRAL, "WorldType: {input} with structures", world.getGeneratorType().getName());
         }
         else
         {
-            i18n.sendTranslated(context, NEUTRAL, "WorldType: {input} no structures", world.getGeneratorType().getName());
+            i18n.send(context, NEUTRAL, "WorldType: {input} no structures", world.getGeneratorType().getName());
         }
 
-        i18n.sendTranslated(context, NEUTRAL, "Difficulty {input}", world.getDifficulty().getTranslation());
+        i18n.send(context, NEUTRAL, "Difficulty {input}", world.getDifficulty().getTranslation());
         if (world.isHardcore())
         {
-            i18n.sendTranslated(context, NEUTRAL, "Hardcoremode active");
+            i18n.send(context, NEUTRAL, "Hardcoremode active");
         }
         if (!world.isPVPEnabled())
         {
-            i18n.sendTranslated(context, NEUTRAL, "PVP disabled");
+            i18n.send(context, NEUTRAL, "PVP disabled");
         }
         if (!world.areCommandsAllowed() && Sponge.getPlatform().getType() == Type.CLIENT)
         {
-            i18n.sendTranslated(context, NEUTRAL, "Commands are not allowed");
+            i18n.send(context, NEUTRAL, "Commands are not allowed");
         }
-        i18n.sendTranslated(context, NEUTRAL, "Seed: {long}", world.getSeed());
+        i18n.send(context, NEUTRAL, "Seed: {long}", world.getSeed());
         if (!world.getGeneratorModifiers().isEmpty())
         {
-            i18n.sendTranslated(context, NEUTRAL, "Generation is modified by:");
+            i18n.send(context, NEUTRAL, "Generation is modified by:");
             for (WorldGeneratorModifier modifier : world.getGeneratorModifiers())
             {
                 context.sendMessage(Text.of(YELLOW, " - ", GOLD, modifier.getName()).toBuilder().onHover(TextActions.showText(Text.of(GOLD, modifier.getId()))).build());
@@ -381,13 +380,13 @@ public class WorldsCommands extends ContainerCommand
         }
         if (!world.loadOnStartup())
         {
-            i18n.sendTranslated(context, NEUTRAL, "This world will not load automatically on startup!");
+            i18n.send(context, NEUTRAL, "This world will not load automatically on startup!");
         }
         Vector3i spawn = world.getSpawnPosition();
-        i18n.sendTranslated(context, NEUTRAL, "This worlds spawn is at {vector}", new Vector3i(spawn.getX(), spawn.getY(), spawn.getZ()));
+        i18n.send(context, NEUTRAL, "This worlds spawn is at {vector}", new Vector3i(spawn.getX(), spawn.getY(), spawn.getZ()));
         if (showGameRules && !world.getGameRules().isEmpty()) // Show gamerules
         {
-            i18n.sendTranslated(context, NEUTRAL, "The following game-rules are set:");
+            i18n.send(context, NEUTRAL, "The following game-rules are set:");
             for (Entry<String, String> entry : world.getGameRules().entrySet())
             {
                 context.sendMessage(Text.of(YELLOW, entry.getKey(), ": ", GOLD, entry.getValue()));
@@ -401,10 +400,10 @@ public class WorldsCommands extends ContainerCommand
         Collection<Entity> players = world.getEntities(e -> e instanceof Player);
         if (players.isEmpty())
         {
-            i18n.sendTranslated(context, NEUTRAL, "There are no players in {world}", world);
+            i18n.send(context, NEUTRAL, "There are no players in {world}", world);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "The following players are in {world}", world);
+        i18n.send(context, POSITIVE, "The following players are in {world}", world);
         for (Entity player : players)
         {
             context.sendMessage(Text.of(YELLOW, " - ", DARK_GREEN, ((Player) player).getName()));

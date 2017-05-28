@@ -29,7 +29,6 @@ import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
@@ -76,7 +75,7 @@ public class InvseeCommand extends PermissionContainer
         {
             if (!context.hasPermission(COMMAND_INVSEE_ENDERCHEST.getId()))
             {
-                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to look into enderchests!");
+                i18n.send(context, NEGATIVE, "You are not allowed to look into enderchests!");
                 return;
             }
             inv = player.getPlayer().map(p -> p.getEnderChestInventory()).orElse(null);
@@ -100,7 +99,7 @@ public class InvseeCommand extends PermissionContainer
         {
             if (!(quiet && context.hasPermission(COMMAND_INVSEE_QUIET.getId())))
             {
-                i18n.sendTranslated(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your inventory.", context);
+                i18n.send(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your inventory.", context);
             }
         }
         InventoryGuardFactory guard = invGuard.prepareInv(inv, context.getUniqueId());

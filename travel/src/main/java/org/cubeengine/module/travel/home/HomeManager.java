@@ -162,14 +162,14 @@ public class HomeManager
         }
         else if (getCount(player) >= module.getConfig().homes.max)
         {
-            i18n.sendTranslated(player, CRITICAL, "You have reached your maximum number of homes!");
-            i18n.sendTranslated(player, NEGATIVE, "You have to delete a home to make a new one");
+            i18n.send(player, CRITICAL, "You have reached your maximum number of homes!");
+            i18n.send(player, NEGATIVE, "You have to delete a home to make a new one");
             return;
         }
         else
         {
             this.create(player, "home", player.getTransform());
-            i18n.sendTranslated(player, POSITIVE, "Your home has been created!");
+            i18n.send(player, POSITIVE, "Your home has been created!");
         }
         event.setCancelled(true);
     }

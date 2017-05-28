@@ -53,7 +53,7 @@ public class NetherportalsCommand extends ContainerCommand
         section.netherTarget = new ConfigWorld(target);
         section.enablePortalRouting = true;
         module.getConfig().save();
-        i18n.sendTranslated(context, POSITIVE, "NetherPortals in {world} now lead to {world}", world, target);
+        i18n.send(context, POSITIVE, "NetherPortals in {world} now lead to {world}", world, target);
     }
 
     @Command(alias = "end", desc = "Sets the EndPortal Target")
@@ -65,7 +65,7 @@ public class NetherportalsCommand extends ContainerCommand
         section.endTarget = new ConfigWorld(target);
         section.enablePortalRouting = true;
         module.getConfig().save();
-        i18n.sendTranslated(context, POSITIVE, "EndPortals in {world} now lead to {world}", world, target);
+        i18n.send(context, POSITIVE, "EndPortals in {world} now lead to {world}", world, target);
     }
 
     // TODO disable portal routing

@@ -18,16 +18,11 @@
 package org.cubeengine.module.teleport;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.data.property.AbstractProperty;
-import org.spongepowered.api.data.property.block.MatterProperty;
-import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -38,15 +33,11 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.util.blockray.BlockRay;
-import org.spongepowered.api.util.blockray.BlockRayHit;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.spongepowered.api.data.property.block.MatterProperty.Matter.SOLID;
 import static org.spongepowered.api.item.ItemTypes.COMPASS;
 import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 
@@ -110,7 +101,7 @@ public class TeleportListener
             return;
         }
         player.setLocation(LocationUtil.getLocationUp(loc).add(0.5, 0, 0.5));
-        i18n.sendTranslated(ACTION_BAR, player, NEUTRAL, "Poof!");
+        i18n.send(ACTION_BAR, player, NEUTRAL, "Poof!");
         event.setCancelled(true);
     }
 
@@ -132,12 +123,12 @@ public class TeleportListener
         Optional<Location<World>> end = LocationUtil.getBlockBehindWall(player, module.getConfig().navigation.thru.maxRange, module.getConfig().navigation.thru.maxWallThickness);
         if (!end.isPresent())
         {
-            i18n.sendTranslated(player, NEGATIVE, "Nothing to pass through!");
+            i18n.send(player, NEGATIVE, "Nothing to pass through!");
             return;
         }
 
         player.setLocation(end.get().add(0.5, 0, 0.5));
-        i18n.sendTranslated(player, NEUTRAL, "You passed through a wall");
+        i18n.send(player, NEUTRAL, "You passed through a wall");
         event.setCancelled(true);
     }
 

@@ -72,7 +72,7 @@ public class TeleportCommands
             target = player;
             if (!(context instanceof Player))
             {
-                i18n.sendTranslated(context, NEGATIVE, "You have to provide both players");
+                i18n.send(context, NEGATIVE, "You have to provide both players");
                 return;
             }
             player = (Player)context;
@@ -80,7 +80,7 @@ public class TeleportCommands
         force = force && context.hasPermission(module.perms().COMMAND_TP_FORCE.getId());
         if (!context.equals(player) && !context.hasPermission(module.perms().COMMAND_TP_OTHER.getId())) // teleport other persons
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to teleport other people!");
+            i18n.send(context, NEGATIVE, "You are not allowed to teleport other people!");
             return;
         }
 
@@ -88,7 +88,7 @@ public class TeleportCommands
         {
             if (!force && player.hasPermission(module.perms().TELEPORT_PREVENT_TP.getId())) // teleport the user
             {
-                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to teleport {user}!", player);
+                i18n.send(context, NEGATIVE, "You are not allowed to teleport {user}!", player);
                 return;
             }
         } // else equals tp -> no need to check tp perm
@@ -98,9 +98,9 @@ public class TeleportCommands
             {
                 if (context.hasPermission(module.perms().COMMAND_TP_FORCE.getId()))
                 {
-                    i18n.sendTranslated(context, POSITIVE, "Use the {text:-force (-f)} flag to teleport to this player."); //Show force flag if has permission
+                    i18n.send(context, POSITIVE, "Use the {text:-force (-f)} flag to teleport to this player."); //Show force flag if has permission
                 }
-                i18n.sendTranslated(context, NEGATIVE, "You are not allowed to teleport to {user}!", target);
+                i18n.send(context, NEGATIVE, "You are not allowed to teleport to {user}!", target);
                 return;
             }
         } // else equals tphere -> no need to check tpto perm
@@ -109,14 +109,14 @@ public class TeleportCommands
         {
             if (context.equals(player))
             {
-                i18n.sendTranslated(context, NEUTRAL, "You found yourself!");
+                i18n.send(context, NEUTRAL, "You found yourself!");
                 return;
             }
-            i18n.sendTranslated(context, NEUTRAL, "You just teleported {user} to {user}... Not very useful right?", player, player);
+            i18n.send(context, NEUTRAL, "You just teleported {user} to {user}... Not very useful right?", player, player);
             return;
         }
         player.setLocation(target.getLocation());
-        i18n.sendTranslated(context, POSITIVE, "You teleported to {user}!", target);
+        i18n.send(context, POSITIVE, "You teleported to {user}!", target);
     }
 
     @Command(desc = "Teleports everyone directly to a player.")
@@ -125,7 +125,7 @@ public class TeleportCommands
         force = force && context.hasPermission(module.perms().COMMAND_TPALL_FORCE.getId());
         if (!force && player.hasPermission(module.perms().TELEPORT_PREVENT_TPTO.getId()))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to teleport to {user}!", player);
+            i18n.send(context, NEGATIVE, "You are not allowed to teleport to {user}!", player);
             return;
         }
         ArrayList<String> noTp = new ArrayList<>();
@@ -142,7 +142,7 @@ public class TeleportCommands
         bc.broadcastTranslated(POSITIVE, "Teleporting everyone to {user}", player);
         if (!noTp.isEmpty())
         {
-            i18n.sendTranslated(context, NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
+            i18n.send(context, NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
         }
     }
 
@@ -153,18 +153,18 @@ public class TeleportCommands
         force = force && context.hasPermission(module.perms().COMMAND_TPHERE_FORCE.getId());
         if ( context.equals(player))
         {
-            i18n.sendTranslated(context, NEUTRAL, "You found yourself!");
+            i18n.send(context, NEUTRAL, "You found yourself!");
             return;
         }
         if (!force && player.hasPermission(module.perms().TELEPORT_PREVENT_TP.getId()))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You are not allowed to teleport {user}!", player);
+            i18n.send(context, NEGATIVE, "You are not allowed to teleport {user}!", player);
             return;
         }
 
         player.setLocation(context.getLocation());
-        i18n.sendTranslated(context, POSITIVE, "You teleported {user} to you!", player);
-        i18n.sendTranslated(player, POSITIVE, "You were teleported to {sender}", context);
+        i18n.send(context, POSITIVE, "You teleported {user} to you!", player);
+        i18n.send(player, POSITIVE, "You were teleported to {sender}", context);
     }
 
     @Command(desc = "Teleport every player directly to you.")
@@ -183,11 +183,11 @@ public class TeleportCommands
             }
             p.getPlayer().get().setLocation(target);
         }
-        i18n.sendTranslated(context, POSITIVE, "You teleported everyone to you!");
+        i18n.send(context, POSITIVE, "You teleported everyone to you!");
         bc.broadcastTranslated(POSITIVE, "Teleporting everyone to {sender}", context);
         if (!noTp.isEmpty())
         {
-            i18n.sendTranslated(context, NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(
+            i18n.send(context, NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(
                 WHITE + "," + DARK_GREEN, noTp));
         }
     }
@@ -208,7 +208,7 @@ public class TeleportCommands
         {
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new Vector3i(x, y, z), world);
+        i18n.send(context, POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new Vector3i(x, y, z), world);
     }
 }
 

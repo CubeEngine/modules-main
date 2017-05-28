@@ -147,7 +147,7 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
             else
             {
                 throw new TranslatedParserException(
-                        i18n.getTranslation(invocation.getContext(Locale.class), MessageType.NEGATIVE,
+                        i18n.translate(invocation.getContext(Locale.class), MessageType.NEGATIVE,
                                 "Unknown World {name} for world-region", token, worldName));
             }
         }
@@ -157,7 +157,7 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
         }
 
         throw new TranslatedParserException(
-                i18n.getTranslation(invocation.getContext(Locale.class), MessageType.NEGATIVE,
+                i18n.translate(invocation.getContext(Locale.class), MessageType.NEGATIVE,
                                     "There is no such Region as {name}", token));
     }
 
@@ -173,7 +173,7 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
             }
         }
         throw new TranslatedParserException(
-                i18n.getTranslation(invocation.getContext(Locale.class), MessageType.NEGATIVE,
+                i18n.translate(invocation.getContext(Locale.class), MessageType.NEGATIVE,
                                     "You need to provide a region"));
 
     }

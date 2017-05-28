@@ -18,8 +18,9 @@
 package org.cubeengine.module.travel;
 
 import org.cubeengine.dirigent.Component;
+import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
-import org.cubeengine.dirigent.formatter.Context;
+import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.module.travel.config.TeleportPoint;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -41,9 +42,9 @@ public class TpPointFormatter extends AbstractFormatter<TeleportPoint>
     }
 
     @Override
-    public Component format(TeleportPoint object, Context context)
+    public Component format(TeleportPoint object, Context context, Arguments args)
     {
         String cmd = "/" + (object instanceof Home ? "home" : "warp") + " tp " + object.name + " " + object.getOwner().getName();
-        return styled(UNDERLINE, runCommand(cmd, hoverText(i18n.getTranslation(context.getLocale(), NONE, "Click to teleport to {}", object.name), object.getOwner().getName())));
+        return styled(UNDERLINE, runCommand(cmd, hoverText(i18n.translate(context, NONE, "Click to teleport to {}", object.name), object.getOwner().getName())));
     }
 }

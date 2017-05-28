@@ -54,7 +54,6 @@ import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.config.Home;
-import org.cubeengine.module.travel.config.Warp;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
@@ -118,7 +117,7 @@ public class HomeCommand extends ContainerCommand
         if (h == null)
         {
             homeNotFoundMessage(sender, owner, home);
-            i18n.sendTranslated(sender, NEUTRAL, "Use {text:/sethome} to set your home"); // TODO create on click
+            i18n.send(sender, NEUTRAL, "Use {text:/sethome} to set your home"); // TODO create on click
             return;
         }
         if (!h.isInvited(sender) && !owner.equals(sender))
@@ -137,10 +136,10 @@ public class HomeCommand extends ContainerCommand
         }
         if (h.owner.equals(sender.getUniqueId()))
         {
-            i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "You have been teleported to your home {name}!", h.name);
+            i18n.send(ACTION_BAR, sender, POSITIVE, "You have been teleported to your home {name}!", h.name);
             return;
         }
-        i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "You have been teleported to the home {name} of {user}!", h.name, h.getOwner());
+        i18n.send(ACTION_BAR, sender, POSITIVE, "You have been teleported to the home {name} of {user}!", h.name, h.getOwner());
     }
 
     @Alias("sethome")
@@ -152,23 +151,23 @@ public class HomeCommand extends ContainerCommand
         if (this.manager.getCount(sender) >= this.module.getConfig().homes.max
             && !context.hasPermission(module.getPermissions().HOME_SET_MORE.getId()))
         {
-            i18n.sendTranslated(context, NEGATIVE, "You have reached your maximum number of homes!");
-            i18n.sendTranslated(context, NEUTRAL, "You have to delete a home to make a new one");
+            i18n.send(context, NEGATIVE, "You have reached your maximum number of homes!");
+            i18n.send(context, NEUTRAL, "You have to delete a home to make a new one");
             return;
         }
         name = name == null ? "home" : name;
         if (name.contains(":") || name.length() >= 32)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Homes may not have names that are longer then 32 characters nor contain colon(:)'s!");
+            i18n.send(context, NEGATIVE, "Homes may not have names that are longer then 32 characters nor contain colon(:)'s!");
             return;
         }
         if (this.manager.has(sender, name))
         {
-            i18n.sendTranslated(context, NEGATIVE, "The home already exists! You can move it with {text:/home move}");
+            i18n.send(context, NEGATIVE, "The home already exists! You can move it with {text:/home move}");
             return;
         }
         Home home = this.manager.create(sender, name, sender.getTransform());
-        i18n.sendTranslated(context, POSITIVE, "Your home {name} has been created!", home.name);
+        i18n.send(context, POSITIVE, "Your home {name} has been created!", home.name);
     }
 
     @Command(desc = "Set the welcome message of homes", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
@@ -195,11 +194,11 @@ public class HomeCommand extends ContainerCommand
         manager.save();
         if (h.getOwner().equals(sender))
         {
-            i18n.sendTranslated(sender, POSITIVE, "The welcome message for your home {name} is now set to:", h.name);
+            i18n.send(sender, POSITIVE, "The welcome message for your home {name} is now set to:", h.name);
         }
         else
         {
-            i18n.sendTranslated(sender, POSITIVE, "The welcome message for the home {name} of {user} is now set to:", h.name, owner);
+            i18n.send(sender, POSITIVE, "The welcome message for the home {name} of {user} is now set to:", h.name, owner);
         }
         sender.sendMessage(Text.of(h.welcomeMsg));
     }
@@ -213,7 +212,7 @@ public class HomeCommand extends ContainerCommand
         if (home == null)
         {
             homeNotFoundMessage(sender, owner, name);
-            i18n.sendTranslated(sender, NEUTRAL, "Use {text:/sethome} to set your home"); // TODO create on click
+            i18n.send(sender, NEUTRAL, "Use {text:/sethome} to set your home"); // TODO create on click
             return;
         }
         if (!home.isInvited(sender))
@@ -227,10 +226,10 @@ public class HomeCommand extends ContainerCommand
         manager.save();
         if (home.owner.equals(sender.getUniqueId()))
         {
-            i18n.sendTranslated(sender, POSITIVE, "Your home {name} has been moved to your current location!", home.name);
+            i18n.send(sender, POSITIVE, "Your home {name} has been moved to your current location!", home.name);
             return;
         }
-        i18n.sendTranslated(sender, POSITIVE, "The home {name} of {user} has been moved to your current location", home.name, owner);
+        i18n.send(sender, POSITIVE, "The home {name} of {user} has been moved to your current location", home.name, owner);
     }
 
     @Alias(value = {"remhome", "removehome", "delhome", "deletehome"})
@@ -251,10 +250,10 @@ public class HomeCommand extends ContainerCommand
         this.manager.delete(home);
         if (owner.equals(sender))
         {
-            i18n.sendTranslated(sender, POSITIVE, "Your home {name} has been removed!", name);
+            i18n.send(sender, POSITIVE, "Your home {name} has been removed!", name);
             return;
         }
-        i18n.sendTranslated(sender, POSITIVE, "The home {name} of {user} has been removed", name, owner);
+        i18n.send(sender, POSITIVE, "The home {name} of {user} has been removed", name, owner);
     }
 
     @Command(desc = "Rename a home")
@@ -272,7 +271,7 @@ public class HomeCommand extends ContainerCommand
         }
         if (home.contains(":") || home.length() >= 32)
         {
-            i18n.sendTranslated(sender, NEGATIVE,
+            i18n.send(sender, NEGATIVE,
                                    "Homes may not have names that are longer than 32 characters or contain colon(:)'s!");
             return;
         }
@@ -280,15 +279,15 @@ public class HomeCommand extends ContainerCommand
 
         if (!manager.rename(h, newName))
         {
-            i18n.sendTranslated(sender, POSITIVE, "Could not rename the home to {name}", newName);
+            i18n.send(sender, POSITIVE, "Could not rename the home to {name}", newName);
             return;
         }
         if (h.getOwner().equals(sender))
         {
-            i18n.sendTranslated(sender, POSITIVE, "Your home {name} has been renamed to {name}", oldName, newName);
+            i18n.send(sender, POSITIVE, "Your home {name} has been renamed to {name}", oldName, newName);
             return;
         }
-        i18n.sendTranslated(sender, POSITIVE, "The home {name} of {user} has been renamed to {name}", oldName, owner, newName);
+        i18n.send(sender, POSITIVE, "The home {name} of {user} has been renamed to {name}", oldName, owner, newName);
     }
 
     @Alias(value = {"listhomes", "homes"})
@@ -315,26 +314,26 @@ public class HomeCommand extends ContainerCommand
         {
             if (owner.equals(sender))
             {
-                i18n.sendTranslated(sender, NEGATIVE, "No homes are available to you!");
+                i18n.send(sender, NEGATIVE, "No homes are available to you!");
                 return;
             }
-            i18n.sendTranslated(sender, NEGATIVE, "No homes are available to {user}!", owner);
+            i18n.send(sender, NEGATIVE, "No homes are available to {user}!", owner);
             return;
         }
         if (owner.equals(sender))
         {
-            i18n.sendTranslated(sender, NEUTRAL, "The following homes are available to you:");
+            i18n.send(sender, NEUTRAL, "The following homes are available to you:");
         }
         else
         {
-            i18n.sendTranslated(sender, NEUTRAL, "The following homes are available to {user}:", owner);
+            i18n.send(sender, NEUTRAL, "The following homes are available to {user}:", owner);
         }
 
         for (Home home : homes)
         {
-            Text teleport = i18n.getTranslation(sender, MessageType.NONE, "(tp)").toBuilder().color(BLUE)
+            Text teleport = i18n.translate(sender, MessageType.NONE, "(tp)").toBuilder().color(BLUE)
                 .onClick(TextActions.runCommand("/home tp " + home.name + " " + home.getOwner().getName()))
-                .onHover(TextActions.showText(i18n.getTranslation(sender, POSITIVE, "Click to teleport to {name}", home.name)))
+                .onHover(TextActions.showText(i18n.translate(sender, POSITIVE, "Click to teleport to {name}", home.name)))
                 .build();
             if (home.isOwner(sender))
             {
@@ -361,19 +360,19 @@ public class HomeCommand extends ContainerCommand
         {
             if (owner.equals(sender))
             {
-                i18n.sendTranslated(sender, NEGATIVE, "You have no homes with players invited to them!");
+                i18n.send(sender, NEGATIVE, "You have no homes with players invited to them!");
                 return;
             }
-            i18n.sendTranslated(sender, NEGATIVE, "{user} has no homes with players invited to them!", owner);
+            i18n.send(sender, NEGATIVE, "{user} has no homes with players invited to them!", owner);
             return;
         }
         if (owner.equals(sender))
         {
-            i18n.sendTranslated(sender, NEUTRAL, "Your following homes have players invited to them:");
+            i18n.send(sender, NEUTRAL, "Your following homes have players invited to them:");
         }
         else
         {
-            i18n.sendTranslated(sender, NEUTRAL, "The following homes of {user} have players invited to them:", owner);
+            i18n.send(sender, NEUTRAL, "The following homes of {user} have players invited to them:", owner);
         }
         for (Home home : homes)
         {
@@ -382,7 +381,7 @@ public class HomeCommand extends ContainerCommand
             {
                 String name = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(invite).get().getName();
                 Text uninvite = Text.of("(-)").toBuilder().color(RED)
-                    .onHover(TextActions.showText(i18n.getTranslation(sender, NEUTRAL, "Click to uninvite {user} from {name}", name, home.name)))
+                    .onHover(TextActions.showText(i18n.translate(sender, NEUTRAL, "Click to uninvite {user} from {name}", name, home.name)))
                     .onClick(TextActions.runCommand("/home uninvite " + name + " " + home.name))
                     .build();
                 sender.sendMessage(Text.of("    ", DARK_GREEN, name, " ", uninvite));
@@ -398,28 +397,28 @@ public class HomeCommand extends ContainerCommand
         Home h = this.manager.get(sender, home).orElse(null);
         if (h == null || !h.owner.equals(sender.getUniqueId()))
         {
-            i18n.sendTranslated(sender, NEGATIVE, "You do not own a home named {name#home}!", home);
+            i18n.send(sender, NEGATIVE, "You do not own a home named {name#home}!", home);
             return;
         }
         if (player.equals(sender))
         {
-            i18n.sendTranslated(sender, NEGATIVE, "You cannot invite yourself to your own home!");
+            i18n.send(sender, NEGATIVE, "You cannot invite yourself to your own home!");
             return;
         }
         if (h.isInvited(player))
         {
-            i18n.sendTranslated(sender, NEGATIVE, "{user} is already invited to your home!", player);
+            i18n.send(sender, NEGATIVE, "{user} is already invited to your home!", player);
             return;
         }
         h.invites.add(player.getUniqueId());
         this.manager.save();
         if (player.isOnline())
         {
-            i18n.sendTranslated(player.getPlayer().get(), NEUTRAL,
+            i18n.send(player.getPlayer().get(), NEUTRAL,
                                 "{user} invited you to their home. To teleport to it use: /home {name#home} {name}", sender,
                                 h.name, sender.getName());
         }
-        i18n.sendTranslated(sender, POSITIVE, "{user} is now invited to your home {name}", player, h.name);
+        i18n.send(sender, POSITIVE, "{user} is now invited to your home {name}", player, h.name);
     }
 
     @Restricted(Player.class)
@@ -430,25 +429,25 @@ public class HomeCommand extends ContainerCommand
         Home h = this.manager.get(sender, home).orElse(null);
         if (h == null || !h.owner.equals(sender.getUniqueId()))
         {
-            i18n.sendTranslated(sender, NEGATIVE, "You do not own a home named {name#home}!", home);
+            i18n.send(sender, NEGATIVE, "You do not own a home named {name#home}!", home);
             return;
         }
         if (player.equals(sender))
         {
-            i18n.sendTranslated(sender, NEGATIVE, "You cannot uninvite yourself from your own home!");
+            i18n.send(sender, NEGATIVE, "You cannot uninvite yourself from your own home!");
             return;
         }
         if (!h.isInvited(player))
         {
-            i18n.sendTranslated(sender, NEGATIVE, "{user} is not invited to your home!", player);
+            i18n.send(sender, NEGATIVE, "{user} is not invited to your home!", player);
             return;
         }
         h.invites.remove(player.getUniqueId());
         if (player.isOnline())
         {
-            i18n.sendTranslated(player.getPlayer().get(), NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.name);
+            i18n.send(player.getPlayer().get(), NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.name);
         }
-        i18n.sendTranslated(sender, POSITIVE, "{user} is no longer invited to your home {name}", player, h.name);
+        i18n.send(sender, POSITIVE, "{user} is no longer invited to your home {name}", player, h.name);
     }
 
     @Alias(value = {"clearhomes"})
@@ -458,7 +457,7 @@ public class HomeCommand extends ContainerCommand
     {
         if (this.module.getConfig().clearOnlyFromConsole && !(context instanceof ConsoleSource))
         {
-            i18n.sendTranslated(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
+            i18n.send(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return;
         }
         final Location<World> firstPoint;
@@ -467,31 +466,31 @@ public class HomeCommand extends ContainerCommand
         {
             if (selector.isAvailable())
             {
-                i18n.sendTranslated(context, NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
+                i18n.send(context, NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
                 return;
             }
             if (!(context instanceof Player))
             {
-                i18n.sendTranslated(context, NEGATIVE, "You have to be in game to use the selection flag");
+                i18n.send(context, NEGATIVE, "You have to be in game to use the selection flag");
                 return;
             }
             Selector selector = this.selector.value();
             Shape shape = selector.getSelection((Player)context);
             if (!(shape instanceof Cuboid))
             {
-                i18n.sendTranslated(context, NEGATIVE, "Invalid selection!");
+                i18n.send(context, NEGATIVE, "Invalid selection!");
                 return;
             }
             firstPoint = selector.getFirstPoint((Player)context);
             secondPoint = selector.getSecondPoint((Player)context);
             if (owner != null)
             {
-                i18n.sendTranslated(context, NEGATIVE,
+                i18n.send(context, NEGATIVE,
                                       "Are you sure you want to delete all homes created by {user} in your current selection?", owner);
             }
             else
             {
-                i18n.sendTranslated(context, NEGATIVE,
+                i18n.send(context, NEGATIVE,
                                       "Are you sure you want to delete all homes created in your current selection?");
             }
         }
@@ -501,16 +500,16 @@ public class HomeCommand extends ContainerCommand
             secondPoint = null;
             if (owner != null)
             {
-                i18n.sendTranslated(context, NEGATIVE,
+                i18n.send(context, NEGATIVE,
                                       "Are you sure you want to delete all homes ever created by {user}?", owner);
             }
             else
             {
-                i18n.sendTranslated(context, NEGATIVE,
+                i18n.send(context, NEGATIVE,
                                       "Are you sure you want to delete all homes ever created on this server?");
             }
         }
-        Text confirmText = i18n.getTranslation(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the homes");
+        Text confirmText = i18n.translate(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the homes");
         ConfirmManager.requestConfirmation(i18n,  confirmText, context,() -> {
             Predicate<Home> predicate = home -> true;
             if (owner != null)
@@ -530,19 +529,19 @@ public class HomeCommand extends ContainerCommand
                 manager.massDelete(predicate);
                 if (owner != null)
                 {
-                    i18n.sendTranslated(context, POSITIVE, "The homes of {user} in the selection are now deleted", owner);
+                    i18n.send(context, POSITIVE, "The homes of {user} in the selection are now deleted", owner);
                     return;
                 }
-                i18n.sendTranslated(context, POSITIVE, "The homes in the selection are now deleted.");
+                i18n.send(context, POSITIVE, "The homes in the selection are now deleted.");
                 return;
             }
             manager.massDelete(predicate);
             if (owner != null)
             {
-                i18n.sendTranslated(context, POSITIVE, "The homes of {user} are now deleted", owner);
+                i18n.send(context, POSITIVE, "The homes of {user} are now deleted", owner);
                 return;
             }
-            i18n.sendTranslated(context, POSITIVE, "The homes are now deleted.");
+            i18n.send(context, POSITIVE, "The homes are now deleted.");
 
         });
 
@@ -552,11 +551,11 @@ public class HomeCommand extends ContainerCommand
     {
         if (sender.getIdentifier().equals(user.getIdentifier()))
         {
-            i18n.sendTranslated(sender, NEGATIVE, "You have no home named {name#home}!", name);
+            i18n.send(sender, NEGATIVE, "You have no home named {name#home}!", name);
         }
         else
         {
-            i18n.sendTranslated(sender, NEGATIVE, "{user} has no home named {name#home}!", user, name);
+            i18n.send(sender, NEGATIVE, "{user} has no home named {name#home}!", user, name);
         }
     }
 }

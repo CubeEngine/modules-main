@@ -73,17 +73,17 @@ public class ItemDBCommand
             List<ItemStack> itemList = materialMatcher.itemStackList(item);
             if (itemList == null || itemList.size() <= 0)
             {
-                i18n.sendTranslated(context, NEGATIVE, "Could not find any item named {input}!", item);
+                i18n.send(context, NEGATIVE, "Could not find any item named {input}!", item);
                 return;
             }
             List<Text> lines = new ArrayList<>();
             ItemStack key = itemList.get(0);
-            lines.add(i18n.getTranslation(context, POSITIVE, "Best Matched {input#item} {input#id} for {input}",
+            lines.add(i18n.translate(context, POSITIVE, "Best Matched {input#item} {input#id} for {input}",
                                           materialMatcher.getNameFor(key), key.getItem().getId(), item));
             itemList.remove(0);
             for (ItemStack stack : itemList)
             {
-                lines.add(i18n.getTranslation(context, POSITIVE, "Matched {input#item} {input#id} for {input}",
+                lines.add(i18n.translate(context, POSITIVE, "Matched {input#item} {input#id} for {input}",
                                               materialMatcher.getNameFor(stack), stack.getItem().getId(), item));
             }
             Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder()
@@ -97,16 +97,16 @@ public class ItemDBCommand
         Player sender = (Player)context;
         if (!sender.getItemInHand(HandTypes.MAIN_HAND).isPresent())
         {
-            i18n.sendTranslated(context, NEUTRAL, "You hold nothing in your hands!");
+            i18n.send(context, NEUTRAL, "You hold nothing in your hands!");
             return;
         }
         ItemStack aItem = sender.getItemInHand(HandTypes.MAIN_HAND).get();
         String found = materialMatcher.getNameFor(aItem);
         if (found == null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Itemname unknown! Itemdata: {integer#id}", aItem.getItem().getId());
+            i18n.send(context, NEGATIVE, "Itemname unknown! Itemdata: {integer#id}", aItem.getItem().getId());
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "The Item in your hand is: {input#item} ({integer#id})", found, aItem.getItem().getId());
+        i18n.send(context, POSITIVE, "The Item in your hand is: {input#item} ({integer#id})", found, aItem.getItem().getId());
     }
 }

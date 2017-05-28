@@ -69,12 +69,12 @@ public class PortalCommands extends ContainerCommand
     {
         if (!(selector.getSelection(context) instanceof Cuboid))
         {
-            i18n.sendTranslated(context, NEGATIVE, "Please select a cuboid first!");
+            i18n.send(context, NEGATIVE, "Please select a cuboid first!");
             return;
         }
         if (module.getPortal(name) != null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "A portal named {input} already exists!", name);
+            i18n.send(context, NEGATIVE, "A portal named {input} already exists!", name);
             return;
         }
         Location p1 = selector.getFirstPoint(context);
@@ -94,10 +94,10 @@ public class PortalCommands extends ContainerCommand
         module.addPortal(portal);
 
         module.getPortalsAttachment(context.getUniqueId()).setPortal(portal);
-        i18n.sendTranslated(context, POSITIVE, "Portal {name} created!", portal.getName());
+        i18n.send(context, POSITIVE, "Portal {name} created!", portal.getName());
         if (destination == null)
         {
-            i18n.sendTranslated(context, POSITIVE, "Select a destination using the portal modify destination command");
+            i18n.send(context, POSITIVE, "Select a destination using the portal modify destination command");
         }
     }
 
@@ -107,7 +107,7 @@ public class PortalCommands extends ContainerCommand
     public void select(Player context, Portal portal)
     {
         module.getPortalsAttachment(context.getUniqueId()).setPortal(portal);
-        i18n.sendTranslated(context, POSITIVE, "Portal selected: {name}", portal.getName());
+        i18n.send(context, POSITIVE, "Portal selected: {name}", portal.getName());
     }
 
     @Alias(value ="mvpi")
@@ -122,7 +122,7 @@ public class PortalCommands extends ContainerCommand
     public void remove(CommandSource context, @Default Portal portal)
     {
         portal.delete();
-        i18n.sendTranslated(context, POSITIVE, "Portal {name} deleted", portal.getName());
+        i18n.send(context, POSITIVE, "Portal {name} deleted", portal.getName());
     }
 
     public enum OnOff implements FixedValues
@@ -158,10 +158,10 @@ public class PortalCommands extends ContainerCommand
         }
         if (attachment.isDebug())
         {
-            i18n.sendTranslated(context, POSITIVE, "Portal debug mode ON!");
+            i18n.send(context, POSITIVE, "Portal debug mode ON!");
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "Portal debug mode OFF!");
+        i18n.send(context, POSITIVE, "Portal debug mode OFF!");
     }
 
     @Alias("mvpl")
@@ -171,10 +171,10 @@ public class PortalCommands extends ContainerCommand
         Set<Portal> portals = module.getPortals(world);
         if (portals.isEmpty())
         {
-            i18n.sendTranslated(context, POSITIVE, "There are no portals in {world}", world);
+            i18n.send(context, POSITIVE, "There are no portals in {world}", world);
             return;
         }
-        i18n.sendTranslated(context, POSITIVE, "The following portals are located in {world}", world);
+        i18n.send(context, POSITIVE, "The following portals are located in {world}", world);
         for (Portal portal : portals)
         {
             context.sendMessage(Text.of(" - ", portal.getName()));

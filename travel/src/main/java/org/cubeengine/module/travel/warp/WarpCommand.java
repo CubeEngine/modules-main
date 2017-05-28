@@ -109,10 +109,10 @@ public class WarpCommand extends ContainerCommand
         }
         if (w.isOwner(sender))
         {
-            i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "You have been teleported to your warp {name}!", w.name);
+            i18n.send(ACTION_BAR, sender, POSITIVE, "You have been teleported to your warp {name}!", w.name);
             return;
         }
-        i18n.sendTranslated(ACTION_BAR, sender, POSITIVE, "You have been teleported to the warp {name} of {user}!", w.name, w.getOwner());
+        i18n.send(ACTION_BAR, sender, POSITIVE, "You have been teleported to the warp {name} of {user}!", w.name, w.getOwner());
     }
 
     @Restricted(Player.class)
@@ -122,27 +122,27 @@ public class WarpCommand extends ContainerCommand
     {
         if (this.manager.getCount() >= this.module.getConfig().warps.max)
         {
-            i18n.sendTranslated(sender, CRITICAL, "The server have reached its maximum number of warps!");
-            i18n.sendTranslated(sender, NEGATIVE, "Some warps must be deleted for new ones to be made");
+            i18n.send(sender, CRITICAL, "The server have reached its maximum number of warps!");
+            i18n.send(sender, NEGATIVE, "Some warps must be deleted for new ones to be made");
             return;
         }
         if (manager.has(name))
         {
-            i18n.sendTranslated(sender, NEGATIVE, "A warp by that name already exist!");
+            i18n.send(sender, NEGATIVE, "A warp by that name already exist!");
             return;
         }
         if (name.contains(":") || name.length() >= 32)
         {
-            i18n.sendTranslated(sender, NEGATIVE, "Warps may not have names that are longer than 32 characters nor contain colon(:)'s!");
+            i18n.send(sender, NEGATIVE, "Warps may not have names that are longer than 32 characters nor contain colon(:)'s!");
             return;
         }
         if (this.manager.has(name))
         {
-            i18n.sendTranslated(sender, NEGATIVE, "The warp already exists! You can move it with {text:/warp move}");
+            i18n.send(sender, NEGATIVE, "The warp already exists! You can move it with {text:/warp move}");
             return;
         }
         Warp warp = manager.create(sender, name, sender.getTransform());
-        i18n.sendTranslated(sender, POSITIVE, "Your warp {name} has been created!", warp.name);
+        i18n.send(sender, POSITIVE, "Your warp {name} has been created!", warp.name);
     }
 
     @Command(desc = "Set the welcome message of warps", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
@@ -168,11 +168,11 @@ public class WarpCommand extends ContainerCommand
         manager.save();
         if (w.isOwner(sender))
         {
-            i18n.sendTranslated(sender, POSITIVE, "The welcome message for your warp {name} is now set to:", w.name);
+            i18n.send(sender, POSITIVE, "The welcome message for your warp {name} is now set to:", w.name);
         }
         else
         {
-            i18n.sendTranslated(sender, POSITIVE, "The welcome message for the warp {name} of {user} is now set to:", w.name, w.getOwner());
+            i18n.send(sender, POSITIVE, "The welcome message for the warp {name} of {user} is now set to:", w.name, w.getOwner());
         }
         sender.sendMessage(Text.of(w.welcomeMsg));
     }
@@ -195,10 +195,10 @@ public class WarpCommand extends ContainerCommand
         manager.save();
         if (w.isOwner(sender))
         {
-            i18n.sendTranslated(sender, POSITIVE, "Your warp {name} has been moved to your current location!", w.name);
+            i18n.send(sender, POSITIVE, "Your warp {name} has been moved to your current location!", w.name);
             return;
         }
-        i18n.sendTranslated(sender, POSITIVE, "The warp {name} of {user} has been moved to your current location", w.name, w.getOwner());
+        i18n.send(sender, POSITIVE, "The warp {name} of {user} has been moved to your current location", w.name, w.getOwner());
     }
 
     @Alias(value = {"removewarp", "deletewarp", "delwarp", "remwarp"})
@@ -218,10 +218,10 @@ public class WarpCommand extends ContainerCommand
         manager.delete(w);
         if (w.isOwner(sender))
         {
-            i18n.sendTranslated(sender, POSITIVE, "Your warp {name} has been removed", warp);
+            i18n.send(sender, POSITIVE, "Your warp {name} has been removed", warp);
             return;
         }
-        i18n.sendTranslated(sender, POSITIVE, "The warp {name} of {user} has been removed", warp, w.getOwner());
+        i18n.send(sender, POSITIVE, "The warp {name} of {user} has been removed", warp, w.getOwner());
     }
 
     @Command(desc = "Rename a warp")
@@ -239,20 +239,20 @@ public class WarpCommand extends ContainerCommand
         }
         if (warp.contains(":") || warp.length() >= 32)
         {
-            i18n.sendTranslated(sender, NEGATIVE, "Warps may not have names that are longer than 32 characters or contain colon(:)'s!");
+            i18n.send(sender, NEGATIVE, "Warps may not have names that are longer than 32 characters or contain colon(:)'s!");
             return;
         }
         if (manager.rename(w, newName))
         {
             if (w.isOwner(sender))
             {
-                i18n.sendTranslated(sender, POSITIVE, "Your warp {name} has been renamed to {name}", w.name, newName);
+                i18n.send(sender, POSITIVE, "Your warp {name} has been renamed to {name}", w.name, newName);
                 return;
             }
-            i18n.sendTranslated(sender, POSITIVE, "The warp {name} of {user} has been renamed to {name}", w.name, w.getOwner(), newName);
+            i18n.send(sender, POSITIVE, "The warp {name} of {user} has been renamed to {name}", w.name, w.getOwner(), newName);
             return;
         }
-        i18n.sendTranslated(sender, POSITIVE, "Could not rename the warp to {name}", newName);
+        i18n.send(sender, POSITIVE, "Could not rename the warp to {name}", newName);
     }
 
     @Command(desc = "List warps of a player")
@@ -265,15 +265,15 @@ public class WarpCommand extends ContainerCommand
         Set<Warp> warps = this.manager.list(owner);
         if (warps.isEmpty())
         {
-            i18n.sendTranslated(context, POSITIVE, "There are no warps set.");
+            i18n.send(context, POSITIVE, "There are no warps set.");
             return;
         }
-        i18n.sendTranslatedN(context, POSITIVE, warps.size(), "There is one warp set:", "There are {amount} warps set:", warps.size());
+        i18n.sendN(context, POSITIVE, warps.size(), "There is one warp set:", "There are {amount} warps set:", warps.size());
         for (Warp warp : warps)
         {
-            Text teleport = i18n.getTranslation(context, MessageType.NONE, "(tp)").toBuilder().color(BLUE)
+            Text teleport = i18n.translate(context, MessageType.NONE, "(tp)").toBuilder().color(BLUE)
                                 .onClick(TextActions.runCommand("/warp tp " + warp.name))
-                                .onHover(TextActions.showText(i18n.getTranslation(context, POSITIVE, "Click to teleport to {name}", warp.name)))
+                                .onHover(TextActions.showText(i18n.translate(context, POSITIVE, "Click to teleport to {name}", warp.name)))
                                 .build();
             if (warp.isOwner(context))
             {
@@ -292,30 +292,30 @@ public class WarpCommand extends ContainerCommand
     {
         if (this.module.getConfig().clearOnlyFromConsole && !(context instanceof ConsoleSource))
         {
-            i18n.sendTranslated(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
+            i18n.send(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return;
         }
         if (owner != null)
         {
-            i18n.sendTranslated(context, NEGATIVE, "Are you sure you want to delete all warps ever created by {user}?", owner);
+            i18n.send(context, NEGATIVE, "Are you sure you want to delete all warps ever created by {user}?", owner);
         }
         else
         {
-            i18n.sendTranslated(context, NEGATIVE, "Are you sure you want to delete all warps ever created on this server!?");
+            i18n.send(context, NEGATIVE, "Are you sure you want to delete all warps ever created on this server!?");
         }
-        Text confirmText = i18n.getTranslation(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the warps");
+        Text confirmText = i18n.translate(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the warps");
         ConfirmManager.requestConfirmation(i18n, confirmText, context, () -> {
             Predicate<Warp> predicate = warp -> true;
             if (owner != null)
             {
                 predicate = predicate.and(warp -> warp.getOwner().equals(owner));
                 manager.massDelete(predicate);
-                i18n.sendTranslated(context, POSITIVE, "Deleted warps.");
+                i18n.send(context, POSITIVE, "Deleted warps.");
             }
             else
             {
                 manager.massDelete(predicate);
-                i18n.sendTranslated(context, POSITIVE, "The warps are now deleted");
+                i18n.send(context, POSITIVE, "The warps are now deleted");
             }
         });
     }
@@ -323,6 +323,6 @@ public class WarpCommand extends ContainerCommand
 
     private void warpNotFoundMessage(CommandSource sender, String name)
     {
-        i18n.sendTranslated(sender, NEGATIVE, "There is no warp named {name#warp}!", name);
+        i18n.send(sender, NEGATIVE, "There is no warp named {name#warp}!", name);
     }
 }

@@ -31,8 +31,6 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
-import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -61,17 +59,17 @@ public class EntityDamageSettingsCommands extends ContainerCommand
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
             Subject subject = ps.getGroupSubjects().get(role);
             subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.entityDamageAll.getId(), set);
-            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
         region.getSettings().entityDamage.all = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: All EntityDamage Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: All EntityDamage Settings updated", region);
     }
 
     @Command(desc = "Controls pvp damage")
@@ -81,17 +79,17 @@ public class EntityDamageSettingsCommands extends ContainerCommand
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
             Subject subject = ps.getGroupSubjects().get(role);
             subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.entityDamagePVP.getId(), set);
-            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
         region.getSettings().entityDamage.pvp = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: PVP Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: PVP Settings updated", region);
     }
 
     @Command(desc = "Controls damage by living entities")
@@ -101,17 +99,17 @@ public class EntityDamageSettingsCommands extends ContainerCommand
         {
             if (!ps.getGroupSubjects().hasRegistered(role))
             {
-                i18n.sendTranslated(context, NEGATIVE, "This role does not exist");
+                i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
             Subject subject = ps.getGroupSubjects().get(role);
             subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.entityDamageLiving.getId(), set);
-            i18n.sendTranslated(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             return;
         }
         region.getSettings().entityDamage.byLiving = set;
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: EntityDamage by Living Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: EntityDamage by Living Settings updated", region);
     }
 
     @Command(desc = "Controls explosions caused by players breaking blocks")
@@ -119,6 +117,6 @@ public class EntityDamageSettingsCommands extends ContainerCommand
     {
         setOrUnset(region.getSettings().entityDamage.byEntity, type, set);
         region.save();
-        i18n.sendTranslated(context, POSITIVE,"Region {region}: EntityDamage by Entity Settings updated", region);
+        i18n.send(context, POSITIVE,"Region {region}: EntityDamage by Entity Settings updated", region);
     }
 }

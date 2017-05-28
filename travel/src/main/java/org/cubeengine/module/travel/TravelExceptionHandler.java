@@ -23,7 +23,6 @@ import org.cubeengine.butler.exception.PriorityExceptionHandler;
 import org.cubeengine.module.travel.config.*;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;
@@ -50,11 +49,11 @@ public class TravelExceptionHandler implements PriorityExceptionHandler
             {
                 if (point instanceof Home)
                 {
-                    i18n.sendTranslated(player, NEGATIVE, "Your home {name} is in a world that no longer exists!", point.name);
+                    i18n.send(player, NEGATIVE, "Your home {name} is in a world that no longer exists!", point.name);
                 }
                 else
                 {
-                    i18n.sendTranslated(player, NEGATIVE, "Your warp {name} is in a world that no longer exists!", point.name);
+                    i18n.send(player, NEGATIVE, "Your warp {name} is in a world that no longer exists!", point.name);
                 }
             }
             else
@@ -62,11 +61,11 @@ public class TravelExceptionHandler implements PriorityExceptionHandler
                 String owner = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(point.owner).map(User::getName).orElse(null);
                 if (point instanceof Home)
                 {
-                    i18n.sendTranslated(player, NEGATIVE, "The home {name} of {user} is in a world that no longer exists!", point.name, owner);
+                    i18n.send(player, NEGATIVE, "The home {name} of {user} is in a world that no longer exists!", point.name, owner);
                 }
                 else
                 {
-                    i18n.sendTranslated(player, NEGATIVE, "The warp {name} of {user} is in a world that no longer exists!", point.name, owner);
+                    i18n.send(player, NEGATIVE, "The warp {name} of {user} is in a world that no longer exists!", point.name, owner);
                 }
             }
             return true;

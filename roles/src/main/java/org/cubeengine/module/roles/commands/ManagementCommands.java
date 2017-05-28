@@ -80,7 +80,7 @@ public class ManagementCommands extends ContainerCommand
         service.getUserSubjects().reload();
 
         // TODO remove cached data ; needed?
-        i18n.sendTranslated(context, POSITIVE, "{text:Roles} reload complete!");
+        i18n.send(context, POSITIVE, "{text:Roles} reload complete!");
     }
 
     @Alias(value = "mansave")
@@ -96,7 +96,7 @@ public class ManagementCommands extends ContainerCommand
             }
         }
 
-        i18n.sendTranslated(context, POSITIVE, "{text:Roles} all configurations saved!");
+        i18n.send(context, POSITIVE, "{text:Roles} all configurations saved!");
     }
 
     @Alias(value = "mandebug")
@@ -109,18 +109,18 @@ public class ManagementCommands extends ContainerCommand
             if (seconds != null)
             {
                 seconds = seconds > 60 ? 60 : seconds < 0 ? 1 : seconds; // Min 1 Max 60
-                i18n.sendTranslated(context, POSITIVE, "Debug enabled for {number} seconds", seconds);
+                i18n.send(context, POSITIVE, "Debug enabled for {number} seconds", seconds);
                 Sponge.getScheduler().createTaskBuilder().delay(seconds, TimeUnit.SECONDS)
                         .execute(() -> RolesUtil.debug = false).submit(plugin);
             }
             else
             {
-                i18n.sendTranslated(context, POSITIVE, "Debug enabled");
+                i18n.send(context, POSITIVE, "Debug enabled");
             }
         }
         else
         {
-            i18n.sendTranslated(context, POSITIVE, "Debug disabled");
+            i18n.send(context, POSITIVE, "Debug disabled");
         }
     }
 
@@ -130,16 +130,16 @@ public class ManagementCommands extends ContainerCommand
         PermissionDescription perm = service.getDescription(permission).orElse(null);
         if (perm == null)
         {
-            i18n.sendTranslated(sender, NEGATIVE, "Permission {name} not found!", permission);
+            i18n.send(sender, NEGATIVE, "Permission {name} not found!", permission);
         }
         else
         {
-            i18n.sendTranslated(sender, POSITIVE, "Permission {name} found:", permission);
+            i18n.send(sender, POSITIVE, "Permission {name} found:", permission);
             sender.sendMessage(perm.getDescription().toBuilder().color(GOLD).build());
             Map<Subject, Boolean> roles = perm.getAssignedSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE);
             if (!roles.isEmpty())
             {
-                i18n.sendTranslated(sender, POSITIVE, "Permission is assigned to the following templates:");
+                i18n.send(sender, POSITIVE, "Permission is assigned to the following templates:");
                 for (Entry<Subject, Boolean> entry : roles.entrySet())
                 {
                     sender.sendMessage(Text.of("  - ", GOLD, entry.getKey().getIdentifier(), ": ",

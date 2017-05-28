@@ -43,9 +43,7 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextAction;
 import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextFormat;
 
@@ -74,13 +72,13 @@ public class UserInformationCommands extends ContainerCommand
     {
         List<Subject> parents = player.getSubjectData().getParents(GLOBAL_CONTEXT);
 
-        Text translation = i18n.getTranslation(ctx, NEUTRAL, "Roles of {user}:", player);
+        Text translation = i18n.translate(ctx, NEUTRAL, "Roles of {user}:", player);
         if (ctx.hasPermission("cubeengine.roles.command.roles.user.assign"))
         {
             translation = translation.toBuilder().append(Text.of(" ")).append(
-                i18n.getTranslation(ctx, POSITIVE, "(+)").toBuilder().onClick(TextActions.executeCallback(
+                i18n.translate(ctx, POSITIVE, "(+)").toBuilder().onClick(TextActions.executeCallback(
                     sender -> {
-                        i18n.sendTranslated(sender, POSITIVE, "Click on the role you want to add to {user}.", player);
+                        i18n.send(sender, POSITIVE, "Click on the role you want to add to {user}.", player);
 
                         for (Subject subject : service.getGroupSubjects().getAllSubjects())
                         {
@@ -91,19 +89,19 @@ public class UserInformationCommands extends ContainerCommand
                                     TextActions.runCommand("/roles user assign " + player.getName() + " " + subject.getIdentifier())).build());
                             }
                         }
-                    })).onHover(showText(i18n.getTranslation(ctx, POSITIVE, "Click to add role"))).build()).build();
+                    })).onHover(showText(i18n.translate(ctx, POSITIVE, "Click to add role"))).build()).build();
         }
         ctx.sendMessage(translation);
 
         if (ctx.hasPermission("cubeengine.roles.command.roles.user.remove"))
         {
-            Text removeText1 = i18n.getTranslation(ctx, NEGATIVE, "Click to remove role.");
+            Text removeText1 = i18n.translate(ctx, NEGATIVE, "Click to remove role.");
             parents.stream().filter(parent -> parent instanceof RoleSubject).map(RoleSubject.class::cast)
                .forEach(parent -> {
                     // TODO perm check for each role
                     Text removeText = Text.of(RED, "(-)").toBuilder().onClick(TextActions.executeCallback(sender -> {
-                        i18n.sendTranslated(sender, NEGATIVE, "Do you really want to remove {role} from {user}?", parent, player);
-                        ctx.sendMessage(i18n.getTranslation(sender, TextFormat.NONE, "Confirm").toBuilder().color(DARK_GREEN).onClick(
+                        i18n.send(sender, NEGATIVE, "Do you really want to remove {role} from {user}?", parent, player);
+                        ctx.sendMessage(i18n.translate(sender, TextFormat.NONE, "Confirm").toBuilder().color(DARK_GREEN).onClick(
                             TextActions.runCommand("/roles user remove " + player.getName() + " " + parent.getIdentifier())).build());
                     })).onHover(showText(removeText1)).build();
                     ctx.sendMessage(Text.of("- ", GOLD, parent.getIdentifier(), " ", removeText));
@@ -127,38 +125,38 @@ public class UserInformationCommands extends ContainerCommand
         FoundPermission found = RolesUtil.findPermission(service, player, permission, contexts);
         FoundPermission foundNow = RolesUtil.findPermission(service, player, permission, player.getActiveContexts());
 
-        i18n.sendTranslated(ctx, NEUTRAL, "Player {user} permission check {txt#permission}", player, permText);
+        i18n.send(ctx, NEUTRAL, "Player {user} permission check {txt#permission}", player, permText);
         if (found != null)
         {
             Text from = getFromText(ctx, player, found);
             if (found.value)
             {
-                i18n.sendTranslated(ctx, POSITIVE, "Set to {text:true:color=DARK_GREEN} in {context} {txt#info}", context, from);
+                i18n.send(ctx, POSITIVE, "Set to {text:true:color=DARK_GREEN} in {context} {txt#info}", context, from);
             }
             else
             {
-                i18n.sendTranslated(ctx, NEGATIVE, "Set to {text:false:color=DARK_RED} in {context} {txt#info}", context, from);
+                i18n.send(ctx, NEGATIVE, "Set to {text:false:color=DARK_RED} in {context} {txt#info}", context, from);
             }
         }
         else
         {
-            i18n.sendTranslated(ctx, NEGATIVE, "Not set in {context}", context);
+            i18n.send(ctx, NEGATIVE, "Not set in {context}", context);
         }
         if (foundNow != null)
         {
             Text from = getFromText(ctx, player, foundNow);
             if (foundNow.value)
             {
-                i18n.sendTranslated(ctx, POSITIVE, "Set to {text:true:color=DARK_GREEN} in their active contexts {txt#info}", from);
+                i18n.send(ctx, POSITIVE, "Set to {text:true:color=DARK_GREEN} in their active contexts {txt#info}", from);
             }
             else
             {
-                i18n.sendTranslated(ctx, NEGATIVE, "Set to {text:false:color=DARK_RED} in their active contexts {txt#info}", from);
+                i18n.send(ctx, NEGATIVE, "Set to {text:false:color=DARK_RED} in their active contexts {txt#info}", from);
             }
         }
         else
         {
-            i18n.sendTranslated(ctx, NEGATIVE, "Not set in {context}", context);
+            i18n.send(ctx, NEGATIVE, "Not set in {context}", context);
         }
     }
 
@@ -167,13 +165,13 @@ public class UserInformationCommands extends ContainerCommand
         Text from;
         if (found.subject == player)
         {
-            from = i18n.getTranslation(ctx, NEUTRAL, "Permission is directly assigned to the user!");
+            from = i18n.translate(ctx, NEUTRAL, "Permission is directly assigned to the user!");
         }
         else
         {
-            from = Text.of(i18n.getTranslation(ctx, NEUTRAL, "Permission inherited from:"), Text.NEW_LINE,
+            from = Text.of(i18n.translate(ctx, NEUTRAL, "Permission inherited from:"), Text.NEW_LINE,
                     TextColors.GOLD, RolesUtil.permText(ctx, found.permission, service, i18n), Text.NEW_LINE,
-                           i18n.getTranslation(ctx, NEUTRAL, "in the role {name}!", found.subject.getIdentifier()));
+                           i18n.translate(ctx, NEUTRAL, "in the role {name}!", found.subject.getIdentifier()));
         }
         from = Text.of("(?)").toBuilder().onHover(TextActions.showText(from)).build();
         return from;
@@ -197,13 +195,13 @@ public class UserInformationCommands extends ContainerCommand
         {
             if (all)
             {
-                i18n.sendTranslated(ctx, NEUTRAL, "{user} has no permissions set in {context}.", player, context);
+                i18n.send(ctx, NEUTRAL, "{user} has no permissions set in {context}.", player, context);
                 return;
             }
-            i18n.sendTranslated(ctx, NEUTRAL, "{user} has no permissions set directly in {context}.", player, context);
+            i18n.send(ctx, NEUTRAL, "{user} has no permissions set directly in {context}.", player, context);
             return;
         }
-        i18n.sendTranslated(ctx, NEUTRAL, "Permissions of {user} in {context}:", player, context);
+        i18n.send(ctx, NEUTRAL, "Permissions of {user} in {context}:", player, context);
         for (Map.Entry<String, Boolean> entry : permissions.entrySet())
         {
             ctx.sendMessage(Text.of("- ", YELLOW, RolesUtil.permText(ctx, entry.getKey(), service, i18n), TextColors.WHITE, ": ", GOLD, entry.getValue()));
@@ -219,18 +217,18 @@ public class UserInformationCommands extends ContainerCommand
         Optional<FoundOption> option = RolesUtil.getOption(service.getUserSubjects().get(player.getIdentifier()), key, contexts);
         if (!option.isPresent())
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "{input#key} is not set for {user} in {context}.", key, player, context);
+            i18n.send(ctx, NEUTRAL, "{input#key} is not set for {user} in {context}.", key, player, context);
             return;
         }
 
-        i18n.sendTranslated(ctx, NEUTRAL, "{input#key}: {input#value} is set for {user} in {context}.", key, option.get().value, player, context);
+        i18n.send(ctx, NEUTRAL, "{input#key}: {input#value} is set for {user} in {context}.", key, option.get().value, player, context);
         if (option.get().subject.getIdentifier().equals(player.getIdentifier()))
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Options is directly assigned to the user!");
+            i18n.send(ctx, NEUTRAL, "Options is directly assigned to the user!");
         }
         else
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Options inherited from the role {name}!", ((RoleSubject)option.get().subject).getIdentifier());
+            i18n.send(ctx, NEUTRAL, "Options inherited from the role {name}!", ((RoleSubject)option.get().subject).getIdentifier());
         }
     }
 
@@ -250,11 +248,11 @@ public class UserInformationCommands extends ContainerCommand
         }
         if (all)
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Options of {user} in {context}:", player, context);
+            i18n.send(ctx, NEUTRAL, "Options of {user} in {context}:", player, context);
         }
         else
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Options of {user} directly set in {context}:", player, context);
+            i18n.send(ctx, NEUTRAL, "Options of {user} directly set in {context}:", player, context);
         }
         for (Map.Entry<String, String> entry : options.entrySet())
         {

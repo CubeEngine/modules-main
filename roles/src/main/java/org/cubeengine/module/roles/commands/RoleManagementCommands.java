@@ -71,16 +71,16 @@ public class RoleManagementCommands extends ContainerCommand
         switch (type)
         {
             case UNDEFINED:
-                i18n.sendTranslated(ctx, NEUTRAL, "{name#permission} has been reset for the role {role} in {context}!",
+                i18n.send(ctx, NEUTRAL, "{name#permission} has been reset for the role {role} in {context}!",
                                         permission, role, context);
                 break;
             case TRUE:
-                i18n.sendTranslated(ctx, POSITIVE,
+                i18n.send(ctx, POSITIVE,
                                         "{name#permission} set to {text:true:color=DARK_GREEN} for the role {role} in {context}!",
                                         permission, role, context);
                 break;
             case FALSE:
-                i18n.sendTranslated(ctx, NEGATIVE,
+                i18n.send(ctx, NEGATIVE,
                                         "{name#permission} set to {text:false:color=DARK_RED} for the role {role} in {context}!",
                                         permission, role, context);
                 break;
@@ -94,10 +94,10 @@ public class RoleManagementCommands extends ContainerCommand
         role.getSubjectData().setOption(toSet(context), key, value);
         if (value == null)
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "Options {input#key} reset for the role {role} in {context}!", key, role, context);
+            i18n.send(ctx, NEUTRAL, "Options {input#key} reset for the role {role} in {context}!", key, role, context);
             return;
         }
-        i18n.sendTranslated(ctx, POSITIVE, "Options {input#key} set to {input#value} for the role {role} in {context}!", key, value, role, context);
+        i18n.send(ctx, POSITIVE, "Options {input#key} set to {input#value} for the role {role} in {context}!", key, value, role, context);
     }
 
     @Alias(value = {"resetROption", "resetRData"})
@@ -112,7 +112,7 @@ public class RoleManagementCommands extends ContainerCommand
     public void clearOption(CommandSource ctx, RoleSubject role, @Named("in") @Default Context context)
     {
         role.getSubjectData().clearOptions(toSet(context));
-        i18n.sendTranslated(ctx, NEUTRAL, "Options cleared for the role {role} in {context}!", role, context);
+        i18n.send(ctx, NEUTRAL, "Options cleared for the role {role} in {context}!", role, context);
     }
 
     @Alias(value = {"addRParent", "manRAdd"})
@@ -121,10 +121,10 @@ public class RoleManagementCommands extends ContainerCommand
     {
         if (role.getSubjectData().addParent(toSet(context), parentRole))
         {
-            i18n.sendTranslated(ctx, POSITIVE, "Added {role} as parent role for the role {role} in {context}", parentRole, role, context);
+            i18n.send(ctx, POSITIVE, "Added {role} as parent role for the role {role} in {context}", parentRole, role, context);
             return;
         }
-        i18n.sendTranslated(ctx, NEUTRAL, "{name#role} is already parent role of the role {role} in {context}!", parentRole, role, context);
+        i18n.send(ctx, NEUTRAL, "{name#role} is already parent role of the role {role} in {context}!", parentRole, role, context);
         // TODO i18n.sendTranslated(ctx, NEGATIVE, "Circular Dependency! {name#role} depends on the role {name}!", pr.getName(), r.getName());
     }
 
@@ -134,10 +134,10 @@ public class RoleManagementCommands extends ContainerCommand
     {
         if (role.getSubjectData().removeParent(toSet(context), parentRole))
         {
-            i18n.sendTranslated(ctx, POSITIVE, "Removed the parent role {role} from the role {role} in {context}!", parentRole, role, context);
+            i18n.send(ctx, POSITIVE, "Removed the parent role {role} from the role {role} in {context}!", parentRole, role, context);
             return;
         }
-        i18n.sendTranslated(ctx, NEUTRAL, "{role} is not a parent role of the role {role} in {context}!", parentRole, role, context);
+        i18n.send(ctx, NEUTRAL, "{role} is not a parent role of the role {role} in {context}!", parentRole, role, context);
     }
 
     @Alias(value = "clearRParent")
@@ -146,10 +146,10 @@ public class RoleManagementCommands extends ContainerCommand
     {
         if (role.getSubjectData().clearParents(toSet(context)))
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "All parent roles of the role {role} in {context} cleared!", role, context);
+            i18n.send(ctx, NEUTRAL, "All parent roles of the role {role} in {context} cleared!", role, context);
             return;
         }
-        i18n.sendTranslated(ctx, NEUTRAL, "{role} had no parent roles in {context}!", role, context);
+        i18n.send(ctx, NEUTRAL, "{role} had no parent roles in {context}!", role, context);
     }
 
     @Alias(value = "setRolePriority")
@@ -161,11 +161,11 @@ public class RoleManagementCommands extends ContainerCommand
             ClassedConverter<Priority> converter = new PriorityConverter();
             Priority prio = converter.fromNode(new StringNode(priority), Priority.class, null);
             role.setPriorityValue(prio.value);
-            i18n.sendTranslated(ctx, POSITIVE, "Priority of the role {role} set to {input#priority}!", role, priority);
+            i18n.send(ctx, POSITIVE, "Priority of the role {role} set to {input#priority}!", role, priority);
         }
         catch (ConversionException ex)
         {
-            i18n.sendTranslated(ctx, NEGATIVE, "{input#priority} is not a valid priority!", priority);
+            i18n.send(ctx, NEGATIVE, "{input#priority} is not a valid priority!", priority);
         }
     }
 
@@ -176,15 +176,15 @@ public class RoleManagementCommands extends ContainerCommand
         String oldName = role.getIdentifier();
         if (oldName.equalsIgnoreCase(newName))
         {
-            i18n.sendTranslated(ctx, NEGATIVE, "These are the same names!");
+            i18n.send(ctx, NEGATIVE, "These are the same names!");
             return;
         }
         if (service.getGroupSubjects().rename(role, newName))
         {
-            i18n.sendTranslated(ctx, POSITIVE, "The role {name#old} was renamed to {role}", oldName, role);
+            i18n.send(ctx, POSITIVE, "The role {name#old} was renamed to {role}", oldName, role);
             return;
         }
-        i18n.sendTranslated(ctx, NEGATIVE, "Renaming failed! The role {name} already exists!", newName);
+        i18n.send(ctx, NEGATIVE, "Renaming failed! The role {name} already exists!", newName);
     }
 
     @Alias(value = "createRole")
@@ -193,12 +193,12 @@ public class RoleManagementCommands extends ContainerCommand
     {
         if (service.getGroupSubjects().hasRegistered(name))
         {
-            i18n.sendTranslated(ctx, NEUTRAL, "There is already a role named {name}.", name);
+            i18n.send(ctx, NEUTRAL, "There is already a role named {name}.", name);
             return;
         }
         RoleSubject r = service.getGroupSubjects().get(name);
         r.getSubjectData().save(true);
-        i18n.sendTranslated(ctx, POSITIVE, "Role {name} created!", name);
+        i18n.send(ctx, POSITIVE, "Role {name} created!", name);
     }
 
     @Alias(value = "deleteRole")
@@ -207,10 +207,10 @@ public class RoleManagementCommands extends ContainerCommand
     {
         if (service.getGroupSubjects().delete(role, force))
         {
-            i18n.sendTranslated(ctx, POSITIVE, "Deleted the role {role}!", role);
+            i18n.send(ctx, POSITIVE, "Deleted the role {role}!", role);
             return;
         }
-        i18n.sendTranslated(ctx, NEGATIVE, "Role is still in use! Use the -force flag to delete the role and all occurrences");
+        i18n.send(ctx, NEGATIVE, "Role is still in use! Use the -force flag to delete the role and all occurrences");
     }
 
     @Command(alias = {"toggleDefault", "toggleDef"}, desc = "Toggles whether given role is a default role")
@@ -220,10 +220,10 @@ public class RoleManagementCommands extends ContainerCommand
         if (defaultData.getParents(GLOBAL_CONTEXT).contains(role))
         {
             defaultData.removeParent(GLOBAL_CONTEXT, role);
-            i18n.sendTranslated(ctx, POSITIVE, "{role} is no longer a default role!", role);
+            i18n.send(ctx, POSITIVE, "{role} is no longer a default role!", role);
             return;
         }
         defaultData.addParent(GLOBAL_CONTEXT, role);
-        i18n.sendTranslated(ctx, POSITIVE, "{role} is now a default role!", role);
+        i18n.send(ctx, POSITIVE, "{role} is now a default role!", role);
     }
 }
