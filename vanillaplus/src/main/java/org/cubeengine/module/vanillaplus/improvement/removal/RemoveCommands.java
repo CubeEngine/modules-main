@@ -64,6 +64,7 @@ public class RemoveCommands
     @Command(desc = "Removes entities in a radius")
     public void remove(CommandSource context, @Label("entityType[:itemMaterial]") EntityFilter filters, @Optional Integer radius, @Default @Named("in") World world)
     {
+        // TODO this is broken
         radius = radius == null ? module.getConfig().improve.commandRemoveDefaultRadius : radius;
         if (radius <= 0 && radius != RADIUS_INFINITE)
         {
