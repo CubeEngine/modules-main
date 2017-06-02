@@ -243,7 +243,7 @@ public class HomeCommand extends ContainerCommand
             homeNotFoundMessage(sender, owner, name);
             return;
         }
-        if (!home.getOwner().equals(sender) && !sender.hasPermission(module.getPermissions().HOME_REMOVE_OTHER.getId()))
+        if (!sender.equals(home.getOwner().getPlayer().orElse(null)) && !sender.hasPermission(module.getPermissions().HOME_REMOVE_OTHER.getId()))
         {
             throw new PermissionDeniedException(module.getPermissions().HOME_REMOVE_OTHER);
         }
