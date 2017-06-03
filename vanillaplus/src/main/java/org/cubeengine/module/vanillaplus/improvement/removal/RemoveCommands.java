@@ -64,8 +64,7 @@ public class RemoveCommands
     @Command(desc = "Removes entities in a radius")
     public void remove(CommandSource context, @Label("entityType[:itemMaterial]") EntityFilter filters, @Optional Integer radius, @Default @Named("in") World world)
     {
-        // TODO this is broken
-        radius = radius == null ? module.getConfig().improve.commandRemoveDefaultRadius : radius;
+        radius = radius == null ? context instanceof Player ? (module.getConfig().improve.commandRemoveDefaultRadius ) : - 1 : radius;
         if (radius <= 0 && radius != RADIUS_INFINITE)
         {
             i18n.send(context, NEGATIVE, "The radius has to be a whole number greater than 0!");
@@ -77,15 +76,7 @@ public class RemoveCommands
             loc = world.getSpawnLocation();
         }
         int entitiesRemoved;
-        List<Entity> list;
-        if ("*".equals(filters))
-        {
-            list = world.getEntities().stream().filter(e -> !(e instanceof Living)).collect(toList());
-        }
-        else
-        {
-            list = world.getEntities().stream().filter(filters).collect(toList());
-        }
+        List<Entity> list = world.getEntities().stream().filter(filters).collect(toList());
         entitiesRemoved = removeEntities(list, loc, radius);
 
         if (entitiesRemoved == 0)
@@ -93,7 +84,7 @@ public class RemoveCommands
             i18n.send(context, NEUTRAL, "No entities to remove!");
             return;
         }
-        if ("*".equals(filters))
+        if (filters.isAll())
         {
             if (radius == RADIUS_INFINITE)
             {

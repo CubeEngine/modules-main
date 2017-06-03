@@ -24,15 +24,27 @@ import org.spongepowered.api.entity.Entity;
 public class EntityFilter implements Predicate<Entity>
 {
     private List<Predicate<Entity>> list;
+    private boolean all = false;
 
     public EntityFilter(List<Predicate<Entity>> list)
     {
         this.list = list;
     }
 
+    public EntityFilter(List<Predicate<Entity>> list, boolean all)
+    {
+        this.list = list;
+        this.all = all;
+    }
+
     @Override
     public boolean test(Entity entity)
     {
         return list.stream().anyMatch(p -> p.test(entity));
+    }
+
+    public boolean isAll()
+    {
+        return all;
     }
 }

@@ -62,6 +62,11 @@ public class EntityFilterParser implements ArgumentParser<EntityFilter>
         CommandSource cmdSource = (CommandSource)invocation.getCommandSource();
         String token = invocation.consume(1);
         List<Predicate<Entity>> filters = new ArrayList<>();
+        if ("*".equals(token)) // All non living
+        {
+            filters.add(e -> !(e instanceof Living));
+            return new EntityFilter(filters, true);
+        }
         for (String entityString : StringUtils.explode(",", token))
         {
             EntityType type;
