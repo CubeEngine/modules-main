@@ -17,9 +17,9 @@
  */
 package org.cubeengine.module.roles.commands.provider;
 
+import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
-import org.cubeengine.dirigent.formatter.argument.Arguments;
 import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
