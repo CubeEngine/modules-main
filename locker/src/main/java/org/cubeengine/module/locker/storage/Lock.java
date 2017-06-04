@@ -47,7 +47,6 @@ import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.commands.PlayerAccess;
 import org.cubeengine.module.locker.data.LockerData;
 import org.jooq.Result;
-import org.jooq.types.UInteger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HandTypes;
@@ -611,7 +610,7 @@ public class Lock
         return access != null && (access.getValue(TABLE_ACCESSLIST.LEVEL) & ACCESS_ADMIN) == ACCESS_ADMIN;
     }
 
-    public UInteger getId()
+    public Long getId()
     {
         return this.model.getValue(TABLE_LOCKS.ID);
     }

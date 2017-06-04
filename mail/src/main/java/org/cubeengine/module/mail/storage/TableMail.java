@@ -18,34 +18,27 @@
 package org.cubeengine.module.mail.storage;
 
 import java.util.UUID;
-import org.cubeengine.libcube.util.Version;
-import org.cubeengine.libcube.service.database.AutoIncrementTable;
-import org.cubeengine.libcube.service.database.Database;
-import org.jooq.TableField;
-import org.jooq.impl.SQLDataType;
-import org.jooq.types.UInteger;
 
+import org.cubeengine.libcube.service.database.Table;
+import org.cubeengine.libcube.util.Version;
+import org.jooq.TableField;
+
+import static org.jooq.impl.SQLDataType.BIGINT;
 import static org.jooq.impl.SQLDataType.VARCHAR;
 
-public class TableMail extends AutoIncrementTable<Mail, UInteger>
+public class TableMail extends Table<Mail>
 {
     public static TableMail TABLE_MAIL;
-    public final TableField<Mail, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
+    public final TableField<Mail, Long> ID = createField("id", BIGINT.nullable(false).identity(true), this);
     public final TableField<Mail, String> MESSAGE = createField("message", VARCHAR.length(100).nullable(false), this);
-    public final TableField<Mail, UUID> USERID = createField("userId", SQLDataType.UUID.length(36).nullable(false), this);
-    public final TableField<Mail, UUID> SENDERID = createField("senderId", SQLDataType.UUID.length(36), this);
+    public final TableField<Mail, UUID> USERID = createField("userId", UUID_TYPE.nullable(false), this);
+    public final TableField<Mail, UUID> SENDERID = createField("senderId", UUID_TYPE, this);
 
-    public TableMail(String prefix, Database db)
+    public TableMail()
     {
-        super("mail", new Version(1), db);
-        setAIKey(ID);
-        addFields(ID, MESSAGE, USERID, SENDERID);
+        super(Mail.class, "mail", new Version(1));
+        this.setPrimaryKey(ID);
+        this.addFields(ID, MESSAGE, USERID, SENDERID);
         TABLE_MAIL = this;
-    }
-
-    @Override
-    public Class<Mail> getRecordType()
-    {
-        return Mail.class;
     }
 }

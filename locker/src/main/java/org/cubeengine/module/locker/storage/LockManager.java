@@ -59,7 +59,6 @@ import org.cubeengine.module.locker.config.EntityLockConfig;
 import org.jooq.Batch;
 import org.jooq.Condition;
 import org.jooq.Result;
-import org.jooq.types.UInteger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
@@ -122,9 +121,9 @@ public class LockManager
     private final Map<UUID, Map<Long, Lock>> loadedLocks = new HashMap<>(); // World -> LocationKey -> Lock
     private final Map<UUID, Map<Long, Set<Lock>>> loadedLocksInChunk = new HashMap<>(); // World -> ChunkKey -> Lock
     private final Map<UUID, Lock> loadedEntityLocks = new HashMap<>(); // EntityID -> Lock
-    private final Map<UInteger, Lock> locksById = new HashMap<>(); // All Locks - LockID -> Lock
+    private final Map<Long, Lock> locksById = new HashMap<>(); // All Locks - LockID -> Lock
 
-    private final Map<UUID, Set<UInteger>> unlocked = new HashMap<>();
+    private final Map<UUID, Set<Long>> unlocked = new HashMap<>();
 
     public final MessageDigest messageDigest;
 
@@ -244,7 +243,7 @@ public class LockManager
         Result<LockModel> models = this.database.getDSL().selectFrom(TABLE_LOCKS).where(TABLE_LOCKS.ID.in(
                 this.database.getDSL().select(TABLE_LOCK_LOCATIONS.LOCK_ID).from(
                         TABLE_LOCK_LOCATIONS).where(TABLE_LOCK_LOCATIONS.WORLD_ID.eq(chunk.getWorld().getUniqueId()), condChunkX, condChunkZ, condNotLoaded))).fetch();
-        Map<UInteger, Result<LockLocationModel>> locations = LockManager.
+        Map<Long, Result<LockLocationModel>> locations = LockManager.
             this.database.getDSL().selectFrom(TABLE_LOCK_LOCATIONS).where(
             TABLE_LOCK_LOCATIONS.LOCK_ID.in(
             models.getValues(TABLE_LOCKS.ID))).fetch().intoGroups(TABLE_LOCK_LOCATIONS.LOCK_ID);
@@ -711,7 +710,7 @@ public class LockManager
      * @param lockID the locks id
      * @return a copy of the Lock with given id
      */
-    public Lock getLockById(UInteger lockID)
+    public Lock getLockById(Long lockID)
     {
         Lock lock = this.locksById.get(lockID);
         if (lock != null)
@@ -842,9 +841,9 @@ public class LockManager
         return getUnlocks(user).contains(lock.getId());
     }
 
-    private Set<UInteger> getUnlocks(Player user)
+    private Set<Long> getUnlocks(Player user)
     {
-        Set<UInteger> unlocks = unlocked.get(user.getUniqueId());
+        Set<Long> unlocks = unlocked.get(user.getUniqueId());
         if (unlocks == null)
         {
             unlocks = new HashSet<>();

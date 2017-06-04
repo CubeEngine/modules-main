@@ -26,7 +26,6 @@ import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.data.LockerData;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.jooq.types.UInteger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.data.type.HandTypes;
@@ -55,7 +54,7 @@ public class KeyBook
     public final Player holder;
     private final Locker module;
     private I18n i18n;
-    public final UInteger lockID;
+    public final Long lockID;
     private final byte[] pass;
     private final Text display;
 
@@ -66,7 +65,7 @@ public class KeyBook
         this.module = module;
         this.i18n = i18n;
         display = item.get(DISPLAY_NAME).get();
-        lockID = UInteger.valueOf(lockerData.get(LockerData.LOCK_ID).get());
+        lockID = lockerData.get(LockerData.LOCK_ID).get();
         List<Byte> pass = lockerData.get(LockerData.LOCK_PASS).get();
         this.pass = new byte[pass.size()];
         for (int i = 0; i < pass.size(); i++)

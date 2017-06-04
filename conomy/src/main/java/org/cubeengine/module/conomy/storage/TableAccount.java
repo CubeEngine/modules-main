@@ -37,9 +37,9 @@ public class TableAccount extends Table<AccountModel> implements TableUpdateCrea
     public final TableField<AccountModel, Boolean> INVITE = createField("invite", SQLDataType.BOOLEAN, this);
     public final TableField<AccountModel, Boolean> IS_UUID = createField("is_uuid", SQLDataType.BOOLEAN, this);
 
-    public TableAccount(String prefix, Database database)
+    public TableAccount()
     {
-        super("conomy_account", new Version(2), database);
+        super(AccountModel.class, "conomy_account", new Version(2));
         this.setPrimaryKey(ID);
         this.addUniqueKey(ID);
         this.addFields(ID, NAME, HIDDEN, INVITE, IS_UUID);
@@ -61,11 +61,5 @@ public class TableAccount extends Table<AccountModel> implements TableUpdateCrea
                             + "IS_UUID = MASK & 4 = 4");
             stmt.execute("ALTER TABLE `" + getName() +"` DROP COLUMN MASK");
         }
-    }
-
-    @Override
-    public Class<AccountModel> getRecordType()
-    {
-        return AccountModel.class;
     }
 }

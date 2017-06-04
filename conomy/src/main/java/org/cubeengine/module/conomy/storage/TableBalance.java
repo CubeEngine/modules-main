@@ -33,18 +33,12 @@ public class TableBalance extends Table<BalanceModel>
     public final TableField<BalanceModel, String> CONTEXT = createField("context", SQLDataType.VARCHAR.length(64).nullable(false), this);
     public final TableField<BalanceModel, Long> BALANCE = createField("balance", SQLDataType.BIGINT.nullable(false), this);
 
-    public TableBalance(String prefix, Database database)
+    public TableBalance()
     {
-        super("conomy_balance", new Version(1), database);
+        super(BalanceModel.class, "conomy_balance", new Version(1));
         this.setPrimaryKey(ACCOUNT_ID, CURRENCY, CONTEXT);
         this.addFields(ACCOUNT_ID, CURRENCY, CONTEXT, BALANCE);
         this.addForeignKey(TABLE_ACCOUNT.getPrimaryKey(), ACCOUNT_ID);
         TABLE_BALANCE = this;
-    }
-
-    @Override
-    public Class<BalanceModel> getRecordType()
-    {
-        return BalanceModel.class;
     }
 }

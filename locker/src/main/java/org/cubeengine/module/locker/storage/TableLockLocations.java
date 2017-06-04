@@ -18,42 +18,36 @@
 package org.cubeengine.module.locker.storage;
 
 import java.util.UUID;
+
+import org.cubeengine.libcube.service.database.Table;
 import org.cubeengine.libcube.util.Version;
-import org.cubeengine.libcube.service.database.AutoIncrementTable;
-import org.cubeengine.libcube.service.database.Database;
 import org.jooq.TableField;
 import org.jooq.impl.SQLDataType;
-import org.jooq.types.UInteger;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
+import static org.jooq.impl.SQLDataType.BIGINT;
 import static org.jooq.impl.SQLDataType.INTEGER;
 
-public class TableLockLocations extends AutoIncrementTable<LockLocationModel, UInteger>
+public class TableLockLocations extends Table<LockLocationModel>
 {
     public static TableLockLocations TABLE_LOCK_LOCATIONS;
-    public final TableField<LockLocationModel, UInteger> ID = createField("id", U_INTEGER.nullable(false), this);
-    public final TableField<LockLocationModel, UUID> WORLD_ID = createField("world_id", SQLDataType.UUID.length(36).nullable(false), this);
+    public final TableField<LockLocationModel, Long> ID = createField("id", BIGINT.nullable(false).identity(true), this);
+    public final TableField<LockLocationModel, UUID> WORLD_ID = createField("world_id", UUID_TYPE.nullable(false), this);
     public final TableField<LockLocationModel, Integer> X = createField("x", INTEGER.nullable(false), this);
     public final TableField<LockLocationModel, Integer> Y = createField("y", INTEGER.nullable(false), this);
     public final TableField<LockLocationModel, Integer> Z = createField("z", INTEGER.nullable(false), this);
     public final TableField<LockLocationModel, Integer> CHUNKX = createField("chunkX", INTEGER.nullable(false), this);
     public final TableField<LockLocationModel, Integer> CHUNKZ = createField("chunkZ", INTEGER.nullable(false), this);
-    public final TableField<LockLocationModel, UInteger> LOCK_ID = createField("lock_id", U_INTEGER.nullable(false),this);
+    public final TableField<LockLocationModel, Long> LOCK_ID = createField("lock_id", BIGINT.nullable(false),this);
 
-    public TableLockLocations(String prefix, Database db)
+    public TableLockLocations()
     {
-        super("locker_locations", new Version(1), db);
-        this.setAIKey(ID);
+        super(LockLocationModel.class, "locker_locations", new Version(1));
+        this.setPrimaryKey(ID);
         this.addIndex(CHUNKX, CHUNKZ);
         this.addUniqueKey(WORLD_ID, X, Y, Z);
         this.addForeignKey(TABLE_LOCKS.getPrimaryKey(), LOCK_ID);
         this.addFields(ID, WORLD_ID, X, Y, Z, CHUNKX, CHUNKZ, LOCK_ID);
         TABLE_LOCK_LOCATIONS = this;
-    }
-
-    @Override
-    public Class<LockLocationModel> getRecordType()
-    {
-        return LockLocationModel.class;
     }
 }

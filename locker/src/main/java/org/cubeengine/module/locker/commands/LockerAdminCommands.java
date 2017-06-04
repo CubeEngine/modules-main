@@ -26,7 +26,6 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
-import org.jooq.types.UInteger;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -58,7 +57,7 @@ public class LockerAdminCommands extends ContainerCommand
             i18n.send(context, NEGATIVE, "Invalid id!"); // TODO parameter reader ; default block you are looking at
             return null;
         }
-        Lock lockById = this.manager.getLockById(UInteger.valueOf(id));
+        Lock lockById = this.manager.getLockById(id.longValue());
         if (lockById == null)
         {
             i18n.send(context, NEGATIVE, "There is no protection with the id {integer}", id);
