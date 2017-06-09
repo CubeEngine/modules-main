@@ -17,7 +17,7 @@
  */
 package org.cubeengine.module.locker.storage;
 
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.UUID;
 
 import org.cubeengine.libcube.service.database.Table;
@@ -47,8 +47,8 @@ public class TableLocks extends Table<LockModel>
     public final TableField<LockModel, byte[]> PASSWORD = createField("password", VARBINARY.length(128).nullable(false), this);
     // optional for entity protection:
     public final TableField<LockModel, UUID> ENTITY_UUID = createField("entity_uuid", UUID_TYPE, this);
-    public final TableField<LockModel, Timestamp> LAST_ACCESS = createField("last_access", TIMESTAMP.nullable(false), this);
-    public final TableField<LockModel, Timestamp> CREATED = createField("created", TIMESTAMP.nullable(false), this);
+    public final TableField<LockModel, Date> LAST_ACCESS = createField("last_access", DATE.nullable(false), this);
+    public final TableField<LockModel, Date> CREATED = createField("created", DATE.nullable(false), this);
 
     public TableLocks()
     {

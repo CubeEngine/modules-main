@@ -18,7 +18,7 @@
 package org.cubeengine.module.locker.storage;
 
 import java.security.SecureRandom;
-import java.sql.Timestamp;
+import java.sql.Date;
 import java.util.UUID;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.service.database.AsyncRecord;
@@ -48,8 +48,8 @@ public class LockModel extends AsyncRecord<LockModel>
         {
             this.setValue(TABLE_LOCKS.ENTITY_UUID, entityUUID);
         }
-        this.setValue(TABLE_LOCKS.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
-        this.setValue(TABLE_LOCKS.CREATED, new Timestamp(System.currentTimeMillis()));
+        this.setValue(TABLE_LOCKS.LAST_ACCESS, new Date(System.currentTimeMillis()));
+        this.setValue(TABLE_LOCKS.CREATED, new Date(System.currentTimeMillis()));
         return this;
     }
 

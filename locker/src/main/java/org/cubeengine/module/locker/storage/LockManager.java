@@ -82,7 +82,6 @@ import org.spongepowered.api.world.World;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -817,7 +816,7 @@ public class LockManager
 
     public CompletableFuture<Integer> purgeOldLocks()
     {
-        Timestamp timestamp = new Timestamp(System.currentTimeMillis() - module.getConfig().cleanupAge * 24 * 60 * 60 * 1000);
+        java.sql.Date timestamp = new java.sql.Date(System.currentTimeMillis() - module.getConfig().cleanupAge * 24 * 60 * 60 * 1000);
         logger.info("Purging old Locks from {}", new Date(timestamp.getTime()));
         CompletableFuture<Integer> future = database.execute(database.getDSL().delete(TABLE_LOCKS)
             .where(TABLE_LOCKS.LAST_ACCESS.lessThan(timestamp)));

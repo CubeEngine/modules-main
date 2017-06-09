@@ -69,7 +69,6 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -960,7 +959,7 @@ public class Lock
 
     public void updateAccess()
     {
-        model.setValue(TABLE_LOCKS.LAST_ACCESS, new Timestamp(System.currentTimeMillis()));
+        model.setValue(TABLE_LOCKS.LAST_ACCESS, new java.sql.Date(System.currentTimeMillis()));
         model.updateAsync();
     }
 }
