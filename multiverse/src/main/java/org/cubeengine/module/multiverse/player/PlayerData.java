@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.Sponge;
@@ -33,9 +32,7 @@ import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.MapValue;
 import org.spongepowered.api.data.value.mutable.Value;
@@ -126,7 +123,17 @@ public class PlayerData implements DataSerializable
         DataView inventoryView = value.getView(INVENTORY.getQuery()).orElse(new MemoryDataContainer());
         for (DataQuery key : inventoryView.getKeys(false))
         {
-            inventory.put(Integer.valueOf(key.asString("")), ItemStack.builder().fromContainer(inventoryView.getView(key).get()).build());
+            try
+            {
+                inventory.put(Integer.valueOf(key.asString("")), ItemStack.builder().fromContainer(inventoryView.getView(key).get()).build());
+            }
+            catch (RuntimeException ignored)
+            {
+                System.err.println(ignored.getMessage());
+                // TODO maybe try to recover?
+                // This can happen when the item was using legacy DataManipulators e.g. SpongeDisplayNameData
+                // in addition to the UnsafeData used now
+            }
         }
 
         enderChest.clear();
