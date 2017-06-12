@@ -129,6 +129,7 @@ public class PlayerData implements DataSerializable
             }
             catch (RuntimeException ignored)
             {
+                System.err.println("Cannot deserialize inventory!");
                 System.err.println(ignored.getMessage());
                 // TODO maybe try to recover?
                 // This can happen when the item was using legacy DataManipulators e.g. SpongeDisplayNameData
