@@ -62,6 +62,7 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.world.ExplosionEvent;
@@ -372,6 +373,22 @@ public class SettingsListener
             else if (checkSetting(event, null, regionsAt, () -> null, (s) -> s.spawn.naturally.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
             {
                 return; // natural
+            }
+        }
+    }
+
+    @Listener
+    public void onPreChangeBlock(ChangeBlockEvent.Pre event, @Root LocatableBlock block, @Named(NamedCause.LIQUID_FLOW) World flow)
+    {
+        for (Location<World> loc : event.getLocations()) {
+
+            System.out.println(loc.getBlockType());
+            if (loc.getBlockType() != BlockTypes.AIR && loc.getBlockType() != block.getBlockState().getType()) {
+                List<Region> regionsAt = manager.getRegionsAt(loc);
+                if (this.checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(block.getBlockState().getType() , UNDEFINED), UNDEFINED) == FALSE)
+                {
+                    return;
+                }
             }
         }
     }
