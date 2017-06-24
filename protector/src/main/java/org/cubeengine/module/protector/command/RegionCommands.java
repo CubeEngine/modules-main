@@ -125,6 +125,7 @@ public class RegionCommands extends ContainerCommand
     @Command(desc = "Lists regions")
     public void list(CommandSource context, @Optional String match, @Named("in") World world)
     {
+        // TODO clickable to select
         World w = world;
         if (world == null && context instanceof Locatable)
         {

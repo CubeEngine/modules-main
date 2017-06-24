@@ -382,7 +382,6 @@ public class SettingsListener
     {
         for (Location<World> loc : event.getLocations()) {
 
-            System.out.println(loc.getBlockType());
             if (loc.getBlockType() != BlockTypes.AIR && loc.getBlockType() != block.getBlockState().getType()) {
                 List<Region> regionsAt = manager.getRegionsAt(loc);
                 if (this.checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(block.getBlockState().getType() , UNDEFINED), UNDEFINED) == FALSE)

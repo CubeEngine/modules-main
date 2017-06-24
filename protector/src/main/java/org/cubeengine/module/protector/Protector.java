@@ -26,7 +26,6 @@ import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.module.protector.command.BlockDamageSettingsCommands;
 import org.cubeengine.module.protector.command.RegionCommands;
 import org.cubeengine.module.protector.command.SettingsCommands;
 import org.cubeengine.module.protector.region.RegionFormatter;
@@ -35,7 +34,6 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.service.permission.PermissionService;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 import javax.inject.Inject;
