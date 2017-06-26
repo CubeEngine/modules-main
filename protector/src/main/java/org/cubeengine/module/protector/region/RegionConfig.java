@@ -21,9 +21,11 @@ import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.reflect.Section;
+import org.cubeengine.reflect.annotations.Comment;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.extra.fluid.FluidType;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.util.Tristate;
 
@@ -80,7 +82,6 @@ public class RegionConfig extends ReflectedYaml
             public Tristate allExplosion = Tristate.UNDEFINED;
             public Tristate playerExplosion = Tristate.UNDEFINED;
             public Map<BlockType, Tristate> block = new HashMap<>();
-            public Map<BlockType, Tristate> fluid = new HashMap<>();
             public Tristate monster = Tristate.UNDEFINED;
         }
 
@@ -88,7 +89,19 @@ public class RegionConfig extends ReflectedYaml
 
         public static class FluidFlow implements Section
         {
+            // TODO commands and listeners
 
+            @Comment("P")
+            public Tristate all = Tristate.UNDEFINED;
+            @Comment("Prevent all types of fluids creating blocks by mixing")
+            public Tristate mix = Tristate.UNDEFINED;
+
+            public Map<FluidType, Tristate> flow = new HashMap<>();
+
+            @Comment("The Keys are the BlockTypes that are created by mixing liquids\n"
+                    + "e.g. Cobblestone when flowing Lava is next to Water\n"
+                    + "or Obsidian when static Lava is next to Water")
+            public Map<BlockType, Tristate> mixResult = new HashMap<>();
         }
 
         public Map<String, Tristate> blockedCommands = new HashMap<>();
