@@ -17,15 +17,14 @@
  */
 package org.cubeengine.module.netherportals;
 
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
+import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ModuleCommand;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.netherportals.NetherportalsConfig.WorldSection;
-import org.cubeengine.libcube.service.filesystem.ModuleConfig;
-import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportCause;
@@ -33,19 +32,26 @@ import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.world.PortalAgent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.world.World;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-@ModuleInfo(name = "Netherportals", description = "Modifies Vanilla Portal behaviours")
-public class Netherportals extends Module
+@Singleton
+@Module(id = "netherportals", name = "Netherportals", version = "1.0.0",
+        description = "Modifies Vanilla Portal behaviours",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+public class Netherportals extends CubeEngineModule
 {
     @ModuleConfig private NetherportalsConfig config;
+    @Inject private CommandManager cm;
+    @Inject private I18n i18n;
 
-    @Enable
-    @Inject
-    public void onEnable(CommandManager cm, I18n i18n)
+    @Listener
+    public void onEnable(GamePreInitializationEvent event)
     {
         cm.addCommand(new NetherportalsCommand(this, cm, i18n));
     }

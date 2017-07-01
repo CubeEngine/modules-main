@@ -18,33 +18,36 @@
 package org.cubeengine.module.multiverse;
 
 
+import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.libcube.InjectService;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.event.EventManager;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.module.multiverse.player.ImmutableMultiverseData;
+import org.cubeengine.module.multiverse.player.MultiverseData;
+import org.cubeengine.module.multiverse.player.MultiverseDataBuilder;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.world.World;
+
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.inject.Inject;
-import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Maybe;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
-import org.cubeengine.module.multiverse.player.ImmutableMultiverseData;
-import org.cubeengine.module.multiverse.player.MultiverseData;
-import org.cubeengine.module.multiverse.player.MultiverseDataBuilder;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.event.EventManager;
-import org.cubeengine.libcube.service.filesystem.ModuleConfig;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataRegistration;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.economy.EconomyService;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.world.World;
+import javax.inject.Singleton;
 
 /**
  * Group Worlds into Universes
@@ -61,15 +64,22 @@ import org.spongepowered.api.world.World;
  * wait for Sponge Inventory or better Data impl of setRawData(..)
  * save all data i want in custom manipulator (Map:World->PlayerData)
  */
-@ModuleInfo(name = "Multiverse", description = "Group worlds into universes")
-public class Multiverse extends Module
+@Singleton
+@Module(id = "multiverse", name = "Multiverse", version = "1.0.0",
+        description = "Group worlds into universes",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+public class Multiverse extends CubeEngineModule
 {
     public static final String UNKNOWN = "unknown";
     @Inject private CommandManager cm;
     @Inject private EventManager em;
     @Inject private I18n i18n;
-    @Inject private Log log;
+    @Inject private ModuleManager mm;
+    private Log log;
     @Inject private PluginContainer plugin;
+    @InjectService private PermissionService ps;
 
     @ModuleConfig private MultiverseConfig config;
 
@@ -85,13 +95,18 @@ public class Multiverse extends Module
         Sponge.getDataManager().registerLegacyManipulatorIds(MultiverseData.class.getName(), dr);
     }
 
-    @Enable
-    @Inject
-    public void onEnable(Maybe<PermissionService> ps) throws IOException
+    @Listener
+    public void onEnable(GamePreInitializationEvent event) throws IOException
     {
+        this.log = mm.getLoggerFor(Multiverse.class);
         cm.addCommand(new MultiverseCommands(cm, this, i18n));
         em.registerListener(Multiverse.class, new MultiverseListener(this));
-        ps.onAvailable(s -> s.registerContextCalculator(new MultiverseContextCalculator(this)));
+    }
+
+    @Listener
+    public void onPostInit(GamePostInitializationEvent event)
+    {
+        ps.registerContextCalculator(new MultiverseContextCalculator(this));
     }
 
     public MultiverseConfig getConfig()
@@ -154,5 +169,10 @@ public class Multiverse extends Module
         }
         set.add(cWorld);
         config.save();
+    }
+
+    public Log getLogger()
+    {
+        return this.log;
     }
 }

@@ -18,11 +18,16 @@
 package org.cubeengine.module.locker;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+
 import org.cubeengine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Disable;
+import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.filesystem.FileManager;
+import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.command.ModuleCommand;
 import org.cubeengine.libcube.service.event.ModuleListener;
@@ -49,27 +54,49 @@ import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 
 // TODO protect lines of redstone
 
-@ModuleInfo(name = "Locker", description = "Puts a Lock on your stuff")
+@Singleton
+@Module(id = "locker", name = "Locker", version = "1.0.0",
+        description = "Puts a Lock on your stuff",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
 @ModuleTables({TableLocks.class, TableLockLocations.class, TableAccessList.class})
-public class Locker extends Module
+public class Locker extends CubeEngineModule
 {
-    @ModuleConfig private LockerConfig config;
+    private LockerConfig config;
     @Inject private TaskManager tm;
     @Inject private LockManager manager;
-    @Inject @ModuleCommand private LockerCommands lockerCmd;
-    @Inject @ModuleCommand(LockerCommands.class) private LockerCreateCommands lockerCreateCmds;
-    @Inject @ModuleCommand(LockerCommands.class) private LockerAdminCommands lockerAdminCmds;
+    @ModuleCommand private LockerCommands lockerCmd;
+    @ModuleCommand(LockerCommands.class) private LockerCreateCommands lockerCreateCmds;
+    @ModuleCommand(LockerCommands.class) private LockerAdminCommands lockerAdminCmds;
     @Inject private LockerPerm perms;
-    @Inject @ModuleListener private LockerListener listener;
-    @Inject @ModuleListener private LockerBlockListener blockListener;
-    @Inject private PluginContainer plugin;
+    @ModuleListener private LockerListener listener;
+    @ModuleListener private LockerBlockListener blockListener;
+    private PluginContainer plugin;
+    private Log logger;
+    @Inject private InventoryGuardFactory igf;
+    @Inject private Reflector reflector;
+    @Inject private EntityMatcher entityMatcher;
+    @Inject private MaterialMatcher mm;
+    @Inject private CommandManager cm;
+    @Inject private FileManager fm;
 
     @Inject
-    public Locker(Reflector reflector, EntityMatcher entityMatcher, Log logger, MaterialMatcher mm, CommandManager cm, PluginContainer plugin)
+    public Locker(ModuleManager momu)
+    {
+        this.logger = momu.getLoggerFor(Locker.class);
+        this.plugin = momu.getPlugin(Locker.class).get();
+    }
+
+    @Listener
+    public void onPreInit(GamePreInitializationEvent event)
     {
         DataRegistration<LockerData, ImmutableLockerData> dr =
                 DataRegistration.<LockerData, ImmutableLockerData>builder()
@@ -86,10 +113,12 @@ public class Locker extends Module
         cManager.registerConverter(new EntityLockerConfigConverter(logger, entityMatcher), EntityLockConfig.class);
 
         cm.getProviders().register(this, new PlayerAccess.PlayerAccessParser(), PlayerAccess.class);
+
+        this.config = fm.loadConfig(this, LockerConfig.class);
     }
 
-    @Disable
-    public void onDisable()
+    @Listener
+    public void onDisable(GameStoppingEvent event)
     {
         this.manager.saveAll();
     }
@@ -114,6 +143,19 @@ public class Locker extends Module
         return plugin;
     }
 
+    public Log getLogger()
+    {
+        return this.logger;
+    }
+
+    public InventoryGuardFactory getInventoryGuardFactory() {
+        return igf;
+    }
+
+    public LockManager getManager()
+    {
+        return manager;
+    }
 
     /*
     Features:

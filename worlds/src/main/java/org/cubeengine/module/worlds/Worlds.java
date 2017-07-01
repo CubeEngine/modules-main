@@ -18,21 +18,30 @@
 package org.cubeengine.module.worlds;
 
 import javax.inject.Inject;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
+import javax.inject.Singleton;
+
+import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ModuleCommand;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
-@ModuleInfo(name = "Worlds", description = "easy lightweight worldmanagement")
-public class Worlds extends Module
+@Singleton
+@Module(id = "worlds", name = "Worlds", version = "1.0.0",
+        description = "Easy lightweight WorldManagement",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+public class Worlds extends CubeEngineModule
 {
-    @Inject @ModuleCommand private WorldsCommands wc;
+    @ModuleCommand private WorldsCommands wc;
     @Inject private CommandManager cm;
 
-    @Enable
-    public void onEnable()
+    @Listener
+    public void onEnable(GamePreInitializationEvent event)
     {
         cm.getProviders().register(this, new WorldGeneratorModifierParser(), WorldGeneratorModifier.class);
     }

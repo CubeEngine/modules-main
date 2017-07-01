@@ -46,10 +46,10 @@ public class LockerCreateCommands extends ContainerCommand
     private I18n i18n;
 
     @Inject
-    public LockerCreateCommands(CommandManager base, LockManager manager, I18n i18n)
+    public LockerCreateCommands(CommandManager base, Locker module, I18n i18n)
     {
         super(base, Locker.class);
-        this.manager = manager;
+        this.manager = module.getManager();
         this.i18n = i18n;
     }
 

@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.vanillaplus.improvement.summon;
 
+import org.cubeengine.libcube.service.logging.LogProvider;
 import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
@@ -321,7 +322,7 @@ public class EntityDataChanger<EntityInterface>
                                                      entity.offer(Keys.SLIME_SIZE, input);
                                                  }
 
-                                                 private StringMatcher sm = new StringMatcher();
+                                                 private StringMatcher sm = new StringMatcher(null); // TODO this is suboptimal
 
                                                  @Override
                                                  public Integer getTypeValue(String input)

@@ -17,15 +17,14 @@
  */
 package org.cubeengine.module.vanillaplus.addition;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
-import de.cubeisland.engine.modularity.core.LifeCycle;
-import de.cubeisland.engine.modularity.core.Modularity;
-import de.cubeisland.engine.modularity.core.graph.meta.ModuleMetadata;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.LibCube;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
@@ -48,15 +47,13 @@ import static org.spongepowered.api.text.format.TextColors.RESET;
 public class PluginCommands extends PermissionContainer
 {
     private I18n i18n;
-    private Modularity modularity;
-    private PluginContainer plugin;
+    private ModuleManager mm;
 
-    public PluginCommands(I18n i18n, PermissionManager pm, Modularity modularity, PluginContainer plugin)
+    public PluginCommands(I18n i18n, PermissionManager pm, ModuleManager mm)
     {
         super(pm, VanillaPlus.class);
         this.i18n = i18n;
-        this.modularity = modularity;
-        this.plugin = plugin;
+        this.mm = mm;
     }
 
     private final Permission COMMAND_VERSION_PLUGINS = register("command.version.plugins", "", null);
@@ -64,25 +61,23 @@ public class PluginCommands extends PermissionContainer
     @Command(desc = "Lists all loaded plugins")
     public void plugins(CommandSource context)
     {
-        Collection<PluginContainer> plugins = Sponge.getPluginManager().getPlugins();
-        Set<LifeCycle> modules = modularity.getModules();
+        Collection<PluginContainer> plugins = new ArrayList<>(Sponge.getPluginManager().getPlugins());
+        Collection<PluginContainer> modules = mm.getModulePlugins();
+        plugins.removeAll(modules);
+        PluginContainer core = mm.getPlugin(LibCube.class).get();
+        modules.remove(core);
 
-        i18n.send(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:", plugins.size(), modules.size());
+        i18n.send(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:", plugins.size() + 1, modules.size());
         context.sendMessage(Text.EMPTY);
-        context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", RESET, " (" + plugin.getVersion().orElse("unknown") + ")"));
+        context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", RESET, " (" + core.getVersion().orElse("unknown") + ")"));
 
-        for (LifeCycle m : modules)
+        for (PluginContainer m : modules)
         {
-            String name = m.getInformation() instanceof ModuleMetadata ? ((ModuleMetadata)m.getInformation()).getName() : m.getInformation().getClassName();
-            context.sendMessage(Text.of("   - ", GREEN, name, RESET, " (" + m.getInformation().getVersion() + ")"));
+            context.sendMessage(Text.of("   - ", GREEN, m.getName(), RESET, " (" + m.getVersion().orElse("unknown") + ")"));
         }
 
         for (PluginContainer plugin : plugins)
         {
-            if (plugin == this.plugin)
-            {
-                continue;
-            }
             context.sendMessage(Text.of(" - ", GREEN, plugin.getName(), RESET, " (" + plugin.getVersion().orElse("unknown") + ")"));
         }
     }
@@ -112,7 +107,8 @@ public class PluginCommands extends PermissionContainer
 
             i18n.send(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getContainer(API).getVersion().orElse("unknown"));
             context.sendMessage(Text.EMPTY);
-            i18n.send(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.plugin.getVersion().orElse("unknown"));
+
+            i18n.send(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.mm.getPlugin(LibCube.class).get().getVersion().orElse("unknown"));
             return;
         }
         if (context.hasPermission(COMMAND_VERSION_PLUGINS.getId()))

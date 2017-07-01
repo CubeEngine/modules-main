@@ -18,10 +18,9 @@
 package org.cubeengine.module.mail;
 
 import javax.inject.Inject;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Disable;
-import de.cubeisland.engine.modularity.core.marker.Enable;
+import javax.inject.Singleton;
+
+import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.module.mail.storage.TableMail;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.database.Database;
@@ -29,10 +28,19 @@ import org.cubeengine.libcube.service.database.ModuleTables;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 
-@ModuleInfo(name = "Mail", description = "Send ingame Mails")
+@Singleton
+@Module(id = "mail", name = "Mail", version = "1.0.0",
+        description = "Send ingame Mails",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
 @ModuleTables(TableMail.class)
-public class MailModule extends Module
+public class MailModule extends CubeEngineModule
 {
     @Inject private Database db;
     @Inject private EventManager em;
@@ -40,8 +48,8 @@ public class MailModule extends Module
     @Inject private TaskManager tm;
     @Inject private I18n i18n;
 
-    @Enable
-    public void onEnable()
+    @Listener
+    public void onEnable(GamePreInitializationEvent event)
     {
         MailCommand cmd = new MailCommand(cm, this, tm, db, i18n);
         cm.addCommand(cmd);

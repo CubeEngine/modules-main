@@ -63,11 +63,11 @@ public class LockerCommands extends ContainerCommand
     private I18n i18n;
 
     @Inject
-    public LockerCommands(CommandManager base, Locker module, LockManager manager, I18n i18n, StringMatcher sm)
+    public LockerCommands(CommandManager base, Locker module, I18n i18n, StringMatcher sm)
     {
         super(base, Locker.class);
         this.module = module;
-        this.manager = manager;
+        this.manager = module.getManager();
         this.sm = sm;
         this.i18n = i18n;
     }

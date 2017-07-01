@@ -18,10 +18,11 @@
 package org.cubeengine.module.protector;
 
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
+import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.libcube.InjectService;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.Selector;
+
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -29,34 +30,46 @@ import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.command.RegionCommands;
 import org.cubeengine.module.protector.command.SettingsCommands;
 import org.cubeengine.module.protector.region.RegionFormatter;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.service.permission.PermissionService;
 
 import java.nio.file.Path;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 // TODO protect items from explosion
 
-@ModuleInfo(name = "Protector", description = "Protects your worlds")
-public class Protector extends Module
+@Singleton
+@Module(id = "protector", name = "Protector", version = "1.0.0",
+        description = "Protects your worlds",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+public class Protector extends CubeEngineModule
 {
-    @Inject private Path modulePath;
+    private Path modulePath;
     @Inject private Reflector reflector;
     @Inject private PermissionManager pm;
     @Inject private I18n i18n;
-    @Inject private PermissionService ps;
+    @InjectService private PermissionService ps;
     @Inject private EventManager em;
     @Inject private CommandManager cm;
-    @Inject private Selector selector;
+    @InjectService private Selector selector;
+    @Inject private ModuleManager mm;
 
     private RegionManager manager;
 
-    @Enable
-    public void onEnable()
+    @Listener
+    public void onEnable(GamePostInitializationEvent event)
     {
+        this.modulePath = mm.getPathFor(Protector.class);
         manager = new RegionManager(modulePath, reflector);
         ps.registerContextCalculator(new RegionContextCalculator(manager));
         RegionCommands regionCmd = new RegionCommands(cm, selector, manager, i18n);
@@ -64,14 +77,12 @@ public class Protector extends Module
         cm.addCommand(regionCmd);
         SettingsCommands settingsCmd = new SettingsCommands(manager, i18n, ps, pm, em, cm);
         regionCmd.addCommand(settingsCmd);
-        em.registerListener(Protector.class, this);
     }
 
     @Listener
-    public void onServerStarted(GameStartingServerEvent event)
+    public void onServerStarted(GameStartedServerEvent event)
     {
-        getProvided(Log.class).info("Loading Regions...");
         manager.reload();
-        getProvided(Log.class).info("{} Regions loaded", manager.getRegionCount());
+        mm.getLoggerFor(Protector.class).info("{} Regions loaded", manager.getRegionCount());
     }
 }

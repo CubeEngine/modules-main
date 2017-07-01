@@ -47,14 +47,12 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE
 public class PortalModifyCommand extends ContainerCommand
 {
     private Selector selector;
-    private Game game;
     private I18n i18n;
 
-    public PortalModifyCommand(CommandManager base, Selector selector, Game game, I18n i18n)
+    public PortalModifyCommand(CommandManager base, Selector selector, I18n i18n)
     {
         super(base, Portals.class);
         this.selector = selector;
-        this.game = game;
         this.i18n = i18n;
     }
 

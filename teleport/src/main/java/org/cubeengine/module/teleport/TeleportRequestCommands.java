@@ -24,6 +24,7 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -40,15 +41,13 @@ public class TeleportRequestCommands
     private final Teleport module;
     private TaskManager taskManager;
     private TeleportListener tl;
-    private Game game;
     private I18n i18n;
 
-    public TeleportRequestCommands(Teleport module, TaskManager taskManager, TeleportListener tl, Game game, I18n i18n)
+    public TeleportRequestCommands(Teleport module, TaskManager taskManager, TeleportListener tl, I18n i18n)
     {
         this.module = module;
         this.taskManager = taskManager;
         this.tl = tl;
-        this.game = game;
         this.i18n = i18n;
     }
 
@@ -136,7 +135,7 @@ public class TeleportRequestCommands
                 return;
             }
             tl.removeFromRequest(context);
-            Optional<Player> player = game.getServer().getPlayer(uuid);
+            Optional<Player> player = Sponge.getServer().getPlayer(uuid);
             if (!player.isPresent())
             {
                 i18n.send(context, NEGATIVE, "That player seems to have disappeared.");
@@ -149,7 +148,7 @@ public class TeleportRequestCommands
         else
         {
             tl.removeToRequest(context);
-            Optional<Player> player = game.getServer().getPlayer(uuid);
+            Optional<Player> player = Sponge.getServer().getPlayer(uuid);
             if (!player.isPresent())
             {
                 i18n.send(context, NEGATIVE, "That player seems to have disappeared.");
@@ -178,7 +177,7 @@ public class TeleportRequestCommands
         {
             tl.removeToRequest(sender);
 
-            Optional<Player> player = game.getServer().getPlayer(tpa);
+            Optional<Player> player = Sponge.getServer().getPlayer(tpa);
             if (!player.isPresent())
             {
                 throw new IllegalStateException("Player saved in \"pendingTpToRequest\" was not found!");
@@ -189,7 +188,7 @@ public class TeleportRequestCommands
         else if (tpahere != null)
         {
             tl.removeFromRequest(sender);
-            Optional<Player> player = game.getServer().getPlayer(tpahere);
+            Optional<Player> player = Sponge.getServer().getPlayer(tpahere);
             if (!player.isPresent())
             {
                 throw new IllegalStateException("User saved in \"pendingTpFromRequest\" was not found!");

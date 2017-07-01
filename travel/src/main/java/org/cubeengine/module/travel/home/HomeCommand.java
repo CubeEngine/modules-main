@@ -29,7 +29,6 @@ import static org.spongepowered.api.text.format.TextColors.GOLD;
 import static org.spongepowered.api.text.format.TextColors.RED;
 
 import com.flowpowered.math.vector.Vector3d;
-import de.cubeisland.engine.modularity.core.Maybe;
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
@@ -77,10 +76,10 @@ public class HomeCommand extends ContainerCommand
 {
     private final HomeManager manager;
     private final Travel module;
-    private Maybe<Selector> selector;
+    private Selector selector;
     private I18n i18n;
 
-    public HomeCommand(CommandManager base, Travel module, Maybe<Selector> selector, I18n i18n)
+    public HomeCommand(CommandManager base, Travel module, Selector selector, I18n i18n)
     {
         super(base, Travel.class);
         this.module = module;
@@ -464,7 +463,7 @@ public class HomeCommand extends ContainerCommand
         final Location<World> secondPoint;
         if (selection)
         {
-            if (selector.isAvailable())
+            if (selector == null)
             {
                 i18n.send(context, NEGATIVE, "You need to use the Selector module to delete homes in a selection!");
                 return;
@@ -474,7 +473,6 @@ public class HomeCommand extends ContainerCommand
                 i18n.send(context, NEGATIVE, "You have to be in game to use the selection flag");
                 return;
             }
-            Selector selector = this.selector.value();
             Shape shape = selector.getSelection((Player)context);
             if (!(shape instanceof Cuboid))
             {

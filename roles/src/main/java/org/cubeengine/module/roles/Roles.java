@@ -25,10 +25,10 @@ import org.cubeengine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.logscribe.LogFactory;
 import de.cubeisland.engine.logscribe.target.file.AsyncFileTarget;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
-import de.cubeisland.engine.modularity.core.marker.Setup;
+import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
@@ -55,6 +55,9 @@ import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
@@ -63,33 +66,37 @@ import java.util.Optional;
 import java.util.concurrent.ThreadFactory;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
-@ModuleInfo(name = "Roles", description = "Manages permissions of players and roles")
 /*
 TODO generate sample configs on the first run AND/OR cmd to generate samples
 TODO role / user permlist clickable red - to remove perm after ok - green + to add (deny/allow?)  - then catch chat tab complete for perm
 TODO lookup permissions (via PermissionDescription)
 TODO lookup permissions (via Command?)
-
 */
-public class Roles extends Module
+@Singleton
+@Module(id = "roles", name = "Roles", version = "1.0.0",
+        description = "Manages permissions of players and roles",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+public class Roles extends CubeEngineModule
 {
     @Inject private CommandManager cm;
     @Inject private FileManager fm;
     @Inject private I18n i18n;
 
     @Inject private LogFactory factory;
-    @Inject private ThreadFactory threadFactory;
     @Inject private PluginContainer plugin;
+    @Inject private ModuleManager mm;
 
     private Log permLogger;
-    private RolesPermissionService service;
+    @Inject private RolesPermissionService service;
 
     @Inject
     public Roles(Reflector reflector, PluginContainer plugin)
     {
-        DataRegistration<PermissionData, ImmutablePermissionData> dr =
-                DataRegistration.<PermissionData, ImmutablePermissionData>builder()
+        DataRegistration<PermissionData, ImmutablePermissionData> dr = DataRegistration.<PermissionData, ImmutablePermissionData>builder()
                         .dataClass(PermissionData.class).immutableClass(ImmutablePermissionData.class)
                         .builder(new PermissionDataBuilder()).manipulatorId("permission")
                         .dataName("CubeEngine Roles Permissions")
@@ -102,14 +109,13 @@ public class Roles extends Module
         cManager.registerConverter(new PriorityConverter(), Priority.class);
     }
 
-    @Setup
-    public void onSetup()
+    @Listener
+    public void onSetup(GamePreInitializationEvent event)
     {
         cm.getProviders().getExceptionHandler().addHandler(new RolesExceptionHandler(i18n));
         this.permLogger = factory.getLog(LogFactory.class, "Permissions");
+        ThreadFactory threadFactory = mm.getThreadFactory(Roles.class);
         this.permLogger.addTarget(new AsyncFileTarget(getLogFile(fm, "Permissions"), getFileFormat(false, false), false, getCycler(), threadFactory));
-
-        this.service = ((RolesPermissionService) getModularity().provide(PermissionService.class));
 
         Optional<PermissionService> previous = Sponge.getServiceManager().provide(PermissionService.class);
         Sponge.getServiceManager().setProvider(plugin.getInstance().get(), PermissionService.class, service);
@@ -122,8 +128,8 @@ public class Roles extends Module
         }
     }
 
-    @Enable
-    public void onEnable()
+    @Listener
+    public void onEnable(GameInitializationEvent event)
     {
         i18n.getCompositor().registerFormatter(new RoleFormatter());
 

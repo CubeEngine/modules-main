@@ -57,10 +57,10 @@ public class LockerListener
     private final Locker module;
 
     @Inject
-    public LockerListener(Locker module, LockManager manager, I18n i18n)
+    public LockerListener(Locker module, I18n i18n)
     {
         this.module = module;
-        this.manager = manager;
+        this.manager = module.getManager();
         this.i18n = i18n;
     }
 

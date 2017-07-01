@@ -44,6 +44,7 @@ import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 
 import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.database.AsyncRecord;
 import org.cubeengine.libcube.service.database.Database;
 import org.cubeengine.libcube.service.event.EventManager;
@@ -70,6 +71,7 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.event.world.chunk.LoadChunkEvent;
 import org.spongepowered.api.event.world.chunk.UnloadChunkEvent;
@@ -139,16 +141,16 @@ public class LockManager
     private Future<?> unloadFuture = null;
 
     @Inject
-    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, TaskManager tm, I18n i18n)
+    public LockManager(Locker module, EventManager em, StringMatcher stringMatcher, Database database, TaskManager tm, I18n i18n, ModuleManager mm)
     {
         this.stringMatcher = stringMatcher;
         this.database = database;
         this.tm = tm;
         this.i18n = i18n;
-        logger = module.getProvided(Log.class);
+        logger = mm.getLoggerFor(Locker.class);
         this.module = module;
-        loadExecutor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));
-        unloadExecutor = Executors.newSingleThreadExecutor(module.getProvided(ThreadFactory.class));
+        loadExecutor = Executors.newSingleThreadExecutor(mm.getThreadFactory(Locker.class));
+        unloadExecutor = Executors.newSingleThreadExecutor(mm.getThreadFactory(Locker.class));
         try
         {
             messageDigest = MessageDigest.getInstance("SHA-1");
@@ -190,7 +192,7 @@ public class LockManager
     }
 
     @Listener
-    public void onServerStarted(GameStartingServerEvent event)
+    public void onServerStarted(GameStartedServerEvent event)
     {
         reloadLocks();
     }

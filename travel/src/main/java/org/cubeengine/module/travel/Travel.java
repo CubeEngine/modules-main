@@ -17,33 +17,41 @@
  */
 package org.cubeengine.module.travel;
 
-import java.nio.file.Path;
-import javax.inject.Inject;
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Maybe;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
-import org.cubeengine.module.travel.config.Home;
-import org.cubeengine.module.travel.config.Warp;
-import org.cubeengine.module.travel.home.HomeCompleter;
-import org.cubeengine.module.travel.warp.WarpCompleter;
-import org.cubeengine.reflect.Reflector;
-import org.cubeengine.module.travel.config.HomeConfig;
-import org.cubeengine.module.travel.config.TravelConfig;
-import org.cubeengine.module.travel.config.WarpConfig;
-import org.cubeengine.module.travel.home.HomeCommand;
-import org.cubeengine.module.travel.home.HomeManager;
-import org.cubeengine.module.travel.warp.WarpCommand;
-import org.cubeengine.module.travel.warp.WarpManager;
+import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.module.travel.config.Home;
+import org.cubeengine.module.travel.config.HomeConfig;
+import org.cubeengine.module.travel.config.TravelConfig;
+import org.cubeengine.module.travel.config.Warp;
+import org.cubeengine.module.travel.config.WarpConfig;
+import org.cubeengine.module.travel.home.HomeCommand;
+import org.cubeengine.module.travel.home.HomeCompleter;
+import org.cubeengine.module.travel.home.HomeManager;
+import org.cubeengine.module.travel.warp.WarpCommand;
+import org.cubeengine.module.travel.warp.WarpCompleter;
+import org.cubeengine.module.travel.warp.WarpManager;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
+import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 
-@ModuleInfo(name = "Travel", description = "Travel anywhere")
-public class Travel extends Module
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
+@Module(id = "travel", name = "Travel", version = "1.0.0",
+        description = "Travel anywhere",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+public class Travel extends CubeEngineModule
 {
     @ModuleConfig private TravelConfig config;
     @Inject private TravelPerm permissions;
@@ -51,22 +59,24 @@ public class Travel extends Module
     private HomeManager homeManager;
     private WarpManager warpManager;
 
-    @Inject private Log logger;
+    private Log logger;
     @Inject private CommandManager cm;
     @Inject private EventManager em;
-    @Inject private Maybe<Selector> selector;
+    @com.google.inject.Inject(optional = true) private Selector selector;
     @Inject private I18n i18n;
     @Inject private Reflector reflector;
+    @Inject private ModuleManager mm;
 
-    @Enable
-    public void onEnable()
+    @Listener
+    public void onEnable(GamePreInitializationEvent event)
     {
+        this.logger = mm.getLoggerFor(Travel.class);
         i18n.getCompositor().registerFormatter(new TpPointFormatter(i18n));
 
-        this.homeManager = new HomeManager(this, i18n, reflector.load(HomeConfig.class, getProvided(Path.class).resolve("homes.yml").toFile()));
+        this.homeManager = new HomeManager(this, i18n, reflector.load(HomeConfig.class, mm.getPathFor(Travel.class).resolve("homes.yml").toFile()));
         this.cm.getProviders().register(this, new HomeCompleter(homeManager), Home.class);
         this.em.registerListener(Travel.class, this.homeManager);
-        this.warpManager = new WarpManager(reflector.load(WarpConfig.class, getProvided(Path.class).resolve("warps.yml").toFile()));
+        this.warpManager = new WarpManager(reflector.load(WarpConfig.class, mm.getPathFor(Travel.class).resolve("warps.yml").toFile()));
         this.cm.getProviders().register(this, new WarpCompleter(warpManager), Warp.class);
 
         cm.addCommand(new HomeCommand(cm, this, selector, i18n));

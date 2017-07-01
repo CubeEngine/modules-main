@@ -53,12 +53,14 @@ public class MovementCommands
     private final Teleport module;
     private TeleportListener tl;
     private I18n i18n;
+    private PluginContainer plugin;
 
-    public MovementCommands(Teleport module, TeleportListener tl, I18n i18n)
+    public MovementCommands(Teleport module, TeleportListener tl, I18n i18n, PluginContainer plugin)
     {
         this.module = module;
         this.tl = tl;
         this.i18n = i18n;
+        this.plugin = plugin;
     }
 
     @Command(desc = "Teleports you X amount of blocks into the air and puts a glass block beneath you.")
@@ -82,7 +84,7 @@ public class MovementCommands
         }
         if (loc.getBlockType() == AIR)
         {
-            loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS, Cause.of(NamedCause.source(module.getModularity().provide(PluginContainer.class)), NamedCause.owner(context)));
+            loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS, Cause.of(NamedCause.source(plugin), NamedCause.owner(context)));
         }
         context.setLocation(loc.getRelative(UP));
         i18n.send(context, POSITIVE, "You have just been lifted!");

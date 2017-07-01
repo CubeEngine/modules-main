@@ -30,6 +30,7 @@ import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.Broadcaster;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
@@ -50,15 +51,13 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 public class TeleportCommands
 {
     private final Teleport module;
-    private Game game;
     private Broadcaster bc;
     private TeleportListener tl;
     private I18n i18n;
 
-    public TeleportCommands(Teleport module, Game game, Broadcaster bc, TeleportListener tl, I18n i18n)
+    public TeleportCommands(Teleport module, Broadcaster bc, TeleportListener tl, I18n i18n)
     {
         this.module = module;
-        this.game = game;
         this.bc = bc;
         this.tl = tl;
         this.i18n = i18n;
@@ -129,7 +128,7 @@ public class TeleportCommands
             return;
         }
         ArrayList<String> noTp = new ArrayList<>();
-        for (Player p : game.getServer().getOnlinePlayers())
+        for (Player p : Sponge.getServer().getOnlinePlayers())
         {
             if (!force && p.hasPermission(module.perms().TELEPORT_PREVENT_TP.getId()))
             {
@@ -174,7 +173,7 @@ public class TeleportCommands
         force = force && context.hasPermission(module.perms().COMMAND_TPHEREALL_FORCE.getId());
         ArrayList<String> noTp = new ArrayList<>();
         Location<World> target = context.getLocation();
-        for (Player p : game.getServer().getOnlinePlayers())
+        for (Player p : Sponge.getServer().getOnlinePlayers())
         {
             if (!force && p.hasPermission(module.perms().TELEPORT_PREVENT_TP.getId()))
             {

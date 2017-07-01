@@ -17,16 +17,16 @@
  */
 package org.cubeengine.module.kickban;
 
-import javax.inject.Inject;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.filesystem.FileManager;
+import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.libcube.service.command.ModuleCommand;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.Broadcaster;
-import org.spongepowered.api.Game;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 /**
  * Overrides and improves Vanilla Kick and Ban Commands:
@@ -37,21 +37,22 @@ import org.spongepowered.api.Game;
  * /kick 	Kicks a player off a server.
  * /pardon 	Removes entries from the banlist.
  */
-@ModuleInfo(name = "KickBan", description = "Kick and Ban players")
-public class KickBan extends Module
+@Singleton
+@Module(id = "kickban", name = "KickBan", version = "1.0.0",
+        description = "Kick and Ban players",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+public class KickBan extends CubeEngineModule
 {
-    @Inject private CommandManager cm;
-    @Inject private Broadcaster bc;
-    @Inject private Game game;
-    @Inject private FileManager fm;
-    @Inject private I18n i18n;
     @Inject private KickBanPerms perms;
     @ModuleConfig private KickBanConfig config;
+    @ModuleCommand private KickBanCommands kickBanCommands;
 
-    @Enable
-    public void onEnable()
+    @Listener
+    public void onEnable(GamePreInitializationEvent event)
     {
-        cm.addCommands(this, new KickBanCommands(this, bc, game, i18n));
+        kickBanCommands.init();
     }
 
     public KickBanPerms perms()

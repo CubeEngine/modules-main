@@ -20,7 +20,7 @@ package org.cubeengine.module.roles.service;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.modularity.asm.marker.ServiceProvider;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.permission.PermissionManager;
@@ -51,8 +51,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
+import javax.management.relation.Role;
 
-@ServiceProvider(PermissionService.class)
 public class RolesPermissionService implements PermissionService
 {
     public static final String DEFAULT_SUBJECTS = "default";
@@ -67,13 +67,13 @@ public class RolesPermissionService implements PermissionService
     @Inject private PermissionManager pm;
 
     @Inject
-    public RolesPermissionService(Roles module, FileManager fm, Reflector reflector)
+    public RolesPermissionService(Roles module, FileManager fm, Reflector reflector, ModuleManager mm)
     {
-        this.logger = module.getProvided(Log.class);
+        this.logger = mm.getLoggerFor(Roles.class);
         this.config = fm.loadConfig(module, RolesConfig.class);
         collections.put(DEFAULT_SUBJECTS, new BasicSubjectCollection(this, DEFAULT_SUBJECTS));
         collections.put(SUBJECTS_USER, new UserCollection(this));
-        collections.put(SUBJECTS_GROUP, new RoleCollection(module.getProvided(Path.class), this, reflector, SUBJECTS_GROUP));
+        collections.put(SUBJECTS_GROUP, new RoleCollection(mm.getPathFor(Roles.class), this, reflector, SUBJECTS_GROUP));
 
         getGroupSubjects().reload();
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM));

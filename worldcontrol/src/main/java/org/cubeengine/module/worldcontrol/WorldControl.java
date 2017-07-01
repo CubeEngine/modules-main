@@ -18,23 +18,31 @@
 package org.cubeengine.module.worldcontrol;
 
 import java.util.Map.Entry;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
+import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.module.worldcontrol.WorldControlConfig.WorldSection;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 
-@ModuleInfo(name = "WorldControl", description = "Control what happens in your world")
-public class WorldControl extends Module
+import javax.inject.Singleton;
+
+@Singleton
+@Module(id = "worldcontrol", name = "WorldControl", version = "1.0.0",
+        description = "Control what happens in your world",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+public class WorldControl extends CubeEngineModule
 {
     // TODO implementation...
     @ModuleConfig private WorldControlConfig config;
 
-    @Enable
-    public void onEnable()
+    @Listener
+    public void onEnable(GamePreInitializationEvent event)
     {
         for (Entry<ConfigWorld, WorldSection> entry : config.worldSettings.entrySet())
         {

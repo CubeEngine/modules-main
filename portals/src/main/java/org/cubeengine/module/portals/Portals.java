@@ -31,14 +31,17 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import com.flowpowered.math.vector.Vector3i;
 import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
 import org.cubeengine.butler.provider.Providers;
+import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.libcube.InjectService;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.libcube.util.Pair;
@@ -54,6 +57,8 @@ import org.cubeengine.libcube.service.task.TaskManager;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.world.Chunk;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -61,18 +66,23 @@ import org.spongepowered.api.world.World;
 import static java.util.stream.Collectors.toSet;
 import static org.cubeengine.libcube.service.filesystem.FileExtensionFilter.YAML;
 
-@ModuleInfo(name = "Portals", description = "Create and use portals")
-public class Portals extends Module
+@Singleton
+@Module(id = "portals", name = "Portals", version = "1.0.0",
+        description = "Create and use portals",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+public class Portals extends CubeEngineModule
 {
     @Inject private Reflector reflector;
     @Inject private CommandManager cm;
-    @Inject private Selector selector;
+    @InjectService private Selector selector;
     @Inject private EventManager em;
     @Inject private TaskManager tm;
-    @Inject private Log logger;
-    @Inject private Path path;
-    @Inject private Game game;
+    private Log logger;
+    private Path path;
     @Inject private I18n i18n;
+    @Inject private ModuleManager mm;
 
     private Path portalsDir;
     private final Map<String, Portal> portals = new HashMap<>();
@@ -82,9 +92,11 @@ public class Portals extends Module
     private Map<UUID, PortalsAttachment> attachments = new HashMap<>();
     @ModuleConfig private PortalsConfig config;
 
-    @Enable
-    public void onEnable() throws IOException
+    @Listener
+    public void onEnable(GamePreInitializationEvent event) throws IOException
     {
+        this.logger = mm.getLoggerFor(Portals.class);
+        this.path = mm.getPathFor(Portals.class);
         reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(), Destination.class);
         Providers rManager = cm.getProviders();
         rManager.register(this, new PortalParser(this), Portal.class);
@@ -94,7 +106,7 @@ public class Portals extends Module
 
         PortalCommands portals = new PortalCommands(cm, this, selector, reflector, i18n);
         cm.addCommand(portals);
-        portals.addCommand(new PortalModifyCommand(cm, selector, game, i18n));
+        portals.addCommand(new PortalModifyCommand(cm, selector, i18n));
 
         em.registerListener(Portals.class, new PortalListener(this, i18n));
         this.loadPortals();

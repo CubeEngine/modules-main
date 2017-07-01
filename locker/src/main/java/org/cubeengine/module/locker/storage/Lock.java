@@ -475,7 +475,7 @@ public class Lock
             this.notifyUsage(user);
             if ((in && out) || user.hasPermission(module.perms().ACCESS_OTHER.getId())) return; // Has full access
             if (protectedInventory == null) return; // Just checking else do lock
-            InventoryGuardFactory igf = module.getModularity().provide(InventoryGuardFactory.class);
+            InventoryGuardFactory igf = module.getInventoryGuardFactory();
             igf.prepareInv(protectedInventory, user.getUniqueId());
             if (!in)
             {
@@ -930,7 +930,7 @@ public class Lock
         }
         else
         {
-            module.getProvided(Log.class).warn("ProtectedTypes do not match for Guard at {}", location.toString());
+            module.getLogger().warn("ProtectedTypes do not match for Guard at {}", location.toString());
         }
         return this.isValidType;
     }

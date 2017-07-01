@@ -47,7 +47,7 @@ import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
-@Command(name = "settings", alias = "set", desc = "Manages the region settings")
+@Command(name = "control", desc = "Manages the region settings")
 public class SettingsCommands extends ContainerCommand
 {
     private I18n i18n;

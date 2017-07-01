@@ -59,6 +59,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 /**
  * Contains commands to manage kicks/bans.
  * /kick
@@ -71,20 +73,23 @@ public class KickBanCommands
 {
     private final KickBan module;
     private I18n i18n;
-    private final BanService banService;
+    private BanService banService;
     private final Broadcaster bc;
-    private Game game;
 
     private static final String kickMessage = "You have been kicked from the server!";
     private static final String banMessage = "You have been banned from this server!";
 
-    public KickBanCommands(KickBan module, Broadcaster bc, Game game, I18n i18n)
+    @Inject
+    public KickBanCommands(KickBan module, Broadcaster bc, I18n i18n)
     {
         this.module = module;
         this.i18n = i18n;
-        this.banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
         this.bc = bc;
-        this.game = game;
+    }
+
+    public void init()
+    {
+        this.banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
     }
 
     @Command(desc = "Kicks a player from the server")
@@ -94,7 +99,7 @@ public class KickBanCommands
         if (players.isAll())
         {
             ensurePermission(context, module.perms().COMMAND_KICK_ALL);
-            for (Player toKick : game.getServer().getOnlinePlayers())
+            for (Player toKick : Sponge.getServer().getOnlinePlayers())
             {
                 if (!context.equals(toKick))
                 {
@@ -146,7 +151,7 @@ public class KickBanCommands
                 }
                 this.banService.addBan(Ban.builder().type(BanTypes.IP).address(ipAdress).reason(Text.of(reason)).source(context).build());
                 Set<String> bannedUsers = new HashSet<>();
-                for (Player ipPlayer : game.getServer().getOnlinePlayers())
+                for (Player ipPlayer : Sponge.getServer().getOnlinePlayers())
                 {
                     if (ipPlayer.getConnection().getAddress().getAddress() != null && ipPlayer.getConnection().getAddress().getAddress().equals(ipAdress))
                     {
@@ -236,7 +241,7 @@ public class KickBanCommands
             this.banService.addBan(Ban.builder().type(BanTypes.IP).address(address).reason(Text.of(reason)).source(context).build());
             i18n.send(context, NEGATIVE, "You banned the IP {input#ip} from your server!", address.getHostAddress());
             Set<String> bannedUsers = new HashSet<>();
-            for (Player user : game.getServer().getOnlinePlayers())
+            for (Player user : Sponge.getServer().getOnlinePlayers())
             {
                 if (user.getConnection().getAddress().getAddress() != null && user.getConnection().getAddress().getAddress().getHostAddress().equals(ipaddress))
                 {
@@ -325,7 +330,7 @@ public class KickBanCommands
 
     private boolean cannotBanUser(CommandSource context)
     {
-        if (!game.getServer().getOnlineMode())
+        if (!Sponge.getServer().getOnlineMode())
         {
             if (this.module.getConfiguration().disallowBanIfOfflineMode)
             {

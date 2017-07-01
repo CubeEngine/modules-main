@@ -76,10 +76,10 @@ public class LockerBlockListener
     private final Game game;
 
     @Inject
-    public LockerBlockListener(Locker locker, LockManager manager, I18n i18n, Game game)
+    public LockerBlockListener(Locker locker, I18n i18n, Game game)
     {
         this.module = locker;
-        this.manager = manager;
+        this.manager = locker.getManager();
         this.i18n = i18n;
         this.game = game;
     }

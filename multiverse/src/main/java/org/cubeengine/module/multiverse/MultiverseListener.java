@@ -55,7 +55,7 @@ public class MultiverseListener
             data.from(module.getUniverse(from), from).applyFromPlayer(((Player)target)); // save playerdata
             data.from(module.getUniverse(to), to).applyToPlayer(((Player)target)); // load playerdata
             target.offer(data);
-            module.getProvided(Log.class).info("{} entered the universe {}", ((Player)target).getName(), module.getUniverse(to));
+            module.getLogger().info("{} entered the universe {}", ((Player)target).getName(), module.getUniverse(to));
         }
         else
         {

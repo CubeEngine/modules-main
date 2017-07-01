@@ -22,11 +22,15 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.concurrent.ThreadFactory;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
+import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.logscribe.LogFactory;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
+import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.logging.LogProvider;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.conomy.bank.BankConomyService;
@@ -38,12 +42,20 @@ import org.cubeengine.libcube.service.database.Database;
 import org.cubeengine.libcube.service.database.ModuleTables;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.EconomyService;
 
-@ModuleInfo(name = "Conomy", description = "Economy API and basic commands")
+@Singleton
+@Module(id = "conomy", name = "Conomy", version = "1.0.0",
+        description = "Economy API and basic commands",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
 @ModuleTables({TableAccount.class, TableBalance.class})
-public class Conomy extends Module
+public class Conomy extends CubeEngineModule
 {
     @ModuleConfig private ConomyConfiguration config;
     @Inject private ConomyPermission perms;
@@ -52,20 +64,21 @@ public class Conomy extends Module
     @Inject private PermissionManager pm;
     @Inject private I18n i18n;
     @Inject private CommandManager cm;
-    @Inject private ThreadFactory tf;
-    @Inject private LogFactory lf;
-    @Inject private Path modulePath;
     @Inject private Reflector reflector;
-    @Inject private Game game;
+    @Inject private LogProvider logProvider;
+    @Inject private ModuleManager mm;
+    private Path modulePath;
 
     private BankPermission bankPerms;
     private ConomyService service;
+    private Log log;
 
-    @Enable
-    public void onEnable()
+    @Listener
+    public void onEnable(GamePreInitializationEvent event)
     {
+        this.log = logProvider.getLogger(Conomy.class, "Conomy", true);
         i18n.getCompositor().registerFormatter(new BaseAccountFormatter());
-
+        this.modulePath = mm.getPathFor(Conomy.class);
         Path curencyPath = modulePath.resolve("currencies");
         try
         {
@@ -84,8 +97,7 @@ public class Conomy extends Module
         {
             service = new ConomyService(this, config, curencyPath, db, reflector);
         }
-        Object plugin = game.getPluginManager().getPlugin("cubeengine").get().getInstance().get();
-        game.getServiceManager().setProvider(plugin, EconomyService.class, service);
+        Sponge.getServiceManager().setProvider(this.mm.getPlugin(Conomy.class).get(), EconomyService.class, service);
 
         service.registerCommands(cm, i18n);
 
@@ -113,5 +125,9 @@ public class Conomy extends Module
     public ConomyService getService()
     {
         return service;
+    }
+
+    public Log getLog() {
+        return log;
     }
 }

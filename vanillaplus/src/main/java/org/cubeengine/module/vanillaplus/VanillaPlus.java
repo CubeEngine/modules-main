@@ -18,9 +18,10 @@
 package org.cubeengine.module.vanillaplus;
 
 import javax.inject.Inject;
-import de.cubeisland.engine.modularity.asm.marker.ModuleInfo;
-import de.cubeisland.engine.modularity.core.Module;
-import de.cubeisland.engine.modularity.core.marker.Enable;
+import javax.inject.Singleton;
+
+import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.addition.FoodCommands;
 import org.cubeengine.module.vanillaplus.addition.GodCommand;
@@ -72,8 +73,12 @@ import org.cubeengine.libcube.service.matcher.TimeMatcher;
 import org.cubeengine.libcube.service.matcher.WorldMatcher;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.service.Broadcaster;
+import org.cubeengine.processor.Dependency;
+import org.cubeengine.processor.Module;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 
 /**
@@ -122,8 +127,13 @@ import org.spongepowered.api.plugin.PluginContainer;
  * /suicide (kill self) {@link KillCommands#suicide}
  */
 
-@ModuleInfo(name = "VanillaPlus", description = "Improved Vanilla")
-public class VanillaPlus extends Module
+@Singleton
+@Module(id = "vanillaplus", name = "Vanilla+", version = "1.0.0",
+        description = "Improved Vanilla",
+        dependencies = @Dependency("cubeengine-core"),
+        url = "http://cubeengine.org",
+        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+public class VanillaPlus extends CubeEngineModule
 {
     @Inject private CommandManager cm;
     @Inject private I18n i18n;
@@ -131,6 +141,7 @@ public class VanillaPlus extends Module
     @Inject private EnchantMatcher em;
     @Inject private EntityMatcher enm;
     @Inject private TimeMatcher tm;
+    @Inject private ModuleManager momu;
     @Inject private WorldMatcher wm;
     @Inject private TaskManager tam;
     @Inject private PermissionManager pm;
@@ -139,7 +150,6 @@ public class VanillaPlus extends Module
     @ModuleConfig private VanillaPlusConfig config;
     @Inject private EventManager evm;
     @Inject private StringMatcher sm;
-    @Inject private PluginContainer plugin;
 
     @Inject
     public VanillaPlus(PluginContainer plugin)
@@ -151,8 +161,8 @@ public class VanillaPlus extends Module
                 .buildAndRegister(plugin);
     }
 
-    @Enable
-    public void onEnable()
+    @Listener
+    public void onEnable(GamePreInitializationEvent event)
     {
         enableImprovements();
         enableFixes();
@@ -195,7 +205,7 @@ public class VanillaPlus extends Module
         }
         if (config.add.commandsPlugins)
         {
-            cm.addCommands(this, new PluginCommands(i18n, pm, getModularity(), plugin));
+            cm.addCommands(this, new PluginCommands(i18n, pm, momu));
         }
         if (config.add.commandStash)
         {
@@ -305,7 +315,7 @@ public class VanillaPlus extends Module
         }
         if (config.improve.commandBorderEnable)
         {
-            cm.addCommand(new BorderCommands(i18n, cm, plugin, config.improve.commandBorderMax));
+            cm.addCommand(new BorderCommands(i18n, cm, momu.getPlugin(VanillaPlus.class).get(), config.improve.commandBorderMax));
         }
     }
 

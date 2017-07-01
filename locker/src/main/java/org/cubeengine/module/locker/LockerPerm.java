@@ -28,7 +28,7 @@ import org.spongepowered.api.service.permission.PermissionDescription;
 public class LockerPerm extends PermissionContainer
 {
     @Inject
-    public LockerPerm(PermissionManager pm, LockerCommands mainCmd)
+    public LockerPerm(PermissionManager pm)
     {
         super(pm, Locker.class);
     }

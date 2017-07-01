@@ -28,8 +28,8 @@ import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.libcube.service.config.WorldSetSpawnEvent;
 import org.spongepowered.api.Game;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
@@ -48,16 +48,14 @@ public class SpawnCommands
 {
     private final Teleport module;
     private EventManager em;
-    private Game game;
     private Broadcaster bc;
     private TeleportListener tl;
     private I18n i18n;
 
-    public SpawnCommands(Teleport basics, EventManager em, Game game, Broadcaster bc, TeleportListener tl, I18n i18n)
+    public SpawnCommands(Teleport basics, EventManager em, Broadcaster bc, TeleportListener tl, I18n i18n)
     {
         this.module = basics;
         this.em = em;
-        this.game = game;
         this.bc = bc;
         this.tl = tl;
         this.i18n = i18n;
@@ -79,7 +77,7 @@ public class SpawnCommands
             z = loc.getBlockZ();
             direction = ((Player)context).getRotation();
         }
-        em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location<>(world, x, y, z), direction, context));
+        //em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location<>(world, x, y, z), direction, context));
         world.getProperties().setSpawnPosition(new Vector3i(x, y, z));
         i18n.send(context, POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new Vector3i(x, y, z));
     }
@@ -88,7 +86,7 @@ public class SpawnCommands
     public void spawnAll(CommandSource context, World world, @Flag boolean force)
     {
         Location<World> loc = world.getSpawnLocation().add(0.5, 0, 0.5);
-        for (Player aPlayer : game.getServer().getOnlinePlayers())
+        for (Player aPlayer : Sponge.getServer().getOnlinePlayers())
         {
             if (!force && aPlayer.hasPermission(module.perms().CMD_SPAWN_PREVENT.getId()))
             {
