@@ -40,11 +40,7 @@ import javax.inject.Singleton;
  * /tp 	Teleports entities.
  */
 @Singleton
-@Module(id = "teleport", name = "Teleport", version = "1.0.0",
-        description = "Better Teleportation",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class Teleport extends CubeEngineModule
 {
     // TODO make override of vanilla-commands optional

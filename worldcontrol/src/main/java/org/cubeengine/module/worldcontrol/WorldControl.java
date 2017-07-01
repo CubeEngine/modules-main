@@ -31,11 +31,7 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import javax.inject.Singleton;
 
 @Singleton
-@Module(id = "worldcontrol", name = "WorldControl", version = "1.0.0",
-        description = "Control what happens in your world",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class WorldControl extends CubeEngineModule
 {
     // TODO implementation...

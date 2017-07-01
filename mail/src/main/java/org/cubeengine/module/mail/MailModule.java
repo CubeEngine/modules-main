@@ -34,11 +34,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 
 @Singleton
-@Module(id = "mail", name = "Mail", version = "1.0.0",
-        description = "Send ingame Mails",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 @ModuleTables(TableMail.class)
 public class MailModule extends CubeEngineModule
 {

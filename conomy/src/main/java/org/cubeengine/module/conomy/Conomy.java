@@ -49,11 +49,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.EconomyService;
 
 @Singleton
-@Module(id = "conomy", name = "Conomy", version = "1.0.0",
-        description = "Economy API and basic commands",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 @ModuleTables({TableAccount.class, TableBalance.class})
 public class Conomy extends CubeEngineModule
 {

@@ -46,11 +46,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-@Module(id = "travel", name = "Travel", version = "1.0.0",
-        description = "Travel anywhere",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class Travel extends CubeEngineModule
 {
     @ModuleConfig private TravelConfig config;

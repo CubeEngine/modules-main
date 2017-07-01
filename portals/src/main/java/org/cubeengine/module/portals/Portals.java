@@ -67,11 +67,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.cubeengine.libcube.service.filesystem.FileExtensionFilter.YAML;
 
 @Singleton
-@Module(id = "portals", name = "Portals", version = "1.0.0",
-        description = "Create and use portals",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class Portals extends CubeEngineModule
 {
     @Inject private Reflector reflector;

@@ -17,12 +17,10 @@
  */
 package org.cubeengine.module.protector;
 
-import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.InjectService;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.Selector;
-
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -30,12 +28,10 @@ import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.command.RegionCommands;
 import org.cubeengine.module.protector.command.SettingsCommands;
 import org.cubeengine.module.protector.region.RegionFormatter;
-import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.service.permission.PermissionService;
 
@@ -47,11 +43,7 @@ import javax.inject.Singleton;
 // TODO protect items from explosion
 
 @Singleton
-@Module(id = "protector", name = "Protector", version = "1.0.0",
-        description = "Protects your worlds",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class Protector extends CubeEngineModule
 {
     private Path modulePath;

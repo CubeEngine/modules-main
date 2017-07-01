@@ -30,11 +30,7 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 @Singleton
-@Module(id = "worlds", name = "Worlds", version = "1.0.0",
-        description = "Easy lightweight WorldManagement",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class Worlds extends CubeEngineModule
 {
     @ModuleCommand private WorldsCommands wc;

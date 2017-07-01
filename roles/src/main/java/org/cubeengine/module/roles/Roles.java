@@ -21,15 +21,12 @@ import static org.cubeengine.libcube.service.logging.LoggingUtil.getCycler;
 import static org.cubeengine.libcube.service.logging.LoggingUtil.getFileFormat;
 import static org.cubeengine.libcube.service.logging.LoggingUtil.getLogFile;
 
-import org.cubeengine.converter.ConverterManager;
 import de.cubeisland.engine.logscribe.Log;
 import de.cubeisland.engine.logscribe.LogFactory;
 import de.cubeisland.engine.logscribe.target.file.AsyncFileTarget;
+import org.cubeengine.converter.ConverterManager;
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.processor.Dependency;
-import org.cubeengine.processor.Module;
-import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -53,6 +50,8 @@ import org.cubeengine.module.roles.data.PermissionDataBuilder;
 import org.cubeengine.module.roles.exception.RolesExceptionHandler;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.processor.Module;
+import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.event.Listener;
@@ -75,11 +74,7 @@ TODO lookup permissions (via PermissionDescription)
 TODO lookup permissions (via Command?)
 */
 @Singleton
-@Module(id = "roles", name = "Roles", version = "1.0.0",
-        description = "Manages permissions of players and roles",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class Roles extends CubeEngineModule
 {
     @Inject private CommandManager cm;

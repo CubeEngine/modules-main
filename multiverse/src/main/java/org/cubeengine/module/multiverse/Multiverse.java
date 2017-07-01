@@ -65,11 +65,7 @@ import javax.inject.Singleton;
  * save all data i want in custom manipulator (Map:World->PlayerData)
  */
 @Singleton
-@Module(id = "multiverse", name = "Multiverse", version = "1.0.0",
-        description = "Group worlds into universes",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class Multiverse extends CubeEngineModule
 {
     public static final String UNKNOWN = "unknown";

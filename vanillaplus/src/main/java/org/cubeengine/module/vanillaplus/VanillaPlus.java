@@ -128,11 +128,7 @@ import org.spongepowered.api.plugin.PluginContainer;
  */
 
 @Singleton
-@Module(id = "vanillaplus", name = "Vanilla+", version = "1.0.0",
-        description = "Improved Vanilla",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class VanillaPlus extends CubeEngineModule
 {
     @Inject private CommandManager cm;

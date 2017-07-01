@@ -39,11 +39,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-@Module(id = "netherportals", name = "Netherportals", version = "1.0.0",
-        description = "Modifies Vanilla Portal behaviours",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class Netherportals extends CubeEngineModule
 {
     @ModuleConfig private NetherportalsConfig config;

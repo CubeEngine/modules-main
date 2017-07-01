@@ -38,11 +38,7 @@ import javax.inject.Singleton;
  * /pardon 	Removes entries from the banlist.
  */
 @Singleton
-@Module(id = "kickban", name = "KickBan", version = "1.0.0",
-        description = "Kick and Ban players",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 public class KickBan extends CubeEngineModule
 {
     @Inject private KickBanPerms perms;

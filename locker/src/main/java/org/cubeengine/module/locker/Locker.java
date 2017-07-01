@@ -62,11 +62,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 // TODO protect lines of redstone
 
 @Singleton
-@Module(id = "locker", name = "Locker", version = "1.0.0",
-        description = "Puts a Lock on your stuff",
-        dependencies = @Dependency("cubeengine-core"),
-        url = "http://cubeengine.org",
-        authors = {"Anselm 'Faithcaio' Brehme", "Phillip Schichtel"})
+@Module
 @ModuleTables({TableLocks.class, TableLockLocations.class, TableAccessList.class})
 public class Locker extends CubeEngineModule
 {
