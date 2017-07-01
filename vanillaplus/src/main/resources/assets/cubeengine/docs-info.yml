@@ -1,0 +1,6 @@
+work-in-progress: true
+features:
+  - Fixes certain vanilla Minecraft behaviors (see configuration for details)
+  - Replaces a set of vanilla commands with more user-friendly versions
+  - Adds a small set of commonly wanted commands
+  - Everything can be disabled

@@ -1,0 +1,5 @@
+features:
+  - Implementation of the standard Economy interface
+  - Individual user accounts
+  - Banks
+  - Configurable currencies

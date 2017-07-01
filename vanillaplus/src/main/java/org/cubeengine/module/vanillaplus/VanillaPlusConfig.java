@@ -128,7 +128,7 @@ public class VanillaPlusConfig extends ReflectedYaml
         @Comment("Adds /heal")
         public boolean commandHeal = true;
 
-        @Comment("Adds /biome, /seed, /compass, /depth, /getPos, /near, /ping, /lag, /listWorlds ")
+        @Comment("Adds /biome, /seed, /compass, /depth, /getPos, /near, /ping, /lag, /listWorlds")
         public boolean commandsInformation = true;
 
         public int commandNearDefaultRadius = 20;
@@ -160,7 +160,4 @@ public class VanillaPlusConfig extends ReflectedYaml
         @Comment("Adds /unlimited")
         public boolean commandUnlimited = true;
     }
-
-
-
 }

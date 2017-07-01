@@ -1,0 +1,4 @@
+features:
+  - Various teleport commands
+  - Safe teleporting to prevent teleport related deaths
+  - Unsafe teleporting for exact teleport destinations

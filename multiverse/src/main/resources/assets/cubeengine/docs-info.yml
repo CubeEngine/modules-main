@@ -1,0 +1,4 @@
+features:
+  - Arbitrary world grouping
+  - Separate Inventory etc. for each universe
+  - Contexts for each universe
