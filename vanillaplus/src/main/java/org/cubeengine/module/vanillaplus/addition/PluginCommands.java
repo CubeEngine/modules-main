@@ -41,6 +41,7 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.Platform.Component.API;
 import static org.spongepowered.api.Platform.Component.IMPLEMENTATION;
+import static org.spongepowered.api.text.format.TextColors.GRAY;
 import static org.spongepowered.api.text.format.TextColors.GREEN;
 import static org.spongepowered.api.text.format.TextColors.RESET;
 
@@ -69,16 +70,16 @@ public class PluginCommands extends PermissionContainer
 
         i18n.send(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:", plugins.size() + 1, modules.size());
         context.sendMessage(Text.EMPTY);
-        context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", RESET, " (" + core.getVersion().orElse("unknown") + ")"));
+        context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", " " ,GRAY, core.getId(), RESET, " (" + core.getVersion().orElse("unknown") + ")"));
 
         for (PluginContainer m : modules)
         {
-            context.sendMessage(Text.of("   - ", GREEN, m.getName(), RESET, " (" + m.getVersion().orElse("unknown") + ")"));
+            context.sendMessage(Text.of("   - ", GREEN, m.getName(), " ", GRAY, m.getId(), RESET, " (" + m.getVersion().orElse("unknown") + ")"));
         }
 
         for (PluginContainer plugin : plugins)
         {
-            context.sendMessage(Text.of(" - ", GREEN, plugin.getName(), RESET, " (" + plugin.getVersion().orElse("unknown") + ")"));
+            context.sendMessage(Text.of(" - ", GREEN, plugin.getName(), " ", GRAY, plugin.getId(), RESET, " (" + plugin.getVersion().orElse("unknown") + ")"));
         }
     }
 
