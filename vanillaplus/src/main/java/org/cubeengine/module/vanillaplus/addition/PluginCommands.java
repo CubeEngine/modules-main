@@ -62,7 +62,7 @@ public class PluginCommands extends PermissionContainer
     public void plugins(CommandSource context)
     {
         Collection<PluginContainer> plugins = new ArrayList<>(Sponge.getPluginManager().getPlugins());
-        Collection<PluginContainer> modules = mm.getModulePlugins();
+        Collection<PluginContainer> modules = new ArrayList<>(mm.getModulePlugins());
         plugins.removeAll(modules);
         PluginContainer core = mm.getPlugin(LibCube.class).get();
         modules.remove(core);
