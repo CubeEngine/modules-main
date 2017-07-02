@@ -219,6 +219,10 @@ public class SettingsListener
         }
         for (Transaction<BlockSnapshot> transaction : event.getTransactions())
         {
+            if (transaction.getOriginal().getState().getType() == transaction.getFinal().getState().getType())
+            {
+                continue;
+            }
             transaction.getOriginal().getLocation().ifPresent(loc -> {
                 List<Region> regionsAt = manager.getRegionsAt(loc);
                 if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.build, UNDEFINED) == FALSE)
