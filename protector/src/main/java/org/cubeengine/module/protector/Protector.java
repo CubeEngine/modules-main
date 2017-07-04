@@ -40,7 +40,9 @@ import java.nio.file.Path;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-// TODO protect items from explosion
+// TODO fill/empty bucket (in hand)
+// TNT can be ignited ( but no world change )
+// TNT/Creeper does no damage to player?
 
 @Singleton
 @Module
