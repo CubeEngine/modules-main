@@ -104,9 +104,9 @@ public class ItemDBCommand
         String found = materialMatcher.getNameFor(aItem);
         if (found == null)
         {
-            i18n.send(context, NEGATIVE, "Itemname unknown! Itemdata: {integer#id}", aItem.getItem().getId());
+            i18n.send(context, NEGATIVE, "Itemname unknown! Itemdata: {input#id}", aItem.getItem().getId());
             return;
         }
-        i18n.send(context, POSITIVE, "The Item in your hand is: {input#item} ({integer#id})", found, aItem.getItem().getId());
+        i18n.send(context, POSITIVE, "The Item in your hand is: {input#item} ({input#id})", found, aItem.getItem().getId());
     }
 }
