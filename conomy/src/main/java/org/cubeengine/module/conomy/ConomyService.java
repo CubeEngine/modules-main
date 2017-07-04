@@ -77,8 +77,8 @@ public class ConomyService implements EconomyService, CatalogRegistryModule<Curr
         {
             for (Path file : Files.newDirectoryStream(path, FileExtensionFilter.YAML))
             {
-                String name = file.getFileName().toString();
-                currencies.put(name, new ConfigCurrency(reflector.load(CurrencyConfiguration.class, file.toFile())));
+                ConfigCurrency cc = new ConfigCurrency(reflector.load(CurrencyConfiguration.class, file.toFile()));
+                currencies.put(cc.getCurrencyID(), cc);
 
                 Sponge.getRegistry().registerModule(Currency.class, this);
 
@@ -93,7 +93,7 @@ public class ConomyService implements EconomyService, CatalogRegistryModule<Curr
         {
             CurrencyConfiguration defConfig = reflector.load(CurrencyConfiguration.class, path.resolve(config.defaultCurrency + ".yml").toFile());
             defaultCurrency = new ConfigCurrency(defConfig);
-            currencies.put(defaultCurrency.getID(), defaultCurrency);
+            currencies.put(defaultCurrency.getCurrencyID(), defaultCurrency);
         }
 
         /* TODO LOGGER

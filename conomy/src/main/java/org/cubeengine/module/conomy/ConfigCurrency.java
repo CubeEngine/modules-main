@@ -69,7 +69,7 @@ public class ConfigCurrency implements Currency
     @Override
     public String getId()
     {
-        return config.name;
+        return this.getCurrencyID();
     }
 
     @Override
@@ -123,7 +123,7 @@ public class ConfigCurrency implements Currency
         return def;
     }
 
-    public String getID()
+    public String getCurrencyID()
     {
         return StringUtils.stripFileExtension(config.getFile().getName());
     }

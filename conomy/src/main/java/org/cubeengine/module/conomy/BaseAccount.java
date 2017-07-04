@@ -82,7 +82,7 @@ public abstract class BaseAccount implements Account
         {
             balanceModel = db.getDSL().selectFrom(TABLE_BALANCE).where(TABLE_BALANCE.ACCOUNT_ID.eq(account.getID()))
                     .and(TABLE_BALANCE.CONTEXT.eq(relevantCtx.get().getType() + "|" + relevantCtx.get().getName()))
-                    .and(TABLE_BALANCE.CURRENCY.eq(currency.getID())).fetchOne();
+                    .and(TABLE_BALANCE.CURRENCY.eq(currency.getCurrencyID())).fetchOne();
             if (balanceModel == null)
             {
                 balanceModel = db.getDSL().newRecord(TABLE_BALANCE).newBalance(account, currency, relevantCtx.get(), getDefaultBalance(currency));
