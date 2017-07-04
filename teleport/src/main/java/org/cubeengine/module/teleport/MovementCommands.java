@@ -214,16 +214,19 @@ public class MovementCommands
             }
             if (loc != null)
             {
-                if (!unsafe || context.setLocationSafely(loc.getLocation()))
+                Location<World> deathLoc = loc.getLocation();
+                Location<World> safeDeathLoc = Sponge.getGame().getTeleportHelper().getSafeLocation(deathLoc, 5, 20).orElse(null);
+                if (deathLoc.equals(safeDeathLoc) || unsafe)
                 {
-                    if (unsafe)
-                    {
-                        context.setLocation(loc.getLocation());
-                    }
+                    context.setLocation(deathLoc);
                     i18n.send(context, POSITIVE, "Teleported to your death point!");
                     tl.setDeathLocation(context, null); // reset after back
+                    context.setRotation(loc.getRotation());
                 }
-                context.setRotation(loc.getRotation());
+                else
+                {
+                    i18n.send(context, NEGATIVE, "Your death point is unsafe! Use /back -unsafe if you are sure you want to go back there!");
+                }
                 return;
             }
         }
