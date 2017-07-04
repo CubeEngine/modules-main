@@ -50,6 +50,7 @@ import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.text.Text;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.text.format.TextColors.*;
@@ -144,9 +145,16 @@ public class MoneyCommand extends ContainerCommand
         {
             Account account = service.getOrCreateAccount(balance.getAccountID()).get();
             ConfigCurrency currency = service.getCurrency(balance.getCurrency());
-            texts.add(Text.of(i++, WHITE, " - ",
-                    DARK_GREEN, account.getDisplayName(), WHITE, ": ",
-                    GOLD, currency.format(currency.fromLong(balance.getBalance()))));
+            if (currency == null)
+            {
+                texts.add(Text.of(CRITICAL, "?", balance.getCurrency(), "? : ", balance.getBalance()));
+            }
+            else
+            {
+                texts.add(Text.of(i++, WHITE, " - ",
+                        DARK_GREEN, account.getDisplayName(), WHITE, ": ",
+                        GOLD, currency.format(currency.fromLong(balance.getBalance()))));
+            }
         }
         pagination.contents(texts);
         pagination.sendTo(context);
