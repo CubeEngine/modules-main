@@ -18,6 +18,7 @@
 package org.cubeengine.module.vanillaplus.addition;
 
 import static java.text.DateFormat.SHORT;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NONE;
 
@@ -67,7 +68,12 @@ public class PlayerInfoCommands
             return;
         }
 
-        Instant lastPlayed = player.get(Keys.FIRST_DATE_PLAYED).get();
+        Instant lastPlayed = player.get(Keys.FIRST_DATE_PLAYED).orElse(null);
+        if (lastPlayed == null)
+        {
+            i18n.send(context, NEGATIVE, "User has not played here yet.");
+            return;
+        }
         if (System.currentTimeMillis() - lastPlayed.toEpochMilli() <= SEVEN_DAYS) // If less than 7 days show timeframe instead of date
         {
             i18n.send(context, NEUTRAL, "{user} was last seen {input#date}.", player, TimeUtil.format(
