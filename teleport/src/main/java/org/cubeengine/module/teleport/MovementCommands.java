@@ -216,7 +216,7 @@ public class MovementCommands
             {
                 Location<World> deathLoc = loc.getLocation();
                 Location<World> safeDeathLoc = Sponge.getGame().getTeleportHelper().getSafeLocation(deathLoc, 5, 20).orElse(null);
-                if (deathLoc.equals(safeDeathLoc) || unsafe)
+                if (deathLoc.getPosition().distance(safeDeathLoc.getPosition()) < 5 || unsafe)
                 {
                     context.setLocation(deathLoc);
                     i18n.send(context, POSITIVE, "Teleported to your death point!");
@@ -228,6 +228,7 @@ public class MovementCommands
                     i18n.send(context, NEGATIVE, "Your death point is unsafe! Use /back -unsafe if you are sure you want to go back there!");
                 }
                 return;
+
             }
         }
         if (backPerm)
