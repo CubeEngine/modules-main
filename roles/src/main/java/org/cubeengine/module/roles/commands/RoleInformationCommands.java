@@ -54,6 +54,7 @@ import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.context.Contextual;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -61,6 +62,7 @@ import org.spongepowered.api.text.format.TextColor;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -105,6 +107,7 @@ public class RoleInformationCommands extends ContainerCommand
         Text permClick = i18n.translate(cContext, NEUTRAL, "Click to show {input}", permTrans);
         Text optClick = i18n.translate(cContext, NEUTRAL, "Click to show {input}", optTrans);
         Text parentClick = i18n.translate(cContext, NEUTRAL, "Click to show {input}", parentTrans);
+        roles.sort(Comparator.comparing(Contextual::getIdentifier));
         for (Subject r : roles)
         {
             cContext.sendMessage(Text.of("- ", GOLD, r.getIdentifier(), " ",
