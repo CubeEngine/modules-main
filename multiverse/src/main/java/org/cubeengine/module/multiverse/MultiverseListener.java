@@ -90,6 +90,7 @@ public class MultiverseListener
         MultiverseData data = player.get(MultiverseData.class).orElse(null);
         if (data == null)
         {
+            return;
             // TODO how?
         }
         String universe = module.getUniverse(player.getWorld());
