@@ -137,6 +137,12 @@ public class SettingsListener
             return;
         }
 
+        // Ignore subblock movements
+        if (event.getFromTransform().getPosition().toInt().equals(event.getToTransform().getPosition().toInt()))
+        {
+            return;
+        }
+
         if (event instanceof MoveEntityEvent.Teleport)
         {
             if (checkMove(event, player, from, to, MoveType.TELEPORT, false))
