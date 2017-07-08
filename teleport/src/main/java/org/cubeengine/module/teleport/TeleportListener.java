@@ -98,6 +98,7 @@ public class TeleportListener
         Location<World> loc = LocationUtil.getBlockInSight(player);
         if (loc == null)
         {
+            i18n.send(ACTION_BAR, player, NEGATIVE, "No block in sight");
             return;
         }
         player.setLocation(LocationUtil.getLocationUp(loc).add(0.5, 0, 0.5));
