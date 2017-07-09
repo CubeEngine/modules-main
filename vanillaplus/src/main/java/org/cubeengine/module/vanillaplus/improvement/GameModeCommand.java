@@ -94,6 +94,9 @@ public class GameModeCommand extends PermissionContainer
             case "a":
             case "2":
                 return ADVENTURE;
+            case "spectator":
+            case "3":
+                return SPECTATOR;
             default:
                 return null;
         }
