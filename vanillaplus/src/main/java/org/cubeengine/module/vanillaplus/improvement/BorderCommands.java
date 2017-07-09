@@ -29,6 +29,9 @@ import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -51,6 +54,12 @@ public class BorderCommands extends ContainerCommand
     private I18n i18n;
     private PluginContainer plugin;
     private int commandBorderMax;
+    private long taskStart;
+
+    private PeriodFormatter formatter = new PeriodFormatterBuilder()
+                    .appendHours().appendSuffix(" hour"," hours").appendSeparator(" ")
+                    .appendMinutes().appendSuffix(" minute", " minutes").appendSeparator(" ")
+                    .appendSeconds().appendSuffix(" second", " seconds").toFormatter();
 
     public BorderCommands(I18n i18n, CommandManager cm, PluginContainer plugin, int commandBorderMax)
     {
@@ -68,7 +77,11 @@ public class BorderCommands extends ContainerCommand
     {
         if (status && task != null && !task.isCancelled())
         {
+            long timePassed = System.currentTimeMillis() - taskStart;
+            long estimateTime = timePassed / (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) * task.getTargetTotalChunks();
+
             i18n.send(context, NEUTRAL, "Border generation for {name}:", task.getWorldProperties().getWorldName());
+            i18n.send(context, NEUTRAL, "Estimated remaining time: {}", this.formatter.print(new Period(estimateTime - timePassed)));
             i18n.send(context, NEUTRAL, "Chunks generated {}", task.getTotalGeneratedChunks());
             i18n.send(context, NEUTRAL, "Chunks skipped {}", task.getTotalSkippedChunks());
             i18n.send(context, NEUTRAL, "Target count {} ({decimal:2}%)", task.getTargetTotalChunks(), 100 * (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) / task.getTargetTotalChunks());
@@ -105,6 +118,7 @@ public class BorderCommands extends ContainerCommand
         generate.logger(plugin.getLogger());
         i18n.send(context, NEGATIVE, "Started Chunk generation for {world}. This may take a while.", world);
         this.task = generate.start();
+        this.taskStart = System.currentTimeMillis();
     }
 
     @Command(desc = "Sets the center for the worldborder", alias = "center")
