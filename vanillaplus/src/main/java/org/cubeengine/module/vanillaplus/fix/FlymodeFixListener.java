@@ -36,6 +36,6 @@ public class FlymodeFixListener
     @Listener
     public void quit(final ClientConnectionEvent.Disconnect event)
     {
-        event.getTargetEntity().offer(SafeLoginData.FLYMODE, event.getTargetEntity().get(Keys.IS_FLYING).orElse(false));
+        event.getTargetEntity().offer(new SafeLoginData(event.getTargetEntity().get(Keys.IS_FLYING).orElse(false)));
     }
 }
