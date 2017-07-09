@@ -320,7 +320,7 @@ public class InformationCommands extends PermissionContainer
                        tps > 10 ?  RED :
                        tps == 0 ?  YELLOW :
                                    DARK_RED;
-        i18n.send(context, POSITIVE, "Current TPS: {txt}", Text.of(color, tps));
+        i18n.send(context, POSITIVE, "Current TPS: {txt}", Text.of(color, (int)tps));
         //Memory
         long memUse = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getUsed() / 1048576;
         long memCom = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage().getCommitted() / 1048576;
