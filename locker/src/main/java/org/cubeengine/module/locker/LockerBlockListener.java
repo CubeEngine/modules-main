@@ -45,6 +45,7 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.ChangeBlockEvent.Place;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
@@ -52,6 +53,7 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Chunk;
+import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -243,16 +245,15 @@ public class LockerBlockListener
     }
 
     @Listener
-    public void onNotifyPiston(NotifyNeighborBlockEvent event, @First BlockSnapshot block)
+    public void onNotifyPiston(NotifyNeighborBlockEvent event, @Root LocatableBlock block)
     {
-
         if (this.module.getConfig().protectFromPistonMove)
         {
             event.getNeighbors().entrySet().stream()
                     .filter(e -> PISTON.equals(e.getValue().getType()) || STICKY_PISTON.equals(e.getValue().getType()))
                     .forEach(entry ->
                     {
-                        Location<World> piston = block.getLocation().get().getRelative(entry.getKey());
+                        Location<World> piston = block.getLocation().getRelative(entry.getKey());
                         Direction direction = piston.get(Keys.DIRECTION).get();
                         boolean extend = !piston.get(Keys.EXTENDED).get();
                         if (!extend)
@@ -270,7 +271,7 @@ public class LockerBlockListener
         {
             for (Map.Entry<Direction, BlockState> entry : event.getNeighbors().entrySet())
             {
-                Lock lock = manager.getLock(block.getLocation().get().getRelative(entry.getKey()));
+                Lock lock = manager.getLock(block.getLocation().getRelative(entry.getKey()));
                 if (lock != null && lock.hasFlag(BLOCK_REDSTONE) && entry.getValue().supports(Keys.POWERED))
                 {
                     event.setCancelled(true);
