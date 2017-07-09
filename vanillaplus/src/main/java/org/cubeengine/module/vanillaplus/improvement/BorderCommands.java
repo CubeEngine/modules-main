@@ -71,9 +71,15 @@ public class BorderCommands extends ContainerCommand
             i18n.send(context, NEUTRAL, "Border generation for {name}:", task.getWorldProperties().getWorldName());
             i18n.send(context, NEUTRAL, "Chunks generated {}", task.getTotalGeneratedChunks());
             i18n.send(context, NEUTRAL, "Chunks skipped {}", task.getTotalSkippedChunks());
-            i18n.send(context, NEUTRAL, "Target count {} ({decimal:2}%)", task.getTargetTotalChunks(), 100 * (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) / task.getTotalGeneratedChunks());
+            i18n.send(context, NEUTRAL, "Target count {} ({decimal:2}%)", task.getTargetTotalChunks(), 100 * (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) / task.getTargetTotalChunks());
             return;
         }
+        if (status)
+        {
+            i18n.send(context, NEUTRAL, "No generation is running.");
+            return;
+        }
+
         if (task != null && !task.isCancelled())
         {
             task.cancel();
@@ -94,6 +100,7 @@ public class BorderCommands extends ContainerCommand
         if (fulltick)
         {
             generate.tickPercentLimit(1);
+            generate.tickInterval(2);
         }
         generate.logger(plugin.getLogger());
         i18n.send(context, NEGATIVE, "Started Chunk generation for {world}. This may take a while.", world);
