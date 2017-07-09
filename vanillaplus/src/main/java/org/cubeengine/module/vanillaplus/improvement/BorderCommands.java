@@ -64,8 +64,16 @@ public class BorderCommands extends ContainerCommand
 
     @Alias(value = "generateBorder")
     @Command(desc = "Generates the chunks located in the border")
-    public void generate(CommandSource context, @Default World world, @Flag boolean fulltick)
+    public void generate(CommandSource context, @Default World world, @Flag boolean fulltick, @Flag boolean status)
     {
+        if (status && task != null && !task.isCancelled())
+        {
+            i18n.send(context, NEUTRAL, "Border generation for {name}:", task.getWorldProperties().getWorldName());
+            i18n.send(context, NEUTRAL, "Chunks generated {}", task.getTotalGeneratedChunks());
+            i18n.send(context, NEUTRAL, "Chunks skipped {}", task.getTotalSkippedChunks());
+            i18n.send(context, NEUTRAL, "Target count {} ({decimal:2}%)", task.getTargetTotalChunks(), 100 * (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) / task.getTotalGeneratedChunks());
+            return;
+        }
         if (task != null && !task.isCancelled())
         {
             task.cancel();
