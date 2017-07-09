@@ -28,8 +28,6 @@ import org.cubeengine.module.protector.region.RegionConfig;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.world.LoadWorldEvent;
 import org.spongepowered.api.util.Identifiable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -74,7 +72,7 @@ public class RegionManager
             throw new IllegalStateException(e);
         }
         RegionConfig config = reflector.load(RegionConfig.class, path.resolve("global.yml").toFile());
-        this.globalRegion = new Region(config);
+        this.globalRegion = new Region(config, this);
     }
 
     private Region loadRegion(Region region)
@@ -120,7 +118,15 @@ public class RegionManager
         return result;
     }
 
+    private Map<UUID, Map<Vector3i, List<Region>>> regionCache = new HashMap<>();
+
     public List<Region> getRegionsAt(Location<World> loc)
+    {
+        Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(loc.getExtent().getUniqueId(), k -> new HashMap<>());
+        return cache.computeIfAbsent(loc.getBlockPosition(), v -> getRegions(loc));
+    }
+
+    private List<Region> getRegions(Location<World> loc)
     {
         int chunkX = loc.getBlockX() >> 4;
         int chunkZ = loc.getBlockZ() >> 4;
@@ -176,7 +182,7 @@ public class RegionManager
         config.corner1 = boundingCuboid.getMinimumPoint().toInt();
         config.corner2 = boundingCuboid.getMaximumPoint().toInt();
         config.save();
-        return loadRegion(new Region(config));
+        return loadRegion(new Region(config, this));
     }
 
     public void reload()
@@ -196,7 +202,7 @@ public class RegionManager
                             continue;
                         }
                         RegionConfig config = reflector.load(RegionConfig.class, configPath.toFile());
-                        loadRegion(new Region(config));
+                        loadRegion(new Region(config, this));
                     }
                 }
             }
@@ -252,7 +258,7 @@ public class RegionManager
             RegionConfig config = reflector.load(RegionConfig.class, path.resolve("world.yml").toFile());
             config.world = new ConfigWorld(prop.get().getWorldName());
             config.save();
-            this.worldRegions.put(world, new Region(config));
+            this.worldRegions.put(world, new Region(config, this));
         }
         return this.worldRegions.get(world);
 
@@ -262,5 +268,10 @@ public class RegionManager
     public Collection<Region> getWorldRegions()
     {
         return worldRegions.values();
+    }
+
+    public void markDirty()
+    {
+        this.regionCache.clear();
     }
 }

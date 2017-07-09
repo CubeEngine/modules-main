@@ -29,10 +29,12 @@ public class Region
     private Cuboid cuboid;
     private RegionConfig config;
     private Context context;
+    private RegionManager manager;
 
-    public Region(RegionConfig config)
+    public Region(RegionConfig config, RegionManager manager)
     {
         this.config = config;
+        this.manager = manager;
         if (config.corner1 != null && config.corner2 != null)
         {
             this.cuboid = new Cuboid(config.corner1.toDouble(), config.corner2.sub(config.corner1).toDouble());
@@ -65,6 +67,7 @@ public class Region
     public void save()
     {
         this.config.save();
+        this.manager.markDirty();
     }
 
     public String getName()
