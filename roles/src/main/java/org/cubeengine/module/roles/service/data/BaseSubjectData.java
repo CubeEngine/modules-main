@@ -231,7 +231,6 @@ public class BaseSubjectData implements SubjectData
         if (this == parent.getSubjectData())
         {
             throw new CircularRoleDependencyException("at", depth); // TODO translatable / show parameter
-            // TODO add exceptionhandler to cmd lib?
         }
         depth++;
         for (Subject parentParents : parent.getParents(contexts))

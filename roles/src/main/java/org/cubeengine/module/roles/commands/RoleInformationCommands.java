@@ -107,19 +107,31 @@ public class RoleInformationCommands extends ContainerCommand
         Text permClick = i18n.translate(cContext, NEUTRAL, "Click to show {input}", permTrans);
         Text optClick = i18n.translate(cContext, NEUTRAL, "Click to show {input}", optTrans);
         Text parentClick = i18n.translate(cContext, NEUTRAL, "Click to show {input}", parentTrans);
+        Text defaultClick = i18n.translate(cContext, NEUTRAL, "Click to toggle default");
+        String defaultRole = i18n.getTranslation(cContext, "default");
+        String noDefaultRole = i18n.getTranslation(cContext, "not default");
         roles.sort(Comparator.comparing(Contextual::getIdentifier));
+        List<Subject> defaults = service.getDefaults().getSubjectData().getParents(Collections.emptySet());
         for (Subject r : roles)
         {
             cContext.sendMessage(Text.of("- ", GOLD, r.getIdentifier(), " ",
-                    Text.of(GRAY, "[", YELLOW, permTrans, GRAY, "]").toBuilder().onHover(TextActions.showText(permClick))
+                    Text.of(GRAY, "[", YELLOW, permTrans, GRAY, "]").toBuilder()
+                            .onHover(TextActions.showText(permClick))
                             .onClick(TextActions.runCommand("/roles role listpermission " + r.getIdentifier()))
                             .build(), " ",
-                    Text.of(GRAY, "[", YELLOW, optTrans, GRAY, "]").toBuilder().onHover(TextActions.showText(optClick))
+                    Text.of(GRAY, "[", YELLOW, optTrans, GRAY, "]").toBuilder()
+                            .onHover(TextActions.showText(optClick))
                             .onClick(TextActions.runCommand("/roles role listoption " + r.getIdentifier()))
                             .build(), " ",
-                    Text.of(GRAY, "[", YELLOW, parentTrans, GRAY, "]").toBuilder().onHover(TextActions.showText(parentClick))
+                    Text.of(GRAY, "[", YELLOW, parentTrans, GRAY, "]").toBuilder()
+                            .onHover(TextActions.showText(parentClick))
                             .onClick(TextActions.runCommand("/roles role listparent " + r.getIdentifier()))
-                            .build() ));
+                            .build(),
+                    Text.of(GRAY, " (", YELLOW, defaults.contains(r) ? defaultRole : noDefaultRole, GRAY, ")").toBuilder()
+                            .onHover(TextActions.showText(defaultClick))
+                            .onClick(TextActions.runCommand("/roles role toggledefault " + r.getIdentifier()))
+                            .build()
+                    ));
         }
     }
 
