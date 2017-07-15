@@ -58,6 +58,8 @@ public class RolesPermissionService implements PermissionService
     public static final String DEFAULT_SUBJECTS = "default";
     private final ConcurrentMap<String, SubjectCollection> collections = new ConcurrentHashMap<>();
     private final List<ContextCalculator<Subject>> calculators = new CopyOnWriteArrayList<>();
+    private Reflector reflector;
+    private final Path rolesPath;
 
     private RolesConfig config;
     private Log logger;
@@ -69,16 +71,21 @@ public class RolesPermissionService implements PermissionService
     @Inject
     public RolesPermissionService(Roles module, FileManager fm, Reflector reflector, ModuleManager mm)
     {
+        this.reflector = reflector;
+        this.rolesPath = mm.getPathFor(Roles.class);
         this.logger = mm.getLoggerFor(Roles.class);
         this.config = fm.loadConfig(module, RolesConfig.class);
-        collections.put(DEFAULT_SUBJECTS, new BasicSubjectCollection(this, DEFAULT_SUBJECTS));
+        collections.put(DEFAULT_SUBJECTS, new RoleCollection(rolesPath, this, reflector, DEFAULT_SUBJECTS));
         collections.put(SUBJECTS_USER, new UserCollection(this));
-        collections.put(SUBJECTS_GROUP, new RoleCollection(mm.getPathFor(Roles.class), this, reflector, SUBJECTS_GROUP));
+        collections.put(SUBJECTS_GROUP, new RoleCollection(rolesPath, this, reflector, SUBJECTS_GROUP));
 
-        getGroupSubjects().reload();
+        this.getKnownSubjects().values().stream()
+                .filter(c -> c instanceof RoleCollection)
+                .map(RoleCollection.class::cast)
+                .forEach(RoleCollection::reload);
+
         collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM));
         collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE));
-        // TODO persist other types than user/role
     }
 
     @Override
@@ -96,21 +103,13 @@ public class RolesPermissionService implements PermissionService
     @Override
     public Subject getDefaults()
     {
-        // TODO make sure defaultdata is properly resolved
-        SubjectCollection collection = getSubjects(DEFAULT_SUBJECTS);
-        return collection.get(DEFAULT_SUBJECTS);
+        return getSubjects(DEFAULT_SUBJECTS).get(DEFAULT_SUBJECTS);
     }
 
     @Override
     public SubjectCollection getSubjects(String identifier)
     {
-        SubjectCollection collection = collections.get(identifier);
-        if (collection == null)
-        {
-            collection = new BasicSubjectCollection(this, identifier);
-            collections.put(identifier, collection);
-        }
-        return collection;
+        return this.collections.computeIfAbsent(identifier, i -> new RoleCollection(rolesPath, this, reflector, i).reload());
     }
 
     @Override

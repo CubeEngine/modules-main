@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class RoleSubjectData extends CachingSubjectData
 {
@@ -55,7 +56,7 @@ public class RoleSubjectData extends CachingSubjectData
             for (Map.Entry<Context, List<Subject>> entry : parents.entrySet())
             {
                 List<String> collect = entry.getValue().stream()
-                        .map(RoleSubject::getInternalIdentifier)
+                        .map(r -> r.getContainingCollection().getIdentifier() + ":" + r.getIdentifier() + "#" + RoleSubject.getInternalIdentifier(r))
                         .collect(toList());
 
                 getContextSetting(config, entry.getKey()).parents.addAll(collect);
@@ -127,16 +128,29 @@ public class RoleSubjectData extends CachingSubjectData
 
     private Subject getParent(String id)
     {
-        int index = id.indexOf(":");
-        if (index > 0)
+        // collection:name#uuid
+        int nameIndex = id.indexOf(":");
+        int idIndex = id.indexOf("#");
+        if (nameIndex > 0)
         {
-            String type = id.substring(0, index);
-            String name = id.substring(index + 1);
+            String type = id.substring(0, nameIndex);
+            String name = idIndex > 0 ? id.substring(idIndex + 1) : id.substring(nameIndex + 1);
             return service.getSubjects(type).get(name);
         }
         else
         {
-            return roleCollection.getByInternalIdentifier(id, getConfig().roleName);
+            if (idIndex > 0)
+            {
+                return roleCollection.getByInternalIdentifier(id.substring(idIndex + 1), getConfig().roleName);
+            }
+            try
+            {
+                return roleCollection.getByUUID(UUID.fromString(id)).orElseThrow(() -> new IllegalArgumentException("Could not find a role for " + id));
+            }
+            catch (IllegalArgumentException e)
+            {
+                return roleCollection.get(id);
+            }
         }
     }
 

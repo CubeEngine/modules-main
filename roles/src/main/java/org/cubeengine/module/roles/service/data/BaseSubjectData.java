@@ -31,6 +31,7 @@ import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.reflect.annotations.Comment;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;

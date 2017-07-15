@@ -71,6 +71,7 @@ public class UserInformationCommands extends ContainerCommand
     public void list(CommandSource ctx, @Default User player)
     {
         List<Subject> parents = player.getSubjectData().getParents(GLOBAL_CONTEXT);
+        List<Subject> transientParents = player.getTransientSubjectData().getParents(GLOBAL_CONTEXT);
 
         Text translation = i18n.translate(ctx, NEUTRAL, "Roles of {user}:", player);
         if (ctx.hasPermission("cubeengine.roles.command.roles.user.assign"))
@@ -112,6 +113,11 @@ public class UserInformationCommands extends ContainerCommand
             parents.stream().filter(parent -> parent instanceof RoleSubject).map(RoleSubject.class::cast)
                    .forEach(parent -> ctx.sendMessage(Text.of("- ", GOLD, parent.getIdentifier())));
         }
+        String transientText = i18n.getTranslation(ctx, "transient");
+        transientParents.stream().filter(parent -> parent instanceof RoleSubject).map(RoleSubject.class::cast)
+                .forEach(parent -> ctx.sendMessage(Text.of("- ", GOLD, parent.getIdentifier(), GRAY, " (", YELLOW, transientText, GRAY, ")")));
+
+
     }
 
 

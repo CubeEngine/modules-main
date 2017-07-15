@@ -175,9 +175,10 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         return true;
     }
 
-    public void reload()
+    public RoleCollection reload()
     {
         loadRoles();
+        return this;
     }
 
     public void setRoleName(RoleSubject subject, String name)

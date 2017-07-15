@@ -110,7 +110,6 @@ public class UserSubject extends BaseSubject<UserSubjectData>
         this.getTransientSubjectData().clearOptions();
         this.getTransientSubjectData().clearParents();
         this.getTransientSubjectData().clearPermissions();
-        applyDefault();
     }
 
     @Override

@@ -32,16 +32,9 @@ import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 @SuppressWarnings("all")
 public class RoleConfig extends ReflectedYaml
 {
-    @Comment("Unique Identifier for this role. Do not change!")
-    public UUID identifier;
-
     @Name("role-name")
     @Comment("The name of this role")
     public String roleName = "defaultName";
-    @Name("priority")
-    @Comment("Use these as priority or just numbers\n"
-        + "ABSULTEZERO(-273) < MINIMUM(0) < LOWEST(125) < LOWER(250) < LOW(375) < NORMAL(500) < HIGH(675) < HIGHER(750) < HIGHEST(1000) < OVER9000(9001)")
-    public Priority priority = Priority.ABSULTEZERO;
 
     @Comment("The settings for this role grouped by context\n" +
             "context type and name are separated by |\n" +
@@ -60,6 +53,8 @@ public class RoleConfig extends ReflectedYaml
             " - -cubeengine.roles.command.assign\n" +
             "\n" +
             "parents are the roles this one will inherit from\n" +
+            "The rolename is ignored if a roleid is present so you can rename all your roles without having to redo inheritance.\n" +
+            "  <rolename> OR <roletype>:<rolename> OR <roletype>:<rolename>#<roleid> OR #<roleid>\n" +
             "\n" +
             "options can contain any String Key-Value data e.g.:\n" +
             "  prefix: '&7Guest'")
@@ -69,6 +64,14 @@ public class RoleConfig extends ReflectedYaml
             settings.put("global", new ContextSetting());
         }
     }
+
+    @Name("priority")
+    @Comment("Use these as priority or just numbers\n"
+            + "ABSULTEZERO(-273) < MINIMUM(0) < LOWEST(125) < LOWER(250) < LOW(375) < NORMAL(500) < HIGH(675) < HIGHER(750) < HIGHEST(1000) < OVER9000(9001)")
+    public Priority priority = Priority.ABSULTEZERO;
+
+    @Comment("Unique Identifier for this role. Do not change!")
+    public UUID identifier;
 
     @Override
     public void onLoaded(File loadFrom) {
