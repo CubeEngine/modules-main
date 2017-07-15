@@ -58,6 +58,7 @@ public class RolesExceptionHandler implements PriorityExceptionHandler
             {
                 i18n.send(sender, NEGATIVE, "Circular Dependency detected! Depth: {}", depth);
             }
+            return true;
         }
         return false;
     }

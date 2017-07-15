@@ -85,6 +85,11 @@ public class RolesUtil
 
     public static FoundPermission findPermission(PermissionService service, Subject subject, SubjectData data, String permission, Set<Context> contexts, boolean resolve)
     {
+        if (data.getParents(contexts).contains(subject)) // Prevent circular dependency
+        {
+            return null;
+        }
+
         // Directly assigned?
         Boolean set = data.getPermissions(contexts).get(permission);
         if (set != null)

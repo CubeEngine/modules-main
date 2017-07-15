@@ -124,5 +124,8 @@ public class RoleSubject extends BaseSubject<RoleSubjectData>
         return getSubjectData().getConfig().priority;
     }
 
-
+    @Override
+    public String toString() {
+        return "RoleSubject: " + this.getIdentifier();
+    }
 }

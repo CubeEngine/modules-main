@@ -112,4 +112,10 @@ public class UserSubject extends BaseSubject<UserSubjectData>
         this.getTransientSubjectData().clearPermissions();
         applyDefault();
     }
+
+    @Override
+    public String toString()
+    {
+        return "UserSubject: " + this.getIdentifier() + " " + this.getCommandSource().map(CommandSource::getName).orElse("?");
+    }
 }
