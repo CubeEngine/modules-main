@@ -23,12 +23,9 @@ import org.spongepowered.api.service.permission.Subject;
 
 public class BasicSubjectCollection extends BaseSubjectCollection<Subject>
 {
-    private RolesPermissionService service;
-
     public BasicSubjectCollection(RolesPermissionService service, String identifier)
     {
-        super(identifier);
-        this.service = service;
+        super(service, identifier);
     }
 
     @Override

@@ -21,75 +21,18 @@ import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.UserSubjectData;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.util.Tristate;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 
 public class UserSubject extends BaseSubject<UserSubjectData>
 {
     private final UUID uuid;
-    boolean defaultsApplied = false;
 
     public UserSubject(RolesPermissionService service, UUID uuid)
     {
         super(service.getUserSubjects(), service, new UserSubjectData(service, uuid));
         this.uuid = uuid;
-        applyDefault();
-    }
-
-    private void applyDefault()
-    {
-        defaultsApplied = true;
-        SubjectData transientData = getTransientSubjectData();
-        SubjectData defaultData = service.getDefaults().getSubjectData(); // TODO transient too?
-        for (Entry<Set<Context>, Map<String, Boolean>> entry : defaultData.getAllPermissions().entrySet())
-        {
-            for (Entry<String, Boolean> perm : entry.getValue().entrySet())
-            {
-                transientData.setPermission(entry.getKey(), perm.getKey(), Tristate.fromBoolean(perm.getValue()));
-            }
-        }
-        for (Entry<Set<Context>, List<Subject>> entry : defaultData.getAllParents().entrySet())
-        {
-            for (Subject subject : entry.getValue())
-            {
-                transientData.addParent(entry.getKey(), subject);
-            }
-        }
-    }
-
-    @Override
-    public List<Subject> getParents(Set<Context> contexts)
-    {
-        List<Subject> parents = super.getParents(contexts);
-        if (!parents.isEmpty() && defaultsApplied)
-        {
-            SubjectData transientData = getTransientSubjectData();
-            SubjectData defaultData = service.getDefaults().getSubjectData(); // TODO transient too?
-            for (Entry<Set<Context>, Map<String, Boolean>> entry : defaultData.getAllPermissions().entrySet())
-            {
-                for (Entry<String, Boolean> perm : entry.getValue().entrySet())
-                {
-                    transientData.setPermission(entry.getKey(), perm.getKey(), Tristate.UNDEFINED);
-                }
-            }
-            for (Entry<Set<Context>, List<Subject>> entry : defaultData.getAllParents().entrySet())
-            {
-                for (Subject subject : entry.getValue())
-                {
-                    transientData.removeParent(entry.getKey(), subject);
-                }
-            }
-        }
-        return parents;
     }
 
     @Override

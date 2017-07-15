@@ -34,23 +34,20 @@ import org.spongepowered.api.service.permission.Subject;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.newDirectoryStream;
 import static org.cubeengine.libcube.service.filesystem.FileExtensionFilter.YAML;
-import static org.spongepowered.api.service.permission.PermissionService.SUBJECTS_GROUP;
 
 public class RoleCollection extends BaseSubjectCollection<RoleSubject>
 {
     private final Path modulePath;
-    private String type;
     private RolesPermissionService service;
     private Reflector reflector;
     private Map<UUID, RoleSubject> subjectByUUID = new ConcurrentHashMap<>();
 
-    public RoleCollection(Path modulePath, RolesPermissionService service, Reflector reflector, String type)
+    public RoleCollection(Path modulePath, RolesPermissionService service, Reflector reflector, String identifier)
     {
-        super(SUBJECTS_GROUP);
+        super(service, identifier);
         this.service = service;
         this.reflector = reflector;
         this.modulePath = modulePath;
-        this.type = type;
     }
 
     private void loadRoles()
@@ -59,8 +56,8 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         this.subjectByUUID.clear();
         try
         {
-            createDirectories(modulePath.resolve(this.type));
-            for (Path configFile : newDirectoryStream(modulePath.resolve(this.type), YAML))
+            createDirectories(modulePath.resolve(this.getIdentifier()));
+            for (Path configFile : newDirectoryStream(modulePath.resolve(this.getIdentifier()), YAML))
             {
                 RoleConfig config = reflector.create(RoleConfig.class);
                 config.setFile(configFile.toFile());
@@ -104,7 +101,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
             RoleConfig config = reflector.create(RoleConfig.class);
             config.identifier = UUID.randomUUID();
             config.roleName = identifier;
-            config.setFile(modulePath.resolve(this.type).resolve(identifier + YAML.getExtention()).toFile());
+            config.setFile(modulePath.resolve(this.getIdentifier()).resolve(identifier + YAML.getExtention()).toFile());
             return addSubject(service, config);
         }
     }
@@ -187,7 +184,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
         subjects.remove(subject.getIdentifier());
         subjects.put(name, subject);
         config.roleName = name;
-        config.setFile(modulePath.resolve(this.type).resolve(name + YAML.getExtention()).toFile());
+        config.setFile(modulePath.resolve(this.getIdentifier()).resolve(name + YAML.getExtention()).toFile());
         subject.getSubjectData().save(true);
     }
 
@@ -219,11 +216,5 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
             // TODO message in logger
         }
         return null;
-    }
-
-    @Override
-    public Subject getDefaults()
-    {
-        return service.getDefaults();
     }
 }

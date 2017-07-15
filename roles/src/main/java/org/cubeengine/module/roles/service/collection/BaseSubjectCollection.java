@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+
+import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
@@ -32,12 +34,14 @@ import static org.spongepowered.api.util.Tristate.UNDEFINED;
 
 public abstract class BaseSubjectCollection<T extends Subject> implements SubjectCollection
 {
+    protected final RolesPermissionService service;
     private final String identifier;
 
     protected final Map<String, T> subjects = new ConcurrentHashMap<>();
 
-    public BaseSubjectCollection(String identifier)
+    public BaseSubjectCollection(RolesPermissionService service, String identifier)
     {
+        this.service = service;
         this.identifier = identifier;
     }
 
@@ -97,4 +101,10 @@ public abstract class BaseSubjectCollection<T extends Subject> implements Subjec
     }
 
     protected abstract T createSubject(String identifier);
+
+    @Override
+    public Subject getDefaults()
+    {
+        return service.getSubjects(RolesPermissionService.DEFAULT_SUBJECTS).get(getIdentifier());
+    }
 }

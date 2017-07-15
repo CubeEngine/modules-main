@@ -31,7 +31,6 @@ import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.RoleCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
 import org.cubeengine.module.roles.service.subject.RoleSubject;
-import org.cubeengine.reflect.annotations.Comment;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
@@ -209,6 +208,10 @@ public class BaseSubjectData implements SubjectData
     @Override
     public boolean addParent(Set<Context> contexts, Subject parent)
     {
+        if (RolesPermissionService.DEFAULT_SUBJECTS.equals(parent.getContainingCollection().getIdentifier()))
+        {
+            return false; // You can never add defaults as parents
+        }
         checkForCircularDependency(contexts, parent, 0);
 
         if (contexts.isEmpty() && parents.get(GLOBAL) != null && parents.get(GLOBAL).contains(parent))

@@ -25,7 +25,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.module.roles.service.subject.UserSubject;
+import org.cubeengine.module.roles.service.subject.RoleSubject;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -46,28 +46,34 @@ public class RolesUtil
 
     public static FoundPermission findPermission(PermissionService service, Subject subject, String permission, Set<Context> contexts)
     {
+        return findPermission(service, subject, permission, contexts, new HashSet<>());
+    }
+
+    public static FoundPermission findPermission(PermissionService service, Subject subject, String permission, Set<Context> contexts, Set<Subject> checked)
+    {
+        checked.add(subject); // prevent checking a subject multiple times
+
         // remember permissions checked for tab-completion etc.
         allPermissions.add(permission);
-        // First search in transient data
-        FoundPermission found = findPermission(service, subject, subject.getTransientSubjectData(), permission, contexts, true);
-        // Then search in persistent data
-        found = found != null ? found : findPermission(service, subject, subject.getSubjectData(), permission, contexts, true);
-        // collection default
-        Subject defaults = subject.getContainingCollection().getDefaults();
-        // transient collection default data
-        found = found != null ? found : findPermission(service, subject, defaults.getTransientSubjectData(), permission, contexts, true);
-        // persistent collection default data
-        found = found != null ? found : findPermission(service, subject, defaults.getSubjectData(), permission, contexts, true);
-        // global default
-        defaults = service.getDefaults();
-        // transient global default data
-        found = found != null ? found : findPermission(service, subject, defaults.getTransientSubjectData(), permission, contexts, true);
-        // persistent global default data
-        found = found != null ? found : findPermission(service, subject, defaults.getSubjectData(), permission, contexts, true);
+
+        // First search in the subject and its parents
+        FoundPermission found = findPermission0(service, subject, permission, contexts, true, checked);
+
+        // If not found check in default
+        if (found == null)
+        {
+            Subject defaults = subject.getContainingCollection().getDefaults();
+            if (defaults == subject)
+            {
+                return null; // Stop recursion at global default
+            }
+            found = findPermission(service, defaults, permission, contexts, checked);
+        }
+
         if (debug)
         {
             String name = subject.getIdentifier();
-            if (subject instanceof UserSubject)
+            if (subject.getCommandSource().isPresent())
             {
                 name = subject.getCommandSource().get().getName();
             }
@@ -83,15 +89,19 @@ public class RolesUtil
         return found;
     }
 
-    public static FoundPermission findPermission(PermissionService service, Subject subject, SubjectData data, String permission, Set<Context> contexts, boolean resolve)
+    public static FoundPermission findPermission0(PermissionService service, Subject subject, String permission, Set<Context> contexts, boolean resolve, Set<Subject> checked)
     {
-        if (data.getParents(contexts).contains(subject)) // Prevent circular dependency
-        {
-            return null;
-        }
+        SubjectData transientData = subject.getTransientSubjectData();
+        SubjectData data = subject.getSubjectData();
 
-        // Directly assigned?
-        Boolean set = data.getPermissions(contexts).get(permission);
+        // Directly assigned transient?
+        Boolean set = transientData.getPermissions(contexts).get(permission);
+        if (set != null)
+        {
+            return new FoundPermission(subject, permission, set); // Great this is done already
+        }
+        // Directly assigned persistent?
+        set = data.getPermissions(contexts).get(permission);
         if (set != null)
         {
             return new FoundPermission(subject, permission, set); // Great this is done already
@@ -103,7 +113,7 @@ public class RolesUtil
             // Attempt to find implicit parent permissions
             for (String implicit : getImplicitParents(permission))
             {
-                FoundPermission found = findPermission(service, subject, data, implicit, contexts, false); // not recursive (we got all already)
+                FoundPermission found = findPermission0(service, subject, implicit, contexts, false, checked); // not recursive (we got all already)
                 if (found != null)
                 {
                     return found;
@@ -111,8 +121,17 @@ public class RolesUtil
             }
 
             // Attempt to find permission in parents
-            for (Subject parentSubject : data.getParents(contexts))
+            List<Subject> list = new ArrayList<>(data.getParents(contexts));
+            list.addAll(transientData.getParents(contexts));
+            list.sort(RoleSubject::compare);
+            for (Subject parentSubject : list)
             {
+                if (checked.contains(parentSubject))
+                {
+                    continue;
+                }
+                checked.add(parentSubject);
+                // Find permission in parent role - parents are ordered by priority
                 FoundPermission found = findPermission(service, parentSubject, permission, contexts);
                 if (found != null)
                 {

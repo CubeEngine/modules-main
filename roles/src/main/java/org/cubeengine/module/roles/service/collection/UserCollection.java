@@ -29,7 +29,7 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
 
     public UserCollection(RolesPermissionService service)
     {
-        super(PermissionService.SUBJECTS_USER);
+        super(service, PermissionService.SUBJECTS_USER);
         this.service = service;
     }
 
@@ -59,11 +59,5 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
         {
             subject.reload();
         }
-    }
-
-    @Override
-    public Subject getDefaults()
-    {
-        return service.getDefaults();
     }
 }
