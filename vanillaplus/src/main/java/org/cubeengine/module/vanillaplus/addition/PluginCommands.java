@@ -35,6 +35,7 @@ import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
@@ -68,19 +69,26 @@ public class PluginCommands extends PermissionContainer
         PluginContainer core = mm.getPlugin(LibCube.class).get();
         modules.remove(core);
 
-        i18n.send(context, NEUTRAL, "There are {amount} plugins and {amount} CubeEngine modules loaded:", plugins.size() + 1, modules.size());
+        PaginationList.Builder builder = PaginationList.builder().header(i18n
+                .translate(context, NEUTRAL, "Plugin-List ({amount})", plugins.size() + 1));
+
         context.sendMessage(Text.EMPTY);
-        context.sendMessage(Text.of(" - ", GREEN, "CubeEngine", " " ,GRAY, core.getId(), RESET, " (" + core.getVersion().orElse("unknown") + ")"));
+
+        List<Text> list = new ArrayList<>();
+        list.add(Text.of(" - ", GREEN, "CubeEngine", " " ,GRAY, core.getId(), RESET, " (" + core.getVersion().orElse("unknown") + ") ",
+                i18n.translate(context, NEUTRAL, "with {amount} Modules:", modules.size())));
 
         for (PluginContainer m : modules)
         {
-            context.sendMessage(Text.of("   - ", GREEN, m.getName(), " ", GRAY, m.getId(), RESET, " (" + m.getVersion().orElse("unknown") + ")"));
+            list.add(Text.of("   - ", GREEN, m.getName(), " ", GRAY, m.getId(), RESET, " (" + m.getVersion().orElse("unknown") + ")"));
         }
 
         for (PluginContainer plugin : plugins)
         {
-            context.sendMessage(Text.of(" - ", GREEN, plugin.getName(), " ", GRAY, plugin.getId(), RESET, " (" + plugin.getVersion().orElse("unknown") + ")"));
+            list.add(Text.of(" - ", GREEN, plugin.getName(), " ", GRAY, plugin.getId(), RESET, " (" + plugin.getVersion().orElse("unknown") + ")"));
         }
+
+        builder.contents(list).sendTo(context);
     }
 
     @Command(desc = "Displays the version of the server or a given plugin")
