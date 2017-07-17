@@ -82,7 +82,7 @@ public class ItemCommands extends PermissionContainer
             return;
         }
         item.setQuantity(amount);
-        if (player.getInventory().offer(item).getType() == Type.SUCCESS)
+        if (player.getInventory().offer(item.copy()).getType() == Type.SUCCESS)
         {
             String matname = materialMatcher.getNameFor(item);
             i18n.send(context, POSITIVE, "You gave {user} {amount} {input#item}!", player, amount, matname);

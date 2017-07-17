@@ -107,6 +107,7 @@ public class SettingsListener
         this.pm = pm;
         this.i18n = i18n;
         // TODO description
+        // TODO ENTER remember last valid pos.
         movePerms.put(MoveType.MOVE, pm.register(SettingsListener.class, "bypass.move.move", "", base));
         movePerms.put(MoveType.EXIT, pm.register(SettingsListener.class, "bypass.move.exit", "", base));
         movePerms.put(MoveType.ENTER, pm.register(SettingsListener.class, "bypass.move.enter", "", base));
