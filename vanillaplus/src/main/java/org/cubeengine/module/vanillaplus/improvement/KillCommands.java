@@ -58,13 +58,12 @@ public class KillCommands extends PermissionContainer
         this.i18n = i18n;
     }
 
-    private final Permission COMMAND_KILL = register("command.kill", "", null);
-    public final Permission COMMAND_KILL_PREVENT = register("prevent", "Prevents from being killed by the kill command unless forced", COMMAND_KILL);
-    public final Permission COMMAND_KILL_FORCE = register("force", "Kills a player even if the player has the prevent PermissionDescription", COMMAND_KILL);
-    public final Permission COMMAND_KILL_ALL = register("all", "Allows killing all players currently online", COMMAND_KILL);
-    public final Permission COMMAND_KILL_LIGHTNING = register("lightning", "Allows killing a player with a lightning strike", COMMAND_KILL);
-    public final Permission COMMAND_KILL_QUIET = register("quiet", "Prevents the other player being notified who killed him", COMMAND_KILL);
-    public final Permission COMMAND_KILL_NOTIFY = register("notify", "Shows who killed you", COMMAND_KILL);
+    public final Permission COMMAND_KILL_PREVENT = register("command.kill.prevent", "Prevents from being killed by the kill command unless forced", null);
+    public final Permission COMMAND_KILL_FORCE = register("command.kill.force", "Kills a player even if the player has the prevent PermissionDescription", null);
+    public final Permission COMMAND_KILL_ALL = register("command.kill.all", "Allows killing all players currently online", null);
+    public final Permission COMMAND_KILL_LIGHTNING = register("command.kill.lightning", "Allows killing a player with a lightning strike", null);
+    public final Permission COMMAND_KILL_QUIET = register("command.kill.quiet", "Prevents the other player being notified who killed him", null);
+    public final Permission COMMAND_KILL_NOTIFY = register("command.kill.notify", "Shows who killed you", null);
 
     @Command(alias = "slay", desc = "Kills a player")
     public void kill(CommandSource context, @Default(UserListInSight.class) PlayerList players,

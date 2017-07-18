@@ -31,26 +31,16 @@ public class TravelPerm extends PermissionContainer
         super(pm, Travel.class);
     }
 
-    private final Permission COMMAND = register("command", "Base Commands Permission", null);
+    public final Permission HOME_TP_OTHER = register("command.home.tp.other", "", null);
+    public final Permission HOME_SET_MORE = register("command.home.set.more", "", null);
+    public final Permission HOME_MOVE_OTHER = register("command.home.move.other", "", null);
+    public final Permission HOME_REMOVE_OTHER = register("command.home.remove.other", "", null);
+    public final Permission HOME_RENAME_OTHER = register("command.home.rename.other", "", null);
+    public final Permission HOME_LIST_OTHER = register("command.home.list.other", "", null);
 
-    //public final Permission HOME_USER = register("home-user", "Home Permission Group for normal users", null);
-    /* TODO
-    HOME_USER.attach(homeCmd.getPermission("tp"), homeCmd.getPermission("set"), homeCmd.getPermission("move"),
-                         homeCmd.getPermission("remove"), homeCmd.getPermission("rename"), homeCmd.getPermission(
-            "list"), homeCmd.getPermission("private"), homeCmd.getPermission("greeting"), homeCmd.getPermission(
-            "ilist"), homeCmd.getPermission("invite"), homeCmd.getPermission("uninvite"));
-     */
-
-    public final Permission HOME_TP_OTHER = register("home.tp.other", "", COMMAND);
-    public final Permission HOME_SET_MORE = register("home.set.more", "", COMMAND);
-    public final Permission HOME_MOVE_OTHER = register("home.move.other", "", COMMAND);
-    public final Permission HOME_REMOVE_OTHER = register("home.remove.other", "", COMMAND);
-    public final Permission HOME_RENAME_OTHER = register("home.rename.other", "", COMMAND);
-    public final Permission HOME_LIST_OTHER = register("home.list.other", "", COMMAND);
-
-    public final Permission WARP_TP_OTHER = register("warp.tp.other", "", COMMAND);
-    public final Permission WARP_MOVE_OTHER = register("warp.move.other", "", COMMAND);
-    public final Permission WARP_REMOVE_OTHER = register("warp.remove.other", "", COMMAND);
-    public final Permission WARP_RENAME_OTHER = register("warp.rename.other", "", COMMAND);
-    public final Permission WARP_LIST_OTHER = register("warp.list.other", "", COMMAND);
+    public final Permission WARP_TP_OTHER = register("command.warp.tp.other", "", null);
+    public final Permission WARP_MOVE_OTHER = register("command.warp.move.other", "", null);
+    public final Permission WARP_REMOVE_OTHER = register("command.warp.remove.other", "", null);
+    public final Permission WARP_RENAME_OTHER = register("command.warp.rename.other", "", null);
+    public final Permission WARP_LIST_OTHER = register("command.warp.list.other", "", null);
 }

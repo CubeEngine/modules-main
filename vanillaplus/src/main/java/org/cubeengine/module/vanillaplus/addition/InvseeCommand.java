@@ -53,13 +53,12 @@ public class InvseeCommand extends PermissionContainer
         this.i18n = i18n;
     }
 
-    private final Permission COMMAND_INVSEE = register("command.invsee", "", null);
-    public final Permission COMMAND_INVSEE_ENDERCHEST = register("ender", "", COMMAND_INVSEE);
-    public final Permission COMMAND_INVSEE_MODIFY = register("modify.allow", "Allows to modify the inventory of other players", COMMAND_INVSEE);
-    public final Permission COMMAND_INVSEE_MODIFY_PREVENT = register("modify.prevent", "Prevents an inventory from being modified unless forced", COMMAND_INVSEE);
-    public final Permission COMMAND_INVSEE_MODIFY_FORCE = register("modify.force", "Allows modifying an inventory even if the player has the prevent permission", COMMAND_INVSEE);
-    public final Permission COMMAND_INVSEE_NOTIFY = register("notify", "Notifies you when someone is looking into your inventory", COMMAND_INVSEE);
-    public final Permission COMMAND_INVSEE_QUIET = register("quiet", "Prevents the other player from being notified when looking into his inventory", COMMAND_INVSEE);
+    public final Permission COMMAND_INVSEE_ENDERCHEST = register("command.invsee.ender", "Allows to look at someones enderchest", null);
+    public final Permission COMMAND_INVSEE_MODIFY = register("command.invsee.modify.allow", "Allows to modify the inventory of other players", null);
+    public final Permission COMMAND_INVSEE_MODIFY_PREVENT = register("command.invsee.modify.prevent", "Prevents an inventory from being modified unless forced", null);
+    public final Permission COMMAND_INVSEE_MODIFY_FORCE = register("command.invsee.modify.force", "Allows modifying an inventory even if the player has the prevent permission", null);
+    public final Permission COMMAND_INVSEE_NOTIFY = register("command.invsee.notify", "Notifies you when someone is looking into your inventory", null);
+    public final Permission COMMAND_INVSEE_QUIET = register("command.invsee.quiet", "Prevents the other player from being notified when looking into his inventory", null);
 
     @Command(desc = "Allows you to see into the inventory of someone else.")
     @Restricted(value = Player.class, msg = "This command can only be used by a player!")

@@ -57,9 +57,8 @@ public class ItemCommands extends PermissionContainer
     private EnchantMatcher enchantMatcher;
     private I18n i18n;
 
-    private final Permission COMMAND_ITEM = register("command.item", "", null);
-    public final Permission COMMAND_ITEM_ENCHANTMENTS = register("enchantments.safe", "", COMMAND_ITEM);
-    public final Permission COMMAND_ITEM_ENCHANTMENTS_UNSAFE = register("enchantments.unsafe", "", COMMAND_ITEM);
+    public final Permission COMMAND_ITEM_ENCHANTMENTS = register("command.item.enchantments.safe", "", null);
+    public final Permission COMMAND_ITEM_ENCHANTMENTS_UNSAFE = register("command.item.enchantments.unsafe", "", null);
 
     public final Permission COMMAND_STACK_FULLSTACK = register("command.stack.fullstack", "", null);
 

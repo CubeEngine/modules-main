@@ -45,36 +45,11 @@ public class LockerPerm extends PermissionContainer
 
     public final Permission PREVENT_NOTIFY = register("prevent-notify", "", null);
 
-    private final Permission COMMAND = register("command", "", null);
+    public final Permission CMD_REMOVE_OTHER = register("command.locker.remove.other", "", null);
+    public final Permission CMD_KEY_OTHER = register("command.locker.key.other", "", null);
+    public final Permission CMD_MODIFY_OTHER = register("command.locker.modify.other", "", null);
+    public final Permission CMD_GIVE_OTHER = register("command.locker.give.other", "", null);
 
-    public final Permission CMD_REMOVE_OTHER = register("locker.remove.other", "", COMMAND);
-    public final Permission CMD_KEY_OTHER = register("locker.key.other", "", COMMAND);
-    public final Permission CMD_MODIFY_OTHER = register("locker.modify.other", "", COMMAND);
-    public final Permission CMD_GIVE_OTHER = register("locker.give.other", "", COMMAND);
-
-    public final Permission CMD_INFO_OTHER = register("locker.info.other", "", COMMAND);
-    public final Permission CMD_INFO_SHOW_OWNER =  register("locker.info.show-owner", "", COMMAND);
-
-    // TODO Locker grouping Perms on commands
-    /*
-    public final Permission PROTECT = registerS("protect", "", null,
-                                                          "command.locker.info.use",
-                                                          "command.locker.persist.use",
-                                                          "command.locker.remove.use",
-                                                          "command.locker.unlock.use",
-                                                          "command.locker.modify.use",
-                                                          "command.locker.key.use",
-                                                          "command.locker.flag.use",
-                                                          "command.locker.give.use",
-                                                          "command.locker.create.private.use",
-                                                          "command.locker.create.public.use",
-                                                          "command.locker.create.donation.use",
-                                                          "command.locker.create.free.use",
-                                                          "command.locker.create.password.use",
-                                                          "command.locker.create.guarded.use",
-                                                          "command.locker.info.show-owner");
-
-
-    public final Permission MODERATOR = register("moderator", "", null, PROTECT, SHOW_OWNER, CMD_INFO_OTHER, ACCESS_OTHER, CMD_REMOVE_OTHER);
-    */
+    public final Permission CMD_INFO_OTHER = register("command.locker.info.other", "", null);
+    public final Permission CMD_INFO_SHOW_OWNER =  register("command.locker.info.show-owner", "", null);
 }

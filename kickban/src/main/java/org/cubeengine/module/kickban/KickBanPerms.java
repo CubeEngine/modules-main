@@ -29,15 +29,13 @@ public class KickBanPerms extends PermissionContainer
         super(pm, KickBan.class);
     }
 
-    private final Permission COMMAND = register("command", "Base Commands Permission", null);
+    public final Permission COMMAND_KICK_ALL = register("command.kick.all", "Allows kicking all players", null);
+    public final Permission COMMAND_KICK_NOREASON = register("command.kick.noreason", "Allows kicking without providing a reason", null);
 
-    public final Permission COMMAND_KICK_ALL = register("kick.all", "Allows kicking all players", COMMAND);
-    public final Permission COMMAND_KICK_NOREASON = register("kick.noreason", "Allows kicking without providing a reason", COMMAND);
+    public final Permission COMMAND_BAN_NOREASON = register("command.ban.noreason", "Allows banning without providing a reason", null);
+    public final Permission COMMAND_IPBAN_NOREASON = register("command.ipban.noreason", "Allows banning without providing a reason", null);
+    public final Permission COMMAND_TEMPBAN_NOREASON = register("command.tempban.noreason", "Allows banning without providing a reason",null);
 
-    public final Permission COMMAND_BAN_NOREASON = register("ban.noreason", "Allows banning without providing a reason",COMMAND);
-    public final Permission COMMAND_IPBAN_NOREASON = register("ipban.noreason", "Allows banning without providing a reason",COMMAND);
-    public final Permission COMMAND_TEMPBAN_NOREASON = register("tempban.noreason", "Allows banning without providing a reason",COMMAND);
-
-    public final Permission KICK_RECEIVEMESSAGE = register("kick.notify", "Enables notification when a player gets kicked", COMMAND);
-    public final Permission BAN_RECEIVEMESSAGE = register("ban.notify", "Enables notification when a player gets banned", COMMAND);
+    public final Permission KICK_RECEIVEMESSAGE = register("command.kick.notify", "Enables notification when a player gets kicked", null);
+    public final Permission BAN_RECEIVEMESSAGE = register("command.ban.notify", "Enables notification when a player gets banned", null);
 }

@@ -36,19 +36,14 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 public class ClearInventoryCommand extends PermissionContainer
 {
-    private final Permission COMMAND_CLEARINVENTORY = register("command.clearinventory", "", null);
-    public final Permission COMMAND_CLEARINVENTORY_OTHER = register("notify",
-                                                                               "Allows clearing the inventory of other players",
-                                                                               COMMAND_CLEARINVENTORY);
-    public final Permission COMMAND_CLEARINVENTORY_NOTIFY = register("other",
-                                                                                "Notifies you if your inventory got cleared by someone else",
-                                                                                COMMAND_CLEARINVENTORY);
-    public final Permission COMMAND_CLEARINVENTORY_PREVENT = register("prevent",
-                                                                                 "Prevents your inventory from being cleared unless forced",
-                                                                                 COMMAND_CLEARINVENTORY);
-    public final Permission COMMAND_CLEARINVENTORY_FORCE = register("force",
-                                                                               "Clears an inventory even if the player has the prevent PermissionDescription",
-                                                                               COMMAND_CLEARINVENTORY);
+    public final Permission COMMAND_CLEARINVENTORY_OTHER = register("command.clearinventory.notify",
+                                                                    "Allows clearing the inventory of other players", null);
+    public final Permission COMMAND_CLEARINVENTORY_NOTIFY = register("command.clearinventory.other",
+                                                                     "Notifies you if your inventory got cleared by someone else", null);
+    public final Permission COMMAND_CLEARINVENTORY_PREVENT = register("command.clearinventory.prevent",
+                                                                      "Prevents your inventory from being cleared unless forced", null);
+    public final Permission COMMAND_CLEARINVENTORY_FORCE = register("command.clearinventory.force",
+                                                                    "Clears an inventory even if the player has the prevent PermissionDescription", null);
 
     private I18n i18n;
 
