@@ -49,7 +49,7 @@ public class TpWorldPermissions extends PermissionContainer
 
     private Permission initWorldPermission(String world)
     {
-        Permission worldPerm = register("tpworld." + world, "", perm.COMMAND);
+        Permission worldPerm = register("command.tpworld." + world, "", null);
         permissions.put(world, worldPerm);
         return worldPerm;
     }
