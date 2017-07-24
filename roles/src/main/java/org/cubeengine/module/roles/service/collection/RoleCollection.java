@@ -94,6 +94,7 @@ public class RoleCollection extends BaseSubjectCollection<RoleSubject>
             UUID uuid = UUID.fromString(identifier);
             RoleConfig config = reflector.create(RoleConfig.class);
             config.identifier = uuid;
+            config.roleName = identifier;
             return addSubject(service, config);
         }
         catch (IllegalArgumentException e)
