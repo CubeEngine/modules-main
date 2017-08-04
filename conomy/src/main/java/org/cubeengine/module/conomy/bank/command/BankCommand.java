@@ -270,7 +270,7 @@ public class BankCommand extends ContainerCommand
         // Everyone can SEE(hidden) DEPOSIT(needInvite)
         // Noone can ...
 
-        for (Subject subject : Sponge.getServiceManager().provideUnchecked(PermissionService.class).getUserSubjects().getAllSubjects())
+        for (Subject subject : Sponge.getServiceManager().provideUnchecked(PermissionService.class).getUserSubjects().getLoadedSubjects())
         {
             Optional<String> option = subject.getOption(bank.getActiveContexts(), "conomy.bank.access-level." + bank.getIdentifier());
             if (option.isPresent())

@@ -25,12 +25,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.cubeengine.libcube.util.ContextUtil;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
@@ -62,33 +63,35 @@ public class UserSubjectData extends CachingSubjectData
     }
 
     @Override
-    public boolean save(boolean changed)
+    public CompletableFuture<Boolean> save(CompletableFuture<Boolean> c)
     {
-        if (changed)
-        {
-            cacheOptions();
-            cachePermissions();
-            cacheParents();
-            // Serialize Data
-            List<String> parents = serializeToList(this.parents);
-            Map<String, Boolean> permissions = serializeToMap(this.permissions);
-            Map<String, String> options = serializeToMap(this.options);
+        return c.thenApply(changed -> {
+            if (changed)
+            {
+                cacheOptions();
+                cachePermissions();
+                cacheParents();
+                // Serialize Data
+                List<String> parents = serializeToList(this.parents);
+                Map<String, Boolean> permissions = serializeToMap(this.permissions);
+                Map<String, String> options = serializeToMap(this.options);
 
-            // Get User for Storage
-            UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
-            User user = storage.get(uuid).get();
-            // Save Data in User
-            user.offer(new PermissionData(parents, permissions, options));
-            // actually save Data in Player til -> TODO remove once saving data on user is implemented
-            user.getPlayer().map(User.class::cast).orElse(user).offer(new PermissionData(parents, permissions, options));
-        }
-        return changed;
+                // Get User for Storage
+                UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
+                User user = storage.get(uuid).get();
+                // Save Data in User
+                user.offer(new PermissionData(parents, permissions, options));
+                // actually save Data in Player til -> TODO remove once saving data on user is implemented
+                user.getPlayer().map(User.class::cast).orElse(user).offer(new PermissionData(parents, permissions, options));
+            }
+            return changed;
+        });
     }
 
     private List<String> serializeToList(Map<Context, List<Subject>> map)
     {
         // On users only global assigned Roles get persisted
-        return map.get(ContextUtil.GLOBAL).stream().map(RoleSubject::getInternalIdentifier).collect(Collectors.toList());
+        return map.get(ContextUtil.GLOBAL).stream().map(FileSubject::getInternalIdentifier).collect(Collectors.toList());
     }
 
     private <T> Map<String, T> serializeToMap(Map<Context, Map<String, T>> map)
@@ -113,7 +116,7 @@ public class UserSubjectData extends CachingSubjectData
             List<Subject> list = new ArrayList<>();
             for (String s : new HashSet<>(parentList))
             {
-                RoleSubject subject = roleCollection.getByInternalIdentifier(s, uuid.toString());
+                FileSubject subject = roleCollection.getByInternalIdentifier(s, uuid.toString());
                 if (subject == null)
                 {
                     parentRemoved = true;
@@ -123,11 +126,11 @@ public class UserSubjectData extends CachingSubjectData
                     list.add(subject);
                 }
             }
-            list.sort(RoleSubject::compare);
+            list.sort(FileSubject::compare);
             parents.put(ContextUtil.GLOBAL, list);
             if (parentRemoved)
             {
-                save(true);
+                save(CompletableFuture.completedFuture(true));
             }
         }
     }

@@ -24,8 +24,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -121,9 +123,9 @@ public class RolesUtil
             }
 
             // Attempt to find permission in parents
-            List<Subject> list = new ArrayList<>(data.getParents(contexts));
-            list.addAll(transientData.getParents(contexts));
-            list.sort(RoleSubject::compare);
+            List<Subject> list = getParents(service, contexts, data);
+            list.addAll(getParents(service, contexts, transientData));
+            list.sort(FileSubject::compare);
             for (Subject parentSubject : list)
             {
                 if (checked.contains(parentSubject))
@@ -142,6 +144,12 @@ public class RolesUtil
         return null;
     }
 
+    private static List<Subject> getParents(PermissionService service, Set<Context> contexts, SubjectData data)
+    {
+        return data.getParents(contexts).stream().map(sr ->
+                service.getCollection(sr.getCollectionIdentifier()).get().getSubject(sr.getSubjectIdentifier()).get()).collect(Collectors.toList());
+    }
+
     public static List<String> getImplicitParents(String permission)
     {
         List<String> implicits = new ArrayList<>();
@@ -158,16 +166,17 @@ public class RolesUtil
         return implicits;
     }
 
-    public static Optional<FoundOption> getOption(Subject subject, SubjectData data, String key, Set<Context> contexts)
+    public static Optional<FoundOption> getOption(PermissionService service, Subject subject, SubjectData data, String key, Set<Context> contexts)
     {
         String result = data.getOptions(contexts).get(key);
         if (result != null)
         {
             return Optional.of(new FoundOption(subject, result));
         }
-        for (Subject parent : data.getParents(contexts))
+
+        for (Subject parent : getParents(service, contexts, data))
         {
-            Optional<FoundOption> option = getOption(parent, key, contexts);
+            Optional<FoundOption> option = getOption(service, parent, key, contexts);
             if (option.isPresent())
             {
                 return option;
@@ -176,12 +185,12 @@ public class RolesUtil
         return Optional.empty();
     }
 
-    public static Optional<FoundOption> getOption(Subject subject, String key, Set<Context> contexts)
+    public static Optional<FoundOption> getOption(PermissionService service, Subject subject, String key, Set<Context> contexts)
     {
-        Optional<FoundOption> option = getOption(subject, subject.getTransientSubjectData(), key, contexts);
+        Optional<FoundOption> option = getOption(service, subject, subject.getTransientSubjectData(), key, contexts);
         if (!option.isPresent())
         {
-            option = getOption(subject, subject.getSubjectData(), key, contexts);
+            option = getOption(service, subject, subject.getSubjectData(), key, contexts);
         }
         return option;
     }
@@ -192,7 +201,11 @@ public class RolesUtil
         Optional<PermissionDescription> permDesc = service.getDescription(permission);
         if (permDesc.isPresent())
         {
-            permText = permText.toBuilder().onHover(showText(permDesc.get().getDescription().toBuilder().color(YELLOW).build())).build();
+            if (permDesc.get().getDescription().isPresent())
+            {
+                permText = permText.toBuilder().onHover(showText(permDesc.get().getDescription().get().toBuilder().color(YELLOW).build())).build();
+            }
+            // TODO else
         }
         else
         {
@@ -239,31 +252,41 @@ public class RolesUtil
         public final boolean value;
     }
 
-    public static Map<String, Boolean> fillPermissions(Subject subject, Set<Context> contexts, Map<String, Boolean> data)
+    public static Map<String, Boolean> fillPermissions(Subject subject, Set<Context> contexts, Map<String, Boolean> data, PermissionService service)
     {
         for (Entry<String, Boolean> entry : subject.getSubjectData().getPermissions(contexts).entrySet())
         {
             data.putIfAbsent(entry.getKey(), entry.getValue());
         }
 
-        for (Subject parent : subject.getParents())
+        for (Subject parent : getParents(service, contexts, subject.getSubjectData()))
         {
-            fillPermissions(parent, contexts, data);
+            fillPermissions(parent, contexts, data, service);
+        }
+
+        for (Subject parent : getParents(service, contexts, subject.getTransientSubjectData()))
+        {
+            fillPermissions(parent, contexts, data, service);
         }
 
         return data;
     }
 
-    public static Map<String, String> fillOptions(Subject subject, Set<Context> contexts, Map<String, String> data)
+    public static Map<String, String> fillOptions(Subject subject, Set<Context> contexts, Map<String, String> data, PermissionService service)
     {
         for (Entry<String, String> entry : subject.getSubjectData().getOptions(contexts).entrySet())
         {
             data.putIfAbsent(entry.getKey(), entry.getValue());
         }
 
-        for (Subject parent : subject.getParents())
+        for (Subject parent : getParents(service, contexts, subject.getSubjectData()))
         {
-            fillOptions(parent, contexts, data);
+            fillOptions(parent, contexts, data, service);
+        }
+
+        for (Subject parent : getParents(service, contexts, subject.getTransientSubjectData()))
+        {
+            fillOptions(parent, contexts, data, service);
         }
 
         return data;

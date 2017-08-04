@@ -27,10 +27,10 @@ import org.cubeengine.module.roles.RolesUtil.FoundPermission;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.BaseSubjectData;
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.unmodifiableList;
@@ -65,7 +65,7 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     @Override
     public Optional<String> getOption(Set<Context> contexts, String key)
     {
-        return RolesUtil.getOption(this, key, contexts).map(found -> found.value);
+        return RolesUtil.getOption(service, this, key, contexts).map(found -> found.value);
     }
 
     @Override
@@ -84,17 +84,23 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     }
 
     @Override
-    public boolean isChildOf(Set<Context> contexts, Subject parent)
+    public boolean isChildOf(Set<Context> contexts, SubjectReference parent)
     {
         return getTransientSubjectData().getParents(contexts).contains(parent) || getSubjectData().getParents(contexts).contains(parent);
     }
 
     @Override
-    public List<Subject> getParents(Set<Context> contexts)
+    public List<SubjectReference> getParents(Set<Context> contexts)
     {
-        List<Subject> parents = new ArrayList<>(getTransientSubjectData().getParents(contexts));
+        List<SubjectReference> parents = new ArrayList<>(getTransientSubjectData().getParents(contexts));
         parents.addAll(getSubjectData().getParents(contexts));
         return unmodifiableList(parents);
+    }
+
+    @Override
+    public SubjectReference asSubjectReference()
+    {
+        return new RolesSubjectReference(getIdentifier(), getContainingCollection());
     }
 
     @Override

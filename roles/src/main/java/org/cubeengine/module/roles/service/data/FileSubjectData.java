@@ -22,8 +22,8 @@ import static java.util.stream.Collectors.toList;
 import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.collection.RoleCollection;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.collection.FileBasedCollection;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
@@ -35,56 +35,60 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
-public class RoleSubjectData extends CachingSubjectData
+public class FileSubjectData extends CachingSubjectData
 {
     private final RoleConfig config;
 
-    public RoleSubjectData(RolesPermissionService service, RoleConfig config)
+    public FileSubjectData(RolesPermissionService service, RoleConfig config)
     {
         super(service);
         this.config = config;
     }
 
     @Override
-    public boolean save(boolean changed)
+    public CompletableFuture<Boolean> save(CompletableFuture<Boolean> c)
     {
-        if (changed)
-        {
-            cacheOptions();
-            cachePermissions();
-            cacheParents();
-            config.settings = new HashMap<>();
-            for (Map.Entry<Context, List<Subject>> entry : parents.entrySet())
+        return c.thenApply(changed -> {
+            if (changed)
             {
-                List<String> collect = entry.getValue().stream()
-                        .map(r -> r.getContainingCollection().getIdentifier() + ":" + r.getIdentifier() + "#" + RoleSubject.getInternalIdentifier(r))
-                        .collect(toList());
+                cacheOptions();
+                cachePermissions();
+                cacheParents();
+                config.settings = new HashMap<>();
+                for (Map.Entry<Context, List<Subject>> entry : parents.entrySet())
+                {
+                    List<String> collect = entry.getValue().stream()
+                            .map(r -> r.getContainingCollection().getIdentifier() + ":" + r.getIdentifier() + "#" + FileSubject.getInternalIdentifier(r))
+                            .collect(toList());
 
-                getContextSetting(config, entry.getKey()).parents.addAll(collect);
-            }
+                    getContextSetting(config, entry.getKey()).parents.addAll(collect);
+                }
 
-            for (Map.Entry<Context, Map<String, Boolean>> entry : permissions.entrySet())
-            {
-                getContextSetting(config, entry.getKey()).permissions = new PermissionTree().setPermissions(entry.getValue());
-            }
+                for (Map.Entry<Context, Map<String, Boolean>> entry : permissions.entrySet())
+                {
+                    getContextSetting(config, entry.getKey()).permissions = new PermissionTree().setPermissions(entry.getValue());
+                }
 
-            for (Map.Entry<Context, Map<String, String>> entry : options.entrySet())
-            {
-                getContextSetting(config, entry.getKey()).options = entry.getValue();
-            }
+                for (Map.Entry<Context, Map<String, String>> entry : options.entrySet())
+                {
+                    getContextSetting(config, entry.getKey()).options = entry.getValue();
+                }
 
-            try
-            {
-                Files.createDirectories(config.getFile().toPath().getParent());
+                try
+                {
+                    Files.createDirectories(config.getFile().toPath().getParent());
+                }
+                catch (IOException e)
+                {
+                    throw new IllegalStateException(e);
+                }
+                config.save();// TODO async
             }
-            catch (IOException e)
-            {
-                throw new IllegalStateException(e);
-            }
-            config.save();// TODO async
-        }
-        return changed;
+            return changed;
+        });
     }
 
     private static RoleConfig.ContextSetting getContextSetting(RoleConfig config, Context context)
@@ -118,11 +122,11 @@ public class RoleSubjectData extends CachingSubjectData
                         collect.add(subject);
                     }
                 }
-                collect.sort(RoleSubject::compare);
+                collect.sort(FileSubject::compare);
                 parents.put(asContext(entry.getKey()), collect);
                 if (parentRemoved)
                 {
-                    save(true);
+                    save(CompletableFuture.completedFuture(true));
                 }
             }
         }
@@ -130,34 +134,42 @@ public class RoleSubjectData extends CachingSubjectData
 
     private Subject getParent(String id)
     {
-        // collection:name#uuid
-        int nameIndex = id.indexOf(":");
-        int idIndex = id.indexOf("#");
-        if (nameIndex > 0)
+        try
         {
-            String type = id.substring(0, nameIndex);
-            String name = idIndex > 0 ? id.substring(idIndex + 1) : id.substring(nameIndex + 1);
-            SubjectCollection collection = service.getSubjects(type);
-            if (collection instanceof RoleCollection)
+            // collection:name#uuid
+            int nameIndex = id.indexOf(":");
+            int idIndex = id.indexOf("#");
+            if (nameIndex > 0)
             {
-                return ((RoleCollection) collection).getByInternalIdentifier(name, getConfig().roleName);
+                String type = id.substring(0, nameIndex);
+                String name = idIndex > 0 ? id.substring(idIndex + 1) : id.substring(nameIndex + 1);
+                SubjectCollection collection = service.getCollection(type).get();
+                if (collection instanceof FileBasedCollection)
+                {
+                    return ((FileBasedCollection) collection).getByInternalIdentifier(name, getConfig().roleName);
+                }
+                return collection.loadSubject(name).get();
             }
-            return collection.get(name);
+            else
+            {
+                if (idIndex > 0)
+                {
+                    return roleCollection.getByInternalIdentifier(id.substring(idIndex + 1), getConfig().roleName);
+                }
+                try
+                {
+                    return roleCollection.getByUUID(UUID.fromString(id)).orElseThrow(() -> new IllegalArgumentException("Could not find a role for " + id));
+                }
+                catch (IllegalArgumentException e)
+                {
+                    return roleCollection.getSubject(id).get();
+                }
+            }
         }
-        else
+        catch (InterruptedException | ExecutionException e)
         {
-            if (idIndex > 0)
-            {
-                return roleCollection.getByInternalIdentifier(id.substring(idIndex + 1), getConfig().roleName);
-            }
-            try
-            {
-                return roleCollection.getByUUID(UUID.fromString(id)).orElseThrow(() -> new IllegalArgumentException("Could not find a role for " + id));
-            }
-            catch (IllegalArgumentException e)
-            {
-                return roleCollection.get(id);
-            }
+
+            return null;
         }
     }
 

@@ -18,22 +18,26 @@
 package org.cubeengine.module.roles.service.data;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.inject.Provider;
 import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.collection.RoleCollection;
+import org.cubeengine.module.roles.service.collection.FileBasedCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.unmodifiableList;
@@ -52,7 +56,7 @@ public class BaseSubjectData implements SubjectData
     protected final Map<Context, List<Subject>> parents = new ConcurrentHashMap<>();
 
     protected final UserCollection userCollection;
-    protected final RoleCollection roleCollection;
+    protected final FileBasedCollection roleCollection;
     protected final RolesPermissionService service;
 
     public BaseSubjectData(RolesPermissionService service)
@@ -97,56 +101,65 @@ public class BaseSubjectData implements SubjectData
     @Override
     public Map<String, String> getOptions(Set<Context> contexts)
     {
-        return unmodifiableMap(accumulate(contexts, options, new HashMap<>(), Map::putAll));
+        return unmodifiableMap(accumulate(contexts, options, new HashMap<>(), Map::putAll, Function.identity()));
     }
 
     @Override
     public Map<String, Boolean> getPermissions(Set<Context> contexts)
     {
-        return unmodifiableMap(accumulate(contexts, permissions, new HashMap<>(), Map::putAll));
+        return unmodifiableMap(accumulate(contexts, permissions, new HashMap<>(), Map::putAll, Function.identity()));
     }
 
     @Override
-    public List<Subject> getParents(Set<Context> contexts)
+    public List<SubjectReference> getParents(Set<Context> contexts)
     {
-        List<Subject> list = accumulate(contexts, parents, new ArrayList<>(), List::addAll);
-        list.sort(RoleSubject::compare);
+        List<SubjectReference> list = accumulate(contexts, parents, new ArrayList<>(), List::addAll, this::toReferenceList);
         return unmodifiableList(list);
     }
 
-    @Override
-    public boolean setOption(Set<Context> contexts, String key, String value)
+    private List<SubjectReference> toReferenceList(List<Subject> t)
     {
-        if (value == null)
-        {
-            return operate(contexts, options, map -> map.remove(key) != null);
-        }
-        return operate(contexts, options, map -> !value.equals(map.put(key, value)), HashMap::new);
+        return t.stream().map(s -> s.getContainingCollection().newSubjectReference(s.getIdentifier())).collect(Collectors.toList());
     }
 
     @Override
-    public boolean clearOptions(Set<Context> contexts)
+    public CompletableFuture<Boolean> setOption(Set<Context> contexts, String key, String value)
     {
-        return operate(contexts, options,  m -> {
-            boolean empty = !m.isEmpty();
-            m.clear();
-            return empty;
+        return CompletableFuture.supplyAsync(() -> {
+            if (value == null)
+            {
+                return operate(contexts, options, map -> map.remove(key) != null);
+            }
+            return operate(contexts, options, map -> !value.equals(map.put(key, value)), HashMap::new);
         });
     }
 
     @Override
-    public boolean clearOptions()
+    public CompletableFuture<Boolean> clearOptions(Set<Context> contexts)
     {
-        boolean changed = false;
-        for (Map<String, String> map : options.values())
-        {
-            if (!map.isEmpty())
+        return CompletableFuture.supplyAsync(() ->
+            operate(contexts, options,  m -> {
+                boolean empty = !m.isEmpty();
+                m.clear();
+                return empty;
+        }));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> clearOptions()
+    {
+        return CompletableFuture.supplyAsync(() -> {
+            boolean changed = false;
+            for (Map<String, String> map : options.values())
             {
-                changed = true;
+                if (!map.isEmpty())
+                {
+                    changed = true;
+                }
+                map.clear();
             }
-            map.clear();
-        }
-        return changed;
+            return changed;
+        });
     }
 
     @Override
@@ -159,75 +172,85 @@ public class BaseSubjectData implements SubjectData
     }
 
     @Override
-    public boolean setPermission(Set<Context> contexts, String permission, Tristate value)
+    public CompletableFuture<Boolean> setPermission(Set<Context> contexts, String permission, Tristate value)
     {
-        if (value == Tristate.UNDEFINED)
-        {
-            return operate(contexts, permissions, map -> map.remove(permission) != null);
-        }
-        return operate(contexts, permissions, map -> {
-            Boolean replaced = map.put(permission, value.asBoolean());
-            return replaced == null || replaced != value.asBoolean();
-        }, HashMap::new);
-    }
-
-    @Override
-    public boolean clearPermissions(Set<Context> contexts)
-    {
-        return operate(contexts, permissions, m -> {
-            boolean empty = !m.isEmpty();
-            m.clear();
-            return empty;
+        return CompletableFuture.supplyAsync(() -> {
+            if (value == Tristate.UNDEFINED)
+            {
+                return operate(contexts, permissions, map -> map.remove(permission) != null);
+            }
+            return operate(contexts, permissions, map -> {
+                Boolean replaced = map.put(permission, value.asBoolean());
+                return replaced == null || replaced != value.asBoolean();
+            }, HashMap::new);
         });
     }
 
     @Override
-    public boolean clearPermissions()
+    public CompletableFuture<Boolean> clearPermissions(Set<Context> contexts)
     {
-        boolean changed = false;
-        for (Map<String, Boolean> map : permissions.values())
-        {
-            if (!map.isEmpty())
-            {
-                changed = true;
-            }
-            map.clear();
-        }
-        return changed;
+        return CompletableFuture.supplyAsync(() ->
+            operate(contexts, permissions, m -> {
+                boolean empty = !m.isEmpty();
+                m.clear();
+                return empty;
+        }));
     }
 
     @Override
-    public Map<Set<Context>, List<Subject>> getAllParents()
+    public CompletableFuture<Boolean> clearPermissions()
     {
-        Map<Set<Context>, List<Subject>> parents = this.parents.entrySet().stream()
-                .collect(Collectors.toMap(e -> toSet(e.getKey()), Map.Entry::getValue));
+        return CompletableFuture.supplyAsync(() -> {
+            boolean changed = false;
+            for (Map<String, Boolean> map : permissions.values())
+            {
+                if (!map.isEmpty())
+                {
+                    changed = true;
+                }
+                map.clear();
+            }
+            return changed;
+        });
+    }
+
+    @Override
+    public Map<Set<Context>, List<SubjectReference>> getAllParents()
+    {
+        Map<Set<Context>, List<SubjectReference>> parents = this.parents.entrySet().stream()
+                .collect(Collectors.toMap(e -> toSet(e.getKey()), e -> toReferenceList(e.getValue())));
 
         return unmodifiableMap(parents);
     }
 
     @Override
-    public boolean addParent(Set<Context> contexts, Subject parent)
+    public CompletableFuture<Boolean> addParent(Set<Context> contexts, SubjectReference parent)
     {
-        if (RolesPermissionService.DEFAULT_SUBJECTS.equals(parent.getContainingCollection().getIdentifier()))
-        {
-            return false; // You can never add defaults as parents
-        }
-        checkForCircularDependency(contexts, parent, 0);
+        return CompletableFuture.supplyAsync(() -> {
+            // TODO dont get subject
+            Subject p = service.getCollection(parent.getCollectionIdentifier()).get().getSubject(parent.getSubjectIdentifier()).get();
+            if (PermissionService.SUBJECTS_DEFAULT.equals(parent.getCollectionIdentifier()))
+            {
+                return false; // You can never add defaults as parents
+            }
 
-        if (contexts.isEmpty() && parents.get(GLOBAL) != null && parents.get(GLOBAL).contains(parent))
-        {
-            return false;
-        }
+            checkForCircularDependency(contexts, p, 0);
 
-        for (Context context : contexts)
-        {
-            if (parents.containsKey(context) && parents.get(context).contains(parent))
+            if (contexts.isEmpty() && parents.get(GLOBAL) != null && parents.get(GLOBAL).contains(p))
             {
                 return false;
             }
-        }
 
-        return operate(contexts, parents, l -> l.add(parent), ArrayList::new);
+            for (Context context : contexts)
+            {
+                if (parents.containsKey(context) && parents.get(context).contains(p))
+                {
+                    return false;
+                }
+            }
+
+            return operate(contexts, parents, l -> l.add(p), ArrayList::new);
+        });
     }
 
     protected void checkForCircularDependency(Set<Context> contexts, Subject parent, int depth)
@@ -237,41 +260,45 @@ public class BaseSubjectData implements SubjectData
             throw new CircularRoleDependencyException("at", depth); // TODO translatable / show parameter
         }
         depth++;
-        for (Subject parentParents : parent.getParents(contexts))
+
+        for (SubjectReference parentParents : parent.getParents(contexts))
         {
-            checkForCircularDependency(contexts, parentParents, depth);
+            checkForCircularDependency(contexts, service.getCollection(parentParents.getCollectionIdentifier()).get().getSubject(parentParents.getSubjectIdentifier()).get(), depth);
         }
     }
 
     @Override
-    public boolean removeParent(Set<Context> contexts, Subject parent)
+    public CompletableFuture<Boolean> removeParent(Set<Context> contexts, SubjectReference parent)
     {
-        return operate(contexts, parents, l -> l.remove(parent));
+        return CompletableFuture.supplyAsync(() -> operate(contexts, parents, l -> l.remove(parent)));
     }
 
     @Override
-    public boolean clearParents()
+    public CompletableFuture<Boolean> clearParents()
     {
-        boolean changed = false;
-        for (List<Subject> list : parents.values())
-        {
-            if (!list.isEmpty())
+        return CompletableFuture.supplyAsync(() -> {
+            boolean changed = false;
+            for (List<Subject> list : parents.values())
             {
-                list.clear();
-                changed = true;
+                if (!list.isEmpty())
+                {
+                    list.clear();
+                    changed = true;
+                }
             }
-        }
-        return changed;
+            return changed;
+        });
     }
 
     @Override
-    public boolean clearParents(Set<Context> contexts)
+    public CompletableFuture<Boolean> clearParents(Set<Context> contexts)
     {
-        return operate(contexts, parents, l -> {
-            boolean empty = !l.isEmpty();
-            l.clear();
-            return empty;
-        });
+        return CompletableFuture.supplyAsync(() ->
+            operate(contexts, parents, l -> {
+                boolean empty = !l.isEmpty();
+                l.clear();
+                return empty;
+        }));
     }
 
     @FunctionalInterface
@@ -323,12 +350,12 @@ public class BaseSubjectData implements SubjectData
         void operate(T mapOrList, T other);
     }
 
-    private <T> T accumulate(Set<Context> contexts, Map<Context, T> all, T result, Accumulator<T> accumulator)
+    private <T, T2> T2 accumulate(Set<Context> contexts, Map<Context, T> all, T2 result, Accumulator<T2> accumulator, Function<T, T2> func)
     {
         T other = all.get(GLOBAL);
         if (other != null)
         {
-            accumulator.operate(result, other);
+            accumulator.operate(result, func.apply(other));
         }
 
         for (Context context : contexts)
@@ -336,11 +363,13 @@ public class BaseSubjectData implements SubjectData
             other = all.get(context);
             if (other != null)
             {
-                accumulator.operate(result, other);
+                accumulator.operate(result, func.apply(other));
             }
         }
         return result;
     }
+
+
 
 
 }

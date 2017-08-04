@@ -82,17 +82,19 @@ public class BlockDamageSettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            if (!ps.getGroupSubjects().hasRegistered(role))
-            {
-                i18n.send(context, NEGATIVE, "This role does not exist");
-                return;
-            }
-            Subject subject = ps.getGroupSubjects().get(role);
-            //for (MoveListener.MoveType type : types)
-            {
-                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.explodePlayer.getId(), set);
-            }
-            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
+                if (!b)
+                {
+                    i18n.send(context, NEGATIVE, "This role does not exist");
+                    return;
+                }
+                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                //for (MoveListener.MoveType type : types)
+                {
+                    subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.explodePlayer.getId(), set);
+                }
+                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            });
             return;
         }
         region.getSettings().blockDamage.playerExplosion = set;

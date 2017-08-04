@@ -49,7 +49,7 @@ import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.data.PermissionDataBuilder;
 import org.cubeengine.module.roles.exception.RolesExceptionHandler;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Sponge;
@@ -128,7 +128,7 @@ public class Roles extends CubeEngineModule
     {
         i18n.getCompositor().registerFormatter(new RoleFormatter());
 
-        cm.getProviders().register(this, new RoleParser(service), RoleSubject.class);
+        cm.getProviders().register(this, new RoleParser(service), FileSubject.class);
         cm.getProviders().register(this, new DefaultPermissionValueProvider(), Tristate.class);
         cm.getProviders().register(this, new PermissionCompleter(service));
 

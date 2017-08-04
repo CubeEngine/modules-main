@@ -34,8 +34,8 @@ import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.collection.RoleCollection;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.collection.FileBasedCollection;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -46,6 +46,7 @@ import org.spongepowered.api.text.Text;
 
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "admin", desc = "Manages the module", alias = "manadmin")
@@ -72,10 +73,11 @@ public class ManagementCommands extends ContainerCommand
         module.getConfiguration().reload();
         service.getConfig().reload();
 
-        service.getKnownSubjects().values().stream()
-                .filter(c -> c instanceof RoleCollection)
-                .map(RoleCollection.class::cast)
-                .forEach(RoleCollection::reload);
+        // TODO
+        service.getLoadedCollections().values().stream()
+                .filter(c -> c instanceof FileBasedCollection)
+                .map(FileBasedCollection.class::cast)
+                .forEach(FileBasedCollection::reload);
 
         service.getUserSubjects().reload();
 
@@ -88,11 +90,11 @@ public class ManagementCommands extends ContainerCommand
     public void save(CommandSource context)
     {
         module.getConfiguration().save();
-        for (Subject subject : service.getGroupSubjects().getAllSubjects())
+        for (Subject subject : service.getGroupSubjects().getLoadedSubjects())
         {
-            if (subject instanceof RoleSubject)
+            if (subject instanceof FileSubject)
             {
-                ((RoleSubject)subject).getSubjectData().save(true);
+                ((FileSubject)subject).getSubjectData().save(CompletableFuture.completedFuture(true));
             }
         }
 
@@ -135,7 +137,10 @@ public class ManagementCommands extends ContainerCommand
         else
         {
             i18n.send(sender, POSITIVE, "Permission {name} found:", permission);
-            sender.sendMessage(perm.getDescription().toBuilder().color(GOLD).build());
+            if (perm.getDescription().isPresent())
+            {
+                sender.sendMessage(perm.getDescription().get().toBuilder().color(GOLD).build());
+            }
             Map<Subject, Boolean> roles = perm.getAssignedSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE);
             if (!roles.isEmpty())
             {

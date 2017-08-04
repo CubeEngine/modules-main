@@ -23,23 +23,24 @@ import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.collection.RoleCollection;
-import org.cubeengine.module.roles.service.data.RoleSubjectData;
+import org.cubeengine.module.roles.service.collection.FileBasedCollection;
+import org.cubeengine.module.roles.service.data.FileSubjectData;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public class RoleSubject extends BaseSubject<RoleSubjectData>
+public class FileSubject extends BaseSubject<FileSubjectData>
 {
     public static final String SEPARATOR = "|";
 
-    public RoleSubject(RolesPermissionService service, RoleCollection collection, RoleConfig config)
+    public FileSubject(RolesPermissionService service, FileBasedCollection collection, RoleConfig config)
     {
-        super(collection, service, new RoleSubjectData(service, config));
+        super(collection, service, new FileSubjectData(service, config));
     }
 
     /**
@@ -49,21 +50,21 @@ public class RoleSubject extends BaseSubject<RoleSubjectData>
      */
     public static String getInternalIdentifier(Subject s)
     {
-        return s instanceof RoleSubject ? ((RoleSubject)s).getUUID().toString() : s.getIdentifier();
+        return s instanceof FileSubject ? ((FileSubject)s).getUUID().toString() : s.getIdentifier();
     }
 
     public static int compare(Subject o1, Subject o2)
     {
-        if (o1 instanceof RoleSubject && o2 instanceof RoleSubject) // Higher priority first
+        if (o1 instanceof FileSubject && o2 instanceof FileSubject) // Higher priority first
         {
-            return -Integer.compare(((RoleSubject) o1).getSubjectData().getConfig().priority.value,
-                                    ((RoleSubject) o2).getSubjectData().getConfig().priority.value);
+            return -Integer.compare(((FileSubject) o1).getSubjectData().getConfig().priority.value,
+                                    ((FileSubject) o2).getSubjectData().getConfig().priority.value);
         }
-        if (o1 instanceof RoleSubject)
+        if (o1 instanceof FileSubject)
         {
             return 1;
         }
-        if (o2 instanceof RoleSubject)
+        if (o2 instanceof FileSubject)
         {
             return -1;
         }
@@ -127,5 +128,15 @@ public class RoleSubject extends BaseSubject<RoleSubjectData>
     @Override
     public String toString() {
         return "RoleSubject: " + this.getIdentifier();
+    }
+
+    @Override
+    public boolean isSubjectDataPersisted() {
+        return true;
+    }
+
+    @Override
+    public SubjectReference asSubjectReference() {
+        return new RolesSubjectReference(getIdentifier(), getContainingCollection());
     }
 }

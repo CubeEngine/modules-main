@@ -20,9 +20,11 @@ package org.cubeengine.module.roles.service.data;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 public abstract class CachingSubjectData extends BaseSubjectData
@@ -35,45 +37,45 @@ public abstract class CachingSubjectData extends BaseSubjectData
     protected abstract void cacheParents();
     protected abstract void cachePermissions();
     protected abstract void cacheOptions();
-    public abstract boolean save(boolean changed);
+    public abstract CompletableFuture<Boolean> save(CompletableFuture<Boolean> changed);
 
     @Override
-    public Map<Set<Context>, List<Subject>> getAllParents()
+    public Map<Set<Context>, List<SubjectReference>> getAllParents()
     {
         cacheParents();
         return super.getAllParents();
     }
 
     @Override
-    public List<Subject> getParents(Set<Context> contexts)
+    public List<SubjectReference> getParents(Set<Context> contexts)
     {
         cacheParents();
         return super.getParents(contexts);
     }
 
     @Override
-    public boolean addParent(Set<Context> contexts, Subject parent)
+    public CompletableFuture<Boolean> addParent(Set<Context> contexts, SubjectReference parent)
     {
         cacheParents();
         return save(super.addParent(contexts, parent));
     }
 
     @Override
-    public boolean removeParent(Set<Context> contexts, Subject parent)
+    public CompletableFuture<Boolean> removeParent(Set<Context> contexts, SubjectReference parent)
     {
         cacheParents();
         return save(super.removeParent(contexts, parent));
     }
 
     @Override
-    public boolean clearParents()
+    public CompletableFuture<Boolean> clearParents()
     {
         cacheParents();
         return save(super.clearParents());
     }
 
     @Override
-    public boolean clearParents(Set<Context> contexts)
+    public CompletableFuture<Boolean> clearParents(Set<Context> contexts)
     {
         cacheParents();
         return save(super.clearParents(contexts));
@@ -94,21 +96,21 @@ public abstract class CachingSubjectData extends BaseSubjectData
     }
 
     @Override
-    public boolean setPermission(Set<Context> contexts, String permission, Tristate value)
+    public CompletableFuture<Boolean> setPermission(Set<Context> contexts, String permission, Tristate value)
     {
         cachePermissions();
         return save(super.setPermission(contexts, permission, value));
     }
 
     @Override
-    public boolean clearPermissions()
+    public CompletableFuture<Boolean> clearPermissions()
     {
         cachePermissions();
         return save(super.clearPermissions());
     }
 
     @Override
-    public boolean clearPermissions(Set<Context> contexts)
+    public CompletableFuture<Boolean> clearPermissions(Set<Context> contexts)
     {
         cachePermissions();
         return save(super.clearPermissions(contexts));
@@ -129,21 +131,21 @@ public abstract class CachingSubjectData extends BaseSubjectData
     }
 
     @Override
-    public boolean setOption(Set<Context> contexts, String key, String value)
+    public CompletableFuture<Boolean> setOption(Set<Context> contexts, String key, String value)
     {
         cacheOptions();
         return save(super.setOption(contexts, key, value));
     }
 
     @Override
-    public boolean clearOptions(Set<Context> contexts)
+    public CompletableFuture<Boolean> clearOptions(Set<Context> contexts)
     {
         cacheOptions();
         return save(super.clearOptions(contexts));
     }
 
     @Override
-    public boolean clearOptions()
+    public CompletableFuture<Boolean> clearOptions()
     {
         cacheOptions();
         return save(super.clearOptions());

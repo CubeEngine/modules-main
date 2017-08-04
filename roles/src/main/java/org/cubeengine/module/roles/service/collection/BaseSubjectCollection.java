@@ -18,26 +18,35 @@
 package org.cubeengine.module.roles.service.collection;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.subject.RolesSubjectReference;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 import static org.spongepowered.api.util.Tristate.UNDEFINED;
 
-public abstract class BaseSubjectCollection<T extends Subject> implements SubjectCollection
+public abstract class BaseSubjectCollection implements SubjectCollection
 {
     protected final RolesPermissionService service;
     private final String identifier;
 
-    protected final Map<String, T> subjects = new ConcurrentHashMap<>();
+    protected final Map<String, Subject> subjects = new ConcurrentHashMap<>();
 
     public BaseSubjectCollection(RolesPermissionService service, String identifier)
     {
@@ -52,19 +61,119 @@ public abstract class BaseSubjectCollection<T extends Subject> implements Subjec
     }
 
     @Override
-    public Map<Subject, Boolean> getAllWithPermission(String permission)
+    public Predicate<String> getIdentifierValidityPredicate()
+    {
+        return this::isValid;
+    }
+
+    protected boolean isValid(String identifier)
+    {
+        return true;
+    }
+
+    @Override
+    public CompletableFuture<Subject> loadSubject(String identifier)
+    {
+        return CompletableFuture.supplyAsync(() -> loadSubject0(identifier));
+    }
+
+    protected abstract Subject loadSubject0(String identifier);
+
+    @Override
+    public final Optional<Subject> getSubject(String identifier)
+    {
+        return Optional.ofNullable(subjects.get(identifier));
+    }
+
+    @Override
+    public CompletableFuture<Map<String, Subject>> loadSubjects(Set<String> identifiers)
+    {
+        return CompletableFuture.supplyAsync(() -> this.loadSubjects0(identifiers));
+    }
+
+    private Map<String, Subject> loadSubjects0(Set<String> ids)
+    {
+        Map<String, Subject> map = new HashMap<>();
+        for (String id : ids)
+        {
+            Optional<Subject> subject = this.getSubject(id);
+            if (subject.isPresent())
+            {
+                map.put(id, subject.get());
+            }
+            else
+            {
+                map.put(id, loadSubject0(id));
+            }
+        }
+        return map;
+    }
+
+    @Override
+    public Collection<Subject> getLoadedSubjects()
+    {
+        List<Subject> list = new ArrayList<>();
+        list.addAll(this.subjects.values());
+        return Collections.unmodifiableCollection(list);
+    }
+
+    @Override
+    public SubjectReference newSubjectReference(String subjectIdentifier)
+    {
+        if (this.getIdentifierValidityPredicate().test(subjectIdentifier))
+        {
+            return new RolesSubjectReference(subjectIdentifier, this);
+        }
+        throw new IllegalArgumentException("Invalid Identifier");
+    }
+
+    @Override
+    public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(String permission)
+    {
+        return getAllIdentifiers().thenApply(s -> loadSubjects0(s)).thenApply(s -> {
+            final Map<SubjectReference, Boolean> result = new HashMap<>();
+            s.values().forEach(elem -> collectPermRef(elem, permission, elem.getActiveContexts(), result));
+            return Collections.unmodifiableMap(result);
+        });
+    }
+
+    @Override
+    public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(Set<Context> contexts, String permission)
+    {
+        return getAllIdentifiers().thenApply(s -> loadSubjects0(s)).thenApply(s -> {
+            final Map<SubjectReference, Boolean> result = new HashMap<>();
+            s.values().forEach(elem -> collectPermRef(elem, permission, contexts, result));
+            return Collections.unmodifiableMap(result);
+        });
+    }
+
+    @Override
+    public Map<Subject, Boolean> getLoadedWithPermission(String permission)
     {
         final Map<Subject, Boolean> result = new HashMap<>();
-        getAllSubjects().forEach(elem -> collectPerm(elem, permission, elem.getActiveContexts(), result));
+        subjects.values().forEach(elem -> collectPerm(elem, permission, elem.getActiveContexts(), result));
         return Collections.unmodifiableMap(result);
     }
 
     @Override
-    public Map<Subject, Boolean> getAllWithPermission(Set<Context> contexts, String permission)
+    public Map<Subject, Boolean> getLoadedWithPermission(Set<Context> contexts, String permission)
     {
         final Map<Subject, Boolean> result = new HashMap<>();
-        getAllSubjects().forEach(elem -> collectPerm(elem, permission, contexts, result));
+        subjects.values().forEach(elem -> collectPerm(elem, permission, contexts, result));
         return Collections.unmodifiableMap(result);
+    }
+
+    @Override
+    public Subject getDefaults()
+    {
+        try
+        {
+            return service.getCollection(PermissionService.SUBJECTS_DEFAULT).get().loadSubject(getIdentifier()).get();
+        }
+        catch (ExecutionException | InterruptedException e)
+        {
+            throw new IllegalStateException(e);
+        }
     }
 
     private void collectPerm(Subject subject, String permission, Set<Context> contexts, Map<Subject, Boolean> result)
@@ -76,35 +185,12 @@ public abstract class BaseSubjectCollection<T extends Subject> implements Subjec
         }
     }
 
-    @Override
-    public final T get(String identifier)
+    private void collectPermRef(Subject subject, String permission, Set<Context> contexts, Map<SubjectReference, Boolean> result)
     {
-        T subject = subjects.get(identifier);
-        if (subject == null)
+        Tristate state = subject.getPermissionValue(contexts, permission);
+        if (state != UNDEFINED)
         {
-            subject = createSubject(identifier);
-            subjects.put(identifier, subject);
+            result.put(subject.getContainingCollection().newSubjectReference(subject.getIdentifier()), state.asBoolean());
         }
-        return subject;
-    }
-
-    @Override
-    public boolean hasRegistered(String identifier)
-    {
-        return subjects.containsKey(identifier);
-    }
-
-    @Override
-    public Iterable<Subject> getAllSubjects()
-    {
-        return new ArrayList<>(subjects.values());
-    }
-
-    protected abstract T createSubject(String identifier);
-
-    @Override
-    public Subject getDefaults()
-    {
-        return service.getSubjects(RolesPermissionService.DEFAULT_SUBJECTS).get(getIdentifier());
     }
 }

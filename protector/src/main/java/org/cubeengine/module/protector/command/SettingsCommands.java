@@ -81,17 +81,19 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            if (!ps.getGroupSubjects().hasRegistered(role))
-            {
-                i18n.send(context, NEGATIVE, "This role does not exist");
-                return;
-            }
-            Subject subject = ps.getGroupSubjects().get(role);
-            //for (MoveListener.MoveType type : types)
-            {
-                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.movePerms.get(type).getId(), set);
-            }
-            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
+                if (!b)
+                {
+                    i18n.send(context, NEGATIVE, "This role does not exist");
+                    return;
+                }
+                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                //for (MoveListener.MoveType type : types)
+                {
+                    subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.movePerms.get(type).getId(), set);
+                }
+                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            });
             return;
         }
         //for (MoveListener.MoveType type : types)
@@ -110,14 +112,16 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            if (!ps.getGroupSubjects().hasRegistered(role))
-            {
-                i18n.send(context, NEGATIVE, "This role does not exist");
-                return;
-            }
-            Subject subject = ps.getGroupSubjects().get(role);
-            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.buildPerm.getId(), set);
-            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
+                if (!b)
+                {
+                    i18n.send(context, NEGATIVE, "This role does not exist");
+                    return;
+                }
+                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.buildPerm.getId(), set);
+                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            });
             return;
         }
         region.getSettings().build = set;
@@ -131,14 +135,16 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            if (!ps.getGroupSubjects().hasRegistered(role))
-            {
-                i18n.send(context, NEGATIVE, "This role does not exist");
-                return;
-            }
-            Subject subject = ps.getGroupSubjects().get(role);
-            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.usePermission.get(type).getId(), set);
-            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
+                if (!b)
+                {
+                    i18n.send(context, NEGATIVE, "This role does not exist");
+                    return;
+                }
+                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.usePermission.get(type).getId(), set);
+                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            });
             return;
         }
         switch (type)
@@ -170,14 +176,16 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            if (!ps.getGroupSubjects().hasRegistered(role))
-            {
-                i18n.send(context, NEGATIVE, "This role does not exist");
-                return;
-            }
-            Subject subject = ps.getGroupSubjects().get(role);
-            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useBlockPerm.getId(), set);
-            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
+                if (!b)
+                {
+                    i18n.send(context, NEGATIVE, "This role does not exist");
+                    return;
+                }
+                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useBlockPerm.getId(), set);
+                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            });
             return;
         }
         setOrUnset(region.getSettings().use.block, type, set);
@@ -192,14 +200,17 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            if (!ps.getGroupSubjects().hasRegistered(role))
-            {
-                i18n.send(context, NEGATIVE, "This role does not exist");
-                return;
-            }
-            Subject subject = ps.getGroupSubjects().get(role);
-            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useItemPerm.getId(), set);
-            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
+                if (!b)
+                {
+                    i18n.send(context, NEGATIVE, "This role does not exist");
+                    return;
+                }
+                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useItemPerm.getId(), set);
+                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+
+            });
             return;
         }
         setOrUnset(region.getSettings().use.item, type, set);
@@ -214,23 +225,25 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            if (!ps.getGroupSubjects().hasRegistered(role))
-            {
-                i18n.send(context, NEGATIVE, "This role does not exist");
-                return;
-            }
-            switch (type)
-            {
-                case NATURALLY:
-                case PLUGIN:
-                    i18n.send(context, NEGATIVE, "There is no bypass permission for natural or plugin only spawning.");
+            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
+                if (!b)
+                {
+                    i18n.send(context, NEGATIVE, "This role does not exist");
                     return;
-                case PLAYER:
-                    Subject subject = ps.getGroupSubjects().get(role);
-                    subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.spawnEntityPlayerPerm.getId(), set);
-                    i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-                    break;
-            }
+                }
+                switch (type)
+                {
+                    case NATURALLY:
+                    case PLUGIN:
+                        i18n.send(context, NEGATIVE, "There is no bypass permission for natural or plugin only spawning.");
+                        return;
+                    case PLAYER:
+                        Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                        subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.spawnEntityPlayerPerm.getId(), set);
+                        i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+                        break;
+                }
+            });
             return;
         }
         switch (type)

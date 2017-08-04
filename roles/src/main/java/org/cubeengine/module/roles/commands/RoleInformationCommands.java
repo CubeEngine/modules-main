@@ -51,11 +51,12 @@ import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.config.PermissionTreeConverter;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.Contextual;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColor;
@@ -91,7 +92,7 @@ public class RoleInformationCommands extends ContainerCommand
     public void list(CommandSource cContext)
     {
         List<Subject> roles = new ArrayList<>();
-        for (Subject subject : service.getGroupSubjects().getAllSubjects())
+        for (Subject subject : service.getGroupSubjects().getLoadedSubjects())
         {
             roles.add(subject);
         }
@@ -111,7 +112,7 @@ public class RoleInformationCommands extends ContainerCommand
         String defaultRole = i18n.getTranslation(cContext, "default");
         String noDefaultRole = i18n.getTranslation(cContext, "not default");
         roles.sort(Comparator.comparing(Contextual::getIdentifier));
-        List<Subject> defaults = service.getDefaults().getSubjectData().getParents(Collections.emptySet());
+        List<SubjectReference> defaults = service.getDefaults().getSubjectData().getParents(Collections.emptySet());
         for (Subject r : roles)
         {
             cContext.sendMessage(Text.of("- ", GOLD, r.getIdentifier(), " ",
@@ -137,7 +138,7 @@ public class RoleInformationCommands extends ContainerCommand
 
     @Alias(value = "checkRPerm")
     @Command(alias = "checkPerm", desc = "Checks the permission in given role [in context]")
-    public void checkPermission(CommandSource ctx, RoleSubject role,
+    public void checkPermission(CommandSource ctx, FileSubject role,
                                 @Complete(PermissionCompleter.class) String permission,
                                 @Named("in") @Default Context context)
     {
@@ -162,13 +163,13 @@ public class RoleInformationCommands extends ContainerCommand
 
     @Alias(value = "listRPerm")
     @Command(alias = "listPerm", desc = "Lists all permissions of given role [in context]")
-    public void listPermission(CommandSource ctx, RoleSubject role, @Flag boolean all, @Named("in") @Default Context context)
+    public void listPermission(CommandSource ctx, FileSubject role, @Flag boolean all, @Named("in") @Default Context context)
     {
         i18n.send(ctx, NEUTRAL, "Permission list for {role}", role);
         Set<Context> contextSet = toSet(context);
         if (all)
         {
-            listPermission(ctx, true, contextSet, RolesUtil.fillPermissions(role, contextSet, new TreeMap<>()));
+            listPermission(ctx, true, contextSet, RolesUtil.fillPermissions(role, contextSet, new TreeMap<>(), service));
         }
         else if (contextSet.isEmpty())
         {
@@ -255,13 +256,13 @@ public class RoleInformationCommands extends ContainerCommand
 
     @Alias(value = {"listROption", "listRData"})
     @Command(alias = "listData", desc = "Lists all options of given role [in context]")
-    public void listOption(CommandSource ctx, RoleSubject role, @Flag boolean all, @Named("in") @Default Context context)
+    public void listOption(CommandSource ctx, FileSubject role, @Flag boolean all, @Named("in") @Default Context context)
     {
         i18n.send(ctx, NEUTRAL, "Options list for {role}", role);
         Set<Context> contextSet = toSet(context);
         if (all)
         {
-            listOption(ctx, true, contextSet, RolesUtil.fillOptions(role, contextSet, new HashMap<>()));
+            listOption(ctx, true, contextSet, RolesUtil.fillOptions(role, contextSet, new HashMap<>(), service));
         }
         else if (contextSet.isEmpty())
         {
@@ -295,9 +296,9 @@ public class RoleInformationCommands extends ContainerCommand
 
     @Alias(value = "listRParent")
     @Command(desc = "Lists all parents of given role [in context]")
-    public void listParent(CommandSource ctx, RoleSubject role, @Named("in") @Default Context context)
+    public void listParent(CommandSource ctx, FileSubject role, @Named("in") @Default Context context)
     {
-        List<Subject> parents = role.getSubjectData().getParents(toSet(context));
+        List<SubjectReference> parents = role.getSubjectData().getParents(toSet(context));
         i18n.send(ctx, NEUTRAL, "Parent list for {role}", role);
         if (parents.isEmpty())
         {
@@ -305,14 +306,14 @@ public class RoleInformationCommands extends ContainerCommand
             return;
         }
         i18n.send(ctx, POSITIVE, "in {context}:", context);
-        for (Subject parent : parents)
+        for (SubjectReference parent : parents)
         {
-            ctx.sendMessage(Text.of("- ", YELLOW, parent.getIdentifier()));
+            ctx.sendMessage(Text.of("- ", YELLOW, parent.getSubjectIdentifier()));
         }
     }
 
     @Command(alias = "prio", desc = "Show the priority of given role")
-    public void priority(CommandSource ctx, RoleSubject role)
+    public void priority(CommandSource ctx, FileSubject role)
     {
         Priority priority = role.prio();
         i18n.send(ctx, NEUTRAL, "The priority of the role {role} is: {integer#priority}", role, priority.value);
@@ -321,16 +322,16 @@ public class RoleInformationCommands extends ContainerCommand
     @Command(alias = {"default","defaultRoles","listDefRoles"}, desc = "Lists all default roles")
     public void listDefaultRoles(CommandSource cContext)
     {
-        List<Subject> parents = service.getDefaults().getSubjectData().getParents(Collections.emptySet());
+        List<SubjectReference> parents = service.getDefaults().getSubjectData().getParents(Collections.emptySet());
         if (parents.isEmpty())
         {
             i18n.send(cContext, NEGATIVE, "There are no default roles set!");
             return;
         }
         i18n.send(cContext, POSITIVE, "The following roles are default roles:");
-        for (Subject role : parents)
+        for (SubjectReference role : parents)
         {
-            cContext.sendMessage(Text.of("- ", YELLOW, role.getIdentifier()));
+            cContext.sendMessage(Text.of("- ", YELLOW, role.getSubjectIdentifier()));
         }
     }
 }

@@ -21,13 +21,13 @@ import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEX
 
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.module.roles.service.subject.RolesSubjectReference;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesConfig;
-import org.cubeengine.module.roles.service.collection.BasicSubjectCollection;
-import org.cubeengine.module.roles.service.collection.RoleCollection;
+import org.cubeengine.module.roles.service.collection.FileBasedCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -37,6 +37,7 @@ import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 import java.nio.file.Path;
@@ -46,20 +47,22 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Predicate;
 
 import javax.inject.Inject;
-import javax.management.relation.Role;
 
 public class RolesPermissionService implements PermissionService
 {
-    public static final String DEFAULT_SUBJECTS = "default";
     private final ConcurrentMap<String, SubjectCollection> collections = new ConcurrentHashMap<>();
     private final List<ContextCalculator<Subject>> calculators = new CopyOnWriteArrayList<>();
     private Reflector reflector;
-    private final Path rolesPath;
+    private final Path modulePath;
 
     private RolesConfig config;
     private Log logger;
@@ -72,20 +75,21 @@ public class RolesPermissionService implements PermissionService
     public RolesPermissionService(Roles module, FileManager fm, Reflector reflector, ModuleManager mm)
     {
         this.reflector = reflector;
-        this.rolesPath = mm.getPathFor(Roles.class);
+        this.modulePath = mm.getPathFor(Roles.class);
         this.logger = mm.getLoggerFor(Roles.class);
         this.config = fm.loadConfig(module, RolesConfig.class);
-        collections.put(DEFAULT_SUBJECTS, new RoleCollection(rolesPath, this, reflector, DEFAULT_SUBJECTS));
+        collections.put(SUBJECTS_DEFAULT, new FileBasedCollection(modulePath, this, reflector, SUBJECTS_DEFAULT, true));
         collections.put(SUBJECTS_USER, new UserCollection(this));
-        collections.put(SUBJECTS_GROUP, new RoleCollection(rolesPath, this, reflector, SUBJECTS_GROUP));
+        collections.put(SUBJECTS_GROUP, new FileBasedCollection(modulePath, this, reflector, SUBJECTS_GROUP, true));
 
-        this.getKnownSubjects().values().stream()
-                .filter(c -> c instanceof RoleCollection)
-                .map(RoleCollection.class::cast)
-                .forEach(RoleCollection::reload);
+        this.getLoadedCollections().values().stream()
+                .filter(c -> c instanceof FileBasedCollection)
+                .map(FileBasedCollection.class::cast)
+                .forEach(FileBasedCollection::reload);
 
-        collections.put(SUBJECTS_SYSTEM, new BasicSubjectCollection(this, SUBJECTS_SYSTEM));
-        collections.put(SUBJECTS_ROLE_TEMPLATE, new BasicSubjectCollection(this, SUBJECTS_ROLE_TEMPLATE));
+        collections.put(SUBJECTS_SYSTEM, new FileBasedCollection(modulePath,this, reflector, SUBJECTS_SYSTEM, true));
+        // TODO SUBJECTS_COMMAND_BLOCK
+        collections.put(SUBJECTS_ROLE_TEMPLATE, new FileBasedCollection(modulePath, this, reflector, SUBJECTS_ROLE_TEMPLATE, true));
     }
 
     @Override
@@ -95,25 +99,32 @@ public class RolesPermissionService implements PermissionService
     }
 
     @Override
-    public RoleCollection getGroupSubjects()
+    public FileBasedCollection getGroupSubjects()
     {
-        return (RoleCollection)collections.get(SUBJECTS_GROUP);
+        return (FileBasedCollection)collections.get(SUBJECTS_GROUP);
     }
 
     @Override
     public Subject getDefaults()
     {
-        return getSubjects(DEFAULT_SUBJECTS).get(DEFAULT_SUBJECTS);
+        try
+        {
+            return getCollection(SUBJECTS_DEFAULT).get().loadSubject(SUBJECTS_DEFAULT).get();
+        }
+        catch (ExecutionException | InterruptedException e)
+        {
+            throw new IllegalStateException(e);
+        }
     }
 
     @Override
-    public SubjectCollection getSubjects(String identifier)
+    public Optional<SubjectCollection> getCollection(String identifier)
     {
-        return this.collections.computeIfAbsent(identifier, i -> new RoleCollection(rolesPath, this, reflector, i).reload());
+        return Optional.of(this.collections.computeIfAbsent(identifier, i -> new FileBasedCollection(modulePath, this, reflector, i).reload()));
     }
 
     @Override
-    public Map<String, SubjectCollection> getKnownSubjects()
+    public Map<String, SubjectCollection> getLoadedCollections()
     {
         return Collections.unmodifiableMap(collections);
     }
@@ -135,11 +146,11 @@ public class RolesPermissionService implements PermissionService
     }
 
     @Override
-    public Optional<Builder> newDescriptionBuilder(Object plugin)
+    public Builder newDescriptionBuilder(Object plugin)
     {
         // TODO somehow allow modules
         Optional<PluginContainer> container = Sponge.getPluginManager().fromInstance(plugin);
-        return Optional.of(new RolesPermissionDescriptionBuilder(container.get(), this));
+        return new RolesPermissionDescriptionBuilder(container.get(), this);
     }
 
     @Override
@@ -160,8 +171,8 @@ public class RolesPermissionService implements PermissionService
 
     protected PermissionDescription addDescription(RolesPermissionDescription desc, Map<String, Tristate> roleAssignments)
     {
-        SubjectCollection subjects = getSubjects(SUBJECTS_ROLE_TEMPLATE); // TODO prevent infinite recursion
-        roleAssignments.entrySet().forEach(e -> subjects.get(e.getKey()).getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), e.getValue()));
+        SubjectCollection subjects = getCollection(SUBJECTS_ROLE_TEMPLATE).get(); // TODO prevent infinite recursion
+        roleAssignments.entrySet().forEach(e -> subjects.getSubject(e.getKey()).get().getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), e.getValue()));
 
         if (descriptionMap.put(desc.getId().toLowerCase(), desc) == null)
         {
@@ -172,6 +183,36 @@ public class RolesPermissionService implements PermissionService
         }
         descriptions = null;
         return desc;
+    }
+
+
+    @Override
+    public Predicate<String> getIdentifierValidityPredicate()
+    {
+        return input -> true;
+    }
+
+    @Override
+    public CompletableFuture<SubjectCollection> loadCollection(String identifier) {
+        return CompletableFuture.completedFuture(this.getCollection(identifier).get());
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasCollection(String identifier)
+    {
+        return CompletableFuture.completedFuture(this.collections.containsKey(identifier));
+    }
+
+    @Override
+    public CompletableFuture<Set<String>> getAllIdentifiers()
+    {
+        return CompletableFuture.completedFuture(this.collections.keySet());
+    }
+
+    @Override
+    public SubjectReference newSubjectReference(String collectionIdentifier, String subjectIdentifier)
+    {
+        return new RolesSubjectReference(subjectIdentifier, getCollection(collectionIdentifier).get());
     }
 
     public PermissionManager getPermissionManager()

@@ -18,12 +18,15 @@
 package org.cubeengine.module.roles.service;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.cubeengine.module.roles.RolesUtil;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 
 public class RolesPermissionDescription implements PermissionDescription
@@ -33,8 +36,7 @@ public class RolesPermissionDescription implements PermissionDescription
     private final Text description;
     private final PluginContainer owner;
 
-    public RolesPermissionDescription(PermissionService permissionService, String id, Text description,
-                                      PluginContainer owner)
+    public RolesPermissionDescription(PermissionService permissionService, String id, Text description, PluginContainer owner)
     {
         this.permissionService = permissionService;
         this.id = id;
@@ -50,21 +52,27 @@ public class RolesPermissionDescription implements PermissionDescription
     }
 
     @Override
-    public Text getDescription()
+    public Optional<Text> getDescription()
     {
-        return this.description;
+        return Optional.ofNullable(this.description);
     }
 
     @Override
     public Map<Subject, Boolean> getAssignedSubjects(String type)
     {
-        return this.permissionService.getSubjects(type).getAllWithPermission(this.id);
+        return this.permissionService.getCollection(type).get().getLoadedWithPermission(this.id);
     }
 
     @Override
-    public PluginContainer getOwner()
+    public Optional<PluginContainer> getOwner()
     {
-        return this.owner;
+        return Optional.ofNullable(this.owner);
+    }
+
+    @Override
+    public CompletableFuture<Map<SubjectReference, Boolean>> findAssignedSubjects(String type)
+    {
+        return this.permissionService.getCollection(type).get().getAllWithPermission(this.id);
     }
 
     @Override

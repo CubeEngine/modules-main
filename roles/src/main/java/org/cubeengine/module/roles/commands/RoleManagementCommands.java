@@ -34,17 +34,21 @@ import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.PriorityConverter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.data.FileSubjectData;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.libcube.util.ContextUtil.toSet;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
+
+import java.util.concurrent.CompletableFuture;
 
 @Alias("manrole")
 @Command(name = "role", desc = "Manage roles")
@@ -62,7 +66,7 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias("setRPerm")
     @Command(alias = "setPerm", desc = "Sets the permission for given role [in context]")
-    public void setPermission(CommandSource ctx, RoleSubject role,
+    public void setPermission(CommandSource ctx, FileSubject role,
                               @Complete(PermissionCompleter.class) String permission,
                               @Default Tristate type,
                               @Named("in") @Default Context context)
@@ -89,7 +93,7 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = {"setROption", "setRData"})
     @Command(alias = "setData", desc = "Sets an option for given role [in context]")
-    public void setOption(CommandSource ctx, RoleSubject role, String key, @Optional String value, @Named("in") @Default Context context)
+    public void setOption(CommandSource ctx, FileSubject role, String key, @Optional String value, @Named("in") @Default Context context)
     {
         role.getSubjectData().setOption(toSet(context), key, value);
         if (value == null)
@@ -102,14 +106,14 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = {"resetROption", "resetRData"})
     @Command(alias = "resetData", desc = "Resets the options for given role [in context]")
-    public void resetOption(CommandSource ctx, RoleSubject role, String key, @Named("in") @Default Context context)
+    public void resetOption(CommandSource ctx, FileSubject role, String key, @Named("in") @Default Context context)
     {
         this.setOption(ctx, role, key, null, context);
     }
 
     @Alias(value = {"clearROption", "clearRData"})
     @Command(alias = "clearData", desc = "Clears the options for given role [in context]")
-    public void clearOption(CommandSource ctx, RoleSubject role, @Named("in") @Default Context context)
+    public void clearOption(CommandSource ctx, FileSubject role, @Named("in") @Default Context context)
     {
         role.getSubjectData().clearOptions(toSet(context));
         i18n.send(ctx, NEUTRAL, "Options cleared for the role {role} in {context}!", role, context);
@@ -117,44 +121,52 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = {"addRParent", "manRAdd"})
     @Command(desc = "Adds a parent role to given role [in context]")
-    public void addParent(CommandSource ctx, RoleSubject role, RoleSubject parentRole, @Named("in") @Default Context context)
+    public void addParent(CommandSource ctx, FileSubject role, FileSubject parentRole, @Named("in") @Default Context context)
     {
-        if (role.getSubjectData().addParent(toSet(context), parentRole))
-        {
-            i18n.send(ctx, POSITIVE, "Added {role} as parent role for the role {role} in {context}", parentRole, role, context);
-            return;
-        }
-        i18n.send(ctx, NEUTRAL, "{name#role} is already parent role of the role {role} in {context}!", parentRole, role, context);
+        role.getSubjectData().addParent(toSet(context), parentRole.asSubjectReference()).thenAccept(b -> {
+            if (b)
+            {
+                i18n.send(ctx, POSITIVE, "Added {role} as parent role for the role {role} in {context}", parentRole, role, context);
+                return;
+            }
+            i18n.send(ctx, NEUTRAL, "{name#role} is already parent role of the role {role} in {context}!", parentRole, role, context);
+        });
+
+
         // TODO i18n.sendTranslated(ctx, NEGATIVE, "Circular Dependency! {name#role} depends on the role {name}!", pr.getName(), r.getName());
     }
 
     @Alias(value = "remRParent")
     @Command(desc = "Removes a parent role from given role [in context]")
-    public void removeParent(CommandSource ctx, RoleSubject role, RoleSubject parentRole, @Named("in") @Default Context context)
+    public void removeParent(CommandSource ctx, FileSubject role, FileSubject parentRole, @Named("in") @Default Context context)
     {
-        if (role.getSubjectData().removeParent(toSet(context), parentRole))
-        {
-            i18n.send(ctx, POSITIVE, "Removed the parent role {role} from the role {role} in {context}!", parentRole, role, context);
-            return;
-        }
-        i18n.send(ctx, NEUTRAL, "{role} is not a parent role of the role {role} in {context}!", parentRole, role, context);
+        role.getSubjectData().removeParent(toSet(context), parentRole.asSubjectReference()).thenAccept(b -> {
+            if (b)
+            {
+                i18n.send(ctx, POSITIVE, "Removed the parent role {role} from the role {role} in {context}!", parentRole, role, context);
+                return;
+            }
+            i18n.send(ctx, NEUTRAL, "{role} is not a parent role of the role {role} in {context}!", parentRole, role, context);
+        });
     }
 
     @Alias(value = "clearRParent")
     @Command(desc = "Removes all parent roles from given role [in context]")
-    public void clearParent(CommandSource ctx, RoleSubject role, @Named("in") @Default Context context)
+    public void clearParent(CommandSource ctx, FileSubject role, @Named("in") @Default Context context)
     {
-        if (role.getSubjectData().clearParents(toSet(context)))
-        {
-            i18n.send(ctx, NEUTRAL, "All parent roles of the role {role} in {context} cleared!", role, context);
-            return;
-        }
-        i18n.send(ctx, NEUTRAL, "{role} had no parent roles in {context}!", role, context);
+        role.getSubjectData().clearParents(toSet(context)).thenAccept(b -> {
+            if (b)
+            {
+                i18n.send(ctx, NEUTRAL, "All parent roles of the role {role} in {context} cleared!", role, context);
+                return;
+            }
+            i18n.send(ctx, NEUTRAL, "{role} had no parent roles in {context}!", role, context);
+        });
     }
 
     @Alias(value = "setRolePriority")
     @Command(alias = "setPrio", desc = "Sets the priority of given role")
-    public void setPriority(CommandSource ctx, RoleSubject role, String priority)
+    public void setPriority(CommandSource ctx, FileSubject role, String priority)
     {
         try
         {
@@ -171,7 +183,7 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = "renameRole")
     @Command(desc = "Renames given role")
-    public void rename(CommandSource ctx, RoleSubject role, @Label("new name") String newName)
+    public void rename(CommandSource ctx, FileSubject role, @Label("new name") String newName)
     {
         String oldName = role.getIdentifier();
         if (oldName.equalsIgnoreCase(newName))
@@ -191,19 +203,21 @@ public class RoleManagementCommands extends ContainerCommand
     @Command(desc = "Creates a new role")
     public void create(CommandSource ctx, String name)
     {
-        if (service.getGroupSubjects().hasRegistered(name))
-        {
-            i18n.send(ctx, NEUTRAL, "There is already a role named {name}.", name);
-            return;
-        }
-        RoleSubject r = service.getGroupSubjects().get(name);
-        r.getSubjectData().save(true);
-        i18n.send(ctx, POSITIVE, "Role {name} created!", name);
+        service.getGroupSubjects().hasSubject(name).thenAccept(b -> {
+            if (b)
+            {
+                i18n.send(ctx, NEUTRAL, "There is already a role named {name}.", name);
+                return;
+            }
+            Subject r = service.getGroupSubjects().getSubject(name).get();
+            ((FileSubjectData) r.getSubjectData()).save(CompletableFuture.completedFuture(true));
+            i18n.send(ctx, POSITIVE, "Role {name} created!", name);
+        });
     }
 
     @Alias(value = "deleteRole")
     @Command(desc = "Deletes a role")
-    public void delete(CommandSource ctx, RoleSubject role, @Flag boolean force)
+    public void delete(CommandSource ctx, FileSubject role, @Flag boolean force)
     {
         if (service.getGroupSubjects().delete(role, force))
         {
@@ -214,16 +228,16 @@ public class RoleManagementCommands extends ContainerCommand
     }
 
     @Command(alias = {"toggleDefault", "toggleDef"}, desc = "Toggles whether given role is a default role")
-    public void toggleDefaultRole(CommandSource ctx, RoleSubject role)
+    public void toggleDefaultRole(CommandSource ctx, FileSubject role)
     {
         SubjectData defaultData = service.getDefaults().getSubjectData();
         if (defaultData.getParents(GLOBAL_CONTEXT).contains(role))
         {
-            defaultData.removeParent(GLOBAL_CONTEXT, role);
+            defaultData.removeParent(GLOBAL_CONTEXT, role.asSubjectReference());
             i18n.send(ctx, POSITIVE, "{role} is no longer a default role!", role);
             return;
         }
-        defaultData.addParent(GLOBAL_CONTEXT, role);
+        defaultData.addParent(GLOBAL_CONTEXT, role.asSubjectReference());
         i18n.send(ctx, POSITIVE, "{role} is now a default role!", role);
     }
 }

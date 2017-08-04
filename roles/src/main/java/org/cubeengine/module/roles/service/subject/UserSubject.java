@@ -21,6 +21,7 @@ import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.UserSubjectData;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.service.permission.SubjectReference;
 
 import java.util.Optional;
 import java.util.UUID;
@@ -53,6 +54,12 @@ public class UserSubject extends BaseSubject<UserSubjectData>
         this.getTransientSubjectData().clearOptions();
         this.getTransientSubjectData().clearParents();
         this.getTransientSubjectData().clearPermissions();
+    }
+
+    @Override
+    public boolean isSubjectDataPersisted()
+    {
+        return true;
     }
 
     @Override

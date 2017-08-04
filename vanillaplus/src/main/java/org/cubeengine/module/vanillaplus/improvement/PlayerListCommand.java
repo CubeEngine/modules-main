@@ -26,6 +26,9 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.result.CommandResult;
 import org.cubeengine.libcube.util.ChatFormat;
@@ -57,15 +60,23 @@ public class PlayerListCommand
         SortedMap<String, Set<Player>> grouped = new TreeMap<>();
         for (Player player : users)
         {
-            Subject subject = Sponge.getServiceManager().provideUnchecked(PermissionService.class).getUserSubjects().get(player.getUniqueId().toString());
-            String listGroup = subject.getOption("list-group").orElse("&6Players");
-            Set<Player> assigned = grouped.get(listGroup);
-            if (assigned == null)
+            try
             {
-                assigned = new LinkedHashSet<>();
-                grouped.put(listGroup, assigned);
+                Subject subject = Sponge.getServiceManager().provideUnchecked(PermissionService.class).getUserSubjects()
+                        .loadSubject(player.getUniqueId().toString()).get();
+                String listGroup = subject.getOption("list-group").orElse("&6Players");
+                Set<Player> assigned = grouped.get(listGroup);
+                if (assigned == null)
+                {
+                    assigned = new LinkedHashSet<>();
+                    grouped.put(listGroup, assigned);
+                }
+                assigned.add(player);
             }
-            assigned.add(player);
+            catch (ExecutionException | InterruptedException e)
+            {
+                throw new IllegalStateException(e);
+            }
         }
         return grouped;
     }

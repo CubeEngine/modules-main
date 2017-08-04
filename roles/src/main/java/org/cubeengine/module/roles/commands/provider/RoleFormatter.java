@@ -22,9 +22,9 @@ import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.parser.component.Component;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 
-public class RoleFormatter extends AbstractFormatter<RoleSubject>
+public class RoleFormatter extends AbstractFormatter<FileSubject>
 {
     public RoleFormatter()
     {
@@ -32,7 +32,7 @@ public class RoleFormatter extends AbstractFormatter<RoleSubject>
     }
 
     @Override
-    public Component format(RoleSubject object, Context context, Arguments args)
+    public Component format(FileSubject object, Context context, Arguments args)
     {
         return new Text(object.getIdentifier());
     }

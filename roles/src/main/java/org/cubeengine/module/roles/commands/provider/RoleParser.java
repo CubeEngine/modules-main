@@ -19,15 +19,17 @@ package org.cubeengine.module.roles.commands.provider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.parameter.argument.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
 import org.cubeengine.butler.parameter.argument.ParserException;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.service.permission.Subject;
 
-public class RoleParser implements ArgumentParser<RoleSubject>, Completer
+public class RoleParser implements ArgumentParser<FileSubject>, Completer
 {
     private RolesPermissionService service;
 
@@ -37,13 +39,19 @@ public class RoleParser implements ArgumentParser<RoleSubject>, Completer
     }
 
     @Override
-    public RoleSubject parse(Class type, CommandInvocation invocation) throws ParserException
+    public FileSubject parse(Class type, CommandInvocation invocation) throws ParserException
     {
-        String token = invocation.consume(1);
-        if (service.getGroupSubjects().hasRegistered(token))
+        String token = null;
+        try
         {
-            return service.getGroupSubjects().get(token);
+            token = invocation.consume(1);
+            if (service.getGroupSubjects().hasSubject(token).get())
+            {
+                return ((FileSubject) service.getGroupSubjects().getSubject(token).get());
+            }
         }
+        catch (InterruptedException | ExecutionException ignored)
+        {}
         throw new ParserException("Could not find the role: {input#role}", token);
     }
 
@@ -52,7 +60,7 @@ public class RoleParser implements ArgumentParser<RoleSubject>, Completer
     {
         ArrayList<String> result = new ArrayList<>();
         String token = invocation.currentToken().toLowerCase();
-        for (Subject subject : service.getGroupSubjects().getAllSubjects())
+        for (Subject subject : service.getGroupSubjects().getLoadedSubjects())
         {
             String name = subject.getIdentifier();
             if (name.startsWith(token))

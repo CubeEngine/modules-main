@@ -35,17 +35,19 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 @Alias("manuser")
 @Command(name = "user", desc = "Manage users")
@@ -63,8 +65,9 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias({"manUAdd", "assignURole", "addURole", "giveURole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [-temp]")
-    public void assign(CommandSource ctx, @Default User player, RoleSubject role, @Flag boolean temp)
+    public void assign(CommandSource ctx, @Default User player, FileSubject role, @Flag boolean temp)
     {
+
         if (!role.canAssignAndRemove(ctx))
         {
             i18n.send(ctx, NEGATIVE, "You are not allowed to assign the role {role}!", role);
@@ -77,25 +80,29 @@ public class UserManagementCommands extends ContainerCommand
                 i18n.send(ctx, NEGATIVE, "You cannot assign a temporary role to a offline player!");
                 return;
             }
-            if (player.getTransientSubjectData().addParent(emptySet(), role))
+            player.getTransientSubjectData().addParent(emptySet(), role.asSubjectReference()).thenAccept(b -> {
+                if (b)
+                {
+                    i18n.send(ctx, POSITIVE, "Added the role {role} temporarily to {user}.", role, player);
+                    return;
+                }
+                i18n.send(ctx, NEUTRAL, "{user} already had the temporary role {role}.", player, role);
+            });
+            return;
+        }
+        player.getSubjectData().addParent(emptySet(), role.asSubjectReference()).thenAccept(b -> {
+            if (b)
             {
-                i18n.send(ctx, POSITIVE, "Added the role {role} temporarily to {user}.", role, player);
+                i18n.send(ctx, POSITIVE, "Added the role {role} to {user}.", role, player);
                 return;
             }
-            i18n.send(ctx, NEUTRAL, "{user} already had the temporary role {role}.", player, role);
-            return;
-        }
-        if (player.getSubjectData().addParent(emptySet(), role))
-        {
-            i18n.send(ctx, POSITIVE, "Added the role {role} to {user}.", role, player);
-            return;
-        }
-        i18n.send(ctx, NEUTRAL, "{user} already has the role {role}.", player, role);
+            i18n.send(ctx, NEUTRAL, "{user} already has the role {role}.", player, role);
+        });
     }
 
     @Alias(value = {"remURole", "manUDel"})
     @Command(desc = "Removes a role from the player")
-    public void remove(CommandSource ctx, @Default User player, RoleSubject role)
+    public void remove(CommandSource ctx, @Default User player, FileSubject role)
     {
         if (!role.canAssignAndRemove(ctx))
         {
@@ -103,14 +110,20 @@ public class UserManagementCommands extends ContainerCommand
             return;
         }
 
-        boolean removed = player.getTransientSubjectData().removeParent(emptySet(), role);
-        removed = player.getSubjectData().removeParent(emptySet(), role) || removed;
-        if (removed)
-        {
-            i18n.send(ctx, POSITIVE, "Removed the role {role} from {user}.", role, player);
-            return;
-        }
-        i18n.send(ctx, NEUTRAL, "{user} did not have the role {role}.", player, role);
+        player.getTransientSubjectData().removeParent(emptySet(), role.asSubjectReference()).thenApply(r -> {
+            try {
+                return r || player.getSubjectData().removeParent(emptySet(), role.asSubjectReference()).get();
+            } catch (ExecutionException | InterruptedException e) {
+                return r;
+            }
+        }).thenAccept(removed -> {
+            if (removed)
+            {
+                i18n.send(ctx, POSITIVE, "Removed the role {role} from {user}.", role, player);
+                return;
+            }
+            i18n.send(ctx, NEUTRAL, "{user} did not have the role {role}.", player, role);
+        });
     }
 
     @Alias(value = {"clearURole", "manUClear"})
@@ -123,10 +136,10 @@ public class UserManagementCommands extends ContainerCommand
         if (defaultData.getParents(emptySet()).isEmpty())
         {
             i18n.send(ctx, NEUTRAL, "Default roles assigned:");
-            for (Subject subject : defaultData.getParents(emptySet()))
+            for (SubjectReference subject : defaultData.getParents(emptySet()))
             {
                 player.getTransientSubjectData().addParent(emptySet(), subject);
-                ctx.sendMessage(Text.of("- ", TextColors.YELLOW, subject.getIdentifier()));
+                ctx.sendMessage(Text.of("- ", TextColors.YELLOW, subject.getSubjectIdentifier()));
             }
         }
     }
@@ -140,17 +153,19 @@ public class UserManagementCommands extends ContainerCommand
             resetPermission(ctx, player, permission, context);
         }
         Set<Context> contexts = toSet(context);
-        if (!player.getSubjectData().setPermission(contexts, permission, type))
-        {
-            i18n.send(ctx, NEGATIVE, "Permission {input} of {user} was already set to {bool} in {context}!", permission, player, type.asBoolean(), context);
-            return;
-        }
-        switch (type)
-        {
-            case TRUE:
-            case FALSE:
-                i18n.send(ctx, POSITIVE, "Permission {input} of {user} set to {bool} in {context}!", permission, player, type.asBoolean(), context);
-        }
+        player.getSubjectData().setPermission(contexts, permission, type).thenAccept(b -> {
+            if (!b)
+            {
+                i18n.send(ctx, NEGATIVE, "Permission {input} of {user} was already set to {bool} in {context}!", permission, player, type.asBoolean(), context);
+                return;
+            }
+            switch (type)
+            {
+                case TRUE:
+                case FALSE:
+                    i18n.send(ctx, POSITIVE, "Permission {input} of {user} set to {bool} in {context}!", permission, player, type.asBoolean(), context);
+            }
+        });
     }
 
     @Alias(value = "resetUPerm")
@@ -158,13 +173,14 @@ public class UserManagementCommands extends ContainerCommand
     public void resetPermission(CommandSource ctx, @Default User player, String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        if (player.getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED))
-        {
-            i18n.send(ctx, NEUTRAL, "Permission {input} of {user} reset in {context}!", permission, player, context);
-            return;
-        }
-        i18n.send(ctx, NEGATIVE, "Permission {input} of {user} was not set in {context}!", permission, player, context);
-
+        player.getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED).thenAccept(b -> {
+            if (b)
+            {
+                i18n.send(ctx, NEUTRAL, "Permission {input} of {user} reset in {context}!", permission, player, context);
+                return;
+            }
+            i18n.send(ctx, NEGATIVE, "Permission {input} of {user} was not set in {context}!", permission, player, context);
+        });
     }
 
     @Alias(value = {"setUOption","setUData"})
@@ -172,12 +188,14 @@ public class UserManagementCommands extends ContainerCommand
     public void setOption(CommandSource ctx, @Default User player, String key, String value, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        if (player.getSubjectData().setOption(contexts, key, value))
-        {
-            i18n.send(ctx, POSITIVE, "Options {input#key} of {user} set to {input#value} in {context}!", key, player, value, context);
-            return;
-        }
-        i18n.send(ctx, NEGATIVE, "Options {input#key} of {user} was already set to {input#value} in {context}!", key, player, value, context);
+        player.getSubjectData().setOption(contexts, key, value).thenAccept(b -> {
+            if (b)
+            {
+                i18n.send(ctx, POSITIVE, "Options {input#key} of {user} set to {input#value} in {context}!", key, player, value, context);
+                return;
+            }
+            i18n.send(ctx, NEGATIVE, "Options {input#key} of {user} was already set to {input#value} in {context}!", key, player, value, context);
+        });
     }
 
     @Alias(value = {"resetUOption","resetUData"})
@@ -185,12 +203,14 @@ public class UserManagementCommands extends ContainerCommand
     public void resetOption(CommandSource ctx, @Default User player, String key, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        if (player.getSubjectData().setOption(contexts, key, null))
-        {
-            i18n.send(ctx, NEUTRAL, "Options {input#key} of {user} removed in {context}!", key, player, context);
-            return;
-        }
-        i18n.send(ctx, NEGATIVE, "Options {input#key} was not set for {user} in {context}!", key, player, context);
+        player.getSubjectData().setOption(contexts, key, null).thenAccept(b -> {
+            if (b)
+            {
+                i18n.send(ctx, NEUTRAL, "Options {input#key} of {user} removed in {context}!", key, player, context);
+                return;
+            }
+            i18n.send(ctx, NEGATIVE, "Options {input#key} was not set for {user} in {context}!", key, player, context);
+        });
     }
 
     @Alias(value = {"clearUOption","clearUData"})
@@ -198,11 +218,13 @@ public class UserManagementCommands extends ContainerCommand
     public void clearOption(CommandSource ctx, @Default User player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        if (player.getSubjectData().clearOptions(contexts))
-        {
-            i18n.send(ctx, NEUTRAL, "Options of {user} cleared in {context}!", player, context);
-            return;
-        }
-        i18n.send(ctx, NEGATIVE, "Options of {user} was already cleared in {context}!", player, context);
+        player.getSubjectData().clearOptions(contexts).thenAccept(b -> {
+            if (b)
+            {
+                i18n.send(ctx, NEUTRAL, "Options of {user} cleared in {context}!", player, context);
+                return;
+            }
+            i18n.send(ctx, NEGATIVE, "Options of {user} was already cleared in {context}!", player, context);
+        });
     }
 }

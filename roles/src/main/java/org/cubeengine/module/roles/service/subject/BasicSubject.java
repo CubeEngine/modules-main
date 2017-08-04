@@ -68,4 +68,10 @@ public class BasicSubject extends BaseSubject<BaseSubjectData>
         }
         return super.getActiveContexts();
     }
+
+    @Override
+    public boolean isSubjectDataPersisted()
+    {
+        return false;
+    }
 }

@@ -35,13 +35,14 @@ import org.cubeengine.module.roles.RolesUtil.FoundOption;
 import org.cubeengine.module.roles.RolesUtil.FoundPermission;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.RoleSubject;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
@@ -70,8 +71,8 @@ public class UserInformationCommands extends ContainerCommand
     @Command(desc = "Lists roles of a user")
     public void list(CommandSource ctx, @Default User player)
     {
-        List<Subject> parents = player.getSubjectData().getParents(GLOBAL_CONTEXT);
-        List<Subject> transientParents = player.getTransientSubjectData().getParents(GLOBAL_CONTEXT);
+        List<SubjectReference> parents = player.getSubjectData().getParents(GLOBAL_CONTEXT);
+        List<SubjectReference> transientParents = player.getTransientSubjectData().getParents(GLOBAL_CONTEXT);
 
         Text translation = i18n.translate(ctx, NEUTRAL, "Roles of {user}:", player);
         if (ctx.hasPermission("cubeengine.roles.command.roles.user.assign"))
@@ -81,10 +82,10 @@ public class UserInformationCommands extends ContainerCommand
                     sender -> {
                         i18n.send(sender, POSITIVE, "Click on the role you want to add to {user}.", player);
 
-                        for (Subject subject : service.getGroupSubjects().getAllSubjects())
+                        for (Subject subject : service.getGroupSubjects().getLoadedSubjects())
                         {
                             // TODO perm check for each role
-                            if (!parents.contains(subject) && subject instanceof RoleSubject)
+                            if (!parents.contains(subject) && subject instanceof FileSubject)
                             {
                                 sender.sendMessage(Text.of(YELLOW, " - ", subject.getIdentifier()).toBuilder().onClick(
                                     TextActions.runCommand("/roles user assign " + player.getName() + " " + subject.getIdentifier())).build());
@@ -97,7 +98,7 @@ public class UserInformationCommands extends ContainerCommand
         if (ctx.hasPermission("cubeengine.roles.command.roles.user.remove"))
         {
             Text removeText1 = i18n.translate(ctx, NEGATIVE, "Click to remove role.");
-            parents.stream().filter(parent -> parent instanceof RoleSubject).map(RoleSubject.class::cast)
+            parents.stream().filter(parent -> parent instanceof FileSubject).map(FileSubject.class::cast)
                .forEach(parent -> {
                     // TODO perm check for each role
                     Text removeText = Text.of(RED, "(-)").toBuilder().onClick(TextActions.executeCallback(sender -> {
@@ -110,11 +111,11 @@ public class UserInformationCommands extends ContainerCommand
         }
         else
         {
-            parents.stream().filter(parent -> parent instanceof RoleSubject).map(RoleSubject.class::cast)
+            parents.stream().filter(parent -> parent instanceof FileSubject).map(FileSubject.class::cast)
                    .forEach(parent -> ctx.sendMessage(Text.of("- ", GOLD, parent.getIdentifier())));
         }
         String transientText = i18n.getTranslation(ctx, "transient");
-        transientParents.stream().filter(parent -> parent instanceof RoleSubject).map(RoleSubject.class::cast)
+        transientParents.stream().filter(parent -> parent instanceof FileSubject).map(FileSubject.class::cast)
                 .forEach(parent -> ctx.sendMessage(Text.of("- ", GOLD, parent.getIdentifier(), GRAY, " (", YELLOW, transientText, GRAY, ")")));
 
 
@@ -191,7 +192,7 @@ public class UserInformationCommands extends ContainerCommand
         Map<String, Boolean> permissions = new HashMap<>();
         if (all)
         {
-            RolesUtil.fillPermissions(player, contexts, permissions);
+            RolesUtil.fillPermissions(player, contexts, permissions, service);
         }
         else
         {
@@ -220,7 +221,7 @@ public class UserInformationCommands extends ContainerCommand
     {
         Set<Context> contexts = toSet(context);
 
-        Optional<FoundOption> option = RolesUtil.getOption(service.getUserSubjects().get(player.getIdentifier()), key, contexts);
+        Optional<FoundOption> option = RolesUtil.getOption(service, service.getUserSubjects().getSubject(player.getIdentifier()).get(), key, contexts);
         if (!option.isPresent())
         {
             i18n.send(ctx, NEUTRAL, "{input#key} is not set for {user} in {context}.", key, player, context);
@@ -234,7 +235,7 @@ public class UserInformationCommands extends ContainerCommand
         }
         else
         {
-            i18n.send(ctx, NEUTRAL, "Options inherited from the role {name}!", ((RoleSubject)option.get().subject).getIdentifier());
+            i18n.send(ctx, NEUTRAL, "Options inherited from the role {name}!", ((FileSubject)option.get().subject).getIdentifier());
         }
     }
 
@@ -246,7 +247,7 @@ public class UserInformationCommands extends ContainerCommand
         Map<String, String> options = new HashMap<>();
         if (all)
         {
-            RolesUtil.fillOptions(service.getUserSubjects().get(player.getIdentifier()), contexts, options);
+            RolesUtil.fillOptions(service.getUserSubjects().getSubject(player.getIdentifier()).get(), contexts, options, service);
         }
         else
         {

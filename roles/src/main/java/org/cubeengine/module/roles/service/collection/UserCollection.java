@@ -17,13 +17,21 @@
  */
 package org.cubeengine.module.roles.service.collection;
 
+import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
 import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.cubeengine.module.roles.service.subject.UserSubject;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.user.UserStorageService;
 
-public class UserCollection extends BaseSubjectCollection<UserSubject>
+public class UserCollection extends BaseSubjectCollection
 {
     private RolesPermissionService service;
 
@@ -34,7 +42,7 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
     }
 
     @Override
-    protected UserSubject createSubject(String identifier)
+    protected UserSubject loadSubject0(String identifier)
     {
         try
         {
@@ -46,18 +54,53 @@ public class UserCollection extends BaseSubjectCollection<UserSubject>
         }
     }
 
-    @Override
-    public Iterable<Subject> getAllSubjects()
-    {
-        // TODO get from all offline users once they can have custom data
-        return super.getAllSubjects();
-    }
-
     public void reload()
     {
-        for (UserSubject subject : subjects.values())
+        for (Subject subject : subjects.values())
         {
-            subject.reload();
+            if (subject instanceof FileSubject)
+            {
+
+            }
         }
+    }
+
+    @Override
+    public Predicate<String> getIdentifierValidityPredicate()
+    {
+        return identifier -> {
+            try
+            {
+                UUID.fromString(identifier);
+                return true;
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+        };
+    }
+
+    @Override
+    public CompletableFuture<Boolean> hasSubject(String identifier)
+    {
+        return CompletableFuture.supplyAsync(() -> {
+            UserStorageService service = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+            return service.get(UUID.fromString(identifier)).isPresent();
+        });
+    }
+
+    @Override
+    public CompletableFuture<Set<String>> getAllIdentifiers()
+    {
+        return CompletableFuture.supplyAsync(() -> {
+            UserStorageService service = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
+            return service.getAll().stream().map(gp -> gp.getUniqueId().toString()).collect(Collectors.toSet());
+        });
+    }
+
+    @Override
+    public void suggestUnload(String identifier)
+    {
     }
 }
