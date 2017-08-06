@@ -46,7 +46,7 @@ public class TeleportPerm extends PermissionContainer
     public final Permission COMMAND_BACK_ONDEATH = register("command.back.ondeath", "Allows using the back command after dieing (if this is not set you won't be able to tp back to your deathpoint)", null);
 
     public final Permission COMPASS_JUMPTO_LEFT = register("compass.jumpto.left", "", null);
-    public final Permission COMPASS_JUMPTO_RIGHT = register("right", "", null);
+    public final Permission COMPASS_JUMPTO_RIGHT = register("compass.jumpto.right", "", null);
 
     public final Permission COMMAND_TPPOS_UNSAFE = register("command.tppos.unsafe", "", null);
 
