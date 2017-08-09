@@ -22,6 +22,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
+
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Complete;
@@ -98,7 +100,14 @@ public class UserInformationCommands extends ContainerCommand
         if (ctx.hasPermission("cubeengine.roles.command.roles.user.remove"))
         {
             Text removeText1 = i18n.translate(ctx, NEGATIVE, "Click to remove role.");
-            parents.stream().filter(parent -> parent instanceof FileSubject).map(FileSubject.class::cast)
+            parents.stream().map(p -> {
+                try{
+                    return p.resolve().get();
+                }
+                catch (ExecutionException | InterruptedException e) {
+                    throw new IllegalStateException(e);
+                }
+            }).filter(parent -> parent instanceof FileSubject).map(FileSubject.class::cast)
                .forEach(parent -> {
                     // TODO perm check for each role
                     Text removeText = Text.of(RED, "(-)").toBuilder().onClick(TextActions.executeCallback(sender -> {

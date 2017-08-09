@@ -74,6 +74,7 @@ public class PluginCommands extends PermissionContainer
 
         context.sendMessage(Text.EMPTY);
 
+        // TODO no pagination for console and hover id for player
         List<Text> list = new ArrayList<>();
         list.add(Text.of(" - ", GREEN, "CubeEngine", " " ,GRAY, core.getId(), RESET, " (" + core.getVersion().orElse("unknown") + ") ",
                 i18n.translate(context, NEUTRAL, "with {amount} Modules:", modules.size())));
