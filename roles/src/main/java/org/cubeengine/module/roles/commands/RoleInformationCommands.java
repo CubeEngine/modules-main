@@ -92,10 +92,7 @@ public class RoleInformationCommands extends ContainerCommand
     public void list(CommandSource cContext)
     {
         List<Subject> roles = new ArrayList<>();
-        for (Subject subject : service.getGroupSubjects().getLoadedSubjects())
-        {
-            roles.add(subject);
-        }
+        roles.addAll(service.getGroupSubjects().getLoadedSubjects());
         if (roles.isEmpty())
         {
             i18n.send(cContext, NEGATIVE, "There are no roles!");
@@ -128,7 +125,7 @@ public class RoleInformationCommands extends ContainerCommand
                             .onHover(TextActions.showText(parentClick))
                             .onClick(TextActions.runCommand("/roles role listparent " + r.getIdentifier()))
                             .build(),
-                    Text.of(GRAY, " (", YELLOW, defaults.contains(r) ? defaultRole : noDefaultRole, GRAY, ")").toBuilder()
+                    Text.of(GRAY, " (", YELLOW, defaults.contains(r.asSubjectReference()) ? defaultRole : noDefaultRole, GRAY, ")").toBuilder()
                             .onHover(TextActions.showText(defaultClick))
                             .onClick(TextActions.runCommand("/roles role toggledefault " + r.getIdentifier()))
                             .build()
@@ -173,8 +170,7 @@ public class RoleInformationCommands extends ContainerCommand
         }
         else if (contextSet.isEmpty())
         {
-            role.getSubjectData().getAllPermissions().entrySet()
-                    .forEach(e -> listPermission(ctx, false, e.getKey(), e.getValue()));
+            role.getSubjectData().getAllPermissions().forEach((key, value) -> listPermission(ctx, false, key, value));
         }
         else
         {
@@ -266,8 +262,7 @@ public class RoleInformationCommands extends ContainerCommand
         }
         else if (contextSet.isEmpty())
         {
-            role.getSubjectData().getAllOptions().entrySet().forEach(
-                    e -> listOption(ctx, false, e.getKey(), e.getValue()));
+            role.getSubjectData().getAllOptions().forEach((key, value) -> listOption(ctx, false, key, value));
         }
         else
         {

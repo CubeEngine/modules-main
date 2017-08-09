@@ -231,7 +231,7 @@ public class RoleManagementCommands extends ContainerCommand
     public void toggleDefaultRole(CommandSource ctx, FileSubject role)
     {
         SubjectData defaultData = service.getDefaults().getSubjectData();
-        if (defaultData.getParents(GLOBAL_CONTEXT).contains(role))
+        if (defaultData.getParents(GLOBAL_CONTEXT).contains(role.asSubjectReference()))
         {
             defaultData.removeParent(GLOBAL_CONTEXT, role.asSubjectReference());
             i18n.send(ctx, POSITIVE, "{role} is no longer a default role!", role);

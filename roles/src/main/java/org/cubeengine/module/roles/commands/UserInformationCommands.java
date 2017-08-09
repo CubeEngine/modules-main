@@ -87,7 +87,7 @@ public class UserInformationCommands extends ContainerCommand
                         for (Subject subject : service.getGroupSubjects().getLoadedSubjects())
                         {
                             // TODO perm check for each role
-                            if (!parents.contains(subject) && subject instanceof FileSubject)
+                            if (!parents.contains(subject.asSubjectReference()) && subject instanceof FileSubject)
                             {
                                 sender.sendMessage(Text.of(YELLOW, " - ", subject.getIdentifier()).toBuilder().onClick(
                                     TextActions.runCommand("/roles user assign " + player.getName() + " " + subject.getIdentifier())).build());

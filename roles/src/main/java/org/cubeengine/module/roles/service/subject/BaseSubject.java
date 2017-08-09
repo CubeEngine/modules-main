@@ -42,6 +42,8 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     protected RolesPermissionService service;
     private T data;
 
+    protected SubjectReference ref;
+
     public BaseSubject(SubjectCollection collection, RolesPermissionService service, T data)
     {
         this.collection = collection;
@@ -100,7 +102,11 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     @Override
     public SubjectReference asSubjectReference()
     {
-        return new RolesSubjectReference(getIdentifier(), getContainingCollection());
+        if (this.ref == null)
+        {
+            this.ref = new RolesSubjectReference(getIdentifier(), getContainingCollection());
+        }
+        return this.ref;
     }
 
     @Override
