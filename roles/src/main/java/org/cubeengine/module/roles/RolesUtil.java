@@ -79,6 +79,7 @@ public class RolesUtil
             {
                 name = subject.getCommandSource().get().getName();
             }
+            name = subject.getContainingCollection().getIdentifier() + ":" + name;
             if (found == null)
             {
                 System.out.print("[PermCheck] " + name + " has not " + permission + "\n");
@@ -134,7 +135,7 @@ public class RolesUtil
                 }
                 checked.add(parentSubject);
                 // Find permission in parent role - parents are ordered by priority
-                FoundPermission found = findPermission(service, parentSubject, permission, contexts);
+                FoundPermission found = findPermission(service, parentSubject, permission, contexts, checked);
                 if (found != null)
                 {
                     return found;
