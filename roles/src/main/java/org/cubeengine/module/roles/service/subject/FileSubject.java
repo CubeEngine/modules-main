@@ -33,6 +33,7 @@ import org.spongepowered.api.service.permission.SubjectReference;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 public class FileSubject extends BaseSubject<FileSubjectData>
 {
@@ -48,9 +49,17 @@ public class FileSubject extends BaseSubject<FileSubjectData>
      * @param s the subject
      * @return the internal identifier
      */
-    public static String getInternalIdentifier(Subject s)
+    public static String getInternalIdentifier(SubjectReference s)
     {
-        return s instanceof FileSubject ? ((FileSubject)s).getUUID().toString() : s.getIdentifier();
+        try
+        {
+            Subject subject = s.resolve().get();
+            return subject instanceof FileSubject ? ((FileSubject)subject).getUUID().toString() : subject.getIdentifier();
+        }
+        catch (InterruptedException | ExecutionException e)
+        {
+            throw new IllegalStateException(e);
+        }
     }
 
     public static int compare(Subject o1, Subject o2)

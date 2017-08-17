@@ -37,6 +37,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.service.user.UserStorageService;
 
 import static java.util.Collections.emptyMap;
@@ -88,7 +89,7 @@ public class UserSubjectData extends CachingSubjectData
         });
     }
 
-    private List<String> serializeToList(Map<Context, List<Subject>> map)
+    private List<String> serializeToList(Map<Context, List<SubjectReference>> map)
     {
         // On users only global assigned Roles get persisted
         return map.get(ContextUtil.GLOBAL).stream().map(FileSubject::getInternalIdentifier).collect(Collectors.toList());
@@ -127,7 +128,7 @@ public class UserSubjectData extends CachingSubjectData
                 }
             }
             list.sort(FileSubject::compare);
-            parents.put(ContextUtil.GLOBAL, list);
+            parents.put(ContextUtil.GLOBAL, list.stream().map(Subject::asSubjectReference).collect(toList()));
             if (parentRemoved)
             {
                 save(CompletableFuture.completedFuture(true));

@@ -53,7 +53,7 @@ public class BaseSubjectData implements SubjectData
 {
     protected final Map<Context, Map<String, String>> options = new ConcurrentHashMap<>();
     protected final Map<Context, Map<String, Boolean>> permissions = new ConcurrentHashMap<>();
-    protected final Map<Context, List<Subject>> parents = new ConcurrentHashMap<>();
+    protected final Map<Context, List<SubjectReference>> parents = new ConcurrentHashMap<>();
 
     protected final UserCollection userCollection;
     protected final FileBasedCollection roleCollection;
@@ -101,19 +101,19 @@ public class BaseSubjectData implements SubjectData
     @Override
     public Map<String, String> getOptions(Set<Context> contexts)
     {
-        return unmodifiableMap(accumulate(contexts, options, new HashMap<>(), Map::putAll, Function.identity()));
+        return unmodifiableMap(accumulate(contexts, options, new HashMap<>(), Map::putAll));
     }
 
     @Override
     public Map<String, Boolean> getPermissions(Set<Context> contexts)
     {
-        return unmodifiableMap(accumulate(contexts, permissions, new HashMap<>(), Map::putAll, Function.identity()));
+        return unmodifiableMap(accumulate(contexts, permissions, new HashMap<>(), Map::putAll));
     }
 
     @Override
     public List<SubjectReference> getParents(Set<Context> contexts)
     {
-        List<SubjectReference> list = accumulate(contexts, parents, new ArrayList<>(), List::addAll, this::toReferenceList);
+        List<SubjectReference> list = accumulate(contexts, parents, new ArrayList<>(), List::addAll);
         return unmodifiableList(list);
     }
 
@@ -218,7 +218,7 @@ public class BaseSubjectData implements SubjectData
     public Map<Set<Context>, List<SubjectReference>> getAllParents()
     {
         Map<Set<Context>, List<SubjectReference>> parents = this.parents.entrySet().stream()
-                .collect(Collectors.toMap(e -> toSet(e.getKey()), e -> toReferenceList(e.getValue())));
+                .collect(Collectors.toMap(e -> toSet(e.getKey()), Map.Entry::getValue));
 
         return unmodifiableMap(parents);
     }
@@ -227,7 +227,6 @@ public class BaseSubjectData implements SubjectData
     public CompletableFuture<Boolean> addParent(Set<Context> contexts, SubjectReference parent)
     {
         return CompletableFuture.supplyAsync(() -> {
-            // TODO dont get subject
             Subject p = service.getCollection(parent.getCollectionIdentifier()).get().getSubject(parent.getSubjectIdentifier()).get();
             if (PermissionService.SUBJECTS_DEFAULT.equals(parent.getCollectionIdentifier()))
             {
@@ -243,13 +242,13 @@ public class BaseSubjectData implements SubjectData
 
             for (Context context : contexts)
             {
-                if (parents.containsKey(context) && parents.get(context).contains(p))
+                if (parents.containsKey(context) && parents.get(context).contains(parent))
                 {
                     return false;
                 }
             }
 
-            return operate(contexts, parents, l -> l.add(p), ArrayList::new);
+            return operate(contexts, parents, l -> l.add(p.asSubjectReference()), ArrayList::new);
         });
     }
 
@@ -278,7 +277,7 @@ public class BaseSubjectData implements SubjectData
     {
         return CompletableFuture.supplyAsync(() -> {
             boolean changed = false;
-            for (List<Subject> list : parents.values())
+            for (List<SubjectReference> list : parents.values())
             {
                 if (!list.isEmpty())
                 {
@@ -350,12 +349,12 @@ public class BaseSubjectData implements SubjectData
         void operate(T mapOrList, T other);
     }
 
-    private <T, T2> T2 accumulate(Set<Context> contexts, Map<Context, T> all, T2 result, Accumulator<T2> accumulator, Function<T, T2> func)
+    private <T> T accumulate(Set<Context> contexts, Map<Context, T> all, T result, Accumulator<T> accumulator)
     {
         T other = all.get(GLOBAL);
         if (other != null)
         {
-            accumulator.operate(result, func.apply(other));
+            accumulator.operate(result, other);
         }
 
         for (Context context : contexts)
@@ -363,7 +362,7 @@ public class BaseSubjectData implements SubjectData
             other = all.get(context);
             if (other != null)
             {
-                accumulator.operate(result, func.apply(other));
+                accumulator.operate(result, other);
             }
         }
         return result;

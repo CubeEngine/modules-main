@@ -27,6 +27,7 @@ import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -58,10 +59,10 @@ public class FileSubjectData extends CachingSubjectData
                 cachePermissions();
                 cacheParents();
                 config.settings = new HashMap<>();
-                for (Map.Entry<Context, List<Subject>> entry : parents.entrySet())
+                for (Map.Entry<Context, List<SubjectReference>> entry : parents.entrySet())
                 {
                     List<String> collect = entry.getValue().stream()
-                            .map(r -> r.getContainingCollection().getIdentifier() + ":" + r.getIdentifier() + "#" + FileSubject.getInternalIdentifier(r))
+                            .map(r -> r.getCollectionIdentifier() + ":" + r.getSubjectIdentifier() + "#" + FileSubject.getInternalIdentifier(r))
                             .collect(toList());
 
                     getContextSetting(config, entry.getKey()).parents.addAll(collect);
@@ -123,7 +124,7 @@ public class FileSubjectData extends CachingSubjectData
                     }
                 }
                 collect.sort(FileSubject::compare);
-                parents.put(asContext(entry.getKey()), collect);
+                parents.put(asContext(entry.getKey()), collect.stream().map(Subject::asSubjectReference).collect(toList()));
                 if (parentRemoved)
                 {
                     save(CompletableFuture.completedFuture(true));
