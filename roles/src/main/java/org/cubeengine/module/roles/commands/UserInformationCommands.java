@@ -107,8 +107,7 @@ public class UserInformationCommands extends ContainerCommand
                 catch (ExecutionException | InterruptedException e) {
                     throw new IllegalStateException(e);
                 }
-            }).filter(parent -> parent instanceof FileSubject).map(FileSubject.class::cast)
-               .forEach(parent -> {
+            }).forEach(parent -> {
                     // TODO perm check for each role
                     Text removeText = Text.of(RED, "(-)").toBuilder().onClick(TextActions.executeCallback(sender -> {
                         i18n.send(sender, NEGATIVE, "Do you really want to remove {role} from {user}?", parent, player);
@@ -120,12 +119,10 @@ public class UserInformationCommands extends ContainerCommand
         }
         else
         {
-            parents.stream().filter(parent -> parent instanceof FileSubject).map(FileSubject.class::cast)
-                   .forEach(parent -> ctx.sendMessage(Text.of("- ", GOLD, parent.getIdentifier())));
+            parents.forEach(parent -> ctx.sendMessage(Text.of("- ", GOLD, parent.getSubjectIdentifier())));
         }
         String transientText = i18n.getTranslation(ctx, "transient");
-        transientParents.stream().filter(parent -> parent instanceof FileSubject).map(FileSubject.class::cast)
-                .forEach(parent -> ctx.sendMessage(Text.of("- ", GOLD, parent.getIdentifier(), GRAY, " (", YELLOW, transientText, GRAY, ")")));
+        transientParents.forEach(parent -> ctx.sendMessage(Text.of("- ", GOLD, parent.getSubjectIdentifier(), GRAY, " (", YELLOW, transientText, GRAY, ")")));
 
 
     }
@@ -244,7 +241,7 @@ public class UserInformationCommands extends ContainerCommand
         }
         else
         {
-            i18n.send(ctx, NEUTRAL, "Options inherited from the role {name}!", ((FileSubject)option.get().subject).getIdentifier());
+            i18n.send(ctx, NEUTRAL, "Options inherited from the role {name}!", option.get().subject.getIdentifier());
         }
     }
 
@@ -256,6 +253,7 @@ public class UserInformationCommands extends ContainerCommand
         Map<String, String> options = new HashMap<>();
         if (all)
         {
+            // TODO loadSubject
             RolesUtil.fillOptions(service.getUserSubjects().getSubject(player.getIdentifier()).get(), contexts, options, service);
         }
         else

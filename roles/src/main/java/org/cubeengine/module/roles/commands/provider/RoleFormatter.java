@@ -17,23 +17,26 @@
  */
 package org.cubeengine.module.roles.commands.provider;
 
-import org.cubeengine.dirigent.context.Arguments;
-import org.cubeengine.dirigent.context.Context;
-import org.cubeengine.dirigent.formatter.AbstractFormatter;
+import org.cubeengine.dirigent.formatter.reflected.Format;
+import org.cubeengine.dirigent.formatter.reflected.Names;
+import org.cubeengine.dirigent.formatter.reflected.ReflectedFormatter;
 import org.cubeengine.dirigent.parser.Text;
 import org.cubeengine.dirigent.parser.component.Component;
 import org.cubeengine.module.roles.service.subject.FileSubject;
+import org.spongepowered.api.service.permission.SubjectReference;
 
-public class RoleFormatter extends AbstractFormatter<FileSubject>
+@Names("role")
+public class RoleFormatter extends ReflectedFormatter
 {
-    public RoleFormatter()
-    {
-        super("role");
-    }
-
-    @Override
-    public Component format(FileSubject object, Context context, Arguments args)
+    @Format
+    public Component format(FileSubject object)
     {
         return new Text(object.getIdentifier());
+    }
+
+    @Format
+    public Component format(SubjectReference object)
+    {
+        return new Text(object.getSubjectIdentifier());
     }
 }
