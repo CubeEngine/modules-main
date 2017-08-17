@@ -209,9 +209,10 @@ public class RoleManagementCommands extends ContainerCommand
                 i18n.send(ctx, NEUTRAL, "There is already a role named {name}.", name);
                 return;
             }
-            Subject r = service.getGroupSubjects().getSubject(name).get();
-            ((FileSubjectData) r.getSubjectData()).save(CompletableFuture.completedFuture(true));
-            i18n.send(ctx, POSITIVE, "Role {name} created!", name);
+            service.getGroupSubjects().loadSubject(name).thenAccept(s -> {
+                ((FileSubjectData) s.getSubjectData()).save(CompletableFuture.completedFuture(true));
+                i18n.send(ctx, POSITIVE, "Role {name} created!", name);
+            });
         });
     }
 
