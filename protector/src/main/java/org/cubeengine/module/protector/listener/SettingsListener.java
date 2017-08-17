@@ -383,6 +383,7 @@ public class SettingsListener
             }
             else if (checkSetting(event, null, regionsAt, () -> null, (s) -> s.spawn.naturally.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
             {
+                entity.remove();
                 return; // natural
             }
         }
