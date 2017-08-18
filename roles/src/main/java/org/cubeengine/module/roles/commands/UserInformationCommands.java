@@ -253,8 +253,15 @@ public class UserInformationCommands extends ContainerCommand
         Map<String, String> options = new HashMap<>();
         if (all)
         {
-            // TODO loadSubject
-            RolesUtil.fillOptions(service.getUserSubjects().getSubject(player.getIdentifier()).get(), contexts, options, service);
+            try
+            {
+                Subject subject = service.getUserSubjects().loadSubject(player.getIdentifier()).get();
+                RolesUtil.fillOptions(subject, contexts, options, service);
+            }
+            catch (InterruptedException | ExecutionException e)
+            {
+                throw new IllegalStateException(e);
+            }
         }
         else
         {
