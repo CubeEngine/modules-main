@@ -42,7 +42,7 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     protected RolesPermissionService service;
     private T data;
 
-    protected SubjectReference ref;
+    private SubjectReference ref;
 
     public BaseSubject(SubjectCollection collection, RolesPermissionService service, T data)
     {

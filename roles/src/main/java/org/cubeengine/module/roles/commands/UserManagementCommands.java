@@ -47,7 +47,6 @@ import org.spongepowered.api.util.Tristate;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 @Alias("manuser")
 @Command(name = "user", desc = "Manage users")
@@ -110,19 +109,11 @@ public class UserManagementCommands extends ContainerCommand
             return;
         }
 
-        player.getTransientSubjectData().removeParent(emptySet(), role.asSubjectReference()).thenApply(r -> {
-            try {
-                return r || player.getSubjectData().removeParent(emptySet(), role.asSubjectReference()).get();
-            } catch (ExecutionException | InterruptedException e) {
-                return r;
-            }
-        }).thenAccept(removed -> {
-            if (removed)
-            {
-                i18n.send(ctx, POSITIVE, "Removed the role {role} from {user}.", role, player);
-                return;
-            }
-            i18n.send(ctx, NEUTRAL, "{user} did not have the role {role}.", player, role);
+        CompletableFuture<Boolean> tData = player.getTransientSubjectData().removeParent(emptySet(), role.asSubjectReference());
+        CompletableFuture<Boolean> pData = player.getSubjectData().removeParent(emptySet(), role.asSubjectReference());
+        tData.thenCombine(pData, (b1, b2) -> b1 || b2).thenAccept(r -> {
+            if (r) i18n.send(ctx, POSITIVE, "Removed the role {role} from {user}.", role, player);
+            else   i18n.send(ctx, NEUTRAL, "{user} did not have the role {role}.", player, role);
         });
     }
 

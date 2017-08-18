@@ -117,11 +117,6 @@ public class BaseSubjectData implements SubjectData
         return unmodifiableList(list);
     }
 
-    private List<SubjectReference> toReferenceList(List<Subject> t)
-    {
-        return t.stream().map(s -> s.getContainingCollection().newSubjectReference(s.getIdentifier())).collect(Collectors.toList());
-    }
-
     @Override
     public CompletableFuture<Boolean> setOption(Set<Context> contexts, String key, String value)
     {

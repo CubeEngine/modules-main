@@ -175,7 +175,6 @@ public class RolesPermissionService implements PermissionService
         roleAssignments.forEach((key, value) ->
             subjects.loadSubject(key).thenAccept(s -> s.getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), value)));
 
-
         if (descriptionMap.put(desc.getId().toLowerCase(), desc) == null)
         {
             if (config.debug)

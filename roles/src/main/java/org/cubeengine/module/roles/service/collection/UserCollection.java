@@ -44,9 +44,16 @@ public class UserCollection extends BaseSubjectCollection
     @Override
     protected UserSubject loadSubject0(String identifier)
     {
+        Subject result = this.subjects.get(identifier);
+        if (result != null)
+        {
+            return ((UserSubject) result);
+        }
         try
         {
-            return new UserSubject(service, UUID.fromString(identifier));
+            UserSubject userSubject = new UserSubject(service, UUID.fromString(identifier));
+            this.subjects.put(identifier, userSubject);
+            return userSubject;
         }
         catch (IllegalArgumentException e)
         {

@@ -143,9 +143,4 @@ public class FileSubject extends BaseSubject<FileSubjectData>
     public boolean isSubjectDataPersisted() {
         return true;
     }
-
-    @Override
-    public SubjectReference asSubjectReference() {
-        return new RolesSubjectReference(getIdentifier(), getContainingCollection());
-    }
 }
