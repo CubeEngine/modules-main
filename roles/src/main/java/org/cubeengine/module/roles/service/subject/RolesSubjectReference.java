@@ -51,12 +51,12 @@ public class RolesSubjectReference implements SubjectReference
         }
         RolesSubjectReference that = (RolesSubjectReference) o;
         return Objects.equals(identifier, that.identifier) &&
-                Objects.equals(collection, that.collection);
+                Objects.equals(collection.getIdentifier(), that.collection.getIdentifier());
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(identifier, collection);
+        return Objects.hash(identifier, collection.getIdentifier());
     }
 }
