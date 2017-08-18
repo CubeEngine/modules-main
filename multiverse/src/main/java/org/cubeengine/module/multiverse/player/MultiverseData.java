@@ -107,7 +107,7 @@ public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiv
             }
             return apply(container.getString(WORLD.getQuery()), Optional.of(map));
         }
-        return Optional.empty();
+        return Optional.of(this);
     }
 
     @Override
