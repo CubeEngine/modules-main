@@ -65,9 +65,9 @@ public class UserCollection extends BaseSubjectCollection
     {
         for (Subject subject : subjects.values())
         {
-            if (subject instanceof FileSubject)
+            if (subject instanceof UserSubject)
             {
-
+                ((UserSubject) subject).reload();
             }
         }
     }
