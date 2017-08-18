@@ -4,6 +4,7 @@ import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
 import org.spongepowered.api.service.permission.SubjectReference;
 
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 public class RolesSubjectReference implements SubjectReference
@@ -37,5 +38,25 @@ public class RolesSubjectReference implements SubjectReference
         return this.collection.loadSubject(identifier);
     }
 
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof RolesSubjectReference))
+        {
+            return false;
+        }
+        RolesSubjectReference that = (RolesSubjectReference) o;
+        return Objects.equals(identifier, that.identifier) &&
+                Objects.equals(collection, that.collection);
+    }
 
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(identifier, collection);
+    }
 }
