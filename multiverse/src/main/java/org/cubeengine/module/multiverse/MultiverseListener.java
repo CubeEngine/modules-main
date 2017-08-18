@@ -77,7 +77,7 @@ public class MultiverseListener
         else if (!data.getCurrentUniverse().equals(loginUniverse)) // Player is not in the expected universe
         {
             data.setCurrentUniverse(loginUniverse); // update universe
-            data.from(loginUniverse, world).applyToPlayer(player); // load playerdata
+            data.from(loginUniverse, world, player).applyToPlayer(player); // load playerdata
         }
         player.offer(data);
     }

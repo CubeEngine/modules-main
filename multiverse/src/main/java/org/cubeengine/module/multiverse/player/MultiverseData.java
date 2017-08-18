@@ -40,6 +40,7 @@ import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.BaseValue;
 import org.spongepowered.api.data.value.mutable.MapValue;
 import org.spongepowered.api.data.value.mutable.Value;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.World;
 
 public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiverseData> implements IMultiverseData
@@ -174,10 +175,19 @@ public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiv
 
     public PlayerData from(String univsere, World world)
     {
+       return this.from(univsere, world, null);
+    }
+
+    public PlayerData from(String univsere, World world, Player player)
+    {
         PlayerData data = this.playerData.get(univsere);
         if (data == null)
         {
             data = new PlayerData(world);
+            if (player != null)
+            {
+                data.applyFromPlayer(player);
+            }
             this.playerData.put(univsere, data);
         }
         return data;
