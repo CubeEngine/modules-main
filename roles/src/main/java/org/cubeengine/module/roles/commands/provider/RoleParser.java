@@ -41,17 +41,11 @@ public class RoleParser implements ArgumentParser<FileSubject>, Completer
     @Override
     public FileSubject parse(Class type, CommandInvocation invocation) throws ParserException
     {
-        String token = null;
-        try
+        String token = invocation.consume(1);
+        if (service.getGroupSubjects().hasSubject(token).join())
         {
-            token = invocation.consume(1);
-            if (service.getGroupSubjects().hasSubject(token).get())
-            {
-                return ((FileSubject) service.getGroupSubjects().getSubject(token).get());
-            }
+            return ((FileSubject) service.getGroupSubjects().loadSubject(token).join());
         }
-        catch (InterruptedException | ExecutionException ignored)
-        {}
         throw new ParserException("Could not find the role: {input#role}", token);
     }
 

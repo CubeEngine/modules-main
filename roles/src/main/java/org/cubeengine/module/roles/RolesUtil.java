@@ -124,8 +124,8 @@ public class RolesUtil
             }
 
             // Attempt to find permission in parents
-            List<Subject> list = getParents(service, contexts, data);
-            list.addAll(getParents(service, contexts, transientData));
+            List<Subject> list = getParents(contexts, data);
+            list.addAll(getParents(contexts, transientData));
             list.sort(FileSubject::compare);
             for (Subject parentSubject : list)
             {
@@ -145,10 +145,9 @@ public class RolesUtil
         return null;
     }
 
-    private static List<Subject> getParents(PermissionService service, Set<Context> contexts, SubjectData data)
+    private static List<Subject> getParents(Set<Context> contexts, SubjectData data)
     {
-        return data.getParents(contexts).stream().map(sr ->
-                service.getCollection(sr.getCollectionIdentifier()).get().getSubject(sr.getSubjectIdentifier()).get()).collect(Collectors.toList());
+        return data.getParents(contexts).stream().map(sr -> sr.resolve().join()).collect(Collectors.toList());
     }
 
     public static List<String> getImplicitParents(String permission)
@@ -175,7 +174,7 @@ public class RolesUtil
             return Optional.of(new FoundOption(subject, result));
         }
 
-        for (Subject parent : getParents(service, contexts, data))
+        for (Subject parent : getParents(contexts, data))
         {
             Optional<FoundOption> option = getOption(service, parent, key, contexts);
             if (option.isPresent())
@@ -260,12 +259,12 @@ public class RolesUtil
             data.putIfAbsent(entry.getKey(), entry.getValue());
         }
 
-        for (Subject parent : getParents(service, contexts, subject.getSubjectData()))
+        for (Subject parent : getParents(contexts, subject.getSubjectData()))
         {
             fillPermissions(parent, contexts, data, service);
         }
 
-        for (Subject parent : getParents(service, contexts, subject.getTransientSubjectData()))
+        for (Subject parent : getParents(contexts, subject.getTransientSubjectData()))
         {
             fillPermissions(parent, contexts, data, service);
         }
@@ -280,12 +279,12 @@ public class RolesUtil
             data.putIfAbsent(entry.getKey(), entry.getValue());
         }
 
-        for (Subject parent : getParents(service, contexts, subject.getSubjectData()))
+        for (Subject parent : getParents(contexts, subject.getSubjectData()))
         {
             fillOptions(parent, contexts, data, service);
         }
 
-        for (Subject parent : getParents(service, contexts, subject.getTransientSubjectData()))
+        for (Subject parent : getParents(contexts, subject.getTransientSubjectData()))
         {
             fillOptions(parent, contexts, data, service);
         }

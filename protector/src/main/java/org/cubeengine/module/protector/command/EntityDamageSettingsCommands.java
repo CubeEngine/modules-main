@@ -63,7 +63,7 @@ public class EntityDamageSettingsCommands extends ContainerCommand
                     i18n.send(context, NEGATIVE, "This role does not exist");
                     return;
                 }
-                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.entityDamageAll.getId(), set);
                 i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             });
@@ -85,7 +85,7 @@ public class EntityDamageSettingsCommands extends ContainerCommand
                     i18n.send(context, NEGATIVE, "This role does not exist");
                     return;
                 }
-                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.entityDamagePVP.getId(), set);
                 i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             });
@@ -107,7 +107,7 @@ public class EntityDamageSettingsCommands extends ContainerCommand
                     i18n.send(context, NEGATIVE, "This role does not exist");
                     return;
                 }
-                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.entityDamageLiving.getId(), set);
                 i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             });

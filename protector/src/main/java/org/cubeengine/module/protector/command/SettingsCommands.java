@@ -87,7 +87,7 @@ public class SettingsCommands extends ContainerCommand
                     i18n.send(context, NEGATIVE, "This role does not exist");
                     return;
                 }
-                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
                 //for (MoveListener.MoveType type : types)
                 {
                     subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.movePerms.get(type).getId(), set);
@@ -118,7 +118,7 @@ public class SettingsCommands extends ContainerCommand
                     i18n.send(context, NEGATIVE, "This role does not exist");
                     return;
                 }
-                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.buildPerm.getId(), set);
                 i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             });
@@ -141,7 +141,7 @@ public class SettingsCommands extends ContainerCommand
                     i18n.send(context, NEGATIVE, "This role does not exist");
                     return;
                 }
-                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.usePermission.get(type).getId(), set);
                 i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             });
@@ -182,7 +182,7 @@ public class SettingsCommands extends ContainerCommand
                     i18n.send(context, NEGATIVE, "This role does not exist");
                     return;
                 }
-                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useBlockPerm.getId(), set);
                 i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
             });
@@ -206,7 +206,7 @@ public class SettingsCommands extends ContainerCommand
                     i18n.send(context, NEGATIVE, "This role does not exist");
                     return;
                 }
-                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
                 subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useItemPerm.getId(), set);
                 i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
 
@@ -238,7 +238,7 @@ public class SettingsCommands extends ContainerCommand
                         i18n.send(context, NEGATIVE, "There is no bypass permission for natural or plugin only spawning.");
                         return;
                     case PLAYER:
-                        Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                        Subject subject = ps.getGroupSubjects().loadSubject(role).join();
                         subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.spawnEntityPlayerPerm.getId(), set);
                         i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
                         break;

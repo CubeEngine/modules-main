@@ -135,42 +135,34 @@ public class FileSubjectData extends CachingSubjectData
 
     private Subject getParent(String id)
     {
-        try
+        // collection:name#uuid
+        int nameIndex = id.indexOf(":");
+        int idIndex = id.indexOf("#");
+        if (nameIndex > 0)
         {
-            // collection:name#uuid
-            int nameIndex = id.indexOf(":");
-            int idIndex = id.indexOf("#");
-            if (nameIndex > 0)
+            String type = id.substring(0, nameIndex);
+            String name = idIndex > 0 ? id.substring(idIndex + 1) : id.substring(nameIndex + 1);
+            SubjectCollection collection = service.getCollection(type).get();
+            if (collection instanceof FileBasedCollection)
             {
-                String type = id.substring(0, nameIndex);
-                String name = idIndex > 0 ? id.substring(idIndex + 1) : id.substring(nameIndex + 1);
-                SubjectCollection collection = service.getCollection(type).get();
-                if (collection instanceof FileBasedCollection)
-                {
-                    return ((FileBasedCollection) collection).getByInternalIdentifier(name, getConfig().roleName);
-                }
-                return collection.loadSubject(name).get();
+                return ((FileBasedCollection) collection).getByInternalIdentifier(name, getConfig().roleName);
             }
-            else
-            {
-                if (idIndex > 0)
-                {
-                    return roleCollection.getByInternalIdentifier(id.substring(idIndex + 1), getConfig().roleName);
-                }
-                try
-                {
-                    return roleCollection.getByUUID(UUID.fromString(id)).orElseThrow(() -> new IllegalArgumentException("Could not find a role for " + id));
-                }
-                catch (IllegalArgumentException e)
-                {
-                    return roleCollection.getSubject(id).get();
-                }
-            }
+            return collection.loadSubject(name).join();
         }
-        catch (InterruptedException | ExecutionException e)
+        else
         {
-
-            return null;
+            if (idIndex > 0)
+            {
+                return roleCollection.getByInternalIdentifier(id.substring(idIndex + 1), getConfig().roleName);
+            }
+            try
+            {
+                return roleCollection.getByUUID(UUID.fromString(id)).orElseThrow(() -> new IllegalArgumentException("Could not find a role for " + id));
+            }
+            catch (IllegalArgumentException e)
+            {
+                return roleCollection.getSubject(id).get();
+            }
         }
     }
 

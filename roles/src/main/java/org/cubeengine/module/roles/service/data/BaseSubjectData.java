@@ -221,8 +221,7 @@ public class BaseSubjectData implements SubjectData
     @Override
     public CompletableFuture<Boolean> addParent(Set<Context> contexts, SubjectReference parent)
     {
-        return CompletableFuture.supplyAsync(() -> {
-            Subject p = service.getCollection(parent.getCollectionIdentifier()).get().getSubject(parent.getSubjectIdentifier()).get();
+        return parent.resolve().thenApply(p -> {
             if (PermissionService.SUBJECTS_DEFAULT.equals(parent.getCollectionIdentifier()))
             {
                 return false; // You can never add defaults as parents
@@ -230,7 +229,7 @@ public class BaseSubjectData implements SubjectData
 
             checkForCircularDependency(contexts, p, 0);
 
-            if (contexts.isEmpty() && parents.get(GLOBAL) != null && parents.get(GLOBAL).contains(p))
+            if (contexts.isEmpty() && parents.get(GLOBAL) != null && parents.get(GLOBAL).contains(parent))
             {
                 return false;
             }
@@ -257,7 +256,7 @@ public class BaseSubjectData implements SubjectData
 
         for (SubjectReference parentParents : parent.getParents(contexts))
         {
-            checkForCircularDependency(contexts, service.getCollection(parentParents.getCollectionIdentifier()).get().getSubject(parentParents.getSubjectIdentifier()).get(), depth);
+            checkForCircularDependency(contexts, parentParents.resolve().join(), depth);
         }
     }
 

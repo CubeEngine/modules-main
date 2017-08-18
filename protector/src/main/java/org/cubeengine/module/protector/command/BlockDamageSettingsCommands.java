@@ -88,7 +88,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
                     i18n.send(context, NEGATIVE, "This role does not exist");
                     return;
                 }
-                Subject subject = ps.getGroupSubjects().getSubject(role).get();
+                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
                 //for (MoveListener.MoveType type : types)
                 {
                     subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.explodePlayer.getId(), set);
