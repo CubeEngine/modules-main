@@ -21,14 +21,14 @@ import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEX
 
 import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.module.roles.service.subject.RolesSubjectReference;
-import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.service.collection.FileBasedCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
+import org.cubeengine.module.roles.service.subject.RolesSubjectReference;
+import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.context.ContextCalculator;
@@ -172,7 +172,9 @@ public class RolesPermissionService implements PermissionService
     protected PermissionDescription addDescription(RolesPermissionDescription desc, Map<String, Tristate> roleAssignments)
     {
         SubjectCollection subjects = getCollection(SUBJECTS_ROLE_TEMPLATE).get(); // TODO prevent infinite recursion
-        roleAssignments.entrySet().forEach(e -> subjects.getSubject(e.getKey()).get().getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), e.getValue()));
+        roleAssignments.forEach((key, value) ->
+            subjects.loadSubject(key).thenAccept(s -> s.getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), value)));
+
 
         if (descriptionMap.put(desc.getId().toLowerCase(), desc) == null)
         {
