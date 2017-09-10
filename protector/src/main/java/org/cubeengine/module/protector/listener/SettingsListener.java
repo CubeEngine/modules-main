@@ -357,7 +357,7 @@ public class SettingsListener
             List<Region> regionsAt = manager.getRegionsAt(loc);
             Cause cause = event.getCause();
             Optional<Player> player = cause.first(Player.class);
-            if (((SpawnCause)cause.root()).getType() == SpawnTypes.PLUGIN)
+            if (event.getCause().getContext().get(EventContextKeys.SPAWN_TYPE).map(t -> t.equals(SpawnTypes.PLUGIN)).orElse(false))
             {
                 if (player.isPresent())
                 {
