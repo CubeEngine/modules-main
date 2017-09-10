@@ -33,11 +33,14 @@ import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.world.World;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -83,13 +86,13 @@ public class ButcherCommand extends PermissionContainer
         Predicate<Entity> filter = radius == -1 ? types :
            types.and(e -> e.getTransform().getPosition().distance(((Player)context).getLocation().getPosition()) <= rSquared);
 
-        Cause lightningCause = CauseUtil.spawnCause(context);
         Collection<Entity> remove = world.getEntities(filter);
+        Sponge.getCauseStackManager().pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
         for (Entity entity : remove)
         {
             if (lightning)
             {
-                world.spawnEntity(world.createEntity(EntityTypes.LIGHTNING, entity.getLocation().getPosition()), lightningCause);
+                world.spawnEntity(world.createEntity(EntityTypes.LIGHTNING, entity.getLocation().getPosition()));
             }
             entity.remove();
         }

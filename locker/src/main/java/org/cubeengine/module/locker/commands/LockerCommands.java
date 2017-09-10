@@ -39,6 +39,7 @@ import org.cubeengine.module.locker.storage.ProtectionFlag;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.StringMatcher;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
@@ -234,8 +235,8 @@ public class LockerCommands extends ContainerCommand
                 if (te.isPresent() && te.get() instanceof Carrier)
                 {
                     // TODO check if this is working
-                    Cause cause = Cause.of(NamedCause.source(context));
-                    ((Carrier) te.get()).getInventory().<Container>query(Container.class).getViewers().forEach(p -> p.closeInventory(cause));
+                    Sponge.getCauseStackManager().pushCause(context);
+                    ((Carrier) te.get()).getInventory().<Container>query(Container.class).getViewers().forEach(Player::closeInventory);
                 }
             });
             i18n.send(context, POSITIVE, "Right click a protection to invalidate old KeyBooks for it!");

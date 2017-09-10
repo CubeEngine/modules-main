@@ -42,6 +42,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
@@ -232,6 +233,6 @@ public class MoneyCommand extends ContainerCommand
 
     private static Cause causeOf(CommandSource context)
     {
-        return Cause.of(NamedCause.source(context));
+        return Cause.of(EventContext.empty(), context);
     }
 }

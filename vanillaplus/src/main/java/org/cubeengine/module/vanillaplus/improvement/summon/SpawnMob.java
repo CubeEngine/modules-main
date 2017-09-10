@@ -29,9 +29,12 @@ import org.cubeengine.libcube.util.CauseUtil;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
@@ -88,11 +91,12 @@ public class SpawnMob
             return null;
         }
         Entity[] spawnedMobs = new Entity[amount];
+        Sponge.getCauseStackManager().pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
         for (int i = 0; i < amount; ++i)
         {
             //CreatureSpawnEvent
             Entity entity = loc.getExtent().createEntity(entityType, loc.getPosition());
-            loc.getExtent().spawnEntity(entity, CauseUtil.spawnCause(context));
+            loc.getExtent().spawnEntity(entity);
             spawnedMobs[i] = entity;
             if (ridingOn != null)
             {

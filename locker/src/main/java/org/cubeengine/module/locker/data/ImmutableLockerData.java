@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.value.BaseValue;
@@ -78,7 +77,7 @@ public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLo
     @Override
     public DataContainer toContainer()
     {
-        MemoryDataContainer container = new MemoryDataContainer();
+        DataContainer container = DataContainer.createNew();
         container.set(LOCK_ID, this.lockID);
         if (pass == null || pass.length == 0)
         {

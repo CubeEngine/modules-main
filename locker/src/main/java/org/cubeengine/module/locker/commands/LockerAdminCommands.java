@@ -26,6 +26,7 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -80,7 +81,8 @@ public class LockerAdminCommands extends ContainerCommand
                     TileEntity te = lock.getFirstLocation().getTileEntity().orElse(null);
                     if (te instanceof Carrier)
                     {
-                        ((Player)context).openInventory(((Carrier)te).getInventory(), Cause.of(NamedCause.source(context)));
+                        Sponge.getCauseStackManager().pushCause(context);
+                        ((Player)context).openInventory(((Carrier)te).getInventory());
                     }
                 }
                 else

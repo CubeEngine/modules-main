@@ -29,7 +29,6 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.DataSerializable;
 import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.MemoryDataContainer;
 import org.spongepowered.api.data.Queries;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -120,7 +119,7 @@ public class PlayerData implements DataSerializable
         this.activePotionEffects = value.getSerializableList(ACTIVE_EFFECTS.getQuery(), PotionEffect.class).orElse(new ArrayList<>());
 
         inventory.clear();
-        DataView inventoryView = value.getView(INVENTORY.getQuery()).orElse(new MemoryDataContainer());
+        DataView inventoryView = value.getView(INVENTORY.getQuery()).orElse(DataContainer.createNew());
         for (DataQuery key : inventoryView.getKeys(false))
         {
             try
@@ -138,7 +137,7 @@ public class PlayerData implements DataSerializable
         }
 
         enderChest.clear();
-        inventoryView = value.getView(ENDER_INVENTORY.getQuery()).orElse(new MemoryDataContainer());
+        inventoryView = value.getView(ENDER_INVENTORY.getQuery()).orElse(DataContainer.createNew());
         for (DataQuery key : inventoryView.getKeys(false))
         {
             enderChest.put(Integer.valueOf(key.asString("")), ItemStack.builder().fromContainer(inventoryView.getView(key).get()).build());
@@ -150,7 +149,7 @@ public class PlayerData implements DataSerializable
     @Override
     public DataContainer toContainer()
     {
-        DataContainer result = new MemoryDataContainer().set(Queries.CONTENT_VERSION, getContentVersion());
+        DataContainer result = DataContainer.createNew().set(Queries.CONTENT_VERSION, getContentVersion());
 
         result.set(HELD_ITEM, heldItemSlot)
             .set(HEALTH, health)

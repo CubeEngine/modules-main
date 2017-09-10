@@ -112,9 +112,10 @@ public class KeyBook
             holder.playSound(ENTITY_GHAST_SCREAM, effectLocation.getPosition(), 1, 1);
 
             final Vector3d userDirection = holder.getRotation();
-
-            holder.damage(0, DamageSources.MAGIC, Cause.of(NamedCause.source(item)));
+            Sponge.getCauseStackManager().pushCause(item);
+            holder.damage(0, DamageSources.MAGIC);
             VelocityData velocity = holder.getOrCreate(VelocityData.class).get();
+            Sponge.getCauseStackManager().popCause();
             velocity.velocity().set(userDirection.mul(-3));
             holder.offer(velocity);
             return false;

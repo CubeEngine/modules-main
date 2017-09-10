@@ -84,7 +84,8 @@ public class MovementCommands
         }
         if (loc.getBlockType() == AIR)
         {
-            loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS, Cause.of(NamedCause.source(plugin), NamedCause.owner(context)));
+            Sponge.getCauseStackManager().pushCause(context);
+            loc.getExtent().setBlockType(loc.getBlockPosition(), GLASS);
         }
         context.setLocation(loc.getRelative(UP));
         i18n.send(context, POSITIVE, "You have just been lifted!");

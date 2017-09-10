@@ -38,11 +38,9 @@ import static org.spongepowered.api.text.format.TextColors.GREEN;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 import com.flowpowered.math.vector.Vector3i;
-import de.cubeisland.engine.logscribe.Log;
 import org.cubeengine.libcube.service.database.Database;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
-import org.cubeengine.libcube.util.CauseUtil;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.commands.PlayerAccess;
 import org.cubeengine.module.locker.data.LockerData;
@@ -213,7 +211,8 @@ public class Lock
                 Location<World> loc = player.getLocation();
                 Entity entity = loc.getExtent().createEntity(EntityTypes.ITEM, loc.getPosition());
                 entity.offer(Keys.REPRESENTED_ITEM, itemStack.createSnapshot());
-                loc.getExtent().spawnEntity(entity, CauseUtil.spawnCause(player));
+                Sponge.getCauseStackManager().pushCause(player);
+                loc.getExtent().spawnEntity(entity);
             }
         }
     }
@@ -844,7 +843,8 @@ public class Lock
             {
                 // TODO creative has no effect
                 i18n.send(ACTION_BAR, user, NEUTRAL, "Sudden pain makes you realize this was not the right passphrase!");
-                user.damage(1, DamageSources.MAGIC, Cause.of(NamedCause.source(user)));
+                Sponge.getCauseStackManager().pushCause(user);
+                user.damage(1, DamageSources.MAGIC);
             }
         }
         else
@@ -879,31 +879,33 @@ public class Lock
 
         for (Location<World> door : locations)
         {
+            Sponge.getCauseStackManager().pushCause(user);
             if (open)
             {
-                door.setBlock(door.getBlock().with(Keys.OPEN, false).get(), Cause.source(module.getPlugin()).build()); // TODO add user
+                door.setBlock(door.getBlock().with(Keys.OPEN, false).get());
                 user.playSound(SoundTypes.BLOCK_WOODEN_DOOR_CLOSE, door.getPosition(), 1);
             }
             else
             {
-                door.setBlock(door.getBlock().with(Keys.OPEN, true).get(), Cause.source(module.getPlugin()).build()); // TODO add user
+                door.setBlock(door.getBlock().with(Keys.OPEN, true).get());
                 user.playSound(SoundTypes.BLOCK_WOODEN_DOOR_OPEN, door.getPosition(), 1);
             }
         }
         if (taskId != null) module.getTaskManager().cancelTask(Locker.class, taskId);
         if (!open)
         {
-            this.scheduleAutoClose();
+            this.scheduleAutoClose(user);
         }
         this.notifyUsage(user);
     }
 
-    private void scheduleAutoClose()
+    private void scheduleAutoClose(Player user)
     {
         if (this.hasFlag(ProtectionFlag.AUTOCLOSE))
         {
             if (!this.manager.module.getConfig().autoCloseEnable) return;
             taskId = module.getTaskManager().runTaskDelayed(Locker.class, () -> {
+                Sponge.getCauseStackManager().pushCause(user);
                 int n = locations.size() / 2;
                 for (Location location : locations)
                 {
@@ -911,7 +913,7 @@ public class Lock
                     {
                         ((World)location.getExtent()).playSound(SoundTypes.BLOCK_WOODEN_DOOR_CLOSE, location.getPosition(), 1);
                     }
-                    location.setBlock(location.getBlock().with(Keys.OPEN, false).get(), Cause.source(manager.module.getPlugin()).build());
+                    location.setBlock(location.getBlock().with(Keys.OPEN, false).get());
                 }
             }, this.manager.module.getConfig().autoCloseSeconds * 20);
         }

@@ -30,6 +30,7 @@ import org.cubeengine.libcube.service.command.parser.PlayerList;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
@@ -124,7 +125,7 @@ public class EcoCommand extends ContainerCommand
 
     private Cause causeOf(CommandSource context)
     {
-        return Cause.of(NamedCause.source(context));
+        return Cause.of(EventContext.empty(), context);
     }
 
     @Command(desc = "Reset the money from given user")

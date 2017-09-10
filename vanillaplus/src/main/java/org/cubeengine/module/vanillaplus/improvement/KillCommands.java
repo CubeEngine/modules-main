@@ -33,11 +33,14 @@ import org.cubeengine.libcube.service.command.parser.UserListInSight;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.command.parser.PlayerList;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.entity.EntityTypes.LIGHTNING;
@@ -112,12 +115,13 @@ public class KillCommands extends PermissionContainer
                 return false;
             }
         }
+        Sponge.getCauseStackManager().pushCause(context);
         if (lightning)
         {
-            player.getWorld().spawnEntity(player.getWorld().createEntity(LIGHTNING, player.getLocation().getPosition()), CauseUtil.spawnCause(context));
+            player.getWorld().spawnEntity(player.getWorld().createEntity(LIGHTNING, player.getLocation().getPosition()));
         }
 
-        player.damage(player.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build(), CauseUtil.spawnCause(context));
+        player.damage(player.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build());
 
         if (force)
         {
@@ -139,7 +143,8 @@ public class KillCommands extends PermissionContainer
     @Restricted(value = Player.class, msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}")
     public void suicide(Player context)
     {
-        context.damage(context.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build(), Cause.of(source(context)));
+        Sponge.getCauseStackManager().pushCause(context);
+        context.damage(context.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build());
         context.offer(Keys.HEALTH, 0d);
         i18n.send(context, NEGATIVE, "You ended your life. Why? {text::(:color=DARK_RED}");
     }

@@ -51,6 +51,7 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
@@ -319,9 +320,9 @@ public class SettingsListener
         {
             // Check all items
             set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ITEM), s -> s.use.all.item, UNDEFINED);
-            Permission usePerm = pm.register(SettingsListener.class, item.getItem().getId(), "Allows interacting with a " + item.getItem().getTranslation().get() + " Item in hand", useItemPerm);
+            Permission usePerm = pm.register(SettingsListener.class, item.getType().getId(), "Allows interacting with a " + item.getType().getTranslation().get() + " Item in hand", useItemPerm);
             // Then check individual item
-            if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item.getItem(), UNDEFINED), set) == FALSE)
+            if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item.getType(), UNDEFINED), set) == FALSE)
             {
                 i18n.send(ACTION_BAR, player, CRITICAL, "You are not allowed to use this here.");
             }
@@ -415,10 +416,10 @@ public class SettingsListener
             {
                 List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
                 this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.allExplosion, UNDEFINED);
-                Player player = event.getCause().get(NamedCause.OWNER, Player.class).orElse(null);
+                Player player = event.getCause().getContext().get(EventContextKeys.OWNER).filter(p -> p instanceof Player).map(Player.class::cast).orElse(null);
                 if (player == null)
                 {
-                    player = event.getCause().get(NamedCause.IGNITER, Player.class).orElse(null);
+                    player = event.getCause().getContext().get(EventContextKeys.IGNITER).filter(p -> p instanceof Player).map(Player.class::cast).orElse(null);
                 }
                 if (rootCause instanceof Player)
                 {
@@ -529,7 +530,7 @@ public class SettingsListener
                     return;
                 }
                 // Redstone is disabled for player?
-                Optional<Player> player = event.getCause().get(NamedCause.NOTIFIER, Player.class);
+                Optional<Player> player = event.getCause().getContext().get(EventContextKeys.NOTIFIER).filter(p -> p instanceof Player).map(Player.class::cast);
                 if (player.isPresent())
                 {
                     if (checkSetting(event, player.get(), regionsAt, () -> null, s -> s.use.all.redstone, UNDEFINED) == FALSE)
