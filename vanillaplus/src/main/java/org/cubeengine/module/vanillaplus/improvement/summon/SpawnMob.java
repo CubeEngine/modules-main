@@ -25,7 +25,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.cubeengine.butler.parameter.IncorrectUsageException;
-import org.cubeengine.libcube.util.CauseUtil;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;

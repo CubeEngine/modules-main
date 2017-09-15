@@ -17,21 +17,27 @@
  */
 package org.cubeengine.module.locker.storage;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
+import static org.spongepowered.api.data.key.Keys.DISPLAY_NAME;
+import static org.spongepowered.api.data.key.Keys.ITEM_LORE;
+import static org.spongepowered.api.effect.sound.SoundTypes.BLOCK_PISTON_EXTEND;
+import static org.spongepowered.api.effect.sound.SoundTypes.ENTITY_BLAZE_HURT;
+import static org.spongepowered.api.effect.sound.SoundTypes.ENTITY_GHAST_SCREAM;
+import static org.spongepowered.api.item.ItemTypes.PAPER;
+import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
+
 import com.flowpowered.math.vector.Vector3d;
-import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.data.LockerData;
-import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.mutable.entity.VelocityData;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -39,13 +45,9 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.data.key.Keys.DISPLAY_NAME;
-import static org.spongepowered.api.data.key.Keys.ITEM_LORE;
-import static org.spongepowered.api.effect.sound.SoundTypes.*;
-import static org.spongepowered.api.item.ItemTypes.PAPER;
-import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 
 public class KeyBook
 {

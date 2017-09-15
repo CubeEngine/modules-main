@@ -52,18 +52,15 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.cause.Cause;
 import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnCause;
 import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
-import org.spongepowered.api.event.filter.cause.Named;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.world.ExplosionEvent;
@@ -391,7 +388,7 @@ public class SettingsListener
     }
 
     @Listener
-    public void onPreChangeBlock(ChangeBlockEvent.Pre event, @Root LocatableBlock block, @Named(NamedCause.LIQUID_FLOW) World flow)
+    public void onPreChangeBlock(ChangeBlockEvent.Pre event, @Root LocatableBlock block)
     {
         for (Location<World> loc : event.getLocations()) {
 

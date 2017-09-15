@@ -17,35 +17,33 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.entity.EntityTypes.LIGHTNING;
+import static org.spongepowered.api.event.cause.entity.damage.DamageTypes.CUSTOM;
+
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.libcube.service.permission.Permission;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.libcube.util.CauseUtil;
-import org.cubeengine.libcube.util.StringUtils;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.cubeengine.libcube.service.command.parser.PlayerList;
 import org.cubeengine.libcube.service.command.parser.UserListInSight;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.cubeengine.libcube.service.command.parser.PlayerList;
+import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.libcube.util.StringUtils;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.entity.EntityTypes.LIGHTNING;
-import static org.spongepowered.api.event.cause.NamedCause.source;
-import static org.spongepowered.api.event.cause.entity.damage.DamageTypes.CUSTOM;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * {@link #kill}

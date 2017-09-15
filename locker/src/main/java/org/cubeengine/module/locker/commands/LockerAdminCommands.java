@@ -17,7 +17,10 @@
  */
 package org.cubeengine.module.locker.commands;
 
-import javax.inject.Inject;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.libcube.service.command.CommandManager;
@@ -31,11 +34,9 @@ import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.Carrier;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import javax.inject.Inject;
 
 @Command(name = "admin", desc = "Administrate the protections")
 public class LockerAdminCommands extends ContainerCommand

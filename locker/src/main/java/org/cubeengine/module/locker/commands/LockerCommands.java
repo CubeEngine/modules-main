@@ -17,43 +17,44 @@
  */
 package org.cubeengine.module.locker.commands;
 
-import java.util.List;
-import java.util.Optional;
-import javax.inject.Inject;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 import org.cubeengine.butler.CommandInvocation;
 import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parameter.argument.Completer;
 import org.cubeengine.butler.filter.Restricted;
+import org.cubeengine.butler.parameter.argument.Completer;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Complete;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.storage.KeyBook;
 import org.cubeengine.module.locker.storage.Lock;
 import org.cubeengine.module.locker.storage.LockManager;
 import org.cubeengine.module.locker.storage.ProtectionFlag;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.NamedCause;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Container;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import java.util.List;
+import java.util.Optional;
+
+import javax.inject.Inject;
 
 @Command(name = "locker", desc = "Locker commands", alias = "l")
 public class LockerCommands extends ContainerCommand

@@ -23,7 +23,8 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.entity.teleport.PortalTeleportCause;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.world.World;
 
@@ -44,7 +45,7 @@ public class PortalListener
     @Listener
     public void onTeleport(MoveEntityEvent.Teleport event)
     {
-        if (this.module.getConfig().disableVanillaPortals && event.getCause().root() instanceof PortalTeleportCause)
+        if (this.module.getConfig().disableVanillaPortals && event.getCause().getContext().get(EventContextKeys.TELEPORT_TYPE).orElse(null) == TeleportTypes.PORTAL)
         {
             event.setCancelled(true);
             return;
