@@ -23,15 +23,13 @@ import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.netherportals.NetherportalsConfig.WorldSection;
-import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.entity.teleport.TeleportCause;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.filter.cause.ContextValue;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.world.World;
 
@@ -53,13 +51,13 @@ public class Netherportals extends CubeEngineModule
     }
 
     @Listener
-    public void onPortal(MoveEntityEvent.Teleport.Portal event, @First TeleportCause cause)
+    public void onPortal(MoveEntityEvent.Teleport.Portal event, @ContextValue("TELEPORT_TYPE") TeleportType type)
     {
+
         WorldSection section = config.worldSettings.get(new ConfigWorld(event.getFromTransform().getExtent()));
         if (section != null && section.enablePortalRouting)
         {
             Transform<World> to = event.getToTransform();
-            TeleportType type = cause.getTeleportType();
             if (type == TeleportTypes.PORTAL)
             {
                 if (section.netherTarget != null)
