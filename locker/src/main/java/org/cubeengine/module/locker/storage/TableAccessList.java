@@ -36,7 +36,7 @@ public class TableAccessList extends Table<AccessListModel>
     public final TableField<AccessListModel, Long> LOCK_ID = createField("lock_id", BIGINT, this);
     // BitMask granting the user access to a protection (this is NOT restricting) (if ACCESS_PUT is not set on a donation chest it does not matter)
     public final TableField<AccessListModel, Short> LEVEL = createField("level", SMALLINT.nullable(false),this);
-    public final TableField<AccessListModel, UUID> OWNER_ID = createField("owner_id", UUID_TYPE, this);
+    public final TableField<AccessListModel, UUID> OWNER_ID = createField("owner_id", UUID_TYPE.nullable(true), this);
 
     public TableAccessList()
     {
