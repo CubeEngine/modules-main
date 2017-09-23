@@ -19,6 +19,7 @@ package org.cubeengine.module.portals;
 
 public class PortalsAttachment
 {
+    private long lastIn = 0;
     private boolean isInPortal = false;
     private Portal portal;
     private boolean debug = false;
@@ -40,6 +41,17 @@ public class PortalsAttachment
 
     public void setInPortal(boolean isInPortal)
     {
+        if (isInPortal)
+        {
+            lastIn = System.currentTimeMillis();
+        }
+        else
+        {
+            if (lastIn + 1000 > System.currentTimeMillis())
+            {
+                return;
+            }
+        }
         this.isInPortal = isInPortal;
     }
 
