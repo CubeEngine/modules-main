@@ -20,9 +20,11 @@ package org.cubeengine.module.vanillaplus.fix;
 import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
 
 public class SpawnFixListener
@@ -35,23 +37,22 @@ public class SpawnFixListener
     }
 
     @Listener
-    public void join(final ClientConnectionEvent.Join event)
+    public void join(final ClientConnectionEvent.Login event)
     {
-        Player player = event.getTargetEntity();
-        WorldBorder border = player.getWorldBorder().orElse(player.getWorld().getWorldBorder());
+        Transform<World> playerLoc = event.getToTransform();
+        WorldBorder border = playerLoc.getExtent().getWorldBorder();
         Vector3d center = border.getCenter();
         double radius = border.getDiameter() / 2;
         double minX = center.getX() - radius;
         double maxX = center.getX() + radius;
         double minZ = center.getZ() - radius;
         double maxZ = center.getZ() + radius;
-        double playerX = player.getLocation().getPosition().getX();
-        double playerZ = player.getLocation().getPosition().getZ();
+        double playerX = playerLoc.getLocation().getPosition().getX();
+        double playerZ = playerLoc.getLocation().getPosition().getZ();
 
         if (playerX > maxX || playerX < minX || playerZ > maxZ || playerZ < minZ)
         {
-            i18n.send(player, MessageType.NEUTRAL, "You spawned outside of the worldborder and were teleported back to spawn!");
-            player.setLocation(player.getWorld().getSpawnLocation());
+            event.setToTransform(event.getToTransform().setLocation(playerLoc.getExtent().getSpawnLocation()));
         }
     }
 }
