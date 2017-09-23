@@ -46,7 +46,7 @@ public class TableLocks extends Table<LockModel>
     // eg. /cguarded [pass <password>] (flag to create pw book/key?)
     public final TableField<LockModel, byte[]> PASSWORD = createField("password", VARBINARY.length(128).nullable(false), this);
     // optional for entity protection:
-    public final TableField<LockModel, UUID> ENTITY_UUID = createField("entity_uuid", UUID_TYPE, this);
+    public final TableField<LockModel, UUID> ENTITY_UUID = createField("entity_uuid", UUID_TYPE.nullable(true), this);
     public final TableField<LockModel, Date> LAST_ACCESS = createField("last_access", DATE.nullable(false), this);
     public final TableField<LockModel, Date> CREATED = createField("created", DATE.nullable(false), this);
 
