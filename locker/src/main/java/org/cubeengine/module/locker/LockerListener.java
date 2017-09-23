@@ -43,6 +43,7 @@ import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
 import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -82,8 +83,8 @@ public class LockerListener
             if (lock == null) return;
 
             // Handled by InteractInventoryEvent.Open
-            //Inventory inv = ((Carrier)block.getTileEntity().get()).getInventory();;
-            //lock.handleInventoryOpen(event, inv, block, player);
+            Inventory inv = ((Carrier)block.getTileEntity().get()).getInventory();
+            lock.handleInventoryOpen(event, inv, block, player);
         }
         else if (block.supports(Keys.OPEN))
         {
