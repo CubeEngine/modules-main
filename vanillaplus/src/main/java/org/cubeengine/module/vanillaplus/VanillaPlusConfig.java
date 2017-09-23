@@ -39,7 +39,10 @@ public class VanillaPlusConfig extends ReflectedYaml
         public boolean preventOverstackedItems = true;
 
         @Comment("Retaints fly-mode on login")
-        public boolean safeLogin = true;
+        public boolean safeLoginFly = true;
+
+        @Comment("Teleports to spawn when logging in outside of worldborder")
+        public boolean safeLoginBorder = true;
 
         @Comment("Right click on a painting allows switching the painting with the mouse wheel")
         public boolean paintingSwitcher = true;

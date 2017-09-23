@@ -42,6 +42,7 @@ import org.cubeengine.module.vanillaplus.fix.OverstackedListener;
 import org.cubeengine.module.vanillaplus.fix.PaintingListener;
 import org.cubeengine.module.vanillaplus.fix.SafeLoginData;
 import org.cubeengine.module.vanillaplus.fix.SafeLoginDataBuilder;
+import org.cubeengine.module.vanillaplus.fix.SpawnFixListener;
 import org.cubeengine.module.vanillaplus.fix.TamedListener;
 import org.cubeengine.module.vanillaplus.improvement.BorderCommands;
 import org.cubeengine.module.vanillaplus.improvement.ClearInventoryCommand;
@@ -73,9 +74,7 @@ import org.cubeengine.libcube.service.matcher.TimeMatcher;
 import org.cubeengine.libcube.service.matcher.WorldMatcher;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
@@ -229,9 +228,13 @@ public class VanillaPlus extends CubeEngineModule
         {
             evm.registerListener(VanillaPlus.class, new OverstackedListener(pm, this));
         }
-        if (config.fix.safeLogin)
+        if (config.fix.safeLoginFly)
         {
             evm.registerListener(VanillaPlus.class, new FlymodeFixListener());
+        }
+        if (config.fix.safeLoginBorder)
+        {
+            evm.registerListener(VanillaPlus.class, new SpawnFixListener(i18n));
         }
         if (config.fix.paintingSwitcher)
         {
