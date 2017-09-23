@@ -289,6 +289,11 @@ public class FileBasedCollection extends BaseSubjectCollection
         }
         catch (IllegalArgumentException ignored)
         {
+            Optional<Subject> subject = this.service.getGroupSubjects().getSubject(internalId);
+            if (subject.isPresent())
+            {
+                return ((FileSubject) subject.get());
+            }
             System.out.print("Could not find Role for Identifier: " + internalId + " and therefor removed it from " + owner + "\n");
             // TODO message in logger
         }
