@@ -214,12 +214,9 @@ public class HomeCommand extends ContainerCommand
             i18n.send(sender, NEUTRAL, "Use {text:/sethome} to set your home"); // TODO create on click
             return;
         }
-        if (!home.isInvited(sender))
+        if (!home.isOwner(sender) && !sender.hasPermission(module.getPermissions().HOME_MOVE_OTHER.getId()))
         {
-            if (!sender.hasPermission(module.getPermissions().HOME_MOVE_OTHER.getId()))
-            {
-                throw new PermissionDeniedException(module.getPermissions().HOME_MOVE_OTHER);
-            }
+            throw new PermissionDeniedException(module.getPermissions().HOME_MOVE_OTHER);
         }
         home.setTransform(sender.getTransform());
         manager.save();
