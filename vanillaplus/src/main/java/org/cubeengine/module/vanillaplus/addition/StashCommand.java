@@ -50,7 +50,7 @@ public class StashCommand
         StashedInventory newStash = new StashedInventory();
         for (Inventory slot : context.getInventory().slots())
         {
-            newStash.items.add(slot.peek().orElse(null));
+            newStash.items.add(slot.poll().orElse(null));
         }
 
         StashedInventory replaced = stashed.put(context.getUniqueId(), newStash);
