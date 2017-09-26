@@ -337,6 +337,10 @@ public class Lock
     private Location<World> getLocation(LockLocationModel model)
     {
         Optional<World> world = Sponge.getServer().getWorld(model.getValue(TABLE_LOCK_LOCATIONS.WORLD_ID));
+        if (!world.isPresent())
+        {
+            throw new IllegalStateException("Attempted to load lock in unloaded world " + model.getValue(TABLE_LOCK_LOCATIONS.WORLD_ID));
+        }
         return new Location<>(world.get(), model.getValue(TABLE_LOCK_LOCATIONS.X), model.getValue(TABLE_LOCK_LOCATIONS.Y), model.getValue(
                 TABLE_LOCK_LOCATIONS.Z));
     }
