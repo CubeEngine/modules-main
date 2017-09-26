@@ -205,6 +205,7 @@ public class TeleportCommands
         }
         else if (!player.setLocationSafely(loc))
         {
+            i18n.send(context, NEGATIVE, "Unsafe Target!");
             return;
         }
         i18n.send(context, POSITIVE, "Teleported to {vector:x\\=:y\\=:z\\=} in {world}!", new Vector3i(x, y, z), world);
