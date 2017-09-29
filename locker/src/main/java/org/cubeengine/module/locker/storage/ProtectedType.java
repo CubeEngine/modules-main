@@ -55,6 +55,44 @@ public enum ProtectedType
         {
             protectedTypes.put(protectedType.id, protectedType);
         }
+
+        blocks.put(CHEST, CONTAINER);
+        blocks.put(TRAPPED_CHEST, CONTAINER);
+        blocks.put(DISPENSER, CONTAINER);
+        blocks.put(DROPPER, CONTAINER);
+        blocks.put(FURNACE, CONTAINER);
+        blocks.put(LIT_FURNACE, CONTAINER);
+        blocks.put(BREWING_STAND, CONTAINER);
+        blocks.put(DROPPER, CONTAINER);
+        blocks.put(BEACON, CONTAINER);
+        blocks.put(HOPPER, CONTAINER);
+
+        blocks.put(WOODEN_DOOR, DOOR);
+        blocks.put(SPRUCE_DOOR, DOOR);
+        blocks.put(BIRCH_DOOR, DOOR);
+        blocks.put(JUNGLE_DOOR, DOOR);
+        blocks.put(ACACIA_DOOR, DOOR);
+        blocks.put(DARK_OAK_DOOR, DOOR);
+        blocks.put(IRON_DOOR, DOOR);
+        blocks.put(FENCE_GATE, DOOR);
+        blocks.put(TRAPDOOR, DOOR);
+        blocks.put(ACACIA_FENCE_GATE, DOOR);
+        blocks.put(BIRCH_FENCE_GATE, DOOR);
+        blocks.put(DARK_OAK_FENCE_GATE, DOOR);
+        blocks.put(JUNGLE_FENCE_GATE, DOOR);
+        blocks.put(SPRUCE_FENCE_GATE, DOOR);
+
+        entities.put(CHESTED_MINECART, ENTITY_CONTAINER);
+        entities.put(HOPPER_MINECART, ENTITY_CONTAINER);
+        entities.put(HORSE, ENTITY_CONTAINER_LIVING);
+        entities.put(LEASH_HITCH, ENTITY);
+        entities.put(PAINTING, ENTITY);
+        entities.put(ITEM_FRAME, ENTITY);
+        entities.put(FURNACE_MINECART, ENTITY);
+        entities.put(TNT_MINECART, ENTITY);
+        entities.put(MOB_SPAWNER_MINECART, ENTITY);
+        entities.put(BOAT, ENTITY_VEHICLE);
+        entities.put(RIDEABLE_MINECART, ENTITY_VEHICLE);
     }
 
     ProtectedType(int id, ProtectionFlag... supportedFlags)
@@ -71,50 +109,21 @@ public enum ProtectedType
 
     public static ProtectedType getProtectedType(BlockType material)
     {
-        if (material.equals(CHEST) || material.equals(TRAPPED_CHEST) || material.equals(DISPENSER) || material.equals(
-            DROPPER) || material.equals(FURNACE) || material.equals(LIT_FURNACE) || material.equals(BREWING_STAND)
-            || material.equals(BEACON) || material.equals(HOPPER))
-        {
-            return CONTAINER;
-        }
-        else if (material.equals(WOODEN_DOOR) || material.equals(SPRUCE_DOOR) || material.equals(BIRCH_DOOR)
-            || material.equals(JUNGLE_DOOR) || material.equals(ACACIA_DOOR) || material.equals(DARK_OAK_DOOR)
-            || material.equals(IRON_DOOR) || material.equals(FENCE_GATE) || material.equals(TRAPDOOR)
-            || material.equals(ACACIA_FENCE_GATE) || material.equals(BIRCH_FENCE_GATE) || material.equals(DARK_OAK_FENCE_GATE)
-            || material.equals(JUNGLE_FENCE_GATE) || material.equals(SPRUCE_FENCE_GATE))
-        {
-            return DOOR;
-        }
-        return BLOCK;
+        return blocks.getOrDefault(material, BLOCK);
     }
 
     public static ProtectedType getProtectedType(EntityType type)
     {
-        if (type.equals(CHESTED_MINECART) || type.equals(HOPPER_MINECART))
+        ProtectedType pType = entities.get(type);
+        if (pType != null)
         {
-            return ENTITY_CONTAINER;
+            return pType;
         }
-        else if (type.equals(HORSE))
+        if (!Monster.class.isAssignableFrom(type.getEntityClass())
+                && Living.class.isAssignableFrom(type.getEntityClass()))
         {
-            return ENTITY_CONTAINER_LIVING;
+            return ENTITY_LIVING;
         }
-        else if (type.equals(LEASH_HITCH) || type.equals(PAINTING) || type.equals(ITEM_FRAME) || type.equals(
-            FURNACE_MINECART) || type.equals(TNT_MINECART) || type.equals(MOB_SPAWNER_MINECART))
-        {
-            return ENTITY;
-        }
-        else if (type.equals(BOAT) || type.equals(RIDEABLE_MINECART))
-        {
-            return ENTITY_VEHICLE;
-        }
-        else
-        {
-            if (!Monster.class.isAssignableFrom(type.getEntityClass())
-            && Living.class.isAssignableFrom(type.getEntityClass()))
-            {
-                return ENTITY_LIVING;
-            }
-            throw new IllegalArgumentException(type.getName() + " is not allowed!");
-        }
+        throw new IllegalArgumentException(type.getName() + " is not allowed!");
     }
 }
