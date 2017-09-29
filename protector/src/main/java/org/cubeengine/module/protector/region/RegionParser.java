@@ -61,6 +61,7 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
         {
             world = ((Locatable) invocation.getCommandSource()).getWorld();
             Map<String, Region> regions = manager.getRegions(world.getUniqueId());
+
             for (Map.Entry<String, Region> entry : regions.entrySet())
             {
                 if (entry.getKey().startsWith(token))
@@ -102,6 +103,19 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
         {
             list.add("world");
         }
+        for (Region region : manager.getWorldRegions())
+        {
+            String worldName = region.getWorld().getName();
+            if (worldName.startsWith(token))
+            {
+                list.add(worldName);
+            }
+            if (token.contains(".") && (worldName + ".").startsWith(token))
+            {
+                list.add(worldName + ".world");
+            }
+        }
+
         return list;
     }
 

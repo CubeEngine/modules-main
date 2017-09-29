@@ -22,6 +22,7 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.text.format.TextColors.GOLD;
+import static org.spongepowered.api.text.format.TextColors.GRAY;
 import static org.spongepowered.api.text.format.TextColors.WHITE;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
@@ -52,6 +53,7 @@ import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -171,11 +173,13 @@ public class RegionCommands extends ContainerCommand
         {
             if (region.getWorld() == null)
             {
-                context.sendMessage(Text.of(" - ", GOLD, "global"));
+                context.sendMessage(Text.of(" - ", GOLD, "global ",
+                        GRAY, i18n.getTranslation(context, "(all worlds)")));
             }
             else if (region.getName() == null)
             {
-                context.sendMessage(Text.of(" - ", GOLD, region.getWorld().getName(), WHITE));
+                context.sendMessage(Text.of(" - ", GOLD, region.getWorld().getName(), WHITE, ".", GOLD, "world ",
+                        GRAY, i18n.getTranslation(context, "(entire world)")));
             }
             else
             {
@@ -199,15 +203,16 @@ public class RegionCommands extends ContainerCommand
         // TODO default to region player is in when no active region is set
         if (region.getWorld() == null)
         {
-            i18n.send(context, POSITIVE, "Global region");
+            i18n.send(context, POSITIVE, "Global region has the following settings:");
         }
         else if (region.getCuboid() == null)
         {
-            i18n.send(context, POSITIVE, "World region in {world}", region.getWorld());
+            i18n.send(context, POSITIVE, "World region in {world} has the following settings:", region.getWorld());
+            // TODO tp on click to spawn
         }
         else
         {
-            i18n.send(context, POSITIVE, "Region {region} in {world}", region, region.getWorld());
+            i18n.send(context, POSITIVE, "Region {region} in {world} has the following settings:", region, region.getWorld());
         }
 
         Cuboid cuboid = region.getCuboid();
@@ -218,7 +223,6 @@ public class RegionCommands extends ContainerCommand
         }
 
         // TODO priority
-        i18n.send(context, POSITIVE, "Settings:");
         RegionConfig.Settings settings = region.getSettings();
         showSetting(context, i18n.getTranslation(context, "build"), settings.build, allSettings);
         showSetting(context, i18n.getTranslation(context, "move"), settings.move, allSettings);
@@ -275,6 +279,7 @@ public class RegionCommands extends ContainerCommand
             Text trueText = Text.of(YELLOW, i18n.getTranslation(cs, "Enabled"), " ", GOLD, pos);
             Text falseText = Text.of(YELLOW, i18n.getTranslation(cs, "Disabled"), " ", GOLD, neg);
             cs.sendMessage(Text.of(YELLOW, name, ": ", trueText, " ", falseText));
+            Map<Tristate, List<String>> settings = new HashMap<>();
             for (Map.Entry<?, Tristate> entry : values.entrySet())
             {
                 String key;
@@ -294,8 +299,25 @@ public class RegionCommands extends ContainerCommand
                 {
                     throw new IllegalArgumentException("Unsupported KeyType for map: " + entry.getKey().getClass().getSimpleName());
                 }
-                cs.sendMessage(Text.of(" - ", YELLOW, key, ": ", GOLD, toText(cs, entry.getValue())));
+                List<String> list = settings.computeIfAbsent(entry.getValue(), k -> new ArrayList<>());
+                list.add(key);
             }
+            for (Map.Entry<Tristate, List<String>> entry : settings.entrySet())
+            {
+                Text.Builder builder = Text.of(" - ", toText(cs, entry.getKey()), YELLOW, ": ").toBuilder();
+                boolean first = true;
+                for (String val : entry.getValue())
+                {
+                    if (!first)
+                    {
+                        builder.append(Text.of(GRAY, ", "));
+                    }
+                    first = false;
+                    builder.append(Text.of(YELLOW, val));
+                }
+                cs.sendMessage(builder.build());
+            }
+
         }
     }
 
