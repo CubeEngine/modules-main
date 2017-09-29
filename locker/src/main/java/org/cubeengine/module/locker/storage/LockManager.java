@@ -134,8 +134,6 @@ public class LockManager
         this.commandListener = new CommandListener(module, this, i18n);
         em.registerListener(Locker.class, this.commandListener);
         em.registerListener(Locker.class, this);
-
-        tm.runAsynchronousTask(Locker.class, this::loadAllLocks);
     }
 
     private void loadAllLocks()

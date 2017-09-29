@@ -79,7 +79,9 @@ public enum ProtectedType
         }
         else if (material.equals(WOODEN_DOOR) || material.equals(SPRUCE_DOOR) || material.equals(BIRCH_DOOR)
             || material.equals(JUNGLE_DOOR) || material.equals(ACACIA_DOOR) || material.equals(DARK_OAK_DOOR)
-            || material.equals(IRON_DOOR) || material.equals(FENCE_GATE) || material.equals(TRAPDOOR))
+            || material.equals(IRON_DOOR) || material.equals(FENCE_GATE) || material.equals(TRAPDOOR)
+            || material.equals(ACACIA_FENCE_GATE) || material.equals(BIRCH_FENCE_GATE) || material.equals(DARK_OAK_FENCE_GATE)
+            || material.equals(JUNGLE_FENCE_GATE) || material.equals(SPRUCE_FENCE_GATE))
         {
             return DOOR;
         }
