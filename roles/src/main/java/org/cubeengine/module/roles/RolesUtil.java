@@ -182,6 +182,7 @@ public class RolesUtil
                 return option;
             }
         }
+
         return Optional.empty();
     }
 
@@ -192,6 +193,17 @@ public class RolesUtil
         {
             option = getOption(service, subject, subject.getSubjectData(), key, contexts);
         }
+
+        if (!option.isPresent())
+        {
+            Subject defaults = subject.getContainingCollection().getDefaults();
+            if (defaults == subject)
+            {
+                return option; // Stop recursion at global default
+            }
+            option = getOption(service, defaults, key, contexts);
+        }
+
         return option;
     }
 
