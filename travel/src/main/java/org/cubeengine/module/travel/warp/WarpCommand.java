@@ -258,7 +258,7 @@ public class WarpCommand extends ContainerCommand
     @Command(desc = "List warps of a player")
     public void list(CommandSource context, @Optional Player owner)
     {
-        if (!context.equals(owner))
+        if (owner != null && !context.equals(owner))
         {
             CommandUtil.ensurePermission(context, module.getPermissions().WARP_LIST_OTHER);
         }
