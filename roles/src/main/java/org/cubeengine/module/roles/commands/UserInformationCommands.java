@@ -227,7 +227,7 @@ public class UserInformationCommands extends ContainerCommand
     {
         Set<Context> contexts = toSet(context);
 
-        Optional<FoundOption> option = RolesUtil.getOption(service, player, key, contexts);
+        Optional<FoundOption> option = RolesUtil.getOption(service, player, key, contexts, true);
         if (!option.isPresent())
         {
             i18n.send(ctx, NEUTRAL, "{input#key} is not set for {user} in {context}.", key, player, context);

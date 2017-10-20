@@ -67,7 +67,7 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     @Override
     public Optional<String> getOption(Set<Context> contexts, String key)
     {
-        return RolesUtil.getOption(service, this, key, contexts).map(found -> found.value);
+        return RolesUtil.getOption(service, this, key, contexts, true).map(found -> found.value);
     }
 
     @Override

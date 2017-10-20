@@ -176,7 +176,7 @@ public class RolesUtil
 
         for (Subject parent : getParents(contexts, data))
         {
-            Optional<FoundOption> option = getOption(service, parent, key, contexts);
+            Optional<FoundOption> option = getOption(service, parent, key, contexts, subject != service.getDefaults());
             if (option.isPresent())
             {
                 return option;
@@ -186,7 +186,7 @@ public class RolesUtil
         return Optional.empty();
     }
 
-    public static Optional<FoundOption> getOption(PermissionService service, Subject subject, String key, Set<Context> contexts)
+    public static Optional<FoundOption> getOption(PermissionService service, Subject subject, String key, Set<Context> contexts, boolean recurseDefault)
     {
         Optional<FoundOption> option = getOption(service, subject, subject.getTransientSubjectData(), key, contexts);
         if (!option.isPresent())
@@ -194,14 +194,14 @@ public class RolesUtil
             option = getOption(service, subject, subject.getSubjectData(), key, contexts);
         }
 
-        if (!option.isPresent())
+        if (recurseDefault && !option.isPresent())
         {
             Subject defaults = subject.getContainingCollection().getDefaults();
             if (defaults == subject)
             {
                 return option; // Stop recursion at global default
             }
-            option = getOption(service, defaults, key, contexts);
+            option = getOption(service, defaults, key, contexts, true);
         }
 
         return option;
