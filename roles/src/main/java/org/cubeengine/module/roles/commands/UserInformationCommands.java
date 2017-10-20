@@ -250,34 +250,32 @@ public class UserInformationCommands extends ContainerCommand
     public void listOption(CommandSource ctx, @Default User player, @Named("in") @Default Context context, @Flag boolean all)
     {
         Set<Context> contexts = toSet(context);
-        Map<String, String> options = new HashMap<>();
-        if (all)
+        if (!all)
         {
-            try
-            {
-                Subject subject = service.getUserSubjects().loadSubject(player.getIdentifier()).get();
-                RolesUtil.fillOptions(subject, contexts, options, service);
-            }
-            catch (InterruptedException | ExecutionException e)
-            {
-                throw new IllegalStateException(e);
-            }
-        }
-        else
-        {
-            options.putAll((player.getSubjectData()).getOptions(contexts));
-        }
-        if (all)
-        {
-            i18n.send(ctx, NEUTRAL, "Options of {user} in {context}:", player, context);
-        }
-        else
-        {
+            Map<String, String> options = (player.getSubjectData()).getOptions(contexts);
             i18n.send(ctx, NEUTRAL, "Options of {user} directly set in {context}:", player, context);
+            for (Map.Entry<String, String> entry : options.entrySet())
+            {
+                ctx.sendMessage(Text.of("- ", YELLOW, entry.getKey(), TextColors.WHITE, ": ", GOLD, entry.getValue()));
+            }
+            return;
         }
-        for (Map.Entry<String, String> entry : options.entrySet())
+        try
         {
-            ctx.sendMessage(Text.of("- ", YELLOW, entry.getKey(), TextColors.WHITE, ": ", GOLD, entry.getValue()));
+            Subject subject = service.getUserSubjects().loadSubject(player.getIdentifier()).get();
+            Map<String, FoundOption> options = new HashMap<>();
+            RolesUtil.fillOptions(subject, contexts, options, service);
+            i18n.send(ctx, NEUTRAL, "Options of {user} in {context}:", player, context);
+            for (Map.Entry<String, FoundOption> entry : options.entrySet())
+            {
+                Subject owner = entry.getValue().subject;
+                Text key = Text.of(YELLOW, entry.getKey()).toBuilder().onHover(TextActions.showText(Text.of(YELLOW, owner.getContainingCollection().getIdentifier(), GRAY, ":", YELLOW, owner.getFriendlyIdentifier()))).build();
+                ctx.sendMessage(Text.of("- ", key, TextColors.WHITE, ": ", GOLD, entry.getValue().value));
+            }
+        }
+        catch (InterruptedException | ExecutionException e)
+        {
+            throw new IllegalStateException(e);
         }
     }
 }

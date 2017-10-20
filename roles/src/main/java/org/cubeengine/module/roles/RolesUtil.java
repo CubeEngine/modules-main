@@ -284,11 +284,11 @@ public class RolesUtil
         return data;
     }
 
-    public static Map<String, String> fillOptions(Subject subject, Set<Context> contexts, Map<String, String> data, PermissionService service)
+    public static Map<String, FoundOption> fillOptions(Subject subject, Set<Context> contexts, Map<String, FoundOption> data, PermissionService service)
     {
         for (Entry<String, String> entry : subject.getSubjectData().getOptions(contexts).entrySet())
         {
-            data.putIfAbsent(entry.getKey(), entry.getValue());
+            data.putIfAbsent(entry.getKey(), new FoundOption(subject, entry.getValue()));
         }
 
         for (Subject parent : getParents(contexts, subject.getSubjectData()))

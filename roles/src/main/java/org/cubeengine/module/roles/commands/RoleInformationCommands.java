@@ -270,7 +270,7 @@ public class RoleInformationCommands extends ContainerCommand
         }
     }
 
-    private void listOption(CommandSource ctx, boolean all, Set<Context> context, Map<String, String> options)
+    private void listOption(CommandSource ctx, boolean all, Set<Context> context, Map<String, ?> options)
     {
         String ctxText = getContextString(context);
         if (options.isEmpty())
@@ -283,9 +283,19 @@ public class RoleInformationCommands extends ContainerCommand
         {
             i18n.send(ctx, POSITIVE, "(Including inherited options)");
         }
-        for (Entry<String, String> entry : options.entrySet())
+        for (Entry<String, ?> entry : options.entrySet())
         {
-            ctx.sendMessage(Text.of("- ", YELLOW, entry.getKey(), WHITE, ": ", GOLD, entry.getValue()));
+            if (entry.getValue() instanceof RolesUtil.FoundOption)
+            {
+                Subject owner = ((RolesUtil.FoundOption) entry.getValue()).subject;
+                Text key = Text.of(YELLOW, entry.getKey()).toBuilder().onHover(TextActions.showText(Text.of(YELLOW, owner.getContainingCollection().getIdentifier(), GRAY, ":", YELLOW, owner.getFriendlyIdentifier()))).build();
+                ctx.sendMessage(Text.of("- ", YELLOW, key, WHITE, ": ", GOLD, ((RolesUtil.FoundOption) entry.getValue()).value));
+            }
+            else
+            {
+                ctx.sendMessage(Text.of("- ", YELLOW, entry.getKey(), WHITE, ": ", GOLD, entry.getValue()));
+            }
+
         }
     }
 

@@ -106,6 +106,12 @@ public class FileSubject extends BaseSubject<FileSubjectData>
     }
 
     @Override
+    public Optional<String> getFriendlyIdentifier()
+    {
+        return Optional.of(getSubjectData().getConfig().roleName);
+    }
+
+    @Override
     public Optional<CommandSource> getCommandSource()
     {
         return Optional.empty();
