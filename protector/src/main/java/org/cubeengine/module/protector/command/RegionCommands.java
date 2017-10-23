@@ -243,6 +243,14 @@ public class RegionCommands extends ContainerCommand
         showSetting(context, i18n.getTranslation(context, "blockdamage block"), settings.blockDamage.block, allSettings);
         showSetting(context, i18n.getTranslation(context, "blockdamage monster"), settings.blockDamage.monster, allSettings);
 
+        showSetting(context, i18n.getTranslation(context, "entitydamage all"), settings.entityDamage.all, allSettings);
+        showSetting(context, i18n.getTranslation(context, "entitydamage byliving"), settings.entityDamage.byLiving, allSettings);
+        showSetting(context, i18n.getTranslation(context, "entitydamage byentity"), settings.entityDamage.byEntity, allSettings);
+
+        showSetting(context, i18n.getTranslation(context, "playerdamage all"), settings.playerDamage.all, allSettings);
+        showSetting(context, i18n.getTranslation(context, "playerdamage pvp"), settings.playerDamage.pvp, allSettings);
+        showSetting(context, i18n.getTranslation(context, "playerdamage byliving"), settings.entityDamage.byLiving, allSettings);
+
         showSetting(context, i18n.getTranslation(context, "blocked commands"), settings.blockedCommands, allSettings);
 
         showSetting(context, i18n.getTranslation(context, "deadcircuit"), settings.deadCircuit, allSettings);

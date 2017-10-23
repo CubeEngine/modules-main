@@ -599,23 +599,18 @@ public class SettingsListener
     private void onPlayerDamage(DamageEntityEvent event, Player target)
     {
         Entity entitySource = getEntitySource(event);
-        Player playerSource = null;
-        if (entitySource instanceof Player)
-        {
-            playerSource = ((Player) entitySource);
-        }
 
         List<Region> regionsAt = manager.getRegionsAt(target.getLocation());
 
-        Tristate defaultTo = this.checkSetting(event, playerSource, regionsAt, () -> playerDamgeAll, s -> s.playerDamage.all, UNDEFINED);
+        Tristate defaultTo = this.checkSetting(event, target, regionsAt, () -> playerDamgeAll, s -> s.playerDamage.all, UNDEFINED);
 
         if (entitySource instanceof Living)
         {
-            defaultTo = this.checkSetting(event, playerSource, regionsAt, () -> playerDamgeLiving, s -> s.playerDamage.byLiving, defaultTo);
+            defaultTo = this.checkSetting(event, target, regionsAt, () -> playerDamgeLiving, s -> s.playerDamage.byLiving, defaultTo);
         }
         if (entitySource instanceof Player)
         {
-            this.checkSetting(event, playerSource, regionsAt, () -> playerDamgePVP, s -> s.playerDamage.pvp, defaultTo);
+            this.checkSetting(event, target, regionsAt, () -> playerDamgePVP, s -> s.playerDamage.pvp, defaultTo);
         }
     }
 }
