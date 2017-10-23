@@ -148,6 +148,10 @@ public class HomeManager
     @Listener(order = EARLY)
     public void rightClickBed(InteractBlockEvent.Secondary event, @First Player player)
     {
+        if (!player.hasPermission("cubeengine.travel.command.home.set.use"))
+        {
+            return;
+        }
         if (event.getTargetBlock().getState().getType() != BlockTypes.BED
             || !player.get(SneakingData.class).isPresent()
             || player.getItemInHand(HandTypes.MAIN_HAND).isPresent())
