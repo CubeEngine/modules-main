@@ -534,7 +534,7 @@ public class SettingsListener
                 Optional<Player> player = event.getCause().getContext().get(EventContextKeys.NOTIFIER).filter(p -> p instanceof Player).map(Player.class::cast);
                 if (player.isPresent())
                 {
-                    if (checkSetting(event, player.get(), regionsAt, () -> null, s -> s.use.all.redstone, UNDEFINED) == FALSE)
+                    if (checkSetting(event, player.get(), regionsAt, () -> usePermission.get(UseType.REDSTONE), s -> s.use.all.redstone, UNDEFINED) == FALSE)
                     {
                         return;
                     }
