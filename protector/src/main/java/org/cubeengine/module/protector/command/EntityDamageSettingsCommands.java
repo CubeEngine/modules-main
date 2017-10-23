@@ -118,7 +118,7 @@ public class EntityDamageSettingsCommands extends ContainerCommand
         i18n.send(context, POSITIVE,"Region {region}: EntityDamage by Living Settings updated", region);
     }
 
-    @Command(desc = "Controls explosions caused by players breaking blocks")
+    @Command(desc = "Controls damage by entities")
     public void entity(CommandSource context, EntityType type, Tristate set, @Default @Named("in") Region region)
     {
         setOrUnset(region.getSettings().entityDamage.byEntity, type, set);
