@@ -96,8 +96,10 @@ public class SettingsListener
     public final Permission command;
     public final Map<UseType, Permission> usePermission = new HashMap<>();
     public final Permission entityDamageAll;
-    public final Permission entityDamagePVP;
     public final Permission entityDamageLiving;
+    public final Permission playerDamgeAll;
+    public final Permission playerDamgeLiving;
+    public final Permission playerDamgePVP;
 
     public SettingsListener(RegionManager manager, Permission base, PermissionManager pm, I18n i18n)
     {
@@ -122,8 +124,10 @@ public class SettingsListener
         usePermission.put(UseType.OPEN, pm.register(SettingsListener.class, "bypass.use-all.open", "", base));
         usePermission.put(UseType.REDSTONE, pm.register(SettingsListener.class, "bypass.use-all.redstone", "", base));
         entityDamageAll = pm.register(SettingsListener.class, "bypass.entity-damage.all", "", base);
-        entityDamagePVP = pm.register(SettingsListener.class, "bypass.entity-damage.pvp", "", base);
         entityDamageLiving = pm.register(SettingsListener.class, "bypass.entity-damage.living", "", base);
+        playerDamgeAll = pm.register(SettingsListener.class, "bypass.player-damage.all", "", base);
+        playerDamgeLiving = pm.register(SettingsListener.class, "bypass.player-damage.living", "", base);
+        playerDamgePVP = pm.register(SettingsListener.class, "bypass.player-damage.pvp", "", base);
     }
 
     @Listener
@@ -542,6 +546,19 @@ public class SettingsListener
     @Listener
     public void onEntityDamage(DamageEntityEvent event)
     {
+        Entity target = event.getTargetEntity();
+        if (target instanceof Player)
+        {
+            onPlayerDamage(event, ((Player) target));
+        }
+        else
+        {
+            onMobDamage(event, target);
+        }
+    }
+
+    private Entity getEntitySource(DamageEntityEvent event)
+    {
         DamageSource source = event.getCause().first(DamageSource.class).get();
         Entity entitySource = null;
         if (source instanceof EntityDamageSource)
@@ -552,23 +569,22 @@ public class SettingsListener
                 entitySource = ((IndirectEntityDamageSource) source).getIndirectSource();
             }
         }
+        return entitySource;
+    }
+
+    private void onMobDamage(DamageEntityEvent event, Entity target)
+    {
+        Entity entitySource = getEntitySource(event);
         Player playerSource = null;
         if (entitySource instanceof Player)
         {
             playerSource = ((Player) entitySource);
         }
 
-        List<Region> regionsAt = manager.getRegionsAt(event.getTargetEntity().getLocation());
+        List<Region> regionsAt = manager.getRegionsAt(target.getLocation());
 
         Tristate defaultTo = this.checkSetting(event, playerSource, regionsAt, () -> entityDamageAll, s -> s.entityDamage.all, UNDEFINED);
 
-        if (event.getTargetEntity() instanceof Player && entitySource instanceof Player)
-        {
-            if (this.checkSetting(event, playerSource, regionsAt, () -> entityDamagePVP, s -> s.entityDamage.pvp, defaultTo) == FALSE)
-            {
-                return;
-            }
-        }
         if (entitySource instanceof Living)
         {
             defaultTo = this.checkSetting(event, playerSource, regionsAt, () -> entityDamageLiving, s -> s.entityDamage.byLiving, defaultTo);
@@ -577,6 +593,29 @@ public class SettingsListener
         {
             EntityType type = entitySource.getType();
             this.checkSetting(event, null, regionsAt, () -> null, s -> s.entityDamage.byEntity.getOrDefault(type, UNDEFINED), defaultTo);
+        }
+    }
+
+    private void onPlayerDamage(DamageEntityEvent event, Player target)
+    {
+        Entity entitySource = getEntitySource(event);
+        Player playerSource = null;
+        if (entitySource instanceof Player)
+        {
+            playerSource = ((Player) entitySource);
+        }
+
+        List<Region> regionsAt = manager.getRegionsAt(target.getLocation());
+
+        Tristate defaultTo = this.checkSetting(event, playerSource, regionsAt, () -> playerDamgeAll, s -> s.playerDamage.all, UNDEFINED);
+
+        if (entitySource instanceof Living)
+        {
+            defaultTo = this.checkSetting(event, playerSource, regionsAt, () -> playerDamgeLiving, s -> s.playerDamage.byLiving, defaultTo);
+        }
+        if (entitySource instanceof Player)
+        {
+            this.checkSetting(event, playerSource, regionsAt, () -> playerDamgePVP, s -> s.playerDamage.pvp, defaultTo);
         }
     }
 }

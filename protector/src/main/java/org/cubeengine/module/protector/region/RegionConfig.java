@@ -112,9 +112,17 @@ public class RegionConfig extends ReflectedYaml
         public static class EntityDamage implements Section
         {
             public Tristate all = Tristate.UNDEFINED;
-            public Tristate pvp = Tristate.UNDEFINED;
             public Tristate byLiving = Tristate.UNDEFINED;
             public Map<EntityType, Tristate> byEntity = new HashMap<>();
+        }
+
+        public PlayerDamage playerDamage = new PlayerDamage();
+
+        public static class PlayerDamage implements Section
+        {
+            public Tristate all = Tristate.UNDEFINED;
+            public Tristate byLiving = Tristate.UNDEFINED;
+            public Tristate pvp = Tristate.UNDEFINED;
         }
     }
 

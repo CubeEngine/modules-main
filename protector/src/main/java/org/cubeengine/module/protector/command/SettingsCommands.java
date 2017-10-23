@@ -65,6 +65,7 @@ public class SettingsCommands extends ContainerCommand
 
         this.addCommand(new BlockDamageSettingsCommands(cm, i18n, psl, ps));
         this.addCommand(new EntityDamageSettingsCommands(cm, i18n, psl, ps));
+        this.addCommand(new BlockDamageSettingsCommands(cm, i18n, psl, ps));
 
     }
 
