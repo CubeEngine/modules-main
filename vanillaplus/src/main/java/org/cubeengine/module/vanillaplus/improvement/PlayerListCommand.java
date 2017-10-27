@@ -60,23 +60,9 @@ public class PlayerListCommand
         SortedMap<String, Set<Player>> grouped = new TreeMap<>();
         for (Player player : users)
         {
-            try
-            {
-                Subject subject = Sponge.getServiceManager().provideUnchecked(PermissionService.class).getUserSubjects()
-                        .loadSubject(player.getUniqueId().toString()).get();
-                String listGroup = subject.getOption("list-group").orElse("&6Players");
-                Set<Player> assigned = grouped.get(listGroup);
-                if (assigned == null)
-                {
-                    assigned = new LinkedHashSet<>();
-                    grouped.put(listGroup, assigned);
-                }
-                assigned.add(player);
-            }
-            catch (ExecutionException | InterruptedException e)
-            {
-                throw new IllegalStateException(e);
-            }
+            String listGroup = player.getOption("list-group").orElse("&6Players");
+            Set<Player> assigned = grouped.computeIfAbsent(listGroup, k -> new LinkedHashSet<>());
+            assigned.add(player);
         }
         return grouped;
     }
