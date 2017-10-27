@@ -17,9 +17,12 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import org.cubeengine.converter.ConversionException;
-import org.cubeengine.converter.converter.ClassedConverter;
-import org.cubeengine.converter.node.StringNode;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.util.ContextUtil.toSet;
+import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
+
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Complete;
@@ -28,7 +31,12 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.converter.ConversionException;
+import org.cubeengine.converter.converter.ClassedConverter;
+import org.cubeengine.converter.node.StringNode;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.config.Priority;
@@ -36,17 +44,10 @@ import org.cubeengine.module.roles.config.PriorityConverter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.FileSubjectData;
 import org.cubeengine.module.roles.service.subject.FileSubject;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
-
-import static org.cubeengine.libcube.util.ContextUtil.toSet;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 import java.util.concurrent.CompletableFuture;
 
