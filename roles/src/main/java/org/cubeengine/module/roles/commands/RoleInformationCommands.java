@@ -327,7 +327,7 @@ public class RoleInformationCommands extends ContainerCommand
     @Command(alias = {"default","defaultRoles","listDefRoles"}, desc = "Lists all default roles")
     public void listDefaultRoles(CommandSource cContext)
     {
-        List<SubjectReference> parents = service.getGroupSubjects().getDefaults().getSubjectData().getParents(Collections.emptySet());
+        List<SubjectReference> parents = service.getUserSubjects().getDefaults().getSubjectData().getParents(Collections.emptySet());
         if (parents.isEmpty())
         {
             i18n.send(cContext, NEGATIVE, "There are no default roles set!");
