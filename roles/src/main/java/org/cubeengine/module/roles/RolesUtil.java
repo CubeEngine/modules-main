@@ -55,7 +55,25 @@ public class RolesUtil
 
     public static FoundPermission findPermission(PermissionService service, Subject subject, String permission, Set<Context> contexts)
     {
-        return findPermission(service, subject, permission, contexts, new HashSet<>());
+        FoundPermission found = findPermission(service, subject, permission, contexts, new HashSet<>());
+        if (debug)
+        {
+            String name = subject.getIdentifier();
+            if (subject.getCommandSource().isPresent())
+            {
+                name = subject.getCommandSource().get().getName();
+            }
+            name = subject.getContainingCollection().getIdentifier() + ":" + name;
+            if (found == null)
+            {
+                System.out.print("[PermCheck] " + name + " has not " + permission + "\n");
+            }
+            else
+            {
+                System.out.print("[PermCheck] " + name + " has " + permission + " set to " + found.value + " as " + found.permission + " in " + found.subject.getIdentifier() + "\n");
+            }
+        }
+        return found;
     }
 
     public static FoundPermission findPermission(PermissionService service, Subject subject, String permission, Set<Context> contexts, Set<Subject> checked)
@@ -79,23 +97,6 @@ public class RolesUtil
             found = findPermission(service, defaults, permission, contexts, checked);
         }
 
-        if (debug)
-        {
-            String name = subject.getIdentifier();
-            if (subject.getCommandSource().isPresent())
-            {
-                name = subject.getCommandSource().get().getName();
-            }
-            name = subject.getContainingCollection().getIdentifier() + ":" + name;
-            if (found == null)
-            {
-                System.out.print("[PermCheck] " + name + " has not " + permission + "\n");
-            }
-            else
-            {
-                System.out.print("[PermCheck] " + name + " has " + permission + " set to " + found.value + " as " + found.permission + " in " + found.subject.getIdentifier() + "\n");
-            }
-        }
         return found;
     }
 
@@ -187,15 +188,6 @@ public class RolesUtil
             return Optional.of(new FoundOption(subject, result));
         }
 
-        for (Subject parent : getParents(contexts, subject))
-        {
-            Optional<FoundOption> option = getOption(service, parent, key, contexts, subject != service.getDefaults());
-            if (option.isPresent())
-            {
-                return option;
-            }
-        }
-
         return Optional.empty();
     }
 
@@ -205,6 +197,20 @@ public class RolesUtil
         if (!option.isPresent())
         {
             option = getOption(service, subject, subject.getSubjectData(), key, contexts);
+        }
+
+        if (!option.isPresent()) {
+
+            for (Subject parent : getParents(contexts, subject))
+            {
+                // TODO do not check a parent multiple times
+                option = getOption(service, parent, key, contexts, false);
+                if (option.isPresent())
+                {
+                    return option;
+                }
+            }
+
         }
 
         if (recurseDefault && !option.isPresent())
