@@ -18,6 +18,7 @@
 package org.cubeengine.module.roles;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,12 @@ public class RolesUtil
 {
     public static boolean debug = false;
     public static final Set<String> allPermissions = new HashSet<>();
+    private static Map<String, Map<String, Map<Set<Context>, List<Subject>>>> cache = new HashMap<>();
+
+    public static void invalidateCache()
+    {
+        cache.clear();
+    }
 
     public static FoundPermission findPermission(PermissionService service, Subject subject, String permission, Set<Context> contexts)
     {
@@ -124,8 +131,7 @@ public class RolesUtil
             }
 
             // Attempt to find permission in parents
-            List<Subject> list = getParents(contexts, data);
-            list.addAll(getParents(contexts, transientData));
+            List<Subject> list = getParents(contexts, subject);
             list.sort(FileSubject::compare);
             for (Subject parentSubject : list)
             {
@@ -145,9 +151,16 @@ public class RolesUtil
         return null;
     }
 
-    private static List<Subject> getParents(Set<Context> contexts, SubjectData data)
+    private static List<Subject> getParents(Set<Context> contexts, Subject subject)
     {
-        return data.getParents(contexts).stream().map(sr -> sr.resolve().join()).collect(Collectors.toList());
+        Map<String, Map<Set<Context>, List<Subject>>> collectionMap = cache.computeIfAbsent(subject.getContainingCollection().getIdentifier(), k -> new HashMap<>());
+        Map<Set<Context>, List<Subject>> subjectMap = collectionMap.computeIfAbsent(subject.getIdentifier(), k -> new HashMap<>());
+        return subjectMap.computeIfAbsent(contexts, c -> {
+            List<Subject> list = new ArrayList<>();
+            list.addAll(subject.getSubjectData().getParents(contexts).stream().map(sr -> sr.resolve().join()).collect(Collectors.toList()));
+            list.addAll(subject.getTransientSubjectData().getParents(contexts).stream().map(sr -> sr.resolve().join()).collect(Collectors.toList()));
+            return list;
+        });
     }
 
     public static List<String> getImplicitParents(String permission)
@@ -174,7 +187,7 @@ public class RolesUtil
             return Optional.of(new FoundOption(subject, result));
         }
 
-        for (Subject parent : getParents(contexts, data))
+        for (Subject parent : getParents(contexts, subject))
         {
             Optional<FoundOption> option = getOption(service, parent, key, contexts, subject != service.getDefaults());
             if (option.isPresent())
@@ -271,12 +284,7 @@ public class RolesUtil
             data.putIfAbsent(entry.getKey(), entry.getValue());
         }
 
-        for (Subject parent : getParents(contexts, subject.getSubjectData()))
-        {
-            fillPermissions(parent, contexts, data, service);
-        }
-
-        for (Subject parent : getParents(contexts, subject.getTransientSubjectData()))
+        for (Subject parent : getParents(contexts, subject))
         {
             fillPermissions(parent, contexts, data, service);
         }
@@ -291,12 +299,7 @@ public class RolesUtil
             data.putIfAbsent(entry.getKey(), new FoundOption(subject, entry.getValue()));
         }
 
-        for (Subject parent : getParents(contexts, subject.getSubjectData()))
-        {
-            fillOptions(parent, contexts, data, service);
-        }
-
-        for (Subject parent : getParents(contexts, subject.getTransientSubjectData()))
+        for (Subject parent : getParents(contexts, subject))
         {
             fillOptions(parent, contexts, data, service);
         }

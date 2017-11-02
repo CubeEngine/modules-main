@@ -28,6 +28,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.inject.Provider;
+
+import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.FileBasedCollection;
@@ -221,29 +223,27 @@ public class BaseSubjectData implements SubjectData
     @Override
     public CompletableFuture<Boolean> addParent(Set<Context> contexts, SubjectReference parent)
     {
-        return parent.resolve().thenApply(p -> {
-            if (PermissionService.SUBJECTS_DEFAULT.equals(parent.getCollectionIdentifier()))
-            {
+        CompletableFuture<Boolean> ret = parent.resolve().thenApply(p -> {
+            if (PermissionService.SUBJECTS_DEFAULT.equals(parent.getCollectionIdentifier())) {
                 return false; // You can never add defaults as parents
             }
 
             checkForCircularDependency(contexts, p, 0);
 
-            if (contexts.isEmpty() && parents.get(GLOBAL) != null && parents.get(GLOBAL).contains(parent))
-            {
+            if (contexts.isEmpty() && parents.get(GLOBAL) != null && parents.get(GLOBAL).contains(parent)) {
                 return false;
             }
 
-            for (Context context : contexts)
-            {
-                if (parents.containsKey(context) && parents.get(context).contains(parent))
-                {
+            for (Context context : contexts) {
+                if (parents.containsKey(context) && parents.get(context).contains(parent)) {
                     return false;
                 }
             }
 
             return operate(contexts, parents, l -> l.add(p.asSubjectReference()), ArrayList::new);
         });
+        RolesUtil.invalidateCache();
+        return ret;
     }
 
     protected void checkForCircularDependency(Set<Context> contexts, Subject parent, int depth)
@@ -263,35 +263,39 @@ public class BaseSubjectData implements SubjectData
     @Override
     public CompletableFuture<Boolean> removeParent(Set<Context> contexts, SubjectReference parent)
     {
-        return CompletableFuture.supplyAsync(() -> operate(contexts, parents, l -> l.remove(parent)));
+        CompletableFuture<Boolean> ret = CompletableFuture.supplyAsync(() -> operate(contexts, parents, l -> l.remove(parent)));
+        RolesUtil.invalidateCache();
+        return ret;
     }
 
     @Override
     public CompletableFuture<Boolean> clearParents()
     {
-        return CompletableFuture.supplyAsync(() -> {
+        CompletableFuture<Boolean> ret = CompletableFuture.supplyAsync(() -> {
             boolean changed = false;
-            for (List<SubjectReference> list : parents.values())
-            {
-                if (!list.isEmpty())
-                {
+            for (List<SubjectReference> list : parents.values()) {
+                if (!list.isEmpty()) {
                     list.clear();
                     changed = true;
                 }
             }
             return changed;
         });
+        RolesUtil.invalidateCache();
+        return ret;
     }
 
     @Override
     public CompletableFuture<Boolean> clearParents(Set<Context> contexts)
     {
-        return CompletableFuture.supplyAsync(() ->
-            operate(contexts, parents, l -> {
-                boolean empty = !l.isEmpty();
-                l.clear();
-                return empty;
-        }));
+        CompletableFuture<Boolean> ret = CompletableFuture.supplyAsync(() ->
+                operate(contexts, parents, l -> {
+                    boolean empty = !l.isEmpty();
+                    l.clear();
+                    return empty;
+                }));
+        RolesUtil.invalidateCache();
+        return ret;
     }
 
     @FunctionalInterface
