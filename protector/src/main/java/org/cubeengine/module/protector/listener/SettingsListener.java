@@ -530,6 +530,11 @@ public class SettingsListener
                 {
                     return;
                 }
+                if (true)
+                {
+                    // TODO this check is spammed way too often (also with wrong notifier mabye?)
+                    return;
+                }
                 // Redstone is disabled for player?
                 Optional<Player> player = event.getCause().getContext().get(EventContextKeys.NOTIFIER).filter(p -> p instanceof Player).map(Player.class::cast);
                 if (player.isPresent())
