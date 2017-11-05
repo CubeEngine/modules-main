@@ -482,7 +482,6 @@ public class LockManager
      */
     public CompletableFuture<Lock> createLock(Entity entity, Player user, LockType lockType, String password, boolean createKeyBook)
     {
-
         LockModel model = database.getDSL().newRecord(TABLE_LOCKS).newLock(user, lockType, getProtectedType(entity.getType()), entity.getUniqueId());
         model.createPassword(this, password);
         return model.insertAsync().thenApply(m -> {

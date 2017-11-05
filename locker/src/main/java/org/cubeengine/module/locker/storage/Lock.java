@@ -184,7 +184,7 @@ public class Lock
             return;
         }
         ItemStack itemStack = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
-        if (itemStack != null && itemStack.getItem() == ItemTypes.BOOK)
+        if (itemStack != null && itemStack.getType() == ItemTypes.BOOK)
         {
             itemStack.setQuantity(itemStack.getQuantity() - 1);
         }
@@ -486,8 +486,8 @@ public class Lock
             {
                 igf.blockTakeOutAll();
             }
-            igf.submitInventory(Locker.class, true);
-            event.setCancelled(true);
+
+            igf.submitInventory(Locker.class, false);
             this.notifyUsage(user);
             updateAccess();
         }
@@ -528,7 +528,9 @@ public class Lock
     private void checkLockType()
     {
         if (this.getLockType().supportedTypes.contains(this.getProtectedType())) return;
-        throw new IllegalStateException("LockType is not supported for " + this.getProtectedType().name() + ":" + this.getLockType().name());
+        this.module.getLogger().warn("LockType is not supported for " + this.getProtectedType().name() + ":" + this.getLockType().name() +
+                (this.getEntityUID() == null ? " at " + this.getFirstLocation().getPosition() : ""));
+        // TODO throw new IllegalStateException("LockType is not supported for " + this.getProtectedType().name() + ":" + this.getLockType().name());
     }
 
     public ProtectedType getProtectedType()

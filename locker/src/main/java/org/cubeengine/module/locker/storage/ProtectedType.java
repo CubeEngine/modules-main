@@ -106,7 +106,6 @@ public enum ProtectedType
         return protectedTypes.get(protectedType);
     }
 
-
     public static ProtectedType getProtectedType(BlockType material)
     {
         return blocks.getOrDefault(material, BLOCK);
