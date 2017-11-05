@@ -486,8 +486,8 @@ public class Lock
             {
                 igf.blockTakeOutAll();
             }
-            igf.submitInventory(Locker.class, false);
-
+            igf.submitInventory(Locker.class, true);
+            event.setCancelled(true);
             this.notifyUsage(user);
             updateAccess();
         }
