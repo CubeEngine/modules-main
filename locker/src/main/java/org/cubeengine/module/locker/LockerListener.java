@@ -118,7 +118,8 @@ public class LockerListener
         if (lock == null) return;
         if (entity instanceof Carrier || (entity.getType() == HORSE && player.get(Keys.IS_SNEAKING).get()))
         {
-            // Handled by InteractInventoryEvent.Open lock.handleInventoryOpen(event, null, null, player);
+            // Handled by InteractInventoryEvent.Open
+            lock.handleInventoryOpen(event, ((Carrier) entity).getInventory(), null, player);
         }
         else
         {
