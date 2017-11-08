@@ -528,8 +528,16 @@ public class Lock
     private void checkLockType()
     {
         if (this.getLockType().supportedTypes.contains(this.getProtectedType())) return;
-        this.module.getLogger().warn("LockType is not supported for " + this.getProtectedType().name() + ":" + this.getLockType().name() +
-                (this.getLocations().isEmpty() ? "" : " at " + this.getFirstLocation().getPosition()));
+        if (this.locations.isEmpty())
+        {
+            this.module.getLogger().warn("LockType is not supported for {}:{}",
+                    this.getProtectedType().name(), this.getLockType().name());
+        }
+        else
+        {
+            this.module.getLogger().warn("LockType is not supported for {}:{} at {}",
+                    this.getProtectedType().name(), this.getLockType().name(), this.locations.get(0).getPosition().toString());
+        }
         // TODO throw new IllegalStateException("LockType is not supported for " + this.getProtectedType().name() + ":" + this.getLockType().name());
     }
 
