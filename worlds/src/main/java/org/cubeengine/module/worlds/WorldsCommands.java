@@ -168,22 +168,6 @@ public class WorldsCommands extends ContainerCommand
         }
     }
 
-    @Command(desc = "Sets the autoload behaviour")
-    public void autoload(CommandSource context, WorldProperties world, @org.cubeengine.butler.parametric.Optional Boolean set)
-    {
-        if (set == null)
-        {
-            set = !world.loadOnStartup();
-        }
-        world.setLoadOnStartup(set);
-        if (set)
-        {
-            i18n.send(context, POSITIVE, "{world} will now autoload.", world);
-            return;
-        }
-        i18n.send(context, POSITIVE, "{world} will no longer autoload.", world);
-    }
-
     @Command(desc = "Loads a world")
     public void load(CommandSource context, WorldProperties world, @Flag boolean enable)
     {
