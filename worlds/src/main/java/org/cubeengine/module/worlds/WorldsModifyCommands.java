@@ -47,7 +47,7 @@ public class WorldsModifyCommands extends ContainerCommand
         {
             set = !world.usesMapFeatures();
         }
-        world.setLoadOnStartup(set);
+        world.setMapFeaturesEnabled(set);
         if (set)
         {
             i18n.send(context, POSITIVE, "{world} will now generate structures", world);
