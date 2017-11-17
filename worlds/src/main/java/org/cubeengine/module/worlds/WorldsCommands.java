@@ -50,6 +50,7 @@ import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.GeneratorType;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldArchetype;
+import org.spongepowered.api.world.WorldArchetypes;
 import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -60,6 +61,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.inject.Inject;
 
@@ -128,8 +130,7 @@ public class WorldsCommands extends ContainerCommand
             i18n.send(context, POSITIVE, "Old world moved to {name#folder}", newName);
         }
 
-        WorldArchetype.Builder builder = WorldArchetype.builder();
-        builder.keepsSpawnLoaded(spawnInMemory);
+        WorldArchetype.Builder builder = WorldArchetype.builder().from(WorldArchetypes.OVERWORLD);
         builder.keepsSpawnLoaded(spawnInMemory);
         builder.loadsOnStartup(!noload);
         if (seed != null)
@@ -155,11 +156,10 @@ public class WorldsCommands extends ContainerCommand
         builder.difficulty(difficulty);
         try
         {
-            WorldProperties properties = Sponge.getServer().createWorldProperties(name, builder.build("org.cubeengine.customworld:" + name, name));
+            WorldProperties properties = Sponge.getServer().createWorldProperties(name, builder.build("org.cubeengine.customworld:" + UUID.randomUUID().toString(), name));
             i18n.send(context, POSITIVE, "World {name} successfully created!", name);
             i18n.send(context, NEUTRAL, "This world is not yet loaded! Click {txt#here} to load.",
-                    i18n.translate(context, TextFormat.NONE, "here").toBuilder().onClick(TextActions.runCommand("/worlds load " + name)).build
-                            ());
+                    i18n.translate(context, TextFormat.NONE, "here").toBuilder().onClick(TextActions.runCommand("/worlds load " + name)).build());
         }
         catch (IOException e)
         {
