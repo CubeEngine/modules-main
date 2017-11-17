@@ -177,7 +177,7 @@ public class ItemCommands extends PermissionContainer
         }
         for (int i = 1; i < amount; ++i)
         {
-            context.getInventory().offer(item.get());
+            context.getInventory().offer(item.get().copy());
         }
         i18n.send(context, POSITIVE, "Refilled {amount} stacks in hand!", amount);
     }
