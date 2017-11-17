@@ -197,6 +197,26 @@ public class ItemModifyCommands extends PermissionContainer
         i18n.send(context, NEGATIVE, "You can not enchant this item!");
     }
 
+    @Command(desc = "Toggles the visibility of enchantments")
+    @Restricted(value = Player.class)
+    public void hideEnchantments(Player context, @Optional Boolean hide)
+    {
+        java.util.Optional<ItemStack> item = context.getItemInHand(HandTypes.MAIN_HAND);
+        if (!item.isPresent())
+        {
+            i18n.send(context, NEGATIVE, "No item in hand!");
+            return;
+        }
+        hide = hide == null ? true : hide;
+        item.get().offer(Keys.HIDE_ENCHANTMENTS, hide);
+        if (hide)
+        {
+            i18n.send(context, POSITIVE, "Enchantments are hidden on this item.");
+            return;
+        }
+        i18n.send(context, POSITIVE, "Enchantments are visible on this item.");
+    }
+
     @Command(desc = "Repairs your items")
     @Restricted(value = Player.class, msg = "If you do this you'll loose your warranty!")
     public void repair(Player context, @Flag boolean all)
