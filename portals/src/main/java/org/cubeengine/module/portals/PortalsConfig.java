@@ -17,10 +17,16 @@
  */
 package org.cubeengine.module.portals;
 
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("all")
 public class PortalsConfig extends ReflectedYaml
 {
     public boolean disableVanillaPortals = false;
+
+    public Map<ConfigWorld, Boolean> disabledVanillaPortalsInWorlds = new HashMap<>();
 }

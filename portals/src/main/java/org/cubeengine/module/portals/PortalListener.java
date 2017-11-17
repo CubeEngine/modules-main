@@ -18,6 +18,8 @@
 package org.cubeengine.module.portals;
 
 import java.util.List;
+
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.Transform;
@@ -45,7 +47,8 @@ public class PortalListener
     @Listener
     public void onTeleport(MoveEntityEvent.Teleport event)
     {
-        if (this.module.getConfig().disableVanillaPortals && event.getCause().getContext().get(EventContextKeys.TELEPORT_TYPE).orElse(null) == TeleportTypes.PORTAL)
+        if ((this.module.getConfig().disableVanillaPortals || this.module.getConfig().disabledVanillaPortalsInWorlds.getOrDefault(new ConfigWorld(event.getFromTransform().getExtent()), false))
+                && event.getCause().getContext().get(EventContextKeys.TELEPORT_TYPE).orElse(null) == TeleportTypes.PORTAL)
         {
             event.setCancelled(true);
             return;
