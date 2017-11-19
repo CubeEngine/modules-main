@@ -55,16 +55,8 @@ public class PlayerDamageSettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-                if (!b)
-                {
-                    i18n.send(context, NEGATIVE, "This role does not exist");
-                    return;
-                }
-                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.playerDamgeAll.getId(), set);
-                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-            });
+            String perm = psl.playerDamgeAll.getId();
+            setPermission(context, set, region, role, perm);
             return;
         }
         region.getSettings().entityDamage.all = set;
@@ -77,16 +69,8 @@ public class PlayerDamageSettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-                if (!b)
-                {
-                    i18n.send(context, NEGATIVE, "This role does not exist");
-                    return;
-                }
-                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.playerDamgeLiving.getId(), set);
-                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-            });
+            String perm = psl.playerDamgeLiving.getId();
+            setPermission(context, set, region, role, perm);
             return;
         }
         region.getSettings().entityDamage.byLiving = set;
@@ -99,20 +83,37 @@ public class PlayerDamageSettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-                if (!b)
-                {
-                    i18n.send(context, NEGATIVE, "This role does not exist");
-                    return;
-                }
-                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.playerDamgePVP.getId(), set);
-                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-            });
+            setPermission(context, set, region, role, psl.playerDamgePVP.getId());
             return;
         }
         region.getSettings().playerDamage.pvp = set;
         region.save();
         i18n.send(context, POSITIVE,"Region {region}: PVP Settings updated", region);
+    }
+
+    @Command(desc = "Controls mobs targeting players")
+    public void targeting(CommandSource context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
+    {
+        if (role != null)
+        {
+            setPermission(context, set, region, role, psl.playerTargeting.getId());
+            return;
+        }
+        region.getSettings().playerDamage.aiTargeting = set;
+        region.save();
+        i18n.send(context, POSITIVE,"Region {region}: PlayerTargeting by AI Settings updated", region);
+    }
+
+    public void setPermission(CommandSource context, Tristate set, Region region, String role, String perm) {
+        ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
+            if (!b)
+            {
+                i18n.send(context, NEGATIVE, "This role does not exist");
+                return;
+            }
+            Subject subject = ps.getGroupSubjects().loadSubject(role).join();
+            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), perm, set);
+            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
+        });
     }
 }

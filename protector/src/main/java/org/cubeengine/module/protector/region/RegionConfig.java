@@ -91,7 +91,7 @@ public class RegionConfig extends ReflectedYaml
         {
             // TODO commands and listeners
 
-            @Comment("P")
+            @Comment("Prevent all types of fluids flowing")
             public Tristate all = Tristate.UNDEFINED;
             @Comment("Prevent all types of fluids creating blocks by mixing")
             public Tristate mix = Tristate.UNDEFINED;
@@ -123,6 +123,8 @@ public class RegionConfig extends ReflectedYaml
             public Tristate all = Tristate.UNDEFINED;
             public Tristate byLiving = Tristate.UNDEFINED;
             public Tristate pvp = Tristate.UNDEFINED;
+
+            public Tristate aiTargeting = Tristate.UNDEFINED;
         }
     }
 

@@ -60,6 +60,7 @@ import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.entity.ai.SetAttackTargetEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
@@ -100,6 +101,7 @@ public class SettingsListener
     public final Permission playerDamgeAll;
     public final Permission playerDamgeLiving;
     public final Permission playerDamgePVP;
+    public final Permission playerTargeting;
 
     public SettingsListener(RegionManager manager, Permission base, PermissionManager pm, I18n i18n)
     {
@@ -128,6 +130,7 @@ public class SettingsListener
         playerDamgeAll = pm.register(SettingsListener.class, "bypass.player-damage.all", "", base);
         playerDamgeLiving = pm.register(SettingsListener.class, "bypass.player-damage.living", "", base);
         playerDamgePVP = pm.register(SettingsListener.class, "bypass.player-damage.pvp", "", base);
+        playerTargeting = pm.register(SettingsListener.class, "bypass.player-targeting", "", base);
     }
 
     @Listener
@@ -560,6 +563,13 @@ public class SettingsListener
         {
             onMobDamage(event, target);
         }
+    }
+
+    @Listener
+    public void onTargetPlayer(SetAttackTargetEvent event, @Getter("getTarget") Player player)
+    {
+        List<Region> regions = manager.getRegionsAt(player.getLocation());
+        checkSetting(event, player, regions, () -> this.playerTargeting, s -> s.playerDamage.aiTargeting, UNDEFINED);
     }
 
     private Entity getEntitySource(DamageEntityEvent event)
