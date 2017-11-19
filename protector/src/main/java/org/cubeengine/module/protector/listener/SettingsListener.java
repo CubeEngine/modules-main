@@ -110,21 +110,22 @@ public class SettingsListener
         this.i18n = i18n;
         // TODO description
         // TODO ENTER remember last valid pos.
-        movePerms.put(MoveType.MOVE, pm.register(SettingsListener.class, "bypass.move.move", "", base));
-        movePerms.put(MoveType.EXIT, pm.register(SettingsListener.class, "bypass.move.exit", "", base));
-        movePerms.put(MoveType.ENTER, pm.register(SettingsListener.class, "bypass.move.enter", "", base));
-        movePerms.put(MoveType.TELEPORT, pm.register(SettingsListener.class, "bypass.move.teleport", "", base));
-        buildPerm = pm.register(SettingsListener.class, "bypass.build", "", base);
-        useBlockPerm = pm.register(SettingsListener.class, "bypass.use", "", base);
-        useItemPerm = pm.register(SettingsListener.class, "bypass.use-item", "", base);
-        spawnEntityPlayerPerm = pm.register(SettingsListener.class, "bypass.spawn.player", "", base);
-        explodePlayer = pm.register(SettingsListener.class, "bypass.blockdamage.explode.player", "", base);
-        command = pm.register(SettingsListener.class, "bypass.command", "", base);
-        usePermission.put(UseType.BLOCK, pm.register(SettingsListener.class, "bypass.use-all.block", "", base));
-        usePermission.put(UseType.CONTAINER, pm.register(SettingsListener.class, "bypass.use-all.container", "", base));
-        usePermission.put(UseType.ITEM, pm.register(SettingsListener.class, "bypass.use-all.item", "", base));
-        usePermission.put(UseType.OPEN, pm.register(SettingsListener.class, "bypass.use-all.open", "", base));
-        usePermission.put(UseType.REDSTONE, pm.register(SettingsListener.class, "bypass.use-all.redstone", "", base));
+        movePerms.put(MoveType.MOVE, pm.register(SettingsListener.class, "bypass.move.move", "Region bypass for moving in a region", base));
+        movePerms.put(MoveType.EXIT, pm.register(SettingsListener.class, "bypass.move.exit", "Region bypass for exiting a region", base));
+        movePerms.put(MoveType.ENTER, pm.register(SettingsListener.class, "bypass.move.enter", "Region bypass for entering a region", base));
+        movePerms.put(MoveType.TELEPORT, pm.register(SettingsListener.class, "bypass.move.teleport", "Region bypass for teleport in a region", base));
+        movePerms.put(MoveType.TELEPORT_PORTAL, pm.register(SettingsListener.class, "bypass.move.teleport-portal", "Region bypass for teleport using portals in a region", base));
+        buildPerm = pm.register(SettingsListener.class, "bypass.build", "Region bypass for building", base);
+        useBlockPerm = pm.register(SettingsListener.class, "bypass.use", "Region bypass for using anything", base);
+        useItemPerm = pm.register(SettingsListener.class, "bypass.use-item", "Region bypass for using items", base);
+        spawnEntityPlayerPerm = pm.register(SettingsListener.class, "bypass.spawn.player", "Region bypass for players spawning entities", base);
+        explodePlayer = pm.register(SettingsListener.class, "bypass.blockdamage.explode.player", "Region bypass for players causing blockdamage with explosions", base);
+        command = pm.register(SettingsListener.class, "bypass.command", "Region bypass for using all commands", base);
+        usePermission.put(UseType.BLOCK, pm.register(SettingsListener.class, "bypass.use-all.block", "Region bypass for using blocks", base));
+        usePermission.put(UseType.CONTAINER, pm.register(SettingsListener.class, "bypass.use-all.container", "Region bypass for using containers", base));
+        usePermission.put(UseType.ITEM, pm.register(SettingsListener.class, "bypass.use-all.item", "Region bypass for using items", base));
+        usePermission.put(UseType.OPEN, pm.register(SettingsListener.class, "bypass.use-all.open", "Region bypass for opening anything", base));
+        usePermission.put(UseType.REDSTONE, pm.register(SettingsListener.class, "bypass.use-all.redstone", "Region bypass for using redstone", base));
         entityDamageAll = pm.register(SettingsListener.class, "bypass.entity-damage.all", "", base);
         entityDamageLiving = pm.register(SettingsListener.class, "bypass.entity-damage.living", "", base);
         playerDamgeAll = pm.register(SettingsListener.class, "bypass.player-damage.all", "", base);
@@ -219,7 +220,7 @@ public class SettingsListener
 
     public enum MoveType
     {
-        MOVE, ENTER, EXIT, TELEPORT
+        MOVE, ENTER, EXIT, TELEPORT, TELEPORT_PORTAL
     }
 
     @Listener

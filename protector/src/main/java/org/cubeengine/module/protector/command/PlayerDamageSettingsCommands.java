@@ -17,37 +17,26 @@
  */
 package org.cubeengine.module.protector.command;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
-import com.google.common.collect.ImmutableSet;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
 @Command(name = "playerDamage", alias = "player", desc = "Manages the region player-damage settings")
-public class PlayerDamageSettingsCommands extends ContainerCommand
+public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
 {
-    private I18n i18n;
-    private SettingsListener psl;
-    private PermissionService ps;
-
     public PlayerDamageSettingsCommands(CommandManager base, I18n i18n, SettingsListener psl, PermissionService ps)
     {
-        super(base, Protector.class);
-        this.i18n = i18n;
-        this.psl = psl;
-        this.ps = ps;
+        super(base, Protector.class, i18n, psl, ps);
     }
 
     @Command(desc = "Controls player damage")
@@ -104,16 +93,5 @@ public class PlayerDamageSettingsCommands extends ContainerCommand
         i18n.send(context, POSITIVE,"Region {region}: PlayerTargeting by AI Settings updated", region);
     }
 
-    public void setPermission(CommandSource context, Tristate set, Region region, String role, String perm) {
-        ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-            if (!b)
-            {
-                i18n.send(context, NEGATIVE, "This role does not exist");
-                return;
-            }
-            Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), perm, set);
-            i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-        });
-    }
+
 }

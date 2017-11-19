@@ -17,16 +17,13 @@
  */
 package org.cubeengine.module.protector.command;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
 
-import com.google.common.collect.ImmutableSet;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.listener.SettingsListener;
@@ -35,11 +32,10 @@ import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
 @Command(name = "blockdamage", alias = "block", desc = "Manages the region block-damage settings")
-public class BlockDamageSettingsCommands extends ContainerCommand
+public class BlockDamageSettingsCommands extends AbstractSettingsCommand
 {
     private I18n i18n;
     private SettingsListener psl;
@@ -47,7 +43,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
 
     public BlockDamageSettingsCommands(CommandManager base, I18n i18n, SettingsListener psl, PermissionService ps)
     {
-        super(base, Protector.class);
+        super(base, Protector.class, i18n, psl, ps);
         this.i18n = i18n;
         this.psl = psl;
         this.ps = ps;
@@ -82,19 +78,7 @@ public class BlockDamageSettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-                if (!b)
-                {
-                    i18n.send(context, NEGATIVE, "This role does not exist");
-                    return;
-                }
-                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-                //for (MoveListener.MoveType type : types)
-                {
-                    subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.explodePlayer.getId(), set);
-                }
-                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-            });
+            this.setPermission(context, set, region, role,  psl.explodePlayer.getId());
             return;
         }
         region.getSettings().blockDamage.playerExplosion = set;

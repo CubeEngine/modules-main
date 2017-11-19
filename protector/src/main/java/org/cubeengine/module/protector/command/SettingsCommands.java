@@ -22,15 +22,14 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
 
-import com.google.common.collect.ImmutableSet;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.RegionManager;
@@ -44,29 +43,24 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
 @Command(name = "control", desc = "Manages the region settings")
-public class SettingsCommands extends ContainerCommand
+public class SettingsCommands extends AbstractSettingsCommand
 {
-    private I18n i18n;
-    private PermissionService ps;
-    private SettingsListener psl;
+
+    private PermissionManager pm;
 
     public SettingsCommands(RegionManager manager, I18n i18n, PermissionService ps, PermissionManager pm, EventManager em, CommandManager cm)
     {
-        super(cm, Protector.class);
+        super(cm, Protector.class, i18n, new SettingsListener(manager, pm.getBasePermission(Protector.class), pm, i18n), ps);
+        this.pm = pm;
         cm.getProviders().register(this, new RegionParser(manager, i18n), Region.class);
-        this.i18n = i18n;
-        this.ps = ps;
-        this.psl = new SettingsListener(manager, pm.getBasePermission(Protector.class), pm, i18n);
         em.registerListener(Protector.class, this.psl);
 
         this.addCommand(new BlockDamageSettingsCommands(cm, i18n, psl, ps));
         this.addCommand(new EntityDamageSettingsCommands(cm, i18n, psl, ps));
         this.addCommand(new PlayerDamageSettingsCommands(cm, i18n, psl, ps));
-
     }
 
     @Command(desc = "Controls teleport movement")
@@ -82,19 +76,7 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-                if (!b)
-                {
-                    i18n.send(context, NEGATIVE, "This role does not exist");
-                    return;
-                }
-                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-                //for (MoveListener.MoveType type : types)
-                {
-                    subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.movePerms.get(type).getId(), set);
-                }
-                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-            });
+            this.setPermission(context, set, region, role, psl.movePerms.get(type).getId());
             return;
         }
         //for (MoveListener.MoveType type : types)
@@ -113,16 +95,7 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-                if (!b)
-                {
-                    i18n.send(context, NEGATIVE, "This role does not exist");
-                    return;
-                }
-                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.buildPerm.getId(), set);
-                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-            });
+            this.setPermission(context, set, region, role, psl.buildPerm.getId());
             return;
         }
         region.getSettings().build = set;
@@ -136,16 +109,7 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-                if (!b)
-                {
-                    i18n.send(context, NEGATIVE, "This role does not exist");
-                    return;
-                }
-                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.usePermission.get(type).getId(), set);
-                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-            });
+            this.setPermission(context, set, region, role, psl.usePermission.get(type).getId());
             return;
         }
         switch (type)
@@ -177,16 +141,7 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-                if (!b)
-                {
-                    i18n.send(context, NEGATIVE, "This role does not exist");
-                    return;
-                }
-                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useBlockPerm.getId(), set);
-                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-            });
+            this.setPermission(context, set, region, role, psl.useBlockPerm.getId());
             return;
         }
         setOrUnset(region.getSettings().use.block, type, set);
@@ -201,17 +156,7 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-                if (!b)
-                {
-                    i18n.send(context, NEGATIVE, "This role does not exist");
-                    return;
-                }
-                Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-                subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.useItemPerm.getId(), set);
-                i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-
-            });
+            this.setPermission(context, set, region, role, psl.useItemPerm.getId());
             return;
         }
         setOrUnset(region.getSettings().use.item, type, set);
@@ -226,26 +171,17 @@ public class SettingsCommands extends ContainerCommand
     {
         if (role != null)
         {
-            ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
-                if (!b)
-                {
-                    i18n.send(context, NEGATIVE, "This role does not exist");
+            switch (type)
+            {
+                case PLAYER:
+                    this.setPermission(context, set, region, role, psl.spawnEntityPlayerPerm.getId());
                     return;
-                }
-                switch (type)
-                {
-                    case NATURALLY:
-                    case PLUGIN:
-                        i18n.send(context, NEGATIVE, "There is no bypass permission for natural or plugin only spawning.");
-                        return;
-                    case PLAYER:
-                        Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-                        subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), psl.spawnEntityPlayerPerm.getId(), set);
-                        i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
-                        break;
-                }
-            });
-            return;
+                case NATURALLY:
+                case PLUGIN:
+                    i18n.send(context, NEGATIVE, "There is no bypass permission for natural or plugin only spawning.");
+                    return;
+            }
+            throw new IllegalStateException("impossible!");
         }
         switch (type)
         {
@@ -270,7 +206,8 @@ public class SettingsCommands extends ContainerCommand
             @Flag boolean force)
     {
         CommandMapping mapping = Sponge.getGame().getCommandManager().get(command).orElse(null);
-        if (mapping == null)
+        boolean all = "*".equals(command);
+        if (mapping == null && !all)
         {
             i18n.send(context, NEGATIVE, "The command {name} is not a registered command", command);
             if (!force)
@@ -279,6 +216,21 @@ public class SettingsCommands extends ContainerCommand
                 return;
             }
         }
+
+        if (role != null)
+        {
+            if (all)
+            {
+                this.setPermission(context, set, region, role, psl.command.getId());
+            }
+            else
+            {
+                Permission perm = pm.register(Protector.class, command, "Region bypass for using command: " + command , psl.command);
+                this.setPermission(context, set, region, role, perm.getId());
+            }
+            return;
+        }
+
         // Block primary alias instead of parameter if found
         setOrUnset(region.getSettings().blockedCommands, mapping == null ? command : mapping.getPrimaryAlias(), set);
         if (set == Tristate.UNDEFINED)
