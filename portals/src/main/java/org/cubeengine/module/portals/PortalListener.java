@@ -19,6 +19,7 @@ package org.cubeengine.module.portals;
 
 import java.util.List;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.entity.Entity;
@@ -50,7 +51,8 @@ public class PortalListener
         if ((this.module.getConfig().disableVanillaPortals || this.module.getConfig().disabledVanillaPortalsInWorlds.getOrDefault(new ConfigWorld(event.getFromTransform().getExtent()), false))
                 && event.getCause().getContext().get(EventContextKeys.TELEPORT_TYPE).orElse(null) == TeleportTypes.PORTAL)
         {
-            event.setCancelled(true);
+            event.setToTransform(event.getFromTransform().addTranslation(new Vector3d(0,1.2,0)));
+//            event.setCancelled(true);
             return;
         }
         Transform<World> target = event.getToTransform();

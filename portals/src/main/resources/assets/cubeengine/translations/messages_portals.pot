@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: org.cubeengine.module:portals:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2017-05-25 11:15:12+0200\n"
+"POT-Creation-Date: 2017-11-19 11:18:15+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,21 +28,21 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Desc:value
-#: org/cubeengine/module/portals/PortalModifyCommand.java:72
+#: org/cubeengine/module/portals/PortalModifyCommand.java:70
 msgid "A destination can be: here, <world> or p:<portal>"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/portals/PortalModifyCommand.java:87
+#: org/cubeengine/module/portals/PortalModifyCommand.java:85
 msgid "Changes a portals location"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/portals/PortalModifyCommand.java:81
+#: org/cubeengine/module/portals/PortalModifyCommand.java:79
 msgid ""
 "Changes the destination of the selected portal to a random position each "
 "time"
@@ -51,7 +51,7 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/portals/PortalModifyCommand.java:61
+#: org/cubeengine/module/portals/PortalModifyCommand.java:59
 msgid "Changes the owner of a portal"
 msgstr ""
 
@@ -72,7 +72,7 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/portals/PortalModifyCommand.java:105
+#: org/cubeengine/module/portals/PortalModifyCommand.java:103
 msgid "Modifies the location where a player exits when teleporting a portal"
 msgstr ""
 
@@ -114,22 +114,22 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/portals/PortalModifyCommand.java:121
+#: org/cubeengine/module/portals/PortalModifyCommand.java:119
 msgid "Toggles safe teleportation for this portal"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/portals/PortalModifyCommand.java:134
+#: org/cubeengine/module/portals/PortalModifyCommand.java:132
 msgid "Toggles whether entities can teleport with this portal"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/portals/PortalModifyCommand.java:88
-#: org/cubeengine/module/portals/PortalModifyCommand.java:106
+#: org/cubeengine/module/portals/PortalModifyCommand.java:86
+#: org/cubeengine/module/portals/PortalModifyCommand.java:104
 msgid "You have to be ingame to do this!"
 msgstr ""
 
@@ -145,7 +145,7 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/portals/PortalModifyCommand.java:70
+#: org/cubeengine/module/portals/PortalModifyCommand.java:68
 msgid "changes the destination of the selected portal"
 msgstr ""
 
@@ -158,232 +158,232 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/PortalCommands.java:77
 msgid "A portal named {input} already exists!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalModifyCommand.java:113
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalModifyCommand.java:111
 msgid "A portals exit cannot be in an other world than its location!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/config/Destination.java:76
 msgid "Destination portal {input} does not exist!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/Portal.java:114
 msgid "Location: {vector} to {vector} in {name#world}"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/PortalCommands.java:72
-#: org/cubeengine/module/portals/PortalModifyCommand.java:93
+#: org/cubeengine/module/portals/PortalModifyCommand.java:91
 msgid "Please select a cuboid first!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/Portal.java:104
 msgid "Portal Information for {name#portal}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/PortalCommands.java:164
 msgid "Portal debug mode OFF!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/PortalCommands.java:161
 msgid "Portal debug mode ON!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalModifyCommand.java:77
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalModifyCommand.java:75
 msgid "Portal destination set!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/PortalCommands.java:110
 msgid "Portal selected: {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/PortalCommands.java:97
 msgid "Portal {name} created!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/PortalCommands.java:125
 msgid "Portal {name} deleted"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalModifyCommand.java:102
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalModifyCommand.java:100
 msgid "Portal {name} updated to your current selection!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/PortalCommands.java:100
 msgid "Select a destination using the portal modify destination command"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/PortalCommands.java:177
 msgid "The following portals are located in {world}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalModifyCommand.java:118
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalModifyCommand.java:116
 msgid "The portal exit of portal {name} was set to your current location!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalModifyCommand.java:131
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalModifyCommand.java:129
 msgid "The portal {name} will also teleport to an unsafe destination"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalModifyCommand.java:128
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalModifyCommand.java:126
 msgid "The portal {name} will not teleport to an unsafe destination"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalModifyCommand.java:144
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalModifyCommand.java:142
 msgid "The portal {name} will only teleport players"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalModifyCommand.java:141
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalModifyCommand.java:139
 msgid "The portal {name} will teleport entities too"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/PortalCommands.java:174
 msgid "There are no portals in {world}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/Portal.java:107
 msgid "This Portal has safe teleport enabled"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/Portal.java:111
 msgid "This Portal will teleport non-players too"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/Portal.java:119
 msgid "This portal has no destination yet"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/Portal.java:126
 msgid "This portal teleports to another portal: {name#portal}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/Portal.java:129
 msgid "This portal teleports to the spawn of {name#world}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/Portal.java:132
 msgid "This portal teleports to {vector} in {name#world}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/Portal.java:76
 msgid "This portal {name} has no destination yet!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalListener.java:69
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalListener.java:81
 msgid "{text:[Portals] Debug\\::color=YELLOW} Teleported into portal: {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalListener.java:137
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalListener.java:149
 msgid "{text:[Portals] Debug} Entered portal: {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalListener.java:133
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalListener.java:145
 msgid "{text:[Portals] Debug} Move in portal: {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/portals/PortalModifyCommand.java:66
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/portals/PortalModifyCommand.java:64
 msgid "{user} is now the owner of {name#portal}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/portals/Portal.java:113
 msgid "{user} is the owner of this portal"
 msgstr ""

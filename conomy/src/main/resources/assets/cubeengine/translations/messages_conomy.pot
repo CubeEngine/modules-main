@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: org.cubeengine.module:conomy:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2017-05-25 11:15:04+0200\n"
+"POT-Creation-Date: 2017-11-19 11:18:08+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -34,7 +34,7 @@ msgstr ""
 #: org/cubeengine/module/conomy/command/EcoCommand.java:159
 #: org/cubeengine/module/conomy/command/EcoCommand.java:187
 #: org/cubeengine/module/conomy/command/EcoCommand.java:208
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:157
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:165
 msgid "*|<players>"
 msgstr ""
 
@@ -69,7 +69,7 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:89
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:88
 msgid "Deposits given amount of money into the bank"
 msgstr ""
 
@@ -104,21 +104,21 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:218
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:217
 msgid "Lists all banks"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:265
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:264
 msgid "Lists the access levels for a bank"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:57
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:58
 msgid "Manage your money"
 msgstr ""
 
@@ -132,28 +132,28 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:53
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:52
 msgid "Manages your money in banks."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/UniqueAccountReader.java:63
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/UniqueAccountParser.java:63
 msgid "No account found for {user}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:189
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:188
 msgid "Pays given amount of money as bank to a user account"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:157
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:156
 msgid "Pays given amount of money as bank to another bank"
 msgstr ""
 
@@ -202,28 +202,28 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:251
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:250
 msgid "Shows bank information"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:67
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:66
 msgid "Shows the balance of the specified bank"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:104
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:105
 msgid "Shows the players with the highest balance."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:87
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:88
 msgid "Shows your balance"
 msgstr ""
 
@@ -243,29 +243,29 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/VirtualAccountReader.java:58
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/VirtualAccountParser.java:58
 msgid "There is no bank account named {input#name}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:135
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:136
 msgid "Top Balance ({amount})"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:139
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:140
 msgid "Top Balance from {integer} to {integer}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:156
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:164
 msgid "Transfer the given amount to another account."
 msgstr ""
 
@@ -286,104 +286,104 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:123
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:122
 msgid "Withdraws given amount of money from the bank"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:90
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:89
 msgid "You cannot deposit into a bank as console!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:124
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:123
 msgid "You cannot withdraw from a bank as console!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/UniqueAccountReader.java:81
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/UniqueAccountParser.java:81
 msgid "You have no account!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/VirtualAccountReader.java:72
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/VirtualAccountParser.java:72
 msgid "You have no banks available!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/VirtualAccountReader.java:77
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/VirtualAccountParser.java:77
 msgid "You have to specify a bank!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/UniqueAccountReader.java:74
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/UniqueAccountParser.java:74
 msgid "You have to specify a user!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:105
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:106
 msgid "[fromRank-]toRank"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:268
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:267
 msgid "Access Levels for {account}:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:254
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:253
 msgid "Bank Information for {account}:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:162
 msgid "Bank name {input#bank} has already been taken!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:159
 msgid "Bank renamed!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:77
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:76
 msgid "Bank {account} Balance:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:78
 msgid "Could not give the money to {user}!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:151
 #: org/cubeengine/module/conomy/command/EcoCommand.java:179
 msgid "Could not reset the money from {user}!"
@@ -391,230 +391,230 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:118
 msgid "Could not take the money from {user}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:122
 msgid "Created new Bank {account}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:255
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:254
 msgid "Current Balance: {txt}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:111
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:110
 msgid "Deposited {txt#amount} into {account}! New Balance: {txt#balance}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:79
 msgid "Granted deposit access to {account}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:83
 msgid "Granted deposit access to {user} to {account}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:103
 msgid "Granted full  access from {user} to {account}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:99
 msgid "Granted full access to {account}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:69
 msgid "Granted seeing {account}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:73
 msgid "Granted seeing {account} to {user}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:89
 msgid "Granted withdraw access to {account}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:93
 msgid "Granted withdraw access to {user} to {account}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:122
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:123
 msgid "Invalid rank!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:74
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:73
 msgid "No Balance for bank {account} found!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:93
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:94
 msgid "No Balance for {account} found!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:63
 msgid "Revoked all access from {user} to {account}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:59
 msgid "Revoked all access to {account}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:162
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:161
 msgid "Sorry but robbing a bank is not allowed!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:180
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:188
 msgid "Source and target are the same!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:219
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:227
 msgid "The Transaction was not successful!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:103
 msgid "The account of the bank {account} got reset to {txt#balance}!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2, 3. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:148
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:181
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:207
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:147
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:180
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:206
 msgid "The bank does not hold enough money to spend that much!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:143
 msgid "The bank {account} is already hidden!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:159
 msgid "The bank {account} is no longer hidden!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:147
 msgid "The bank {account} is now hidden!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:155
 msgid "The bank {account} was not hidden!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:244
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:243
 msgid "The following banks are available:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:125
 msgid "The money of bank account {account} got set to {txt#balance}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:241
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:240
 msgid "There are no banks currently!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:116
 msgid "There is already a bank names {input#bank}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:261
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:260
 msgid "This bank is hidden for other players!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2, 3, 4, 5, 6, 7, 8. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:118
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:151
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:184
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:210
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:117
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:150
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:183
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:209
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:68
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:89
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:111
@@ -624,8 +624,8 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:203
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:202
 msgid ""
 "Transferred {txt#amount} from {account} to {account#user}! New Balance: "
 "{txt#balance}"
@@ -633,8 +633,8 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:177
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:176
 msgid ""
 "Transferred {txt#amount} from {account} to {account} New Balance: "
 "{txt#balance}"
@@ -642,255 +642,255 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:161
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:169
 msgid "What are you trying to do?"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:144
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:143
 msgid "Withdrawn {txt#amount} from {account}! New Balance: {txt#balance}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:114
 msgid "Withdrew {txt} from your account."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:102
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:101
 msgid "You are not allowed to deposit money into that bank!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:168
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:194
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:167
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:193
 msgid "You are not allowed to make transaction from that bank!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:170
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:178
 msgid "You are not allowed to pay money as someone else!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:136
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:135
 msgid "You are not allowed to withdraw money from that bank!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:115
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:114
 msgid "You cannot afford to spend that much!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:215
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:223
 msgid "You cannot afford {txt#amount}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/BankManageCommand.java:146
 msgid "You deleted the bank {account}!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:96
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:130
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:95
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:129
 msgid "You do not have an account!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:60
 msgid "You gave {txt#amount} to the bank {account}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:71
 msgid "You gave {txt} to {user}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:81
 msgid "You took {input#amount} from the bank {account}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:111
 msgid "You took {txt} from {user}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:74
 msgid "You were granted {txt}."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:147
 msgid "Your balance got reset to {txt}."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:175
 msgid "Your balance got set to {txt}."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:211
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:219
 msgid "{account} cannot afford {txt#amount}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:205
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:213
 msgid "{account} just paid you {txt#amount}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:96
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:97
 msgid "{account}'s Balance:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:197
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:205
 msgid "{txt#amount} transferred from {account}'s to {user}'s account!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:201
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:209
 msgid "{txt#amount} transferred to {user}'s account!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:144
 msgid "{user} account reset to {txt}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:172
 msgid "{user} account set to {txt}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:85
 msgid "{user} charged your bank {account} for {input#amount}!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:92
-#: org/cubeengine/module/conomy/command/MoneyCommand.java:186
+#: org/cubeengine/module/conomy/command/MoneyCommand.java:194
 msgid "{user} does not have an account!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:64
 msgid "{user} granted {input#amount} to your bank {account}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:226
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:225
 msgid "{user} is not owner of any bank!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/conomy/bank/command/BankCommand.java:229
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/conomy/bank/command/BankCommand.java:228
 msgid "{user} is the owner of the following banks:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:107
 msgid "{user} reset the money of your bank {account} to {txt#balance}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/bank/command/EcoBankCommand.java:129
 msgid "{user} set the money of your bank {account} to {txt#balance}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:196
 msgid "{user}'s account is already hidden!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:218
 msgid "{user}'s account is no longer hidden!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:201
 msgid "{user}'s account is now hidden!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/conomy/command/EcoCommand.java:222
 msgid "{user}'s account was not hidden!"
 msgstr ""

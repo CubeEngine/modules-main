@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: org.cubeengine.module:multiverse:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2017-05-25 11:15:17+0200\n"
+"POT-Creation-Date: 2017-11-19 11:18:19+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,98 +28,98 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:83
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:82
 msgid "Lists all known universes"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:57
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:56
 msgid "Moves a world into another universe"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:41
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:40
 msgid "Multiverse commands"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:119
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:118
 msgid "Renames a universe"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:104
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:103
 msgid "Removes a universe"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:128
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:127
 msgid "Renamed universe {input} to {input}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:93
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:92
 msgid "The following univserses exits:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:75
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:74
 msgid "The sky opens up and sucks in the whole world."
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:110
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:125
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:109
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:124
 msgid "There is no universe named {}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:90
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:89
 msgid "There is no universe yet."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:78
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:77
 msgid "When you open your eyes you now are in {input#univserse}."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:116
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:115
 msgid "{name} was removed and {amount} universes moved to {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:64
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:63
 msgid "{world} is already in the universe {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/multiverse/MultiverseCommands.java:68
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/multiverse/MultiverseCommands.java:67
 msgid "{world} is now in the universe {input}!"
 msgstr ""

@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: org.cubeengine.module:travel:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2017-05-25 11:15:08+0200\n"
+"POT-Creation-Date: 2017-11-19 11:18:12+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -27,237 +27,237 @@ msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:334
-#: org/cubeengine/module/travel/warp/WarpCommand.java:277
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:330
+#: org/cubeengine/module/travel/warp/WarpCommand.java:274
 msgid "(tp)"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:454
+#: org/cubeengine/module/travel/home/HomeCommand.java:450
 msgid "Clear all homes [of a player]"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/warp/WarpCommand.java:293
+#: org/cubeengine/module/travel/warp/WarpCommand.java:290
 msgid "Clear all warps [of a player]"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:336
-#: org/cubeengine/module/travel/warp/WarpCommand.java:279
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:332
+#: org/cubeengine/module/travel/warp/WarpCommand.java:276
 msgid "Click to teleport to {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.util.Locale, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/TpPointFormatter.java:47
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.cubeengine.dirigent.context.Context, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/TpPointFormatter.java:48
 msgid "Click to teleport to {}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:384
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:380
 msgid "Click to uninvite {user} from {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:512
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:507
 msgid "Confirm before 30 seconds have passed to delete the homes"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:309
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:306
 msgid "Confirm before 30 seconds have passed to delete the warps"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/warp/WarpCommand.java:123
+#: org/cubeengine/module/travel/warp/WarpCommand.java:120
 msgid "Create a warp"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/travel/home/HomeCommand.java:392
+#: org/cubeengine/module/travel/home/HomeCommand.java:388
 msgid "How about making a phone call to invite someone instead?"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/travel/home/HomeCommand.java:206
+#: org/cubeengine/module/travel/home/HomeCommand.java:205
 msgid "I am calling the moving company right now!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:393
+#: org/cubeengine/module/travel/home/HomeCommand.java:389
 msgid "Invite a user to one of your homes"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:349
+#: org/cubeengine/module/travel/home/HomeCommand.java:345
 msgid "List all players invited to your homes"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/warp/WarpCommand.java:261
+#: org/cubeengine/module/travel/warp/WarpCommand.java:258
 msgid "List warps of a player"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:294
+#: org/cubeengine/module/travel/home/HomeCommand.java:290
 msgid "Lists homes a player can access"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:207
+#: org/cubeengine/module/travel/home/HomeCommand.java:206
 msgid "Move a home"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/warp/WarpCommand.java:184
+#: org/cubeengine/module/travel/warp/WarpCommand.java:181
 msgid "Move a warp"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/travel/home/HomeCommand.java:147
+#: org/cubeengine/module/travel/home/HomeCommand.java:146
 msgid "Ok so I'll need your new address then. No seriously this won't work!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:236
+#: org/cubeengine/module/travel/home/HomeCommand.java:232
 msgid "Remove a home"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/warp/WarpCommand.java:208
+#: org/cubeengine/module/travel/warp/WarpCommand.java:205
 msgid "Remove a warp"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:259
+#: org/cubeengine/module/travel/home/HomeCommand.java:255
 msgid "Rename a home"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/warp/WarpCommand.java:230
+#: org/cubeengine/module/travel/warp/WarpCommand.java:227
 msgid "Rename a warp"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:173
+#: org/cubeengine/module/travel/home/HomeCommand.java:172
 msgid "Set the welcome message of homes"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/warp/WarpCommand.java:151
+#: org/cubeengine/module/travel/warp/WarpCommand.java:148
 msgid "Set the welcome message of warps"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:146
+#: org/cubeengine/module/travel/home/HomeCommand.java:145
 msgid "Set your home"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:111
+#: org/cubeengine/module/travel/home/HomeCommand.java:110
 msgid "Teleport to a home"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/warp/WarpCommand.java:58
-#: org/cubeengine/module/travel/warp/WarpCommand.java:92
+#: org/cubeengine/module/travel/warp/WarpCommand.java:55
+#: org/cubeengine/module/travel/warp/WarpCommand.java:89
 msgid "Teleport to a warp"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:75
+#: org/cubeengine/module/travel/home/HomeCommand.java:74
 msgid "Teleport to your home"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/travel/home/HomeCommand.java:425
+#: org/cubeengine/module/travel/home/HomeCommand.java:421
 msgid "Uninvite a player from one of your homes"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
-#: org/cubeengine/module/travel/home/HomeCommand.java:260
-#: org/cubeengine/module/travel/warp/WarpCommand.java:231
+#: org/cubeengine/module/travel/home/HomeCommand.java:256
+#: org/cubeengine/module/travel/warp/WarpCommand.java:228
 msgid "new name"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
-#: org/cubeengine/module/travel/home/HomeCommand.java:176
-#: org/cubeengine/module/travel/warp/WarpCommand.java:153
+#: org/cubeengine/module/travel/home/HomeCommand.java:175
+#: org/cubeengine/module/travel/warp/WarpCommand.java:150
 msgid "welcome message"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:134
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:131
 msgid "A warp by that name already exist!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:488
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:483
 msgid ""
 "Are you sure you want to delete all homes created by {user} in your current "
 "selection?"
@@ -265,66 +265,66 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:493
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:488
 msgid ""
 "Are you sure you want to delete all homes created in your current selection?"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:503
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:498
 msgid "Are you sure you want to delete all homes ever created by {user}?"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:508
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:503
 msgid "Are you sure you want to delete all homes ever created on this server?"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:303
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:300
 msgid "Are you sure you want to delete all warps ever created by {user}?"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:307
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:304
 msgid ""
 "Are you sure you want to delete all warps ever created on this server!?"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:282
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:278
 msgid "Could not rename the home to {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:258
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:255
 msgid "Could not rename the warp to {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:316
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:313
 msgid "Deleted warps."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:274
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:270
 msgid ""
 "Homes may not have names that are longer than 32 characters or contain "
 "colon(:)'s!"
@@ -332,8 +332,8 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:161
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:160
 msgid ""
 "Homes may not have names that are longer then 32 characters nor contain "
 "colon(:)'s!"
@@ -341,169 +341,169 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:481
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:476
 msgid "Invalid selection!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:317
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:313
 msgid "No homes are available to you!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:320
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:316
 msgid "No homes are available to {user}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:129
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:126
 msgid "Some warps must be deleted for new ones to be made"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:325
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:321
 msgid "The following homes are available to you:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:329
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:325
 msgid "The following homes are available to {user}:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:375
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:371
 msgid "The following homes of {user} have players invited to them:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:166
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:165
 msgid "The home already exists! You can move it with {text:/home move}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:232
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:228
 msgid "The home {name} of {user} has been moved to your current location"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:256
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:252
 msgid "The home {name} of {user} has been removed"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:290
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:286
 msgid "The home {name} of {user} has been renamed to {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/TravelExceptionHandler.java:65
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/TravelExceptionHandler.java:64
 msgid "The home {name} of {user} is in a world that no longer exists!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:544
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:539
 msgid "The homes are now deleted."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:535
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:530
 msgid "The homes in the selection are now deleted."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:541
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:536
 msgid "The homes of {user} are now deleted"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:532
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:527
 msgid "The homes of {user} in the selection are now deleted"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:128
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:125
 msgid "The server have reached its maximum number of warps!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:144
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:141
 msgid "The warp already exists! You can move it with {text:/warp move}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:204
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:201
 msgid "The warp {name} of {user} has been moved to your current location"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:227
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:224
 msgid "The warp {name} of {user} has been removed"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:255
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:252
 msgid "The warp {name} of {user} has been renamed to {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/TravelExceptionHandler.java:69
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/TravelExceptionHandler.java:68
 msgid "The warp {name} of {user} is in a world that no longer exists!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:321
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:318
 msgid "The warps are now deleted"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:201
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:200
 #, fuzzy
 #| msgid "I am calling the moving company right now!"
 msgid "The welcome message for the home {name} of {user} is now set to:"
@@ -511,43 +511,43 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:178
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:175
 msgid "The welcome message for the warp {name} of {user} is now set to:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:197
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:196
 msgid "The welcome message for your home {name} is now set to:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:174
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:171
 msgid "The welcome message for your warp {name} is now set to:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:271
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:268
 msgid "There are no warps set."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:329
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:326
 msgid "There is no warp named {name#warp}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslatedN(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, int, java.lang.String, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:274
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#sendN(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, int, java.lang.String, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:271
 msgid "There is one warp set:"
 msgid_plural "There are {amount} warps set:"
 msgstr[0] ""
@@ -555,24 +555,24 @@ msgstr[1] ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:460
-#: org/cubeengine/module/travel/warp/WarpCommand.java:298
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:456
+#: org/cubeengine/module/travel/warp/WarpCommand.java:295
 msgid "This command has been disabled for ingame use via the configuration"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:120
-#: org/cubeengine/module/travel/home/HomeCommand.java:215
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:119
+#: org/cubeengine/module/travel/home/HomeCommand.java:214
 msgid "Use {text:/sethome} to set your home"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:139
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:136
 msgid ""
 "Warps may not have names that are longer than 32 characters nor contain "
 "colon(:)'s!"
@@ -580,8 +580,8 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:245
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:242
 msgid ""
 "Warps may not have names that are longer than 32 characters or contain "
 "colon(:)'s!"
@@ -589,179 +589,179 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:448
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:444
 msgid "You are no longer invited to {user}'s home {name#home}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:405
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:401
 msgid "You cannot invite yourself to your own home!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:437
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:433
 msgid "You cannot uninvite yourself from your own home!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:400
-#: org/cubeengine/module/travel/home/HomeCommand.java:432
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:396
+#: org/cubeengine/module/travel/home/HomeCommand.java:428
 msgid "You do not own a home named {name#home}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:554
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:549
 msgid "You have no home named {name#home}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:363
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:359
 msgid "You have no homes with players invited to them!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:154
-#: org/cubeengine/module/travel/home/HomeManager.java:165
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:153
+#: org/cubeengine/module/travel/home/HomeManager.java:169
 msgid "You have reached your maximum number of homes!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:474
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:470
 msgid "You have to be in game to use the selection flag"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:155
-#: org/cubeengine/module/travel/home/HomeManager.java:166
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:154
+#: org/cubeengine/module/travel/home/HomeManager.java:170
 msgid "You have to delete a home to make a new one"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:469
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:465
 msgid "You need to use the Selector module to delete homes in a selection!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:371
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:367
 msgid "Your following homes have players invited to them:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeManager.java:172
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeManager.java:176
 msgid "Your home has been created!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:170
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:169
 msgid "Your home {name} has been created!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:229
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:225
 msgid "Your home {name} has been moved to your current location!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:253
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:249
 msgid "Your home {name} has been removed!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:287
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:283
 msgid "Your home {name} has been renamed to {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/TravelExceptionHandler.java:53
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/TravelExceptionHandler.java:52
 msgid "Your home {name} is in a world that no longer exists!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:148
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:145
 msgid "Your warp {name} has been created!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:201
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:198
 msgid "Your warp {name} has been moved to your current location!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:224
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:221
 msgid "Your warp {name} has been removed"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/warp/WarpCommand.java:252
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:249
 msgid "Your warp {name} has been renamed to {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/TravelExceptionHandler.java:57
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/TravelExceptionHandler.java:56
 msgid "Your warp {name} is in a world that no longer exists!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:558
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:553
 msgid "{user} has no home named {name#home}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:366
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:362
 msgid "{user} has no homes with players invited to them!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:417
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:413
 msgid ""
 "{user} invited you to their home. To teleport to it use: /home {name#home} "
 "{name}"
@@ -769,28 +769,56 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:410
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:406
 msgid "{user} is already invited to your home!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:450
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:446
 msgid "{user} is no longer invited to your home {name}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:442
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:438
 msgid "{user} is not invited to your home!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/travel/home/HomeCommand.java:421
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:417
 msgid "{user} is now invited to your home {name}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:141
+msgid "You have been teleported to the home {name} of {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:115
+msgid "You have been teleported to the warp {name} of {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/home/HomeCommand.java:138
+msgid "You have been teleported to your home {name}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/travel/warp/WarpCommand.java:112
+msgid "You have been teleported to your warp {name}!"
 msgstr ""

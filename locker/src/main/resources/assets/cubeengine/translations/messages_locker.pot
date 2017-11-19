@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: org.cubeengine.module:locker:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2017-05-25 11:15:10+0200\n"
+"POT-Creation-Date: 2017-11-19 11:18:13+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,14 +28,14 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:40
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:41
 msgid "Administrate the protections"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/LockerBlockListener.java:124
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.entity.living.player.Player, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/LockerBlockListener.java:123
 msgid "Click here to protect"
 msgstr ""
 
@@ -49,88 +49,88 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:97
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:99
 msgid "Deletes a protection by its id"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:122
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:124
 msgid "Deletes all locks of given player"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:137
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:139
 msgid "Deletes old locks"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerCommands.java:58
+#: org/cubeengine/module/locker/commands/LockerCommands.java:59
 msgid "Locker commands"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:69
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:70
 msgid "Opens a protected chest by protection id"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerCommands.java:262
+#: org/cubeengine/module/locker/commands/LockerCommands.java:263
 msgid "Sets or unsets flags"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerCommands.java:77
-#: org/cubeengine/module/locker/commands/LockerCommands.java:138
+#: org/cubeengine/module/locker/commands/LockerCommands.java:78
+#: org/cubeengine/module/locker/commands/LockerCommands.java:139
 msgid "Shows information about a protection"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:106
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:108
 msgid "Teleport to a protection"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/KeyBook.java:152
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.entity.living.player.Player, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/KeyBook.java:154
 msgid "This KeyBook"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:205
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.entity.living.player.Player, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:199
 msgid "This book can"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17. Annotation
 #. 	Name: org.cubeengine.butler.filter.Restricted:msg
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:70
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:98
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:107
-#: org/cubeengine/module/locker/commands/LockerCommands.java:78
-#: org/cubeengine/module/locker/commands/LockerCommands.java:126
-#: org/cubeengine/module/locker/commands/LockerCommands.java:139
-#: org/cubeengine/module/locker/commands/LockerCommands.java:152
-#: org/cubeengine/module/locker/commands/LockerCommands.java:165
-#: org/cubeengine/module/locker/commands/LockerCommands.java:186
-#: org/cubeengine/module/locker/commands/LockerCommands.java:207
-#: org/cubeengine/module/locker/commands/LockerCommands.java:263
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:71
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:100
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:109
+#: org/cubeengine/module/locker/commands/LockerCommands.java:79
+#: org/cubeengine/module/locker/commands/LockerCommands.java:127
+#: org/cubeengine/module/locker/commands/LockerCommands.java:140
+#: org/cubeengine/module/locker/commands/LockerCommands.java:153
+#: org/cubeengine/module/locker/commands/LockerCommands.java:166
+#: org/cubeengine/module/locker/commands/LockerCommands.java:187
+#: org/cubeengine/module/locker/commands/LockerCommands.java:208
+#: org/cubeengine/module/locker/commands/LockerCommands.java:264
 #: org/cubeengine/module/locker/commands/LockerCreateCommands.java:71
 #: org/cubeengine/module/locker/commands/LockerCreateCommands.java:130
 #: org/cubeengine/module/locker/commands/LockerCreateCommands.java:139
@@ -143,21 +143,21 @@ msgstr ""
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerCommands.java:151
+#: org/cubeengine/module/locker/commands/LockerCommands.java:152
 msgid "Unlocks a password protected chest"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerCommands.java:164
+#: org/cubeengine/module/locker/commands/LockerCommands.java:165
 msgid "adds or removes player from the accesslist"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerCommands.java:206
+#: org/cubeengine/module/locker/commands/LockerCommands.java:207
 msgid "creates a KeyBook or invalidates previous KeyBooks"
 msgstr ""
 
@@ -200,85 +200,85 @@ msgstr ""
 #. Extracted by:
 #. 1, 2. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
-#: org/cubeengine/module/locker/commands/LockerCommands.java:265
 #: org/cubeengine/module/locker/commands/LockerCommands.java:266
+#: org/cubeengine/module/locker/commands/LockerCommands.java:267
 msgid "flags..."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerCommands.java:185
+#: org/cubeengine/module/locker/commands/LockerCommands.java:186
 msgid "gives a protection to someone else"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:207
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.entity.living.player.Player, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:201
 msgid "locked protection"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/KeyBook.java:153
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.entity.living.player.Player, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/KeyBook.java:155
 msgid "looks old and"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/KeyBook.java:156
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.entity.living.player.Player, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/KeyBook.java:158
 msgid "open any containers!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/locker/commands/LockerCommands.java:125
+#: org/cubeengine/module/locker/commands/LockerCommands.java:126
 msgid "persists your last locker command"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:206
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.entity.living.player.Player, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:200
 msgid "unlock a magically"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/KeyBook.java:154
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.entity.living.player.Player, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/KeyBook.java:156
 msgid "used up. It"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#getTranslation(java.lang.Object, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/KeyBook.java:155
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#translate(org.spongepowered.api.entity.living.player.Player, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/KeyBook.java:157
 msgid "won't let you"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:318
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:319
 msgid "All flags are now unset!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:128
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:130
 msgid "All locks for {user} are now deleted!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:113
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:114
 msgid ""
 "As you inspect the KeyBook closer you realize that its magic power has "
 "disappeared!"
@@ -286,8 +286,8 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:790
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:799
 msgid ""
 "As you memorize the pass phrase the magic aura protecting this allows you to "
 "interact"
@@ -295,98 +295,98 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/LockerBlockListener.java:127
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/LockerBlockListener.java:126
 msgid "Autoprotect is disabled while sneaking. {txt}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:230
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:231
 msgid "Change the password to invalidate them!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/LockManager.java:384
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/LockManager.java:244
 msgid "Deleted invalid BlockProtection!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:304
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:305
 msgid "Flags set!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:327
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:328
 msgid "Flags unset!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:294
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:289
 msgid "Granted {user} access to this protection!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:290
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:285
 msgid "Granted {user} admin access to this protection!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:730
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:739
 msgid "Has a password and is currently {text:locked:color=RED}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:726
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:735
 msgid "Has a password and is currently {text:unlocked:color=YELLOW}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:58
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:59
 msgid "Invalid id!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:212
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:213
 msgid "KeyBooks are deactivated!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:185
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:179
 msgid "KeyBooks are not enabled!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:147
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:149
 msgid "No locks deleted!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/locker/commands/CommandListener.java:70
 msgid ""
 "Persist mode is active. Your command will be repeated until reusing {text:/"
@@ -395,127 +395,127 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:718
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:727
 msgid "Protection: #{integer#id} Type: {input#type} by {user}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:783
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:792
 msgid "ProtectionType: {input#locktype}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:779
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:788
 msgid "ProtectionType: {input#locktype} Owner: {user}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:286
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:281
 msgid "Removed {user}'s access to this protection!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:330
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:331
 msgid "Right click a protection to change its flags!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:202
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:203
 msgid "Right click a protection to give it to {user}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:242
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:243
 msgid "Right click a protection to invalidate old KeyBooks for it!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:180
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:181
 msgid "Right click a protection to modify it!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:147
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:148
 msgid "Right click a protection to remove it!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:258
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:259
 msgid "Right click a protection to with a book to create a new KeyBook!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/locker/commands/LockerCreateCommands.java:61
 msgid "Right click the item you want to protect with a book in your hand!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/locker/commands/LockerCreateCommands.java:65
 msgid "Right click the item you want to protect!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:121
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:122
 msgid "Right click to show protection-info"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:160
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:161
 msgid "Right click to unlock a password protected chest!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/LockerListener.java:95
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/LockerListener.java:93
 msgid "Strong magic prevents you from accessing any door!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/LockerListener.java:81
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/LockerListener.java:79
 msgid "Strong magic prevents you from accessing any inventory!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/LockerListener.java:115
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/LockerListener.java:113
 msgid "Strong magic prevents you from reaching this entity!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:104
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:105
 msgid ""
 "The entity protection corresponding to this book is located at {vector} in "
 "{world}"
@@ -523,51 +523,51 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:272
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:273
 msgid "The following flags are available:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:745
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:754
 msgid "The following flags are set:"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:755
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:764
 msgid "The following users have direct access to this protection"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:95
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:96
 msgid ""
 "The protection corresponding to this book is located at {vector} in {world}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:824
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:833
 msgid "The protection is currently not active because its owner is offline!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:820
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:829
 msgid "The protection is currently not active because its owner is online!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:89
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:91
 msgid ""
 "The protection with the id {integer} is an entity and cannot be accessed "
 "from far away!"
@@ -575,15 +575,15 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:93
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:95
 msgid "The protection with the id {integer} is not a container!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:91
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:92
 msgid ""
 "The strong magic surrounding this KeyBook allows you to access the "
 "designated protection"
@@ -591,31 +591,34 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/locker/commands/LockerCreateCommands.java:82
+#: org/cubeengine/module/locker/storage/LockManager.java:363
 msgid "There is already protection here!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:64
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:65
 msgid "There is no protection with the id {integer}"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2, 3. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:200
-#: org/cubeengine/module/locker/commands/LockerCommands.java:224
-#: org/cubeengine/module/locker/commands/LockerCommands.java:248
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:201
+#: org/cubeengine/module/locker/commands/LockerCommands.java:225
+#: org/cubeengine/module/locker/commands/LockerCommands.java:249
 msgid "This is not your protection!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslatedN(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, int, java.lang.String, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:772
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#sendN(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, int, java.lang.String, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:781
 msgid "This protection covers a single block!"
 msgid_plural "This protections covers {amount} blocks!"
 msgstr[0] ""
@@ -623,43 +626,43 @@ msgstr[1] ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:253
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:254
 msgid "This protection is public!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:303
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:298
 msgid "Updated {user}'s access to admin access!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:307
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:302
 msgid "Updated {user}'s access to normal access!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:295
-#: org/cubeengine/module/locker/commands/LockerCommands.java:312
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:296
+#: org/cubeengine/module/locker/commands/LockerCommands.java:313
 msgid "You are not allowed to modify the flags for this protection!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:278
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:279
 msgid "You can also unset {text:all}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/locker/commands/LockerCreateCommands.java:121
 msgid ""
 "You can only apply guarded, donation and free protections to inventory "
@@ -668,57 +671,57 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:229
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:230
 msgid "You cannot invalidate KeyBooks for password protected locks."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/locker/commands/LockerCreateCommands.java:99
 msgid "You cannot protect this block!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
 #: org/cubeengine/module/locker/commands/LockerCreateCommands.java:110
 msgid "You cannot protect this entity!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:118
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:120
 msgid "You cannot teleport to an entity protection!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:287
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:288
 msgid "You have cannot set and unset flags at the same time!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:271
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:272
 msgid "You need to define which flags to {text:set} or {text:unset}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:799
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:808
 msgid "You sense a strong magic aura protecting this"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:794
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:803
 msgid ""
 "You sense that the strong magic aura protecting this won't let you through "
 "without the right passphrase"
@@ -726,22 +729,22 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:134
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:135
 msgid "Your commands will now no longer persist!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:131
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:132
 msgid "Your commands will now persist!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:108
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:109
 msgid ""
 "Your magic is not strong enough to locate the corresponding entity "
 "protection!"
@@ -749,91 +752,388 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:809
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:818
 msgid "but it does not hinder you when moving items"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:813
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:822
 msgid "but it lets you interact as if you were not there"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:721
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:730
 msgid "last access was {input#time}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:719
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:728
 msgid "protects {input#type} since {input#time}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:687
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:696
 msgid "which is located at {vector} in {world}"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:677
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:686
 msgid "which is located at {vector} in {world}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:143
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:145
 msgid "{amount} locks deleted!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:691
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:700
 msgid "{user} accessed one of your protected entities somewhere!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:685
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:694
 msgid "{user} accessed one of your protected entities!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:675
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:684
 msgid "{user} accessed one your protection with the id {integer}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:132
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerAdminCommands.java:134
 msgid "{user} had no locks!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/commands/LockerCommands.java:197
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/commands/LockerCommands.java:198
 msgid "{user} is now the owner of this protection."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/locker/storage/Lock.java:643
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:652
 msgid "{user} used a KeyBook to access one of your protections!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:462
+msgid "A magical lock from {user} prevents you from accessing this inventory!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:402
+msgid "A magical lock from {user} prevents you from using this door!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:466
+msgid "A magical lock prevents you from accessing this inventory!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:406
+msgid "A magical lock prevents you from using this door!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/KeyBook.java:129
+msgid "As you approach with your KeyBook the magic lock disappears!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#sendN(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, int, java.lang.String, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:148
+msgid "Donation Lock created!"
+msgid_plural "Donation Lock created! ({amount} blocks)"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#sendN(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, int, java.lang.String, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:151
+msgid "Free Lock created!"
+msgid_plural "Free Lock created! ({amount} blocks)"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/LockManager.java:613
+msgid "Global access for {user} set!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#sendN(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, int, java.lang.String, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:145
+msgid "Guarded Lock created!"
+msgid_plural "Guarded Lock created! ({amount} blocks)"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:518
+msgid "Magic from {user} repelled your attempts to reach this entity!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:563
+msgid "Magic prevents you from breaking this protection!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:580
+msgid "Magic prevents you from interacting with this block!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:593
+msgid "Magic repelled your attempts to hit this entity!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:522
+msgid "Magic repelled your attempts to reach this entity!"
+msgstr ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/LockerBlockListener.java:165
+#: org/cubeengine/module/locker/LockerBlockListener.java:213
+msgid "Nearby BlockProtection is not valid!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#sendN(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, int, java.lang.String, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:139
+msgid "Private Lock created!"
+msgid_plural "Private Lock created! ({amount} blocks)"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Extracted by:
+#. 1, 2. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/LockerBlockListener.java:184
+#: org/cubeengine/module/locker/LockerBlockListener.java:219
+msgid "Protection expanded to {amount} blocks!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#sendN(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, int, java.lang.String, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:142
+msgid "Public Lock created!"
+msgid_plural "Public Lock created! ({amount} blocks)"
+msgstr[0] ""
+msgstr[1] ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/LockManager.java:342
+msgid "Removed Lock!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/LockManager.java:629
+msgid "Removed global access from {user}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:857
+msgid "Sudden pain makes you realize this was not the right passphrase!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:588
+msgid "The magic surrounding this entity quivers as you hit it!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/LockerBlockListener.java:224
+msgid "The nearby chest is protected by someone else!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/LockerBlockListener.java:189
+msgid "The nearby door is protected by someone else!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:571
+msgid "This block is protected by {user}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:884
+msgid "This door is protected by {user}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:500
+msgid "This entity is protected by {user}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:434
+msgid "This inventory is protected by {user}"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/LockManager.java:346
+msgid "This protection is not yours!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:267
+msgid "This protection is public and so is accessible to everyone"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/LockManager.java:619
+msgid "Updated global access level for {user}!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:849
+msgid ""
+"Upon hearing the right passphrase the magic gets thinner and lets you pass!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:262
+msgid "You are not allowed to modify the access list of this protection!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:879
+msgid "You cannot open the heavy door!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:194
+msgid "You need to hold a book in your hand in order to create a KeyBook!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:864
+msgid "You try to open the container with a passphrase but nothing changes!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/KeyBook.java:104
+msgid "You try to open the container with your KeyBook but nothing happens!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/KeyBook.java:112
+msgid ""
+"You try to open the container with your KeyBook but you get forcefully "
+"pushed away!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/Lock.java:294
+#, fuzzy
+#| msgid "Granted {user} access to this protection!"
+msgid "{user} had no access to this protection!"
+msgstr ""
+
+#. Extracted by:
+#. 1. Method
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.chat.ChatType, org.spongepowered.api.text.channel.ChatTypeMessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/locker/storage/LockManager.java:624
+msgid "{user} had no global access!"
 msgstr ""

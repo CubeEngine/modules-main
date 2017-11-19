@@ -18,7 +18,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: org.cubeengine.module:kickban:1.0.0-SNAPSHOT\n"
 "Report-Msgid-Bugs-To: development@cubeisland.de\n"
-"POT-Creation-Date: 2017-05-25 11:15:15+0200\n"
+"POT-Creation-Date: 2017-11-19 11:18:17+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -28,289 +28,289 @@ msgstr ""
 #. Extracted by:
 #. 1, 2. Method
 #. 	Name: org.cubeengine.libcube.service.Broadcaster#broadcastTranslatedWithPerm(org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:161
-#: org/cubeengine/module/kickban/KickBanCommands.java:252
+#: org/cubeengine/module/kickban/KickBanCommands.java:166
+#: org/cubeengine/module/kickban/KickBanCommands.java:257
 msgid "And with it kicked: {user#list}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/kickban/KickBanCommands.java:284
+#: org/cubeengine/module/kickban/KickBanCommands.java:289
 msgid "Bans a player for a given time."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/kickban/KickBanCommands.java:115
+#: org/cubeengine/module/kickban/KickBanCommands.java:120
 msgid "Bans a player permanently on your server."
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/kickban/KickBanCommands.java:224
-#: org/cubeengine/module/kickban/KickBanCommands.java:264
+#: org/cubeengine/module/kickban/KickBanCommands.java:229
+#: org/cubeengine/module/kickban/KickBanCommands.java:269
 msgid "Bans the IP from this server."
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Label:value
-#: org/cubeengine/module/kickban/KickBanCommands.java:225
-#: org/cubeengine/module/kickban/KickBanCommands.java:265
+#: org/cubeengine/module/kickban/KickBanCommands.java:230
+#: org/cubeengine/module/kickban/KickBanCommands.java:270
 msgid "IP address"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/kickban/KickBanCommands.java:90
+#: org/cubeengine/module/kickban/KickBanCommands.java:95
 msgid "Kicks a player from the server"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
 #. 	Name: org.cubeengine.libcube.service.Broadcaster#broadcastTranslatedWithPerm(org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:247
+#: org/cubeengine/module/kickban/KickBanCommands.java:252
 msgid "The IP {input#ip} was banned from the server by {sender}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/kickban/KickBanCommands.java:205
+#: org/cubeengine/module/kickban/KickBanCommands.java:210
 msgid "Unbans a previously banned player."
 msgstr ""
 
 #. Extracted by:
 #. 1. Annotation
 #. 	Name: org.cubeengine.butler.parametric.Command:desc
-#: org/cubeengine/module/kickban/KickBanCommands.java:356
+#: org/cubeengine/module/kickban/KickBanCommands.java:361
 msgid "View all players banned from this server"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2, 3, 4. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
-#: org/cubeengine/module/kickban/KickBanCommands.java:153
-#: org/cubeengine/module/kickban/KickBanCommands.java:182
-#: org/cubeengine/module/kickban/KickBanCommands.java:243
-#: org/cubeengine/module/kickban/KickBanCommands.java:313
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#getTranslation(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/kickban/KickBanCommands.java:158
+#: org/cubeengine/module/kickban/KickBanCommands.java:187
+#: org/cubeengine/module/kickban/KickBanCommands.java:248
+#: org/cubeengine/module/kickban/KickBanCommands.java:318
 msgid "You have been banned from this server!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#translate(org.spongepowered.api.command.CommandSource, java.lang.String)
-#: org/cubeengine/module/kickban/KickBanCommands.java:101
-#: org/cubeengine/module/kickban/KickBanCommands.java:108
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#getTranslation(org.spongepowered.api.command.CommandSource, java.lang.String)
+#: org/cubeengine/module/kickban/KickBanCommands.java:106
+#: org/cubeengine/module/kickban/KickBanCommands.java:113
 msgid "You have been kicked from the server!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
 #. 	Name: org.cubeengine.libcube.service.Broadcaster#broadcastTranslatedWithPerm(org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:158
-#: org/cubeengine/module/kickban/KickBanCommands.java:186
+#: org/cubeengine/module/kickban/KickBanCommands.java:163
+#: org/cubeengine/module/kickban/KickBanCommands.java:191
 msgid "{user} was banned from the server by {sender}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
 #. 	Name: org.cubeengine.libcube.service.Broadcaster#broadcastTranslatedWithPerm(org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:316
+#: org/cubeengine/module/kickban/KickBanCommands.java:321
 msgid "{user} was banned temporarily from the server by {sender}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
 #. 	Name: org.cubeengine.libcube.service.Broadcaster#broadcastTranslatedWithPerm(org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:109
+#: org/cubeengine/module/kickban/KickBanCommands.java:114
 msgid "{user} was kicked from the server by {user}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:332
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:337
 msgid "Banning players by name is not allowed in offline-mode!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:322
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:327
 msgid "Invalid time value! Examples: 1d 12h 5m"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:386
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:391
 msgid "Only the IP {name#ip} is banned on this server"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:406
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:411
 msgid "Only {user}({name#uuid}) is banned on this server"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:337
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:342
 msgid "Players could change their username with a cracked client!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:232
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:237
 msgid "The IP {input#ip} is already banned!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:276
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:281
 msgid "The IP {input#ip} was not banned!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:389
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:394
 msgid "The following {amount} IPs are banned from this server"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:410
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:415
 msgid "The following {amount} players are banned from this server"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:336
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:341
 msgid "The server is running in {text:OFFLINE-mode:color=DARK_RED}."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:380
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:385
 msgid "There are no IPs banned on this server!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:400
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:405
 msgid "There are no players banned on this server!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:237
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:242
 msgid "You banned the IP {input#ip} from your server!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:157
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:162
 msgid "You banned the IP: {input#ip}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:315
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:320
 msgid "You banned {user} temporarily!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:185
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:190
 msgid "You banned {user}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:338
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:343
 msgid "You can IP-ban to prevent banning a real player in that case."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:333
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:338
 msgid "You can change this in your Basics-Configuration."
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:136
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:141
 msgid "You cannot IP ban a player that has never played on the server before!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:167
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:172
 msgid "You cannot IP ban {user} because he was offline for too long!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:196
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:201
 msgid "You need to specify a reason!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:273
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:278
 msgid "You unbanned the IP {input#ip}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:213
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:218
 msgid "You unbanned {user}!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:217
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:222
 msgid "You unbanned {user}({name#uuid})!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:260
-#: org/cubeengine/module/kickban/KickBanCommands.java:280
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:265
+#: org/cubeengine/module/kickban/KickBanCommands.java:285
 msgid "{input#ip} is not a valid IP address!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:128
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:133
 msgid ""
 "{user} has never played on this server before! Use the -force flag to ban "
 "him anyway."
@@ -318,8 +318,8 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:296
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:301
 msgid ""
 "{user} has never played on this server before! Use the -force flag to ban "
 "him anyways."
@@ -327,22 +327,22 @@ msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:144
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:149
 msgid "{user} is already IP banned!"
 msgstr ""
 
 #. Extracted by:
 #. 1, 2. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:175
-#: org/cubeengine/module/kickban/KickBanCommands.java:302
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:180
+#: org/cubeengine/module/kickban/KickBanCommands.java:307
 msgid "{user} is already banned!"
 msgstr ""
 
 #. Extracted by:
 #. 1. Method
-#. 	Name: org.cubeengine.libcube.service.i18n.I18n#sendTranslated(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
-#: org/cubeengine/module/kickban/KickBanCommands.java:221
+#. 	Name: org.cubeengine.libcube.service.i18n.I18nTranslate#send(org.spongepowered.api.text.channel.MessageReceiver, org.spongepowered.api.text.format.TextFormat, java.lang.String, java.lang.Object[])
+#: org/cubeengine/module/kickban/KickBanCommands.java:226
 msgid "{user} is not banned, maybe you misspelled his name?"
 msgstr ""
