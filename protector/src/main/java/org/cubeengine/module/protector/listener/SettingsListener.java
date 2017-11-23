@@ -60,7 +60,7 @@ import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.entity.ai.SetAttackTargetEvent;
+import org.spongepowered.api.event.entity.ai.SetAITargetEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
@@ -567,7 +567,7 @@ public class SettingsListener
     }
 
     @Listener
-    public void onTargetPlayer(SetAttackTargetEvent event, @Getter("getTarget") Player player)
+    public void onTargetPlayer(SetAITargetEvent event, @Getter("getTarget") Player player)
     {
         List<Region> regions = manager.getRegionsAt(player.getLocation());
         checkSetting(event, player, regions, () -> this.playerTargeting, s -> s.playerDamage.aiTargeting, UNDEFINED);
