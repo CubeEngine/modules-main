@@ -56,6 +56,7 @@ import org.cubeengine.module.travel.config.Home;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.ConsoleSource;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -127,6 +128,7 @@ public class HomeCommand extends ContainerCommand
             }
         }
         Transform<World> location = h.transform.getTransformIn(h.world.getWorld());
+        sender.remove(Keys.VEHICLE);
         sender.setTransform(location);
         if (h.welcomeMsg != null)
         {
