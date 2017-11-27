@@ -17,20 +17,25 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import static org.cubeengine.butler.parameter.Parameter.INFINITE;
+import static org.cubeengine.libcube.service.command.parser.EnchantmentParser.getPossibleEnchantments;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.item.ItemTypes.SKULL;
+import static org.spongepowered.api.text.serializer.TextSerializers.FORMATTING_CODE;
+
 import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
@@ -44,11 +49,9 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.libcube.service.command.parser.EnchantmentParser.getPossibleEnchantments;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.item.ItemTypes.SKULL;
-import static org.spongepowered.api.text.serializer.TextSerializers.FORMATTING_CODE;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * <p>/rename
@@ -209,6 +212,7 @@ public class ItemModifyCommands extends PermissionContainer
         }
         hide = hide == null ? true : hide;
         item.get().offer(Keys.HIDE_ENCHANTMENTS, hide);
+        context.setItemInHand(HandTypes.MAIN_HAND, item.get());
         if (hide)
         {
             i18n.send(context, POSITIVE, "Enchantments are hidden on this item.");
