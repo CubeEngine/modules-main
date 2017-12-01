@@ -39,12 +39,12 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
-import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.property.item.UseLimitProperty;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.data.type.SkullTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.item.Enchantment;
+import org.spongepowered.api.item.enchantment.Enchantment;
+import org.spongepowered.api.item.enchantment.EnchantmentType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.text.Text;
@@ -136,7 +136,7 @@ public class ItemModifyCommands extends PermissionContainer
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
     @Restricted(value = Player.class, msg = "Want to be Harry Potter?")
-    public void enchant(Player context, @Default Enchantment enchantment, @Optional Integer level,
+    public void enchant(Player context, @Default EnchantmentType enchantment, @Optional Integer level,
                         @ParameterPermission @Flag boolean unsafe) // TODO are param permissions working????
     {
         if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
@@ -152,19 +152,19 @@ public class ItemModifyCommands extends PermissionContainer
             i18n.send(context, NEGATIVE, "The enchantment level has to be a number greater than 0!");
             return;
         }
-        ItemEnchantment ench = new ItemEnchantment(enchantment, level);
+        Enchantment ench = Enchantment.builder().type(enchantment).level(level).build();
 
         if (unsafe)
         {
             if (item.get(Keys.STORED_ENCHANTMENTS).isPresent())
             {
-                List<ItemEnchantment> list = item.get(Keys.STORED_ENCHANTMENTS).get();
+                List<Enchantment> list = item.get(Keys.STORED_ENCHANTMENTS).get();
                 list.add(ench);
                 item.offer(Keys.STORED_ENCHANTMENTS, list);
                 return;
             }
 
-            List<ItemEnchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
+            List<Enchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
             list.add(ench);
             item.offer(Keys.ITEM_ENCHANTMENTS, list);
             context.setItemInHand(HandTypes.MAIN_HAND, item);
@@ -178,7 +178,7 @@ public class ItemModifyCommands extends PermissionContainer
         {
             if (level >= enchantment.getMinimumLevel() && level <= enchantment.getMaximumLevel())
             {
-                List<ItemEnchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
+                List<Enchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
                 list.add(ench);
                 item.offer(Keys.ITEM_ENCHANTMENTS, list);
                 context.setItemInHand(HandTypes.MAIN_HAND, item);
