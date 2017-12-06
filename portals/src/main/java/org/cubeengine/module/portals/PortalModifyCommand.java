@@ -32,7 +32,6 @@ import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.config.WorldTransform;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -46,12 +45,15 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE
 @Command(name = "modify", desc = "modifies a portal")
 public class PortalModifyCommand extends ContainerCommand
 {
+
+    private Portals module;
     private Selector selector;
     private I18n i18n;
 
-    public PortalModifyCommand(CommandManager base, Selector selector, I18n i18n)
+    public PortalModifyCommand(CommandManager base, Portals module, Selector selector, I18n i18n)
     {
         super(base, Portals.class);
+        this.module = module;
         this.selector = selector;
         this.i18n = i18n;
     }
@@ -91,12 +93,14 @@ public class PortalModifyCommand extends ContainerCommand
             i18n.send(context, NEGATIVE, "Please select a cuboid first!");
             return;
         }
+        this.module.removePortal(portal);
         Location<World> p1 = selector.getFirstPoint(context);
         Location<World> p2 = selector.getSecondPoint(context);
         portal.config.world = new ConfigWorld(p1.getExtent());
         portal.config.location.from = new Vector3i(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
         portal.config.location.to = new Vector3i(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
         portal.config.save();
+        this.module.addPortal(portal);
         i18n.send(context, POSITIVE, "Portal {name} updated to your current selection!", portal.getName());
     }
 

@@ -17,7 +17,11 @@
  */
 package org.cubeengine.module.portals;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.reflect.Reflector;
@@ -36,8 +40,10 @@ import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.config.WorldTransform;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.service.pagination.PaginationList;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -174,10 +180,8 @@ public class PortalCommands extends ContainerCommand
             i18n.send(context, POSITIVE, "There are no portals in {world}", world);
             return;
         }
-        i18n.send(context, POSITIVE, "The following portals are located in {world}", world);
-        for (Portal portal : portals)
-        {
-            context.sendMessage(Text.of(" - ", portal.getName()));
-        }
+        PaginationList.Builder builder = PaginationList.builder().title(i18n.translate(context, POSITIVE, "The following portals are located in {world}", world))
+            .contents(portals.stream().sorted(Comparator.comparing(Portal::getName)).map(p -> Text.of(" - ", p.getName())).collect(Collectors.toList()));
+        builder.sendTo(context);
     }
 }

@@ -30,6 +30,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
+import java.util.stream.Collectors;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -103,7 +105,7 @@ public class Portals extends CubeEngineModule
 
         PortalCommands portals = new PortalCommands(cm, this, selector, reflector, i18n);
         cm.addCommand(portals);
-        portals.addCommand(new PortalModifyCommand(cm, selector, i18n));
+        portals.addCommand(new PortalModifyCommand(cm, this, selector, i18n));
 
         em.registerListener(Portals.class, new PortalListener(this, i18n));
         this.loadPortals();
@@ -216,9 +218,14 @@ public class Portals extends CubeEngineModule
         return portalsDir.resolve(name + ".yml").toFile();
     }
 
-    public List<Portal> getPortalsInChunk(Location location)
+    public List<Portal> getPortalsInChunk(Location<World> location)
     {
-        return chunksWithPortals.get(LocationUtil.getChunkKey(location));
+        List<Portal> portals = this.chunksWithPortals.get(LocationUtil.getChunkKey(location));
+        if (portals != null)
+        {
+            portals = portals.stream().filter(p -> p.getWorld().equals(location.getExtent())).collect(Collectors.toList());
+        }
+        return portals;
     }
 
     public List<Entity> getEntitiesInPortal(Portal portal)
