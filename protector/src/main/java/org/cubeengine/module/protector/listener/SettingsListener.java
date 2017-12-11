@@ -45,6 +45,7 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Hostile;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
@@ -466,6 +467,18 @@ public class SettingsListener
             {
                 List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
                 if (this.checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(((LocatableBlock) rootCause).getBlockState().getType() , UNDEFINED), UNDEFINED) == FALSE)
+                {
+                    return;
+                }
+            }
+        }
+
+        if (rootCause instanceof Lightning)
+        {
+            for (Transaction<BlockSnapshot> trans : event.getTransactions())
+            {
+                List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
+                if (this.checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.lightning, UNDEFINED) == FALSE)
                 {
                     return;
                 }

@@ -83,6 +83,7 @@ public class RegionConfig extends ReflectedYaml
             public Tristate playerExplosion = Tristate.UNDEFINED;
             public Map<BlockType, Tristate> block = new HashMap<>();
             public Tristate monster = Tristate.UNDEFINED;
+            public Tristate lightning = Tristate.UNDEFINED;
         }
 
         public FluidFlow fluidFlow = new FluidFlow();

@@ -91,4 +91,13 @@ public class BlockDamageSettingsCommands extends AbstractSettingsCommand
     {
         this.block(context, BlockTypes.FIRE, set, region);
     }
+
+
+    @Command(desc = "Controls lightning fire")
+    public void lightningFire(CommandSource context, Tristate set, @Default @Named("in") Region region)
+    {
+        region.getSettings().blockDamage.lightning = set;
+        region.save();
+        i18n.send(context, POSITIVE,"Region {region}: Lightning Fire Settings updated", region);
+    }
 }
