@@ -168,6 +168,20 @@ public class WorldsCommands extends ContainerCommand
         }
     }
 
+    @Command(desc = "Renames a world")
+    public void rename(CommandSource context, WorldProperties world, String newName)
+    {
+        Optional<World> theWorld = Sponge.getServer().getWorld(world.getUniqueId());
+        if (theWorld.isPresent())
+        {
+            i18n.send(context, POSITIVE, "The world must be unloaded to rename.");
+            return;
+        }
+        String oldName = world.getWorldName();
+        Sponge.getServer().renameWorld(world, newName);
+        i18n.send(context, POSITIVE, "The world {name} was renamed to {name}", oldName, newName);
+    }
+
     @Command(desc = "Loads a world")
     public void load(CommandSource context, WorldProperties world, @Flag boolean enable)
     {
