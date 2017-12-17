@@ -71,7 +71,7 @@ public class WarpManager
 
     public Optional<Warp> get(String name)
     {
-        return config.warps.stream().filter(warp -> warp.name.equals(name)).findFirst();
+        return config.warps.stream().filter(warp -> warp.name.equalsIgnoreCase(name)).findFirst();
     }
 
     public long getCount()
