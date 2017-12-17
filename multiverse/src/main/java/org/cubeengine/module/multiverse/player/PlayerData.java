@@ -69,7 +69,6 @@ public class PlayerData implements DataSerializable
     public static final Key<Value<Double>> SATURATION = makeSingleKey(TT_Double, TTV_Double, of("saturation"), "cubeengine:multiverse:player-saturation", "Saturation");
     public static final Key<Value<Double>> EXHAUSTION = makeSingleKey(TT_Double, TTV_Double, of("exhaustion"), "cubeengine:multiverse:player-exhaustion", "Exhaustion");
     public static final Key<Value<Integer>> EXP = makeSingleKey(TT_Int, TTV_Int, of("exp"), "cubeengine:multiverse:player-exp", "Exp");
-    public static final Key<Value<Integer>> LVL = makeSingleKey(TT_Int, TTV_Int, of("lvl"), "cubeengine:multiverse:player-lvl", "Lvl");
     public static final Key<Value<Integer>> FIRE_TICKS = makeSingleKey(TT_Int, TTV_Int, of("fireticks"), "cubeengine:multiverse:player-fireticks", "Fire-Ticks");
     public static final Key<ListValue<PotionEffect>> ACTIVE_EFFECTS = makeListKey(TTL_PotionEffect, TTLV_PotionEffect, of("activeEffects"), "cubeengine:multiverse:player-effects", "Effects");
     public static final Key<MapValue<Integer, ItemStack>> INVENTORY = makeMapKey(TTM_Inventory, TTMV_Inventory, of("inventory"), "cubeengine:multiverse:player-inventory", "Inventory");
@@ -83,7 +82,6 @@ public class PlayerData implements DataSerializable
     public double saturation = 20;
     public double exhaustion = 0;
     public int exp = 0;
-    public int lvl = 0;
     public int fireTicks = 0;
 
     public List<PotionEffect> activePotionEffects = new ArrayList<>();
@@ -114,7 +112,6 @@ public class PlayerData implements DataSerializable
         this.saturation = value.getDouble(SATURATION.getQuery()).get();
         this.exhaustion = value.getDouble(EXHAUSTION.getQuery()).get();
         this.exp = value.getInt(EXP.getQuery()).get();
-        this.lvl = value.getInt(LVL.getQuery()).get();
         this.fireTicks = value.getInt(FIRE_TICKS.getQuery()).get();
         this.activePotionEffects = value.getSerializableList(ACTIVE_EFFECTS.getQuery(), PotionEffect.class).orElse(new ArrayList<>());
 
@@ -158,7 +155,6 @@ public class PlayerData implements DataSerializable
             .set(SATURATION, saturation)
             .set(EXHAUSTION, exhaustion)
             .set(EXP, exp)
-            .set(LVL, lvl)
             .set(FIRE_TICKS, fireTicks)
               // TODO are those working?:
             .set(ACTIVE_EFFECTS, activePotionEffects)
@@ -178,7 +174,6 @@ public class PlayerData implements DataSerializable
         player.offer(Keys.SATURATION, saturation);
         player.offer(Keys.EXHAUSTION, exhaustion);
         player.offer(Keys.TOTAL_EXPERIENCE, exp);
-        player.offer(Keys.EXPERIENCE_LEVEL, exp);
         if (fireTicks != 0)
         {
             player.offer(Keys.FIRE_TICKS, fireTicks);
@@ -231,7 +226,6 @@ public class PlayerData implements DataSerializable
         this.foodLevel = player.get(Keys.FOOD_LEVEL).get();
         this.saturation = player.get(Keys.SATURATION).get();
         this.exhaustion = player.get(Keys.EXHAUSTION).get();
-        this.lvl = player.get(Keys.EXPERIENCE_LEVEL).get();
         this.exp = player.get(Keys.TOTAL_EXPERIENCE).get();
         this.fireTicks = player.get(Keys.FIRE_TICKS).orElse(0);
         this.activePotionEffects = player.get(Keys.POTION_EFFECTS).orElse(emptyList());

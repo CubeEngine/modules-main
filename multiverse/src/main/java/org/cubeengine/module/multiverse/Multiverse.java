@@ -52,7 +52,7 @@ import javax.inject.Singleton;
 /**
  * Group Worlds into Universes
  * <p>
- * Mass konfigurate worlds (in that universe)
+ * Mass configurate worlds (in that universe)
  * <p>
  * Separate PlayerData(Inventories) for universes /
  * Block plugin teleports of entites with inventories / alternative save entity inventory and reload later? using custom data
@@ -116,7 +116,7 @@ public class Multiverse extends CubeEngineModule
         {
             for (ConfigWorld cWorld : entry.getValue())
             {
-                if (world.equals(cWorld.getWorld()))
+                if (world.getName().equals(cWorld.getName()))
                 {
                     return entry.getKey();
                 }
