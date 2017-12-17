@@ -17,6 +17,9 @@
  */
 package org.cubeengine.module.teleport;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.butler.filter.Restricted;
@@ -25,18 +28,15 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.Broadcaster;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.Broadcaster;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 /**
  * Contains spawn-commands.
@@ -122,10 +122,15 @@ public class SpawnCommands
 
     @Command(desc = "Teleports you to the spawn of given world")
     @Restricted(value = Player.class, msg = "Pro Tip: Teleport does not work IRL!")
-    public void tpworld(Player context, World world)
+    public void tpworld(Player context, WorldProperties world)
     {
-        final Location<World> spawnLocation = world.getSpawnLocation().add(0.5, 0, 0.5);
-        if (!context.hasPermission(module.permsTpWorld().getPermission(world.getName()).getId()))
+        World loadedWorld = Sponge.getServer().getWorld(world.getUniqueId()).orElse(Sponge.getServer().loadWorld(world).orElse(null));
+        if (loadedWorld == null)
+        {
+            i18n.send(context, NEGATIVE, "Cannot reach {world}", world);
+        }
+        final Location<World> spawnLocation = loadedWorld.getSpawnLocation().add(0.5, 0, 0.5);
+        if (!context.hasPermission(module.permsTpWorld().getPermission(loadedWorld.getName()).getId()))
         {
             i18n.send(context, NEGATIVE, "You are not allowed to teleport to this world!");
             return;
