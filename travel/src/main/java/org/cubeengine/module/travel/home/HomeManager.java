@@ -41,6 +41,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.event.Order.EARLY;
@@ -178,4 +179,9 @@ public class HomeManager
         event.setCancelled(true);
     }
 
+    public void purge(WorldProperties world)
+    {
+        this.config.homes.removeIf(home -> home.world.getName().equals(world.getWorldName()));
+        this.config.save();
+    }
 }

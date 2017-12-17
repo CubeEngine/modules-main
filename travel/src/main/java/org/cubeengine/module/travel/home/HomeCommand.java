@@ -66,6 +66,7 @@ import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.storage.WorldProperties;
 
 import java.util.List;
 import java.util.Set;
@@ -446,6 +447,14 @@ public class HomeCommand extends ContainerCommand
             i18n.send(player.getPlayer().get(), NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.name);
         }
         i18n.send(sender, POSITIVE, "{user} is no longer invited to your home {name}", player, h.name);
+    }
+
+    @Alias("purgehomes")
+    @Command(desc = "Removes all homes in a world")
+    public void purge(CommandSource context, WorldProperties world)
+    {
+        this.manager.purge(world);
+        i18n.send(context, POSITIVE, "Purged all homes in {world}", world);
     }
 
     @Alias(value = {"clearhomes"})
