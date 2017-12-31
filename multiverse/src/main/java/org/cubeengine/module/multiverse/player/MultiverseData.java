@@ -45,14 +45,11 @@ import org.spongepowered.api.world.World;
 
 public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiverseData> implements IMultiverseData
 {
-    private static TypeToken<String> TT_String = new TypeToken<String>() {};
     private static TypeToken<Value<String>> TTV_String = new TypeToken<Value<String>>() {};
-
-    private static TypeToken<Map<String, DataContainer>> TTM_Data = new TypeToken<Map<String, DataContainer>>() {};
     private static TypeToken<MapValue<String, DataContainer>> TTMV_Data = new TypeToken<MapValue<String, DataContainer>>() {};
 
-    public static final Key<Value<String>> WORLD = makeSingleKey(TT_String, TTV_String, of("current"), "cubeengine-multiverse:data-world", "World");
-    public static final Key<MapValue<String, DataContainer>> DATA = makeMapKey(TTM_Data, TTMV_Data, of("playerdata"), "cubeengine-multiverse:data-container", "DataContainer");
+    public static final Key<Value<String>> WORLD = Key.builder().type(TTV_String).query(of("current")).id("cubeengine-multiverse:data-world").name("World").build();
+    public static final Key<MapValue<String, DataContainer>> DATA = Key.builder().type(TTMV_Data).query(of("playerdata")).id("cubeengine-multiverse:data-container").name("DataContainer").build();
 
     public String currentUniverse;
     private Map<String, PlayerData> playerData;

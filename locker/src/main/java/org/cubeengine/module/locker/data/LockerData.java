@@ -18,36 +18,30 @@
 package org.cubeengine.module.locker.data;
 
 import static org.spongepowered.api.data.DataQuery.of;
-import static org.spongepowered.api.data.key.KeyFactory.makeSingleKey;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 import com.google.common.reflect.TypeToken;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.manipulator.mutable.common.AbstractData;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.ValueFactory;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.data.value.mutable.Value;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
 public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
 {
-    private static TypeToken<Long> TT_Long = new TypeToken<Long>() {};
     private static TypeToken<Value<Long>> TTV_Long = new TypeToken<Value<Long>>() {};
-
-    private static TypeToken<List<Byte>> TTL_Byte = new TypeToken<List<Byte>>() {};
     private static TypeToken<ListValue<Byte>> TTLV_Byte = new TypeToken<ListValue<Byte>>() {};
 
-    public static Key<Value<Long>> LOCK_ID = makeSingleKey(TT_Long, TTV_Long, of("LockID"), "cubeengine-locker:data-id", "ID");
-    public static Key<ListValue<Byte>> LOCK_PASS = KeyFactory.makeListKey(TTL_Byte, TTLV_Byte, of("LockPass"), "cubeengine-locker:data-pass", "Password");
+    public static Key<Value<Long>> LOCK_ID = Key.builder().id("cubeengine-locker:data-id").name("ID").type(TTV_Long).query(of("LockID")).build();
+    public static Key<ListValue<Byte>> LOCK_PASS = Key.builder().id("cubeengine-locker:data-pass").name("Password").type(TTLV_Byte).query(of("LockPass")).build();
 
     private long lockID;
     private byte[] pass;
