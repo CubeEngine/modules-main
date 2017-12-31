@@ -42,7 +42,7 @@ import static org.spongepowered.api.block.BlockTypes.TRAPPED_CHEST;
 import static org.spongepowered.api.block.BlockTypes.WOODEN_DOOR;
 import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 
-import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.logscribe.Log;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.database.AsyncRecord;
 import org.cubeengine.libcube.service.database.Database;

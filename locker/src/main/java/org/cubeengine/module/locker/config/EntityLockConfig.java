@@ -18,7 +18,7 @@
 package org.cubeengine.module.locker.config;
 
 import org.cubeengine.converter.ConversionException;
-import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.locker.storage.ProtectedType;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.spongepowered.api.entity.EntityType;

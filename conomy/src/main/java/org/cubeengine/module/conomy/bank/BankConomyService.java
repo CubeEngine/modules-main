@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.logscribe.Log;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.butler.Dispatcher;
 import org.cubeengine.module.conomy.AccessLevel;

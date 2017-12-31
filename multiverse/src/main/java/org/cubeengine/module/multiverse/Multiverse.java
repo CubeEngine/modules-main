@@ -18,7 +18,7 @@
 package org.cubeengine.module.multiverse;
 
 
-import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.logscribe.Log;
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.InjectService;
 import org.cubeengine.libcube.ModuleManager;

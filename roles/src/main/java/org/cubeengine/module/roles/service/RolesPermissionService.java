@@ -19,7 +19,7 @@ package org.cubeengine.module.roles.service;
 
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
-import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.logscribe.Log;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.permission.PermissionManager;

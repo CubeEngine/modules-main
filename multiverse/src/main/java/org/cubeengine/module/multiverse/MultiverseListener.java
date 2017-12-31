@@ -18,7 +18,7 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.HashMap;
-import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;

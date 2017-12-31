@@ -27,7 +27,7 @@ import org.cubeengine.converter.node.MapNode;
 import org.cubeengine.converter.node.Node;
 import org.cubeengine.converter.node.NullNode;
 import org.cubeengine.converter.node.StringNode;
-import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.locker.storage.LockType;
 import org.cubeengine.module.locker.storage.ProtectionFlag;
 

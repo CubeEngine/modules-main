@@ -21,9 +21,10 @@ import static org.cubeengine.libcube.service.logging.LoggingUtil.getCycler;
 import static org.cubeengine.libcube.service.logging.LoggingUtil.getFileFormat;
 import static org.cubeengine.libcube.service.logging.LoggingUtil.getLogFile;
 
-import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.logscribe.LogFactory;
-import de.cubeisland.engine.logscribe.target.file.AsyncFileTarget;
+import org.cubeengine.libcube.service.logging.LoggingUtil;
+import org.cubeengine.logscribe.Log;
+import org.cubeengine.logscribe.LogFactory;
+import org.cubeengine.logscribe.target.file.AsyncFileTarget;
 import org.cubeengine.converter.ConverterManager;
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.ModuleManager;
@@ -113,7 +114,10 @@ public class Roles extends CubeEngineModule
         cm.getProviders().getExceptionHandler().addHandler(new RolesExceptionHandler(i18n));
         this.permLogger = factory.getLog(LogFactory.class, "Permissions");
         ThreadFactory threadFactory = mm.getThreadFactory(Roles.class);
-        this.permLogger.addTarget(new AsyncFileTarget(getLogFile(fm, "Permissions"), getFileFormat(false, false), false, getCycler(), threadFactory));
+        this.permLogger.addTarget(
+                new AsyncFileTarget.Builder(LoggingUtil.getLogFile(fm, "Permissions").toPath(),
+                        LoggingUtil.getFileFormat(false, true)
+                ).setAppend(true).setCycler(LoggingUtil.getCycler()).setThreadFactory(threadFactory).build());
 
         Optional<PermissionService> previous = Sponge.getServiceManager().provide(PermissionService.class);
         Sponge.getServiceManager().setProvider(plugin.getInstance().get(), PermissionService.class, service);

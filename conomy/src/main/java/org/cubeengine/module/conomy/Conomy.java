@@ -24,8 +24,8 @@ import java.util.concurrent.ThreadFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import de.cubeisland.engine.logscribe.Log;
-import de.cubeisland.engine.logscribe.LogFactory;
+import org.cubeengine.logscribe.Log;
+import org.cubeengine.logscribe.LogFactory;
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.logging.LogProvider;

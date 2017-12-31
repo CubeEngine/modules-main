@@ -21,7 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.cubeengine.converter.ConverterManager;
-import de.cubeisland.engine.logscribe.Log;
+import org.cubeengine.logscribe.Log;
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
