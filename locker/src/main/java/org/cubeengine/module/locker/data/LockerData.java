@@ -46,8 +46,8 @@ public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
     private static TypeToken<List<Byte>> TTL_Byte = new TypeToken<List<Byte>>() {};
     private static TypeToken<ListValue<Byte>> TTLV_Byte = new TypeToken<ListValue<Byte>>() {};
 
-    public static Key<Value<Long>> LOCK_ID = makeSingleKey(TT_Long, TTV_Long, of("LockID"), "cubeengine:locker:data-id", "ID");
-    public static Key<ListValue<Byte>> LOCK_PASS = KeyFactory.makeListKey(TTL_Byte, TTLV_Byte, of("LockPass"), "cubeengine:locker:data-pass", "Password");
+    public static Key<Value<Long>> LOCK_ID = makeSingleKey(TT_Long, TTV_Long, of("LockID"), "cubeengine-locker:data-id", "ID");
+    public static Key<ListValue<Byte>> LOCK_PASS = KeyFactory.makeListKey(TTL_Byte, TTLV_Byte, of("LockPass"), "cubeengine-locker:data-pass", "Password");
 
     private long lockID;
     private byte[] pass;

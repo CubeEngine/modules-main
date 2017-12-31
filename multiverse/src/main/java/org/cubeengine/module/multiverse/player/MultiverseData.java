@@ -51,8 +51,8 @@ public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiv
     private static TypeToken<Map<String, DataContainer>> TTM_Data = new TypeToken<Map<String, DataContainer>>() {};
     private static TypeToken<MapValue<String, DataContainer>> TTMV_Data = new TypeToken<MapValue<String, DataContainer>>() {};
 
-    public static final Key<Value<String>> WORLD = makeSingleKey(TT_String, TTV_String, of("current"), "cubeengine:multiverse:data-world", "World");
-    public static final Key<MapValue<String, DataContainer>> DATA = makeMapKey(TTM_Data, TTMV_Data, of("playerdata"), "cubeengine:multiverse:data-container", "DataContainer");
+    public static final Key<Value<String>> WORLD = makeSingleKey(TT_String, TTV_String, of("current"), "cubeengine-multiverse:data-world", "World");
+    public static final Key<MapValue<String, DataContainer>> DATA = makeMapKey(TTM_Data, TTMV_Data, of("playerdata"), "cubeengine-multiverse:data-container", "DataContainer");
 
     public String currentUniverse;
     private Map<String, PlayerData> playerData;

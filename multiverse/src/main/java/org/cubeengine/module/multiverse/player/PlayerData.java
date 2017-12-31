@@ -62,18 +62,18 @@ public class PlayerData implements DataSerializable
     private static TypeToken<Map<Integer, ItemStack>> TTM_Inventory = new TypeToken<Map<Integer, ItemStack>>() {};
     private static TypeToken<MapValue<Integer, ItemStack>> TTMV_Inventory = new TypeToken<MapValue<Integer, ItemStack>>() {};
 
-    public static final Key<Value<Integer>> HELD_ITEM = makeSingleKey(TT_Int, TTV_Int, of("heldItemSlot"), "cubeengine:multiverse:player-helditem", "Held Item Index");
-    public static final Key<Value<Double>> HEALTH = makeSingleKey(TT_Double, TTV_Double, of("health"), "cubeengine:multiverse:player-health", "Health");
-    public static final Key<Value<Double>> MAX_HEALTH = makeSingleKey(TT_Double, TTV_Double, of("maxHealth"), "cubeengine:multiverse:player-max-health", "Max Health");
-    public static final Key<Value<Integer>> FOOD = makeSingleKey(TT_Int, TTV_Int, of("foodLevel"), "cubeengine:multiverse:player-food", "Food");
-    public static final Key<Value<Double>> SATURATION = makeSingleKey(TT_Double, TTV_Double, of("saturation"), "cubeengine:multiverse:player-saturation", "Saturation");
-    public static final Key<Value<Double>> EXHAUSTION = makeSingleKey(TT_Double, TTV_Double, of("exhaustion"), "cubeengine:multiverse:player-exhaustion", "Exhaustion");
-    public static final Key<Value<Integer>> EXP = makeSingleKey(TT_Int, TTV_Int, of("exp"), "cubeengine:multiverse:player-exp", "Exp");
-    public static final Key<Value<Integer>> FIRE_TICKS = makeSingleKey(TT_Int, TTV_Int, of("fireticks"), "cubeengine:multiverse:player-fireticks", "Fire-Ticks");
-    public static final Key<ListValue<PotionEffect>> ACTIVE_EFFECTS = makeListKey(TTL_PotionEffect, TTLV_PotionEffect, of("activeEffects"), "cubeengine:multiverse:player-effects", "Effects");
-    public static final Key<MapValue<Integer, ItemStack>> INVENTORY = makeMapKey(TTM_Inventory, TTMV_Inventory, of("inventory"), "cubeengine:multiverse:player-inventory", "Inventory");
-    public static final Key<MapValue<Integer, ItemStack>> ENDER_INVENTORY = makeMapKey(TTM_Inventory, TTMV_Inventory, of("enderInventory"), "cubeengine:multiverse:player-enderchest", "Enderchest");
-    public static final Key<Value<String>> GAMEMODE = makeSingleKey(TT_String, TTV_String, of("gamemode"), "cubeengine:multiverse:player-gamemode", "Gamemode");
+    public static final Key<Value<Integer>> HELD_ITEM = makeSingleKey(TT_Int, TTV_Int, of("heldItemSlot"), "cubeengine-multiverse:player-helditem", "Held Item Index");
+    public static final Key<Value<Double>> HEALTH = makeSingleKey(TT_Double, TTV_Double, of("health"), "cubeengine-multiverse:player-health", "Health");
+    public static final Key<Value<Double>> MAX_HEALTH = makeSingleKey(TT_Double, TTV_Double, of("maxHealth"), "cubeengine-multiverse:player-max-health", "Max Health");
+    public static final Key<Value<Integer>> FOOD = makeSingleKey(TT_Int, TTV_Int, of("foodLevel"), "cubeengine-multiverse:player-food", "Food");
+    public static final Key<Value<Double>> SATURATION = makeSingleKey(TT_Double, TTV_Double, of("saturation"), "cubeengine-multiverse:player-saturation", "Saturation");
+    public static final Key<Value<Double>> EXHAUSTION = makeSingleKey(TT_Double, TTV_Double, of("exhaustion"), "cubeengine-multiverse:player-exhaustion", "Exhaustion");
+    public static final Key<Value<Integer>> EXP = makeSingleKey(TT_Int, TTV_Int, of("exp"), "cubeengine-multiverse:player-exp", "Exp");
+    public static final Key<Value<Integer>> FIRE_TICKS = makeSingleKey(TT_Int, TTV_Int, of("fireticks"), "cubeengine-multiverse:player-fireticks", "Fire-Ticks");
+    public static final Key<ListValue<PotionEffect>> ACTIVE_EFFECTS = makeListKey(TTL_PotionEffect, TTLV_PotionEffect, of("activeEffects"), "cubeengine-multiverse:player-effects", "Effects");
+    public static final Key<MapValue<Integer, ItemStack>> INVENTORY = makeMapKey(TTM_Inventory, TTMV_Inventory, of("inventory"), "cubeengine-multiverse:player-inventory", "Inventory");
+    public static final Key<MapValue<Integer, ItemStack>> ENDER_INVENTORY = makeMapKey(TTM_Inventory, TTMV_Inventory, of("enderInventory"), "cubeengine-multiverse:player-enderchest", "Enderchest");
+    public static final Key<Value<String>> GAMEMODE = makeSingleKey(TT_String, TTV_String, of("gamemode"), "cubeengine-multiverse:player-gamemode", "Gamemode");
 
     public int heldItemSlot = 0;
     public double health = 20;

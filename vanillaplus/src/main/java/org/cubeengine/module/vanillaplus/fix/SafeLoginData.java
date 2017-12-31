@@ -36,7 +36,7 @@ public class SafeLoginData extends AbstractBooleanData<SafeLoginData, ImmutableS
             new TypeToken<Boolean>() {},
             new TypeToken<Value<Boolean>>() {},
             DataQuery.of("flymode"),
-            "cubeengine:vanillaplus:flymode", "Flymode on Login");
+            "cubeengine-vanillaplus:flymode", "Flymode on Login");
 
     public SafeLoginData(Boolean value)
     {

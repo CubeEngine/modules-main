@@ -41,9 +41,9 @@ public interface IPermissionData
     TypeToken<Map<String, String>> TTM_StringString = new TypeToken<Map<String, String>>() {};
     TypeToken<MapValue<String, String>> TTMV_StringString = new TypeToken<MapValue<String, String>>() {};
 
-    Key<ListValue<String>> PARENTS = KeyFactory.makeListKey(TTL_String, TTLV_String, of("parents"), "cubeengine:roles:permission-parent","Parents");
-    Key<MapValue<String, Boolean>> PERMISSIONS = KeyFactory.makeMapKey(TTM_StringBool, TTMV_StringBool, of("permissions"), "cubeengine:roles:permission-perms","Permission");
-    Key<MapValue<String, String>> OPTIONS = KeyFactory.makeMapKey(TTM_StringString, TTMV_StringString, of("options"), "cubeengine:roles:permission-opts","Options");
+    Key<ListValue<String>> PARENTS = KeyFactory.makeListKey(TTL_String, TTLV_String, of("parents"), "cubeengine-roles:permission-parent","Parents");
+    Key<MapValue<String, Boolean>> PERMISSIONS = KeyFactory.makeMapKey(TTM_StringBool, TTMV_StringBool, of("permissions"), "cubeengine-roles:permission-perms","Permission");
+    Key<MapValue<String, String>> OPTIONS = KeyFactory.makeMapKey(TTM_StringString, TTMV_StringString, of("options"), "cubeengine-roles:permission-opts","Options");
 
     List<String> getParents();
     Map<String, Boolean> getPermissions();
