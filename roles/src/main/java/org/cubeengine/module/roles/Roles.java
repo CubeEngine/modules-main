@@ -44,6 +44,7 @@ import org.cubeengine.module.roles.config.PermissionTree;
 import org.cubeengine.module.roles.config.PermissionTreeConverter;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.PriorityConverter;
+import org.cubeengine.module.roles.data.IPermissionData;
 import org.cubeengine.module.roles.data.ImmutablePermissionData;
 import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.data.PermissionDataBuilder;
@@ -96,6 +97,8 @@ public class Roles extends CubeEngineModule
                         .builder(new PermissionDataBuilder()).manipulatorId("permission")
                         .dataName("CubeEngine Roles Permissions")
                         .buildAndRegister(plugin);
+
+        IPermissionData.OPTIONS.getQuery();
 
         Sponge.getDataManager().registerLegacyManipulatorIds(PermissionData.class.getName(), dr);
 

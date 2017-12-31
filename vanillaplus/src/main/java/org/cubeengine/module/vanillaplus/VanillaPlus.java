@@ -154,6 +154,7 @@ public class VanillaPlus extends CubeEngineModule
                 .builder(new SafeLoginDataBuilder()).manipulatorId("safe_login")
                 .dataName("CubeEngine VanillaPlus Safe Login")
                 .buildAndRegister(plugin);
+        SafeLoginData.FLYMODE.getQuery();
     }
 
     @Listener

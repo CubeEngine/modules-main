@@ -101,6 +101,8 @@ public class Locker extends CubeEngineModule
                         .dataName("CubeEngine Locker Data")
                         .buildAndRegister(plugin);
 
+        LockerData.LOCK_ID.getQuery();
+
         Sponge.getDataManager().registerLegacyManipulatorIds(LockerData.class.getName(), dr);
 
 

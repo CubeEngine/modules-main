@@ -30,6 +30,7 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.multiverse.player.ImmutableMultiverseData;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.module.multiverse.player.MultiverseDataBuilder;
+import org.cubeengine.module.multiverse.player.PlayerData;
 import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
 import org.spongepowered.api.Sponge;
@@ -87,6 +88,9 @@ public class Multiverse extends CubeEngineModule
                 .builder(new MultiverseDataBuilder()).manipulatorId("multiverse")
                 .dataName("CubeEngine Multiverse Data")
                 .buildAndRegister(plugin);
+
+        MultiverseData.DATA.getQuery();
+        PlayerData.ACTIVE_EFFECTS.getQuery();
 
         Sponge.getDataManager().registerLegacyManipulatorIds(MultiverseData.class.getName(), dr);
     }
