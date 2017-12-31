@@ -97,7 +97,7 @@ public class MoneyCommand extends ContainerCommand
         i18n.send(context, POSITIVE, "{account}'s Balance:", account);
         for (Map.Entry<Currency, BigDecimal> entry : balances.entrySet())
         {
-            context.sendMessage(Text.of(" - ", GOLD, entry.getKey().format(entry.getValue())));
+            context.sendMessage(Text.of(GOLD, entry.getKey().format(entry.getValue())));
         }
     }
 
