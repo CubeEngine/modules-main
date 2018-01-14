@@ -19,8 +19,8 @@ package org.cubeengine.module.mail.storage;
 
 import java.util.UUID;
 
-import org.cubeengine.libcube.service.database.Table;
 import org.cubeengine.libcube.util.Version;
+import org.cubeengine.module.sql.database.Table;
 import org.jooq.TableField;
 
 import static org.jooq.impl.SQLDataType.BIGINT;

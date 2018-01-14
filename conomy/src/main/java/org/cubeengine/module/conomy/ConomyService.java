@@ -37,7 +37,7 @@ import org.cubeengine.module.conomy.command.UniqueAccountParser;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.database.Database;
+import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.jooq.Condition;

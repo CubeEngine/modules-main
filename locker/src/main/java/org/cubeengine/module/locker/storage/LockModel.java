@@ -21,7 +21,7 @@ import java.security.SecureRandom;
 import java.sql.Date;
 import java.util.UUID;
 import org.cubeengine.libcube.util.StringUtils;
-import org.cubeengine.libcube.service.database.AsyncRecord;
+import org.cubeengine.module.sql.database.AsyncRecord;
 import org.spongepowered.api.entity.living.player.User;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;

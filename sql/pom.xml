@@ -8,10 +8,10 @@
   </parent>
 
   <groupId>org.cubeengine.module</groupId>
-  <artifactId>locker</artifactId>
-  <name>Locker</name>
+  <artifactId>sql</artifactId>
+  <name>sql</name>
   <version>1.0.0-SNAPSHOT</version>
-  <description>Put a lock onto your most precious things</description>
+  <description>Provide SQL with jOOQ</description>
 
   <dependencies>
     <dependency>
@@ -22,11 +22,22 @@
       <type>jar</type>
     </dependency>
     <dependency>
-      <groupId>org.cubeengine.module</groupId>
-      <artifactId>sql</artifactId>
-      <version>1.0.0-SNAPSHOT</version>
+      <groupId>org.jooq</groupId>
+      <artifactId>jooq</artifactId>
+      <version>3.9.2</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>2.8.1</version>
       <scope>provided</scope>
-      <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>com.zaxxer</groupId>
+      <artifactId>HikariCP</artifactId>
+      <version>2.5.1</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>

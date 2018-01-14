@@ -19,10 +19,9 @@ package org.cubeengine.module.locker.storage;
 
 import java.util.UUID;
 
-import org.cubeengine.libcube.service.database.Table;
 import org.cubeengine.libcube.util.Version;
+import org.cubeengine.module.sql.database.Table;
 import org.jooq.TableField;
-import org.jooq.impl.SQLDataType;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
 import static org.jooq.impl.SQLDataType.BIGINT;

@@ -44,8 +44,6 @@ import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 
 import org.cubeengine.logscribe.Log;
 import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.database.AsyncRecord;
-import org.cubeengine.libcube.service.database.Database;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
@@ -55,6 +53,8 @@ import org.cubeengine.module.locker.commands.CommandListener;
 import org.cubeengine.module.locker.commands.PlayerAccess;
 import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.config.EntityLockConfig;
+import org.cubeengine.module.sql.database.AsyncRecord;
+import org.cubeengine.module.sql.database.Database;
 import org.jooq.Batch;
 import org.jooq.Result;
 import org.spongepowered.api.Sponge;

@@ -34,7 +34,7 @@ import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.mail.storage.Mail;
 import org.cubeengine.module.mail.storage.TableMail;
 import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.database.Database;
+import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.spongepowered.api.Sponge;

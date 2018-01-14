@@ -19,7 +19,7 @@ package org.cubeengine.module.conomy.storage;
 
 import java.math.BigDecimal;
 import org.cubeengine.module.conomy.ConfigCurrency;
-import org.cubeengine.libcube.service.database.AsyncRecord;
+import org.cubeengine.module.sql.database.AsyncRecord;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
 

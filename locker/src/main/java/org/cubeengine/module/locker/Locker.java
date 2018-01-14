@@ -26,6 +26,7 @@ import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
+import org.cubeengine.module.sql.database.ModuleTables;
 import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
@@ -47,8 +48,6 @@ import org.cubeengine.module.locker.storage.TableAccessList;
 import org.cubeengine.module.locker.storage.TableLockLocations;
 import org.cubeengine.module.locker.storage.TableLocks;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.database.ModuleTables;
-import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.cubeengine.libcube.service.task.TaskManager;
@@ -60,9 +59,11 @@ import org.spongepowered.api.event.game.state.GameStoppingEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 
 // TODO protect lines of redstone
+// TODO Q out of guarded chest works
+// TODO hoppers and protection
 
 @Singleton
-@Module
+@Module(dependencies = @Dependency("cubeengine-sql"))
 @ModuleTables({TableLocks.class, TableLockLocations.class, TableAccessList.class})
 public class Locker extends CubeEngineModule
 {

@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import org.cubeengine.logscribe.Log;
+
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.butler.Dispatcher;
 import org.cubeengine.module.conomy.AccessLevel;
@@ -39,7 +39,7 @@ import org.cubeengine.module.conomy.bank.command.EcoBankCommand;
 import org.cubeengine.module.conomy.bank.command.VirtualAccountParser;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.database.Database;
+import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.permission.Subject;

@@ -19,7 +19,8 @@ package org.cubeengine.module.mail.storage;
 
 import java.util.Optional;
 import java.util.UUID;
-import org.cubeengine.libcube.service.database.AsyncRecord;
+
+import org.cubeengine.module.sql.database.AsyncRecord;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.user.UserStorageService;

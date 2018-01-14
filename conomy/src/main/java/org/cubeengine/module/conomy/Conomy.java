@@ -20,16 +20,16 @@ package org.cubeengine.module.conomy;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.concurrent.ThreadFactory;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.cubeengine.logscribe.Log;
-import org.cubeengine.logscribe.LogFactory;
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.logging.LogProvider;
-import org.cubeengine.processor.Dependency;
+import org.cubeengine.module.sql.database.Database;
+import org.cubeengine.module.sql.database.ModuleTables;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.permission.PermissionManager;
@@ -38,14 +38,11 @@ import org.cubeengine.module.conomy.bank.BankPermission;
 import org.cubeengine.module.conomy.storage.TableAccount;
 import org.cubeengine.module.conomy.storage.TableBalance;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.database.Database;
-import org.cubeengine.libcube.service.database.ModuleTables;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.economy.EconomyService;
 
 @Singleton

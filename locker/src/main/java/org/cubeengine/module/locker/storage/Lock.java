@@ -38,12 +38,12 @@ import static org.spongepowered.api.text.format.TextColors.GREEN;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
 import com.flowpowered.math.vector.Vector3i;
-import org.cubeengine.libcube.service.database.Database;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
 import org.cubeengine.module.locker.Locker;
 import org.cubeengine.module.locker.commands.PlayerAccess;
 import org.cubeengine.module.locker.data.LockerData;
+import org.cubeengine.module.sql.database.Database;
 import org.jooq.Result;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
@@ -188,7 +188,7 @@ public class Lock
         {
             itemStack.setQuantity(itemStack.getQuantity() - 1);
         }
-        if (player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getItem).orElse(null) != ItemTypes.BOOK)
+        if (player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getType).orElse(null) != ItemTypes.BOOK)
         {
             // TODO allow creative with empty hand?
             i18n.send(ACTION_BAR, player, NEGATIVE, "You need to hold a book in your hand in order to create a KeyBook!");
