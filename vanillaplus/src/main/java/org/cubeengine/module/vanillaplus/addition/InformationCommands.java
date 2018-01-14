@@ -44,14 +44,12 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.Pair;
+import org.cubeengine.libcube.util.TimeUtil;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.cubeengine.libcube.service.command.CommandContext;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.joda.time.Duration;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
@@ -78,7 +76,6 @@ import static org.spongepowered.api.util.Direction.getClosest;
 
 public class InformationCommands extends PermissionContainer
 {
-    private final PeriodFormatter formatter;
     private VanillaPlus module;
     private I18n i18n;
 
@@ -87,11 +84,6 @@ public class InformationCommands extends PermissionContainer
         super(pm, VanillaPlus.class);
         this.module = module;
         this.i18n = i18n;
-        this.formatter = new PeriodFormatterBuilder().appendWeeks().appendSuffix(" week"," weeks").appendSeparator(" ")
-                                                     .appendDays().appendSuffix(" day", " days").appendSeparator(" ")
-                                                     .appendHours().appendSuffix(" hour"," hours").appendSeparator(" ")
-                                                     .appendMinutes().appendSuffix(" minute", " minutes").appendSeparator(" ")
-                                                     .appendSeconds().appendSuffix(" second", " seconds").toFormatter();
     }
 
 
@@ -310,9 +302,9 @@ public class InformationCommands extends PermissionContainer
         DateFormat df = SimpleDateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT,
                                                              context.getLocale());
         Date start = new Date(ManagementFactory.getRuntimeMXBean().getStartTime());
-        Duration dura = new Duration(start.getTime(), System.currentTimeMillis());
+        String uptime = TimeUtil.format(context.getLocale(), System.currentTimeMillis() - start.getTime());
         i18n.send(context, POSITIVE, "Server has been running since {input#uptime}", df.format(start));
-        i18n.send(context, POSITIVE, "Uptime: {input#uptime}", formatter.print(dura.toPeriod()));
+        i18n.send(context, POSITIVE, "Uptime: {input#uptime}", uptime);
         //TPS:
         double tps = Sponge.getServer().getTicksPerSecond();
         TextColor color = tps == 20 ? DARK_GREEN :
