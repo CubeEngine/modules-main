@@ -28,10 +28,8 @@ import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.util.TimeUtil;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.joda.time.Period;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -56,11 +54,6 @@ public class BorderCommands extends ContainerCommand
     private int commandBorderMax;
     private long taskStart;
 
-    private PeriodFormatter formatter = new PeriodFormatterBuilder()
-                    .appendHours().appendSuffix(" hour"," hours").appendSeparator(" ")
-                    .appendMinutes().appendSuffix(" minute", " minutes").appendSeparator(" ")
-                    .appendSeconds().appendSuffix(" second", " seconds").toFormatter();
-
     public BorderCommands(I18n i18n, CommandManager cm, PluginContainer plugin, int commandBorderMax)
     {
         super(cm, VanillaPlus.class);
@@ -81,7 +74,7 @@ public class BorderCommands extends ContainerCommand
             long estimateTime = timePassed / (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) * task.getTargetTotalChunks();
 
             i18n.send(context, NEUTRAL, "Border generation for {name}:", task.getWorldProperties().getWorldName());
-            i18n.send(context, NEUTRAL, "Estimated remaining time: {}", this.formatter.print(new Period(estimateTime - timePassed)));
+            i18n.send(context, NEUTRAL, "Estimated remaining time: {}", TimeUtil.format(context.getLocale(), estimateTime - timePassed));
             i18n.send(context, NEUTRAL, "Chunks generated {}", task.getTotalGeneratedChunks());
             i18n.send(context, NEUTRAL, "Chunks skipped {}", task.getTotalSkippedChunks());
             i18n.send(context, NEUTRAL, "Target count {} ({decimal:2}%)", task.getTargetTotalChunks(), 100 * (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) / task.getTargetTotalChunks());
