@@ -65,7 +65,7 @@ public class PaintingListener extends PermissionContainer
     // TODO maybe save painting type when breaking so the same can be placed and allow stacking them somehow
 
     @Listener(order = Order.EARLY)
-    public void onPlayerInteractEntity(InteractEntityEvent event, @First Player player)
+    public void onPlayerInteractEntity(InteractEntityEvent.Secondary.MainHand event, @First Player player)
     {
         if (event.getTargetEntity().getType() == EntityTypes.PAINTING)
         {
