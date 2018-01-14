@@ -17,33 +17,28 @@
  */
 package org.cubeengine.module.roles.data;
 
+import static java.util.stream.Collectors.toMap;
+import static org.spongepowered.api.data.DataQuery.of;
+
+import com.google.common.reflect.TypeToken;
+import org.spongepowered.api.data.key.Key;
+import org.spongepowered.api.data.value.mutable.ListValue;
+import org.spongepowered.api.data.value.mutable.MapValue;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.google.common.reflect.TypeToken;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.KeyFactory;
-import org.spongepowered.api.data.property.BooleanProperty;
-import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.data.value.mutable.MapValue;
-
-import static java.util.stream.Collectors.toMap;
-import static org.spongepowered.api.data.DataQuery.of;
-
 public interface IPermissionData
 {
 
-    TypeToken<List<String>> TTL_String = new TypeToken<List<String>>() {};
     TypeToken<ListValue<String>> TTLV_String = new TypeToken<ListValue<String>>() {};
-    TypeToken<Map<String, Boolean>> TTM_StringBool = new TypeToken<Map<String, Boolean>>() {};
     TypeToken<MapValue<String, Boolean>> TTMV_StringBool = new TypeToken<MapValue<String, Boolean>>() {};
-    TypeToken<Map<String, String>> TTM_StringString = new TypeToken<Map<String, String>>() {};
     TypeToken<MapValue<String, String>> TTMV_StringString = new TypeToken<MapValue<String, String>>() {};
 
-    Key<ListValue<String>> PARENTS = KeyFactory.makeListKey(TTL_String, TTLV_String, of("parents"), "cubeengine-roles:permission-parent","Parents");
-    Key<MapValue<String, Boolean>> PERMISSIONS = KeyFactory.makeMapKey(TTM_StringBool, TTMV_StringBool, of("permissions"), "cubeengine-roles:permission-perms","Permission");
-    Key<MapValue<String, String>> OPTIONS = KeyFactory.makeMapKey(TTM_StringString, TTMV_StringString, of("options"), "cubeengine-roles:permission-opts","Options");
+    Key<ListValue<String>> PARENTS = Key.builder().type(TTLV_String).query(of("parents")).id("cubeengine-roles:permission-parent").name("Parents").build();
+    Key<MapValue<String, Boolean>> PERMISSIONS = Key.builder().type(TTMV_StringBool).query(of("permissions")).id("cubeengine-roles:permission-perms").name("Permission").build();
+    Key<MapValue<String, String>> OPTIONS = Key.builder().type(TTMV_StringString).query(of("options")).id("cubeengine-roles:permission-opts").name("Options").build();
 
     List<String> getParents();
     Map<String, Boolean> getPermissions();

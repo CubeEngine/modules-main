@@ -30,6 +30,7 @@ import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.type.InventoryRow;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -77,10 +78,10 @@ public class ClearInventoryCommand extends PermissionContainer
                 return;
             }
         }
-        player.getInventory().query(InventoryRow.class).clear();
+        player.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(InventoryRow.class)).clear();
         if (removeArmor)
         {
-            player.getInventory().query(EquipmentInventory.class).clear();
+            player.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(EquipmentInventory.class)).clear();
         }
         if (self)
         {

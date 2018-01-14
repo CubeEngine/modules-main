@@ -47,6 +47,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Container;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.Location;
@@ -237,7 +238,7 @@ public class LockerCommands extends ContainerCommand
                 {
                     // TODO check if this is working
                     Sponge.getCauseStackManager().pushCause(context);
-                    ((Carrier) te.get()).getInventory().<Container>query(Container.class).getViewers().forEach(Player::closeInventory);
+                    ((Carrier) te.get()).getInventory().<Container>query(QueryOperationTypes.INVENTORY_TYPE.of(Container.class)).getViewers().forEach(Player::closeInventory);
                 }
             });
             i18n.send(context, POSITIVE, "Right click a protection to invalidate old KeyBooks for it!");

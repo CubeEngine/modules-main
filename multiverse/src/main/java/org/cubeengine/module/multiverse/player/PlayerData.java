@@ -41,13 +41,11 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.world.World;
 
 import static java.util.Collections.emptyList;
 import static org.spongepowered.api.data.DataQuery.of;
-import static org.spongepowered.api.data.key.KeyFactory.makeListKey;
-import static org.spongepowered.api.data.key.KeyFactory.makeMapKey;
-import static org.spongepowered.api.data.key.KeyFactory.makeSingleKey;
 
 public class PlayerData implements DataSerializable
 {
@@ -162,7 +160,7 @@ public class PlayerData implements DataSerializable
     public void applyToPlayer(Player player)
     {
         Inventory inv = player.getInventory();
-        ((Hotbar)inv.query(Hotbar.class)).setSelectedSlotIndex(heldItemSlot);
+        ((Hotbar)inv.query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class))).setSelectedSlotIndex(heldItemSlot);
         player.offer(Keys.MAX_HEALTH, maxHealth);
         player.offer(Keys.HEALTH, health);
         player.offer(Keys.FOOD_LEVEL, foodLevel);
@@ -215,7 +213,7 @@ public class PlayerData implements DataSerializable
     public void applyFromPlayer(Player player)
     {
         Inventory playerInventory = player.getInventory();
-        this.heldItemSlot = ((Hotbar)playerInventory.query(Hotbar.class)).getSelectedSlotIndex();
+        this.heldItemSlot = ((Hotbar)playerInventory.query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class))).getSelectedSlotIndex();
         this.maxHealth = player.get(Keys.MAX_HEALTH).get();
         this.health = player.get(Keys.HEALTH).get();
         this.foodLevel = player.get(Keys.FOOD_LEVEL).get();

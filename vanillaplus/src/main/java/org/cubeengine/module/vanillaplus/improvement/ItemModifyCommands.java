@@ -121,7 +121,7 @@ public class ItemModifyCommands extends PermissionContainer
     public void headchange(Player context, @Optional String name) throws ExecutionException, InterruptedException
     {
         ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
-        if (item == null || item.getItem() != SKULL)
+        if (item == null || item.getType() != SKULL)
         {
             i18n.send(context, NEGATIVE, "You are not holding a head.");
             return;

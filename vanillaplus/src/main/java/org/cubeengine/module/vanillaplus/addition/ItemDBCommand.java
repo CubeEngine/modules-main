@@ -79,12 +79,12 @@ public class ItemDBCommand
             List<Text> lines = new ArrayList<>();
             ItemStack key = itemList.get(0);
             lines.add(i18n.translate(context, POSITIVE, "Best Matched {input#item} {input#id} for {input}",
-                                          materialMatcher.getNameFor(key), key.getItem().getId(), item));
+                                          materialMatcher.getNameFor(key), key.getType().getId(), item));
             itemList.remove(0);
             for (ItemStack stack : itemList)
             {
                 lines.add(i18n.translate(context, POSITIVE, "Matched {input#item} {input#id} for {input}",
-                                              materialMatcher.getNameFor(stack), stack.getItem().getId(), item));
+                                              materialMatcher.getNameFor(stack), stack.getType().getId(), item));
             }
             Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder()
                 .contents(lines).sendTo(context);
@@ -104,9 +104,9 @@ public class ItemDBCommand
         String found = materialMatcher.getNameFor(aItem);
         if (found == null)
         {
-            i18n.send(context, NEGATIVE, "Itemname unknown! Itemdata: {input#id}", aItem.getItem().getId());
+            i18n.send(context, NEGATIVE, "Itemname unknown! Itemdata: {input#id}", aItem.getType().getId());
             return;
         }
-        i18n.send(context, POSITIVE, "The Item in your hand is: {input#item} ({input#id})", found, aItem.getItem().getId());
+        i18n.send(context, POSITIVE, "The Item in your hand is: {input#item} ({input#id})", found, aItem.getType().getId());
     }
 }

@@ -37,6 +37,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Type;
 import org.spongepowered.api.item.inventory.type.InventoryRow;
 
@@ -190,7 +191,7 @@ public class ItemCommands extends PermissionContainer
     {
         boolean allow64 = context.hasPermission(COMMAND_STACK_FULLSTACK.getId());
         allow64 = false; // TODO this is currently not working /w Sponge
-        Inventory rows = context.getInventory().query(InventoryRow.class);
+        Inventory rows = context.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(InventoryRow.class));
         ItemStack[] items = new ItemStack[rows.capacity()];
         int slotIndex = 0;
         for (Inventory row : rows)

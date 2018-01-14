@@ -24,7 +24,6 @@ import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
 import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.KeyFactory;
 import org.spongepowered.api.data.manipulator.mutable.common.AbstractBooleanData;
 import org.spongepowered.api.data.merge.MergeFunction;
 import org.spongepowered.api.data.value.mutable.Value;
@@ -32,11 +31,8 @@ import org.spongepowered.api.data.value.mutable.Value;
 public class SafeLoginData extends AbstractBooleanData<SafeLoginData, ImmutableSafeLoginData>
 {
 
-    public final static Key<Value<Boolean>> FLYMODE = KeyFactory.makeSingleKey(
-            new TypeToken<Boolean>() {},
-            new TypeToken<Value<Boolean>>() {},
-            DataQuery.of("flymode"),
-            "cubeengine-vanillaplus:flymode", "Flymode on Login");
+    public final static Key<Value<Boolean>> FLYMODE = Key.builder().type(new TypeToken<Value<Boolean>>() {}).id("cubeengine-vanillaplus:flymode")
+            .name("Flymode on Login").query(DataQuery.of("flymode")).build();
 
     public SafeLoginData(Boolean value)
     {

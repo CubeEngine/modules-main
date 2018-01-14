@@ -83,7 +83,7 @@ public class KeyBook
             return null;
         }
 
-        if (item.get().getItem() == ItemTypes.ENCHANTED_BOOK
+        if (item.get().getType() == ItemTypes.ENCHANTED_BOOK
             && item.get().get(DISPLAY_NAME).map(Text::toPlain).map(s -> s.contains(TITLE.toPlain())).orElse(false))
         {
             Optional<LockerData> lockerData = item.get().get(LockerData.class);
