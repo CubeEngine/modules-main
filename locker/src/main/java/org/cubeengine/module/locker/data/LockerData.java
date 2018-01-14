@@ -45,13 +45,11 @@ public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
 
     private long lockID;
     private byte[] pass;
-    private ValueFactory valueFactory;
 
-    public LockerData(long lockID, byte[] pass, ValueFactory valueFactory)
+    public LockerData(long lockID, byte[] pass)
     {
         this.lockID = lockID;
         this.pass = pass;
-        this.valueFactory = valueFactory;
         registerGettersAndSetters();
     }
 
@@ -106,9 +104,9 @@ public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
         return lockID;
     }
 
-    public LockerData(ValueFactory valueFactory)
+    public LockerData()
     {
-        this(0, null, valueFactory);
+        this(0, null);
     }
 
     @Override
@@ -167,13 +165,13 @@ public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
     @Override
     public LockerData copy()
     {
-        return new LockerData(lockID, pass, valueFactory);
+        return new LockerData(lockID, pass);
     }
 
     @Override
     public ImmutableLockerData asImmutable()
     {
-        return new ImmutableLockerData(lockID, pass, valueFactory);
+        return new ImmutableLockerData(lockID, pass);
     }
 
     @Override

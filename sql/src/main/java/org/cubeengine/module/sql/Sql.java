@@ -18,19 +18,9 @@
 package org.cubeengine.module.sql;
 
 import org.cubeengine.libcube.CubeEngineModule;
-import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.module.sql.database.ModuleTables;
-import org.cubeengine.module.sql.database.mysql.MySQLDatabase;
 import org.cubeengine.processor.Module;
-
-import javax.inject.Inject;
 
 @Module
 public class Sql extends CubeEngineModule
 {
-    @Inject
-    public Sql(MySQLDatabase db, ModuleManager mm)
-    {
-        mm.registerClassInjector(ModuleTables.class, db);
-    }
 }

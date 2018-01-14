@@ -199,7 +199,7 @@ public class Lock
         item.offer(Keys.ITEM_LORE, Arrays.asList(i18n.translate(player, NEUTRAL, "This book can"),
                                                  i18n.translate(player, NEUTRAL, "unlock a magically"),
                                                  i18n.translate(player, NEUTRAL, "locked protection")));
-        item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCKS.PASSWORD), Sponge.getRegistry().getValueFactory()));
+        item.offer(new LockerData(getId().longValue(), model.getValue(TABLE_LOCKS.PASSWORD)));
         player.setItemInHand(HandTypes.MAIN_HAND, item);
         if (itemStack != null && itemStack.getQuantity() != 0)
         {

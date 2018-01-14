@@ -19,28 +19,23 @@ package org.cubeengine.module.locker.data;
 
 import java.util.Optional;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulatorBuilder;
 import org.spongepowered.api.data.persistence.AbstractDataBuilder;
 import org.spongepowered.api.data.persistence.InvalidDataException;
-import org.spongepowered.api.data.value.ValueFactory;
 
 public class LockerDataBuilder extends AbstractDataBuilder<LockerData> implements DataManipulatorBuilder<LockerData, ImmutableLockerData>
 {
-    private ValueFactory valueFactory;
-
     public LockerDataBuilder()
     {
         super(LockerData.class, 1);
-        this.valueFactory = Sponge.getRegistry().getValueFactory();
     }
 
     @Override
     public LockerData create()
     {
-        return new LockerData(valueFactory);
+        return new LockerData();
     }
 
     @Override
@@ -63,7 +58,7 @@ public class LockerDataBuilder extends AbstractDataBuilder<LockerData> implement
                 }
                 return pass;
             }).orElse(null);
-            return Optional.of(new LockerData(lockID.get(), password, valueFactory));
+            return Optional.of(new LockerData(lockID.get(), password));
         }
         return Optional.empty();
     }

@@ -97,7 +97,7 @@ public class LockManager
 {
     public static final int VIEWDISTANCE_DEFAULT = 10;
     protected final Locker module;
-    private Database database;
+    @Inject private Database database;
 
     protected TaskManager tm;
     private I18n i18n;
@@ -116,9 +116,8 @@ public class LockManager
     public final MessageDigest messageDigest;
 
     @Inject
-    public LockManager(Locker module, EventManager em, Database database, TaskManager tm, I18n i18n, ModuleManager mm)
+    public LockManager(Locker module, EventManager em, TaskManager tm, I18n i18n, ModuleManager mm)
     {
-        this.database = database;
         this.tm = tm;
         this.i18n = i18n;
         logger = mm.getLoggerFor(Locker.class);

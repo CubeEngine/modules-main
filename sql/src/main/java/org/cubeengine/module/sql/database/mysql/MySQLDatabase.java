@@ -28,7 +28,6 @@ import java.sql.SQLException;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.google.inject.Injector;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
@@ -40,6 +39,7 @@ import org.cubeengine.logscribe.LogTarget;
 import org.cubeengine.logscribe.filter.PrefixFilter;
 import org.cubeengine.logscribe.target.file.AsyncFileTarget;
 import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.module.sql.Sql;
 import org.cubeengine.module.sql.database.AbstractDatabase;
 import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.DatabaseConfiguration;
@@ -154,6 +154,9 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
         this.logger.info("connected!");
 
         this.registerTable(new TableVersion());
+
+        mm.registerClassInjector(ModuleTables.class, this);
+        mm.registerBinding(Database.class, this);
     }
 
     private boolean updateTableStructure(TableUpdateCreator updater)
@@ -247,7 +250,7 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
     }
 
     @Override
-    public void inject(Injector moduleInjector, Object instance, ModuleTables annotation) {
+    public void inject(Object instance, ModuleTables annotation) {
         for (Class<? extends Table<?>> table : annotation.value()) {
             this.registerTable(table);
         }

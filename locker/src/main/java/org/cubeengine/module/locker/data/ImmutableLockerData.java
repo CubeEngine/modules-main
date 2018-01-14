@@ -23,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
@@ -38,13 +40,11 @@ public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLo
 {
     private final long lockID;
     private final byte[] pass;
-    private ValueFactory valueFactory;
 
-    public ImmutableLockerData(long lockID, byte[] pass, ValueFactory valueFactory)
+    public ImmutableLockerData(long lockID, byte[] pass)
     {
         this.lockID = lockID;
         this.pass = pass;
-        this.valueFactory = valueFactory;
     }
 
     @Override
@@ -53,7 +53,7 @@ public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLo
         if (LOCK_ID.equals(key))
         {
             long lockID = (Long)value;
-            return Optional.of(new ImmutableLockerData(lockID, pass, valueFactory));
+            return Optional.of(new ImmutableLockerData(lockID, pass));
         }
         else if (LOCK_PASS.equals(key))
         {
@@ -63,7 +63,7 @@ public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLo
             {
                 pass[i] = list.get(i);
             }
-            return Optional.of(new ImmutableLockerData(lockID, pass, valueFactory));
+            return Optional.of(new ImmutableLockerData(lockID, pass));
         }
         return Optional.empty();
     }
@@ -71,7 +71,7 @@ public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLo
     @Override
     public LockerData asMutable()
     {
-        return new LockerData(lockID, pass, valueFactory);
+        return new LockerData(lockID, pass);
     }
 
     @Override
@@ -117,7 +117,8 @@ public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLo
         {
             if (LOCK_ID.equals(key))
             {
-                return Optional.ofNullable((V) valueFactory.createValue(LOCK_ID, lockID));
+
+                return Optional.ofNullable((V) Sponge.getRegistry().getValueFactory().createValue(LOCK_ID, lockID));
             }
             else if (LOCK_PASS.equals(key))
             {
@@ -126,7 +127,7 @@ public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLo
                     return Optional.empty();
                 }
                 List<Byte> list = passAsList();
-                return Optional.of(((V) valueFactory.createListValue(LOCK_PASS, list)));
+                return Optional.of(((V) Sponge.getRegistry().getValueFactory().createListValue(LOCK_PASS, list)));
             }
         }
         return Optional.empty();
@@ -158,10 +159,10 @@ public class ImmutableLockerData implements ImmutableDataManipulator<ImmutableLo
     public Set<ImmutableValue<?>> getValues()
     {
         HashSet<ImmutableValue<?>> set = new HashSet<>();
-        set.add(valueFactory.createValue(LOCK_ID, lockID).asImmutable());
+        set.add(Sponge.getRegistry().getValueFactory().createValue(LOCK_ID, lockID).asImmutable());
         if (pass != null)
         {
-            set.add(((ImmutableValue<?>) valueFactory.createListValue(LOCK_PASS, passAsList())));
+            set.add(((ImmutableValue<?>) Sponge.getRegistry().getValueFactory().createListValue(LOCK_PASS, passAsList())));
         }
         return set;
     }
