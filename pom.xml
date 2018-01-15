@@ -45,8 +45,7 @@
   </distributionManagement>
 
   <modules>
-    <module>conomy</module>
-    <module>roles</module>
+    <module>docs</module>
     <module>travel</module>
     <module>locker</module>
     <module>worlds</module>
