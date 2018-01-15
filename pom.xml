@@ -46,6 +46,8 @@
 
   <modules>
     <module>docs</module>
+    <module>conomy</module>
+    <module>roles</module>
     <module>travel</module>
     <module>locker</module>
     <module>worlds</module>
