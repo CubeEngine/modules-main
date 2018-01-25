@@ -18,9 +18,13 @@
 package org.cubeengine.module.sql;
 
 import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.module.sql.database.mysql.MySQLDatabase;
 import org.cubeengine.processor.Module;
+
+import javax.inject.Inject;
 
 @Module
 public class Sql extends CubeEngineModule
 {
+    @Inject MySQLDatabase db;
 }

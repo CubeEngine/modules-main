@@ -30,6 +30,7 @@ import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.logging.LogProvider;
 import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.ModuleTables;
+import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.libcube.service.permission.PermissionManager;
@@ -46,7 +47,7 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.service.economy.EconomyService;
 
 @Singleton
-@Module
+@Module(dependencies = @Dependency("cubeengine-sql"))
 @ModuleTables({TableAccount.class, TableBalance.class})
 public class Conomy extends CubeEngineModule
 {
