@@ -33,6 +33,7 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -129,7 +130,7 @@ public class TeleportListener
         }
 
         player.setLocation(end.get().add(0.5, 0, 0.5));
-        i18n.send(player, NEUTRAL, "You passed through a wall");
+        i18n.send(ChatTypes.ACTION_BAR, player, NEUTRAL, "You passed through a wall");
         event.setCancelled(true);
     }
 
