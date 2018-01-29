@@ -42,6 +42,7 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;
+import org.spongepowered.api.item.inventory.BlockCarrier;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -138,9 +139,9 @@ public class LockerListener
         }
         Object carrier = ((CarriedInventory) event.getTargetInventory()).getCarrier().get();
         Location<World> loc = null;
-        if (carrier instanceof TileEntityCarrier)
+        if (carrier instanceof BlockCarrier)
         {
-            loc = ((TileEntityCarrier) carrier).getLocation();
+            loc = ((BlockCarrier) carrier).getLocation();
         }
         else if (carrier instanceof Entity)
         {

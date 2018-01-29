@@ -71,7 +71,9 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.world.LoadWorldEvent;
+import org.spongepowered.api.item.inventory.BlockCarrier;
 import org.spongepowered.api.item.inventory.Carrier;
+import org.spongepowered.api.item.inventory.MultiBlockCarrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -556,9 +558,13 @@ public class LockManager
         {
             return this.getLockForEntityUID(((Entity)holder).getUniqueId());
         }
-        if (holder instanceof TileEntityCarrier)
+        if (holder instanceof MultiBlockCarrier)
         {
-            return getValidLock(((TileEntityCarrier)holder).getLocation(), null);
+            return getValidLock(((MultiBlockCarrier)holder).getLocation(), null);
+        }
+        if (holder instanceof BlockCarrier)
+        {
+            return getValidLock(((BlockCarrier)holder).getLocation(), null);
         }
         return null;
     }
