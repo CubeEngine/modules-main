@@ -13,8 +13,15 @@
     <version>1.0.0-SNAPSHOT</version>
     <description>Mails</description>
 
+    <scm>
+        <url>scm:git:https://github.com/CubeEngine/modules-main</url>
+        <connection>scm:git:https://github.com/CubeEngine/modules-main.git</connection>
+        <developerConnection>scm:git:git@github.com:CubeEngine/modules-main.git</developerConnection>
+    </scm>
+
     <properties>
         <libcube.version>1.2.1-SNAPSHOT</libcube.version>
+        <module.sql.version>1.0.0-SNAPSHOT</module.sql.version>
         <sponge.version>7.1.0-SNAPSHOT</sponge.version>
     </properties>
 
@@ -34,9 +41,8 @@
         <dependency>
             <groupId>org.cubeengine.module</groupId>
             <artifactId>sql</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>${module.sql.version}</version>
             <scope>provided</scope>
-            <type>jar</type>
         </dependency>
     </dependencies>
 </project>
