@@ -18,13 +18,22 @@
 package org.cubeengine.module.sql;
 
 import org.cubeengine.libcube.CubeEngineModule;
+import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.mysql.MySQLDatabase;
 import org.cubeengine.processor.Module;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameInitializationEvent;
 
 import javax.inject.Inject;
 
 @Module
 public class Sql extends CubeEngineModule
 {
-    @Inject MySQLDatabase db;
+    @Inject Database db;
+
+    @Listener
+    public void onInit(GameInitializationEvent event)
+    {
+        ((MySQLDatabase) db).init();
+    }
 }

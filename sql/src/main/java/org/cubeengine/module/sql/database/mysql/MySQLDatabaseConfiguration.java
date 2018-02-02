@@ -25,21 +25,6 @@ import org.cubeengine.reflect.annotations.Comment;
  */
 public class MySQLDatabaseConfiguration extends DatabaseConfiguration
 {
-    @Comment("The host to connect with. Default: localhost")
-    public String host = "localhost";
-
-    @Comment("The port to connect with. Default 3306")
-    public short port = 3306;
-
-    @Comment("The user using the database")
-    public String user = "minecraft";
-
-    @Comment("The password for the specified user")
-    public String password = "";
-
-    @Comment("The name of the database")
-    public String database = "minecraft";
-
     @Comment("The table prefix to use for all CubeEngine tables")
     public String tablePrefix = "cube_";
 }

@@ -19,27 +19,22 @@ package org.cubeengine.module.sql.database.mysql;
 
 import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
 import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
 import com.zaxxer.hikari.pool.HikariPool;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.ModuleInjector;
+import org.cubeengine.libcube.service.filesystem.FileManager;
+import org.cubeengine.libcube.service.logging.LoggingUtil;
+import org.cubeengine.libcube.util.Version;
 import org.cubeengine.logscribe.Log;
 import org.cubeengine.logscribe.LogFactory;
 import org.cubeengine.logscribe.LogLevel;
 import org.cubeengine.logscribe.LogTarget;
 import org.cubeengine.logscribe.filter.PrefixFilter;
 import org.cubeengine.logscribe.target.file.AsyncFileTarget;
-import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.module.sql.Sql;
 import org.cubeengine.module.sql.database.AbstractDatabase;
 import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.DatabaseConfiguration;
@@ -49,33 +44,47 @@ import org.cubeengine.module.sql.database.TableCreator;
 import org.cubeengine.module.sql.database.TableUpdateCreator;
 import org.cubeengine.module.sql.database.TableVersion;
 import org.cubeengine.reflect.Reflector;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
-import org.cubeengine.libcube.util.Version;
-import org.cubeengine.libcube.service.filesystem.FileManager;
-import org.cubeengine.libcube.service.logging.LoggingUtil;
-import org.jooq.*;
+import org.jooq.Configuration;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SQLDialect;
 import org.jooq.conf.MappedSchema;
 import org.jooq.conf.MappedTable;
 import org.jooq.conf.RenderMapping;
 import org.jooq.conf.Settings;
-import org.jooq.impl.*;
+import org.jooq.impl.DSL;
+import org.jooq.impl.DataSourceConnectionProvider;
+import org.jooq.impl.DefaultConfiguration;
+import org.jooq.impl.DefaultExecuteListenerProvider;
+import org.jooq.impl.DefaultVisitListenerProvider;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.service.sql.SqlService;
+
+import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.sql.DataSource;
 
 @Singleton
 public class MySQLDatabase extends AbstractDatabase implements Database, ModuleInjector<ModuleTables>
 {
     private final MySQLDatabaseConfiguration config;
-    private final HikariDataSource dataSource;
+    private DataSource dataSource;
+    private ModuleManager mm;
 
-    private final Settings settings;
-    private final MappedSchema mappedSchema;
+    private Settings settings;
+    private MappedSchema mappedSchema;
     private Log logger;
     private final JooqLogger jooqLogger = new JooqLogger(this);
 
     @Inject
     public MySQLDatabase(Reflector reflector, ModuleManager mm, FileManager fm, LogFactory logFactory)
     {
+        this.mm = mm;
+        this.mm.registerBinding(Database.class, this);
         File pluginFolder = mm.getBasePath();
 
         // Disable HikariPool Debug ConsoleSpam
@@ -93,52 +102,28 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
         target.setLevel(LogLevel.DEBUG);
         logger.addTarget(target);
 
+
         LogTarget parentTarget = logger.addDelegate(logFactory.getLog(LogFactory.class));
         parentTarget.appendFilter(new PrefixFilter("[DB] "));
         parentTarget.setLevel(LogLevel.INFO);
 
-        // Now go connect to the database:
-        this.logger.info("Connecting to the database...");
+
         this.config = reflector.load(MySQLDatabaseConfiguration.class, new File(pluginFolder, "database.yml"));
 
-        HikariConfig dsConf = new HikariDataSource();
-        dsConf.setPoolName("CubeEngine");
-        //dsConf.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
-        dsConf.setJdbcUrl("jdbc:mysql://" + config.host + ":" + config.port + "/" + config.database);
 
-        dsConf.addDataSourceProperty("user", config.user);
-        dsConf.addDataSourceProperty("password", config.password);
-        dsConf.addDataSourceProperty("databaseName", config.database);
-        dsConf.addDataSourceProperty("cachePrepStmts", "true");
-        dsConf.addDataSourceProperty("prepStmtCacheSize", "250");
-        dsConf.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        dsConf.addDataSourceProperty("useServerPrepStmts", "true");
-        dsConf.addDataSourceProperty("useUnicode", "yes");
-        dsConf.addDataSourceProperty("characterEncoding", "UTF-8");
-        dsConf.addDataSourceProperty("connectionCollation", "utf8_general_ci");
-        dsConf.setMinimumIdle(5);
-        dsConf.setMaximumPoolSize(20);
-        dsConf.setThreadFactory(threadFactory);
-        dsConf.setConnectionTimeout(10000); // 10s
-        dsConf.setInitializationFailFast(false);
-        dataSource = new HikariDataSource(dsConf);
-        try (Connection connection = dataSource.getConnection())
+    }
+
+    public void init()
+    {
+        // Now go connect to the database:
+        this.logger.info("Connecting to the database...");
+
+        SqlService service = Sponge.getServiceManager().provide(SqlService.class).get();
+        String url = service.getConnectionUrlFromAlias("cubeengine-sql").orElse("jdbc:mysql://minecraft@localhost:3306/minecraft");
+
+        try
         {
-            try (PreparedStatement s = connection.prepareStatement("SHOW variables WHERE Variable_name='wait_timeout'"))
-            {
-                ResultSet result = s.executeQuery();
-                if (result.next())
-                {
-                    final int TIMEOUT_DELTA = 60;
-                    int second = result.getInt("Value") - TIMEOUT_DELTA;
-                    if (second <= 0)
-                    {
-                        second += TIMEOUT_DELTA;
-                    }
-                    dataSource.setIdleTimeout(second);
-                    dataSource.setMaxLifetime(second);
-                }
-            }
+            this.dataSource = service.getDataSource(url);
         }
         catch (SQLException e)
         {
@@ -146,7 +131,7 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
             throw new IllegalStateException("Could not establish connection with the database!", e);
         }
 
-        this.mappedSchema = new MappedSchema().withInput(config.database);
+        this.mappedSchema = new MappedSchema();
         this.settings = new Settings();
         this.settings.withRenderMapping(new RenderMapping().withSchemata(this.mappedSchema));
         this.settings.setExecuteLogging(false);
@@ -158,6 +143,7 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
         mm.registerClassInjector(ModuleTables.class, this);
         mm.registerBinding(Database.class, this);
     }
+
 
     private boolean updateTableStructure(TableUpdateCreator updater)
     {
@@ -279,7 +265,6 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
     public void shutdown()
     {
         super.shutdown();
-        this.dataSource.close();
     }
 
     @Override
