@@ -74,6 +74,7 @@ TODO generate sample configs on the first run AND/OR cmd to generate samples
 TODO role / user permlist clickable red - to remove perm after ok - green + to add (deny/allow?)  - then catch chat tab complete for perm
 TODO lookup permissions (via PermissionDescription)
 TODO lookup permissions (via Command?)
+TODO SubjectDataUpdateEvent
 */
 @Singleton
 @Module

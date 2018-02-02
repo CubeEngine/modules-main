@@ -176,7 +176,7 @@ public class HomeManager
             this.create(player, "home", player.getTransform());
             i18n.send(player, POSITIVE, "Your home has been created!");
         }
-        event.setCancelled(true);
+        // event.setCancelled(true);
     }
 
     public void purge(WorldProperties world)
