@@ -55,18 +55,18 @@ public class PlayerData implements DataSerializable
     private static TypeToken<ListValue<PotionEffect>> TTLV_PotionEffect = new TypeToken<ListValue<PotionEffect>>() {};
     private static TypeToken<MapValue<Integer, ItemStack>> TTMV_Inventory = new TypeToken<MapValue<Integer, ItemStack>>() {};
 
-    public static final Key<Value<Integer>> HELD_ITEM = Key.builder().type(TTV_Int).query(of("heldItemSlot")).id("cubeengine-multiverse:player-helditem").name("Held Item Index").build();
-    public static final Key<Value<Double>> HEALTH = Key.builder().type(TTV_Double).query(of("health")).id("cubeengine-multiverse:player-health").name("Health").build();
-    public static final Key<Value<Double>> MAX_HEALTH = Key.builder().type(TTV_Double).query(of("maxHealth")).id("cubeengine-multiverse:player-max-health").name("Max Health").build();
-    public static final Key<Value<Integer>> FOOD = Key.builder().type(TTV_Int).query(of("foodLevel")).id("cubeengine-multiverse:player-food").name("Food").build();
-    public static final Key<Value<Double>> SATURATION = Key.builder().type(TTV_Double).query(of("saturation")).id("cubeengine-multiverse:player-saturation").name("Saturation").build();
-    public static final Key<Value<Double>> EXHAUSTION = Key.builder().type(TTV_Double).query(of("exhaustion")).id("cubeengine-multiverse:player-exhaustion").name("Exhaustion").build();
-    public static final Key<Value<Integer>> EXP = Key.builder().type(TTV_Int).query(of("exp")).id("cubeengine-multiverse:player-exp").name("Exp").build();
-    public static final Key<Value<Integer>> FIRE_TICKS = Key.builder().type(TTV_Int).query(of("fireticks")).id("cubeengine-multiverse:player-fireticks").name("Fire-Ticks").build();
-    public static final Key<ListValue<PotionEffect>> ACTIVE_EFFECTS = Key.builder().type(TTLV_PotionEffect).query(of("activeEffects")).id("cubeengine-multiverse:player-effects").name("Effects").build();
-    public static final Key<MapValue<Integer, ItemStack>> INVENTORY = Key.builder().type(TTMV_Inventory).query(of("inventory")).id("cubeengine-multiverse:player-inventory").name("Inventory").build();
-    public static final Key<MapValue<Integer, ItemStack>> ENDER_INVENTORY = Key.builder().type(TTMV_Inventory).query(of("enderInventory")).id("cubeengine-multiverse:player-enderchest").name("Enderchest").build();
-    public static final Key<Value<String>> GAMEMODE = Key.builder().type(TTV_String).query(of("gamemode")).id("cubeengine-multiverse:player-gamemode").name("Gamemode").build();
+    public static final Key<Value<Integer>> HELD_ITEM = Key.builder().type(TTV_Int).query(of("heldItemSlot")).id("player-helditem").name("Held Item Index").build();
+    public static final Key<Value<Double>> HEALTH = Key.builder().type(TTV_Double).query(of("health")).id("player-health").name("Health").build();
+    public static final Key<Value<Double>> MAX_HEALTH = Key.builder().type(TTV_Double).query(of("maxHealth")).id("player-max-health").name("Max Health").build();
+    public static final Key<Value<Integer>> FOOD = Key.builder().type(TTV_Int).query(of("foodLevel")).id("player-food").name("Food").build();
+    public static final Key<Value<Double>> SATURATION = Key.builder().type(TTV_Double).query(of("saturation")).id("player-saturation").name("Saturation").build();
+    public static final Key<Value<Double>> EXHAUSTION = Key.builder().type(TTV_Double).query(of("exhaustion")).id("player-exhaustion").name("Exhaustion").build();
+    public static final Key<Value<Integer>> EXP = Key.builder().type(TTV_Int).query(of("exp")).id("player-exp").name("Exp").build();
+    public static final Key<Value<Integer>> FIRE_TICKS = Key.builder().type(TTV_Int).query(of("fireticks")).id("player-fireticks").name("Fire-Ticks").build();
+    public static final Key<ListValue<PotionEffect>> ACTIVE_EFFECTS = Key.builder().type(TTLV_PotionEffect).query(of("activeEffects")).id("player-effects").name("Effects").build();
+    public static final Key<MapValue<Integer, ItemStack>> INVENTORY = Key.builder().type(TTMV_Inventory).query(of("inventory")).id("player-inventory").name("Inventory").build();
+    public static final Key<MapValue<Integer, ItemStack>> ENDER_INVENTORY = Key.builder().type(TTMV_Inventory).query(of("enderInventory")).id("player-enderchest").name("Enderchest").build();
+    public static final Key<Value<String>> GAMEMODE = Key.builder().type(TTV_String).query(of("gamemode")).id("player-gamemode").name("Gamemode").build();
 
     public int heldItemSlot = 0;
     public double health = 20;

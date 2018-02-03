@@ -22,7 +22,7 @@ import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.mysql.MySQLDatabase;
 import org.cubeengine.processor.Module;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameInitializationEvent;
+import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
 
 import javax.inject.Inject;
 
@@ -32,7 +32,7 @@ public class Sql extends CubeEngineModule
     @Inject Database db;
 
     @Listener
-    public void onInit(GameInitializationEvent event)
+    public void onStart(GameAboutToStartServerEvent event)
     {
         ((MySQLDatabase) db).init();
     }

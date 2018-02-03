@@ -31,7 +31,7 @@ import org.spongepowered.api.data.value.mutable.Value;
 public class SafeLoginData extends AbstractBooleanData<SafeLoginData, ImmutableSafeLoginData>
 {
 
-    public final static Key<Value<Boolean>> FLYMODE = Key.builder().type(new TypeToken<Value<Boolean>>() {}).id("cubeengine-vanillaplus:flymode")
+    public final static Key<Value<Boolean>> FLYMODE = Key.builder().type(new TypeToken<Value<Boolean>>() {}).id("flymode")
             .name("Flymode on Login").query(DataQuery.of("flymode")).build();
 
     public SafeLoginData(Boolean value)

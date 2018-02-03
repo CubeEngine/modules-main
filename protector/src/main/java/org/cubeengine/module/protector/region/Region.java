@@ -84,6 +84,15 @@ public class Region
         return this.config.world.getWorld();
     }
 
+    public String getWorldName()
+    {
+        if (this.config.world == null)
+        {
+            return null;
+        }
+        return this.config.world.getName();
+    }
+
     public Context getContext()
     {
         if (this.context == null)

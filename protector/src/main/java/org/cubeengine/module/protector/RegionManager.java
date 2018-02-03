@@ -23,6 +23,7 @@ import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
+import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
 import org.cubeengine.reflect.Reflector;
@@ -51,6 +52,7 @@ public class RegionManager
 {
     private final Path modulePath;
     private final Reflector reflector;
+    private Log logger;
     public Map<UUID, Map<String, Region>> byName = new HashMap<>();
     public Map<UUID, Map<Vector2i, List<Region>>> byChunk = new HashMap<>();
     public Map<UUID, Region> worldRegions = new HashMap<>();
@@ -58,10 +60,11 @@ public class RegionManager
 
     public Map<UUID, Region> activeRegion = new HashMap<>(); // playerUUID -> Region
 
-    public RegionManager(Path modulePath, Reflector reflector)
+    public RegionManager(Path modulePath, Reflector reflector, Log logger)
     {
         this.modulePath = modulePath;
         this.reflector = reflector;
+        this.logger = logger;
         Path path = modulePath.resolve("region");
         try
         {
@@ -77,7 +80,12 @@ public class RegionManager
 
     private Region loadRegion(Region region)
     {
-        byName.computeIfAbsent(region.getWorld().getUniqueId(), k -> new HashMap<>()).put(region.getName().toLowerCase(), region);
+        World world = region.getWorld();
+        if (world == null) {
+            logger.warn("Region {} was not loaded: Could not find world {}.", region.getName(), region.getWorldName());
+            return region;
+        }
+        byName.computeIfAbsent(world.getUniqueId(), k -> new HashMap<>()).put(region.getName().toLowerCase(), region);
 
         Vector3d max = region.getCuboid().getMaximumPoint();
         Vector3d min = region.getCuboid().getMinimumPoint();

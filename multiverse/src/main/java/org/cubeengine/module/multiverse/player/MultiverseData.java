@@ -44,8 +44,8 @@ public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiv
     private static TypeToken<Value<String>> TTV_String = new TypeToken<Value<String>>() {};
     private static TypeToken<MapValue<String, DataContainer>> TTMV_Data = new TypeToken<MapValue<String, DataContainer>>() {};
 
-    public static final Key<Value<String>> WORLD = Key.builder().type(TTV_String).query(of("current")).id("cubeengine-multiverse:data-world").name("World").build();
-    public static final Key<MapValue<String, DataContainer>> DATA = Key.builder().type(TTMV_Data).query(of("playerdata")).id("cubeengine-multiverse:data-container").name("DataContainer").build();
+    public static final Key<Value<String>> WORLD = Key.builder().type(TTV_String).query(of("current")).id("data-world").name("World").build();
+    public static final Key<MapValue<String, DataContainer>> DATA = Key.builder().type(TTMV_Data).query(of("playerdata")).id("data-container").name("DataContainer").build();
 
     public String currentUniverse;
     private Map<String, PlayerData> playerData;
