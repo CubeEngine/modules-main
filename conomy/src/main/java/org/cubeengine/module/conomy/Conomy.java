@@ -17,6 +17,9 @@
  */
 package org.cubeengine.module.conomy;
 
+import static org.cubeengine.module.sql.PluginSql.SQL_ID;
+import static org.cubeengine.module.sql.PluginSql.SQL_VERSION;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,6 +31,7 @@ import org.cubeengine.logscribe.Log;
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.logging.LogProvider;
+import org.cubeengine.module.sql.PluginSql;
 import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.ModuleTables;
 import org.cubeengine.processor.Dependency;
@@ -47,7 +51,7 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.service.economy.EconomyService;
 
 @Singleton
-@Module(dependencies = @Dependency("cubeengine-sql"))
+@Module(dependencies = @Dependency(value = SQL_ID, version = SQL_VERSION))
 @ModuleTables({TableAccount.class, TableBalance.class})
 public class Conomy extends CubeEngineModule
 {

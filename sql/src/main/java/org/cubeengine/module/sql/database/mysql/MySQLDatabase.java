@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.sql.database.mysql;
 
+import static org.cubeengine.module.sql.PluginSql.SQL_ID;
 import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -35,6 +36,7 @@ import org.cubeengine.logscribe.LogLevel;
 import org.cubeengine.logscribe.LogTarget;
 import org.cubeengine.logscribe.filter.PrefixFilter;
 import org.cubeengine.logscribe.target.file.AsyncFileTarget;
+import org.cubeengine.module.sql.PluginSql;
 import org.cubeengine.module.sql.database.AbstractDatabase;
 import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.DatabaseConfiguration;
@@ -119,7 +121,7 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
         this.logger.info("Connecting to the database...");
 
         SqlService service = Sponge.getServiceManager().provide(SqlService.class).get();
-        String url = service.getConnectionUrlFromAlias("cubeengine-sql").orElse("jdbc:mysql://minecraft@localhost:3306/minecraft");
+        String url = service.getConnectionUrlFromAlias(SQL_ID).orElse("jdbc:mysql://minecraft@localhost:3306/minecraft");
 
         try
         {

@@ -17,6 +17,9 @@
  */
 package org.cubeengine.module.locker;
 
+import static org.cubeengine.module.sql.PluginSql.SQL_ID;
+import static org.cubeengine.module.sql.PluginSql.SQL_VERSION;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -26,6 +29,7 @@ import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
+import org.cubeengine.module.sql.PluginSql;
 import org.cubeengine.module.sql.database.ModuleTables;
 import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
@@ -63,7 +67,7 @@ import org.spongepowered.api.plugin.PluginContainer;
 // TODO hoppers and protection
 
 @Singleton
-@Module(dependencies = @Dependency("cubeengine-sql"))
+@Module(dependencies = @Dependency(value = SQL_ID, version = SQL_VERSION))
 @ModuleTables({TableLocks.class, TableLockLocations.class, TableAccessList.class})
 public class Locker extends CubeEngineModule
 {
