@@ -76,20 +76,43 @@ public class PluginCommands extends PermissionContainer
 
         // TODO no pagination for console and hover id for player
         List<Text> list = new ArrayList<>();
-        list.add(Text.of(" - ", GREEN, "CubeEngine", " " ,GRAY, core.getId(), RESET, " (" + core.getVersion().orElse("unknown") + ") ",
+        list.add(Text.of(" - ", GREEN, "CubeEngine", " " ,GRAY, core.getId(), RESET, " (" + getVersionOf(core) + ") ",
                 i18n.translate(context, NEUTRAL, "with {amount} Modules:", modules.size())));
 
         for (PluginContainer m : modules)
         {
-            list.add(Text.of("   - ", GREEN, m.getName(), " ", GRAY, m.getId(), RESET, " (" + m.getVersion().orElse("unknown") + ")"));
+            list.add(Text.of("   - ", GREEN, simplifyCEName(m.getName()), " ", GRAY, m.getId(), RESET, " (" + getVersionOf(m) + ")"));
         }
 
         for (PluginContainer plugin : plugins)
         {
-            list.add(Text.of(" - ", GREEN, plugin.getName(), " ", GRAY, plugin.getId(), RESET, " (" + plugin.getVersion().orElse("unknown") + ")"));
+            list.add(Text.of(" - ", GREEN, plugin.getName(), " ", GRAY, plugin.getId(), RESET, " (" + getVersionOf(plugin) + ")"));
         }
 
         builder.contents(list).sendTo(context);
+    }
+
+    private String simplifyCEName(String name)
+    {
+        if (name.startsWith("CubeEngine - "))
+        {
+            name = name.substring(13);
+        }
+        return name;
+    }
+
+    private String getVersionOf(PluginContainer core)
+    {
+        return core.getVersion().map(this::simplifyVersion).orElse("unknown");
+    }
+
+    private String simplifyVersion(String version)
+    {
+        if (version.endsWith("SNAPSHOT"))
+        {
+            version = version.substring(0, version.length() - 7);
+        }
+        return version;
     }
 
     @Command(desc = "Displays the version of the server or a given plugin")
