@@ -38,7 +38,7 @@ public class VanillaPlusConfig extends ReflectedYaml
             + "Turning this on prevents putting unsafe Itemstacks into these inventories")
         public boolean preventOverstackedItems = true;
 
-        @Comment("Retaints fly-mode on login")
+        @Comment("Retains fly-mode on login")
         public boolean safeLoginFly = true;
 
         @Comment("Teleports to spawn when logging in outside of worldborder")

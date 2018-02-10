@@ -47,7 +47,7 @@ public class DifficultyCommand
             i18n.send(context, POSITIVE, "The difficulty has been set to {input}!", difficulty.getTranslation());
             return;
         }
-        i18n.send(context, POSITIVE, "Current difficulty level: {input}", world.getDifficulty().getName());
+        i18n.send(context, POSITIVE, "Current difficulty level: {input}", world.getDifficulty().getTranslation());
         if (world.getProperties().isHardcore())
         {
             i18n.send(context, POSITIVE, "The world {world} has the hardcore mode enabled.", world);
