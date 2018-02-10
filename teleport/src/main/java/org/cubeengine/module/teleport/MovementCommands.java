@@ -286,9 +286,9 @@ public class MovementCommands
             i18n.send(context, NEUTRAL, "Truly a hero! Trying to swap a users position with himself...");
             return;
         }
-        Location<World> userLoc = player.getLocation();
-        player.setLocation(sender.getLocation());
-        sender.setLocation(userLoc);
+        Transform<World> userLoc = player.getTransform();
+        player.setTransform(sender.getTransform());
+        sender.setTransform(userLoc);
         if (!context.equals(sender))
         {
             i18n.send(context, POSITIVE, "Swapped position of {user} and {user}!", player, sender);
