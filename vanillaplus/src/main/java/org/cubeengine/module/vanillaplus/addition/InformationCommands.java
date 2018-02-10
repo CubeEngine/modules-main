@@ -298,7 +298,6 @@ public class InformationCommands extends PermissionContainer
     public void lag(CommandSource context)
     {
         //Uptime:
-        i18n.send(context, POSITIVE, "[{text:CubeEngine-Basics:color=RED}]");
         DateFormat df = SimpleDateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT,
                                                              context.getLocale());
         Date start = new Date(ManagementFactory.getRuntimeMXBean().getStartTime());
