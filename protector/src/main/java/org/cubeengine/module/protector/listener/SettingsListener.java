@@ -63,6 +63,7 @@ import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.ai.SetAITargetEvent;
 import org.spongepowered.api.event.filter.Getter;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.event.world.ExplosionEvent;
@@ -225,12 +226,32 @@ public class SettingsListener
     }
 
     @Listener
-    public void onBuild(ChangeBlockEvent event, @Root Player player)
+    public void onPreBuild(ChangeBlockEvent.Pre event, @First Player player)
     {
         if (player.hasPermission(this.buildPerm.getId()))
         {
             return;
         }
+
+        for (Location<World> loc : event.getLocations())
+        {
+            List<Region> regionsAt = manager.getRegionsAt(loc);
+            if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.build, UNDEFINED) == FALSE)
+            {
+                i18n.send(ACTION_BAR, player, NEGATIVE, "You are not allowed to build here.");
+                return;
+            }
+        }
+    }
+
+    @Listener
+    public void onBuild(ChangeBlockEvent event, @First Player player)
+    {
+        if (player.hasPermission(this.buildPerm.getId()))
+        {
+            return;
+        }
+
         for (Transaction<BlockSnapshot> transaction : event.getTransactions())
         {
             if (transaction.getOriginal().getState().getType() == transaction.getFinal().getState().getType())
