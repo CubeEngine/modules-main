@@ -25,6 +25,7 @@ import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.protector.command.RegionCommands;
 import org.cubeengine.module.protector.command.SettingsCommands;
@@ -58,6 +59,7 @@ public class Protector extends CubeEngineModule
     @Inject private CommandManager cm;
     @InjectService private Selector selector;
     @Inject private ModuleManager mm;
+    @Inject private TaskManager tm;
     private Log logger;
 
     private RegionManager manager;
@@ -69,7 +71,7 @@ public class Protector extends CubeEngineModule
         this.modulePath = mm.getPathFor(Protector.class);
         manager = new RegionManager(modulePath, reflector, logger);
         ps.registerContextCalculator(new RegionContextCalculator(manager));
-        RegionCommands regionCmd = new RegionCommands(cm, selector, manager, i18n);
+        RegionCommands regionCmd = new RegionCommands(cm, selector, manager, i18n, tm);
         i18n.getCompositor().registerFormatter(new RegionFormatter());
         cm.addCommand(regionCmd);
         SettingsCommands settingsCmd = new SettingsCommands(manager, i18n, ps, pm, em, cm);

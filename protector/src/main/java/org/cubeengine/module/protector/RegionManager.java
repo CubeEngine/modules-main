@@ -53,12 +53,12 @@ public class RegionManager
     private final Path modulePath;
     private final Reflector reflector;
     private Log logger;
-    public Map<UUID, Map<String, Region>> byName = new HashMap<>();
-    public Map<UUID, Map<Vector2i, List<Region>>> byChunk = new HashMap<>();
-    public Map<UUID, Region> worldRegions = new HashMap<>();
-    public Region globalRegion;
+    private Map<UUID, Map<String, Region>> byName = new HashMap<>();
+    private Map<UUID, Map<Vector2i, List<Region>>> byChunk = new HashMap<>();
+    private Map<UUID, Region> worldRegions = new HashMap<>();
+    private Region globalRegion;
 
-    public Map<UUID, Region> activeRegion = new HashMap<>(); // playerUUID -> Region
+    private Map<UUID, Region> activeRegion = new HashMap<>(); // playerUUID -> Region
 
     public RegionManager(Path modulePath, Reflector reflector, Log logger)
     {
@@ -131,21 +131,26 @@ public class RegionManager
     public List<Region> getRegionsAt(Location<World> loc)
     {
         Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(loc.getExtent().getUniqueId(), k -> new HashMap<>());
-        return cache.computeIfAbsent(loc.getBlockPosition(), v -> getRegions(loc));
+        return cache.computeIfAbsent(loc.getBlockPosition(), v -> getRegions(loc.getExtent(), loc.getBlockPosition()));
     }
 
-    private List<Region> getRegions(Location<World> loc)
+    public List<Region> getRegionsAt(World world, Vector3i pos) {
+        Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(world.getUniqueId(), k -> new HashMap<>());
+        return cache.computeIfAbsent(pos, v -> getRegions(world, pos));
+    }
+
+    private List<Region> getRegions(World world, Vector3i pos)
     {
-        int chunkX = loc.getBlockX() >> 4;
-        int chunkZ = loc.getBlockZ() >> 4;
+        int chunkX = pos.getX() >> 4;
+        int chunkZ = pos.getZ() >> 4;
         List<Region> regions = new ArrayList<>();
         regions.add(globalRegion);
-        regions.add(getWorldRegion(loc.getExtent().getUniqueId()));
-        regions.addAll(byChunk.getOrDefault(loc.getExtent().getUniqueId(), Collections.emptyMap())
+        regions.add(getWorldRegion(world.getUniqueId()));
+        regions.addAll(byChunk.getOrDefault(world.getUniqueId(), Collections.emptyMap())
                 .getOrDefault(new Vector2i(chunkX, chunkZ), Collections.emptyList())
-                            .stream().filter(r -> r.contains(loc))
-                .sorted(Comparator.comparingInt(Region::getPriority))
+                            .stream().filter(r -> r.contains(pos))
                 .collect(Collectors.toList()));
+        regions.sort(Comparator.comparingInt(Region::getPriority).reversed());
         return regions;
     }
 
@@ -197,6 +202,9 @@ public class RegionManager
     {
         try
         {
+            this.byChunk.clear();
+            this.byName.clear();
+            this.markDirty();
             Path regionsPath = modulePath.resolve("region");
             Files.createDirectories(regionsPath);
             for (Path worldPath : Files.newDirectoryStream(regionsPath))
@@ -281,5 +289,14 @@ public class RegionManager
     public void markDirty()
     {
         this.regionCache.clear();
+    }
+
+
+    public boolean deleteRegion(Region region) {
+        if (region.getConfig().getFile().delete()) {
+            this.reload();
+            return true;
+        }
+        return false;
     }
 }

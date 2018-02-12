@@ -18,14 +18,17 @@
 package org.cubeengine.module.protector.command;
 
 import static java.util.stream.Collectors.toList;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 import static org.spongepowered.api.text.format.TextColors.GOLD;
 import static org.spongepowered.api.text.format.TextColors.GRAY;
 import static org.spongepowered.api.text.format.TextColors.WHITE;
 import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
@@ -35,6 +38,7 @@ import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.module.protector.Protector;
@@ -42,20 +46,33 @@ import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
 import org.spongepowered.api.CatalogType;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleOptions;
+import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextFormat;
+import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Command(name = "region", desc = "Manages the regions")
@@ -64,13 +81,15 @@ public class RegionCommands extends ContainerCommand
     private Selector selector;
     private RegionManager manager;
     private I18n i18n;
+    private TaskManager tm;
 
-    public RegionCommands(CommandManager base, Selector selector, RegionManager manager, I18n i18n)
+    public RegionCommands(CommandManager base, Selector selector, RegionManager manager, I18n i18n, TaskManager tm)
     {
         super(base, Protector.class);
         this.selector = selector;
         this.manager = manager;
         this.i18n = i18n;
+        this.tm = tm;
     }
 
     @Command(desc = "Defines a new Region")
@@ -90,7 +109,41 @@ public class RegionCommands extends ContainerCommand
         }
         Region region = manager.newRegion(world, shape.getBoundingCuboid(), name);
         manager.setActiveRegion(context, region);
-        i18n.send(context, POSITIVE, "Region {region} created!", region);
+        Set<Region> regions = new HashSet<>();
+        for (Vector3d vec : region.getCuboid())
+        {
+            regions.addAll(manager.getRegionsAt(region.getWorld(), vec.toInt()));
+        }
+        int containedPrio = 0;
+        int containsPrio = 9000;
+        int containedCnt = 0;
+        int containsCnt = 0;
+        int intersectCnt = 0;
+        for (Region otherRegion : regions)
+        {
+            if (otherRegion.isGlobal() || otherRegion.isWorldRegion() || otherRegion.getCuboid().contains(region.getCuboid()))
+            {
+                containedPrio = Math.max(containedPrio, otherRegion.getPriority());
+                containedCnt++;
+            }
+            else if (region.getCuboid().contains(otherRegion.getCuboid()))
+            {
+                containsPrio = Math.min(containsPrio, otherRegion.getPriority());
+                containsCnt++;
+            }
+            else
+            {
+                intersectCnt++;
+            }
+        }
+
+        containedPrio -= 2; // remove world and global region
+
+        // TODO search for intersecting/containing/enveloping regions and adjust base priority accordingly
+        region.setPriority((containedPrio + containsPrio) / 2);
+        region.save();
+
+        i18n.send(context, POSITIVE, "Region {region} created with priority ({amount})!", region, region.getPriority());
     }
 
     @Command(desc = "Redefines an existing Region")
@@ -169,30 +222,40 @@ public class RegionCommands extends ContainerCommand
         }
 
         i18n.send(context, NEUTRAL, "The following regions were found:");
+        list.sort(Comparator.comparingInt(Region::getPriority).reversed());
         for (Region region : list)
         {
-            if (region.getWorld() == null)
+            Text prio = i18n.translate(context, TextFormat.of(YELLOW), "priority: {amount}", region.getPriority());
+            if (region.isGlobal())
             {
                 context.sendMessage(Text.of(" - ", GOLD, "global ",
-                        GRAY, i18n.getTranslation(context, "(all worlds)")));
+                        GRAY, i18n.getTranslation(context, "(all worlds)"), " ", prio));
             }
-            else if (region.getName() == null)
+            else if (region.isWorldRegion())
             {
                 context.sendMessage(Text.of(" - ", GOLD, region.getWorld().getName(), WHITE, ".", GOLD, "world ",
-                        GRAY, i18n.getTranslation(context, "(entire world)")));
+                        GRAY, i18n.getTranslation(context, "(entire world)"), " ", prio));
             }
             else
             {
-                context.sendMessage(Text.of(" - ", GOLD, region.getWorld().getName(), WHITE, ".", GOLD, region.getName()));
+                context.sendMessage(Text.of(" - ", GOLD, region.getWorld().getName(), WHITE, ".", GOLD, region.getName(), " ", prio));
             }
 
         }
 
     }
 
-    public void priority(CommandSource context, int priority, @Default Region region)
+    @Command(desc = "Changes Region priority")
+    public void priority(CommandSource context, @Optional Integer priority, @Default Region region)
     {
-
+        if (priority == null)
+        {
+            i18n.send(context, POSITIVE, "{name} has priority {amount}", region.toString(), region.getPriority());
+            return;
+        }
+        region.setPriority(priority);
+        region.save();
+        i18n.send(context, POSITIVE, "{name} priority set to {amount}", region.toString(), region.getPriority());
     }
 
     // TODO region here / at / there? print all regions at position
@@ -200,7 +263,6 @@ public class RegionCommands extends ContainerCommand
     @Command(desc = "Displays Region info")
     public void info(CommandSource context, @Default Region region, @Flag boolean allSettings)
     {
-        // TODO default to region player is in when no active region is set
         if (region.getWorld() == null)
         {
             i18n.send(context, POSITIVE, "Global region has the following settings:");
@@ -342,9 +404,109 @@ public class RegionCommands extends ContainerCommand
         }
     }
 
+    @Command(desc = "Deletes a region", alias = "remove")
+    public void delete(CommandSource context, Region region)
+    {
+        if (region.isGlobal())
+        {
+            i18n.send(context, NEGATIVE, "Cannot delete global region.");
+            return;
+        }
+        if (!manager.deleteRegion(region))
+        {
+            i18n.send(context, CRITICAL, "Could not delete region file.");
+            return;
+        }
+        i18n.send(context, POSITIVE, "The region {name} was deleted.", region.toString());
+    }
+
+    private Map<UUID, UUID> showRegionTasks = new HashMap<>();
+
+    @Command(desc = "Toggles particles for the currently selected region")
     public void show(Player context)
     {
-        // Show boundry with player-only blocks
+        UUID task = this.showRegionTasks.remove(context.getUniqueId());
+        if (task != null)
+        {
+            tm.cancelTask(Protector.class, task);
+            i18n.send(ACTION_BAR, context, POSITIVE, "Stopped showing active region.");
+            return;
+        }
+        task = tm.runTimer(Protector.class, () -> this.showActiveRegion(context), 10, 5);
+        this.showRegionTasks.put(context.getUniqueId(), task);
+        i18n.send(ACTION_BAR, context, POSITIVE, "Started showing active region.");
+    }
+
+    private void showActiveRegion(Player player)
+    {
+        if (!player.isOnline()) {
+            UUID task = this.showRegionTasks.remove(player.getUniqueId());
+            tm.cancelTask(Protector.class, task);
+            return;
+        }
+
+        Region region = manager.getActiveRegion(player);
+        if (region == null || region.isGlobal() || region.isWorldRegion()) {
+            return;
+        }
+        Cuboid cuboid = region.getCuboid();
+        Vector3d mmm = cuboid.getMinimumPoint();
+        Vector3d xxx = cuboid.getMaximumPoint();
+
+        Vector3d mmx = new Vector3d(mmm.getX(), mmm.getY(), xxx.getZ());
+        Vector3d mxx = new Vector3d(mmm.getX(), xxx.getY(), xxx.getZ());
+        Vector3d xmm = new Vector3d(xxx.getX(), mmm.getY(), mmm.getZ());
+        Vector3d xxm = new Vector3d(xxx.getX(), xxx.getY(), mmm.getZ());
+
+        Vector3d mxm = new Vector3d(mmm.getX(), xxx.getY(), mmm.getZ());
+        Vector3d xmx = new Vector3d(xxx.getX(), mmm.getY(), xxx.getZ());
+
+        Map<Color, List<Vector3d>> particles = new HashMap<>();
+        List<Vector3d> red = new ArrayList<>();
+        particles.put(Color.RED, red);
+        int stepZ = ((int) mmm.distance(mmx)) * 5;
+        linePoints(red, mmm, mmx, stepZ);
+        linePoints(red, mxx, mxm, stepZ);
+        linePoints(red, xxx, xxm, stepZ);
+        linePoints(red, xmx, xmm, stepZ);
+
+        List<Vector3d> green = new ArrayList<>();
+        particles.put(Color.GREEN, green);
+        int stepY = ((int) mmm.distance(mxm)) * 5;
+        linePoints(green, mmm, mxm, stepY);
+        linePoints(green, mmx, mxx, stepY);
+        linePoints(green, xxx, xmx, stepY);
+        linePoints(green, xxm, xmm, stepY);
+
+        List<Vector3d> blue = new ArrayList<>();
+        particles.put(Color.BLUE, blue);
+        int stepX = ((int) mmm.distance(xmm)) * 5;
+        linePoints(blue, mmm, xmm, stepX);
+        linePoints(blue, mmx, xmx, stepX);
+        linePoints(blue, xxx, mxx, stepX);
+        linePoints(blue, xxm, mxm, stepX);
+
+        draw(player, new Vector3d(0.5,0.5,0.5), particles);
+    }
+
+    public void linePoints(List<Vector3d> list, Vector3d point, Vector3d point2, int steps) {
+        Vector3d move = point2.sub(point).div(steps);
+        for (int step = 0; step < steps; step++) {
+            point = point.add(move);
+            list.add(point);
+        }
+    }
+
+    public void draw(Player player, Vector3d position, Map<Color, List<Vector3d>> particles) {
+        for (Map.Entry<Color, List<Vector3d>> entry : particles.entrySet()) {
+            for (Vector3d vec : entry.getValue()) {
+                player.spawnParticles(ParticleEffect.builder()
+                                .type(ParticleTypes.REDSTONE_DUST)
+                                .option(ParticleOptions.COLOR, entry.getKey())
+                                .build(),
+                        position.add(vec));
+            }
+        }
     }
 
     public void parent(CommandSource context, Region parent, @Default Region region)
@@ -352,9 +514,32 @@ public class RegionCommands extends ContainerCommand
 
     }
 
-    public void teleport(CommandSource context, @Default Region region)
+    @Command(desc = "Teleports to a region")
+    public void teleport(Player context, Region region, @Flag boolean force)
     {
-
+        if (region.isGlobal())
+        {
+            // TODO
+            return;
+        }
+        Vector3d middle = region.getCuboid().getMinimumPoint().add(region.getCuboid().getMaximumPoint()).div(2);
+        Location<World> loc = new Location<>(region.getWorld(), middle);
+        GameMode mode = context.get(Keys.GAME_MODE).orElse(null);
+        if (mode != GameModes.SPECTATOR)
+        {
+            int h = (int) region.getCuboid().getHeight() / 2 + 1;
+            int w = (int) Math.max(region.getCuboid().getWidth() / 2 + 1, region.getCuboid().getDepth() / 2 + 1);
+            java.util.Optional<Location<World>> adjusted =
+                    Sponge.getTeleportHelper().getSafeLocation(loc, Math.max(h, 5), Math.max(w, 5), ((int) region.getCuboid().getHeight()),
+                            mode == GameModes.CREATIVE ? TeleportHelperFilters.FLYING : TeleportHelperFilters.DEFAULT);
+            if (!adjusted.isPresent() && !force) {
+                i18n.send(ACTION_BAR, context, POSITIVE, "Could not find a safe spot in region. Use -force to teleport anyways");
+                return;
+            }
+            loc = adjusted.orElse(loc);
+        }
+        context.setLocation(loc);
+        i18n.send(ACTION_BAR, context, POSITIVE, "Teleported to {name}", region.toString());
     }
 
     public void redstonedefine(CommandSource context, String name)

@@ -17,7 +17,7 @@
  */
 package org.cubeengine.module.protector.region;
 
-import com.flowpowered.math.vector.Vector3d;
+import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.protector.RegionManager;
 import org.spongepowered.api.service.context.Context;
@@ -41,13 +41,22 @@ public class Region
         }
     }
 
+    public RegionConfig getConfig() {
+        return config;
+    }
+
     public boolean contains(Location<World> loc)
     {
-        Vector3d pos = loc.getPosition();
+        Vector3i pos = loc.getBlockPosition();
         return (this.config.world == null || loc.getExtent().equals(this.config.world.getWorld()))
-                && (this.cuboid == null || (this.cuboid.contains(pos.toInt().toDouble())
-                 || this.cuboid.contains(pos.add(0,1,0).toInt().toDouble())
-                 || this.cuboid.contains(pos.add(0,1.8,0).toInt().toDouble())));
+                && (this.cuboid == null || this.contains(pos));
+    }
+
+    public boolean contains(Vector3i pos)
+    {
+        return (this.cuboid.contains(pos.toDouble())
+             || this.cuboid.contains(pos.add(0,1,0).toDouble())
+             || this.cuboid.contains(pos.add(0,1.8,0).toDouble()));
     }
 
     public RegionConfig.Settings getSettings()
@@ -115,5 +124,32 @@ public class Region
         this.cuboid = cuboid;
         this.config.corner1 = cuboid.getMinimumPoint().toInt();
         this.config.corner2 = cuboid.getMaximumPoint().toInt();
+    }
+
+    @Override
+    public String toString()
+    {
+        String prio = " (" + this.config.priority + ")";
+        if (this.isGlobal()) {
+            return "Global Region" + prio;
+        }
+        if (this.isWorldRegion()) {
+            return "World Region: " + this.config.world.getName() + prio;
+        }
+        return "Region " + this.config.name + " in " + this.config.world.getName() + prio;
+    }
+
+    public void setPriority(int priority) {
+        this.config.priority = priority;
+    }
+
+    public boolean isGlobal()
+    {
+        return this.config.world == null;
+    }
+
+    public boolean isWorldRegion()
+    {
+        return this.config.corner1 == null;
     }
 }

@@ -18,8 +18,8 @@
 package org.cubeengine.module.protector.region;
 
 import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.argument.Completer;
 import org.cubeengine.butler.parameter.argument.ArgumentParser;
+import org.cubeengine.butler.parameter.argument.Completer;
 import org.cubeengine.butler.parameter.argument.DefaultValue;
 import org.cubeengine.butler.parameter.argument.ParserException;
 import org.cubeengine.libcube.service.command.TranslatedParserException;
@@ -28,6 +28,7 @@ import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.module.protector.RegionManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.storage.WorldProperties;
@@ -184,6 +185,14 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
             if (activeRegion != null)
             {
                 return activeRegion;
+            }
+        }
+        if (invocation.getCommandSource() instanceof Player)
+        {
+            List<Region> regions = manager.getRegionsAt(((Player) invocation.getCommandSource()).getLocation());
+            if (!regions.isEmpty())
+            {
+                return regions.get(0);
             }
         }
         throw new TranslatedParserException(
