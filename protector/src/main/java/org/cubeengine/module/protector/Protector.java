@@ -17,11 +17,14 @@
  */
 package org.cubeengine.module.protector;
 
+import org.cubeengine.butler.parameter.enumeration.SimpleEnumButler;
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.InjectService;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.parser.CatalogTypeParser;
+import org.cubeengine.libcube.service.command.parser.DefaultedCatalogTypeParser;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
@@ -29,13 +32,17 @@ import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.protector.command.RegionCommands;
 import org.cubeengine.module.protector.command.SettingsCommands;
+import org.cubeengine.module.protector.command.parser.TristateParser;
+import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.RegionFormatter;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.util.Tristate;
 
 import java.nio.file.Path;
 
@@ -67,6 +74,9 @@ public class Protector extends CubeEngineModule
     @Listener
     public void onEnable(GamePostInitializationEvent event)
     {
+        cm.getProviders().register(this, new TristateParser(), Tristate.class);
+        cm.getProviders().register(this, new SimpleEnumButler(), SettingsListener.MoveType.class, SettingsListener.UseType.class, SettingsListener.SpawnType.class);
+        cm.getProviders().register(this, new DefaultedCatalogTypeParser<>(EntityType.class, null), EntityType.class);
         this.logger = mm.getLoggerFor(Protector.class);
         this.modulePath = mm.getPathFor(Protector.class);
         manager = new RegionManager(modulePath, reflector, logger);

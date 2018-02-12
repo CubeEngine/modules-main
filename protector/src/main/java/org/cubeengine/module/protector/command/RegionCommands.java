@@ -432,7 +432,7 @@ public class RegionCommands extends ContainerCommand
             i18n.send(ACTION_BAR, context, POSITIVE, "Stopped showing active region.");
             return;
         }
-        task = tm.runTimer(Protector.class, () -> this.showActiveRegion(context), 10, 5);
+        task = tm.runTimer(Protector.class, () -> this.showActiveRegion(context), 10, 10);
         this.showRegionTasks.put(context.getUniqueId(), task);
         i18n.send(ACTION_BAR, context, POSITIVE, "Started showing active region.");
     }
@@ -450,8 +450,8 @@ public class RegionCommands extends ContainerCommand
             return;
         }
         Cuboid cuboid = region.getCuboid();
-        Vector3d mmm = cuboid.getMinimumPoint();
-        Vector3d xxx = cuboid.getMaximumPoint();
+        Vector3d mmm = cuboid.getMinimumPoint().add(-0.5, -0.5, -0.5);
+        Vector3d xxx = cuboid.getMaximumPoint().add(0.5, 0.5, 0.5);
 
         Vector3d mmx = new Vector3d(mmm.getX(), mmm.getY(), xxx.getZ());
         Vector3d mxx = new Vector3d(mmm.getX(), xxx.getY(), xxx.getZ());
@@ -465,10 +465,10 @@ public class RegionCommands extends ContainerCommand
         List<Vector3d> red = new ArrayList<>();
         particles.put(Color.RED, red);
         int stepZ = ((int) mmm.distance(mmx)) * 5;
-        linePoints(red, mmm, mmx, stepZ);
-        linePoints(red, mxx, mxm, stepZ);
-        linePoints(red, xxx, xxm, stepZ);
-        linePoints(red, xmx, xmm, stepZ);
+        linePoints(red, mmm, xmm, stepZ);
+        linePoints(red, mmx, xmx, stepZ);
+        linePoints(red, xxx, mxx, stepZ);
+        linePoints(red, xxm, mxm, stepZ);
 
         List<Vector3d> green = new ArrayList<>();
         particles.put(Color.GREEN, green);
@@ -481,10 +481,10 @@ public class RegionCommands extends ContainerCommand
         List<Vector3d> blue = new ArrayList<>();
         particles.put(Color.BLUE, blue);
         int stepX = ((int) mmm.distance(xmm)) * 5;
-        linePoints(blue, mmm, xmm, stepX);
-        linePoints(blue, mmx, xmx, stepX);
-        linePoints(blue, xxx, mxx, stepX);
-        linePoints(blue, xxm, mxm, stepX);
+        linePoints(blue, mmm, mmx, stepX);
+        linePoints(blue, mxx, mxm, stepX);
+        linePoints(blue, xxx, xxm, stepX);
+        linePoints(blue, xmx, xmm, stepX);
 
         draw(player, new Vector3d(0.5,0.5,0.5), particles);
     }

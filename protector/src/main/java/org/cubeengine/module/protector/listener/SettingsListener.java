@@ -25,6 +25,7 @@ import static org.spongepowered.api.util.Tristate.FALSE;
 import static org.spongepowered.api.util.Tristate.TRUE;
 import static org.spongepowered.api.util.Tristate.UNDEFINED;
 
+import org.cubeengine.butler.parameter.enumeration.EnumName;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
@@ -215,6 +216,11 @@ public class SettingsListener
         return false;
     }
 
+    public enum SpawnType
+    {
+        NATURALLY, PLAYER, PLUGIN
+    }
+
     public enum UseType
     {
         ITEM, BLOCK, CONTAINER, OPEN, REDSTONE
@@ -369,10 +375,7 @@ public class SettingsListener
         }
     }
 
-    public enum SpawnType
-    {
-        NATURALLY, PLAYER, PLUGIN
-    }
+
 
     @Listener
     public void onSpawn(SpawnEntityEvent event)
