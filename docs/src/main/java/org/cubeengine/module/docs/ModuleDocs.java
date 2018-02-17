@@ -144,7 +144,7 @@ public class ModuleDocs
                 sb.append(configInfo);
                 sb.append("\n```\n");
 
-                Files.write(modulePath.resolve(this.id + "-config-" + configClass.getSimpleName().toLowerCase() + ".md"), sb.toString()en.getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+                Files.write(modulePath.resolve(this.id + "-config-" + configClass.getSimpleName().toLowerCase() + ".md"), sb.toString().getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
             }
 
 
