@@ -23,14 +23,22 @@ import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.reflect.Reflected;
+import org.cubeengine.reflect.ReflectedFile;
 import org.cubeengine.reflect.Reflector;
+import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -48,6 +56,7 @@ public class ModuleDocs
     private final Permission basePermission;
     private final String moduleName;
     private final String moduleId;
+    private final Reflector reflector;
 
     public String getModuleName()
     {
@@ -66,6 +75,7 @@ public class ModuleDocs
 
     public ModuleDocs(PluginContainer plugin, Class module, Reflector reflector, PermissionManager pm, PermissionService ps, CommandManager cm, ModuleManager mm)
     {
+        this.reflector = reflector;
         this.pc = plugin;
         this.name = plugin.getName();
         this.moduleName = mm.getModuleName(module).get();
@@ -115,6 +125,29 @@ public class ModuleDocs
                 Path pageFileTarget = modulePath.resolve(this.id + "-" + pageName + ".md");
                 Files.copy(is, pageFileTarget);
             }
+
+            for (Class configClass : this.config.config) {
+                ReflectedFile conf = ((ReflectedFile) reflector.create(configClass));
+                StringWriter sw = new StringWriter();
+                conf.save(sw);
+                StringBuilder sb = new StringBuilder();
+                sb.append("# ").append(configClass.getSimpleName()).append("\n\n");
+                String configInfo = sw.toString();
+                if (conf instanceof ReflectedYaml)
+                {
+                    sb.append("```yaml\n");
+                }
+                else
+                {
+                    sb.append("```\n");
+                }
+                sb.append(configInfo);
+                sb.append("\n```\n");
+
+                Files.write(modulePath.resolve(this.id + "-config-" + configClass.getSimpleName().toLowerCase() + ".md"), sb.toString()en.getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+            }
+
+
         }
         catch (IOException e)
         {

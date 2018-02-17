@@ -133,6 +133,14 @@ public class MarkdownGenerator implements Generator
             }
         }
 
+        if (!info.config.isEmpty()) {
+            sb.append("\n## Config:\n");
+            for (Class clazz : info.config) {
+                String simpleName = clazz.getSimpleName();
+                sb.append(" - [").append(simpleName).append("]").append("(").append(id).append("-config-").append(simpleName.toLowerCase()).append(".md)\n");
+            }
+        }
+
         TreeMap<String, PermissionDescription> addPerms = new TreeMap<>(
             permissions.stream().collect(toMap(PermissionDescription::getId, p -> p)));
         if (!commands.isEmpty())
@@ -157,7 +165,7 @@ public class MarkdownGenerator implements Generator
 
         if (!addPerms.values().isEmpty())
         {
-            sb.append("\n## Additional Permissions:\n\n");
+            sb.append("\n## Permissions:\n\n");
             sb.append("| Permission | Description |\n");
             sb.append("| --- | --- |\n");
             for (PermissionDescription perm : addPerms.values())
