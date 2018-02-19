@@ -35,6 +35,7 @@ import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.property.block.PoweredProperty;
@@ -534,62 +535,93 @@ public class RegionCommands extends ContainerCommand
         i18n.send(ACTION_BAR, context, POSITIVE, "Teleported to {name}", region.toString());
     }
 
+    @Command(desc = "Defines a region by following connected redstone")
     public void redstonedefine(Player player, String name)
     {
         Set<Direction> directions = EnumSet.of(Direction.DOWN, Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
-        em.listenUntil(this.module.getClass(), InteractBlockEvent.Secondary.class, e -> e.getCause().root().equals(player), e -> {
-            e.setCancelled(true);
-            java.util.Optional<Location<World>> target = e.getTargetBlock().getLocation();
-            if (target.isPresent())
+        em.listenUntil(this.module.getClass(), InteractBlockEvent.Secondary.class, e -> e.getCause().root().equals(player), e -> this.redstoneDefine(e, player, name, directions));
+    }
+
+    private boolean redstoneDefine(InteractBlockEvent.Secondary e, Player player, String name, Set<Direction> directions)
+    {
+        e.setCancelled(true);
+        java.util.Optional<Location<World>> target = e.getTargetBlock().getLocation();
+        if (target.isPresent())
+        {
+            Location<World> start = target.get();
+            if (start.getProperty(PoweredProperty.class).isPresent())
             {
-                Location<World> start = target.get();
-                if (start.getProperty(PoweredProperty.class).isPresent())
+                Set<Location<World>> knownLocations = new HashSet<>();
+                Set<Location<World>> poweringLocations = new HashSet<>();
+                Vector3i min = start.getBlockPosition();
+                Vector3i max = min;
+
+                Queue<Location<World>> next = new ArrayDeque<>();
+                next.offer(start);
+                if (isPowering(start)) {
+                    poweringLocations.add(start);
+                }
+
+                while (!next.isEmpty())
                 {
-                    Set<Location<World>> knownLocations = new HashSet<>();
-                    Vector3i min = start.getBlockPosition();
-                    Vector3i max = min;
-
-                    Queue<Location<World>> next = new ArrayDeque<>();
-                    next.offer(start);
-
-                    while (!next.isEmpty())
+                    Location<World> current = next.poll();
+                    knownLocations.add(current);
+                    for (Direction dir : directions)
                     {
-                        Location<World> current = next.poll();
-                        knownLocations.add(current);
-                        for (Direction dir : directions) {
-                            Location<World> loc = current.getRelative(dir);
-                            if (!knownLocations.contains(loc) && loc.getProperty(PoweredProperty.class).isPresent())
+                        Location<World> loc = current.getRelative(dir);
+                        if (!knownLocations.contains(loc))
+                        {
+                            if (isPowering(loc))
                             {
-                                knownLocations.add(loc);
+                                poweringLocations.add(loc);
+                                next.add(loc);
 
                                 Vector3i pos = loc.getBlockPosition();
                                 min = min.min(pos);
                                 max = max.max(pos);
                             }
+                            if (poweringLocations.contains(current)) {
+                                next.add(loc);
+                            }
                         }
                     }
 
-                    manager.newRegion(start.getExtent(), new Cuboid(min.toDouble(), max.sub(min).toDouble()), name);
-
-                    i18n.send(player, POSITIVE, "Minimum: x={number} y={number} z={number}", min.getX(), min.getY(), min.getZ());
-                    i18n.send(player, POSITIVE, "Maximum: x={number} y={number} z={number}", max.getX(), max.getY(), max.getZ());
-                    i18n.send(player, POSITIVE, "Redstone blocks contained in region: {number}", knownLocations.size());
-
-                    return true;
-
+                    if (knownLocations.size() > 1000) {
+                        break;
+                    }
                 }
-                else
-                {
-                    i18n.send(player, NEGATIVE, "Click a redstone powered block!");
-                    return false;
-                }
+
+                Region region = manager.newRegion(start.getExtent(), new Cuboid(min.toDouble(), max.sub(min).toDouble()), name);
+                manager.setActiveRegion(player, region);
+
+                i18n.send(player, POSITIVE, "Minimum: x={number} y={number} z={number}", min.getX(), min.getY(), min.getZ());
+                i18n.send(player, POSITIVE, "Maximum: x={number} y={number} z={number}", max.getX(), max.getY(), max.getZ());
+                i18n.send(player, POSITIVE, "Redstone blocks contained in region: {number}", poweringLocations.size());
+
+                return true;
 
             }
             else
             {
-                i18n.send(player, NEGATIVE, "Block had no location.");
+                i18n.send(player, NEGATIVE, "Click a redstone powered block!");
                 return false;
             }
-        });
+
+        }
+        else
+        {
+            i18n.send(player, NEGATIVE, "Block had no location.");
+            return false;
+        }
+    }
+
+    private boolean isPowering(Location<World> loc) {
+        return loc.supports(Keys.POWER) ||
+            loc.supports(Keys.POWERED) ||
+            loc.getBlockType() == BlockTypes.REDSTONE_TORCH ||
+            loc.getBlockType() == BlockTypes.UNLIT_REDSTONE_TORCH ||
+            loc.getBlockType() == BlockTypes.REDSTONE_BLOCK ||
+            loc.getBlockType() == BlockTypes.POWERED_REPEATER ||
+            loc.getBlockType() == BlockTypes.UNPOWERED_REPEATER;
     }
 }
