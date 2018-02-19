@@ -17,26 +17,14 @@
  */
 package org.cubeengine.module.protector.command;
 
-import static java.util.stream.Collectors.toList;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
-import static org.spongepowered.api.text.format.TextColors.GOLD;
-import static org.spongepowered.api.text.format.TextColors.GRAY;
-import static org.spongepowered.api.text.format.TextColors.WHITE;
-import static org.spongepowered.api.text.format.TextColors.YELLOW;
-
 import com.flowpowered.math.vector.Vector3d;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Named;
+import com.flowpowered.math.vector.Vector3i;
+import org.cubeengine.butler.parametric.*;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
@@ -49,47 +37,51 @@ import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.property.block.PoweredProperty;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOptions;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextFormat;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
+import static org.spongepowered.api.text.format.TextColors.*;
 
 @Command(name = "region", desc = "Manages the regions")
 public class RegionCommands extends ContainerCommand
 {
+    private final Protector module;
     private Selector selector;
     private RegionManager manager;
     private I18n i18n;
     private TaskManager tm;
+    private final EventManager em;
 
-    public RegionCommands(CommandManager base, Selector selector, RegionManager manager, I18n i18n, TaskManager tm)
+    public RegionCommands(CommandManager base, Protector module, Selector selector, RegionManager manager, I18n i18n, TaskManager tm, EventManager em)
     {
         super(base, Protector.class);
+        this.module = module;
         this.selector = selector;
         this.manager = manager;
         this.i18n = i18n;
         this.tm = tm;
+        this.em = em;
     }
 
     @Command(desc = "Defines a new Region")
@@ -542,8 +534,62 @@ public class RegionCommands extends ContainerCommand
         i18n.send(ACTION_BAR, context, POSITIVE, "Teleported to {name}", region.toString());
     }
 
-    public void redstonedefine(CommandSource context, String name)
+    public void redstonedefine(Player player, String name)
     {
-        // Rightclick redstone - define region around the whole circuit
+        Set<Direction> directions = EnumSet.of(Direction.DOWN, Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
+        em.listenUntil(this.module.getClass(), InteractBlockEvent.Secondary.class, e -> e.getCause().root().equals(player), e -> {
+            e.setCancelled(true);
+            java.util.Optional<Location<World>> target = e.getTargetBlock().getLocation();
+            if (target.isPresent())
+            {
+                Location<World> start = target.get();
+                if (start.getProperty(PoweredProperty.class).isPresent())
+                {
+                    Set<Location<World>> knownLocations = new HashSet<>();
+                    Vector3i min = start.getBlockPosition();
+                    Vector3i max = min;
+
+                    Queue<Location<World>> next = new ArrayDeque<>();
+                    next.offer(start);
+
+                    while (!next.isEmpty())
+                    {
+                        Location<World> current = next.poll();
+                        knownLocations.add(current);
+                        for (Direction dir : directions) {
+                            Location<World> loc = current.getRelative(dir);
+                            if (!knownLocations.contains(loc) && loc.getProperty(PoweredProperty.class).isPresent())
+                            {
+                                knownLocations.add(loc);
+
+                                Vector3i pos = loc.getBlockPosition();
+                                min = min.min(pos);
+                                max = max.max(pos);
+                            }
+                        }
+                    }
+
+                    manager.newRegion(start.getExtent(), new Cuboid(min.toDouble(), max.sub(min).toDouble()), name);
+
+                    i18n.send(player, POSITIVE, "Minimum: x={number} y={number} z={number}", min.getX(), min.getY(), min.getZ());
+                    i18n.send(player, POSITIVE, "Maximum: x={number} y={number} z={number}", max.getX(), max.getY(), max.getZ());
+                    i18n.send(player, POSITIVE, "Redstone blocks contained in region: {number}", knownLocations.size());
+
+                    return true;
+
+                }
+                else
+                {
+                    i18n.send(player, NEGATIVE, "Click a redstone powered block!");
+                    return false;
+                }
+
+            }
+            else
+            {
+                i18n.send(player, NEGATIVE, "Block had no location.");
+                return false;
+            }
+        });
     }
 }

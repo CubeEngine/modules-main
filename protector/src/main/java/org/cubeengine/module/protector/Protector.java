@@ -23,7 +23,6 @@ import org.cubeengine.libcube.InjectService;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.parser.CatalogTypeParser;
 import org.cubeengine.libcube.service.command.parser.DefaultedCatalogTypeParser;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -44,10 +43,9 @@ import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
-import java.nio.file.Path;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.nio.file.Path;
 
 // TODO fill/empty bucket (in hand)
 // TNT can be ignited ( but no world change )
@@ -81,7 +79,7 @@ public class Protector extends CubeEngineModule
         this.modulePath = mm.getPathFor(Protector.class);
         manager = new RegionManager(modulePath, reflector, logger);
         ps.registerContextCalculator(new RegionContextCalculator(manager));
-        RegionCommands regionCmd = new RegionCommands(cm, selector, manager, i18n, tm);
+        RegionCommands regionCmd = new RegionCommands(cm, this, selector, manager, i18n, tm, em);
         i18n.getCompositor().registerFormatter(new RegionFormatter());
         cm.addCommand(regionCmd);
         SettingsCommands settingsCmd = new SettingsCommands(manager, i18n, ps, pm, em, cm);
