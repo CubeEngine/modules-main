@@ -123,6 +123,7 @@ public class Docs extends CubeEngineModule
 
 
         log.info("Done Generating Module Docs!");
+        log.info(modulePath.toAbsolutePath().toString());
     }
 
     private static void deleteFile(Path path)
@@ -137,7 +138,7 @@ public class Docs extends CubeEngineModule
         }
     }
 
-    @Alias("gd")
+    @Alias({"gd", "docgen", "gendoc"})
     @Command(desc = "Generates documentation")
     public void generateDocs(CommandSource ctx)
     {
