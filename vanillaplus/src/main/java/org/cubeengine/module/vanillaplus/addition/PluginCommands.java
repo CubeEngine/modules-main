@@ -166,7 +166,7 @@ public class PluginCommands extends PermissionContainer
             return;
         }
         i18n.send(context, NEUTRAL, "{name#plugin} is currently running in version {input#version:color=INDIGO}.",
-                               instance.get().getName(), instance.get().getVersion());
+                               instance.get().getName(), instance.get().getVersion().orElse("unknown"));
         context.sendMessage(Text.EMPTY);
         i18n.send(context, NEUTRAL, "Plugin information:");
         context.sendMessage(Text.EMPTY);
