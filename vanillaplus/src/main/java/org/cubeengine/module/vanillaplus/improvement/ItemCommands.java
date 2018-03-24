@@ -37,6 +37,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.entity.Hotbar;
 import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Type;
@@ -136,16 +137,19 @@ public class ItemCommands extends PermissionContainer
             }
         }
         item.setQuantity(amount);
-        Inventory mpi = context.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory.class));
-        if (mpi instanceof MainPlayerInventory) {
-            if (!((MainPlayerInventory) mpi).getHotbar().offer(item.copy()).getRejectedItems().isEmpty()) {
-                if (((MainPlayerInventory) mpi).getGrid().offer(item.copy()).getRejectedItems().isEmpty()) {
-                    i18n.send(context, NEGATIVE, "Not enough space for the item!");
-                    return;
-                }
-            }
+        Inventory hotbarFirstInventory = getHotbarFirst(context.getInventory());
+        if (!hotbarFirstInventory.offer(item.copy()).getRejectedItems().isEmpty())
+        {
+            i18n.send(context, NEGATIVE, "Not enough space for the item!");
+            return;
         }
         i18n.send(context, NEUTRAL, "Received: {amount} {input#item}", amount, materialMatcher.getNameFor(item));
+    }
+
+    public Inventory getHotbarFirst(Inventory inventory)
+    {
+        return inventory.query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class))
+        .union(inventory.query(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory.class)));
     }
 
     @Command(desc = "Refills the stack in hand")
