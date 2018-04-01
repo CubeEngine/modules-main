@@ -20,8 +20,6 @@ package org.cubeengine.module.sql.database.mysql;
 import static org.cubeengine.module.sql.PluginSql.SQL_ID;
 import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.pool.HikariPool;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
@@ -36,7 +34,6 @@ import org.cubeengine.logscribe.LogLevel;
 import org.cubeengine.logscribe.LogTarget;
 import org.cubeengine.logscribe.filter.PrefixFilter;
 import org.cubeengine.logscribe.target.file.AsyncFileTarget;
-import org.cubeengine.module.sql.PluginSql;
 import org.cubeengine.module.sql.database.AbstractDatabase;
 import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.DatabaseConfiguration;
@@ -90,9 +87,9 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
         File pluginFolder = mm.getBasePath();
 
         // Disable HikariPool Debug ConsoleSpam
-        ((Logger)LogManager.getLogger(HikariPool.class)).setLevel(Level.INFO);
+        ((Logger)LogManager.getLogger("com.zaxxer.hikari.pool.HikariPool")).setLevel(Level.INFO);
         ((Logger)LogManager.getLogger("com.zaxxer.hikari.pool.PoolBase")).setLevel(Level.INFO); // really? now pkg-private
-        ((Logger)LogManager.getLogger(HikariConfig.class)).setLevel(Level.INFO);
+        ((Logger)LogManager.getLogger("com.zaxxer.hikari.HikariConfig")).setLevel(Level.INFO);
 
         // Setting up Logger...
         this.logger = mm.getLoggerFor(Database.class);
