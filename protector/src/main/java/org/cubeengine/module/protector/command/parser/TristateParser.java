@@ -41,7 +41,7 @@ public class TristateParser implements ArgumentParser<Tristate>, Completer
             case "reset":
                 return Tristate.UNDEFINED;
         }
-        throw new ParserException(token);
+        throw new ParserException("Unknown token " + token + " use allow/deny/reset");
     }
 
     @Override
