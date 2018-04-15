@@ -387,7 +387,7 @@ public class LockerBlockListener
             }
         }
 
-        event.filterEntities(input -> manager.getLockForEntityUID(input.getUniqueId()) != null);
+        event.filterEntities(input -> manager.getLockForEntityUID(input.getUniqueId()) == null);
     }
 
     @Listener
