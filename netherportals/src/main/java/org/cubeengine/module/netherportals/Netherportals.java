@@ -26,10 +26,10 @@ import org.cubeengine.module.netherportals.NetherportalsConfig.WorldSection;
 import org.cubeengine.processor.Module;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
 import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.event.filter.cause.ContextValue;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.world.World;
 
@@ -51,8 +51,13 @@ public class Netherportals extends CubeEngineModule
     }
 
     @Listener
-    public void onPortal(MoveEntityEvent.Teleport.Portal event, @ContextValue("TELEPORT_TYPE") TeleportType type)
+    public void onPortal(MoveEntityEvent.Teleport.Portal event)
     {
+        TeleportType type = event.getContext().get(EventContextKeys.TELEPORT_TYPE).orElse(null);
+        if (type != null)
+        {
+            return;
+        }
 
         WorldSection section = config.worldSettings.get(new ConfigWorld(event.getFromTransform().getExtent()));
         if (section != null && section.enablePortalRouting)
