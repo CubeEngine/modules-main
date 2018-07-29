@@ -289,17 +289,4 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
     {
         return logger;
     }
-
-    // TODO register tables
-    public void onEnable(Object module)
-    {
-        ModuleTables annotation = module.getClass().getAnnotation(ModuleTables.class);
-        if (annotation != null)
-        {
-            for (Class<? extends Table<?>> tableClass : annotation.value())
-            {
-                registerTable(tableClass);
-            }
-        }
-    }
 }
