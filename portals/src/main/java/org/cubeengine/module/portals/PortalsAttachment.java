@@ -47,7 +47,7 @@ public class PortalsAttachment
         }
         else
         {
-            if (lastIn + 5000 > System.currentTimeMillis())
+            if (lastIn + 1000 > System.currentTimeMillis())
             {
                 return;
             }
