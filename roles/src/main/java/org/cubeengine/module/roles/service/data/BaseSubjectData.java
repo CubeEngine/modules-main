@@ -70,8 +70,7 @@ public class BaseSubjectData implements SubjectData
 
     public static String stringify(Context c)
     {
-        return c.getName().isEmpty() ? c.getType() : c.getType().equals(
-            WORLD_KEY) ? c.getName() : c.getType() + "|" + c.getName();
+        return c.getName().isEmpty() ? c.getType() : c.getType() + "|" + c.getName();
     }
 
     public static Context asContext(String string)

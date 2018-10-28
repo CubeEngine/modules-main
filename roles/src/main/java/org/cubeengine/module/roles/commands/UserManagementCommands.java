@@ -142,6 +142,7 @@ public class UserManagementCommands extends ContainerCommand
         if (type == Tristate.UNDEFINED)
         {
             resetPermission(ctx, player, permission, context);
+            return;
         }
         Set<Context> contexts = toSet(context);
         player.getSubjectData().setPermission(contexts, permission, type).thenAccept(b -> {

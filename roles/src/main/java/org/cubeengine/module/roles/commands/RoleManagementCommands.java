@@ -72,24 +72,26 @@ public class RoleManagementCommands extends ContainerCommand
                               @Default Tristate type,
                               @Named("in") @Default Context context)
     {
-        role.getSubjectData().setPermission(toSet(context), permission, type);
-        switch (type)
-        {
-            case UNDEFINED:
-                i18n.send(ctx, NEUTRAL, "{name#permission} has been reset for the role {role} in {context}!",
-                                        permission, role, context);
-                break;
-            case TRUE:
-                i18n.send(ctx, POSITIVE,
-                                        "{name#permission} set to {text:true:color=DARK_GREEN} for the role {role} in {context}!",
-                                        permission, role, context);
-                break;
-            case FALSE:
-                i18n.send(ctx, NEGATIVE,
-                                        "{name#permission} set to {text:false:color=DARK_RED} for the role {role} in {context}!",
-                                        permission, role, context);
-                break;
-        }
+        role.getSubjectData().setPermission(toSet(context), permission, type).thenAccept(b -> {
+            switch (type)
+            {
+                case UNDEFINED:
+                    i18n.send(ctx, NEUTRAL, "{name#permission} has been reset for the role {role} in {context}!",
+                            permission, role, context);
+                    break;
+                case TRUE:
+                    i18n.send(ctx, POSITIVE,
+                            "{name#permission} set to {text:true:color=DARK_GREEN} for the role {role} in {context}!",
+                            permission, role, context);
+                    break;
+                case FALSE:
+                    i18n.send(ctx, NEGATIVE,
+                            "{name#permission} set to {text:false:color=DARK_RED} for the role {role} in {context}!",
+                            permission, role, context);
+                    break;
+            }
+        });
+
     }
 
     @Alias(value = {"setROption", "setRData"})

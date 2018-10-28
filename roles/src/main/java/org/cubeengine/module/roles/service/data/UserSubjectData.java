@@ -139,7 +139,7 @@ public class UserSubjectData extends CachingSubjectData
     @Override
     protected void cachePermissions()
     {
-        if (!permissions.isEmpty())
+        if (permissions.isEmpty())
         {
             permissions.putAll(deserialzeMap(PermissionData::getPermissions));
         }
