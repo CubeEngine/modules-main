@@ -17,20 +17,16 @@
  */
 package org.cubeengine.module.roles;
 
-import static org.cubeengine.libcube.service.logging.LoggingUtil.getCycler;
-import static org.cubeengine.libcube.service.logging.LoggingUtil.getFileFormat;
-import static org.cubeengine.libcube.service.logging.LoggingUtil.getLogFile;
-
-import org.cubeengine.libcube.service.logging.LoggingUtil;
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.logscribe.LogFactory;
-import org.cubeengine.logscribe.target.file.AsyncFileTarget;
 import org.cubeengine.converter.ConverterManager;
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.logging.LoggingUtil;
+import org.cubeengine.logscribe.Log;
+import org.cubeengine.logscribe.LogFactory;
+import org.cubeengine.logscribe.target.file.AsyncFileTarget;
 import org.cubeengine.module.roles.commands.ManagementCommands;
 import org.cubeengine.module.roles.commands.RoleCommands;
 import org.cubeengine.module.roles.commands.RoleInformationCommands;

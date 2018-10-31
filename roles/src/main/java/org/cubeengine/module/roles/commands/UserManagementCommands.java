@@ -219,4 +219,7 @@ public class UserManagementCommands extends ContainerCommand
             i18n.send(ctx, NEGATIVE, "Options of {user} was already cleared in {context}!", player, context);
         });
     }
+
+    // TODO clone command
+
 }
