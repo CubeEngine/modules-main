@@ -162,5 +162,8 @@ public class VanillaPlusConfig extends ReflectedYaml
 
         @Comment("Adds /unlimited")
         public boolean commandUnlimited = true;
+
+        @Comment("Grants unlimited food for players with the permission")
+        public boolean unlimitedFood = true;
     }
 }

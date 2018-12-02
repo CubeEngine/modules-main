@@ -34,6 +34,7 @@ import org.cubeengine.module.vanillaplus.addition.PlayerInfoCommands;
 import org.cubeengine.module.vanillaplus.addition.PluginCommands;
 import org.cubeengine.module.vanillaplus.addition.StashCommand;
 import org.cubeengine.module.vanillaplus.addition.SudoCommand;
+import org.cubeengine.module.vanillaplus.addition.UnlimitedFood;
 import org.cubeengine.module.vanillaplus.addition.UnlimitedItems;
 import org.cubeengine.module.vanillaplus.fix.ColoredSigns;
 import org.cubeengine.module.vanillaplus.fix.FlymodeFixListener;
@@ -146,9 +147,12 @@ public class VanillaPlus extends CubeEngineModule
     @Inject private EventManager evm;
     @Inject private StringMatcher sm;
 
+    private PluginContainer plugin;
+
     @Inject
     public VanillaPlus(PluginContainer plugin)
     {
+        this.plugin = plugin;
         DataRegistration.<SafeLoginData, ImmutableSafeLoginData>builder()
                 .dataClass(SafeLoginData.class).immutableClass(ImmutableSafeLoginData.class)
                 .builder(new SafeLoginDataBuilder()).manipulatorId("safe_login")
@@ -216,6 +220,10 @@ public class VanillaPlus extends CubeEngineModule
             UnlimitedItems cmd = new UnlimitedItems(i18n);
             cm.addCommands(this, cmd);
             evm.registerListener(VanillaPlus.class, cmd);
+        }
+        if (config.add.unlimitedFood)
+        {
+            new UnlimitedFood(pm, plugin);
         }
     }
 
