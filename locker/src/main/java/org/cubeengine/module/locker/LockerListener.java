@@ -110,12 +110,25 @@ public class LockerListener
     {
         if (!this.module.getConfig().protectEntityFromRClick) return;
         Entity entity = event.getTargetEntity();
-        if (!player.hasPermission(module.perms().ALLOW_ENTITY.getId()))
+        if (entity instanceof Living)
         {
-            i18n.send(player, NEGATIVE, "Strong magic prevents you from reaching this entity!");
-            event.setCancelled(true);
-            return;
+            if (!player.hasPermission(module.perms().ALLOW_LIVING_ENTITY.getId()))
+            {
+                i18n.send(player, NEGATIVE, "Strong magic prevents you from reaching this living entity!");
+                event.setCancelled(true);
+                return;
+            }
         }
+        else
+        {
+            if (!player.hasPermission(module.perms().ALLOW_ENTITY.getId()))
+            {
+                i18n.send(player, NEGATIVE, "Strong magic prevents you from reaching this entity!");
+                event.setCancelled(true);
+                return;
+            }
+        }
+
         Lock lock = this.manager.getLockForEntityUID(entity.getUniqueId());
         if (lock == null) return;
         if (entity instanceof Carrier || (entity.getType() == HORSE && player.get(Keys.IS_SNEAKING).get()))

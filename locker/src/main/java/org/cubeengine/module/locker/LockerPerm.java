@@ -35,7 +35,8 @@ public class LockerPerm extends PermissionContainer
 
     public final Permission ALLOW_CONTAINER = register("allow.container", "", null);
     public final Permission ALLOW_DOOR = register("allow.door", "", null);
-    public final Permission ALLOW_ENTITY = register("allow.entity", "", null);
+    public final Permission ALLOW_LIVING_ENTITY = register("allow.living-entity", "Allows interaction with living entities", null);
+    public final Permission ALLOW_ENTITY = register("allow.entity", "Allows interaction with non living entities", null);
     public final Permission ALLOW_HANGING = register("allow.hanging", "", null);
 
     public final Permission SHOW_OWNER = register("show-owner", "", null);
