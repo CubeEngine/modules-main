@@ -61,6 +61,7 @@
     <module>netherportals</module>
     <module>protector</module>
     <module>sql</module>
+    <module>zoned</module>
   </modules>
 
   <build>
