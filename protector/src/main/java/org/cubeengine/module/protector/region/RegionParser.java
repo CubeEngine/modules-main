@@ -26,6 +26,8 @@ import org.cubeengine.libcube.service.command.TranslatedParserException;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.module.protector.RegionManager;
+import org.cubeengine.module.zoned.ZoneConfig;
+import org.cubeengine.module.zoned.ZoneManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.living.player.Player;
@@ -42,11 +44,14 @@ import java.util.UUID;
 
 public class RegionParser implements ArgumentParser<Region>, Completer, DefaultValue<Region>
 {
+
+    private ZoneManager zoneMan;
     private RegionManager manager;
     private I18n i18n;
 
-    public RegionParser(RegionManager manager, I18n i18n)
+    public RegionParser(ZoneManager zoneMan, RegionManager manager, I18n i18n)
     {
+        this.zoneMan = zoneMan;
         this.manager = manager;
         this.i18n = i18n;
     }
@@ -169,6 +174,12 @@ public class RegionParser implements ArgumentParser<Region>, Completer, DefaultV
         if ("global".equals(token))
         {
             return manager.getGlobalRegion();
+        }
+
+        ZoneConfig zone = zoneMan.getZone(token); // TODO world
+        if (zone != null)
+        {
+            return manager.newRegion(zone);
         }
 
         throw new TranslatedParserException(

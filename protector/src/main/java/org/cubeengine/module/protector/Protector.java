@@ -34,6 +34,7 @@ import org.cubeengine.module.protector.command.SettingsCommands;
 import org.cubeengine.module.protector.command.parser.TristateParser;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.RegionFormatter;
+import org.cubeengine.module.zoned.Zoned;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.entity.EntityType;
@@ -62,10 +63,10 @@ public class Protector extends CubeEngineModule
     @InjectService private PermissionService ps;
     @Inject private EventManager em;
     @Inject private CommandManager cm;
-    @InjectService private Selector selector;
     @Inject private ModuleManager mm;
     @Inject private TaskManager tm;
     private Log logger;
+    private Zoned zoned;
 
     private RegionManager manager;
 
@@ -77,12 +78,13 @@ public class Protector extends CubeEngineModule
         cm.getProviders().register(this, new DefaultedCatalogTypeParser<>(EntityType.class, null), EntityType.class);
         this.logger = mm.getLoggerFor(Protector.class);
         this.modulePath = mm.getPathFor(Protector.class);
-        manager = new RegionManager(modulePath, reflector, logger);
+        this.zoned = (Zoned) mm.getModule(Zoned.class);
+        manager = new RegionManager(modulePath, reflector, logger, zoned);
         ps.registerContextCalculator(new RegionContextCalculator(manager));
-        RegionCommands regionCmd = new RegionCommands(cm, this, selector, manager, i18n, tm, em);
+        RegionCommands regionCmd = new RegionCommands(cm, this, manager, i18n, tm, em);
         i18n.getCompositor().registerFormatter(new RegionFormatter());
         cm.addCommand(regionCmd);
-        SettingsCommands settingsCmd = new SettingsCommands(manager, i18n, ps, pm, em, cm);
+        SettingsCommands settingsCmd = new SettingsCommands(zoned.getManager(), manager, i18n, ps, pm, em, cm);
         regionCmd.addCommand(settingsCmd);
     }
 

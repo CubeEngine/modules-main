@@ -17,28 +17,30 @@
  */
 package org.cubeengine.module.protector.region;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.protector.RegionManager;
+import org.cubeengine.module.zoned.ZoneConfig;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
+import javax.annotation.Nullable;
+
 public class Region
 {
-    private Cuboid cuboid;
+
+    private ZoneConfig zone;
     private RegionConfig config;
     private Context context;
     private RegionManager manager;
 
-    public Region(RegionConfig config, RegionManager manager)
+    public Region(@Nullable ZoneConfig zone, RegionConfig config, RegionManager manager)
     {
+        this.zone = zone;
         this.config = config;
         this.manager = manager;
-        if (config.corner1 != null && config.corner2 != null)
-        {
-            this.cuboid = new Cuboid(config.corner1.toDouble(), config.corner2.sub(config.corner1).toDouble());
-        }
     }
 
     public RegionConfig getConfig() {
@@ -47,16 +49,20 @@ public class Region
 
     public boolean contains(Location<World> loc)
     {
-        Vector3i pos = loc.getBlockPosition();
-        return (this.config.world == null || loc.getExtent().equals(this.config.world.getWorld()))
-                && (this.cuboid == null || this.contains(pos));
+        if (this.config.world == null)
+        {
+            return true; // global
+        }
+        if (this.config.name == null) // world
+        {
+            return loc.getExtent().equals(this.config.world.getWorld());
+        }
+        return this.contains(loc.getPosition()); // zone
     }
 
-    public boolean contains(Vector3i pos)
+    public boolean contains(Vector3d pos)
     {
-        return (this.cuboid.contains(pos.toDouble())
-             || this.cuboid.contains(pos.add(0,1,0).toDouble())
-             || this.cuboid.contains(pos.add(0,1.8,0).toDouble()));
+        return zone.shape.contains(pos) || zone.shape.contains(pos.add(0, 1.8, 0)) ;
     }
 
     public RegionConfig.Settings getSettings()
@@ -66,7 +72,11 @@ public class Region
 
     public Cuboid getCuboid()
     {
-        return this.cuboid;
+        if (this.zone == null)
+        {
+            return null;
+        }
+        return this.zone.shape.getBoundingCuboid();
     }
 
     public int getPriority() {
@@ -117,13 +127,6 @@ public class Region
             this.context = new Context("region", this.config.world.getName().toLowerCase() + "." + this.config.name.toLowerCase());
         }
         return this.context;
-    }
-
-    public void setCuboid(Cuboid cuboid)
-    {
-        this.cuboid = cuboid;
-        this.config.corner1 = cuboid.getMinimumPoint().toInt();
-        this.config.corner2 = cuboid.getMaximumPoint().toInt();
     }
 
     @Override

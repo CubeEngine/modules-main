@@ -36,6 +36,7 @@ import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionParser;
+import org.cubeengine.module.zoned.ZoneManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.CommandMapping;
@@ -51,11 +52,11 @@ public class SettingsCommands extends AbstractSettingsCommand
 
     private PermissionManager pm;
 
-    public SettingsCommands(RegionManager manager, I18n i18n, PermissionService ps, PermissionManager pm, EventManager em, CommandManager cm)
+    public SettingsCommands(ZoneManager zoneMan, RegionManager manager, I18n i18n, PermissionService ps, PermissionManager pm, EventManager em, CommandManager cm)
     {
         super(cm, Protector.class, i18n, new SettingsListener(manager, pm.getBasePermission(Protector.class), pm, i18n), ps);
         this.pm = pm;
-        cm.getProviders().register(this, new RegionParser(manager, i18n), Region.class);
+        cm.getProviders().register(this, new RegionParser(zoneMan, manager, i18n), Region.class);
         em.registerListener(Protector.class, this.psl);
 
         this.addCommand(new BlockDamageSettingsCommands(cm, i18n, psl, ps));

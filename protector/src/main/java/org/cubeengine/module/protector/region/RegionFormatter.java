@@ -33,6 +33,15 @@ public class RegionFormatter extends AbstractFormatter<Region>
     @Override
     public Component format(Region region, Context context, Arguments args)
     {
-        return new Text(region.getName() == null ? region.getWorld() == null ? "global" : region.getWorld().getName() : region.getName());
+        if (region.getName() == null)
+        {
+            if (region.getWorld() == null)
+            {
+                return new Text("global");
+            }
+            return new Text(region.getWorld().getName() + ".world");
+        }
+
+        return new Text(region.getWorld().getName() + "." + region.getName());
     }
 }

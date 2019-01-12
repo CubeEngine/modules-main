@@ -35,10 +35,12 @@ import java.util.Map;
 public class RegionConfig extends ReflectedYaml
 {
     public String name;
-
-    public Vector3i corner1;
-    public Vector3i corner2;
     public ConfigWorld world;
+
+    @Deprecated
+    public Vector3i corner1;
+    @Deprecated
+    public Vector3i corner2;
 
     public int priority = 0;
 
