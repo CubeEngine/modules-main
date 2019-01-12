@@ -17,43 +17,74 @@
  */
 package org.cubeengine.module.zoned;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.libcube.CubeEngineModule;
-import org.cubeengine.libcube.InjectService;
 import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.ModuleCommand;
+import org.cubeengine.libcube.service.event.EventManager;
+import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.Permission;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.module.selector.CuboidSelector;
-import org.cubeengine.module.selector.SelectorCommand;
+import org.cubeengine.libcube.service.task.TaskManager;
+import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.processor.Module;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.Sponge;
+import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+
+import java.nio.file.Path;
+
+import javax.inject.Inject;
+import javax.inject.Singleton;
 
 @Singleton
 @Module
 public class Zoned extends CubeEngineModule
 {
-    @Inject private PermissionManager pm;
     @Inject private CommandManager cm;
-    @Inject private Game game;
     @Inject private I18n i18n;
-    private Permission selectPerm;
 
-    @InjectService private Selector selector;
-
+    private Path path;
     @Inject private ModuleManager mm;
+    @Inject private Reflector reflector;
+
+    @ModuleListener private ZonesListener listener;
+    @ModuleCommand private ZonedCommands zonedCommands;
+    @ModuleCommand private SelectorCommand selectorCommand;
+    @Inject private TaskManager tm;
+    @Inject private EventManager em;
+
+    private ZoneManager manager;
 
     @Listener
     public void onEnable(GamePreInitializationEvent event)
     {
-        // selectPerm = pm.register(Zoned.class, "use-wand", "Allows using the selector wand",null);
+        this.reflector.getDefaultConverterManager().registerConverter(new ShapeConverter(), Shape.class);
+        this.reflector.getDefaultConverterManager().registerConverter(new Vector3dConverter(), Vector3d.class);
+
+        this.path = mm.getPathFor(Zoned.class);
+        this.manager = new ZoneManager(this, i18n, reflector, mm.getLoggerFor(Zoned.class));
+        this.cm.getProviders().register(this, new ZoneParser(this, manager, i18n), ZoneConfig.class);
     }
 
+    public ZoneConfig getActiveZone(Player player)
+    {
+        return this.listener.getZone(player);
+    }
+
+    public void setActiveZone(Player player, ZoneConfig zone)
+    {
+        this.listener.setZone(player, zone);
+    }
+
+    public Path getPath()
+    {
+        return this.path;
+    }
+
+    public ZoneManager getManager()
+    {
+        return this.manager;
+    }
 }
