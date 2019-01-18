@@ -19,7 +19,7 @@ package org.cubeengine.module.sql.database;
 
 import com.google.inject.ImplementedBy;
 import org.cubeengine.logscribe.Log;
-import org.cubeengine.module.sql.database.mysql.MySQLDatabase;
+import org.cubeengine.module.sql.database.impl.SQLDatabase;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record;
@@ -36,7 +36,7 @@ import java.util.concurrent.CompletableFuture;
 /**
  * The Database interface.
  */
-@ImplementedBy(MySQLDatabase.class)
+@ImplementedBy(SQLDatabase.class)
 public interface Database
 {
     /**
@@ -113,4 +113,6 @@ public interface Database
     String getTablePrefix();
 
     Log getLog();
+
+    void init();
 }

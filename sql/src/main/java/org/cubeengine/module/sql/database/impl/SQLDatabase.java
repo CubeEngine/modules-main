@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.sql.database.mysql;
+package org.cubeengine.module.sql.database.impl;
 
 import static org.cubeengine.module.sql.PluginSql.SQL_ID;
 import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
@@ -34,14 +34,7 @@ import org.cubeengine.logscribe.LogLevel;
 import org.cubeengine.logscribe.LogTarget;
 import org.cubeengine.logscribe.filter.PrefixFilter;
 import org.cubeengine.logscribe.target.file.AsyncFileTarget;
-import org.cubeengine.module.sql.database.AbstractDatabase;
-import org.cubeengine.module.sql.database.Database;
-import org.cubeengine.module.sql.database.DatabaseConfiguration;
-import org.cubeengine.module.sql.database.ModuleTables;
-import org.cubeengine.module.sql.database.Table;
-import org.cubeengine.module.sql.database.TableCreator;
-import org.cubeengine.module.sql.database.TableUpdateCreator;
-import org.cubeengine.module.sql.database.TableVersion;
+import org.cubeengine.module.sql.database.*;
 import org.cubeengine.reflect.Reflector;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
@@ -68,9 +61,9 @@ import javax.inject.Singleton;
 import javax.sql.DataSource;
 
 @Singleton
-public class MySQLDatabase extends AbstractDatabase implements Database, ModuleInjector<ModuleTables>
+public class SQLDatabase extends AbstractDatabase implements Database, ModuleInjector<ModuleTables>
 {
-    private final MySQLDatabaseConfiguration config;
+    private final DatabaseConfiguration config;
     private DataSource dataSource;
     private ModuleManager mm;
 
@@ -78,9 +71,10 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
     private MappedSchema mappedSchema;
     private Log logger;
     private final JooqLogger jooqLogger = new JooqLogger(this);
+    private Configuration jooqConfig;
 
     @Inject
-    public MySQLDatabase(Reflector reflector, ModuleManager mm, FileManager fm, LogFactory logFactory)
+    public SQLDatabase(Reflector reflector, ModuleManager mm, FileManager fm, LogFactory logFactory)
     {
         this.mm = mm;
         this.mm.registerBinding(Database.class, this);
@@ -107,18 +101,21 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
         parentTarget.setLevel(LogLevel.INFO);
 
 
-        this.config = reflector.load(MySQLDatabaseConfiguration.class, new File(pluginFolder, "database.yml"));
+        reflector.getDefaultConverterManager().registerConverter(new SQLDialectConverter(), SQLDialect.class);
+
+        this.config = reflector.load(DatabaseConfiguration.class, new File(pluginFolder, "database.yml"));
 
 
     }
 
+    @Override
     public void init()
     {
         // Now go connect to the database:
         this.logger.info("Connecting to the database...");
 
         SqlService service = Sponge.getServiceManager().provide(SqlService.class).get();
-        String url = service.getConnectionUrlFromAlias(SQL_ID).orElse("jdbc:mysql://minecraft@localhost:3306/minecraft");
+        String url = service.getConnectionUrlFromAlias(SQL_ID).orElse("jdbc:postgresql://minecraft@localhost:5432/minecraft");
 
         try
         {
@@ -250,13 +247,20 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
     @Override
     public DSLContext getDSL()
     {
-        Configuration conf = new DefaultConfiguration()
-                .set(SQLDialect.MYSQL)
-                .set(new DataSourceConnectionProvider(this.dataSource))
-                .set(new DefaultExecuteListenerProvider(jooqLogger))
-                .set(settings)
-                .set(new DefaultVisitListenerProvider(new TablePrefixer(getTablePrefix())));
+        Configuration conf = getConfiguration();
         return DSL.using(conf);
+    }
+
+    private Configuration getConfiguration() {
+        if (jooqConfig == null) {
+            jooqConfig = new DefaultConfiguration()
+                    .set(config.dialect)
+                    .set(new DataSourceConnectionProvider(this.dataSource))
+                    .set(new DefaultExecuteListenerProvider(jooqLogger))
+                    .set(settings)
+                    .set(new DefaultVisitListenerProvider(new TablePrefixer(getTablePrefix())));
+        }
+        return jooqConfig;
     }
 
     @Override
@@ -269,7 +273,7 @@ public class MySQLDatabase extends AbstractDatabase implements Database, ModuleI
     @Override
     public String getName()
     {
-        return "MySQL";
+        return this.config.dialect.getName();
     }
 
     @Override

@@ -17,13 +17,21 @@
  */
 package org.cubeengine.module.sql.database;
 
+import org.cubeengine.reflect.annotations.Comment;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
+import org.jooq.SQLDialect;
 
 /**
  * DatabaseConfiguration have to return their corresponding DatabaseClass.
  */
 @SuppressWarnings("all")
-public abstract class DatabaseConfiguration extends ReflectedYaml
+public class DatabaseConfiguration extends ReflectedYaml
 {
     public boolean logDatabaseQueries = false;
+    @Comment("The table prefix to use for all CubeEngine tables")
+    public String tablePrefix = "cube_";
+    @Comment({"The dialect to use for the CubeEngine database",
+            "The following dialects are supported:",
+            "H2, MYSQL, POSTGRES, SQLITE"})
+    public SQLDialect dialect = SQLDialect.POSTGRES;
 }

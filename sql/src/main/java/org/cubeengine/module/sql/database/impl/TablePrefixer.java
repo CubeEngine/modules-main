@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.sql.database.mysql;
+package org.cubeengine.module.sql.database.impl;
 
 import org.cubeengine.module.sql.database.Table;
 import org.jooq.QueryPart;

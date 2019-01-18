@@ -19,7 +19,7 @@ package org.cubeengine.module.sql;
 
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.module.sql.database.Database;
-import org.cubeengine.module.sql.database.mysql.MySQLDatabase;
+import org.cubeengine.module.sql.database.impl.SQLDatabase;
 import org.cubeengine.processor.Module;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
@@ -34,6 +34,6 @@ public class Sql extends CubeEngineModule
     @Listener
     public void onStart(GameAboutToStartServerEvent event)
     {
-        ((MySQLDatabase) db).init();
+        db.init();
     }
 }

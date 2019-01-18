@@ -21,7 +21,7 @@ import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
 import static org.jooq.impl.DSL.constraint;
 
 import org.cubeengine.libcube.util.Version;
-import org.cubeengine.module.sql.database.mysql.Keys;
+import org.cubeengine.module.sql.database.impl.Keys;
 import org.jooq.CreateTableColumnStep;
 import org.jooq.DSLContext;
 import org.jooq.DataType;
