@@ -18,14 +18,17 @@
 package org.cubeengine.module.conomy.storage;
 
 import org.cubeengine.libcube.util.Version;
+import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.Table;
 import org.cubeengine.module.sql.database.TableUpdateCreator;
+import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.TableField;
+import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
-import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 
 public class TableAccount extends Table<AccountModel> implements TableUpdateCreator<AccountModel>
 {
@@ -46,19 +49,27 @@ public class TableAccount extends Table<AccountModel> implements TableUpdateCrea
     }
 
     @Override
-    public void update(Connection connection, Version dbVersion) throws SQLException
+    public void update(Database database, Version dbVersion) throws SQLException
     {
         if (new Version(1).equals(dbVersion)) // Update to Version 2
         {
             // Remove mask;
-            Statement stmt = connection.createStatement();
-            stmt.execute("ALTER TABLE `"+ getName()+ "` ADD"
-                    + "( HIDDEN BOOLEAN, INVITE BOOLEAN, IS_UUID BOOLEAN)");
-            stmt.execute("UPDATE TABLE `" + getName() + "` SET "
-                            + "HIDDEN = MASK & 1 = 1,"
-                            + "INVITE = MASK & 2 = 2,"
-                            + "IS_UUID = MASK & 4 = 4");
-            stmt.execute("ALTER TABLE `" + getName() +"` DROP COLUMN MASK");
+            DSLContext dsl = database.getDSL();
+            dsl.alterTable(TABLE_ACCOUNT).addColumn(HIDDEN, HIDDEN.getDataType()).execute();
+            dsl.alterTable(TABLE_ACCOUNT).addColumn(INVITE, INVITE.getDataType()).execute();
+            dsl.alterTable(TABLE_ACCOUNT).addColumn(IS_UUID, IS_UUID.getDataType()).execute();
+            Field<Byte> maskField = DSL.field("mask", SQLDataType.TINYINT);
+            dsl.update(TABLE_ACCOUNT)
+                    .set(HIDDEN, DSL.field(maskField.bitAnd((byte) 1).eq((byte) 1)))
+                    .set(INVITE, DSL.field(maskField.bitAnd((byte) 2).eq((byte) 2)))
+                    .set(IS_UUID, DSL.field(maskField.bitAnd((byte) 4).eq((byte) 4)))
+                    .execute();
+            try {
+                dsl.alterTable(TABLE_ACCOUNT).dropColumn(maskField).execute();
+            } catch (DataAccessException e) {
+                e.printStackTrace();
+            }
+
         }
     }
 }

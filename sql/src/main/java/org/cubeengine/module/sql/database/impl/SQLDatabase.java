@@ -115,7 +115,7 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
         this.logger.info("Connecting to the database...");
 
         SqlService service = Sponge.getServiceManager().provide(SqlService.class).get();
-        String url = service.getConnectionUrlFromAlias(SQL_ID).orElse("jdbc:postgresql://minecraft@localhost:5432/minecraft");
+        String url = service.getConnectionUrlFromAlias(SQL_ID).orElse("jdbc:sqlite:cubeengine.db");
 
         try
         {
@@ -159,11 +159,10 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
                 {
                     logger.info("table-version is too old! Updating {} from {} to {}", updater.getName(),
                             dbVersion.toString(), version.toString());
-                    try (Connection connection = this.getConnection())
-                    {
-                        updater.update(connection, dbVersion);
-                    }
-                    getDSL().mergeInto(TABLE_VERSION).values(updater.getName(), version.toString());
+                    updater.update(this, dbVersion);
+                    DSLContext dsl = getDSL();// TODO .mergeInto(TABLE_VERSION).values(updater.getName(), version.toString());
+                    dsl.update(TABLE_VERSION).set(TABLE_VERSION.VERSION, version.toString()).where(TABLE_VERSION.NAME.eq(updater.getName())).execute();
+                    dsl.insertInto(TABLE_VERSION).values(updater.getName(), version.toString()).onDuplicateKeyIgnore().execute();
                     logger.info("{} got updated to {}", updater.getName(), version.toString());
                 }
                 return true;

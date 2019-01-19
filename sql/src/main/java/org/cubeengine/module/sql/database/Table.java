@@ -198,7 +198,9 @@ public abstract class Table<R extends Record> extends TableImpl<R> implements Ta
 
         if (this.version != null)
         {
-            dsl.mergeInto(TABLE_VERSION).values(getName(), getTableVersion().toString()).execute();
+            // TODO dsl.mergeInto(TABLE_VERSION).values(getName(), getTableVersion().toString()).execute();
+            dsl.update(TABLE_VERSION).set(TABLE_VERSION.VERSION, getTableVersion().toString()).where(TABLE_VERSION.NAME.eq(getName())).execute();
+            dsl.insertInto(TABLE_VERSION).values(getName(), getTableVersion().toString()).onDuplicateKeyIgnore().execute();
         }
     }
 }

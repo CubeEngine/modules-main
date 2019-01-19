@@ -19,7 +19,7 @@ public class SQLDialectConverter extends SimpleConverter<SQLDialect> {
     @Override
     public SQLDialect fromNode(Node node) throws ConversionException {
 
-        SQLDialect sqlDialect = SQLDialect.valueOf(node.asString());
+        SQLDialect sqlDialect = SQLDialect.valueOf(node.asText());
         filterAllowedDialect(sqlDialect, node);
         return sqlDialect;
     }

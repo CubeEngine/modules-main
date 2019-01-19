@@ -32,6 +32,7 @@ public class DatabaseConfiguration extends ReflectedYaml
     public String tablePrefix = "cube_";
     @Comment({"The dialect to use for the CubeEngine database",
             "The following dialects are supported:",
-            "H2, MYSQL, POSTGRES, SQLITE"})
-    public SQLDialect dialect = SQLDialect.POSTGRES;
+            "H2, MYSQL, POSTGRES, SQLITE",
+            "Make sure that the required driver is present on the classpath"})
+    public SQLDialect dialect = SQLDialect.SQLITE;
 }
