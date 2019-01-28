@@ -231,6 +231,7 @@ public class LockerBlockListener
     @Listener
     public void onBlockPistonExtend(ChangeBlockEvent.Pre event, @First Player player)
     {
+        if (true) return; // TODO this is broken
         if (!this.module.getConfig().protectFromPistonMove) return;
         for (Location<World> loc : event.getLocations())
         {
