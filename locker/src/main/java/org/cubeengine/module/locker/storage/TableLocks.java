@@ -23,6 +23,7 @@ import java.util.UUID;
 import org.cubeengine.libcube.util.Version;
 import org.cubeengine.module.sql.database.Table;
 import org.jooq.TableField;
+import org.jooq.impl.SQLDataType;
 
 import static org.jooq.impl.SQLDataType.*;
 
@@ -30,7 +31,7 @@ public class TableLocks extends Table<LockModel>
 {
     public static TableLocks TABLE_LOCKS;
     public final TableField<LockModel, Long> ID = createField("id", BIGINT.nullable(false).identity(true), this);
-    public final TableField<LockModel, UUID> OWNER_ID = createField("owner_id", UUID_TYPE.nullable(false), this);
+    public final TableField<LockModel, UUID> OWNER_ID = createField("owner_id", SQLDataType.UUID.nullable(false), this);
     /**
      * Flags see {@link ProtectionFlag}
      */
@@ -46,7 +47,7 @@ public class TableLocks extends Table<LockModel>
     // eg. /cguarded [pass <password>] (flag to create pw book/key?)
     public final TableField<LockModel, byte[]> PASSWORD = createField("password", VARBINARY.length(128).nullable(false), this);
     // optional for entity protection:
-    public final TableField<LockModel, UUID> ENTITY_UUID = createField("entity_uuid", UUID_TYPE.nullable(true), this);
+    public final TableField<LockModel, UUID> ENTITY_UUID = createField("entity_uuid", SQLDataType.UUID.nullable(true), this);
     public final TableField<LockModel, Date> LAST_ACCESS = createField("last_access", DATE.nullable(false), this);
     public final TableField<LockModel, Date> CREATED = createField("created", DATE.nullable(false), this);
 

@@ -22,6 +22,7 @@ import java.util.UUID;
 import org.cubeengine.libcube.util.Version;
 import org.cubeengine.module.sql.database.Table;
 import org.jooq.TableField;
+import org.jooq.impl.SQLDataType;
 
 import static org.jooq.impl.SQLDataType.BIGINT;
 import static org.jooq.impl.SQLDataType.VARCHAR;
@@ -31,8 +32,8 @@ public class TableMail extends Table<Mail>
     public static TableMail TABLE_MAIL;
     public final TableField<Mail, Long> ID = createField("id", BIGINT.nullable(false).identity(true), this);
     public final TableField<Mail, String> MESSAGE = createField("message", VARCHAR.length(100).nullable(false), this);
-    public final TableField<Mail, UUID> USERID = createField("userId", UUID_TYPE.nullable(false), this);
-    public final TableField<Mail, UUID> SENDERID = createField("senderId", UUID_TYPE, this);
+    public final TableField<Mail, UUID> USERID = createField("userId", SQLDataType.UUID.nullable(false), this);
+    public final TableField<Mail, UUID> SENDERID = createField("senderId", SQLDataType.UUID, this);
 
     public TableMail()
     {

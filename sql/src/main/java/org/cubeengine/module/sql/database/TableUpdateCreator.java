@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.sql.database;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import org.cubeengine.libcube.util.Version;
 import org.jooq.Record;
@@ -27,5 +26,5 @@ import org.jooq.Record;
  */
 public interface TableUpdateCreator<T extends Record> extends TableCreator<T>
 {
-    void update(Connection connection, Version dbVersion) throws SQLException;
+    void update(Database database, Version dbVersion) throws SQLException;
 }

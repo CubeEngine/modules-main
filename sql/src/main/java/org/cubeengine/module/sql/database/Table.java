@@ -17,39 +17,28 @@
  */
 package org.cubeengine.module.sql.database;
 
-import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
-import static org.jooq.impl.DSL.constraint;
-
 import org.cubeengine.libcube.util.Version;
-import org.cubeengine.module.sql.database.mysql.Keys;
-import org.jooq.CreateTableColumnStep;
-import org.jooq.DSLContext;
-import org.jooq.DataType;
-import org.jooq.ForeignKey;
-import org.jooq.Identity;
-import org.jooq.Record;
-import org.jooq.TableField;
-import org.jooq.UniqueKey;
+import org.cubeengine.module.sql.database.impl.Keys;
+import org.jooq.*;
 import org.jooq.exception.DataAccessException;
+import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
 import org.spongepowered.api.entity.living.player.Player;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
+import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
+import static org.jooq.impl.DSL.constraint;
 
 public abstract class Table<R extends Record> extends TableImpl<R> implements TableCreator<R>
 {
-    // This is not working because DataType#hasLength returns false for the converted type UUID
-    // jOOQ issue: https://github.com/jOOQ/jOOQ/issues/5807
-    // public static final DataType<UUID> UUID_TYPE = SQLDataType.VARCHAR(36).asConvertedDataType(new UUIDConverter());
     public static final DataType<Player> PLAYER_TYPE = SQLDataType.VARCHAR(36).asConvertedDataType(new PlayerConverter());
-    public static final DataType<UUID> UUID_TYPE = new UUIDDataType(false);
+
     public Table(Class<R> model, String name, Version version)
     {
-        super(name);
+        super(DSL.name(name));
         this.model = model;
         this.version = version;
     }
@@ -143,7 +132,7 @@ public abstract class Table<R extends Record> extends TableImpl<R> implements Ta
     }
 
     @Override
-    public void createTable(Database db) throws SQLException
+    public void createTable(Database db)
     {
         DSLContext dsl = db.getDSL();
 
@@ -198,7 +187,12 @@ public abstract class Table<R extends Record> extends TableImpl<R> implements Ta
 
         if (this.version != null)
         {
-            dsl.mergeInto(TABLE_VERSION).values(getName(), getTableVersion().toString()).execute();
+            // TODO dsl.mergeInto(TABLE_VERSION).values(getName(), getTableVersion().toString()).execute();
+            dsl.transaction(cfg -> {
+                DSLContext ctx = DSL.using(cfg);
+                ctx.update(TABLE_VERSION).set(TABLE_VERSION.VERSION, getTableVersion().toString()).where(TABLE_VERSION.NAME.eq(getName())).execute();
+                ctx.insertInto(TABLE_VERSION).values(getName(), getTableVersion().toString()).onDuplicateKeyIgnore().execute();
+            });
         }
     }
 }
