@@ -22,6 +22,7 @@ import java.util.UUID;
 import org.cubeengine.libcube.util.Version;
 import org.cubeengine.module.sql.database.Table;
 import org.jooq.TableField;
+import org.jooq.impl.SQLDataType;
 
 import static org.cubeengine.module.locker.storage.TableLocks.TABLE_LOCKS;
 import static org.jooq.impl.SQLDataType.BIGINT;
@@ -31,7 +32,7 @@ public class TableLockLocations extends Table<LockLocationModel>
 {
     public static TableLockLocations TABLE_LOCK_LOCATIONS;
     public final TableField<LockLocationModel, Long> ID = createField("id", BIGINT.nullable(false).identity(true), this);
-    public final TableField<LockLocationModel, UUID> WORLD_ID = createField("world_id", UUID_TYPE.nullable(false), this);
+    public final TableField<LockLocationModel, UUID> WORLD_ID = createField("world_id", SQLDataType.UUID.nullable(false), this);
     public final TableField<LockLocationModel, Integer> X = createField("x", INTEGER.nullable(false), this);
     public final TableField<LockLocationModel, Integer> Y = createField("y", INTEGER.nullable(false), this);
     public final TableField<LockLocationModel, Integer> Z = createField("z", INTEGER.nullable(false), this);

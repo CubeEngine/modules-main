@@ -44,6 +44,7 @@ import org.jooq.conf.MappedSchema;
 import org.jooq.conf.MappedTable;
 import org.jooq.conf.RenderMapping;
 import org.jooq.conf.Settings;
+import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DataSourceConnectionProvider;
 import org.jooq.impl.DefaultConfiguration;
@@ -161,8 +162,12 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
                             dbVersion.toString(), version.toString());
                     updater.update(this, dbVersion);
                     DSLContext dsl = getDSL();// TODO .mergeInto(TABLE_VERSION).values(updater.getName(), version.toString());
-                    dsl.update(TABLE_VERSION).set(TABLE_VERSION.VERSION, version.toString()).where(TABLE_VERSION.NAME.eq(updater.getName())).execute();
-                    dsl.insertInto(TABLE_VERSION).values(updater.getName(), version.toString()).onDuplicateKeyIgnore().execute();
+                    dsl.transaction(cfg -> {
+                        DSLContext ctx = DSL.using(cfg);
+                        ctx.update(TABLE_VERSION).set(TABLE_VERSION.VERSION, version.toString()).where(TABLE_VERSION.NAME.eq(updater.getName())).execute();
+                        ctx.insertInto(TABLE_VERSION).values(updater.getName(), version.toString()).onDuplicateKeyIgnore().execute();
+                    });
+
                     logger.info("{} got updated to {}", updater.getName(), version.toString());
                 }
                 return true;
@@ -211,7 +216,7 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
         {
             table.createTable(this);
         }
-        catch (SQLException ex)
+        catch (DataAccessException ex)
         {
             throw new IllegalStateException("Cannot create table " + table.getName(), ex);
         }
