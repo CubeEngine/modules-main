@@ -58,7 +58,13 @@ public class ZoneManager
     private void loadZones()
     {
         this.zones.clear();
-        try (Stream<Path> files = Files.walk(this.module.getPath().resolve("zones"))){
+        Path zonesDir = this.module.getPath().resolve("zones");
+        try {
+            Files.createDirectories(zonesDir);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try (Stream<Path> files = Files.walk(zonesDir)){
             files.filter(f -> !Files.isDirectory(f))
                  .filter(f -> f.toString().endsWith("yml"))
                  .forEach(file -> {
