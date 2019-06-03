@@ -135,7 +135,10 @@ public class ZonedCommands extends ContainerCommand {
     }
 
     @Command(desc = "Toggles particles for the currently selected region")
-    public void show(Player context) {
+    public void show(Player context, @Optional ZoneConfig zone) {
+        if (zone != null) {
+            this.module.setActiveZone(context, zone);
+        }
         if (!ShapeRenderer.toggleShowActiveRegion(tm, context, module)) {
             i18n.send(ACTION_BAR, context, POSITIVE, "Stopped showing active region.");
             return;
