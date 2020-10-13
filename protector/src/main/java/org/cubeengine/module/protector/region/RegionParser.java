@@ -26,7 +26,6 @@ import org.cubeengine.libcube.service.command.TranslatedParserException;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.module.protector.RegionManager;
-import org.cubeengine.module.zoned.ZoneConfig;
 import org.cubeengine.module.zoned.ZoneManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;

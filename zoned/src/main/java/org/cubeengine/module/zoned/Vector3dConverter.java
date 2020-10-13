@@ -17,13 +17,12 @@
  */
 package org.cubeengine.module.zoned;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.converter.converter.SimpleConverter;
 import org.cubeengine.converter.node.DoubleNode;
-import org.cubeengine.converter.node.IntNode;
 import org.cubeengine.converter.node.ListNode;
 import org.cubeengine.converter.node.Node;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.List;
 

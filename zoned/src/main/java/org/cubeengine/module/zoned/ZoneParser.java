@@ -17,47 +17,74 @@
  */
 package org.cubeengine.module.zoned;
 
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.Completer;
-import org.cubeengine.butler.parameter.argument.DefaultValue;
-import org.cubeengine.butler.parameter.argument.ParserException;
-import org.cubeengine.libcube.service.command.TranslatedParserException;
+import com.google.inject.Inject;
+import net.kyori.adventure.audience.Audience;
+import org.cubeengine.libcube.service.command.DefaultParameterProvider;
+import org.cubeengine.libcube.service.command.annotation.ParserFor;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.parameter.ArgumentReader;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.managed.ValueCompleter;
+import org.spongepowered.api.command.parameter.managed.ValueParser;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.Locatable;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Optional;
 
-public class ZoneParser implements ArgumentParser<ZoneConfig>, Completer, DefaultValue<ZoneConfig>
+@ParserFor(ZoneConfig.class)
+public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, DefaultParameterProvider<ZoneConfig>
 {
+    private final Zoned module;
+    private final ZoneManager manager;
+    private final I18n i18n;
 
-    private Zoned module;
-    private ZoneManager manager;
-    private I18n i18n;
-
+    @Inject
     public ZoneParser(Zoned module, ZoneManager manager, I18n i18n)
     {
         this.module = module;
-
         this.manager = manager;
         this.i18n = i18n;
     }
 
     @Override
-    public List<String> suggest(Class type, CommandInvocation invocation)
+    public ZoneConfig apply(CommandCause cause)
     {
-        String token = invocation.currentToken().toLowerCase();
+        // TODO for other command-sources?
+        if (cause.getAudience() instanceof ServerPlayer)
+        {
+            ZoneConfig zone = module.getActiveZone(((ServerPlayer) cause.getAudience()));
+            if (zone != null)
+            {
+                return zone;
+            }
+            List<ZoneConfig> zones = manager.getZonesAt(((ServerPlayer) cause.getAudience()).getServerLocation());
+            if (!zones.isEmpty())
+            {
+                return zones.get(0);
+            }
+        }
+
+        cause.sendMessage(i18n.translate(cause.getAudience(), MessageType.NEGATIVE, "You need to provide a zone"));
+        return null;
+    }
+
+    @Override
+    public List<String> complete(CommandContext context, String currentInput)
+    {
+        String token = currentInput.toLowerCase();
         List<String> list = new ArrayList<>();
-        World world = null;
-        boolean isLocatable = invocation.getCommandSource() instanceof Locatable;
+        ServerWorld world = null;
+        boolean isLocatable = context.getCause().getAudience() instanceof Locatable;
         if (isLocatable)
         {
-            world = ((Locatable) invocation.getCommandSource()).getWorld();
+            world = ((Locatable) context.getCause().getAudience()).getServerLocation().getWorld();
             for (ZoneConfig zone : manager.getZones(null, world))
             {
                 if (zone.name == null)
@@ -80,7 +107,7 @@ public class ZoneParser implements ArgumentParser<ZoneConfig>, Completer, Defaul
             }
              */
             if (world != null && zone.world.getWorld().getUniqueId().equals(world.getUniqueId())
-                    && !world.getName().startsWith(token.replace(".", "")))
+                    && !world.getKey().toString().startsWith(token.replace(".", "")))
             {
                 continue; // Skip if already without world ; except when token starts with world
             }
@@ -125,15 +152,17 @@ public class ZoneParser implements ArgumentParser<ZoneConfig>, Completer, Defaul
     }
 
     @Override
-    public ZoneConfig parse(Class aClass, CommandInvocation invocation) throws ParserException
-    {
-        String token = invocation.consume(1).toLowerCase();
-        if (invocation.getCommandSource() instanceof Locatable)
+    public Optional<? extends ZoneConfig> getValue(Parameter.Key<? super ZoneConfig> parameterKey, ArgumentReader.Mutable reader,
+            CommandContext.Builder context) throws ArgumentParseException {
+        final Audience audience = context.getCause().getAudience();
+
+        final String token = reader.parseString().toLowerCase();
+        if (audience instanceof Locatable)
         {
-            World world = ((Locatable) invocation.getCommandSource()).getWorld();
+            ServerWorld world = ((Locatable) audience).getServerLocation().getWorld();
             ZoneConfig zone = manager.getZone(token);
             if (zone != null) {
-                return zone;
+                return Optional.of(zone);
             }
             /* TODO world regions
             if ("world".equals(token))
@@ -170,31 +199,8 @@ public class ZoneParser implements ArgumentParser<ZoneConfig>, Completer, Defaul
             return manager.getGlobalZoneConfig();
         }
         */
-
-        throw new TranslatedParserException(
-                i18n.translate(invocation.getContext(Locale.class), MessageType.NEGATIVE,
-                        "There is no zone named {name}", token));
+        audience.sendMessage(i18n.translate(audience, MessageType.NEGATIVE, "There is no zone named {name}", token));;
+        return Optional.empty();
     }
 
-    @Override
-    public ZoneConfig provide(CommandInvocation invocation)
-    {
-        // TODO for other command-sources?
-        if (invocation.getCommandSource() instanceof Player)
-        {
-            ZoneConfig zone = module.getActiveZone(((Player) invocation.getCommandSource()));
-            if (zone != null)
-            {
-                return zone;
-            }
-            List<ZoneConfig> zones = manager.getZonesAt(((Player) invocation.getCommandSource()).getLocation());
-            if (!zones.isEmpty())
-            {
-                return zones.get(0);
-            }
-        }
-        throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), MessageType.NEGATIVE,
-                        "You need to provide a zone"));
-
-    }
 }

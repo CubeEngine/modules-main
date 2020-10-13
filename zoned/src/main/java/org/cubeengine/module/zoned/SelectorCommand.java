@@ -18,36 +18,17 @@
 package org.cubeengine.module.zoned;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.data.key.Keys.COAL_TYPE;
-import static org.spongepowered.api.data.key.Keys.DISPLAY_NAME;
-import static org.spongepowered.api.data.key.Keys.ITEM_ENCHANTMENTS;
-import static org.spongepowered.api.data.key.Keys.ITEM_LORE;
-import static org.spongepowered.api.item.ItemTypes.COAL;
 
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
+import com.google.inject.Inject;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.SpawnUtil;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.CoalTypes;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemTypes;
-import org.spongepowered.api.item.enchantment.Enchantment;
-import org.spongepowered.api.item.enchantment.EnchantmentTypes;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
-import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-
-import java.util.Arrays;
-import java.util.Optional;
-
-import javax.inject.Inject;
+import org.spongepowered.api.item.inventory.query.QueryTypes;
 
 public class SelectorCommand
 {
@@ -59,57 +40,44 @@ public class SelectorCommand
         this.i18n = i18n;
     }
 
-    public void giveSelectionTool(Player user)
+    public void giveSelectionTool(ServerPlayer player)
     {
         ItemStack found = null;
-        Inventory axes = user.getInventory().query(QueryOperationTypes.ITEM_TYPE.of(ItemTypes.WOODEN_AXE));
+        Inventory axes = player.getInventory().query(QueryTypes.ITEM_TYPE, ItemTypes.COAL);
         for (Inventory slot : axes.slots())
         {
-            Optional<ItemStack> itemStack = slot.peek();
-            if (itemStack.isPresent())
+            if (SelectionTool.isTool(slot.peek()))
             {
-                Optional<Text> display = itemStack.get().get(Keys.DISPLAY_NAME);
-                if (display.isPresent())
-                {
-                    if ("Selector-Tool".equals(display.get().toPlain()))
-                    {
-                        found = itemStack.get();
-                        slot.clear();
-                        break;
-                    }
-                }
+                found = slot.peek();
+                slot.clear();
+                break;
             }
         }
 
-        Optional<ItemStack> itemInHand = user.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack itemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
         if (found == null)
         {
-            found = Sponge.getGame().getRegistry().createBuilder(ItemStack.Builder.class).itemType(COAL).quantity(1).build();
-            found.offer(COAL_TYPE, CoalTypes.CHARCOAL);
-            found.offer(ITEM_ENCHANTMENTS, Arrays.asList(Enchantment.builder().type(EnchantmentTypes.BINDING_CURSE).level(1).build()));
-            found.offer(DISPLAY_NAME, Text.of(TextColors.BLUE, "Selector-Tool"));
-            found.offer(ITEM_LORE, Arrays.asList(Text.of("created by ", user.getName())));
-
-            user.setItemInHand(HandTypes.MAIN_HAND, found);
-            if (itemInHand.isPresent())
+            found = SelectionTool.newTool(player);
+            player.setItemInHand(HandTypes.MAIN_HAND, found);
+            if (!itemInHand.isEmpty())
             {
-                if (user.getInventory().offer(itemInHand.get()).getType() != InventoryTransactionResult.Type.SUCCESS)
+                if (player.getInventory().offer(itemInHand).revertOnFailure())
                 {
-                    SpawnUtil.spawnItem(itemInHand.get(), user.getLocation());
+                    SpawnUtil.spawnItem(itemInHand, player.getServerLocation());
                 }
             }
-            i18n.send(user, POSITIVE, "Received a new region selector tool");
+            i18n.send(player, POSITIVE, "Received a new region selector tool");
             return;
         }
 
-        user.setItemInHand(HandTypes.MAIN_HAND, found);
-        itemInHand.ifPresent(stack -> user.getInventory().offer(stack));
-        i18n.send(user, POSITIVE, "Found a region selector tool in your inventory!");
+        player.setItemInHand(HandTypes.MAIN_HAND, found);
+        player.getInventory().offer(itemInHand);
+        i18n.send(player, POSITIVE, "Found a region selector tool in your inventory!");
     }
 
     @Command(desc = "Provides you with a wand to select a cuboid")
-    @Restricted(value = Player.class, msg =  "You cannot hold a selection tool!")
-    public void selectiontool(Player context)
+//    @Restricted(value = ServerPlayer.class, msg =  "You cannot hold a selection tool!")
+    public void selectiontool(ServerPlayer context)
     {
         giveSelectionTool(context);
     }

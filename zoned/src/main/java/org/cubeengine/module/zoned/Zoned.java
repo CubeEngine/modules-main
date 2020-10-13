@@ -17,55 +17,55 @@
  */
 package org.cubeengine.module.zoned;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.cubeengine.libcube.CubeEngineModule;
-import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ModuleCommand;
-import org.cubeengine.libcube.service.event.EventManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
+import org.spongepowered.math.vector.Vector3d;
 
-import java.nio.file.Path;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import java.io.IOException;
 
 @Singleton
 @Module
-public class Zoned extends CubeEngineModule
+public class Zoned
 {
-    @Inject private CommandManager cm;
     @Inject private I18n i18n;
-
-    private Path path;
-    @Inject private ModuleManager mm;
     @Inject private Reflector reflector;
-
     @ModuleListener private ZonesListener listener;
     @ModuleCommand private ZonedCommands zonedCommands;
     @ModuleCommand private SelectorCommand selectorCommand;
-    @Inject private TaskManager tm;
-    @Inject private EventManager em;
-
-    private ZoneManager manager;
+    @Inject private ZoneManager manager;
 
     @Listener
-    public void onEnable(GamePreInitializationEvent event)
+    public void onEnable(StartingEngineEvent<Server> event)
     {
         this.reflector.getDefaultConverterManager().registerConverter(new ShapeConverter(), Shape.class);
         this.reflector.getDefaultConverterManager().registerConverter(new Vector3dConverter(), Vector3d.class);
 
-        this.path = mm.getPathFor(Zoned.class);
-        this.manager = new ZoneManager(this, i18n, reflector, mm.getLoggerFor(Zoned.class));
-        this.cm.getProviders().register(this, new ZoneParser(this, manager, i18n), ZoneConfig.class);
+        try
+        {
+            this.manager.loadZones();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Listener
+    public void onRegisterData(RegisterCatalogEvent<DataRegistration> event)
+    {
+        ZonedData.register(event);
     }
 
     public ZoneConfig getActiveZone(Player player)
@@ -76,11 +76,6 @@ public class Zoned extends CubeEngineModule
     public void setActiveZone(Player player, ZoneConfig zone)
     {
         this.listener.setZone(player, zone);
-    }
-
-    public Path getPath()
-    {
-        return this.path;
     }
 
     public ZoneManager getManager()

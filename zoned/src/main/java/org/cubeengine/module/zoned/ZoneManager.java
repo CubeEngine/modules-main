@@ -21,11 +21,13 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
+import com.google.inject.Inject;
+import net.kyori.adventure.audience.Audience;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.logscribe.Log;
 import org.cubeengine.reflect.Reflector;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.World;
 
 import java.io.IOException;
@@ -40,39 +42,35 @@ import java.util.stream.Stream;
 
 public class ZoneManager
 {
+
+    private Path path;
     private Map<String, ZoneConfig> zones = new HashMap<>();
-    private Zoned module;
     private I18n i18n;
     private Reflector reflector;
     private Log logger;
 
-    public ZoneManager(Zoned module, I18n i18n, Reflector reflector, Log logger)
+    @Inject
+    public ZoneManager(I18n i18n, Reflector reflector, ModuleManager mm)
     {
-        this.module = module;
         this.i18n = i18n;
         this.reflector = reflector;
-        this.logger = logger;
-        this.loadZones();
+        this.logger = mm.getLoggerFor(Zoned.class);
+        this.path = mm.getPathFor(Zoned.class);
     }
 
-    private void loadZones()
+    public void loadZones() throws IOException
     {
         this.zones.clear();
-        Path zonesDir = this.module.getPath().resolve("zones");
-        try {
-            Files.createDirectories(zonesDir);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try (Stream<Path> files = Files.walk(zonesDir)){
+        Path zones = this.path.resolve("zones");
+        Files.createDirectories(zones);
+        try (Stream<Path> files = Files.walk(zones))
+        {
             files.filter(f -> !Files.isDirectory(f))
                  .filter(f -> f.toString().endsWith("yml"))
                  .forEach(file -> {
                      ZoneConfig cfg = reflector.load(ZoneConfig.class, file.toFile());
                      this.zones.put(cfg.name, cfg);
                  });
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         logger.info("Loaded {} zones", this.zones.size());
     }
@@ -85,7 +83,7 @@ public class ZoneManager
     }
 
 
-    public void delete(CommandSource context, ZoneConfig zone)
+    public void delete(Audience context, ZoneConfig zone)
     {
         try
         {
@@ -99,9 +97,9 @@ public class ZoneManager
         }
     }
 
-    public void define(CommandSource cmdSource, String name, ZoneConfig cfg, boolean overwrite)
+    public void define(Audience cmdSource, String name, ZoneConfig cfg, boolean overwrite)
     {
-        Path dir = module.getPath().resolve("zones").resolve(cfg.world.getName());
+        Path dir = this.path.resolve("zones").resolve(cfg.world.getName());
         Path file = dir.resolve(name + ".yml");
         if (!overwrite && Files.exists(file))
         {
@@ -128,7 +126,7 @@ public class ZoneManager
         return this.zones.get(token);
     }
 
-    public List<ZoneConfig> getZonesAt(Location<World> location)
+    public List<ZoneConfig> getZonesAt(ServerLocation location)
     {
         return null;
     }

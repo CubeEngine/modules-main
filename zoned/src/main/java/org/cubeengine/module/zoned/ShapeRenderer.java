@@ -17,14 +17,16 @@
  */
 package org.cubeengine.module.zoned;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOptions;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +38,7 @@ public class ShapeRenderer
 {
     private static Map<UUID, UUID> showRegionTasks = new HashMap<>();
 
-    public static boolean toggleShowActiveRegion(TaskManager tm, Player player, Zoned module)
+    public static boolean toggleShowActiveRegion(TaskManager tm, ServerPlayer player, Zoned module)
     {
         UUID task = showRegionTasks.remove(player.getUniqueId());
         if (task != null)
@@ -44,16 +46,17 @@ public class ShapeRenderer
             tm.cancelTask(Zoned.class, task);
             return false;
         }
-        task = tm.runTimer(Zoned.class, () -> ShapeRenderer.showActiveRegion(tm, player, module.getActiveZone(player)), 10, 10);
+        task = tm.runTimer(Zoned.class, () -> ShapeRenderer.showActiveRegion(tm, player.getUniqueId(), module.getActiveZone(player)), 10, 10);
         showRegionTasks.put(player.getUniqueId(), task);
         return true;
     }
 
-    private static void showActiveRegion(TaskManager tm, Player player, ZoneConfig zone)
+    private static void showActiveRegion(TaskManager tm, UUID playerUuid, ZoneConfig zone)
     {
-        if (!player.isOnline())
+        final ServerPlayer player = Sponge.getServer().getPlayer(playerUuid).orElse(null);
+        if (player == null)
         {
-            UUID task = showRegionTasks.remove(player.getUniqueId());
+            UUID task = showRegionTasks.remove(playerUuid);
             tm.cancelTask(Zoned.class, task);
             return;
         }
@@ -118,7 +121,7 @@ public class ShapeRenderer
         for (Map.Entry<Color, List<Vector3d>> entry : particles.entrySet()) {
             for (Vector3d vec : entry.getValue()) {
                 player.spawnParticles(ParticleEffect.builder()
-                                .type(ParticleTypes.REDSTONE_DUST)
+                                .type(ParticleTypes.DUST)
                                 .option(ParticleOptions.COLOR, entry.getKey())
                                 .build(),
                         position.add(vec));

@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.zoned;
 
-import com.flowpowered.math.vector.Vector3d;
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.converter.ConverterManager;
 import org.cubeengine.converter.converter.ClassedConverter;
@@ -26,6 +25,7 @@ import org.cubeengine.converter.node.Node;
 import org.cubeengine.converter.node.StringNode;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.libcube.util.math.shape.Shape;
+import org.spongepowered.math.vector.Vector3d;
 
 public class ShapeConverter implements ClassedConverter<Shape>
 {

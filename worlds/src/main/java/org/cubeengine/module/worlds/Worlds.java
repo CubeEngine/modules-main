@@ -19,7 +19,7 @@ package org.cubeengine.module.worlds;
 
 import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ModuleCommand;
+import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.processor.Module;
 import org.spongepowered.api.event.Listener;

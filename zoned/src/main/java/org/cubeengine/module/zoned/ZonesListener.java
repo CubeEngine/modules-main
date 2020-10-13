@@ -21,25 +21,25 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.spongepowered.api.block.BlockTypes.AIR;
 
+import com.google.inject.Inject;
+import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.reflect.Reflector;
-import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import javax.inject.Inject;
 
 public class ZonesListener
 {
@@ -58,30 +58,14 @@ public class ZonesListener
     }
 
     @Listener
-    public void onInteract(InteractBlockEvent event, @First Player player)
+    public void onInteract(InteractBlockEvent event, @First ServerPlayer player)
     {
-        if (!(event instanceof InteractBlockEvent.Primary.MainHand) && !(event instanceof InteractBlockEvent.Secondary.MainHand))
-        {
+        if (!event.getContext().get(EventContextKeys.USED_HAND).map(hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false)) {
             return;
         }
 
-        if (event.getTargetBlock() == BlockSnapshot.NONE)
-        {
-            return;
-        }
-        Location<World> block = event.getTargetBlock().getLocation().get();
-        if ((int)block.getPosition().length() == 0 || block.getBlockType() == AIR)
-        {
-            return;
-        }
-        if (!SelectionTool.inHand(player))
-        {
-            return;
-        }
-
-
-        if (!player.hasPermission(selectPerm.getId()))
-        {
+        final ServerLocation block = player.getWorld().getLocation(event.getBlock().getPosition());
+        if (block.getBlockType().isAnyOf(AIR) || !SelectionTool.inHand(player) || !player.hasPermission(selectPerm.getId())) {
             return;
         }
 
@@ -99,8 +83,8 @@ public class ZonesListener
             }
         }
 
-        Text added = config.addPoint(i18n, player, event instanceof InteractBlockEvent.Primary, block.getPosition());
-        Text selected = config.getSelected(i18n, player);
+        Component added = config.addPoint(i18n, player, event instanceof InteractBlockEvent.Primary, block.getPosition());
+        Component selected = config.getSelected(i18n, player);
 
         i18n.send(player, POSITIVE, "{txt} ({integer}, {integer}, {integer}). {txt}",
                 added, block.getBlockX(), block.getBlockY(), block.getBlockZ(), selected);

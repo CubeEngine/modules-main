@@ -17,9 +17,9 @@
  */
 package org.cubeengine.module.zoned;
 
-import static org.spongepowered.api.text.format.TextColors.GRAY;
-
-import com.flowpowered.math.vector.Vector3d;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
@@ -27,8 +27,8 @@ import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextFormat;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.math.vector.Vector3d;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,7 +44,7 @@ public class ZoneConfig extends ReflectedYaml
     private Map<Integer, Vector3d> vectors = new HashMap<>();
     private Class<? extends Shape> currentShape = Cuboid.class;
 
-    public Text addPoint(I18n i18n, Player player, boolean primary, Vector3d loc)
+    public Component addPoint(I18n i18n, ServerPlayer player, boolean primary, Vector3d loc)
     {
         if (currentShape == Cuboid.class)
         {
@@ -69,11 +69,11 @@ public class ZoneConfig extends ReflectedYaml
             // TODO additional shapes
         }
         shape = null;
-        return Text.of("UNSUPPORTED SHAPE ", currentShape.getSimpleName());
+        return Component.text("UNSUPPORTED SHAPE " + currentShape.getSimpleName());
 
     }
 
-    public Text getSelected(I18n i18n, Player player)
+    public Component getSelected(I18n i18n, ServerPlayer player)
     {
         if (currentShape == Cuboid.class)
         {
@@ -86,18 +86,18 @@ public class ZoneConfig extends ReflectedYaml
                         (Math.abs(size.getY()) + 1) *
                         (Math.abs(size.getZ()) + 1));
 
-                return i18n.translate(player, TextFormat.of(GRAY), "{amount} blocks selected", count);
+                return i18n.translate(player, Style.empty().color(NamedTextColor.GRAY), "{amount} blocks selected", count);
             }
             else
             {
-                return i18n.translate(player, TextFormat.of(GRAY), "incomplete selection");
+                return i18n.translate(player, Style.empty().color(NamedTextColor.GRAY), "incomplete selection");
             }
         }
         else
         {
             // TODO additional shapes
         }
-        return Text.of("UNSUPPORTED SHAPE ", currentShape.getSimpleName());
+        return Component.text("UNSUPPORTED SHAPE " + currentShape.getSimpleName());
     }
 
     public ZoneConfig name(String name)
