@@ -15,16 +15,15 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.zoned;
+package org.cubeengine.module.zoned.config;
 
+import java.util.List;
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.converter.converter.SimpleConverter;
 import org.cubeengine.converter.node.DoubleNode;
 import org.cubeengine.converter.node.ListNode;
 import org.cubeengine.converter.node.Node;
 import org.spongepowered.math.vector.Vector3d;
-
-import java.util.List;
 
 public class Vector3dConverter extends SimpleConverter<Vector3d>
 {
@@ -46,7 +45,7 @@ public class Vector3dConverter extends SimpleConverter<Vector3d>
         {
             throw ConversionException.of(this, node, "Node is not a ListNode");
         }
-        List<Node> value = ((ListNode) node).getValue();
+        List<Node> value = ((ListNode)node).getValue();
         double x = Double.parseDouble(value.get(0).asText());
         double y = Double.parseDouble(value.get(1).asText());
         double z = Double.parseDouble(value.get(2).asText());

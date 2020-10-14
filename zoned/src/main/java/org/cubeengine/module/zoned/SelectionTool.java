@@ -17,8 +17,7 @@
  */
 package org.cubeengine.module.zoned;
 
-import static org.spongepowered.api.item.ItemTypes.COAL;
-
+import java.util.Arrays;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.api.data.Keys;
@@ -29,7 +28,7 @@ import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 
-import java.util.Arrays;
+import static org.spongepowered.api.item.ItemTypes.COAL;
 
 public class SelectionTool
 {

@@ -15,8 +15,10 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.zoned;
+package org.cubeengine.module.zoned.config;
 
+import java.util.HashMap;
+import java.util.Map;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -26,12 +28,8 @@ import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.math.vector.Vector3d;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class ZoneConfig extends ReflectedYaml
 {
@@ -70,7 +68,6 @@ public class ZoneConfig extends ReflectedYaml
         }
         shape = null;
         return Component.text("UNSUPPORTED SHAPE " + currentShape.getSimpleName());
-
     }
 
     public Component getSelected(I18n i18n, ServerPlayer player)
@@ -82,9 +79,7 @@ public class ZoneConfig extends ReflectedYaml
                 Vector3d pos1 = vectors.get(1);
                 Vector3d pos2 = vectors.get(2);
                 Vector3d size = pos1.sub(pos2);
-                int count = (int)((Math.abs(size.getX()) + 1) *
-                        (Math.abs(size.getY()) + 1) *
-                        (Math.abs(size.getZ()) + 1));
+                int count = (int)((Math.abs(size.getX()) + 1) * (Math.abs(size.getY()) + 1) * (Math.abs(size.getZ()) + 1));
 
                 return i18n.translate(player, Style.empty().color(NamedTextColor.GRAY), "{amount} blocks selected", count);
             }
@@ -128,6 +123,4 @@ public class ZoneConfig extends ReflectedYaml
         clone.world = this.world;
         return clone;
     }
-
-
 }

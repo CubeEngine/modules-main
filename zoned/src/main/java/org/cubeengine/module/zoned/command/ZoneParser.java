@@ -15,14 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.zoned;
+package org.cubeengine.module.zoned.command;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import com.google.inject.Inject;
 import net.kyori.adventure.audience.Audience;
 import org.cubeengine.libcube.service.command.DefaultParameterProvider;
 import org.cubeengine.libcube.service.command.annotation.ParserFor;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
+import org.cubeengine.module.zoned.config.ZoneConfig;
+import org.cubeengine.module.zoned.ZoneManager;
+import org.cubeengine.module.zoned.Zoned;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
@@ -33,10 +39,6 @@ import org.spongepowered.api.command.parameter.managed.ValueParser;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.server.ServerWorld;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @ParserFor(ZoneConfig.class)
 public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, DefaultParameterProvider<ZoneConfig>
@@ -59,12 +61,12 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
         // TODO for other command-sources?
         if (cause.getAudience() instanceof ServerPlayer)
         {
-            ZoneConfig zone = module.getActiveZone(((ServerPlayer) cause.getAudience()));
+            ZoneConfig zone = module.getActiveZone(((ServerPlayer)cause.getAudience()));
             if (zone != null)
             {
                 return zone;
             }
-            List<ZoneConfig> zones = manager.getZonesAt(((ServerPlayer) cause.getAudience()).getServerLocation());
+            List<ZoneConfig> zones = manager.getZonesAt(((ServerPlayer)cause.getAudience()).getServerLocation());
             if (!zones.isEmpty())
             {
                 return zones.get(0);
@@ -84,7 +86,7 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
         boolean isLocatable = context.getCause().getAudience() instanceof Locatable;
         if (isLocatable)
         {
-            world = ((Locatable) context.getCause().getAudience()).getServerLocation().getWorld();
+            world = ((Locatable)context.getCause().getAudience()).getServerLocation().getWorld();
             for (ZoneConfig zone : manager.getZones(null, world))
             {
                 if (zone.name == null)
@@ -107,7 +109,7 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
             }
              */
             if (world != null && zone.world.getWorld().getUniqueId().equals(world.getUniqueId())
-                    && !world.getKey().toString().startsWith(token.replace(".", "")))
+                && !world.getKey().toString().startsWith(token.replace(".", "")))
             {
                 continue; // Skip if already without world ; except when token starts with world
             }
@@ -152,16 +154,19 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
     }
 
     @Override
-    public Optional<? extends ZoneConfig> getValue(Parameter.Key<? super ZoneConfig> parameterKey, ArgumentReader.Mutable reader,
-            CommandContext.Builder context) throws ArgumentParseException {
+    public Optional<? extends ZoneConfig> getValue(Parameter.Key<? super ZoneConfig> parameterKey,
+                                                   ArgumentReader.Mutable reader,
+                                                   CommandContext.Builder context) throws ArgumentParseException
+    {
         final Audience audience = context.getCause().getAudience();
 
-        final String token = reader.parseString().toLowerCase();
+        final String token = reader.parseUnquotedString().toLowerCase();
         if (audience instanceof Locatable)
         {
-            ServerWorld world = ((Locatable) audience).getServerLocation().getWorld();
+            ServerWorld world = ((Locatable)audience).getServerLocation().getWorld();
             ZoneConfig zone = manager.getZone(token);
-            if (zone != null) {
+            if (zone != null)
+            {
                 return Optional.of(zone);
             }
             /* TODO world regions
@@ -199,8 +204,6 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
             return manager.getGlobalZoneConfig();
         }
         */
-        audience.sendMessage(i18n.translate(audience, MessageType.NEGATIVE, "There is no zone named {name}", token));;
-        return Optional.empty();
+        throw reader.createException(i18n.translate(audience, MessageType.NEGATIVE, "There is no zone named {name}", token));
     }
-
 }

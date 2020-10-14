@@ -15,14 +15,14 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.zoned;
-
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+package org.cubeengine.module.zoned.command;
 
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.SpawnUtil;
+import org.cubeengine.module.zoned.SelectionTool;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemTypes;
@@ -30,8 +30,12 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.query.QueryTypes;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+
+@Singleton
 public class SelectorCommand
 {
+
     private I18n i18n;
 
     @Inject
@@ -76,7 +80,7 @@ public class SelectorCommand
     }
 
     @Command(desc = "Provides you with a wand to select a cuboid")
-//    @Restricted(value = ServerPlayer.class, msg =  "You cannot hold a selection tool!")
+    //    @Restricted(value = ServerPlayer.class, msg =  "You cannot hold a selection tool!")
     public void selectiontool(ServerPlayer context)
     {
         giveSelectionTool(context);

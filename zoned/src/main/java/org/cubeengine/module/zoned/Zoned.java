@@ -17,12 +17,17 @@
  */
 package org.cubeengine.module.zoned;
 
+import java.io.IOException;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.event.ModuleListener;
-import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.math.shape.Shape;
+import org.cubeengine.module.zoned.command.SelectorCommand;
+import org.cubeengine.module.zoned.command.ZonedCommands;
+import org.cubeengine.module.zoned.config.ShapeConverter;
+import org.cubeengine.module.zoned.config.Vector3dConverter;
+import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Server;
@@ -33,15 +38,12 @@ import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.math.vector.Vector3d;
 
-import java.io.IOException;
-
 @Singleton
 @Module
 public class Zoned
 {
-    @Inject private I18n i18n;
     @Inject private Reflector reflector;
-    @ModuleListener private ZonesListener listener;
+    @ModuleListener private ZonedListener listener;
     @ModuleCommand private ZonedCommands zonedCommands;
     @ModuleCommand private SelectorCommand selectorCommand;
     @Inject private ZoneManager manager;

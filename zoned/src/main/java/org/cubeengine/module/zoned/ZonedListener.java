@@ -17,16 +17,17 @@
  */
 package org.cubeengine.module.zoned;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.block.BlockTypes.AIR;
-
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -37,11 +38,12 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.ServerLocation;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.spongepowered.api.block.BlockTypes.AIR;
 
-public class ZonesListener
+@Singleton
+public class ZonedListener
 {
     private Map<UUID, ZoneConfig> zonesByPlayer = new HashMap<>();
 
@@ -50,22 +52,26 @@ public class ZonesListener
     private Reflector reflector;
 
     @Inject
-    public ZonesListener(I18n i18n, PermissionManager pm, Reflector reflector)
+    public ZonedListener(I18n i18n, PermissionManager pm, Reflector reflector)
     {
         this.i18n = i18n;
-        selectPerm = pm.register(Zoned.class, "use-tool", "Allows using the selector tool",null);
+        selectPerm = pm.register(Zoned.class, "use-tool", "Allows using the selector tool", null);
         this.reflector = reflector;
     }
 
     @Listener
     public void onInteract(InteractBlockEvent event, @First ServerPlayer player)
     {
-        if (!event.getContext().get(EventContextKeys.USED_HAND).map(hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false)) {
+        if (!event.getContext().get(EventContextKeys.USED_HAND).map(
+            hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        {
             return;
         }
 
         final ServerLocation block = player.getWorld().getLocation(event.getBlock().getPosition());
-        if (block.getBlockType().isAnyOf(AIR) || !SelectionTool.inHand(player) || !player.hasPermission(selectPerm.getId())) {
+        if (block.getBlockType().isAnyOf(AIR) || !SelectionTool.inHand(player) || !player.hasPermission(
+            selectPerm.getId()))
+        {
             return;
         }
 
@@ -83,17 +89,18 @@ public class ZonesListener
             }
         }
 
-        Component added = config.addPoint(i18n, player, event instanceof InteractBlockEvent.Primary, block.getPosition());
+        Component added = config.addPoint(i18n, player, event instanceof InteractBlockEvent.Primary,
+                                          block.getPosition());
         Component selected = config.getSelected(i18n, player);
 
-        i18n.send(player, POSITIVE, "{txt} ({integer}, {integer}, {integer}). {txt}",
-                added, block.getBlockX(), block.getBlockY(), block.getBlockZ(), selected);
+        i18n.send(player, POSITIVE, "{txt} ({integer}, {integer}, {integer}). {txt}", added, block.getBlockX(),
+                  block.getBlockY(), block.getBlockZ(), selected);
         event.setCancelled(true);
     }
 
     public ZoneConfig getZone(Player player)
     {
-        return zonesByPlayer.computeIfAbsent(player.getUniqueId(), k ->  reflector.create(ZoneConfig.class));
+        return zonesByPlayer.computeIfAbsent(player.getUniqueId(), k -> reflector.create(ZoneConfig.class));
     }
 
     public void setZone(Player player, ZoneConfig zone)

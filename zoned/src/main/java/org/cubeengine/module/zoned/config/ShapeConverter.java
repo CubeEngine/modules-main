@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.zoned;
+package org.cubeengine.module.zoned.config;
 
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.converter.ConverterManager;
@@ -36,7 +36,7 @@ public class ShapeConverter implements ClassedConverter<Shape>
         if (shape instanceof Cuboid)
         {
             MapNode node = MapNode.emptyMap();
-            Cuboid cuboid = (Cuboid) shape;
+            Cuboid cuboid = (Cuboid)shape;
             node.set("type", StringNode.of(shape.getClass().getName()));
             Vector3d min = cuboid.getMinimumPoint();
             Vector3d max = cuboid.getMaximumPoint();
@@ -50,8 +50,9 @@ public class ShapeConverter implements ClassedConverter<Shape>
     @Override
     public Shape fromNode(Node node, Class<? extends Shape> type, ConverterManager manager) throws ConversionException
     {
-        if (node instanceof MapNode) {
-            MapNode map = (MapNode) node;
+        if (node instanceof MapNode)
+        {
+            MapNode map = (MapNode)node;
             switch (map.get("type").asText())
             {
                 case "org.cubeengine.libcube.util.math.shape.Cuboid":
@@ -62,7 +63,6 @@ public class ShapeConverter implements ClassedConverter<Shape>
                 default:
                     throw new UnsupportedOperationException("Unsupported Shape");
             }
-
         }
         throw new UnsupportedOperationException("Invalid Shape Data " + node.asString());
     }

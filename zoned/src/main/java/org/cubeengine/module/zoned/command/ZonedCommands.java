@@ -15,16 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.zoned;
+package org.cubeengine.module.zoned.command;
 
-import static net.kyori.adventure.text.format.NamedTextColor.GOLD;
-import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
-import static org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType.ACTION_BAR;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-
+import java.util.ArrayDeque;
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Queue;
+import java.util.Set;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.command.DispatcherCommand;
@@ -40,13 +40,18 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.util.math.shape.CompositeShape;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
+import org.cubeengine.module.zoned.ShapeRenderer;
+import org.cubeengine.module.zoned.config.ZoneConfig;
+import org.cubeengine.module.zoned.Zoned;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.ServerLocation;
@@ -55,17 +60,16 @@ import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
-import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Queue;
-import java.util.Set;
+import static net.kyori.adventure.text.format.NamedTextColor.GOLD;
+import static net.kyori.adventure.text.format.NamedTextColor.WHITE;
+import static org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType.ACTION_BAR;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
+@Singleton
 @Command(name = "zone", desc = "Manages zones")
 @Using(ZoneParser.class)
-public class ZonedCommands extends DispatcherCommand {
+public class ZonedCommands extends DispatcherCommand
+{
 
     private Zoned module;
     private I18n i18n;
@@ -110,16 +114,17 @@ public class ZonedCommands extends DispatcherCommand {
     public void list(Audience context, @Option String match, @Named("in") ServerWorld world)
     {
         Collection<ZoneConfig> zones = this.module.getManager().getZones(match, world);
-        if (zones.isEmpty()) {
+        if (zones.isEmpty())
+        {
             i18n.send(context, NEGATIVE, "No Zones found");
             return;
         }
         i18n.send(context, NEUTRAL, "The following zones were found:");
-        for (ZoneConfig zone : zones) {
-            context.sendMessage(Component.empty().append(Component.text(" - "))
-                    .append(Component.text(zone.world.getName(), GOLD))
-                    .append(Component.text(".", WHITE))
-                    .append(Component.text(zone.name, GOLD)));
+        for (ZoneConfig zone : zones)
+        {
+            context.sendMessage(Component.empty().append(Component.text(" - ")).append(
+                Component.text(zone.world.getName(), GOLD)).append(Component.text(".", WHITE)).append(
+                Component.text(zone.name, GOLD)));
         }
     }
 
@@ -141,15 +146,30 @@ public class ZonedCommands extends DispatcherCommand {
         this.module.getManager().delete(context, zone);
     }
 
-    @Command(desc = "Toggles particles for the currently selected region")
-    public void show(ServerPlayer context)
+    @Command(desc = "Toggles particles for the currently selected zone")
+    public void show(ServerPlayer context, @Option ZoneConfig zone)
     {
-        if (!ShapeRenderer.toggleShowActiveRegion(tm, context, module))
+        if (zone != null)
         {
-            i18n.send(ACTION_BAR, context, POSITIVE, "Stopped showing active region.");
+            if (this.module.getActiveZone(context) != zone)
+            {
+                this.module.setActiveZone(context, zone);
+                if (ShapeRenderer.isShowingActiveZone(context))
+                {
+                    return;
+                }
+            }
+        }
+        if (this.module.getActiveZone(context) == null)
+        {
+            i18n.send(ACTION_BAR, context, NEGATIVE, "You don't have an active zone");
+        }
+        if (!ShapeRenderer.toggleShowActiveZone(tm, context, module))
+        {
+            i18n.send(ACTION_BAR, context, POSITIVE, "Stopped showing active zone.");
             return;
         }
-        i18n.send(ACTION_BAR, context, POSITIVE, "Started showing active region.");
+        i18n.send(ACTION_BAR, context, POSITIVE, "Started showing active zone.");
     }
 
     @Command(desc = "Teleports to a zone", alias = "tp")
@@ -159,14 +179,18 @@ public class ZonedCommands extends DispatcherCommand {
         Vector3d middle = boundingCuboid.getMinimumPoint().add(boundingCuboid.getMaximumPoint()).div(2);
         ServerLocation loc = zone.world.getWorld().getLocation(middle);
         GameMode mode = context.get(Keys.GAME_MODE).orElse(null);
-        if (mode != GameModes.SPECTATOR) {
-            int h = (int) boundingCuboid.getHeight() / 2 + 1;
-            int w = (int) Math.max(boundingCuboid.getWidth() / 2 + 1, boundingCuboid.getDepth() / 2 + 1);
-            java.util.Optional<ServerLocation> adjusted =
-                    Sponge.getServer().getTeleportHelper().getSafeLocation(loc, Math.max(h, 5), Math.max(w, 5), ((int) boundingCuboid.getHeight()),
-                            mode == GameModes.CREATIVE ? TeleportHelperFilters.FLYING.get() : TeleportHelperFilters.DEFAULT.get());
-            if (!adjusted.isPresent() && !force) {
-                i18n.send(ACTION_BAR, context, POSITIVE, "Could not find a safe spot in region. Use -force to teleport anyways");
+        if (mode != GameModes.SPECTATOR)
+        {
+            int h = (int)boundingCuboid.getHeight() / 2 + 1;
+            int w = (int)Math.max(boundingCuboid.getWidth() / 2 + 1, boundingCuboid.getDepth() / 2 + 1);
+            java.util.Optional<ServerLocation> adjusted = Sponge.getServer().getTeleportHelper()
+                .getSafeLocation(loc, Math.max(h, 5), Math.max(w, 5),
+                                 ((int)boundingCuboid.getHeight()),
+                                 mode == GameModes.CREATIVE ? TeleportHelperFilters.FLYING.get() : TeleportHelperFilters.DEFAULT.get());
+            if (!adjusted.isPresent() && !force)
+            {
+                i18n.send(ACTION_BAR, context, POSITIVE,
+                          "Could not find a safe spot in zone. Use -force to teleport anyways");
                 return;
             }
             loc = adjusted.orElse(loc);
@@ -179,8 +203,7 @@ public class ZonedCommands extends DispatcherCommand {
     public void circuitSelect(ServerPlayer player)
     {
         Set<Direction> directions = EnumSet.of(Direction.DOWN, Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
-        em.listenUntil(this.module.getClass(), InteractBlockEvent.Secondary.class, e -> e.getCause().root().equals(player),
-                e -> this.circuitSelect(e, player, directions));
+        em.listenUntil(this.module.getClass(), InteractBlockEvent.Secondary.class, e -> e.getCause().root().equals(player), e -> this.circuitSelect(e, player, directions));
         i18n.send(player, POSITIVE, "Select a piece of your redstone circuit.");
     }
 
@@ -199,93 +222,80 @@ public class ZonedCommands extends DispatcherCommand {
         // TODO select part
         i18n.send(context, POSITIVE, "Part {number} of composite zone selected.", part);
         i18n.send(context, POSITIVE, "Part {number} does not exist yet", part);
-
     }
 
     private boolean circuitSelect(InteractBlockEvent.Secondary e, ServerPlayer player, Set<Direction> directions)
     {
-        e.setCancelled(true);
-        final Optional<Vector3d> target = e.getInteractionPoint();
-        final ServerWorld world = player.getWorld();
-        if (target.isPresent())
+        if (!e.getContext().get(EventContextKeys.USED_HAND).map(h -> h.equals(HandTypes.MAIN_HAND.get())).orElse(false))
         {
-            Vector3i start = target.get().toInt();
-            if (world.getBlock(start).supports(Keys.IS_POWERED))
-            {
-                Set<Vector3i> knownLocations = new HashSet<>();
-                Set<Vector3i> poweringLocations = new HashSet<>();
-                Vector3i min = start;
-                Vector3i max = min;
-
-                Queue<Vector3i> next = new ArrayDeque<>();
-                next.offer(start);
-                if (isPowering(world, start)) {
-                    poweringLocations.add(start);
-                }
-
-                while (!next.isEmpty())
-                {
-                    final Vector3i current = next.poll();
-                    knownLocations.add(current);
-                    for (Direction dir : directions)
-                    {
-                        final Vector3i pos = current.add(dir.asBlockOffset());
-                        if (!knownLocations.contains(pos)) {
-                            if (isPowering(world, pos))
-                            {
-                                poweringLocations.add(pos);
-                                next.add(pos);
-
-                                min = min.min(pos);
-                                max = max.max(pos);
-                            }
-                            if (poweringLocations.contains(current))
-                            {
-                                next.add(pos);
-                            }
-                        }
-                    }
-
-                    if (knownLocations.size() > 1000)
-                    {
-                        break;
-                    }
-                }
-
-
-                ZoneConfig cfg = module.getActiveZone(player);
-                cfg.world = new ConfigWorld(world);
-                cfg.shape = new Cuboid(min.toDouble(), max.sub(min).toDouble());
-
-                i18n.send(player, POSITIVE, "Minimum: x={number} y={number} z={number}", min.getX(), min.getY(), min.getZ());
-                i18n.send(player, POSITIVE, "Maximum: x={number} y={number} z={number}", max.getX(), max.getY(), max.getZ());
-                i18n.send(player, POSITIVE, "Redstone blocks contained in region: {number}", poweringLocations.size());
-
-                return true;
-
-            }
-            else
-            {
-                i18n.send(player, NEGATIVE, "Click a redstone powered block!");
-                return false;
-            }
-
-        }
-        else
-        {
-            i18n.send(player, NEGATIVE, "Block had no location.");
             return false;
         }
+        e.setCancelled(true);
+        final ServerWorld world = player.getWorld();
+        Vector3i start = e.getBlock().getPosition();
+        if (!isPowering(world, start))
+        {
+            i18n.send(player, NEGATIVE, "Click a redstone powered block!");
+            return true;
+        }
+        Set<Vector3i> knownLocations = new HashSet<>();
+        Set<Vector3i> poweringLocations = new HashSet<>();
+        Vector3i min = start;
+        Vector3i max = min;
+
+        Queue<Vector3i> next = new ArrayDeque<>();
+        next.offer(start);
+        if (isPowering(world, start))
+        {
+            poweringLocations.add(start);
+        }
+
+        while (!next.isEmpty())
+        {
+            final Vector3i current = next.poll();
+            knownLocations.add(current);
+            for (Direction dir : directions)
+            {
+                final Vector3i pos = current.add(dir.asBlockOffset());
+                if (!knownLocations.contains(pos))
+                {
+                    if (isPowering(world, pos))
+                    {
+                        poweringLocations.add(pos);
+                        next.add(pos);
+
+                        min = min.min(pos);
+                        max = max.max(pos);
+                    }
+                    if (poweringLocations.contains(current))
+                    {
+                        next.add(pos);
+                    }
+                }
+            }
+
+            if (knownLocations.size() > 1000)
+            {
+                break;
+            }
+        }
+
+        ZoneConfig cfg = module.getActiveZone(player);
+        cfg.world = new ConfigWorld(world);
+        cfg.shape = new Cuboid(min.toDouble(), max.sub(min).toDouble());
+
+        i18n.send(player, POSITIVE, "Minimum: x={number} y={number} z={number}", min.getX(), min.getY(), min.getZ());
+        i18n.send(player, POSITIVE, "Maximum: x={number} y={number} z={number}", max.getX(), max.getY(), max.getZ());
+        i18n.send(player, POSITIVE, "Redstone blocks contained in zone: {number}", poweringLocations.size());
+
+        return true;
     }
 
     private boolean isPowering(ServerWorld world, Vector3i pos)
     {
         final BlockState state = world.getBlock(pos);
-        return state.supports(Keys.POWER) || state.supports(Keys.IS_POWERED) ||
-                state.getType().isAnyOf(BlockTypes.REDSTONE_TORCH, BlockTypes.REDSTONE_WALL_TORCH,
-                    BlockTypes.REPEATER, BlockTypes.PISTON, BlockTypes.PISTON_HEAD,
-                    BlockTypes.MOVING_PISTON,  BlockTypes.STICKY_PISTON, BlockTypes.SLIME_BLOCK
-                );
+        return state.supports(Keys.POWER) || state.supports(Keys.IS_POWERED) || state.getType().isAnyOf(
+            BlockTypes.REDSTONE_TORCH, BlockTypes.REDSTONE_WALL_TORCH, BlockTypes.REPEATER, BlockTypes.PISTON,
+            BlockTypes.PISTON_HEAD, BlockTypes.MOVING_PISTON, BlockTypes.STICKY_PISTON, BlockTypes.SLIME_BLOCK);
     }
-
 }

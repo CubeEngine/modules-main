@@ -17,19 +17,6 @@
  */
 package org.cubeengine.module.zoned;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-
-import com.google.inject.Inject;
-import net.kyori.adventure.audience.Audience;
-import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.reflect.Reflector;
-import org.spongepowered.api.world.ServerLocation;
-import org.spongepowered.api.world.World;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,10 +26,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.audience.Audience;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.logscribe.Log;
+import org.cubeengine.module.zoned.config.ZoneConfig;
+import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+
+@Singleton
 public class ZoneManager
 {
-
     private Path path;
     private Map<String, ZoneConfig> zones = new HashMap<>();
     private I18n i18n;
@@ -65,21 +64,19 @@ public class ZoneManager
         Files.createDirectories(zones);
         try (Stream<Path> files = Files.walk(zones))
         {
-            files.filter(f -> !Files.isDirectory(f))
-                 .filter(f -> f.toString().endsWith("yml"))
-                 .forEach(file -> {
-                     ZoneConfig cfg = reflector.load(ZoneConfig.class, file.toFile());
-                     this.zones.put(cfg.name, cfg);
-                 });
+            files.filter(f -> !Files.isDirectory(f)).filter(f -> f.toString().endsWith("yml")).forEach(file -> {
+                ZoneConfig cfg = reflector.load(ZoneConfig.class, file.toFile());
+                this.zones.put(cfg.name, cfg);
+            });
         }
         logger.info("Loaded {} zones", this.zones.size());
     }
 
-    public Collection<ZoneConfig> getZones(String match, World world)
+    public Collection<ZoneConfig> getZones(String match, ServerWorld world)
     {
         return zones.values().stream().filter(z -> world == null || z.world.getWorld() == world)
-                // TODO fuzzy match
-                .filter(z -> match == null || z.name.equalsIgnoreCase(match)).collect(Collectors.toList());
+                    // TODO fuzzy match
+                    .filter(z -> match == null || z.name.equalsIgnoreCase(match) || z.name.startsWith(match)).collect(Collectors.toList());
     }
 
 
@@ -89,7 +86,7 @@ public class ZoneManager
         {
             Files.delete(zone.getFile().toPath());
             this.zones.remove(zone.name);
-            i18n.send(context, POSITIVE, "The region {name} was deleted.", zone.toString());
+            i18n.send(context, POSITIVE, "The zone {name} was deleted.", zone.name);
         }
         catch (IOException e)
         {

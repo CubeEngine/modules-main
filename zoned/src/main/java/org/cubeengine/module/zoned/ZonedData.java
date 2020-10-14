@@ -25,22 +25,19 @@ import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 import org.spongepowered.api.util.TypeTokens;
 
-public interface ZonedData {
+public interface ZonedData
+{
 
-    Key<Value<String>> ZONE_TYPE = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-type"))
-            .type(TypeTokens.STRING_VALUE_TOKEN).build();
+    Key<Value<String>> ZONE_TYPE = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-type")).type(TypeTokens.STRING_VALUE_TOKEN).build();
 
-    static void register(RegisterCatalogEvent<DataRegistration> event) {
-        final DataStore dataStore = DataStore.builder()
-                .key(ZonedData.ZONE_TYPE, "zone-type")
-                .holder(TypeTokens.ITEM_STACK_TOKEN)
-                .build();
-
+    static void register(RegisterCatalogEvent<DataRegistration> event)
+    {
+        final DataStore dataStore = DataStore.builder().key(ZonedData.ZONE_TYPE, "zone-type").holder(TypeTokens.ITEM_STACK_TOKEN).build();
         final DataRegistration registration = DataRegistration.builder()
-                .key(ZonedData.ZONE_TYPE)
-                .store(dataStore)
-                .key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-type"))
-                .build();
+            .key(ZonedData.ZONE_TYPE)
+            .store(dataStore)
+            .key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-type"))
+            .build();
         event.register(registration);
     }
 }

@@ -21,7 +21,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.protector.RegionManager;
-import org.cubeengine.module.zoned.ZoneConfig;
+import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;

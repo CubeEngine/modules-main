@@ -26,7 +26,7 @@ import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
-import org.cubeengine.module.zoned.ZoneConfig;
+import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.cubeengine.module.zoned.Zoned;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Sponge;

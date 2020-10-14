@@ -17,8 +17,14 @@
  */
 package org.cubeengine.module.zoned;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
+import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleOptions;
@@ -28,17 +34,11 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.math.vector.Vector3d;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
 public class ShapeRenderer
 {
-    private static Map<UUID, UUID> showRegionTasks = new HashMap<>();
+    private static final Map<UUID, UUID> showRegionTasks = new HashMap<>();
 
-    public static boolean toggleShowActiveRegion(TaskManager tm, ServerPlayer player, Zoned module)
+    public static boolean toggleShowActiveZone(TaskManager tm, ServerPlayer player, Zoned module)
     {
         UUID task = showRegionTasks.remove(player.getUniqueId());
         if (task != null)
@@ -46,9 +46,16 @@ public class ShapeRenderer
             tm.cancelTask(Zoned.class, task);
             return false;
         }
-        task = tm.runTimer(Zoned.class, () -> ShapeRenderer.showActiveRegion(tm, player.getUniqueId(), module.getActiveZone(player)), 10, 10);
+        task = tm.runTimer(Zoned.class,
+                           () -> ShapeRenderer.showActiveRegion(tm, player.getUniqueId(), module.getActiveZone(player)),
+                           10, 10);
         showRegionTasks.put(player.getUniqueId(), task);
         return true;
+    }
+
+    public static boolean isShowingActiveZone(ServerPlayer player)
+    {
+        return showRegionTasks.containsKey(player.getUniqueId());
     }
 
     private static void showActiveRegion(TaskManager tm, UUID playerUuid, ZoneConfig zone)
@@ -57,7 +64,10 @@ public class ShapeRenderer
         if (player == null)
         {
             UUID task = showRegionTasks.remove(playerUuid);
-            tm.cancelTask(Zoned.class, task);
+            if (task != null)
+            {
+                tm.cancelTask(Zoned.class, task);
+            }
             return;
         }
 
@@ -66,8 +76,7 @@ public class ShapeRenderer
             return; // Skip no complete zone selected
         }
 
-
-        Cuboid cuboid = ((Cuboid) zone.shape); // TODO other shapes
+        Cuboid cuboid = ((Cuboid)zone.shape); // TODO other shapes
         Vector3d mmm = cuboid.getMinimumPoint().add(-0.5, -0.5, -0.5);
         Vector3d xxx = cuboid.getMaximumPoint().add(0.5, 0.5, 0.5);
 
@@ -82,7 +91,7 @@ public class ShapeRenderer
         Map<Color, List<Vector3d>> particles = new HashMap<>();
         List<Vector3d> red = new ArrayList<>();
         particles.put(Color.RED, red);
-        int stepZ = ((int) mmm.distance(mmx)) * 5;
+        int stepZ = ((int)mmm.distance(mmx)) * 5;
         linePoints(red, mmm, xmm, stepZ);
         linePoints(red, mmx, xmx, stepZ);
         linePoints(red, xxx, mxx, stepZ);
@@ -90,7 +99,7 @@ public class ShapeRenderer
 
         List<Vector3d> green = new ArrayList<>();
         particles.put(Color.GREEN, green);
-        int stepY = ((int) mmm.distance(mxm)) * 5;
+        int stepY = ((int)mmm.distance(mxm)) * 5;
         linePoints(green, mmm, mxm, stepY);
         linePoints(green, mmx, mxx, stepY);
         linePoints(green, xxx, xmx, stepY);
@@ -98,19 +107,20 @@ public class ShapeRenderer
 
         List<Vector3d> blue = new ArrayList<>();
         particles.put(Color.BLUE, blue);
-        int stepX = ((int) mmm.distance(xmm)) * 5;
+        int stepX = ((int)mmm.distance(xmm)) * 5;
         linePoints(blue, mmm, mmx, stepX);
         linePoints(blue, mxx, mxm, stepX);
         linePoints(blue, xxx, xxm, stepX);
         linePoints(blue, xmx, xmm, stepX);
 
-        draw(player, new Vector3d(0.5,0.5,0.5), particles);
+        draw(player, new Vector3d(0.5, 0.5, 0.5), particles);
     }
 
     private static void linePoints(List<Vector3d> list, Vector3d point, Vector3d point2, int steps)
     {
         Vector3d move = point2.sub(point).div(steps);
-        for (int step = 0; step < steps; step++) {
+        for (int step = 0; step < steps; step++)
+        {
             point = point.add(move);
             list.add(point);
         }
@@ -118,13 +128,11 @@ public class ShapeRenderer
 
     private static void draw(Player player, Vector3d position, Map<Color, List<Vector3d>> particles)
     {
-        for (Map.Entry<Color, List<Vector3d>> entry : particles.entrySet()) {
-            for (Vector3d vec : entry.getValue()) {
-                player.spawnParticles(ParticleEffect.builder()
-                                .type(ParticleTypes.DUST)
-                                .option(ParticleOptions.COLOR, entry.getKey())
-                                .build(),
-                        position.add(vec));
+        for (Map.Entry<Color, List<Vector3d>> entry : particles.entrySet())
+        {
+            for (Vector3d vec : entry.getValue())
+            {
+                player.spawnParticles(ParticleEffect.builder().type(ParticleTypes.DUST).option(ParticleOptions.COLOR, entry.getKey()).build(), position.add(vec));
             }
         }
     }
