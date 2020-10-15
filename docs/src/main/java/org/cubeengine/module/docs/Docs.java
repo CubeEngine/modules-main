@@ -36,6 +36,7 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -81,7 +82,7 @@ public class Docs extends CubeEngineModule
     {
         Log log = mm.getLoggerFor(Docs.class);
         Map<String, ModuleDocs> docs = new TreeMap<>();
-        for (Map.Entry<Class, PluginContainer> entry : mm.getModulePlugins().entrySet())
+        for (Map.Entry<Class<?>, PluginContainer> entry : mm.getModulePlugins().entrySet())
         {
             docs.put(entry.getValue().getId(), new ModuleDocs(entry.getValue(), entry.getKey(), reflector, pm, ps, cm, mm));
         }

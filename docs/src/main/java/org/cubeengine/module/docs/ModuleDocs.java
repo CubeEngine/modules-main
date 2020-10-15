@@ -30,6 +30,7 @@ import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.plugin.PluginContainer;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileWriter;
