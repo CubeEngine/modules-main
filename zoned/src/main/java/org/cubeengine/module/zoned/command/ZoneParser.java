@@ -73,7 +73,7 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
             }
         }
 
-        cause.sendMessage(i18n.translate(cause.getAudience(), MessageType.NEGATIVE, "You need to provide a zone"));
+        i18n.send(cause.getAudience(), MessageType.NEGATIVE, "You need to provide a zone");
         return null;
     }
 

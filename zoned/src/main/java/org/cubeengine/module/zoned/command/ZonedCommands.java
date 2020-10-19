@@ -26,6 +26,7 @@ import java.util.Set;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Command;
@@ -122,7 +123,7 @@ public class ZonedCommands extends DispatcherCommand
         i18n.send(context, NEUTRAL, "The following zones were found:");
         for (ZoneConfig zone : zones)
         {
-            context.sendMessage(Component.empty().append(Component.text(" - ")).append(
+            context.sendMessage(Identity.nil(), Component.empty().append(Component.text(" - ")).append(
                 Component.text(zone.world.getName(), GOLD)).append(Component.text(".", WHITE)).append(
                 Component.text(zone.name, GOLD)));
         }
