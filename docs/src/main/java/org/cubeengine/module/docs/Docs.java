@@ -17,60 +17,47 @@
  */
 package org.cubeengine.module.docs;
 
-import static org.cubeengine.module.docs.DocType.MARKDOWN;
-
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.libcube.CubeEngineModule;
-import org.cubeengine.libcube.InjectService;
-import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.processor.Module;
-import org.cubeengine.reflect.Reflector;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.plugin.PluginContainer;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.InjectService;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
+import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.logscribe.Log;
+import org.cubeengine.processor.Module;
+import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.plugin.PluginContainer;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import static org.cubeengine.module.docs.DocType.MARKDOWN;
 
 @Singleton
 @Module
-public class Docs extends CubeEngineModule
+public class Docs
 {
     @Inject private Reflector reflector;
     @InjectService private PermissionService ps;
-    @Inject private CommandManager cm;
     @Inject private PermissionManager pm;
     private Path modulePath;
     @Inject private ModuleManager mm;
+    @ModuleCommand private DocsCommands docsCommands;
 
-    @Listener
-    public void onPreInitialization(GamePreInitializationEvent event)
+    @Listener(order = Order.LAST)
+    public void onStartedServer(StartedEngineEvent<Server> event)
     {
         this.modulePath = mm.getPathFor(Docs.class);
-        cm.addCommands(this, this);
-    }
-
-    @Listener
-    public void onStartedServer(GameStartedServerEvent event)
-    {
         this.generateDocumentation();
         if ("true".equals(System.getenv("CUBEENGINE_DOCS_SHUTDOWN")))
         {
@@ -78,13 +65,13 @@ public class Docs extends CubeEngineModule
         }
     }
 
-    private void generateDocumentation()
+    public void generateDocumentation()
     {
         Log log = mm.getLoggerFor(Docs.class);
         Map<String, ModuleDocs> docs = new TreeMap<>();
         for (Map.Entry<Class<?>, PluginContainer> entry : mm.getModulePlugins().entrySet())
         {
-            docs.put(entry.getValue().getId(), new ModuleDocs(entry.getValue(), entry.getKey(), reflector, pm, ps, cm, mm));
+            docs.put(entry.getValue().getMetadata().getId(), new ModuleDocs(entry.getValue(), entry.getKey(), reflector, pm, ps, mm));
         }
 
         log.info("Generating Module Docs...");
@@ -114,6 +101,7 @@ public class Docs extends CubeEngineModule
 
             for (Map.Entry<String, ModuleDocs> entry : docs.entrySet())
             {
+                log.info("Generating docs for " + entry.getKey());
                 entry.getValue().generate(moduleDocsPath, MARKDOWN, mm.getLoggerFor(getClass()));
             }
         }
@@ -137,13 +125,6 @@ public class Docs extends CubeEngineModule
         {
             throw new IllegalStateException(e);
         }
-    }
-
-    @Alias({"gd", "docgen", "gendoc"})
-    @Command(desc = "Generates documentation")
-    public void generateDocs(CommandSource ctx)
-    {
-        this.generateDocumentation();
     }
 
 }

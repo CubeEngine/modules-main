@@ -89,8 +89,7 @@ public class ZonedListener
             }
         }
 
-        Component added = config.addPoint(i18n, player, event instanceof InteractBlockEvent.Primary,
-                                          block.getPosition());
+        Component added = config.addPoint(i18n, player, event instanceof InteractBlockEvent.Primary, block.getPosition());
         Component selected = config.getSelected(i18n, player);
 
         i18n.send(player, POSITIVE, "{txt} ({integer}, {integer}, {integer}). {txt}", added, block.getBlockX(),

@@ -17,23 +17,6 @@
  */
 package org.cubeengine.module.docs;
 
-import static java.util.stream.Collectors.toMap;
-
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.butler.CommandBase;
-import org.cubeengine.butler.Dispatcher;
-import org.cubeengine.butler.StringUtils;
-import org.cubeengine.butler.alias.AliasCommand;
-import org.cubeengine.butler.alias.AliasConfiguration;
-import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.command.CubeDescriptor;
-import org.cubeengine.libcube.service.command.HelpCommand;
-import org.cubeengine.libcube.service.permission.Permission;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.permission.PermissionDescription;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.plugin.meta.PluginDependency;
-
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +27,27 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import org.apache.logging.log4j.util.Strings;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.command.AnnotationCommandBuilder;
+import org.cubeengine.libcube.service.command.AnnotationCommandBuilder.CubeEngineCommand;
+import org.cubeengine.libcube.service.command.AnnotationCommandBuilder.HelpExecutor;
+import org.cubeengine.libcube.service.command.AnnotationCommandBuilder.Requirements;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.util.StringUtils;
+import org.cubeengine.logscribe.Log;
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.manager.CommandMapping;
+import org.spongepowered.api.command.parameter.Parameter.Subcommand;
+import org.spongepowered.api.command.registrar.CommandRegistrar;
+import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.plugin.PluginContainer;
+import org.spongepowered.plugin.metadata.PluginDependency;
+
+import static java.util.stream.Collectors.toMap;
 
 public class MarkdownGenerator implements Generator
 {
@@ -83,7 +87,7 @@ public class MarkdownGenerator implements Generator
 
     @Override
     public String generate(Log log, String id, String name, PluginContainer pc, Info info, Set<PermissionDescription> permissions,
-            Set<CommandBase> commands, Permission basePermission)
+                           Map<CommandMapping, Command.Parameterized> commands, Permission basePermission)
     {
         StringBuilder sb = new StringBuilder();
         sb.append("# ").append(name);
@@ -93,11 +97,11 @@ public class MarkdownGenerator implements Generator
         }
 
         sb.append("\n");
-        sb.append(pc.getDescription().orElse(""));
+        sb.append(pc.getMetadata().getDescription().orElse(""));
         sb.append("\n");
         if (info.features.isEmpty())
         {
-            log.warn("Missing Features for " + name + "(" + pc.getId() + ")!");
+            log.warn("Missing Features for " + name + "(" + pc.getMetadata().getId() + ")!");
         }
         else
         {
@@ -108,7 +112,7 @@ public class MarkdownGenerator implements Generator
             }
         }
 
-        Set<PluginDependency> plugDep = pc.getDependencies();
+        List<PluginDependency> plugDep = pc.getMetadata().getDependencies();
         if (plugDep.size() > 2) // ignore cubeengine-core and spongeapi
         {
             sb.append("\n## Dependencies:\n");
@@ -145,22 +149,20 @@ public class MarkdownGenerator implements Generator
             permissions.stream().collect(toMap(PermissionDescription::getId, p -> p)));
         if (!commands.isEmpty())
         {
-            List<CommandBase> cmds = new ArrayList<>(commands);
-            cmds.sort(Comparator.comparing(o -> o.getDescriptor().getName()));
+
             sb.append("\n## Commands:").append("\n\n");
 
             sb.append("| Command | Description | Permission<br>`").append(basePermission.getId()).append(
                 ".command.<perm>`").append(" |\n");
             sb.append("| --- | --- | --- |\n");
-            for (CommandBase command : cmds)
-            {
-                generateCommandDocs(sb, addPerms, command, new Stack<>(), basePermission, true);
-            }
 
-            for (CommandBase command : cmds)
-            {
-                generateCommandDocs(sb, addPerms, command, new Stack<>(), basePermission, false);
-            }
+            commands.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey().getPrimaryAlias())).forEach(entry -> {
+                generateCommandDocs(sb, addPerms, entry.getKey(), entry.getValue(), new Stack<>(), basePermission, true);
+            });
+
+            commands.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey().getPrimaryAlias())).forEach(entry -> {
+                generateCommandDocs(sb, addPerms, entry.getKey(), entry.getValue(), new Stack<>(), basePermission, false);
+            });
         }
 
         if (!addPerms.values().isEmpty())
@@ -170,7 +172,8 @@ public class MarkdownGenerator implements Generator
             sb.append("| --- | --- |\n");
             for (PermissionDescription perm : addPerms.values())
             {
-                sb.append("| `").append(perm.getId()).append("` | ").append(perm.getDescription().orElse(Text.EMPTY).toPlain()).append(" |\n");
+                final String plainDesc = PlainComponentSerializer.plain().serialize(perm.getDescription().orElse(Component.empty()));
+                sb.append("| `").append(perm.getId()).append("` | ").append(plainDesc).append(" |\n");
             }
         }
 
@@ -182,83 +185,94 @@ public class MarkdownGenerator implements Generator
         return sb.toString();
     }
 
-    private void generateCommandDocs(StringBuilder sb, Map<String, PermissionDescription> addPerms, CommandBase command,
-                                     Stack<String> commandStack, Permission basePermission, boolean overview)
+    private void generateCommandDocs(StringBuilder sb, Map<String, PermissionDescription> addPerms, CommandMapping mapping,
+                                     Command.Parameterized command, Stack<String> commandStack, Permission basePermission, boolean overview)
     {
-        if (command instanceof AliasCommand || command instanceof HelpCommand)
-        {
-            return;
-        }
+        final PlainComponentSerializer plainSerializer = PlainComponentSerializer.plain();
+        // TODO aliascommand?
+//        if (command.getExecutor().map(e -> e instanceof HelpExecutor).orElse(false))
+//        {
+//            return;
+//        }
         String id = basePermission.getId() + ".command.";
 
-        List<CommandBase> subCommands = command instanceof Dispatcher ? new ArrayList<>(
-            ((Dispatcher)command).getCommands()) : Collections.emptyList();
-        subCommands.sort(Comparator.comparing(o -> o.getDescriptor().getName()));
+        final List<Subcommand> subCommands = command.subcommands();
+        subCommands.sort(Comparator.comparing(s -> s.getAliases().iterator().next()));
 
         if (overview)
         {
-            commandStack.push("*" + command.getDescriptor().getName() + "*");
-            String fullCmd = StringUtils.join(WHITESPACE, commandStack);
-            sb.append("| [").append(fullCmd).append("]").append("(#").append(fullCmd.replace("*", "").replace(" ",
-                                                                                                              "-").replace(
-                WHITESPACE, "").toLowerCase()).append(") | ");
-            sb.append(command.getDescriptor().getDescription().replace("\n", "<br>")).append(" | ");
-            Permission perm = ((CubeDescriptor)command.getDescriptor()).getPermission().getRegistered();
-            sb.append("`").append(perm.getId().replace(id, "")).append("` |\n");
+            commandStack.push("*" + mapping.getPrimaryAlias() + "*");
+            String fullCmd = String.join(WHITESPACE, commandStack);
+            sb.append("| [").append(fullCmd).append("]").append("(#").append(
+                fullCmd.replace("*", "")
+                       .replace(" ","-")
+                       .replace(WHITESPACE, "").toLowerCase()).append(") | ");
+
+            sb.append(plainSerializer.serialize(command.getShortDescription(CommandCause.create()).orElse(Component.empty())).replace("\n", "<br>")).append(" | ");
+//            CubeEngineCommand executor = command.getExecutor().filter(CubeEngineCommand.class::isInstance).map(CubeEngineCommand.class::cast).orElse(null);
+            if (command.getExecutionRequirements() instanceof AnnotationCommandBuilder.Requirements) {
+                final String perm = ((Requirements)command.getExecutionRequirements()).getPermission();
+                sb.append("`").append(perm.replace(id, "")).append("` |\n");
+            }
+
 
             commandStack.pop();
-            commandStack.push("**" + command.getDescriptor().getName() + "**");
+            commandStack.push("**" + mapping.getPrimaryAlias() + "**");
         }
         else
         {
-            commandStack.push(command.getDescriptor().getName());
-            String fullCmd = StringUtils.join(WHITESPACE, commandStack);
+            commandStack.push(mapping.getPrimaryAlias());
+            String fullCmd = String.join(WHITESPACE, commandStack);
             sb.append("\n#### ").append(fullCmd).append("  \n");
-            sb.append(command.getDescriptor().getDescription()).append("  \n");
-            sb.append("**Usage:** `").append(command.getDescriptor().getUsage(null)).append("`  \n");
 
-            if (!command.getDescriptor().getAliases().isEmpty())
+            sb.append(plainSerializer.serialize(command.getShortDescription(CommandCause.create()).orElse(Component.empty()))).append("  \n");
+            // TODO usage from sponge is rather bad
+            sb.append("**Usage:** `").append(plainSerializer.serialize(command.getUsage(CommandCause.create()))).append("`  \n");
+
+            if (!mapping.getAllAliases().isEmpty())
             {
                 sb.append("**Alias:**");
-                for (AliasConfiguration alias : command.getDescriptor().getAliases())
+                for (String alias : mapping.getAllAliases())
                 {
-                    String[] dispatcher = alias.getDispatcher();
-                    List<String> labels = new ArrayList<>();
-                    if (dispatcher == null)
-                    {
-                        labels.add(alias.getName()); // local alias
-                    }
-                    else
-                    {
-                        labels.addAll(Arrays.asList(alias.getDispatcher()));
-                        labels.add(alias.getName());
-                        labels.set(0, "/" + labels.get(0));
-                    }
-                    sb.append(" `").append(StringUtils.join(" ", labels)).append("`");
+                    // TODO alias registered on different dispatchers?
+//                    String[] dispatcher = alias.getDispatcher();
+//                    List<String> labels = new ArrayList<>();
+//                    if (dispatcher == null)
+//                    {
+//                        labels.add(alias); // local alias
+//                    }
+//                    else
+//                    {
+//                        labels.addAll(Arrays.asList(alias.getDispatcher()));
+//                        labels.add(alias.getName());
+//                        labels.set(0, "/" + labels.get(0));
+//                    }
+//                    sb.append(" `").append(String.join(" ", labels)).append("`");
+                    sb.append(" `").append(alias).append("`");
                 }
                 sb.append("  \n");
             }
 
-            if (command.getDescriptor() instanceof CubeDescriptor)
-            {
-                Permission perm = ((CubeDescriptor)command.getDescriptor()).getPermission().getRegistered();
-                sb.append("**Permission:** `").append(perm.getId()).append("`  \n");
-                addPerms.remove(perm.getId());
-
-                // TODO parameter permission?
-                // TODO parameter description?
-                // TODO Butler Parser with default parameter descriptions
+            if (command.getExecutionRequirements() instanceof AnnotationCommandBuilder.Requirements) {
+                final String perm = ((Requirements)command.getExecutionRequirements()).getPermission();
+                sb.append("**Permission:** `").append(perm).append("`  \n");
+                addPerms.remove(perm);
             }
+
+            // TODO parameter permission?
+            // TODO parameter description?
+            // TODO Parser with default parameter descriptions
         }
 
         if (!overview)
         {
             StringBuilder subBuilder = new StringBuilder();
-            for (CommandBase sub : subCommands)
+            for (Subcommand sub : subCommands)
             {
-                if (!(sub instanceof HelpCommand) && !(sub instanceof AliasCommand))
+                // TODO is alias?
+                if (!sub.getCommand().getExecutor().map(e -> e instanceof HelpExecutor).orElse(false))
                 {
-                    subBuilder.append(" `").append(sub.getDescriptor().getName()).append("`");
+                    subBuilder.append(" `").append(sub.getAliases().iterator().next()).append("`");
                 }
             }
 
@@ -269,11 +283,49 @@ public class MarkdownGenerator implements Generator
             sb.append("  \n");
         }
 
-        for (CommandBase sub : subCommands)
+        for (Subcommand sub : subCommands)
         {
-            this.generateCommandDocs(sb, addPerms, sub, commandStack, basePermission, overview);
+            if (!sub.getCommand().getExecutor().map(e -> e instanceof HelpExecutor).orElse(false)
+                && !sub.getCommand().subcommands().isEmpty())
+            {
+                this.generateCommandDocs(sb, addPerms, new TmpCommandMapping(sub.getAliases()), sub.getCommand(), commandStack, basePermission, overview);
+            }
         }
 
         commandStack.pop();
+    }
+
+    private static class TmpCommandMapping implements CommandMapping {
+
+        private final Set<String> aliases;
+
+        public TmpCommandMapping(Set<String> aliases)
+        {
+            this.aliases = aliases;
+        }
+
+        @Override
+        public String getPrimaryAlias()
+        {
+            return this.aliases.iterator().next();
+        }
+
+        @Override
+        public Set<String> getAllAliases()
+        {
+            return this.aliases;
+        }
+
+        @Override
+        public PluginContainer getPlugin()
+        {
+            return null;
+        }
+
+        @Override
+        public CommandRegistrar<?> getRegistrar()
+        {
+            return null;
+        }
     }
 }

@@ -17,34 +17,29 @@
  */
 package org.cubeengine.module.docs;
 
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.butler.CommandBase;
-import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.permission.Permission;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.reflect.Reflected;
-import org.cubeengine.reflect.ReflectedFile;
-import org.cubeengine.reflect.Reflector;
-import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.permission.PermissionDescription;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.plugin.PluginContainer;
-
-import java.io.ByteArrayOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.logscribe.Log;
+import org.cubeengine.reflect.ReflectedFile;
+import org.cubeengine.reflect.Reflector;
+import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
+import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.manager.CommandMapping;
+import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.plugin.PluginContainer;
 
 public class ModuleDocs
 {
@@ -52,7 +47,7 @@ public class ModuleDocs
     private final String name;
     private final Info config;
     private final Set<PermissionDescription> permissions = new HashSet<>();
-    private final Set<CommandBase> commands = new HashSet<>();
+    private final Map<CommandMapping, Command.Parameterized> commands = new HashMap<>();
     private final String id;
     private final Permission basePermission;
     private final String moduleName;
@@ -74,13 +69,13 @@ public class ModuleDocs
         return id;
     }
 
-    public ModuleDocs(PluginContainer plugin, Class module, Reflector reflector, PermissionManager pm, PermissionService ps, CommandManager cm, ModuleManager mm)
+    public ModuleDocs(PluginContainer plugin, Class module, Reflector reflector, PermissionManager pm, PermissionService ps, ModuleManager mm)
     {
         this.reflector = reflector;
         this.pc = plugin;
-        this.name = plugin.getName();
+        this.name = plugin.getMetadata().getName().get();
         this.moduleName = mm.getModuleName(module).get();
-        this.id = plugin.getId();
+        this.id = plugin.getMetadata().getId();
         this.moduleId = mm.getModuleID(module).get();
         InputStream is = plugin.getClass().getResourceAsStream("/assets/cubeengine/"+ moduleId + "-info.yml");
         if (is == null)
@@ -100,13 +95,7 @@ public class ModuleDocs
             }
         }
 
-        for (CommandBase base : cm.getCommands())
-        {
-            if (base.getDescriptor().getOwner().equals(module))
-            {
-                this.commands.add(base);
-            }
-        }
+        this.commands.putAll(mm.getBaseCommands(module));
     }
 
     public void generate(Path modulePath, DocType docType, Log log)
