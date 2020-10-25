@@ -42,6 +42,7 @@ import org.cubeengine.converter.node.Node;
 import org.cubeengine.converter.node.StringNode;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.roles.Roles;

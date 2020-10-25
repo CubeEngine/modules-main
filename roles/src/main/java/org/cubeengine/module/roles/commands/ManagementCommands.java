@@ -29,6 +29,8 @@ import org.cubeengine.butler.parametric.Complete;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.command.annotation.Alias;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;

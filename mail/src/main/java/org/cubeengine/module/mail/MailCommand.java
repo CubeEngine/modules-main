@@ -30,6 +30,8 @@ import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.annotation.Alias;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.mail.storage.Mail;
 import org.cubeengine.module.mail.storage.TableMail;

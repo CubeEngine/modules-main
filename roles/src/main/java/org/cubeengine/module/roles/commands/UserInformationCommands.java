@@ -31,6 +31,8 @@ import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.annotation.Alias;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.RolesUtil.FoundOption;

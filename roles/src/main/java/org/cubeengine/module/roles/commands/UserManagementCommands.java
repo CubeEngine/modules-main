@@ -31,6 +31,8 @@ import org.cubeengine.butler.parametric.Flag;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.command.annotation.Alias;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
@@ -205,7 +207,7 @@ public class UserManagementCommands extends ContainerCommand
         });
     }
 
-    @Alias(value = {"clearUOption","clearUData"})
+    @Alias(value = {"clearUOption", "clearUData"})
     @Command(alias = "clearData", desc = "Resets options for this user [in context]")
     public void clearOption(CommandSource ctx, @Default User player, @Named("in") @Default Context context)
     {

@@ -30,6 +30,8 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.annotation.Alias;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.ConfigCurrency;
 import org.cubeengine.module.conomy.Conomy;

@@ -20,6 +20,8 @@ package org.cubeengine.module.vanillaplus.improvement;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Optional;
+import org.cubeengine.libcube.service.command.annotation.Alias;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.util.Profiler;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Server;

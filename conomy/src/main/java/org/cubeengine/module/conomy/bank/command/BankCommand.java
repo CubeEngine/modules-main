@@ -26,6 +26,8 @@ import org.cubeengine.butler.filter.Restricted;
 import org.cubeengine.butler.parametric.Command;
 import org.cubeengine.butler.parametric.Default;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.annotation.Alias;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;

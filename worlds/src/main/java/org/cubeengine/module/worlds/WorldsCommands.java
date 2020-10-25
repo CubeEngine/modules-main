@@ -35,6 +35,8 @@ import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Named;
 import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.command.annotation.Alias;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Platform.Type;
@@ -289,8 +291,8 @@ public class WorldsCommands extends ContainerCommand
         i18n.send(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
     }
 
-    @Command(desc = "Lists all worlds")
     @Alias("listworlds")
+    @Command(desc = "Lists all worlds")
     public void list(CommandSource context)
     {
         i18n.send(context, POSITIVE, "The following worlds do exist:");

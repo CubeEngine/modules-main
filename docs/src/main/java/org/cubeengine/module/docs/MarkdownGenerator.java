@@ -189,7 +189,7 @@ public class MarkdownGenerator implements Generator
                                      Command.Parameterized command, Stack<String> commandStack, Permission basePermission, boolean overview)
     {
         final PlainComponentSerializer plainSerializer = PlainComponentSerializer.plain();
-        // TODO aliascommand?
+        // TODO alias commands?
 //        if (command.getExecutor().map(e -> e instanceof HelpExecutor).orElse(false))
 //        {
 //            return;

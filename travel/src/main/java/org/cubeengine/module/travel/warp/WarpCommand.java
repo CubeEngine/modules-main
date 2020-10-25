@@ -30,6 +30,8 @@ import org.cubeengine.butler.parametric.Greed;
 import org.cubeengine.butler.parametric.Label;
 import org.cubeengine.butler.parametric.Optional;
 import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.annotation.Alias;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.libcube.util.ConfirmManager;
 import org.cubeengine.module.travel.Travel;

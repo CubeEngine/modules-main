@@ -24,6 +24,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.flowpowered.math.vector.Vector3i;
+import org.cubeengine.libcube.service.command.annotation.Alias;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.butler.alias.Alias;
 import org.cubeengine.butler.filter.Restricted;
