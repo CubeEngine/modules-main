@@ -17,31 +17,38 @@
  */
 package org.cubeengine.module.roles.service.subject;
 
-import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
-
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.FileBasedCollection;
 import org.cubeengine.module.roles.service.data.FileSubjectData;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
 
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
+import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 public class FileSubject extends BaseSubject<FileSubjectData>
 {
     public static final String SEPARATOR = "|";
+    private FileSubjectData data;
 
     public FileSubject(RolesPermissionService service, FileBasedCollection collection, RoleConfig config)
     {
-        super(collection, service, new FileSubjectData(service, config));
+        super(collection, service);
+        this.data = new FileSubjectData(service, config, this);
+    }
+
+    @Override
+    public FileSubjectData getSubjectData()
+    {
+        return this.data;
     }
 
     /**
@@ -112,18 +119,12 @@ public class FileSubject extends BaseSubject<FileSubjectData>
     }
 
     @Override
-    public Optional<CommandSource> getCommandSource()
-    {
-        return Optional.empty();
-    }
-
-    @Override
     public Set<Context> getActiveContexts()
     {
         return GLOBAL_CONTEXT;
     }
 
-    public boolean canAssignAndRemove(CommandSource source)
+    public boolean canAssignAndRemove(CommandCause source)
     {
         String perm = service.getPermissionManager().getBasePermission(Roles.class).getId();
         return source.hasPermission(perm + ".assign." + getIdentifier()); // TODO register permission + assign base

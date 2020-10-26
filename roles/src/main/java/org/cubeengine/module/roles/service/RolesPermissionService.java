@@ -17,29 +17,6 @@
  */
 package org.cubeengine.module.roles.service;
 
-import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
-
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.filesystem.FileManager;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.module.roles.Roles;
-import org.cubeengine.module.roles.RolesConfig;
-import org.cubeengine.module.roles.service.collection.FileBasedCollection;
-import org.cubeengine.module.roles.service.collection.UserCollection;
-import org.cubeengine.module.roles.service.subject.RolesSubjectReference;
-import org.cubeengine.reflect.Reflector;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.context.ContextCalculator;
-import org.spongepowered.api.service.permission.PermissionDescription;
-import org.spongepowered.api.service.permission.PermissionDescription.Builder;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.permission.SubjectCollection;
-import org.spongepowered.api.service.permission.SubjectReference;
-import org.spongepowered.api.util.Tristate;
-
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,9 +31,36 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.converter.ConverterManager;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.filesystem.FileManager;
+import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.logscribe.Log;
+import org.cubeengine.module.roles.Roles;
+import org.cubeengine.module.roles.RolesConfig;
+import org.cubeengine.module.roles.config.PermissionTree;
+import org.cubeengine.module.roles.config.PermissionTreeConverter;
+import org.cubeengine.module.roles.config.Priority;
+import org.cubeengine.module.roles.config.PriorityConverter;
+import org.cubeengine.module.roles.service.collection.FileBasedCollection;
+import org.cubeengine.module.roles.service.collection.UserCollection;
+import org.cubeengine.module.roles.service.subject.RolesSubjectReference;
+import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.service.context.ContextCalculator;
+import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.api.service.permission.PermissionDescription.Builder;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.service.permission.SubjectCollection;
+import org.spongepowered.api.service.permission.SubjectReference;
+import org.spongepowered.api.util.Tristate;
+import org.spongepowered.plugin.PluginContainer;
 
-import javax.inject.Inject;
+import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
+@Singleton
 public class RolesPermissionService implements PermissionService
 {
     private final ConcurrentMap<String, SubjectCollection> collections = new ConcurrentHashMap<>();
@@ -74,6 +78,10 @@ public class RolesPermissionService implements PermissionService
     @Inject
     public RolesPermissionService(Roles module, FileManager fm, Reflector reflector, ModuleManager mm)
     {
+        ConverterManager cManager = reflector.getDefaultConverterManager();
+        cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);
+        cManager.registerConverter(new PriorityConverter(), Priority.class);
+
         this.reflector = reflector;
         this.modulePath = mm.getPathFor(Roles.class);
         this.logger = mm.getLoggerFor(Roles.class);
@@ -146,11 +154,9 @@ public class RolesPermissionService implements PermissionService
     }
 
     @Override
-    public Builder newDescriptionBuilder(Object plugin)
+    public Builder newDescriptionBuilder(PluginContainer plugin)
     {
-        // TODO somehow allow modules
-        Optional<PluginContainer> container = Sponge.getPluginManager().fromInstance(plugin);
-        return new RolesPermissionDescriptionBuilder(container.get(), this);
+        return new RolesPermissionDescriptionBuilder(plugin, this);
     }
 
     @Override
@@ -221,7 +227,8 @@ public class RolesPermissionService implements PermissionService
         return pm;
     }
 
-    public Log getLog() {
+    public Log getLog()
+    {
         return logger;
     }
 }

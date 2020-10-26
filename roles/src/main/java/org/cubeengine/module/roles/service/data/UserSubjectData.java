@@ -33,12 +33,17 @@ import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.cubeengine.libcube.util.ContextUtil;
+import org.cubeengine.module.roles.service.subject.UserSubject;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.value.ListValue;
+import org.spongepowered.api.data.value.MapValue;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
-import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.user.UserManager;
 
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.*;
@@ -48,19 +53,17 @@ public class UserSubjectData extends CachingSubjectData
 {
     private final UUID uuid;
 
-    public UserSubjectData(RolesPermissionService service, UUID uuid)
+    public UserSubjectData(RolesPermissionService service, UUID uuid, UserSubject holder)
     {
-        super(service);
+        super(service, holder);
         this.uuid = uuid;
     }
 
-    private Optional<PermissionData> getData()
+    private <E> Optional<E> getData(Key<? extends Value<E>> key)
     {
-        UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
-        User player = storage.get(uuid).get();
-        player = player.getPlayer().map(User.class::cast).orElse(player); // TODO wait for User Data impl
-
-        return player.get(PermissionData.class);
+        final UserManager userManager = Sponge.getServer().getUserManager();
+        User player = userManager.get(uuid).get();
+        return player.get(key);
     }
 
     @Override
@@ -78,12 +81,12 @@ public class UserSubjectData extends CachingSubjectData
                 Map<String, String> options = serializeToMap(this.options);
 
                 // Get User for Storage
-                UserStorageService storage = Sponge.getServiceManager().provide(UserStorageService.class).get();
-                User user = storage.get(uuid).get();
+                final UserManager userManager = Sponge.getServer().getUserManager();
+                User user = userManager.get(uuid).get();
                 // Save Data in User
-                user.offer(new PermissionData(parents, permissions, options));
-                // actually save Data in Player til -> TODO remove once saving data on user is implemented
-                user.getPlayer().map(User.class::cast).orElse(user).offer(new PermissionData(parents, permissions, options));
+                user.offer(PermissionData.PARENTS, parents);
+                user.offer(PermissionData.PERMISSIONS, permissions);
+                user.offer(PermissionData.OPTIONS, options);
             }
             return changed;
         });
@@ -112,7 +115,7 @@ public class UserSubjectData extends CachingSubjectData
     {
         if (!parents.containsKey(ContextUtil.GLOBAL))
         {
-            List<String> parentList = getData().map(PermissionData::getParents).orElse(Collections.emptyList());
+            List<String> parentList = getData(PermissionData.PARENTS).orElse(Collections.emptyList());
             boolean parentRemoved = false;
             List<Subject> list = new ArrayList<>();
             for (String s : new HashSet<>(parentList))
@@ -141,7 +144,7 @@ public class UserSubjectData extends CachingSubjectData
     {
         if (permissions.isEmpty())
         {
-            permissions.putAll(deserialzeMap(PermissionData::getPermissions));
+            permissions.putAll(deserialzeMap(PermissionData.PERMISSIONS));
         }
     }
 
@@ -150,13 +153,13 @@ public class UserSubjectData extends CachingSubjectData
     {
         if (options.isEmpty())
         {
-            options.putAll(deserialzeMap(PermissionData::getOptions));
+            options.putAll(deserialzeMap(PermissionData.OPTIONS));
         }
     }
 
-    private <T> Map<Context, Map<String, T>> deserialzeMap(Function<PermissionData, Map<String, T>> func)
+    private <T> Map<Context, Map<String, T>> deserialzeMap(Key<MapValue<String, T>> key)
     {
-        return getData().map(func).orElse(emptyMap()).entrySet().stream().collect(groupedByContext());
+        return this.getData(key).orElse(emptyMap()).entrySet().stream().collect(groupedByContext());
     }
 
     private <T> Collector<Entry<String, T>, ?, Map<Context, Map<String, T>>> groupedByContext()

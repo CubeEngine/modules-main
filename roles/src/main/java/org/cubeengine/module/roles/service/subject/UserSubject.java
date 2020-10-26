@@ -17,23 +17,29 @@
  */
 package org.cubeengine.module.roles.service.subject;
 
+import java.util.Optional;
+import java.util.UUID;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.UserSubjectData;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.service.permission.SubjectReference;
-
-import java.util.Optional;
-import java.util.UUID;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 public class UserSubject extends BaseSubject<UserSubjectData>
 {
     private final UUID uuid;
+    private final UserSubjectData data;
 
     public UserSubject(RolesPermissionService service, UUID uuid)
     {
-        super(service.getUserSubjects(), service, new UserSubjectData(service, uuid));
+        super(service.getUserSubjects(), service);
+        this.data = new UserSubjectData(service, uuid, this);
         this.uuid = uuid;
+    }
+
+    @Override
+    public UserSubjectData getSubjectData()
+    {
+        return data;
     }
 
     @Override
@@ -42,10 +48,9 @@ public class UserSubject extends BaseSubject<UserSubjectData>
         return uuid.toString();
     }
 
-    @Override
-    public Optional<CommandSource> getCommandSource()
+    public Optional<ServerPlayer> getPlayer()
     {
-        return Sponge.getServer().getPlayer(uuid).map(CommandSource.class::cast);
+        return Sponge.getServer().getPlayer(uuid);
     }
 
     public void reload()
@@ -65,6 +70,6 @@ public class UserSubject extends BaseSubject<UserSubjectData>
     @Override
     public String toString()
     {
-        return "UserSubject: " + this.getIdentifier() + " " + this.getCommandSource().map(CommandSource::getName).orElse("?");
+        return "UserSubject: " + this.getIdentifier() + " " + this.getPlayer().map(ServerPlayer::getName).orElse("?");
     }
 }

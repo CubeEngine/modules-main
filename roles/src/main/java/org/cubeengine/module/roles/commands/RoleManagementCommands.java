@@ -17,60 +17,65 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.cubeengine.libcube.util.ContextUtil.toSet;
-import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
-
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Complete;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
+import java.util.concurrent.CompletableFuture;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.converter.converter.ClassedConverter;
 import org.cubeengine.converter.node.StringNode;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.ExceptionHandler;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Label;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.command.annotation.Parser;
+import org.cubeengine.libcube.service.command.annotation.Using;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
+import org.cubeengine.module.roles.commands.provider.ContextParser;
+import org.cubeengine.module.roles.commands.provider.TristateParser;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
+import org.cubeengine.module.roles.commands.provider.FileSubjectParser;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.config.PriorityConverter;
+import org.cubeengine.module.roles.exception.CircularRoleDependencyExceptionHandler;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.FileSubjectData;
 import org.cubeengine.module.roles.service.subject.FileSubject;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.util.Tristate;
 
-import java.util.concurrent.CompletableFuture;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.util.ContextUtil.toSet;
+import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
+@Singleton
 @Alias("manrole")
 @Command(name = "role", desc = "Manage roles")
-public class RoleManagementCommands extends ContainerCommand
+@Using({FileSubjectParser.class, TristateParser.class, ContextParser.class})
+public class RoleManagementCommands extends DispatcherCommand
 {
     private RolesPermissionService service;
     private I18n i18n;
 
-    public RoleManagementCommands(CommandManager base, RolesPermissionService service, I18n i18n)
+    @Inject
+    public RoleManagementCommands(RolesPermissionService service, I18n i18n, RoleInformationCommands roleInformationCommands)
     {
-        super(base, Roles.class);
+        super(Roles.class, roleInformationCommands);
         this.service = service;
         this.i18n = i18n;
     }
 
     @Alias("setRPerm")
     @Command(alias = "setPerm", desc = "Sets the permission for given role [in context]")
-    public void setPermission(CommandSource ctx, FileSubject role,
-                              @Complete(PermissionCompleter.class) String permission,
+    public void setPermission(CommandCause ctx, FileSubject role,
+                              @Parser(completer = PermissionCompleter.class) String permission,
                               @Default Tristate type,
                               @Named("in") @Default Context context)
     {
@@ -96,9 +101,9 @@ public class RoleManagementCommands extends ContainerCommand
 
     }
 
-    @Alias(value = {"setROption", "setRData"})
+    @Alias(value = "setROption", alias = "setRData")
     @Command(alias = "setData", desc = "Sets an option for given role [in context]")
-    public void setOption(CommandSource ctx, FileSubject role, String key, @Optional String value, @Named("in") @Default Context context)
+    public void setOption(CommandCause ctx, FileSubject role, String key, @Option String value, @Named("in") @Default Context context)
     {
         role.getSubjectData().setOption(toSet(context), key, value);
         if (value == null)
@@ -109,24 +114,25 @@ public class RoleManagementCommands extends ContainerCommand
         i18n.send(ctx, POSITIVE, "Options {input#key} set to {input#value} for the role {role} in {context}!", key, value, role, context);
     }
 
-    @Alias(value = {"resetROption", "resetRData"})
+    @Alias(value = "resetROption", alias = "resetRData")
     @Command(alias = "resetData", desc = "Resets the options for given role [in context]")
-    public void resetOption(CommandSource ctx, FileSubject role, String key, @Named("in") @Default Context context)
+    public void resetOption(CommandCause ctx, FileSubject role, String key, @Named("in") @Default Context context)
     {
         this.setOption(ctx, role, key, null, context);
     }
 
-    @Alias(value = {"clearROption", "clearRData"})
+    @Alias(value = "clearROption", alias = "clearRData")
     @Command(alias = "clearData", desc = "Clears the options for given role [in context]")
-    public void clearOption(CommandSource ctx, FileSubject role, @Named("in") @Default Context context)
+    public void clearOption(CommandCause ctx, FileSubject role, @Named("in") @Default Context context)
     {
         role.getSubjectData().clearOptions(toSet(context));
         i18n.send(ctx, NEUTRAL, "Options cleared for the role {role} in {context}!", role, context);
     }
 
-    @Alias(value = {"addRParent", "manRAdd"})
+    @Alias(value = "addRParent", alias = "manRAdd")
     @Command(desc = "Adds a parent role to given role [in context]")
-    public void addParent(CommandSource ctx, FileSubject role, FileSubject parentRole, @Named("in") @Default Context context)
+    @ExceptionHandler(CircularRoleDependencyExceptionHandler.class)
+    public void addParent(CommandCause ctx, FileSubject role, FileSubject parentRole, @Named("in") @Default Context context)
     {
         role.getSubjectData().addParent(toSet(context), parentRole.asSubjectReference()).thenAccept(b -> {
             if (b)
@@ -143,7 +149,7 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = "remRParent")
     @Command(desc = "Removes a parent role from given role [in context]")
-    public void removeParent(CommandSource ctx, FileSubject role, FileSubject parentRole, @Named("in") @Default Context context)
+    public void removeParent(CommandCause ctx, FileSubject role, FileSubject parentRole, @Named("in") @Default Context context)
     {
         role.getSubjectData().removeParent(toSet(context), parentRole.asSubjectReference()).thenAccept(b -> {
             if (b)
@@ -157,7 +163,7 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = "clearRParent")
     @Command(desc = "Removes all parent roles from given role [in context]")
-    public void clearParent(CommandSource ctx, FileSubject role, @Named("in") @Default Context context)
+    public void clearParent(CommandCause ctx, FileSubject role, @Named("in") @Default Context context)
     {
         role.getSubjectData().clearParents(toSet(context)).thenAccept(b -> {
             if (b)
@@ -171,7 +177,7 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = "setRolePriority")
     @Command(alias = "setPrio", desc = "Sets the priority of given role")
-    public void setPriority(CommandSource ctx, FileSubject role, String priority)
+    public void setPriority(CommandCause ctx, FileSubject role, String priority)
     {
         try
         {
@@ -188,7 +194,7 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = "renameRole")
     @Command(desc = "Renames given role")
-    public void rename(CommandSource ctx, FileSubject role, @Label("new name") String newName)
+    public void rename(CommandCause ctx, FileSubject role, @Label("new name") String newName)
     {
         String oldName = role.getIdentifier();
         if (oldName.equalsIgnoreCase(newName))
@@ -206,7 +212,7 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = "createRole")
     @Command(desc = "Creates a new role")
-    public void create(CommandSource ctx, String name)
+    public void create(CommandCause ctx, String name)
     {
         service.getGroupSubjects().hasSubject(name).thenAccept(b -> {
             if (b)
@@ -223,7 +229,7 @@ public class RoleManagementCommands extends ContainerCommand
 
     @Alias(value = "deleteRole")
     @Command(desc = "Deletes a role")
-    public void delete(CommandSource ctx, FileSubject role, @Flag boolean force)
+    public void delete(CommandCause ctx, FileSubject role, @Flag boolean force)
     {
         if (service.getGroupSubjects().delete(role, force))
         {
@@ -234,7 +240,8 @@ public class RoleManagementCommands extends ContainerCommand
     }
 
     @Command(alias = {"toggleDefault", "toggleDef"}, desc = "Toggles whether given role is a default role")
-    public void toggleDefaultRole(CommandSource ctx, FileSubject role)
+    @ExceptionHandler(CircularRoleDependencyExceptionHandler.class)
+    public void toggleDefaultRole(CommandCause ctx, FileSubject role)
     {
         SubjectData defaultData = service.getUserSubjects().getDefaults().getSubjectData();
         if (defaultData.getParents(GLOBAL_CONTEXT).contains(role.asSubjectReference()))

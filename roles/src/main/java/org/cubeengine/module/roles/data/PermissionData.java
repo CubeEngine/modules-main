@@ -17,179 +17,48 @@
  */
 package org.cubeengine.module.roles.data;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import com.google.common.reflect.TypeToken;
+import org.cubeengine.module.roles.PluginRoles;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.persistence.DataStore;
+import org.spongepowered.api.data.value.ListValue;
+import org.spongepowered.api.data.value.MapValue;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.util.TypeTokens;
 
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.manipulator.mutable.common.AbstractData;
-import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.data.value.mutable.MapValue;
-import org.spongepowered.api.service.permission.Subject;
-
-import static java.util.stream.Collectors.toMap;
-
-public class PermissionData extends AbstractData<PermissionData, ImmutablePermissionData> implements IPermissionData
+public interface PermissionData
 {
-    private List<String> parents;
-    private Map<String, Boolean> permissions;
-    private Map<String, String> options;
 
-    public PermissionData(List<String> parents, Map<String, Boolean> permissions, Map<String, String> options)
+    TypeToken<ListValue<String>> TTLV_String = new TypeToken<ListValue<String>>() {};
+    TypeToken<MapValue<String, Boolean>> TTMV_StringBool = new TypeToken<MapValue<String, Boolean>>() {};
+    TypeToken<MapValue<String, String>> TTMV_StringString = new TypeToken<MapValue<String, String>>() {};
+
+    Key<ListValue<String>> PARENTS = Key.builder().key(ResourceKey.of(PluginRoles.ROLES_ID, "parents")).type(TTLV_String).build();
+    Key<MapValue<String, Boolean>> PERMISSIONS = Key.builder().key(ResourceKey.of(PluginRoles.ROLES_ID, "permissions")).type(TTMV_StringBool).build();
+    Key<MapValue<String, String>> OPTIONS = Key.builder().key(ResourceKey.of(PluginRoles.ROLES_ID, "options")).type(TTMV_StringString).build();
+
+    static void register(RegisterCatalogEvent<DataRegistration> event)
     {
-        this.parents = parents.stream().distinct().collect(Collectors.toList());
-        this.permissions = permissions;
-        this.options = options;
-        registerGettersAndSetters();
+        final ResourceKey rkey = ResourceKey.of(PluginRoles.ROLES_ID, "permissiondata");
+        final DataStore dataStore = DataStore.builder()
+                                             .pluginData(rkey)
+                                             .holder(TypeTokens.SERVER_PLAYER_TOKEN, TypeTokens.USER_TOKEN)
+
+                      .key(PARENTS, "parents")
+                                             .key(PERMISSIONS, "permissions")
+                                             .key(OPTIONS, "options")
+                                             .build();
+
+        final DataRegistration registration = DataRegistration.builder()
+                                                              .dataKey(PARENTS)
+                                                              .dataKey(PERMISSIONS)
+                                                              .dataKey(OPTIONS)
+                                                              .store(dataStore)
+                                                              .key(rkey)
+                                                              .build();
+        event.register(registration);
     }
 
-    @Override
-    protected void registerGettersAndSetters()
-    {
-        registerFieldGetter(PARENTS, PermissionData.this::getParents);
-        registerFieldSetter(PARENTS, PermissionData.this::setParents);
-        registerKeyValue(PARENTS, PermissionData.this::parents);
-
-        registerFieldGetter(PERMISSIONS, PermissionData.this::getPermissions);
-        registerFieldSetter(PERMISSIONS, PermissionData.this::setPermissions);
-        registerKeyValue(PERMISSIONS, PermissionData.this::permissions);
-
-        registerFieldGetter(OPTIONS, PermissionData.this::getOptions);
-        registerFieldSetter(OPTIONS, PermissionData.this::setOptions);
-        registerKeyValue(OPTIONS, PermissionData.this::options);
-    }
-
-    private MapValue<String, String> options()
-    {
-        return Sponge.getRegistry().getValueFactory().createMapValue(OPTIONS, options);
-    }
-
-    public void setOptions(Map<String, String> options)
-    {
-        this.options = options;
-    }
-
-    public Map<String, String> getOptions()
-    {
-        return options;
-    }
-
-    private MapValue<String, Boolean> permissions()
-    {
-        return Sponge.getRegistry().getValueFactory().createMapValue(PERMISSIONS, permissions);
-    }
-
-    public void setPermissions(Map<String, Boolean> permissions)
-    {
-        this.permissions = permissions;
-    }
-
-    public Map<String, Boolean> getPermissions()
-    {
-        return permissions;
-    }
-
-    private ListValue<String> parents()
-    {
-        return Sponge.getRegistry().getValueFactory().createListValue(PARENTS, parents);
-    }
-
-    public void setParents(List<String> parents)
-    {
-        this.parents = parents;
-    }
-
-    public List<String> getParents()
-    {
-        return parents;
-    }
-
-    @Override
-    public Optional<PermissionData> fill(DataHolder dataHolder, MergeFunction overlap)
-    {
-        if (!(dataHolder instanceof Subject))
-        {
-            return Optional.empty();
-        }
-        Optional<List<String>> parents = dataHolder.get(PARENTS);
-        Optional<Map<String, Boolean>> permissions = dataHolder.get(PERMISSIONS);
-        Optional<Map<String, String>> options = dataHolder.get(OPTIONS);
-
-        if (parents.isPresent() || permissions.isPresent() || options.isPresent())
-        {
-            PermissionData data = new PermissionData(
-                    parents.orElse(null),
-                    permissions.orElse(null),
-                    options.orElse(null));
-            overlap.merge(this, data);
-            if (data != this)
-            {
-                this.parents = data.parents;
-                this.permissions = data.permissions;
-                this.options = data.options;
-            }
-            return Optional.of(this);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Optional<PermissionData> from(DataContainer container)
-    {
-        Optional<List<String>> parents = container.getStringList(PARENTS.getQuery());
-        Optional<Map<String, Boolean>> permissions = ((Optional<Map<String, Boolean>>) container.getMap(PERMISSIONS.getQuery()));
-        Optional<Map<String, String>> options = ((Optional<Map<String, String>>) container.getMap(OPTIONS.getQuery()));
-
-        if (parents.isPresent() || permissions.isPresent() || options.isPresent())
-        {
-            this.parents = parents.orElse(null);
-            this.permissions = IPermissionData.replaceKeys(permissions, ":", ".").orElse(null);
-            this.options = IPermissionData.replaceKeys(options, ":", ".").orElse(null);
-            return Optional.of(this);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public PermissionData copy()
-    {
-        return new PermissionData(parents, permissions, options);
-    }
-
-    @Override
-    public ImmutablePermissionData asImmutable()
-    {
-        return new ImmutablePermissionData(parents, permissions, options);
-    }
-
-    @Override
-    public DataContainer toContainer()
-    {
-        DataContainer result = super.toContainer();
-        if (parents != null)
-        {
-            result.set(PARENTS, parents);
-        }
-        if (permissions != null)
-        {
-            Map<String, Boolean> perms = permissions.entrySet().stream().collect(toMap(e -> e.getKey().replace(".", ":"), Map.Entry::getValue));
-            result.set(PERMISSIONS, perms);
-        }
-        if (options != null)
-        {
-            result.set(OPTIONS, options);
-        }
-        return result;
-    }
-
-    @Override
-    public int getContentVersion()
-    {
-        return 2;
-    }
 }

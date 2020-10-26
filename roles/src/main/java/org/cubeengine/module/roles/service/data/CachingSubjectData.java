@@ -23,15 +23,17 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.cubeengine.module.roles.service.RolesPermissionService;
+import org.cubeengine.module.roles.service.subject.UserSubject;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
 public abstract class CachingSubjectData extends BaseSubjectData
 {
-    public CachingSubjectData(RolesPermissionService service)
+    public CachingSubjectData(RolesPermissionService service, Subject holder)
     {
-        super(service);
+        super(service, holder, false);
     }
 
     protected abstract void cacheParents();

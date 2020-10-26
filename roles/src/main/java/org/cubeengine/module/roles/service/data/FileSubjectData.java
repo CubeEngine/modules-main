@@ -37,15 +37,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class FileSubjectData extends CachingSubjectData
 {
     private final RoleConfig config;
 
-    public FileSubjectData(RolesPermissionService service, RoleConfig config)
+    public FileSubjectData(RolesPermissionService service, RoleConfig config, FileSubject holder)
     {
-        super(service);
+        super(service, holder);
         this.config = config;
     }
 

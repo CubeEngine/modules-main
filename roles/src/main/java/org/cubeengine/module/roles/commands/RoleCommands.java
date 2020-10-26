@@ -17,16 +17,19 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.module.roles.Roles;
 
+@Singleton
 @Command(name = "roles", desc = "Manages the roles")
-public class RoleCommands extends ContainerCommand
+public class RoleCommands extends DispatcherCommand
 {
-    public RoleCommands(CommandManager base)
+    @Inject
+    public RoleCommands(RoleManagementCommands roleManagementCommands, UserManagementCommands userManagementCommands, ManagementCommands adminCommands)
     {
-        super(base, Roles.class);
+        super(Roles.class, roleManagementCommands, userManagementCommands, adminCommands);
     }
 }

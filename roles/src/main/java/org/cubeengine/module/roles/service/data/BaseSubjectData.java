@@ -21,20 +21,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import javax.inject.Provider;
-
 import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.exception.CircularRoleDependencyException;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.FileBasedCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
-import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -60,17 +56,21 @@ public class BaseSubjectData implements SubjectData
     protected final UserCollection userCollection;
     protected final FileBasedCollection roleCollection;
     protected final RolesPermissionService service;
+    private final boolean isTransient;
+    private final Subject subject;
 
-    public BaseSubjectData(RolesPermissionService service)
+    public BaseSubjectData(RolesPermissionService service, Subject holder, boolean isTransient)
     {
         this.service = service;
         userCollection = service.getUserSubjects();
         roleCollection = service.getGroupSubjects();
+        this.isTransient = isTransient;
+        this.subject = holder;
     }
 
     public static String stringify(Context c)
     {
-        return c.getName().isEmpty() ? c.getType() : c.getType() + "|" + c.getName();
+        return c.getValue().isEmpty() ? c.getKey() : c.getKey() + "|" + c.getValue();
     }
 
     public static Context asContext(String string)
@@ -78,7 +78,7 @@ public class BaseSubjectData implements SubjectData
         String[] context = string.split("\\|");
         if (context.length == 1)
         {
-            if (context[0].equals(GLOBAL.getType()))
+            if (context[0].equals(GLOBAL.getKey()))
             {
                 return new Context(context[0], "");
             }
@@ -308,7 +308,7 @@ public class BaseSubjectData implements SubjectData
         return operate(contexts, all, operator, () -> null);
     }
 
-    private <T> boolean operate(Set<Context> contexts, Map<Context, T> all, Operator<T> operator, Provider<T> provider)
+    private <T> boolean operate(Set<Context> contexts, Map<Context, T> all, Operator<T> operator, Supplier<T> provider)
     {
         boolean changed = false;
         if (contexts.isEmpty())
@@ -322,7 +322,7 @@ public class BaseSubjectData implements SubjectData
         return changed;
     }
 
-    private <T> boolean operateOn(Map<Context, T> all, Operator<T> operator, Provider<T> provider, boolean changed, Context context)
+    private <T> boolean operateOn(Map<Context, T> all, Operator<T> operator, Supplier<T> provider, boolean changed, Context context)
     {
         T val = all.get(context);
         if (val == null)
@@ -365,7 +365,15 @@ public class BaseSubjectData implements SubjectData
         return result;
     }
 
+    @Override
+    public Subject getSubject()
+    {
+        return this.subject;
+    }
 
-
-
+    @Override
+    public boolean isTransient()
+    {
+        return this.isTransient;
+    }
 }

@@ -40,22 +40,14 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     private BaseSubjectData transientData;
     private final SubjectCollection collection;
     protected RolesPermissionService service;
-    private T data;
 
     private SubjectReference ref;
 
-    public BaseSubject(SubjectCollection collection, RolesPermissionService service, T data)
+    public BaseSubject(SubjectCollection collection, RolesPermissionService service)
     {
         this.collection = collection;
         this.service = service;
-        this.data = data;
-        this.transientData = new BaseSubjectData(service);
-    }
-
-    @Override
-    public T getSubjectData()
-    {
-        return data;
+        this.transientData = new BaseSubjectData(service, this,true);
     }
 
     @Override

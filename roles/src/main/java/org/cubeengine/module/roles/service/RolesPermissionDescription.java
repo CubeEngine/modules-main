@@ -20,23 +20,22 @@ package org.cubeengine.module.roles.service;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
-
+import net.kyori.adventure.text.Component;
 import org.cubeengine.module.roles.RolesUtil;
-import org.spongepowered.api.plugin.PluginContainer;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.plugin.PluginContainer;
 
 public class RolesPermissionDescription implements PermissionDescription
 {
     private final PermissionService permissionService;
     private final String id;
-    private final Text description;
+    private final Component description;
     private final PluginContainer owner;
 
-    public RolesPermissionDescription(PermissionService permissionService, String id, Text description, PluginContainer owner)
+    public RolesPermissionDescription(PermissionService permissionService, String id, Component description, PluginContainer owner)
     {
         this.permissionService = permissionService;
         this.id = id;
@@ -52,7 +51,7 @@ public class RolesPermissionDescription implements PermissionDescription
     }
 
     @Override
-    public Optional<Text> getDescription()
+    public Optional<Component> getDescription()
     {
         return Optional.ofNullable(this.description);
     }

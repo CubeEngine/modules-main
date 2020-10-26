@@ -19,18 +19,18 @@ package org.cubeengine.module.roles.service;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import org.spongepowered.api.plugin.PluginContainer;
+import net.kyori.adventure.text.Component;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;
-import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.plugin.PluginContainer;
 
 public class RolesPermissionDescriptionBuilder implements Builder
 {
     private final PluginContainer owner;
     private final RolesPermissionService permissionService;
     private String id;
-    private Text description;
+    private Component description;
     private final Map<String, Tristate> roleAssignments = new LinkedHashMap<String, Tristate>();
 
     public RolesPermissionDescriptionBuilder(PluginContainer owner, RolesPermissionService permissionService)
@@ -49,7 +49,7 @@ public class RolesPermissionDescriptionBuilder implements Builder
     }
 
     @Override
-    public Builder description(Text description)
+    public Builder description(Component description)
     {
         this.description = description;
         return this;

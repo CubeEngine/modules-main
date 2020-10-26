@@ -26,21 +26,20 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.service.subject.FileSubject;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
-import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.libcube.util.ContextUtil.GLOBAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.spongepowered.api.text.action.TextActions.showText;
-import static org.spongepowered.api.text.format.TextColors.YELLOW;
+import static org.cubeengine.libcube.util.ContextUtil.GLOBAL;
 
 public class RolesUtil
 {
@@ -58,12 +57,7 @@ public class RolesUtil
         FoundPermission found = findPermission(service, subject, permission, contexts, new HashSet<>());
         if (debug)
         {
-            String name = subject.getIdentifier();
-            if (subject.getCommandSource().isPresent())
-            {
-                name = subject.getCommandSource().get().getName();
-            }
-            name = subject.getContainingCollection().getIdentifier() + ":" + name;
+            final String name =  subject.getContainingCollection().getIdentifier() + ":" + subject.getFriendlyIdentifier().orElse(subject.getIdentifier());
             if (found == null)
             {
                 System.out.print("[PermCheck] " + name + " has not " + permission + "\n");
@@ -226,21 +220,22 @@ public class RolesUtil
         return option;
     }
 
-    public static Text permText(CommandSource cmdSource, String permission, PermissionService service, I18n i18n)
+    public static Component permText(CommandCause cmdSource, String permission, PermissionService service, I18n i18n)
     {
-        Text permText = Text.of(permission);
+        Component permText = Component.text(permission);
         Optional<PermissionDescription> permDesc = service.getDescription(permission);
         if (permDesc.isPresent())
         {
             if (permDesc.get().getDescription().isPresent())
             {
-                permText = permText.toBuilder().onHover(showText(permDesc.get().getDescription().get().toBuilder().color(YELLOW).build())).build();
+                permText = permText.hoverEvent(HoverEvent.showText(permDesc.get().getDescription().get().color(NamedTextColor.YELLOW)));
             }
             // TODO else
         }
         else
         {
-            permText = permText.toBuilder().onHover(showText(i18n.translate(cmdSource, NEGATIVE, "Permission not registered"))).build();
+
+            permText = permText.hoverEvent(HoverEvent.showText(i18n.translate(cmdSource, NEGATIVE, "Permission not registered")));
         }
         return permText;
     }
@@ -254,7 +249,7 @@ public class RolesUtil
             type = name.substring(0, name.indexOf("|"));
             name = name.substring(name.indexOf("|") + 1);
         }
-        return GLOBAL.getType().equals(name) ? GLOBAL : new Context(name, type);
+        return GLOBAL.getKey().equals(name) ? GLOBAL : new Context(name, type);
     }
 
     public static final class FoundOption

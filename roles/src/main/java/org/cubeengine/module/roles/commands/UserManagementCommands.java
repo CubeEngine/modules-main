@@ -23,50 +23,59 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.cubeengine.libcube.util.ContextUtil.toSet;
 
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Complete;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.format.Style;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.ExceptionHandler;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Parser;
+import org.cubeengine.libcube.service.command.annotation.Using;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
+import org.cubeengine.module.roles.commands.provider.ContextParser;
+import org.cubeengine.module.roles.commands.provider.TristateParser;
+import org.cubeengine.module.roles.commands.provider.FileSubjectParser;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
+import org.cubeengine.module.roles.exception.CircularRoleDependencyExceptionHandler;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.FileSubject;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.SubjectReference;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.util.Tristate;
 
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+@Singleton
 @Alias("manuser")
 @Command(name = "user", desc = "Manage users")
-public class UserManagementCommands extends ContainerCommand
+@Using({FileSubjectParser.class, TristateParser.class, ContextParser.class})
+public class UserManagementCommands extends DispatcherCommand
 {
     private RolesPermissionService service;
     private I18n i18n;
 
-    public UserManagementCommands(CommandManager base, RolesPermissionService service, I18n i18n)
+    @Inject
+    public UserManagementCommands(RolesPermissionService service, I18n i18n, UserInformationCommands userInformationCommands)
     {
-        super(base, Roles.class);
+        super(Roles.class, userInformationCommands);
         this.service = service;
         this.i18n = i18n;
     }
 
-    @Alias({"manUAdd", "assignURole", "addURole", "giveURole"})
+    @Alias(value = "manUAdd", alias = {"assignURole", "addURole", "giveURole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [-temp]")
-    public void assign(CommandSource ctx, @Default User player, FileSubject role, @Flag boolean temp)
+    @ExceptionHandler(CircularRoleDependencyExceptionHandler.class)
+    public void assign(CommandCause ctx, @Default User player, FileSubject role, @Flag boolean temp)
     {
 
         if (!role.canAssignAndRemove(ctx))
@@ -101,9 +110,9 @@ public class UserManagementCommands extends ContainerCommand
         });
     }
 
-    @Alias(value = {"remURole", "manUDel"})
+    @Alias(value = "remURole", alias = "manUDel")
     @Command(desc = "Removes a role from the player")
-    public void remove(CommandSource ctx, @Default User player, FileSubject role)
+    public void remove(CommandCause ctx, @Default User player, FileSubject role)
     {
         if (!role.canAssignAndRemove(ctx))
         {
@@ -119,9 +128,10 @@ public class UserManagementCommands extends ContainerCommand
         });
     }
 
-    @Alias(value = {"clearURole", "manUClear"})
+    @Alias(value = "clearURole", alias = "manUClear")
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in context]")
-    public void clear(CommandSource ctx, @Default User player)
+    @ExceptionHandler(CircularRoleDependencyExceptionHandler.class)
+    public void clear(CommandCause ctx, @Default User player)
     {
         player.getSubjectData().clearParents(emptySet());
         i18n.send(ctx, NEUTRAL, "Cleared the roles of {user}.", player);
@@ -132,14 +142,14 @@ public class UserManagementCommands extends ContainerCommand
             for (SubjectReference subject : defaultData.getParents(emptySet()))
             {
                 player.getTransientSubjectData().addParent(emptySet(), subject);
-                ctx.sendMessage(Text.of("- ", TextColors.YELLOW, subject.getSubjectIdentifier()));
+                ctx.sendMessage(Identity.nil(), i18n.composeMessage(ctx, Style.empty(), "- {name:color=YELLOW}", subject.getSubjectIdentifier()));
             }
         }
     }
 
     @Alias(value = "setUPerm")
     @Command(alias = "setPerm", desc = "Sets a permission for this user [in context]")
-    public void setPermission(CommandSource ctx, @Default User player, @Complete(PermissionCompleter.class) String permission, @Default Tristate type, @Named("in") @Default Context context)
+    public void setPermission(CommandCause ctx, @Default User player, @Parser(completer = PermissionCompleter.class) String permission, @Default Tristate type, @Named("in") @Default Context context)
     {
         if (type == Tristate.UNDEFINED)
         {
@@ -164,7 +174,7 @@ public class UserManagementCommands extends ContainerCommand
 
     @Alias(value = "resetUPerm")
     @Command(alias = "resetPerm", desc = "Resets a permission for this user [in context]")
-    public void resetPermission(CommandSource ctx, @Default User player, String permission, @Named("in") @Default Context context)
+    public void resetPermission(CommandCause ctx, @Default User player, String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         player.getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED).thenAccept(b -> {
@@ -177,9 +187,9 @@ public class UserManagementCommands extends ContainerCommand
         });
     }
 
-    @Alias(value = {"setUOption","setUData"})
+    @Alias(value = "setUOption", alias = "setUData")
     @Command(alias = "setData", desc = "Sets options for this user [in context]")
-    public void setOption(CommandSource ctx, @Default User player, String key, String value, @Named("in") @Default Context context)
+    public void setOption(CommandCause ctx, @Default User player, String key, String value, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         player.getSubjectData().setOption(contexts, key, value).thenAccept(b -> {
@@ -192,9 +202,9 @@ public class UserManagementCommands extends ContainerCommand
         });
     }
 
-    @Alias(value = {"resetUOption","resetUData"})
+    @Alias(value = "resetUOption", alias = "resetUData")
     @Command(alias = {"resetData", "deleteOption", "deleteData"}, desc = "Resets options for this user [in context]")
-    public void resetOption(CommandSource ctx, @Default User player, String key, @Named("in") @Default Context context)
+    public void resetOption(CommandCause ctx, @Default User player, String key, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         player.getSubjectData().setOption(contexts, key, null).thenAccept(b -> {
@@ -207,9 +217,9 @@ public class UserManagementCommands extends ContainerCommand
         });
     }
 
-    @Alias(value = {"clearUOption", "clearUData"})
+    @Alias(value = "clearUOption", alias = "clearUData")
     @Command(alias = "clearData", desc = "Resets options for this user [in context]")
-    public void clearOption(CommandSource ctx, @Default User player, @Named("in") @Default Context context)
+    public void clearOption(CommandCause ctx, @Default User player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         player.getSubjectData().clearOptions(contexts).thenAccept(b -> {

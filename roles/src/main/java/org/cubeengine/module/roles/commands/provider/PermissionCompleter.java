@@ -22,31 +22,24 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.argument.Completer;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.ParserFor;
 import org.cubeengine.module.roles.RolesUtil;
-import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.managed.ValueCompleter;
 
 import static java.util.stream.Collectors.toList;
 
-public class PermissionCompleter implements Completer
+@Singleton
+public class PermissionCompleter implements ValueCompleter
 {
-    private PermissionService ps;
-
-    public PermissionCompleter(PermissionService ps)
-    {
-        this.ps = ps;
-    }
-
     @Override
-    public List<String> suggest(Class type, CommandInvocation invocation)
+    public List<String> complete(CommandContext context, String currentInput)
     {
         Set<String> result = new HashSet<>();
-        String token = invocation.currentToken();
-
-        for (String permission : RolesUtil.allPermissions.stream().filter(p -> p.startsWith(token)).collect(toList()))
+        for (String permission : RolesUtil.allPermissions.stream().filter(p -> p.startsWith(currentInput)).collect(toList()))
         {
-            String substring = permission.substring(token.length());
+            String substring = permission.substring(currentInput.length());
             int i = substring.indexOf(".");
             if (i == -1)
             {
@@ -54,11 +47,12 @@ public class PermissionCompleter implements Completer
             }
             else
             {
-                result.add(permission.substring(0, token.length() + i));
+                result.add(permission.substring(0, currentInput.length() + i));
             }
         }
         ArrayList<String> list = new ArrayList<>(result);
         Collections.sort(list);
         return list;
     }
+
 }

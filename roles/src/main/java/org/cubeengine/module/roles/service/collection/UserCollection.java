@@ -24,12 +24,11 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.cubeengine.module.roles.service.subject.UserSubject;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.user.UserManager;
 
 public class UserCollection extends BaseSubjectCollection
 {
@@ -92,8 +91,8 @@ public class UserCollection extends BaseSubjectCollection
     public CompletableFuture<Boolean> hasSubject(String identifier)
     {
         return CompletableFuture.supplyAsync(() -> {
-            UserStorageService service = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-            return service.get(UUID.fromString(identifier)).isPresent();
+            final UserManager userManager = Sponge.getServer().getUserManager();
+            return userManager.get(UUID.fromString(identifier)).isPresent();
         });
     }
 
@@ -101,8 +100,8 @@ public class UserCollection extends BaseSubjectCollection
     public CompletableFuture<Set<String>> getAllIdentifiers()
     {
         return CompletableFuture.supplyAsync(() -> {
-            UserStorageService service = Sponge.getServiceManager().provideUnchecked(UserStorageService.class);
-            return service.getAll().stream().map(gp -> gp.getUniqueId().toString()).collect(Collectors.toSet());
+            final UserManager userManager = Sponge.getServer().getUserManager();
+            return userManager.getAll().stream().map(gp -> gp.getUniqueId().toString()).collect(Collectors.toSet());
         });
     }
 

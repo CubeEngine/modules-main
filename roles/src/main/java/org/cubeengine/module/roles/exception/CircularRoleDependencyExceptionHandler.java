@@ -17,46 +17,39 @@
  */
 package org.cubeengine.module.roles.exception;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.ExecutionException;
-import org.cubeengine.butler.CommandBase;
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.exception.PriorityExceptionHandler;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.text.TextComponent.Builder;
+import org.cubeengine.libcube.service.command.CommandExceptionHandler;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.parameter.CommandContext;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
-public class RolesExceptionHandler implements PriorityExceptionHandler
+@Singleton
+public class CircularRoleDependencyExceptionHandler implements CommandExceptionHandler
 {
     private I18n i18n;
 
-    public RolesExceptionHandler(I18n i18n)
+    @Inject
+    public CircularRoleDependencyExceptionHandler(I18n i18n)
     {
         this.i18n = i18n;
     }
 
     @Override
-    public boolean handleException(Throwable t, CommandBase command, CommandInvocation invocation)
+    public boolean handleException(Throwable t, CommandContext context, Builder builder)
     {
-        if (t instanceof InvocationTargetException || t instanceof ExecutionException)
-        {
-            t = t.getCause();
-        }
-
-        CommandSource sender = (CommandSource) invocation.getCommandSource();
-
-
         if (t instanceof CircularRoleDependencyException)
         {
             int depth = ((CircularRoleDependencyException) t).getDepth();
             if (depth == 0)
             {
-                i18n.send(sender, NEGATIVE, "Cannot assign role to itself");
+                builder.append(i18n.translate(context.getCause(), NEGATIVE, "Cannot assign role to itself"));
             }
             else
             {
-                i18n.send(sender, NEGATIVE, "Circular Dependency detected! Depth: {}", depth);
+                builder.append(i18n.translate(context.getCause(), NEGATIVE, "Circular Dependency detected! Depth: {}", depth));
             }
             return true;
         }

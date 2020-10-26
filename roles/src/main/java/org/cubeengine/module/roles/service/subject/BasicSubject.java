@@ -18,25 +18,29 @@
 package org.cubeengine.module.roles.service.subject;
 
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.BaseSubjectData;
-import org.spongepowered.api.Game;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectCollection;
 
 public class BasicSubject extends BaseSubject<BaseSubjectData>
 {
+    private final BaseSubjectData data;
     private String identifier;
 
     public BasicSubject(String identifier, SubjectCollection collection, RolesPermissionService service)
     {
-        super(collection, service, new BaseSubjectData(service));
+        super(collection, service);
         this.identifier = identifier;
+        this.data = new BaseSubjectData(service, this,false);
+    }
+
+    @Override
+    public BaseSubjectData getSubjectData()
+    {
+        return this.data;
     }
 
     @Override
@@ -45,19 +49,19 @@ public class BasicSubject extends BaseSubject<BaseSubjectData>
         return identifier;
     }
 
-    @Override
-    public Optional<CommandSource> getCommandSource()
-    {
-        if (identifier.equals("Server"))
-        {
-            return Optional.of(Sponge.getServer().getConsole());
-        }
-        if (identifier.equals("RCON"))
-        {
-
-        }
-        return Optional.empty();
-    }
+//    @Override
+//    public Optional<CommandSource> getCommandSource()
+//    {
+//        if (identifier.equals("Server"))
+//        {
+//            return Optional.of(Sponge.getServer().getConsole());
+//        }
+//        if (identifier.equals("RCON"))
+//        {
+//
+//        }
+//        return Optional.empty();
+//    }
 
     @Override
     public Set<Context> getActiveContexts()

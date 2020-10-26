@@ -26,14 +26,16 @@ import org.cubeengine.converter.node.MapNode;
 import org.cubeengine.converter.node.Node;
 import org.cubeengine.converter.node.StringNode;
 import org.cubeengine.module.roles.Roles;
+import org.cubeengine.module.roles.service.RolesPermissionService;
 
 public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
 {
-    private final Roles module;
 
-    public PermissionTreeConverter(Roles module)
+    private RolesPermissionService service;
+
+    public PermissionTreeConverter(RolesPermissionService service)
     {
-        this.module = module;
+        this.service = service;
     }
 
     @Override
@@ -143,7 +145,7 @@ public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
         }
         else
         {
-            this.module.getService().getLog().warn("Deleted Invalid PermissionTree!");
+            this.service.getLog().warn("Deleted Invalid PermissionTree!");
         }
         return permTree;
     }

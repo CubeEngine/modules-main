@@ -17,20 +17,19 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
-import static org.spongepowered.api.text.format.TextColors.DARK_RED;
-import static org.spongepowered.api.text.format.TextColors.GOLD;
-
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Complete;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import com.google.inject.Inject;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.command.annotation.Parser;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;
@@ -39,29 +38,28 @@ import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.FileBasedCollection;
 import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.plugin.PluginContainer;
 
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 @Command(name = "admin", desc = "Manages the module", alias = "manadmin")
-public class ManagementCommands extends ContainerCommand
+public class ManagementCommands extends DispatcherCommand
 {
     private Roles module;
     private RolesPermissionService service;
     private I18n i18n;
     private PluginContainer plugin;
 
-    public ManagementCommands(CommandManager base, Roles module, RolesPermissionService service, I18n i18n, PluginContainer plugin)
+    @Inject
+    public ManagementCommands(Roles module, RolesPermissionService service, I18n i18n, PluginContainer plugin)
     {
-        super(base, Roles.class);
+        super(Roles.class);
         this.module = module;
         this.service = service;
         this.i18n = i18n;
@@ -70,7 +68,7 @@ public class ManagementCommands extends ContainerCommand
 
     @Alias(value = "manload")
     @Command(desc = "Reloads all roles from config")
-    public void reload(CommandSource context)
+    public void reload(CommandCause context)
     {
         module.getConfiguration().reload();
         service.getConfig().reload();
@@ -89,7 +87,7 @@ public class ManagementCommands extends ContainerCommand
 
     @Alias(value = "mansave")
     @Command(desc = "Overrides all configs with current settings")
-    public void save(CommandSource context)
+    public void save(CommandCause context)
     {
         module.getConfiguration().save();
         for (Subject subject : service.getGroupSubjects().getLoadedSubjects())
@@ -105,7 +103,7 @@ public class ManagementCommands extends ContainerCommand
 
     @Alias(value = "mandebug")
     @Command(desc = "Toggles debug mode")
-    public void debug(CommandSource context, @Optional Integer seconds)
+    public void debug(CommandCause context, @Option Integer seconds)
     {
         RolesUtil.debug = !RolesUtil.debug;
         if (RolesUtil.debug)
@@ -114,8 +112,9 @@ public class ManagementCommands extends ContainerCommand
             {
                 seconds = seconds > 60 ? 60 : seconds < 0 ? 1 : seconds; // Min 1 Max 60
                 i18n.send(context, POSITIVE, "Debug enabled for {number} seconds", seconds);
-                Sponge.getScheduler().createTaskBuilder().delay(seconds, TimeUnit.SECONDS)
-                        .execute(() -> RolesUtil.debug = false).submit(plugin);
+
+                final Task task = Task.builder().delay(seconds, TimeUnit.SECONDS).execute(() -> RolesUtil.debug = false).plugin(plugin).build();
+                Sponge.getServer().getScheduler().submit(task);
             }
             else
             {
@@ -129,7 +128,7 @@ public class ManagementCommands extends ContainerCommand
     }
 
     @Command(desc = "Searches for registered Permissions")
-    public void findPermission(CommandSource sender, @Complete(PermissionCompleter.class) String permission)
+    public void findPermission(CommandCause sender, @Parser(completer = PermissionCompleter.class) String permission)
     {
         PermissionDescription perm = service.getDescription(permission).orElse(null);
         if (perm == null)
@@ -141,7 +140,7 @@ public class ManagementCommands extends ContainerCommand
             i18n.send(sender, POSITIVE, "Permission {name} found:", permission);
             if (perm.getDescription().isPresent())
             {
-                sender.sendMessage(perm.getDescription().get().toBuilder().color(GOLD).build());
+                sender.sendMessage(Identity.nil(), perm.getDescription().get().color(NamedTextColor.GOLD));
             }
             Map<Subject, Boolean> roles = perm.getAssignedSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE);
             if (!roles.isEmpty())
@@ -149,9 +148,10 @@ public class ManagementCommands extends ContainerCommand
                 i18n.send(sender, POSITIVE, "Permission is assigned to the following templates:");
                 for (Entry<Subject, Boolean> entry : roles.entrySet())
                 {
-                    sender.sendMessage(Text.of("  - ", GOLD, entry.getKey().getIdentifier(), ": ",
-                                                entry.getValue() ? DARK_GREEN : DARK_RED,
-                                                entry.getValue() ? "true" : "false")); // TODO translate
+                    Component.text().append(Component.text("  - "))
+                             .append(Component.text(entry.getKey().getIdentifier() + ": ", NamedTextColor.GOLD))
+                             .append(Component.text(entry.getValue(), entry.getValue() ? NamedTextColor.DARK_GREEN : NamedTextColor.DARK_RED));
+                    // TODO translate entry.getValue true/false
                 }
             }
         }
