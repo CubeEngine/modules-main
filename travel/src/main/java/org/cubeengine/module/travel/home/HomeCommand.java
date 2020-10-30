@@ -17,102 +17,82 @@
  */
 package org.cubeengine.module.travel.home;
 
-import static java.util.stream.Collectors.toSet;
-import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
-import static org.spongepowered.api.text.format.TextColors.BLUE;
-import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
-import static org.spongepowered.api.text.format.TextColors.GOLD;
-import static org.spongepowered.api.text.format.TextColors.RED;
-
-import com.flowpowered.math.vector.Vector3d;
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Complete;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Greed;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Predicate;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.cubeengine.libcube.service.Selector;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
-import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
-import org.cubeengine.libcube.service.command.property.RawPermission;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Greedy;
+import org.cubeengine.libcube.service.command.annotation.Label;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.command.annotation.Parser;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.i18n.formatter.MessageType;
-import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
 import org.cubeengine.libcube.util.ConfirmManager;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.module.travel.Travel;
+import org.cubeengine.module.travel.TravelPerm;
 import org.cubeengine.module.travel.config.Home;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.util.Transform;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-import java.util.function.Predicate;
+import static java.util.stream.Collectors.toSet;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
+@Singleton
 @Command(name = "home", desc = "Teleport to your home")
-public class HomeCommand extends ContainerCommand
+public class HomeCommand extends DispatcherCommand
 {
     private final HomeManager manager;
+    private TravelPerm perms;
     private final Travel module;
-    private Selector selector;
+    @Inject(optional = true) private Selector selector;
     private I18n i18n;
 
-    public HomeCommand(CommandManager base, Travel module, Selector selector, I18n i18n)
+    @Inject
+    public HomeCommand(Travel module, I18n i18n, HomeManager manager, TravelPerm perms)
     {
-        super(base, Travel.class);
+        super(Travel.class);
         this.module = module;
-        this.selector = selector;
         this.i18n = i18n;
-        this.manager = module.getHomeManager();
+        this.manager = manager;
+        this.perms = perms;
     }
 
-    @Override
-    protected boolean selfExecute(CommandInvocation invocation)
+    @Restricted
+    @Command(name = "tp", desc = "Teleport to a home", dispatcher = true)
+    public void dispatcher(ServerPlayer sender, @Parser(completer = HomeCompleter.class) @Option String home)
     {
-        if (invocation.getCommandSource() instanceof Player)
-        {
-            return getCommand("tp").execute(invocation);
-        }
-        return super.selfExecute(invocation);
+        this.tp(sender, home, sender.getUser());
     }
 
-    @Override
-    public List<String> getSuggestions(CommandInvocation invocation)
-    {
-        List<String> list = super.getSuggestions(invocation);
-        list.addAll(invocation.providers().completers().get(Home.class).suggest(Home.class, invocation));
-        return list;
-    }
-
-    @Restricted(Player.class)
+    @Restricted
     @Command(desc = "Teleport to a home")
-    public void tp(Player sender, @Complete(HomeCompleter.class) @Optional String home, @Default User owner)
+    public void tp(ServerPlayer sender, @Parser(completer = HomeCompleter.class) @Option String home, @Default User owner)
     {
         home = home == null ? "home" : home;
         // TODO find close match and display as click cmd
@@ -123,37 +103,36 @@ public class HomeCommand extends ContainerCommand
             i18n.send(sender, NEUTRAL, "Use {text:/sethome} to set your home"); // TODO create on click
             return;
         }
-        if (!h.isInvited(sender) && !owner.equals(sender))
+        if (!h.isInvited(sender.getUser()) && !owner.getUniqueId().equals(sender.getUniqueId()))
         {
-            if (!sender.hasPermission(module.getPermissions().HOME_TP_OTHER.getId()))
+            if (!perms.HOME_TP_OTHER.check(sender, i18n))
             {
-                throw new PermissionDeniedException(module.getPermissions().HOME_TP_OTHER);
+                return;
             }
         }
-        Transform<World> location = h.transform.getTransformIn(h.world.getWorld());
+        Transform transform = h.transform;
         sender.remove(Keys.VEHICLE);
-        sender.setTransform(location);
+        sender.setLocationAndRotation(h.world.getWorld().getLocation(transform.getPosition()), transform.getRotation());
         if (h.welcomeMsg != null)
         {
-            sender.sendMessage(Text.of(h.welcomeMsg));
+            sender.sendMessage(Identity.nil(), Component.text(h.welcomeMsg));
             return;
         }
         if (h.owner.equals(sender.getUniqueId()))
         {
-            i18n.send(ACTION_BAR, sender, POSITIVE, "You have been teleported to your home {name}!", h.name);
+            i18n.send(ChatType.ACTION_BAR, sender, POSITIVE, "You have been teleported to your home {name}!", h.name);
             return;
         }
-        i18n.send(ACTION_BAR, sender, POSITIVE, "You have been teleported to the home {name} of {user}!", h.name, h.getOwner());
+        i18n.send(ChatType.ACTION_BAR, sender, POSITIVE, "You have been teleported to the home {name} of {user}!", h.name, h.getOwner());
     }
 
     @Alias("sethome")
     @Command(alias = {"create", "sethome", "createhome"}, desc = "Set your home")
-    @Restricted(value = Player.class, msg = "Ok so I'll need your new address then. No seriously this won't work!")
-    public void set(CommandSource context, @Optional String name)
+    @Restricted(msg = "Ok so I'll need your new address then. No seriously this won't work!")
+    public void set(ServerPlayer context, @Option String name)
     {
-        Player sender = (Player)context;
-        if (this.manager.getCount(sender) >= this.module.getConfig().homes.max
-            && !context.hasPermission(module.getPermissions().HOME_SET_MORE.getId()))
+        if (this.manager.getCount(context) >= this.module.getConfig().homes.max
+            && !context.hasPermission(perms.HOME_SET_MORE.getId()))
         {
             i18n.send(context, NEGATIVE, "You have reached your maximum number of homes!");
             i18n.send(context, NEUTRAL, "You have to delete a home to make a new one");
@@ -165,26 +144,26 @@ public class HomeCommand extends ContainerCommand
             i18n.send(context, NEGATIVE, "Homes may not have names that are longer then 32 characters nor contain colon(:)'s!");
             return;
         }
-        if (this.manager.has(sender, name))
+        if (this.manager.has(context.getUser(), name))
         {
             i18n.send(context, NEGATIVE, "The home already exists! You can move it with {text:/home move}");
             return;
         }
-        Home home = this.manager.create(sender, name, sender.getTransform());
+        Home home = this.manager.create(context.getUser(), name, context.getWorld(), context.getTransform());
         i18n.send(context, POSITIVE, "Your home {name} has been created!", home.name);
     }
 
     @Command(desc = "Set the welcome message of homes", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
-    public void greeting(CommandSource sender,
-                         @Complete(HomeCompleter.class) String home,
-                         @Optional @Label("welcome message") @Greed(INFINITE) String message,
+    public void greeting(CommandCause sender,
+                         @Parser(completer = HomeCompleter.class) String home,
+                         @Option @Label("welcome message") @Greedy String message,
                          @Default @Named("owner") User owner,
                          @Flag boolean append)
     {
         Home h = this.manager.get(owner, home).orElse(null);
         if (h == null)
         {
-            homeNotFoundMessage(sender, owner, home);
+            homeNotFoundMessage(sender.getAudience(), owner, home);
             return;
         }
         if (append)
@@ -196,7 +175,7 @@ public class HomeCommand extends ContainerCommand
             h.welcomeMsg = message;
         }
         manager.save();
-        if (h.getOwner().equals(sender))
+        if (h.isOwner(sender))
         {
             i18n.send(sender, POSITIVE, "The welcome message for your home {name} is now set to:", h.name);
         }
@@ -204,12 +183,12 @@ public class HomeCommand extends ContainerCommand
         {
             i18n.send(sender, POSITIVE, "The welcome message for the home {name} of {user} is now set to:", h.name, owner);
         }
-        sender.sendMessage(Text.of(h.welcomeMsg));
+        sender.sendMessage(Identity.nil(), Component.text(h.welcomeMsg));
     }
 
-    @Restricted(value = Player.class, msg = "I am calling the moving company right now!")
+    @Restricted(msg = "I am calling the moving company right now!")
     @Command(alias = "replace", desc = "Move a home")
-    public void move(Player sender, @Complete(HomeCompleter.class) @Optional String name, @Default User owner)
+    public void move(ServerPlayer sender, @Parser(completer = HomeCompleter.class) @Option String name, @Default User owner)
     {
         name = name == null ? "home" : name;
         Home home = this.manager.get(owner, name).orElse(null);
@@ -219,11 +198,12 @@ public class HomeCommand extends ContainerCommand
             i18n.send(sender, NEUTRAL, "Use {text:/sethome} to set your home"); // TODO create on click
             return;
         }
-        if (!home.isOwner(sender) && !sender.hasPermission(module.getPermissions().HOME_MOVE_OTHER.getId()))
+
+        if (!home.isOwner(sender.getUser()) && !perms.HOME_MOVE_OTHER.check(sender, i18n))
         {
-            throw new PermissionDeniedException(module.getPermissions().HOME_MOVE_OTHER);
+            return;
         }
-        home.setTransform(sender.getTransform());
+        home.setTransform(sender.getWorld(), sender.getTransform());
         manager.save();
         if (home.owner.equals(sender.getUniqueId()))
         {
@@ -233,23 +213,24 @@ public class HomeCommand extends ContainerCommand
         i18n.send(sender, POSITIVE, "The home {name} of {user} has been moved to your current location", home.name, owner);
     }
 
-    @Alias(value = {"remhome", "removehome", "delhome", "deletehome"})
+    @Alias(value = "remhome", alias = {"removehome", "delhome", "deletehome"})
     @Command(alias = {"delete", "rem", "del"}, desc = "Remove a home")
-    public void remove(CommandSource sender, @Complete(HomeCompleter.class) @Optional String name, @Default @Optional Player owner)
+    public void remove(CommandCause sender, @Parser(completer = HomeCompleter.class) @Option String name, @Default User owner)
     {
         name = name == null ? "home" : name;
         Home home = this.manager.get(owner, name).orElse(null);
         if (home == null)
         {
-            homeNotFoundMessage(sender, owner, name);
+            homeNotFoundMessage(sender.getAudience(), owner, name);
             return;
         }
-        if (!sender.equals(home.getOwner().getPlayer().orElse(null)) && !sender.hasPermission(module.getPermissions().HOME_REMOVE_OTHER.getId()))
+
+        if (!home.isOwner(sender) && !perms.HOME_REMOVE_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
         {
-            throw new PermissionDeniedException(module.getPermissions().HOME_REMOVE_OTHER);
+            return;
         }
         this.manager.delete(home);
-        if (owner.equals(sender))
+        if (sender.getAudience() instanceof ServerPlayer && owner.getUniqueId().equals(((ServerPlayer)sender.getAudience()).getUniqueId()))
         {
             i18n.send(sender, POSITIVE, "Your home {name} has been removed!", name);
             return;
@@ -258,22 +239,22 @@ public class HomeCommand extends ContainerCommand
     }
 
     @Command(desc = "Rename a home")
-    public void rename(CommandSource sender, @Complete(HomeCompleter.class) String home, @Label("new name") String newName, @Default @Optional Player owner)
+    public void rename(CommandCause sender, @Parser(completer = HomeCompleter.class) String home, @Label("new name") String newName, @Default @Option User owner)
     {
         Home h = manager.get(owner, home).orElse(null);
         if (h == null)
         {
-            homeNotFoundMessage(sender, owner, home);
+            homeNotFoundMessage(sender.getAudience(), owner, home);
             return;
         }
-        if (!h.getOwner().equals(sender) && !sender.hasPermission(module.getPermissions().HOME_RENAME_OTHER.getId()))
+
+        if (!h.isOwner(sender) && !perms.HOME_RENAME_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
         {
-            throw new PermissionDeniedException(module.getPermissions().HOME_RENAME_OTHER);
+            return;
         }
         if (home.contains(":") || home.length() >= 32)
         {
-            i18n.send(sender, NEGATIVE,
-                                   "Homes may not have names that are longer than 32 characters or contain colon(:)'s!");
+            i18n.send(sender, NEGATIVE, "Homes may not have names that are longer than 32 characters or contain colon(:)'s!");
             return;
         }
         String oldName = h.name;
@@ -283,7 +264,7 @@ public class HomeCommand extends ContainerCommand
             i18n.send(sender, POSITIVE, "Could not rename the home to {name}", newName);
             return;
         }
-        if (h.getOwner().equals(sender))
+        if (h.isOwner(sender))
         {
             i18n.send(sender, POSITIVE, "Your home {name} has been renamed to {name}", oldName, newName);
             return;
@@ -291,18 +272,19 @@ public class HomeCommand extends ContainerCommand
         i18n.send(sender, POSITIVE, "The home {name} of {user} has been renamed to {name}", oldName, owner, newName);
     }
 
-    @Alias(value = {"listhomes", "homes"})
+    @Alias(value = "listhomes", alias = "homes")
     @Command(alias = "listhomes", desc = "Lists homes a player can access")
-    public void list(CommandSource sender, @Default User owner,
+    public void list(CommandCause sender, @Default User owner,
                      @Flag boolean owned,
                      @Flag boolean invited) throws Exception
     {
-        if (!owner.equals(sender))
+
+        final boolean isOwner = sender.getAudience() instanceof ServerPlayer && owner.getUniqueId().equals(((ServerPlayer)sender.getAudience()).getUniqueId());
+        if (!isOwner)
         {
-            Permission otherPerm = module.getPermissions().HOME_LIST_OTHER;
-            if (!sender.hasPermission(otherPerm.getId()))
+            if (!perms.HOME_LIST_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
             {
-                throw new PermissionDeniedException(new RawPermission(otherPerm.getId(), otherPerm.getDesc()));
+                return;
             }
         }
         if (!owned && !invited)
@@ -313,7 +295,7 @@ public class HomeCommand extends ContainerCommand
         Set<Home> homes = this.manager.list(owner, owned, invited);
         if (homes.isEmpty())
         {
-            if (owner.equals(sender))
+            if (isOwner)
             {
                 i18n.send(sender, NEGATIVE, "No homes are available to you!");
                 return;
@@ -321,7 +303,7 @@ public class HomeCommand extends ContainerCommand
             i18n.send(sender, NEGATIVE, "No homes are available to {user}!", owner);
             return;
         }
-        if (owner.equals(sender))
+        if (isOwner)
         {
             i18n.send(sender, NEUTRAL, "The following homes are available to you:");
         }
@@ -332,34 +314,39 @@ public class HomeCommand extends ContainerCommand
 
         for (Home home : homes)
         {
-            Text teleport = i18n.translate(sender, MessageType.NONE, "(tp)").toBuilder().color(BLUE)
-                .onClick(TextActions.runCommand("/home tp " + home.name + " " + home.getOwner().getName()))
-                .onHover(TextActions.showText(i18n.translate(sender, POSITIVE, "Click to teleport to {name}", home.name)))
-                .build();
+            Component teleport = i18n.translate(sender, "(tp)").color(NamedTextColor.BLUE)
+                                     .clickEvent(ClickEvent.runCommand("/home tp " + home.name + " " + home.getOwner().getName()))
+                                     .hoverEvent(HoverEvent.showText(i18n.translate(sender, POSITIVE, "Click to teleport to {name}", home.name)));
             if (home.isOwner(sender))
             {
-                sender.sendMessage(Text.of("  - ", GOLD, home.name, " ", teleport));
+                sender.sendMessage(Identity.nil(), Component.text().append(Component.text("   - "))
+                                                                   .append(Component.text(home.name + " ", NamedTextColor.GOLD))
+                                                                   .append(teleport).build());
             }
             else
             {
-                sender.sendMessage(Text.of("  - ", GOLD, home.getOwner().getName(), ":", home.name, " ", teleport));
+                sender.sendMessage(Identity.nil(), Component.text().append(Component.text("   - "))
+                                                            .append(Component.text(home.getOwner().getName() +":" + home.name + " ", NamedTextColor.GOLD))
+                                                            .append(teleport).build());
             }
         }
     }
 
     @Command(name = "ilist", alias = "invited", desc = "List all players invited to your homes")
-    public void invitedList(CommandSource sender, @Default User owner)
+    public void invitedList(CommandCause sender, @Default User owner)
     {
-        if (!owner.equals(sender) && !sender.hasPermission(module.getPermissions().HOME_LIST_OTHER.getId()))
+        final boolean isOwner = sender.getAudience() instanceof ServerPlayer && owner.getUniqueId().equals(((ServerPlayer)sender.getAudience()).getUniqueId());
+
+        if (!isOwner && !perms.HOME_LIST_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
         {
-            throw new PermissionDeniedException(module.getPermissions().HOME_LIST_OTHER);
+            return;
         }
         Set<Home> homes = this.manager.list(owner, true, false).stream()
                                       .filter(home -> !home.invites.isEmpty())
                                       .collect(toSet());
         if (homes.isEmpty())
         {
-            if (owner.equals(sender))
+            if (isOwner)
             {
                 i18n.send(sender, NEGATIVE, "You have no homes with players invited to them!");
                 return;
@@ -367,7 +354,7 @@ public class HomeCommand extends ContainerCommand
             i18n.send(sender, NEGATIVE, "{user} has no homes with players invited to them!", owner);
             return;
         }
-        if (owner.equals(sender))
+        if (isOwner)
         {
             i18n.send(sender, NEUTRAL, "Your following homes have players invited to them:");
         }
@@ -377,31 +364,30 @@ public class HomeCommand extends ContainerCommand
         }
         for (Home home : homes)
         {
-            sender.sendMessage(Text.of(TextColors.GOLD, "  ", home.name, ":"));
+            sender.sendMessage(Identity.nil(), Component.text("  " + home.name + ":", NamedTextColor.GOLD));
             for (UUID invite : home.invites)
             {
-                String name = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(invite).get().getName();
-                Text uninvite = Text.of("(-)").toBuilder().color(RED)
-                    .onHover(TextActions.showText(i18n.translate(sender, NEUTRAL, "Click to uninvite {user} from {name}", name, home.name)))
-                    .onClick(TextActions.runCommand("/home uninvite " + name + " " + home.name))
-                    .build();
-                sender.sendMessage(Text.of("    ", DARK_GREEN, name, " ", uninvite));
+                final String name = Sponge.getServer().getUserManager().get(invite).get().getName();
+                final Component unInvite = Component.text("(-)", NamedTextColor.RED).hoverEvent(
+                    HoverEvent.showText(i18n.translate(sender, NEUTRAL, "Click to uninvite {user} from {name}", name, home.name)))
+                              .clickEvent(ClickEvent.runCommand("/home uninvite " + name + " " + home.name));
+                sender.sendMessage(Identity.nil(), unInvite);
             }
         }
     }
 
-    @Restricted(value = Player.class, msg = "How about making a phone call to invite someone instead?")
+    @Restricted(msg = "How about making a phone call to invite someone instead?")
     @Command(desc = "Invite a user to one of your homes")
-    public void invite(Player sender, User player, @Complete(HomeCompleter.class) @Optional String home)
+    public void invite(ServerPlayer sender, User player, @Parser(completer = HomeCompleter.class) @Option String home)
     {
         home = home == null ? "home" : home;
-        Home h = this.manager.get(sender, home).orElse(null);
+        Home h = this.manager.get(sender.getUser(), home).orElse(null);
         if (h == null || !h.owner.equals(sender.getUniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You do not own a home named {name#home}!", home);
             return;
         }
-        if (player.equals(sender))
+        if (player.getUniqueId().equals(sender.getUniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You cannot invite yourself to your own home!");
             return;
@@ -422,18 +408,18 @@ public class HomeCommand extends ContainerCommand
         i18n.send(sender, POSITIVE, "{user} is now invited to your home {name}", player, h.name);
     }
 
-    @Restricted(Player.class)
+    @Restricted(ServerPlayer.class)
     @Command(desc = "Uninvite a player from one of your homes")
-    public void unInvite(Player sender, User player, @Complete(HomeCompleter.class) @Optional String home )
+    public void unInvite(ServerPlayer sender, User player, @Parser(completer = HomeCompleter.class) @Option String home)
     {
         home = home == null ? "home" : home;
-        Home h = this.manager.get(sender, home).orElse(null);
+        Home h = this.manager.get(sender.getUser(), home).orElse(null);
         if (h == null || !h.owner.equals(sender.getUniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You do not own a home named {name#home}!", home);
             return;
         }
-        if (player.equals(sender))
+        if (player.getUniqueId().equals(sender.getUniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You cannot uninvite yourself from your own home!");
             return;
@@ -453,24 +439,24 @@ public class HomeCommand extends ContainerCommand
 
     @Alias("purgehomes")
     @Command(desc = "Removes all homes in a world")
-    public void purge(CommandSource context, WorldProperties world)
+    public void purge(CommandCause context, ServerWorld world)
     {
         this.manager.purge(world);
         i18n.send(context, POSITIVE, "Purged all homes in {world}", world);
     }
 
-    @Alias(value = {"clearhomes"})
+    @Alias("clearhomes")
     @Command(desc = "Clear all homes [of a player]")
-    public void clear(final CommandSource context, @Optional final User owner,
-                               @Flag(name = "sel", longName = "selection") final boolean selection)
+    public void clear(final CommandCause context, @Option final User owner,
+                               @Flag(value = "sel", longName = "selection") final boolean selection)
     {
-        if (this.module.getConfig().clearOnlyFromConsole && !(context instanceof ConsoleSource))
+        if (this.module.getConfig().clearOnlyFromConsole && !(context.getAudience() instanceof SystemSubject))
         {
             i18n.send(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return;
         }
-        final Location<World> firstPoint;
-        final Location<World> secondPoint;
+        final ServerLocation firstPoint;
+        final ServerLocation secondPoint;
         if (selection)
         {
             if (selector == null)
@@ -493,13 +479,11 @@ public class HomeCommand extends ContainerCommand
             secondPoint = selector.getSecondPoint((Player)context);
             if (owner != null)
             {
-                i18n.send(context, NEGATIVE,
-                                      "Are you sure you want to delete all homes created by {user} in your current selection?", owner);
+                i18n.send(context, NEGATIVE, "Are you sure you want to delete all homes created by {user} in your current selection?", owner);
             }
             else
             {
-                i18n.send(context, NEGATIVE,
-                                      "Are you sure you want to delete all homes created in your current selection?");
+                i18n.send(context, NEGATIVE, "Are you sure you want to delete all homes created in your current selection?");
             }
         }
         else
@@ -508,17 +492,15 @@ public class HomeCommand extends ContainerCommand
             secondPoint = null;
             if (owner != null)
             {
-                i18n.send(context, NEGATIVE,
-                                      "Are you sure you want to delete all homes ever created by {user}?", owner);
+                i18n.send(context, NEGATIVE, "Are you sure you want to delete all homes ever created by {user}?", owner);
             }
             else
             {
-                i18n.send(context, NEGATIVE,
-                                      "Are you sure you want to delete all homes ever created on this server?");
+                i18n.send(context, NEGATIVE, "Are you sure you want to delete all homes ever created on this server?");
             }
         }
-        Text confirmText = i18n.translate(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the homes");
-        ConfirmManager.requestConfirmation(i18n,  confirmText, context,() -> {
+        Component confirmText = i18n.translate(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the homes");
+        ConfirmManager.requestConfirmation(i18n, confirmText, context.getAudience(), () -> {
             Predicate<Home> predicate = home -> true;
             if (owner != null)
             {
@@ -526,12 +508,10 @@ public class HomeCommand extends ContainerCommand
             }
             if (selection)
             {
-                Cuboid cuboid = new Cuboid(new Vector3d(firstPoint.getX(), firstPoint.getY(), firstPoint.getZ()), new Vector3d(
-                    secondPoint.getX(), secondPoint.getY(), secondPoint.getZ()));
-                predicate = predicate.and(
-                    h -> {
+                Cuboid cuboid = new Cuboid(firstPoint.getPosition(), secondPoint.getPosition());
+                predicate = predicate.and(h -> {
                         Vector3d chp = h.transform.getPosition();
-                        return h.world.getWorld().equals(firstPoint.getExtent())
+                        return h.world.getWorld().equals(firstPoint.getWorld())
                             && cuboid.contains(new Vector3d(chp.getX(), chp.getY(), chp.getZ()));
                     });
                 manager.massDelete(predicate);
@@ -550,14 +530,13 @@ public class HomeCommand extends ContainerCommand
                 return;
             }
             i18n.send(context, POSITIVE, "The homes are now deleted.");
-
         });
 
     }
 
-    private void homeNotFoundMessage(CommandSource sender, User user, String name)
+    private void homeNotFoundMessage(Audience sender, User user, String name)
     {
-        if (sender.getIdentifier().equals(user.getIdentifier()))
+        if (sender instanceof ServerPlayer && ((ServerPlayer)sender).getUniqueId().equals(user.getUniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You have no home named {name#home}!", name);
         }

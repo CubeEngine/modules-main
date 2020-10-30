@@ -21,26 +21,31 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.config.Warp;
 import org.cubeengine.module.travel.config.WarpConfig;
-import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.libcube.service.config.WorldTransform;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.Player;
+import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.util.Transform;
+import org.spongepowered.api.world.server.ServerWorld;
 
+@Singleton
 public class WarpManager
 {
     private WarpConfig config;
 
-    public WarpManager(WarpConfig config)
+    @Inject
+    public WarpManager(Reflector reflector, ModuleManager mm)
     {
-        this.config = config;
+        this.config = reflector.load(WarpConfig.class, mm.getPathFor(Travel.class).resolve("warps.yml").toFile());
     }
 
-    public Warp create(Player owner, String name, Transform<World> transform)
+    public Warp create(User owner, String name, ServerWorld world, Transform transform)
     {
         if (this.has(name))
         {
@@ -50,8 +55,8 @@ public class WarpManager
         Warp warp = new Warp();
         warp.name = name;
         warp.owner = owner.getUniqueId();
-        warp.transform = new WorldTransform(transform.getLocation(), transform.getRotation());
-        warp.world = new ConfigWorld(transform.getExtent());
+        warp.transform = transform;
+        warp.world = new ConfigWorld(world);
 
         config.warps.add(warp);
         config.save();

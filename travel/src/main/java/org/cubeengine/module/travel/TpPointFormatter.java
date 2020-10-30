@@ -17,19 +17,19 @@
  */
 package org.cubeengine.module.travel;
 
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.cubeengine.dirigent.context.Arguments;
 import org.cubeengine.dirigent.context.Context;
 import org.cubeengine.dirigent.formatter.AbstractFormatter;
 import org.cubeengine.dirigent.parser.component.Component;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.formatter.component.StyledComponent;
 import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.module.travel.config.TeleportPoint;
-import org.cubeengine.libcube.service.i18n.I18n;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NONE;
 import static org.cubeengine.libcube.service.i18n.formatter.component.ClickComponent.runCommand;
 import static org.cubeengine.libcube.service.i18n.formatter.component.HoverComponent.hoverText;
-import static org.cubeengine.libcube.service.i18n.formatter.component.StyledComponent.styled;
-import static org.spongepowered.api.text.format.TextStyles.UNDERLINE;
 
 public class TpPointFormatter extends AbstractFormatter<TeleportPoint>
 {
@@ -45,6 +45,6 @@ public class TpPointFormatter extends AbstractFormatter<TeleportPoint>
     public Component format(TeleportPoint object, Context context, Arguments args)
     {
         String cmd = "/" + (object instanceof Home ? "home" : "warp") + " tp " + object.name + " " + object.getOwner().getName();
-        return styled(UNDERLINE, runCommand(cmd, hoverText(i18n.translate(context, NONE, "Click to teleport to {}", object.name), object.getOwner().getName())));
+        return StyledComponent.styled(Style.style(TextDecoration.UNDERLINED), runCommand(cmd, hoverText(i18n.translate(context, Style.empty(), "Click to teleport to {}", object.name), object.getOwner().getName())));
     }
 }

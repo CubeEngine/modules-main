@@ -17,33 +17,35 @@
  */
 package org.cubeengine.module.travel.warp;
 
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.argument.Completer;
-import org.cubeengine.module.travel.config.Warp;
-import org.spongepowered.api.entity.living.player.Player;
-
 import java.util.ArrayList;
 import java.util.List;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.module.travel.config.Warp;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.managed.ValueCompleter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
-public class WarpCompleter implements Completer
+@Singleton
+public class WarpCompleter implements ValueCompleter
 {
-    private WarpManager manager;
+    private final WarpManager manager;
 
+    @Inject
     public WarpCompleter(WarpManager manager)
     {
         this.manager = manager;
     }
 
     @Override
-    public List<String> suggest(Class type, CommandInvocation invocation)
+    public List<String> complete(CommandContext context, String currentInput)
     {
-        List<String> list = new ArrayList<>();
-        if (invocation.getCommandSource() instanceof Player)
+        final List<String> list = new ArrayList<>();
+        if (context.getCause().getAudience() instanceof ServerPlayer)
         {
-            String token = invocation.currentToken();
-            for (Warp warp : manager.list(((Player) invocation.getCommandSource())))
+            for (Warp warp : manager.list(((ServerPlayer) context.getCause().getAudience()).getUser()))
             {
-                if (warp.name.startsWith(token))
+                if (warp.name.startsWith(currentInput))
                 {
                     list.add(warp.name);
                 }

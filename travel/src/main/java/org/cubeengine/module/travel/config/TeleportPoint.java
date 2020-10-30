@@ -18,15 +18,14 @@
 package org.cubeengine.module.travel.config;
 
 import java.util.UUID;
-import org.cubeengine.reflect.Section;
 import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.libcube.service.config.WorldTransform;
+import org.cubeengine.reflect.Section;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.user.UserStorageService;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.util.Transform;
+import org.spongepowered.api.world.server.ServerWorld;
 
 public class TeleportPoint implements Section
 {
@@ -34,23 +33,28 @@ public class TeleportPoint implements Section
 
     public UUID owner;
     public ConfigWorld world;
-    public WorldTransform transform;
+    public Transform transform;
 
     public String welcomeMsg;
 
-    public void setTransform(Transform<World> transform)
+    public void setTransform(ServerWorld world, Transform transform)
     {
-        this.transform = new WorldTransform(transform.getLocation(), transform.getRotation());
-        this.world = new ConfigWorld(transform.getExtent());
+        this.transform = transform;
+        this.world = new ConfigWorld(world);
     }
 
     public User getOwner()
     {
-        return Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(owner).orElse(null);
+        return Sponge.getServer().getUserManager().get(this.owner).orElse(null);
     }
 
-    public boolean isOwner(CommandSource cmdSource)
+    public boolean isOwner(User user)
     {
-        return getOwner().getIdentifier().equals(cmdSource.getIdentifier());
+        return this.owner.equals(user.getUniqueId());
+    }
+
+    public boolean isOwner(CommandCause cause)
+    {
+        return cause.getAudience() instanceof ServerPlayer && this.owner.equals(((ServerPlayer)cause.getAudience()).getUniqueId());
     }
 }

@@ -24,42 +24,50 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import javax.annotation.Nullable;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.module.travel.config.HomeConfig;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.libcube.service.config.WorldTransform;
+import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.data.manipulator.mutable.entity.SneakingData;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.EventManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.util.Transform;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.plugin.PluginContainer;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.event.Order.EARLY;
 
+@Singleton
 public class HomeManager
 {
     private Travel module;
     private I18n i18n;
     private HomeConfig config;
 
-    public HomeManager(Travel module, I18n i18n, HomeConfig config)
+    @Inject
+    public HomeManager(EventManager em, PluginContainer plugin, Travel module, I18n i18n, Reflector reflector, ModuleManager mm)
     {
+        this.config = reflector.load(HomeConfig.class, mm.getPathFor(Travel.class).resolve("homes.yml").toFile());
         this.module = module;
         this.i18n = i18n;
-        this.config = config;
+        em.registerListeners(plugin, this);
     }
 
-    public Home create(Player owner, String name, Transform<World> transform)
+    public Home create(User owner, String name, ServerWorld world, Transform transform)
     {
         if (this.has(owner, name))
         {
@@ -69,8 +77,8 @@ public class HomeManager
         Home home = new Home();
         home.name = name;
         home.owner = owner.getUniqueId();
-        home.transform = new WorldTransform(transform.getLocation(), transform.getRotation());
-        home.world = new ConfigWorld(transform.getExtent());
+        home.transform = transform;
+        home.world = new ConfigWorld(world);
 
         config.homes.add(home);
         config.save();
@@ -93,11 +101,11 @@ public class HomeManager
         return config.homes.stream().filter(home -> home.owner.equals(user.getUniqueId()) && home.name.equals(name)).findFirst();
     }
 
-    public Optional<Home> find(Player player, String name, @Nullable User owner)
+    public Optional<Home> find(ServerPlayer player, String name, @Nullable User owner)
     {
-        owner = owner == null ? player : owner; // No owner specified?
+        owner = owner == null ? player.getUser() : owner; // No owner specified?
         Optional<Home> home = get(owner, name); // Get home by name and owner
-        if (!home.isPresent() && owner == player) // Not found and not looking for a specific home
+        if (!home.isPresent() && owner.getUniqueId().equals(player.getUniqueId())) // Not found and not looking for a specific home
         {
             List<UUID> globalInvites = config.globalInvites.getOrDefault(player.getUniqueId(), Collections.emptyList());
             // Go look in invites...
@@ -147,22 +155,25 @@ public class HomeManager
 
 
     @Listener(order = EARLY)
-    public void rightClickBed(InteractBlockEvent.Secondary event, @First Player player)
+    public void rightClickBed(InteractBlockEvent.Secondary event, @First ServerPlayer player)
     {
         if (!player.hasPermission("cubeengine.travel.command.home.set.use"))
         {
             return;
         }
-        if (event.getTargetBlock().getState().getType() != BlockTypes.BED
-            || !player.get(SneakingData.class).isPresent()
-            || player.getItemInHand(HandTypes.MAIN_HAND).isPresent())
+
+        if (!event.getBlock().getState().getType().isAnyOf(BlockTypes.BLACK_BED, BlockTypes.BLUE_BED, BlockTypes.BROWN_BED, BlockTypes.CYAN_BED, BlockTypes.GRAY_BED,
+                                                           BlockTypes.GREEN_BED, BlockTypes.LIGHT_BLUE_BED, BlockTypes.LIGHT_GRAY_BED, BlockTypes.LIME_BED, BlockTypes.MAGENTA_BED,
+                                                           BlockTypes.ORANGE_BED, BlockTypes.PINK_BED, BlockTypes.PURPLE_BED, BlockTypes.RED_BED, BlockTypes.WHITE_BED, BlockTypes.YELLOW_BED)
+            || !player.get(Keys.IS_SNEAKING).orElse(false)
+            || !player.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
         {
             return;
         }
-        Optional<Home> home = this.get(player, "home");
+        Optional<Home> home = this.get(player.getUser(), "home");
         if (home.isPresent())
         {
-            home.get().setTransform(player.getTransform());
+            home.get().setTransform(player.getWorld(), player.getTransform());
             config.save();
         }
         else if (getCount(player) >= module.getConfig().homes.max)
@@ -173,15 +184,15 @@ public class HomeManager
         }
         else
         {
-            this.create(player, "home", player.getTransform());
+            this.create(player.getUser(), "home", player.getWorld(), player.getTransform());
             i18n.send(player, POSITIVE, "Your home has been created!");
         }
         // event.setCancelled(true);
     }
 
-    public void purge(WorldProperties world)
+    public void purge(ServerWorld world)
     {
-        this.config.homes.removeIf(home -> home.world.getName().equals(world.getWorldName()));
+        this.config.homes.removeIf(home -> home.world.getWorld().getKey().equals(world.getKey()));
         this.config.save();
     }
 }

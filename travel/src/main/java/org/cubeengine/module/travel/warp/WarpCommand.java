@@ -17,79 +17,67 @@
  */
 package org.cubeengine.module.travel.warp;
 
-import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Complete;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Greed;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
-import org.cubeengine.libcube.service.i18n.formatter.MessageType;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Greedy;
+import org.cubeengine.libcube.service.command.annotation.Label;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.command.annotation.Parser;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
 import org.cubeengine.libcube.util.ConfirmManager;
 import org.cubeengine.module.travel.Travel;
+import org.cubeengine.module.travel.TravelPerm;
 import org.cubeengine.module.travel.config.Warp;
-import org.cubeengine.libcube.service.command.CommandUtil;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.action.TextActions;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
-import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
-import static org.spongepowered.api.text.format.TextColors.BLUE;
-import static org.spongepowered.api.text.format.TextColors.YELLOW;
 
+@Singleton
 @Command(name = "warp", desc = "Teleport to a warp")
-public class WarpCommand extends ContainerCommand
+public class WarpCommand extends DispatcherCommand
 {
     private final Travel module;
-    private I18n i18n;
+    private final I18n i18n;
     private final WarpManager manager;
+    private final TravelPerm perms;
 
-    public WarpCommand(CommandManager base, Travel module, I18n i18n)
+    @Inject
+    public WarpCommand(Travel module, I18n i18n, WarpManager manager, TravelPerm perms)
     {
-        super(base, Travel.class);
+        super(Travel.class);
         this.module = module;
         this.i18n = i18n;
-        this.manager = module.getWarpManager();
+        this.manager = manager;
+        this.perms = perms;
     }
 
-    @Override
-    protected boolean selfExecute(CommandInvocation invocation)
+    @Restricted
+    @Command(name = "tp", desc = "Teleport to a warp", dispatcher = true)
+    public void dispatcher(ServerPlayer sender, @Parser(completer = WarpCompleter.class) String warp)
     {
-        if (invocation.getCommandSource() instanceof Player)
-        {
-            return getCommand("tp").execute(invocation);
-        }
-        return super.selfExecute(invocation);
+        this.tp(sender, warp);
     }
 
-    @Override
-    public List<String> getSuggestions(CommandInvocation invocation)
-    {
-        List<String> list = super.getSuggestions(invocation);
-        list.addAll(invocation.providers().completers().get(Warp.class).suggest(Warp.class, invocation));
-        return list;
-    }
-
-    @Restricted(Player.class)
+    @Restricted
     @Command(desc = "Teleport to a warp")
-    public void tp(Player sender, @Complete(WarpCompleter.class) String warp)
+    public void tp(ServerPlayer sender, @Parser(completer = WarpCompleter.class) String warp)
     {
         // TODO find close match and display as click cmd
         Warp w = manager.get(warp).orElse(null);
@@ -98,29 +86,28 @@ public class WarpCommand extends ContainerCommand
             warpNotFoundMessage(sender,  warp);
             return;
         }
-        if (!w.isOwner(sender) && !w.isAllowed(sender) && sender.hasPermission(module.getPermissions().WARP_TP_OTHER.getId()))
+        if (!w.isOwner(sender.getUser()) && !w.isAllowed(sender.getUser()) && !perms.WARP_TP_OTHER.check(sender, i18n))
         {
-            throw new PermissionDeniedException(module.getPermissions().WARP_TP_OTHER);
+            return;
         }
-        Transform<World> location = w.transform.getTransformIn(w.world.getWorld());
-        sender.setTransform(location);
+        sender.setTransform(w.transform);
         if (w.welcomeMsg != null)
         {
-            sender.sendMessage(Text.of(w.welcomeMsg));
+            sender.sendMessage(Identity.nil(), Component.text(w.welcomeMsg));
             return;
         }
-        if (w.isOwner(sender))
+        if (w.isOwner(sender.getUser()))
         {
-            i18n.send(ACTION_BAR, sender, POSITIVE, "You have been teleported to your warp {name}!", w.name);
+            i18n.send(ChatType.ACTION_BAR, sender, POSITIVE, "You have been teleported to your warp {name}!", w.name);
             return;
         }
-        i18n.send(ACTION_BAR, sender, POSITIVE, "You have been teleported to the warp {name} of {user}!", w.name, w.getOwner());
+        i18n.send(ChatType.ACTION_BAR, sender, POSITIVE, "You have been teleported to the warp {name} of {user}!", w.name, w.getOwner());
     }
 
-    @Restricted(Player.class)
-    @Alias(value = {"createwarp", "mkwarp", "makewarp"})
+    @Restricted
+    @Alias(value = "createwarp", alias = {"mkwarp", "makewarp"})
     @Command(alias = "make", desc = "Create a warp")
-    public void create(Player sender, String name)
+    public void create(ServerPlayer sender, String name)
     {
         if (this.manager.getCount() >= this.module.getConfig().warps.max)
         {
@@ -143,20 +130,20 @@ public class WarpCommand extends ContainerCommand
             i18n.send(sender, NEGATIVE, "The warp already exists! You can move it with {text:/warp move}");
             return;
         }
-        Warp warp = manager.create(sender, name, sender.getTransform());
+        Warp warp = manager.create(sender.getUser(), name, sender.getWorld(), sender.getTransform());
         i18n.send(sender, POSITIVE, "Your warp {name} has been created!", warp.name);
     }
 
     @Command(desc = "Set the welcome message of warps", alias = {"setgreeting", "setwelcome", "setwelcomemsg"})
-    public void greeting(CommandSource sender, @Complete(WarpCompleter.class) String warp,
-                         @Label("welcome message") @Greed(INFINITE) @Optional String message,
+    public void greeting(CommandCause sender, @Parser(completer = WarpCompleter.class) String warp,
+                         @Label("welcome message") @Greedy @Option String message,
                          @Flag boolean append)
     {
         // TODO permission other
         Warp w = this.manager.get(warp).orElse(null);
         if (w == null)
         {
-            warpNotFoundMessage(sender, warp);
+            warpNotFoundMessage(sender.getAudience(), warp);
             return;
         }
         if (append)
@@ -176,12 +163,12 @@ public class WarpCommand extends ContainerCommand
         {
             i18n.send(sender, POSITIVE, "The welcome message for the warp {name} of {user} is now set to:", w.name, w.getOwner());
         }
-        sender.sendMessage(Text.of(w.welcomeMsg));
+        sender.sendMessage(Identity.nil(), Component.text(w.welcomeMsg));
     }
 
-    @Restricted(Player.class)
+    @Restricted
     @Command(desc = "Move a warp")
-    public void move(Player sender, @Complete(WarpCompleter.class) String warp)
+    public void move(ServerPlayer sender, @Parser(completer = WarpCompleter.class) String warp)
     {
         Warp w = manager.get(warp).orElse(null);
         if (w == null)
@@ -189,13 +176,13 @@ public class WarpCommand extends ContainerCommand
             warpNotFoundMessage(sender, warp);
             return;
         }
-        if (!w.isOwner(sender) && sender.hasPermission(module.getPermissions().WARP_MOVE_OTHER.getId()))
+        if (!w.isOwner(sender.getUser()) && !perms.WARP_MOVE_OTHER.check(sender, i18n))
         {
-            throw new PermissionDeniedException(module.getPermissions().WARP_MOVE_OTHER);
+            return;
         }
-        w.setTransform(sender.getTransform());
+        w.setTransform(sender.getWorld(), sender.getTransform());
         manager.save();
-        if (w.isOwner(sender))
+        if (w.isOwner(sender.getUser()))
         {
             i18n.send(sender, POSITIVE, "Your warp {name} has been moved to your current location!", w.name);
             return;
@@ -203,22 +190,23 @@ public class WarpCommand extends ContainerCommand
         i18n.send(sender, POSITIVE, "The warp {name} of {user} has been moved to your current location", w.name, w.getOwner());
     }
 
-    @Alias(value = {"removewarp", "deletewarp", "delwarp", "remwarp"})
+    @Alias(value = "removewarp", alias = {"deletewarp", "delwarp", "remwarp"})
     @Command(alias = "delete", desc = "Remove a warp")
-    public void remove(CommandSource sender, @Complete(WarpCompleter.class) String warp)
+    public void remove(CommandCause sender, @Parser(completer = WarpCompleter.class) String warp)
     {
         Warp w = manager.get(warp).orElse(null);
         if (w == null)
         {
-            warpNotFoundMessage(sender, warp);
+            warpNotFoundMessage(sender.getAudience(), warp);
             return;
         }
-        if (!w.isOwner(sender) && sender.hasPermission(module.getPermissions().WARP_REMOVE_OTHER.getId()))
+        final boolean isOwner = w.isOwner(sender);
+        if (!isOwner && perms.WARP_REMOVE_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
         {
-            throw new PermissionDeniedException(module.getPermissions().WARP_REMOVE_OTHER);
+            return;
         }
         manager.delete(w);
-        if (w.isOwner(sender))
+        if (isOwner)
         {
             i18n.send(sender, POSITIVE, "Your warp {name} has been removed", warp);
             return;
@@ -227,17 +215,18 @@ public class WarpCommand extends ContainerCommand
     }
 
     @Command(desc = "Rename a warp")
-    public void rename(CommandSource sender, @Complete(WarpCompleter.class) String warp, @Label("new name") String newName)
+    public void rename(CommandCause sender, @Parser(completer = WarpCompleter.class) String warp, @Label("new name") String newName)
     {
         Warp w = manager.get(warp).orElse(null);
         if (w == null)
         {
-            warpNotFoundMessage(sender, warp);
+            warpNotFoundMessage(sender.getAudience(), warp);
             return;
         }
-        if (!w.isOwner(sender) && sender.hasPermission(module.getPermissions().WARP_RENAME_OTHER.getId()))
+        final boolean isOwner = w.isOwner(sender);
+        if (!isOwner && !perms.WARP_RENAME_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
         {
-            throw new PermissionDeniedException(module.getPermissions().WARP_RENAME_OTHER);
+            return;
         }
         if (warp.contains(":") || warp.length() >= 32)
         {
@@ -246,7 +235,7 @@ public class WarpCommand extends ContainerCommand
         }
         if (manager.rename(w, newName))
         {
-            if (w.isOwner(sender))
+            if (isOwner)
             {
                 i18n.send(sender, POSITIVE, "Your warp {name} has been renamed to {name}", w.name, newName);
                 return;
@@ -258,11 +247,14 @@ public class WarpCommand extends ContainerCommand
     }
 
     @Command(desc = "List warps of a player")
-    public void list(CommandSource context, @Optional Player owner)
+    public void list(CommandCause context, @Option User owner)
     {
-        if (owner != null && !context.equals(owner))
+        if (owner != null && !(context.getAudience() instanceof ServerPlayer && ((ServerPlayer)context.getAudience()).getUniqueId().equals(owner.getUniqueId())))
         {
-            CommandUtil.ensurePermission(context, module.getPermissions().WARP_LIST_OTHER);
+            if (!perms.WARP_LIST_OTHER.check(context.getSubject(), context.getAudience(), i18n))
+            {
+                return;
+            }
         }
         Set<Warp> warps = this.manager.list(owner);
         if (warps.isEmpty())
@@ -273,26 +265,26 @@ public class WarpCommand extends ContainerCommand
         i18n.sendN(context, POSITIVE, warps.size(), "There is one warp set:", "There are {amount} warps set:", warps.size());
         for (Warp warp : warps)
         {
-            Text teleport = i18n.translate(context, MessageType.NONE, "(tp)").toBuilder().color(BLUE)
-                                .onClick(TextActions.runCommand("/warp tp " + warp.name))
-                                .onHover(TextActions.showText(i18n.translate(context, POSITIVE, "Click to teleport to {name}", warp.name)))
-                                .build();
+            Component teleport = i18n.translate(context, "(tp)").color(NamedTextColor.BLUE)
+                                     .clickEvent(ClickEvent.runCommand("/warp tp " + warp.name))
+                                     .hoverEvent(HoverEvent.showText(i18n.translate(context, POSITIVE, "Click to teleport to {name}", warp.name)));
+
             if (warp.isOwner(context))
             {
-                context.sendMessage(Text.of(YELLOW, "  ", warp.name, " ", teleport));
+                context.sendMessage(Identity.nil(), Component.text("  " + warp.name + " ", NamedTextColor.YELLOW).append(teleport));
             }
             else
             {
-                context.sendMessage(Text.of(YELLOW, "  ", warp.getOwner().getName(), ":", warp.name, " ", teleport));
+                context.sendMessage(Identity.nil(), Component.text("  "+ warp.getOwner().getName() + ":" + warp.name + " ", NamedTextColor.YELLOW).append(teleport));
             }
         }
     }
 
     @Alias(value = "clearwarps")
     @Command(desc = "Clear all warps [of a player]")
-    public void clear(final CommandSource context, @Optional Player owner)
+    public void clear(final CommandCause context, @Option User owner)
     {
-        if (this.module.getConfig().clearOnlyFromConsole && !(context instanceof ConsoleSource))
+        if (this.module.getConfig().clearOnlyFromConsole && !(context.getAudience() instanceof SystemSubject))
         {
             i18n.send(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return;
@@ -305,12 +297,12 @@ public class WarpCommand extends ContainerCommand
         {
             i18n.send(context, NEGATIVE, "Are you sure you want to delete all warps ever created on this server!?");
         }
-        Text confirmText = i18n.translate(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the warps");
-        ConfirmManager.requestConfirmation(i18n, confirmText, context, () -> {
+        Component confirmText = i18n.translate(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the warps");
+        ConfirmManager.requestConfirmation(i18n, confirmText, context.getAudience(), () -> {
             Predicate<Warp> predicate = warp -> true;
             if (owner != null)
             {
-                predicate = predicate.and(warp -> warp.getOwner().equals(owner));
+                predicate = predicate.and(warp -> warp.isOwner(owner));
                 manager.massDelete(predicate);
                 i18n.send(context, POSITIVE, "Deleted warps.");
             }
@@ -323,7 +315,7 @@ public class WarpCommand extends ContainerCommand
     }
 
 
-    private void warpNotFoundMessage(CommandSource sender, String name)
+    private void warpNotFoundMessage(Audience sender, String name)
     {
         i18n.send(sender, NEGATIVE, "There is no warp named {name#warp}!", name);
     }

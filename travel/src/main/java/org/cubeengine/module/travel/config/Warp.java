@@ -26,5 +26,4 @@ public class Warp extends TeleportPoint implements Section
     {
         return user.hasPermission("cubeengine.travel.warps.access." + name);
     }
-
 }

@@ -17,33 +17,35 @@
  */
 package org.cubeengine.module.travel.home;
 
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.argument.Completer;
-import org.cubeengine.module.travel.config.Home;
-import org.spongepowered.api.entity.living.player.Player;
-
 import java.util.ArrayList;
 import java.util.List;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.module.travel.config.Home;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.managed.ValueCompleter;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
-public class HomeCompleter implements Completer
+@Singleton
+public class HomeCompleter implements ValueCompleter
 {
-    private HomeManager manager;
+    private final HomeManager manager;
 
+    @Inject
     public HomeCompleter(HomeManager manager)
     {
         this.manager = manager;
     }
 
     @Override
-    public List<String> suggest(Class type, CommandInvocation invocation)
+    public List<String> complete(CommandContext context, String currentInput)
     {
         List<String> list = new ArrayList<>();
-        if (invocation.getCommandSource() instanceof Player)
+        if (context.getCause().getAudience() instanceof ServerPlayer)
         {
-            String token = invocation.currentToken();
-            for (Home home : manager.list(((Player) invocation.getCommandSource()), true, true))
+            for (Home home : manager.list(((ServerPlayer) context.getCause().getAudience()).getUser(), true, true))
             {
-                if (home.name.startsWith(token))
+                if (home.name.startsWith(currentInput))
                 {
                     list.add(home.name);
                 }

@@ -17,12 +17,13 @@
  */
 package org.cubeengine.module.travel;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.spongepowered.api.service.permission.PermissionDescription;
 
+@Singleton
 public class TravelPerm extends PermissionContainer
 {
     @Inject
@@ -31,16 +32,16 @@ public class TravelPerm extends PermissionContainer
         super(pm, Travel.class);
     }
 
-    public final Permission HOME_TP_OTHER = register("command.home.tp.other", "", null);
-    public final Permission HOME_SET_MORE = register("command.home.set.more", "", null);
-    public final Permission HOME_MOVE_OTHER = register("command.home.move.other", "", null);
-    public final Permission HOME_REMOVE_OTHER = register("command.home.remove.other", "", null);
-    public final Permission HOME_RENAME_OTHER = register("command.home.rename.other", "", null);
-    public final Permission HOME_LIST_OTHER = register("command.home.list.other", "", null);
+    public final Permission HOME_TP_OTHER = register("command.home.tp.other", "Lets you tp to other player homes");
+    public final Permission HOME_SET_MORE = register("command.home.set.more", "Lets you set more then the configured max. homes");
+    public final Permission HOME_MOVE_OTHER = register("command.home.move.other", "Lets you move other player homes");
+    public final Permission HOME_REMOVE_OTHER = register("command.home.remove.other", "Lets you remove other player homes");
+    public final Permission HOME_RENAME_OTHER = register("command.home.rename.other", "Lets you rename other player homes");
+    public final Permission HOME_LIST_OTHER = register("command.home.list.other", "Lets you list other player homes");
 
-    public final Permission WARP_TP_OTHER = register("command.warp.tp.other", "", null);
-    public final Permission WARP_MOVE_OTHER = register("command.warp.move.other", "", null);
-    public final Permission WARP_REMOVE_OTHER = register("command.warp.remove.other", "", null);
-    public final Permission WARP_RENAME_OTHER = register("command.warp.rename.other", "", null);
-    public final Permission WARP_LIST_OTHER = register("command.warp.list.other", "", null);
+    public final Permission WARP_TP_OTHER = register("command.warp.tp.other", "Lets you tp to other player warps");
+    public final Permission WARP_MOVE_OTHER = register("command.warp.move.other", "Lets you move other player warps");
+    public final Permission WARP_REMOVE_OTHER = register("command.warp.remove.other", "Lets you remove other player warps");
+    public final Permission WARP_RENAME_OTHER = register("command.warp.rename.other", "Lets you rename other player warps");
+    public final Permission WARP_LIST_OTHER = register("command.warp.list.other", "Lets you list other player warps");
 }
