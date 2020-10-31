@@ -33,6 +33,7 @@ public class PortalConfig extends ReflectedYaml
     public boolean teleportNonPlayers = false;
     public String owner;
     public ConfigWorld world;
+    public boolean particles;
 
     public PortalRegion location = new PortalRegion();
 

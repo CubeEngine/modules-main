@@ -28,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.WeakHashMap;
-import java.util.stream.Collectors;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.ModuleManager;
@@ -38,7 +36,6 @@ import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
-import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.libcube.util.Pair;
 import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.portals.command.PortalCommands;
@@ -50,16 +47,18 @@ import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleOptions;
+import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.util.AABB;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.util.Color;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.chunk.Chunk;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
 import static java.util.stream.Collectors.toSet;
@@ -98,7 +97,26 @@ public class Portals
         this.portalsDir = Files.createDirectories(path.resolve("portals"));
         this.loadPortals();
         tm.runTimer(Portals.class, this::checkForEntitiesInPortals, 5, 5);
+        tm.runTimer(Portals.class, this::spawnPortalParticles, 20, 20);
         this.zoned = (Zoned) mm.getModule(Zoned.class);
+    }
+
+    private void spawnPortalParticles()
+    {
+        for (Portal portal : portals.values())
+        {
+            if (portal.config.particles)
+            {
+                final AABB aabb = portal.config.getAABB();
+                final Vector3d size = aabb.getSize();
+                final ParticleEffect effect = ParticleEffect.builder()
+                                                            .type(ParticleTypes.PORTAL)
+                                                            .quantity((int)(10 * size.getX() * size.getY() * size.getZ()))
+                                                            .offset(size.div(4))
+                                                            .build();
+                portal.getWorld().spawnParticles(effect, aabb.getCenter());
+            }
+        }
     }
 
     public Pair<Integer, Vector3i> getRandomDestinationSetting(ServerWorld world)
