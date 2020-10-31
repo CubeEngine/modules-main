@@ -17,12 +17,13 @@
  */
 package org.cubeengine.module.portals.config;
 
-import com.flowpowered.math.vector.Vector3i;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.reflect.Section;
 import org.cubeengine.reflect.annotations.Comment;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
-import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.libcube.service.config.WorldTransform;
+import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.util.Transform;
+import org.spongepowered.math.vector.Vector3i;
 
 @SuppressWarnings("all")
 public class PortalConfig extends ReflectedYaml
@@ -35,13 +36,18 @@ public class PortalConfig extends ReflectedYaml
 
     public PortalRegion location = new PortalRegion();
 
+    public AABB getAABB()
+    {
+        return new AABB(location.from, location.to.add(Vector3i.ONE));
+    }
+
     public class PortalRegion implements Section
     {
         public Vector3i from;
         public Vector3i to;
 
         @Comment("When linking another portal to this one a player will be teleported to this location")
-        public WorldTransform destination;
+        public Transform destination;
     }
 
     public Destination destination;

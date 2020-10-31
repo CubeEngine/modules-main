@@ -97,12 +97,12 @@ public class ZonedListener
         event.setCancelled(true);
     }
 
-    public ZoneConfig getZone(Player player)
+    public ZoneConfig getZone(ServerPlayer player)
     {
         return zonesByPlayer.computeIfAbsent(player.getUniqueId(), k -> reflector.create(ZoneConfig.class));
     }
 
-    public void setZone(Player player, ZoneConfig zone)
+    public void setZone(ServerPlayer player, ZoneConfig zone)
     {
         zonesByPlayer.put(player.getUniqueId(), zone.clone(reflector));
     }

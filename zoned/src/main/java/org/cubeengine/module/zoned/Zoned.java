@@ -32,7 +32,7 @@ import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.data.DataRegistration;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
@@ -70,12 +70,12 @@ public class Zoned
         ZonedData.register(event);
     }
 
-    public ZoneConfig getActiveZone(Player player)
+    public ZoneConfig getActiveZone(ServerPlayer player)
     {
         return this.listener.getZone(player);
     }
 
-    public void setActiveZone(Player player, ZoneConfig zone)
+    public void setActiveZone(ServerPlayer player, ZoneConfig zone)
     {
         this.listener.setZone(player, zone);
     }

@@ -17,16 +17,17 @@
  */
 package org.cubeengine.module.portals.config;
 
-import com.flowpowered.math.vector.Vector3d;
+import java.util.Optional;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.libcube.service.config.WorldTransform;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
@@ -34,19 +35,21 @@ public class Destination
 {
     public Type type;
     public ConfigWorld world;
-    public WorldTransform location;
+    public Vector3d position;
+    public Vector3d rotation;
     public String portal;
     private I18n i18n;
 
-    public Destination(Location<World> location, Vector3d direction, I18n i18n)
+    public Destination(ServerLocation location, Vector3d rotation, I18n i18n)
     {
         this.i18n = i18n;
-        this.location = new WorldTransform(location, direction);
-        this.world = new ConfigWorld(location.getExtent());
+        this.world = new ConfigWorld(location.getWorld());
+        this.position = location.getPosition();
+        this.rotation = rotation;
         this.type = Type.LOCATION;
     }
 
-    public Destination(World world)
+    public Destination(ServerWorld world)
     {
         this.world = new ConfigWorld(world);
         this.type = Type.WORLD;
@@ -63,29 +66,30 @@ public class Destination
 
     public void teleport(Entity entity, Portals module, boolean safe)
     {
-        Location<World> loc;
+        ServerLocation loc;
         Vector3d rotation = null;
+        final ServerWorld world = this.world.getWorld();
         switch (type)
         {
         case PORTAL:
             Portal destPortal = module.getPortal(portal);
             if (destPortal == null)
             {
-                if (entity instanceof Player)
+                if (entity instanceof ServerPlayer)
                 {
-                    i18n.send(((Player)entity), NEGATIVE, "Destination portal {input} does not exist!", portal);
+                    i18n.send(((ServerPlayer)entity), NEGATIVE, "Destination portal {input} does not exist!", portal);
                 }
                 return;
             }
             loc = destPortal.getPortalPos();
+            rotation = destPortal.getPortalRot();
             break;
         case WORLD:
-            loc = world.getWorld().getSpawnLocation();
-            loc = new Location<>(loc.getExtent(), loc.getBlockX() + 0.5, loc.getY(), loc.getBlockZ() + 0.5);
+            loc = world.getLocation(world.getProperties().getSpawnPosition()).add(0.5, 0, 0.5);
             break;
         case LOCATION:
-            loc = location.getLocationIn(world.getWorld());
-            rotation = location.getRotation();
+            loc = world.getLocation(this.position);
+            rotation = this.rotation;
             break;
         default:
             throw new IllegalStateException();
@@ -93,7 +97,15 @@ public class Destination
         // TODO check if this is working when riding on a horse
         if (safe)
         {
-            entity.setLocationSafely(loc);
+            final Optional<ServerLocation> safeLoc = Sponge.getServer().getTeleportHelper().getSafeLocation(loc);
+            if (safeLoc.isPresent())
+            {
+                entity.setLocation(safeLoc.get());
+            }
+            else if (entity instanceof ServerPlayer)
+            {
+                i18n.send((ServerPlayer)entity, NEGATIVE, "Target destination is unsafe");
+            }
         }
         else
         {
@@ -109,8 +121,4 @@ public class Destination
     {
         PORTAL, WORLD, LOCATION, RANDOM
     }
-
-
-
-    // TODO completer for destination
 }

@@ -15,67 +15,67 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.portals;
+package org.cubeengine.module.portals.command;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import com.flowpowered.math.vector.Vector3i;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.text.Component;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
-import org.cubeengine.reflect.Reflector;
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parameter.FixedValues;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.command.CommandManager;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
+import org.cubeengine.libcube.service.command.annotation.Using;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
+import org.cubeengine.module.portals.Portal;
+import org.cubeengine.module.portals.Portals;
+import org.cubeengine.module.portals.PortalsAttachment;
 import org.cubeengine.module.portals.config.Destination;
 import org.cubeengine.module.portals.config.PortalConfig;
-import org.cubeengine.libcube.service.Selector;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.libcube.service.config.WorldTransform;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
+import org.cubeengine.module.zoned.config.ZoneConfig;
+import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.util.Transform;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3i;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
+@Singleton
 @Command(name = "portals", desc = "The portal commands", alias = "mvp")
-public class PortalCommands extends ContainerCommand
+@Using({DestinationParser.class, PortalParser.class})
+public class PortalCommands extends DispatcherCommand
 {
     private final Portals module;
-    private Selector selector;
     private Reflector reflector;
     private I18n i18n;
 
-    public PortalCommands(CommandManager base, Portals module, Selector selector, Reflector reflector, I18n i18n)
+    @Inject
+    public PortalCommands(Portals module, Reflector reflector, I18n i18n, PortalModifyCommand modifyCommand)
     {
-        super(base, Portals.class);
+        super(Portals.class, modifyCommand);
         this.module = module;
-        this.selector = selector;
         this.reflector = reflector;
         this.i18n = i18n;
     }
 
     @Alias(value = "mvpc")
     @Command(desc = "Creates a new Portal")
-    @Restricted(value = Player.class, msg = "You must be ingame to do this!")
-    public void create(Player context, String name, @Optional Destination destination)
+    @Restricted(msg = "You must be ingame to do this!")
+    public void create(ServerPlayer context, String name, @Option Destination destination)
     {
-        if (!(selector.getSelection(context) instanceof Cuboid))
+        final ZoneConfig activeZone = module.getZoned().getActiveZone(context);
+        if (activeZone == null || !(activeZone.shape instanceof Cuboid))
         {
             i18n.send(context, NEGATIVE, "Please select a cuboid first!");
             return;
@@ -85,20 +85,21 @@ public class PortalCommands extends ContainerCommand
             i18n.send(context, NEGATIVE, "A portal named {input} already exists!", name);
             return;
         }
-        Location p1 = selector.getFirstPoint(context);
-        Location p2 = selector.getSecondPoint(context);
-        PortalConfig config = reflector.create(PortalConfig.class);
+        final ServerWorld world = activeZone.world.getWorld();
+        final ServerLocation p1 = world.getLocation(((Cuboid)activeZone.shape).getMinimumPoint());
+        final ServerLocation p2 = world.getLocation(((Cuboid)activeZone.shape).getMaximumPoint());
+        final PortalConfig config = reflector.create(PortalConfig.class);
         config.location.from = new Vector3i(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
         config.location.to = new Vector3i(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
-        config.location.destination = new WorldTransform(context.getLocation(), context.getRotation());
+        config.location.destination = Transform.of(context.getLocation().getPosition(), context.getRotation());
         config.owner = context.getName();
-        config.world = new ConfigWorld((World)p1.getExtent());
+        config.world = new ConfigWorld(p1.getWorld());
 
         config.destination = destination;
 
         config.setFile(module.getPortalFile(name));
         config.save();
-        Portal portal = new Portal(module, name, config, i18n);
+        final Portal portal = new Portal(module, name, config, i18n);
         module.addPortal(portal);
 
         module.getPortalsAttachment(context.getUniqueId()).setPortal(portal);
@@ -111,8 +112,8 @@ public class PortalCommands extends ContainerCommand
 
     @Alias(value = "mvps")
     @Command(desc = "Selects an existing portal")
-    @Restricted(value = Player.class, msg = "You must be ingame to do this!")
-    public void select(Player context, Portal portal)
+    @Restricted(msg = "You must be ingame to do this!")
+    public void select(ServerPlayer context, Portal portal)
     {
         module.getPortalsAttachment(context.getUniqueId()).setPortal(portal);
         i18n.send(context, POSITIVE, "Portal selected: {name}", portal.getName());
@@ -120,48 +121,37 @@ public class PortalCommands extends ContainerCommand
 
     @Alias(value ="mvpi")
     @Command(desc = "Show info about a portal")
-    public void info(CommandSource context, @Default Portal portal)
+    public void info(CommandCause context, @Default Portal portal)
     {
-        portal.showInfo(context);
+        portal.showInfo(context.getAudience());
     }
 
     @Alias(value = "mvpr")
     @Command(desc = "Removes a portal permanently")
-    public void remove(CommandSource context, @Default Portal portal)
+    public void remove(CommandCause context, @Default Portal portal)
     {
         portal.delete();
         i18n.send(context, POSITIVE, "Portal {name} deleted", portal.getName());
     }
 
-    public enum OnOff implements FixedValues
-    {
-        ON,OFF;
-
-        @Override
-        public String getName()
-        {
-            return this.name().toLowerCase();
-        }
-    }
-
     @Command(desc = "Shows debug portal information instead of teleporting")
-    @Restricted(value = Player.class, msg = "You must be ingame to do this!")
-    public void debug(Player context, @Optional OnOff onOff)
+    @Restricted(msg = "You must be ingame to do this!")
+    public void debug(ServerPlayer context, @Option Boolean isDebug)
     {
-        PortalsAttachment attachment = module.getPortalsAttachment(context.getUniqueId());
-        if (onOff == null)
+        final PortalsAttachment attachment = module.getPortalsAttachment(context.getUniqueId());
+        if (isDebug == null)
         {
             attachment.toggleDebug();
         }
         else
         {
-            switch (onOff)
+            if (isDebug)
             {
-                case OFF:
-                    if (attachment.isDebug()) attachment.toggleDebug();
-                    break;
-                case ON:
-                    if (!attachment.isDebug()) attachment.toggleDebug();
+                if (!attachment.isDebug()) attachment.toggleDebug();
+            }
+            else
+            {
+                if (attachment.isDebug()) attachment.toggleDebug();
             }
         }
         if (attachment.isDebug())
@@ -174,16 +164,16 @@ public class PortalCommands extends ContainerCommand
 
     @Alias("mvpl")
     @Command(desc = "Lists the portals")
-    public void list(CommandSource context, @Default World world)
+    public void list(CommandCause context, @Default ServerWorld world)
     {
-        Set<Portal> portals = module.getPortals(world);
+        final Set<Portal> portals = module.getPortals(world);
         if (portals.isEmpty())
         {
             i18n.send(context, POSITIVE, "There are no portals in {world}", world);
             return;
         }
         PaginationList.Builder builder = PaginationList.builder().title(i18n.translate(context, POSITIVE, "The following portals are located in {world}", world))
-            .contents(portals.stream().sorted(Comparator.comparing(Portal::getName)).map(p -> Text.of(" - ", p.getName())).collect(Collectors.toList()));
-        builder.sendTo(context);
+            .contents(portals.stream().sorted(Comparator.comparing(Portal::getName)).map(p -> Component.text(" - " + p.getName())).collect(Collectors.toList()));
+        builder.sendTo(context.getAudience());
     }
 }

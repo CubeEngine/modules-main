@@ -26,14 +26,14 @@ import org.cubeengine.converter.node.Node;
 import org.cubeengine.converter.node.StringNode;
 import org.cubeengine.module.portals.config.Destination.Type;
 import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.libcube.service.config.WorldTransform;
+import org.spongepowered.math.vector.Vector3d;
 
 public class DestinationConverter extends SingleClassConverter<Destination>
 {
     @Override
     public Node toNode(Destination destination, ConverterManager converterManager) throws ConversionException
     {
-        MapNode result = MapNode.emptyMap();
+        final MapNode result = MapNode.emptyMap();
         result.set("type", StringNode.of(destination.type.name()));
         switch (destination.type)
         {
@@ -46,7 +46,8 @@ public class DestinationConverter extends SingleClassConverter<Destination>
                 break;
             case LOCATION:
                 result.set("world", StringNode.of(destination.world.getName()));
-                result.set("location", converterManager.convertToNode(destination.location));
+                result.set("position", converterManager.convertToNode(destination.position));
+                result.set("rotation", converterManager.convertToNode(destination.rotation));
                 break;
         }
         return result;
@@ -57,10 +58,10 @@ public class DestinationConverter extends SingleClassConverter<Destination>
     {
         if (node instanceof MapNode)
         {
-         Map<String, Node> mappedNodes = ((MapNode)node).getValue();
+            final Map<String, Node> mappedNodes = ((MapNode)node).getValue();
             try
             {
-                Type type = Type.valueOf(mappedNodes.get("type").asText());
+                final Type type = Type.valueOf(mappedNodes.get("type").asText());
                 Destination destination;
                 if (type == Type.RANDOM)
                 {
@@ -82,7 +83,8 @@ public class DestinationConverter extends SingleClassConverter<Destination>
                         break;
                     case LOCATION:
                         destination.world = new ConfigWorld(mappedNodes.get("world").asText());
-                        destination.location = converterManager.convertFromNode(mappedNodes.get("location"), WorldTransform.class);
+                        destination.position = converterManager.convertFromNode(mappedNodes.get("position"), Vector3d.class);
+                        destination.rotation = converterManager.convertFromNode(mappedNodes.get("rotation"), Vector3d.class);
                         break;
                 }
                 return destination;

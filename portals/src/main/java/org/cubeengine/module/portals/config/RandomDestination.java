@@ -18,22 +18,21 @@
 package org.cubeengine.module.portals.config;
 
 import java.util.Random;
-
-import com.flowpowered.math.vector.Vector3i;
+import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.util.Pair;
 import org.cubeengine.module.portals.Portals;
-import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3i;
 
 public class RandomDestination extends Destination
 {
     private final Random random = new Random();
 
-    public RandomDestination(World world)
+    public RandomDestination(ServerWorld world)
     {
         this.type = Type.RANDOM;
         this.world = new ConfigWorld(world);
@@ -52,14 +51,14 @@ public class RandomDestination extends Destination
             return;
         }
 
-        World world = this.world.getWorld();
-        Pair<Integer, Vector3i> config = module.getRandomDestinationSetting(world);
-        int x = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
-        int z = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
-        Vector3i pos = config.getRight().add(x, 0, z);
+        final ServerWorld world = this.world.getWorld();
+        final Pair<Integer, Vector3i> config = module.getRandomDestinationSetting(world);
+        final int x = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
+        final int z = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
+        final Vector3i pos = config.getRight().add(x, 0, z);
         world.loadChunk(Sponge.getServer().getChunkLayout().forceToChunk(pos.getX(), pos.getY(), pos.getZ()), true);
-        Location<World> block = world.getLocation(pos);
-        block = Sponge.getGame().getTeleportHelper().getSafeLocation(block, 256, 16).orElse(block);
+        ServerLocation block = world.getLocation(pos);
+        block = Sponge.getServer().getTeleportHelper().getSafeLocation(block, 256, 16).orElse(block);
         entity.setLocation(block);
     }
 }

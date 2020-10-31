@@ -19,17 +19,18 @@ package org.cubeengine.module.portals;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import com.flowpowered.math.vector.Vector3i;
+import net.kyori.adventure.audience.Audience;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.Pair;
 import org.cubeengine.libcube.util.math.MathHelper;
 import org.cubeengine.module.portals.config.PortalConfig;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
@@ -38,8 +39,8 @@ public class Portal
 {
     private final Portals module;
     private final String name;
-    protected final PortalConfig config;
-    private I18n i18n;
+    public final PortalConfig config;
+    private final I18n i18n;
 
     public Portal(Portals module, String name, PortalConfig config, I18n i18n)
     {
@@ -54,9 +55,9 @@ public class Portal
         return name;
     }
 
-    public boolean has(Location location)
+    public boolean has(ServerLocation location)
     {
-        return ((World)location.getExtent()).getName().equals(config.world.getName()) &&
+        return location.getWorld().getKey().equals(config.world.getWorld().getKey()) &&
             isBetween(config.location.from.getX(), config.location.to.getX(), location.getBlockX()) &&
             isBetween(config.location.from.getY(), config.location.to.getY(), location.getBlockY()) &&
             isBetween(config.location.from.getZ(), config.location.to.getZ(), location.getBlockZ());
@@ -83,14 +84,19 @@ public class Portal
         }
     }
 
-    public Location<World> getPortalPos()
+    public ServerLocation getPortalPos()
     {
         if (this.config.location.destination == null)
         {
             Vector3i midpoint = MathHelper.midpoint(this.config.location.to, this.config.location.from);
-            return new Location<World>(this.config.world.getWorld(), midpoint.getX() + 0.5, midpoint.getY(), midpoint.getZ() + 0.5);
+            return ServerLocation.of(this.config.world.getWorld(), midpoint.getX() + 0.5, midpoint.getY(), midpoint.getZ() + 0.5);
         }
-        return this.config.location.destination.getLocationIn(this.config.world.getWorld()); // TODO rotation
+        return this.config.world.getWorld().getLocation(this.config.location.destination.getPosition());
+    }
+
+    public Vector3d getPortalRot()
+    {
+        return this.config.location.destination.getRotation();
     }
 
     public void delete()
@@ -99,7 +105,7 @@ public class Portal
         this.config.getFile().delete();
     }
 
-    public void showInfo(CommandSource user)
+    public void showInfo(Audience user)
     {
         i18n.send(user, POSITIVE, "Portal Information for {name#portal}", this.getName());
         if (this.config.safeTeleport)
@@ -130,44 +136,20 @@ public class Portal
                 break;
             case LOCATION:
                 i18n.send(user, POSITIVE, "This portal teleports to {vector} in {name#world}",
-                    new Vector3i((int)config.destination.location.x, (int)config.destination.location.y, (int)config.destination.location.z), config.destination.world.getName());
+                          config.destination.position.toInt(), config.destination.world.getName());
                 break;
             }
 
         }
     }
 
-    public List<Pair<Integer,Integer>> getChunks()
-    {
-        List<Pair<Integer,Integer>> result = new ArrayList<>();
-        int chunkXFrom = config.location.from.getX() >> 4;
-        int chunkZFrom =  config.location.from.getZ() >> 4;
-        int chunkXTo =  config.location.to.getX() >> 4;
-        int chunkZTo = config.location.to.getZ() >> 4;
-        if (chunkXFrom > chunkXTo) // if from is greater swap
-        {
-            chunkXFrom = chunkXFrom + chunkXTo;
-            chunkXTo = chunkXFrom - chunkXTo;
-            chunkXFrom = chunkXFrom - chunkXTo;
-        }
-        if (chunkZFrom > chunkZTo) // if from is greater swap
-        {
-            chunkZFrom = chunkZFrom + chunkZTo;
-            chunkZTo = chunkZFrom - chunkZTo;
-            chunkZFrom = chunkZFrom - chunkZTo;
-        }
-        for (int x = chunkXFrom; x <= chunkXTo; x++)
-        {
-            for (int z = chunkZFrom; z <= chunkZTo; z++)
-            {
-                result.add(new Pair<>(x,z));
-            }
-        }
-        return result;
-    }
-
-    public World getWorld()
+    public ServerWorld getWorld()
     {
         return this.config.world.getWorld();
+    }
+
+    public AABB getAABB()
+    {
+        return this.config.getAABB();
     }
 }

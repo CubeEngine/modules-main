@@ -26,57 +26,50 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import com.flowpowered.math.vector.Vector3i;
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.butler.provider.Providers;
-import org.cubeengine.libcube.CubeEngineModule;
-import org.cubeengine.libcube.InjectService;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
+import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.task.TaskManager;
+import org.cubeengine.libcube.util.LocationUtil;
+import org.cubeengine.libcube.util.Pair;
+import org.cubeengine.logscribe.Log;
+import org.cubeengine.module.portals.command.PortalCommands;
+import org.cubeengine.module.portals.config.Destination;
+import org.cubeengine.module.portals.config.DestinationConverter;
+import org.cubeengine.module.portals.config.PortalConfig;
+import org.cubeengine.module.zoned.Zoned;
 import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
-import org.cubeengine.libcube.util.LocationUtil;
-import org.cubeengine.libcube.util.Pair;
-import org.cubeengine.module.portals.config.Destination;
-import org.cubeengine.module.portals.config.DestinationConverter;
-import org.cubeengine.module.portals.config.DestinationParser;
-import org.cubeengine.module.portals.config.PortalConfig;
-import org.cubeengine.libcube.service.Selector;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.event.EventManager;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.task.TaskManager;
-import org.spongepowered.api.Game;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.world.Chunk;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.chunk.Chunk;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3i;
 
 import static java.util.stream.Collectors.toSet;
 import static org.cubeengine.libcube.service.filesystem.FileExtensionFilter.YAML;
 
 @Singleton
-@Module
-public class Portals extends CubeEngineModule
+@Module(dependencies = @Dependency("cubeengine-zoned"))
+public class Portals
 {
     @Inject private Reflector reflector;
-    @Inject private CommandManager cm;
-    @InjectService private Selector selector;
-    @Inject private EventManager em;
     @Inject private TaskManager tm;
     private Log logger;
     private Path path;
@@ -85,37 +78,33 @@ public class Portals extends CubeEngineModule
 
     private Path portalsDir;
     private final Map<String, Portal> portals = new HashMap<>();
-    private final Map<Long, List<Portal>> chunksWithPortals = new HashMap<>();
-    private final WeakHashMap<Portal, List<Entity>> entitesInPortals = new WeakHashMap<>();
+    private final Map<Portal, List<UUID>> entitesInPortals = new HashMap<>();
 
-    private Map<UUID, PortalsAttachment> attachments = new HashMap<>();
+    private final Map<UUID, PortalsAttachment> attachments = new HashMap<>();
+
     @ModuleConfig private PortalsConfig config;
+    @ModuleCommand private PortalCommands portalCommands;
+    @ModuleListener private PortalListener listener;
+
+    private Zoned zoned;
 
     @Listener
-    public void onEnable(GamePostInitializationEvent event) throws IOException
+    public void onEnable(StartedEngineEvent<Server> event) throws IOException
     {
         this.logger = mm.getLoggerFor(Portals.class);
         this.path = mm.getPathFor(Portals.class);
-        reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(), Destination.class);
-        Providers rManager = cm.getProviders();
-        rManager.register(this, new PortalParser(this), Portal.class);
-        rManager.register(this, new DestinationParser(this, i18n), Destination.class);
+        this.reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(), Destination.class);
 
         this.portalsDir = Files.createDirectories(path.resolve("portals"));
-
-        PortalCommands portals = new PortalCommands(cm, this, selector, reflector, i18n);
-        cm.addCommand(portals);
-        portals.addCommand(new PortalModifyCommand(cm, this, selector, i18n));
-
-        em.registerListener(Portals.class, new PortalListener(this, i18n));
         this.loadPortals();
         tm.runTimer(Portals.class, this::checkForEntitiesInPortals, 5, 5);
+        this.zoned = (Zoned) mm.getModule(Zoned.class);
     }
 
-    public Pair<Integer, Vector3i> getRandomDestinationSetting(World world)
+    public Pair<Integer, Vector3i> getRandomDestinationSetting(ServerWorld world)
     {
-        Vector3i pos = world.getSpawnLocation().getBlockPosition();
-        Integer radius = Math.min((int)world.getWorldBorder().getDiameter() / 2, 60 * 16);
+        Vector3i pos = world.getProperties().getSpawnPosition();
+        Integer radius = Math.min((int)world.getProperties().getWorldBorder().getDiameter() / 2, 60 * 16);
         return new Pair<>(radius, pos);
     }
 
@@ -136,7 +125,6 @@ public class Portals extends CubeEngineModule
             }
         }
         logger.info("{} portals loaded!", this.portals.size());
-        logger.debug("in {} chunks", this.chunksWithPortals.size());
     }
 
     public Portal getPortal(String name)
@@ -144,31 +132,14 @@ public class Portals extends CubeEngineModule
         return this.portals.get(name.toLowerCase());
     }
 
-    protected void addPortal(Portal portal)
+    public void addPortal(Portal portal)
     {
-        List<Pair<Integer,Integer>> chunks = portal.getChunks();
-        for (Pair<Integer, Integer> chunk : chunks)
-        {
-            long chunkKey = LocationUtil.getChunkKey(chunk.getLeft(), chunk.getRight());
-            List<Portal> list = this.chunksWithPortals.get(chunkKey);
-            if (list == null)
-            {
-                list = new ArrayList<>();
-                this.chunksWithPortals.put(chunkKey, list);
-            }
-            list.add(portal);
-        }
-
         this.portals.put(portal.getName().toLowerCase(), portal);
     }
 
-    protected void removePortal(Portal portal)
+    public void removePortal(Portal portal)
     {
         this.portals.remove(portal.getName().toLowerCase());
-        for (List<Portal> portalList : this.chunksWithPortals.values())
-        {
-            portalList.remove(portal);
-        }
     }
 
     public Collection<Portal> getPortals()
@@ -186,30 +157,15 @@ public class Portals extends CubeEngineModule
         this.portals.values().stream()
                     .filter(portal -> portal.config.teleportNonPlayers)
                     .forEach(portal -> {
-                        for (Pair<Integer, Integer> chunk : portal.getChunks())
-                        {
-                            Optional<Chunk> loaded = portal.getWorld().getChunk(chunk.getLeft(), 0, chunk.getRight());
-                            if (!loaded.isPresent())
+                        final AABB aabb = portal.getAABB();
+                        final Collection<? extends Entity> nowInPortal = portal.getWorld().getEntities(aabb, entity -> !(entity instanceof ServerPlayer));
+                        final List<UUID> wasInPortal = entitesInPortals.computeIfAbsent(portal, k -> new ArrayList<>());
+                        nowInPortal.forEach(entity -> {
+                            if (!wasInPortal.remove(entity.getUniqueId()))
                             {
-                                return;
+                                portal.teleport(entity);
                             }
-                            loaded.get().getEntities().stream()
-                                  .filter(entity -> !(entity instanceof Player))
-                                  .forEach(entity -> {
-                                      List<Entity> entities = entitesInPortals.get(portal);
-                                      if (portal.has(entity.getLocation()))
-                                      {
-                                          if (entities == null || entities.isEmpty() || !entities.contains(entity))
-                                          {
-                                              portal.teleport(entity);
-                                          }
-                                      }
-                                      else if (entities != null)
-                                      {
-                                          entities.remove(entity);
-                                      }
-                                  });
-                        }
+                        });
                     });
     }
 
@@ -218,27 +174,10 @@ public class Portals extends CubeEngineModule
         return portalsDir.resolve(name + ".yml").toFile();
     }
 
-    public List<Portal> getPortalsInChunk(Location<World> location)
+    public List<UUID> getEntitiesInPortal(Portal portal)
     {
-        List<Portal> portals = this.chunksWithPortals.get(LocationUtil.getChunkKey(location));
-        if (portals != null)
-        {
-            portals = portals.stream().filter(p -> p.getWorld().equals(location.getExtent())).collect(Collectors.toList());
-        }
-        return portals;
+        return this.entitesInPortals.computeIfAbsent(portal, p -> new ArrayList<>());
     }
-
-    public List<Entity> getEntitiesInPortal(Portal portal)
-    {
-        List<Entity> entities = entitesInPortals.get(portal);
-        if (entities == null)
-        {
-            entities = new ArrayList<>();
-            entitesInPortals.put(portal, entities);
-        }
-        return entities;
-    }
-
 
     public PortalsAttachment getPortalsAttachment(UUID uuid)
     {
@@ -253,5 +192,10 @@ public class Portals extends CubeEngineModule
 
     public PortalsConfig getConfig() {
         return config;
+    }
+
+    public Zoned getZoned()
+    {
+        return this.zoned;
     }
 }

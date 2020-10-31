@@ -18,27 +18,35 @@
 package org.cubeengine.module.portals;
 
 import java.util.List;
-
-import com.flowpowered.math.vector.Vector3d;
+import java.util.Optional;
+import java.util.UUID;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
+import org.spongepowered.api.event.cause.entity.MovementType;
+import org.spongepowered.api.event.cause.entity.MovementTypes;
+import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
+@Singleton
 public class PortalListener
 {
     private final Portals module;
     private I18n i18n;
 
-
+    @Inject
     public PortalListener(Portals module,I18n i18n)
     {
         this.module = module;
@@ -46,97 +54,45 @@ public class PortalListener
     }
 
     @Listener
-    public void onTeleport(MoveEntityEvent.Teleport event)
-    {
-        if ((this.module.getConfig().disableVanillaPortals || this.module.getConfig().disabledVanillaPortalsInWorlds.getOrDefault(new ConfigWorld(event.getFromTransform().getExtent()), false))
-                && event.getCause().getContext().get(EventContextKeys.TELEPORT_TYPE).orElse(null) == TeleportTypes.PORTAL)
-        {
-            event.setToTransform(event.getFromTransform().addTranslation(new Vector3d(0,1.2,0)));
-//            event.setCancelled(true);
-            return;
-        }
-        Transform<World> target = event.getToTransform();
-        Entity player = event.getTargetEntity();
-        if (player instanceof Player)
-        {
-            onTeleport(target, ((Player) player)); // TODO event listener parameter
-        }
-    }
-
-    private void onTeleport(Transform<World> target, Player player)
-    {
-        List<Portal> portals = this.module.getPortalsInChunk(target.getLocation());
-        if (portals == null)
-        {
-            return;
-        }
-        for (Portal portal : portals)
-        {
-            if (portal.has(target.getLocation()))
-            {
-                PortalsAttachment attachment = module.getPortalsAttachment(player.getUniqueId());
-                attachment.setInPortal(true);
-                if (attachment.isDebug())
-                {
-                    i18n.send(player, POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Teleported into portal: {name}", portal.getName());
-                }
-                return;
-            }
-            // else ignore
-        }
-    }
-
-    @Listener
-    public void onEntityTeleport(MoveEntityEvent.Teleport event)
-    {
-        if (event.getTargetEntity() instanceof Player)
-        {
-            return;
-        }
-        List<Portal> portals = module.getPortalsInChunk(event.getFromTransform().getLocation());
-        if (portals == null)
-        {
-            return;
-        }
-        for (Portal portal : portals)
-        {
-            List<Entity> entities = module.getEntitiesInPortal(portal);
-            if (portal.has(event.getToTransform().getLocation()))
-            {
-                entities.add(event.getTargetEntity());
-                return;
-            }
-            else
-            {
-                entities.remove(event.getTargetEntity());
-            }
-        }
-    }
-
-    @Listener
     public void onMove(MoveEntityEvent event)
     {
-        if (!(event.getTargetEntity() instanceof Player))
+        final Optional<MovementType> movementType = event.getContext().get(EventContextKeys.MOVEMENT_TYPE);
+        final Entity entity = event.getEntity();
+        ServerWorld destWorld = entity.getServerLocation().getWorld();
+        ServerWorld origWorld = entity.getServerLocation().getWorld();
+        if (event instanceof ChangeEntityWorldEvent)
         {
-            return;
-        }
-        Player player = ((Player) event.getTargetEntity());
-
-
-        if (event.getFromTransform().getExtent() != event.getToTransform().getExtent()
-            || (event.getFromTransform().getLocation().getBlockX() == event.getToTransform().getLocation().getBlockX()
-            && event.getFromTransform().getLocation().getBlockY() == event.getToTransform().getLocation().getBlockY()
-            && event.getFromTransform().getLocation().getBlockZ() == event.getToTransform().getLocation().getBlockZ()))
-        {
-            return;
-        }
-        List<Portal> portals = module.getPortalsInChunk(event.getToTransform().getLocation());
-        PortalsAttachment attachment = module.getPortalsAttachment(player.getUniqueId());
-        if (portals != null)
-        {
-            for (Portal portal : portals)
+            destWorld = ((ChangeEntityWorldEvent)event).getDestinationWorld();
+            origWorld = ((ChangeEntityWorldEvent)event).getOriginalWorld();
+            if ((this.module.getConfig().disableVanillaPortals
+                || this.module.getConfig().disabledVanillaPortalsInWorlds.getOrDefault(new ConfigWorld(origWorld), false))
+                && movementType.map(t -> t == MovementTypes.PORTAL.get()).orElse(false))
             {
-                if (portal.has(event.getToTransform().getLocation()))
+                event.setCancelled(true);
+                return;
+            }
+            if (entity instanceof ServerPlayer)
+            {
+                final ServerLocation dest = ((ChangeEntityWorldEvent)event).getDestinationWorld().getLocation(event.getDestinationPosition());
+                onTeleport(dest, ((ServerPlayer)entity));
+            }
+        }
+        if (entity instanceof ServerPlayer)
+        {
+            final ServerPlayer player = (ServerPlayer)entity;
+            if (!origWorld.getKey().equals(destWorld.getKey())
+                || (event.getOriginalPosition().getFloorX() == event.getDestinationPosition().getFloorX()
+                && event.getOriginalPosition().getFloorY() == event.getDestinationPosition().getFloorY()
+                && event.getOriginalPosition().getFloorZ() == event.getDestinationPosition().getFloorZ())
+            )
+            {
+                return;
+            }
+
+            final PortalsAttachment attachment = module.getPortalsAttachment(player.getUniqueId());
+            for (Portal portal : module.getPortals())
+            {
+                if (portal.has(destWorld.getLocation(event.getDestinationPosition())))
                 {
                     if (attachment.isDebug())
                     {
@@ -154,13 +110,45 @@ public class PortalListener
                     else if (!attachment.isInPortal())
                     {
                         portal.teleport(player);
-                        onTeleport(player.getTransform(), player); // TODO remove when DisplaceEntityEvent.Teleport is implemented
+                        onTeleport(player.getServerLocation(), player);
                     }
                     return;
                 }
                 // else ignore
             }
+            attachment.setInPortal(false);
+            return;
         }
-        attachment.setInPortal(false);
+
+        // For non-players
+        for (Portal portal : module.getPortals())
+        {
+            // Get list of entities known to be in the portal
+            List<UUID> entities = module.getEntitiesInPortal(portal);
+            if (portal.has(destWorld.getLocation(event.getDestinationPosition())))
+            {
+                entities.add(entity.getUniqueId());
+                return;
+            }
+            entities.remove(entity.getUniqueId());
+        }
+    }
+
+    private void onTeleport(ServerLocation target, Player player)
+    {
+        for (Portal portal : module.getPortals())
+        {
+            if (portal.has(target))
+            {
+                PortalsAttachment attachment = module.getPortalsAttachment(player.getUniqueId());
+                attachment.setInPortal(true);
+                if (attachment.isDebug())
+                {
+                    i18n.send(player, POSITIVE, "{text:[Portals] Debug\\::color=YELLOW} Teleported into portal: {name}", portal.getName());
+                }
+                return;
+            }
+            // else ignore
+        }
     }
 }
