@@ -15,14 +15,16 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.teleport;
+package org.cubeengine.module.teleport.permission;
 
-import javax.inject.Inject;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.spongepowered.api.service.permission.PermissionDescription;
+import org.cubeengine.module.teleport.Teleport;
 
+@Singleton
 public class TeleportPerm extends PermissionContainer
 {
     @Inject

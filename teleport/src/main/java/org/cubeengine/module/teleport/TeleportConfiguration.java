@@ -23,6 +23,7 @@ import org.cubeengine.reflect.annotations.Name;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
 
 public class TeleportConfiguration extends ReflectedYaml
 {
@@ -36,7 +37,7 @@ public class TeleportConfiguration extends ReflectedYaml
 
     public NavigationSection navigation;
 
-    public World getMainWorld()
+    public ServerWorld getMainWorld()
     {
         return mainWorld == null ? null : mainWorld.getWorld();
     }

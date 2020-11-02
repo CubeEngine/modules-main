@@ -17,22 +17,15 @@
  */
 package org.cubeengine.module.teleport;
 
-import org.cubeengine.libcube.CubeEngineModule;
-import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.event.EventManager;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
+import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.libcube.service.task.TaskManager;
-import org.cubeengine.processor.Dependency;
+import org.cubeengine.module.teleport.command.MovementCommands;
+import org.cubeengine.module.teleport.command.SpawnCommands;
+import org.cubeengine.module.teleport.command.TeleportCommands;
+import org.cubeengine.module.teleport.command.TeleportRequestCommands;
 import org.cubeengine.processor.Module;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 /**
  * /setworldspawn 	Sets the world spawn.
@@ -41,46 +34,18 @@ import javax.inject.Singleton;
  */
 @Singleton
 @Module
-public class Teleport extends CubeEngineModule
+public class Teleport
 {
     // TODO make override of vanilla-commands optional
-    @Inject private CommandManager cm;
-    @Inject private EventManager em;
-    @Inject private TaskManager tm;
-    @Inject private PermissionManager pm;
-    @Inject private Broadcaster bc;
-    @Inject private I18n i18n;
-    @Inject private ModuleManager mm;
 
-    @Inject private TeleportPerm perms;
     @ModuleConfig private TeleportConfiguration config;
-    private TpWorldPermissions tpWorld;
 
-    @Listener
-    public void onEnable(GamePreInitializationEvent event)
-    {
-        TeleportListener tl = new TeleportListener(this, i18n);
-        em.registerListener(Teleport.class, tl);
+    @ModuleCommand private MovementCommands movementCommands;
+    @ModuleCommand private SpawnCommands spawnCommands;
+    @ModuleCommand private TeleportCommands teleportCommands;
+    @ModuleCommand private TeleportRequestCommands teleportRequestCommands;
 
-        cm.addCommands(cm, this, new MovementCommands(this, tl, i18n, mm.getPlugin(Teleport.class).get()));
-        cm.addCommands(cm, this, new SpawnCommands(this, em, bc, tl, i18n));
-        cm.addCommands(cm, this, new TeleportCommands(this, bc, tl, i18n));
-        cm.addCommands(cm, this, new TeleportRequestCommands(this, tm, tl, i18n));
-    }
-
-    public TeleportPerm perms()
-    {
-        return this.perms;
-    }
-
-    public TpWorldPermissions permsTpWorld()
-    {
-        if (tpWorld == null)
-        {
-            tpWorld = new TpWorldPermissions(perms, pm);
-        }
-        return tpWorld;
-    }
+    @ModuleListener private TeleportListener teleportListener;
 
     public TeleportConfiguration getConfig()
     {

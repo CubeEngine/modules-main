@@ -15,18 +15,23 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.teleport;
+package org.cubeengine.module.teleport.command;
 
 import java.util.Optional;
 import java.util.UUID;
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
-import org.spongepowered.api.Game;
+import org.cubeengine.module.teleport.Teleport;
+import org.cubeengine.module.teleport.TeleportListener;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
+import static org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType.ACTION_BAR;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 /**
@@ -36,6 +41,7 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
  * /tpaccept
  * /tpdeny
  */
+@Singleton
 public class TeleportRequestCommands
 {
     private final Teleport module;
@@ -43,6 +49,7 @@ public class TeleportRequestCommands
     private TeleportListener tl;
     private I18n i18n;
 
+    @Inject
     public TeleportRequestCommands(Teleport module, TaskManager taskManager, TeleportListener tl, I18n i18n)
     {
         this.module = module;
@@ -52,12 +59,12 @@ public class TeleportRequestCommands
     }
 
     @Command(desc = "Requests to teleport to a player.")
-    @Restricted(value = Player.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
-    public void tpa(Player context, Player player)
+    @Restricted(msg = "{text:Pro Tip}: Teleport does not work IRL!")
+    public void tpa(ServerPlayer context, ServerPlayer player)
     {
         if (player.getUniqueId().equals(context.getUniqueId()))
         {
-            i18n.send(context, NEUTRAL, "Teleporting you to yourself? Done.");
+            i18n.send(ACTION_BAR, context, NEUTRAL, "Teleporting you to yourself? Done.");
             return;
         }
         tl.removeRequestTask(context);
@@ -87,12 +94,12 @@ public class TeleportRequestCommands
     }
 
     @Command(desc = "Requests to teleport a player to you.")
-    @Restricted(value = Player.class, msg = "{text:Pro Tip}: Teleport does not work IRL!")
-    public void tpahere(Player context, Player player)
+    @Restricted(msg = "{text:Pro Tip}: Teleport does not work IRL!")
+    public void tpahere(ServerPlayer context, ServerPlayer player)
     {
         if (player.getUniqueId().equals(context.getUniqueId()))
         {
-            i18n.send(context, NEUTRAL, "Teleporting yourself to you? Done.");
+            i18n.send(ACTION_BAR, context, NEUTRAL, "Teleporting yourself to you? Done.");
             return;
         }
         tl.removeRequestTask(player);
@@ -121,8 +128,8 @@ public class TeleportRequestCommands
     }
 
     @Command(alias = "tpac", desc = "Accepts any pending teleport request.")
-    @Restricted(value = Player.class, msg = "No one wants to teleport to you!")
-    public void tpaccept(Player context)
+    @Restricted(msg = "No one wants to teleport to you!")
+    public void tpaccept(ServerPlayer context)
     {
 
         UUID uuid = tl.getToRequest(context);
@@ -131,30 +138,30 @@ public class TeleportRequestCommands
             uuid = tl.getFromRequest(context);
             if (uuid == null)
             {
-                i18n.send(context, NEGATIVE, "You don't have any pending requests!");
+                i18n.send(ACTION_BAR, context, NEGATIVE, "You don't have any pending requests!");
                 return;
             }
             tl.removeFromRequest(context);
-            Optional<Player> player = Sponge.getServer().getPlayer(uuid);
+            Optional<ServerPlayer> player = Sponge.getServer().getPlayer(uuid);
             if (!player.isPresent())
             {
-                i18n.send(context, NEGATIVE, "That player seems to have disappeared.");
+                i18n.send(ACTION_BAR, context, NEGATIVE, "That player seems to have disappeared.");
                 return;
             }
-            context.setLocation(player.get().getLocation());
+            context.setLocation(player.get().getServerLocation());
             i18n.send(player.get(), POSITIVE, "{user} accepted your teleport request!", context);
             i18n.send(context, POSITIVE, "You accepted a teleport to {user}!", player.get());
         }
         else
         {
             tl.removeToRequest(context);
-            Optional<Player> player = Sponge.getServer().getPlayer(uuid);
+            Optional<ServerPlayer> player = Sponge.getServer().getPlayer(uuid);
             if (!player.isPresent())
             {
-                i18n.send(context, NEGATIVE, "That player seems to have disappeared.");
+                i18n.send(ACTION_BAR, context, NEGATIVE, "That player seems to have disappeared.");
                 return;
             }
-            player.get().setLocation(context.getLocation());
+            player.get().setLocation(context.getServerLocation());
             i18n.send(player.get(), POSITIVE, "{user} accepted your teleport request!", context);
             i18n.send(context, POSITIVE, "You accepted a teleport to {user}!", player.get());
         }
@@ -167,8 +174,8 @@ public class TeleportRequestCommands
     }
 
     @Command(desc = "Denies any pending teleport request.")
-    @Restricted(value = Player.class, msg = "No one wants to teleport to you!")
-    public void tpdeny(Player sender)
+    @Restricted(msg = "No one wants to teleport to you!")
+    public void tpdeny(ServerPlayer sender)
     {
 
         UUID tpa = tl.getToRequest(sender);
@@ -177,7 +184,7 @@ public class TeleportRequestCommands
         {
             tl.removeToRequest(sender);
 
-            Optional<Player> player = Sponge.getServer().getPlayer(tpa);
+            Optional<ServerPlayer> player = Sponge.getServer().getPlayer(tpa);
             if (!player.isPresent())
             {
                 throw new IllegalStateException("Player saved in \"pendingTpToRequest\" was not found!");
@@ -188,7 +195,7 @@ public class TeleportRequestCommands
         else if (tpahere != null)
         {
             tl.removeFromRequest(sender);
-            Optional<Player> player = Sponge.getServer().getPlayer(tpahere);
+            Optional<ServerPlayer> player = Sponge.getServer().getPlayer(tpahere);
             if (!player.isPresent())
             {
                 throw new IllegalStateException("User saved in \"pendingTpFromRequest\" was not found!");
@@ -198,7 +205,7 @@ public class TeleportRequestCommands
         }
         else
         {
-            i18n.send(sender, NEGATIVE, "You don't have any pending requests!");
+            i18n.send(ACTION_BAR, sender, NEGATIVE, "You don't have any pending requests!");
             return;
         }
         UUID taskID = tl.getRequestTask(sender);

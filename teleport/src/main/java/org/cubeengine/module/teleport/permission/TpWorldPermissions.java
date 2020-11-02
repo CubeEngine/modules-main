@@ -15,36 +15,34 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.teleport;
+package org.cubeengine.module.teleport.permission;
 
 import java.util.HashMap;
 import java.util.Map;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.permission.PermissionDescription;
-import org.spongepowered.api.world.World;
+import org.cubeengine.module.teleport.Teleport;
 
 /**
  * Dynamically registered Permissions for each world.
  */
 @SuppressWarnings("all")
+@Singleton
 public class TpWorldPermissions extends PermissionContainer
 {
     private final Map<String, Permission> permissions = new HashMap<>();
     private TeleportPerm perm;
     private PermissionManager pm;
 
+    @Inject
     public TpWorldPermissions(TeleportPerm perm, PermissionManager pm)
     {
         super(pm, Teleport.class);
         this.perm = perm;
         this.pm = pm;
-        for (final World world : Sponge.getServer().getWorlds())
-        {
-            initWorldPermission(world.getName());
-        }
     }
 
     private Permission initWorldPermission(String world)

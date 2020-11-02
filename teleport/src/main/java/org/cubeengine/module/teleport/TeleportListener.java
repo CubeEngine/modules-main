@@ -21,82 +21,91 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
-import org.cubeengine.libcube.util.LocationUtil;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.util.LocationUtil;
+import org.cubeengine.module.teleport.permission.TeleportPerm;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.cause.entity.MovementTypes;
+import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 
+import static org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType.ACTION_BAR;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.item.ItemTypes.COMPASS;
-import static org.spongepowered.api.text.chat.ChatTypes.ACTION_BAR;
 
+@Singleton
 public class TeleportListener
 {
     private final Teleport module;
     private I18n i18n;
+    private TeleportPerm perms;
 
-    private Map<UUID, Transform<World>> deathLocations = new HashMap<>();
-    private Map<UUID, Transform<World>> lastLocations = new HashMap<>();
+    private Map<UUID, ServerLocation> deathLocations = new HashMap<>();
+    private Map<UUID, ServerLocation> lastLocations = new HashMap<>();
     private Map<UUID, UUID> requestCancelTasks = new HashMap<>();
     private Map<UUID, UUID> tpToRequests = new HashMap<>();
     private Map<UUID, UUID> tpFromRequests = new HashMap<>();
 
-    public TeleportListener(Teleport module, I18n i18n)
+    @Inject
+    public TeleportListener(Teleport module, I18n i18n, TeleportPerm perms)
     {
         this.module = module;
         this.i18n = i18n;
+        this.perms = perms;
     }
 
     @Listener
-    public void onTeleport(MoveEntityEvent.Teleport event)
+    public void onTeleport(MoveEntityEvent event)
     {
-        if (event.getTargetEntity() instanceof Player)
+        if (event.getEntity() instanceof ServerPlayer && event.getContext().get(EventContextKeys.MOVEMENT_TYPE)
+                          .map(mt -> mt.equals(MovementTypes.COMMAND) || mt.equals(MovementTypes.PLUGIN)).orElse(false))
         {
-            lastLocations.put(event.getTargetEntity().getUniqueId(), event.getFromTransform());
+            final ServerWorld world = event instanceof ChangeEntityWorldEvent ? ((ChangeEntityWorldEvent)event).getDestinationWorld() : ((ServerPlayer)event.getEntity()).getWorld();
+            lastLocations.put(event.getEntity().getUniqueId(), world.getLocation(event.getDestinationPosition()));
         }
     }
 
     @Listener
     public void onDeath(DestructEntityEvent event)
     {
-        if (!(event.getTargetEntity() instanceof Player))
+        if (!(event.getEntity() instanceof ServerPlayer))
         {
             return;
         }
-        if (((Player)event.getTargetEntity()).hasPermission(module.perms().COMMAND_BACK_ONDEATH.getId()))
+        if (((ServerPlayer)event.getEntity()).hasPermission(perms.COMMAND_BACK_ONDEATH.getId()))
         {
-            deathLocations.put(event.getTargetEntity().getUniqueId(), event.getTargetEntity().getTransform());
+            deathLocations.put(event.getEntity().getUniqueId(), event.getEntity().getServerLocation());
         }
     }
 
     @Listener
     // TODO @Include(value = {InteractBlockEvent.Primary.class, InteractEntityEvent.Primary.class})
-    public void onPrimary(InteractEvent event, @First Player player)
+    public void onPrimary(InteractEvent event, @First ServerPlayer player)
     {
         if (!(event instanceof InteractBlockEvent.Primary))
         {
             // TODO remove when include works as intended
             return;
         }
-        if (player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getType).orElse(null) != COMPASS
-                || !player.hasPermission(module.perms().COMPASS_JUMPTO_LEFT.getId()))
+        if (player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS) || !player.hasPermission(perms.COMPASS_JUMPTO_LEFT.getId()))
         {
             return;
         }
 
-        Location<World> loc = LocationUtil.getBlockInSight(player);
+        ServerLocation loc = LocationUtil.getBlockInSight(player);
         if (loc == null)
         {
             i18n.send(ACTION_BAR, player, NEGATIVE, "No block in sight");
@@ -109,20 +118,20 @@ public class TeleportListener
 
     @Listener
     // TODO @Include(value = {InteractBlockEvent.Secondary.class, InteractEntityEvent.Secondary.class})
-    public void onSecondary(InteractEvent event, @First Player player)
+    public void onSecondary(InteractEvent event, @First ServerPlayer player)
     {
         if (!(event instanceof InteractBlockEvent.Secondary))
         {
             // TODO remove when include works as intended
             return;
         }
-        if (player.getItemInHand(HandTypes.MAIN_HAND).map(ItemStack::getType).orElse(null) != COMPASS
-                || !player.hasPermission(module.perms().COMPASS_JUMPTO_RIGHT.getId()))
+        if (player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS)
+                || !player.hasPermission(perms.COMPASS_JUMPTO_RIGHT.getId()))
         {
             return;
         }
 
-        Optional<Location<World>> end = LocationUtil.getBlockBehindWall(player, module.getConfig().navigation.thru.maxRange, module.getConfig().navigation.thru.maxWallThickness);
+        Optional<ServerLocation> end = LocationUtil.getBlockBehindWall(player, module.getConfig().navigation.thru.maxRange, module.getConfig().navigation.thru.maxWallThickness);
         if (!end.isPresent())
         {
             i18n.send(player, NEGATIVE, "Nothing to pass through!");
@@ -130,16 +139,16 @@ public class TeleportListener
         }
 
         player.setLocation(end.get().add(0.5, 0, 0.5));
-        i18n.send(ChatTypes.ACTION_BAR, player, NEUTRAL, "You passed through a wall");
+        i18n.send(ACTION_BAR, player, NEUTRAL, "You passed through a wall");
         event.setCancelled(true);
     }
 
-    public Transform<World> getDeathLocation(Player player)
+    public ServerLocation getDeathLocation(Player player)
     {
         return deathLocations.get(player.getUniqueId());
     }
 
-    public void setDeathLocation(Player player, Transform<World> loc)
+    public void setDeathLocation(Player player, ServerLocation loc)
     {
         if (loc == null)
         {
@@ -151,7 +160,7 @@ public class TeleportListener
         }
     }
 
-    public Transform<World> getLastLocation(Player player)
+    public ServerLocation getLastLocation(Player player)
     {
         return lastLocations.get(player.getUniqueId());
     }
