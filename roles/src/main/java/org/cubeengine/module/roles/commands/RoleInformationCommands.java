@@ -57,7 +57,7 @@ import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.RolesUtil.FoundOption;
 import org.cubeengine.module.roles.RolesUtil.FoundPermission;
-import org.cubeengine.module.roles.commands.provider.ContextParser;
+import org.cubeengine.libcube.service.command.parser.ContextParser;
 import org.cubeengine.module.roles.commands.provider.FileSubjectParser;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.config.PermissionTreeConverter;
@@ -123,11 +123,12 @@ public class RoleInformationCommands extends DispatcherCommand
                 .hoverEvent(HoverEvent.showText(optClick)).clickEvent(ClickEvent.runCommand("/roles role listoption " + r.getIdentifier()));
             final Component parents = i18n.composeMessage(cause, Style.style(NamedTextColor.GRAY), "[{name:color=yellow}]", parentTrans)
                 .hoverEvent(HoverEvent.showText(parentClick)).clickEvent(ClickEvent.runCommand("/roles role listparent " + r.getIdentifier()));
+            // TODO downloads
             final Component def = i18n.composeMessage(cause, Style.style(NamedTextColor.GRAY), "[{name:color=yellow}]", defaults.contains(r.asSubjectReference()) ? defaultRole : noDefaultRole)
                 .hoverEvent(HoverEvent.showText(defaultClick)).clickEvent(ClickEvent.runCommand("/roles role toggledefault " + r.getIdentifier()));
 
             cContext.sendMessage(Identity.nil(), i18n.composeMessage(cause, Style.empty(),
-                 "- {name} {text#perm} {text#opts} {text#parents} {text#def}", r.getIdentifier(), perms, opts, parents, def));
+                 "- {name} {txt#perm} {txt#opts} {txt#parents} {txt#def}", r.getIdentifier(), perms, opts, parents, def));
         }
     }
 

@@ -45,7 +45,7 @@ import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.RolesUtil.FoundOption;
 import org.cubeengine.module.roles.RolesUtil.FoundPermission;
-import org.cubeengine.module.roles.commands.provider.ContextParser;
+import org.cubeengine.libcube.service.command.parser.ContextParser;
 import org.cubeengine.module.roles.commands.provider.FileSubjectParser;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;

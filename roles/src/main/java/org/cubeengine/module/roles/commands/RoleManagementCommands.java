@@ -36,7 +36,7 @@ import org.cubeengine.libcube.service.command.annotation.Parser;
 import org.cubeengine.libcube.service.command.annotation.Using;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
-import org.cubeengine.module.roles.commands.provider.ContextParser;
+import org.cubeengine.libcube.service.command.parser.ContextParser;
 import org.cubeengine.module.roles.commands.provider.TristateParser;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.commands.provider.FileSubjectParser;
