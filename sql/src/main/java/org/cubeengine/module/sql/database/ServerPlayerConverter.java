@@ -17,21 +17,20 @@
  */
 package org.cubeengine.module.sql.database;
 
+import java.util.UUID;
 import org.jooq.impl.AbstractConverter;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
-import java.util.UUID;
-
-public class PlayerConverter extends AbstractConverter<String, Player>
+public class ServerPlayerConverter extends AbstractConverter<String, ServerPlayer>
 {
-    public PlayerConverter()
+    public ServerPlayerConverter()
     {
-        super(String.class, Player.class);
+        super(String.class, ServerPlayer.class);
     }
 
     @Override
-    public Player from(String databaseObject)
+    public ServerPlayer from(String databaseObject)
     {
         if (databaseObject == null)
         {
@@ -41,7 +40,7 @@ public class PlayerConverter extends AbstractConverter<String, Player>
     }
 
     @Override
-    public String to(Player userObject)
+    public String to(ServerPlayer userObject)
     {
         if (userObject == null)
         {

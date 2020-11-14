@@ -24,7 +24,7 @@ import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 import org.jooq.impl.TableImpl;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,7 +34,7 @@ import static org.jooq.impl.DSL.constraint;
 
 public abstract class Table<R extends Record> extends TableImpl<R> implements TableCreator<R>
 {
-    public static final DataType<Player> PLAYER_TYPE = SQLDataType.VARCHAR(36).asConvertedDataType(new PlayerConverter());
+    public static final DataType<ServerPlayer> PLAYER_TYPE = SQLDataType.VARCHAR(36).asConvertedDataType(new ServerPlayerConverter());
 
     public Table(Class<R> model, String name, Version version)
     {

@@ -17,9 +17,12 @@
  */
 package org.cubeengine.module.sql.database.impl;
 
-import static org.cubeengine.module.sql.PluginSql.SQL_ID;
-import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
-
+import java.io.File;
+import java.sql.Connection;
+import java.sql.SQLException;
+import javax.sql.DataSource;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
@@ -34,7 +37,15 @@ import org.cubeengine.logscribe.LogLevel;
 import org.cubeengine.logscribe.LogTarget;
 import org.cubeengine.logscribe.filter.PrefixFilter;
 import org.cubeengine.logscribe.target.file.AsyncFileTarget;
-import org.cubeengine.module.sql.database.*;
+import org.cubeengine.module.sql.database.AbstractDatabase;
+import org.cubeengine.module.sql.database.Database;
+import org.cubeengine.module.sql.database.DatabaseConfiguration;
+import org.cubeengine.module.sql.database.ModuleTables;
+import org.cubeengine.module.sql.database.SQLDialectConverter;
+import org.cubeengine.module.sql.database.Table;
+import org.cubeengine.module.sql.database.TableCreator;
+import org.cubeengine.module.sql.database.TableUpdateCreator;
+import org.cubeengine.module.sql.database.TableVersion;
 import org.cubeengine.reflect.Reflector;
 import org.jooq.Configuration;
 import org.jooq.DSLContext;
@@ -51,15 +62,10 @@ import org.jooq.impl.DefaultConfiguration;
 import org.jooq.impl.DefaultExecuteListenerProvider;
 import org.jooq.impl.DefaultVisitListenerProvider;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.service.sql.SqlService;
+import org.spongepowered.api.sql.SqlManager;
 
-import java.io.File;
-import java.sql.Connection;
-import java.sql.SQLException;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.sql.DataSource;
+import static org.cubeengine.module.sql.PluginSql.SQL_ID;
+import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
 
 @Singleton
 public class SQLDatabase extends AbstractDatabase implements Database, ModuleInjector<ModuleTables>
@@ -115,12 +121,12 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
         // Now go connect to the database:
         this.logger.info("Connecting to the database...");
 
-        SqlService service = Sponge.getServiceManager().provide(SqlService.class).get();
-        String url = service.getConnectionUrlFromAlias(SQL_ID).orElse("jdbc:sqlite:cubeengine.db");
+        SqlManager manager = Sponge.getSqlManager();
+        String url = manager.getConnectionUrlFromAlias(SQL_ID).orElse("jdbc:sqlite:cubeengine.db");
 
         try
         {
-            this.dataSource = service.getDataSource(url);
+            this.dataSource = manager.getDataSource(url);
         }
         catch (SQLException e)
         {

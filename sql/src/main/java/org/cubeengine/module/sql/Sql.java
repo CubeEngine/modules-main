@@ -17,22 +17,20 @@
  */
 package org.cubeengine.module.sql;
 
-import org.cubeengine.libcube.CubeEngineModule;
+import com.google.inject.Inject;
 import org.cubeengine.module.sql.database.Database;
-import org.cubeengine.module.sql.database.impl.SQLDatabase;
 import org.cubeengine.processor.Module;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameAboutToStartServerEvent;
-
-import javax.inject.Inject;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 
 @Module
-public class Sql extends CubeEngineModule
+public class Sql
 {
-    @Inject Database db;
+    @Inject private Database db;
 
     @Listener
-    public void onStart(GameAboutToStartServerEvent event)
+    public void onStart(StartedEngineEvent<Server> event)
     {
         db.init();
     }
