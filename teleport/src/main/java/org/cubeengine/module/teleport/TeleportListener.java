@@ -100,7 +100,7 @@ public class TeleportListener
             // TODO remove when include works as intended
             return;
         }
-        if (player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS) || !player.hasPermission(perms.COMPASS_JUMPTO_LEFT.getId()))
+        if (!player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS) || !player.hasPermission(perms.COMPASS_JUMPTO_LEFT.getId()))
         {
             return;
         }
@@ -125,7 +125,7 @@ public class TeleportListener
             // TODO remove when include works as intended
             return;
         }
-        if (player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS)
+        if (!player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS)
                 || !player.hasPermission(perms.COMPASS_JUMPTO_RIGHT.getId()))
         {
             return;
