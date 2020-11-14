@@ -17,147 +17,69 @@
  */
 package org.cubeengine.module.locker;
 
-import static org.cubeengine.module.sql.PluginSql.SQL_ID;
-import static org.cubeengine.module.sql.PluginSql.SQL_VERSION;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.converter.ConverterManager;
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.libcube.CubeEngineModule;
 import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.filesystem.FileManager;
-import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
-import org.cubeengine.module.sql.PluginSql;
-import org.cubeengine.module.sql.database.ModuleTables;
-import org.cubeengine.processor.Dependency;
-import org.cubeengine.processor.Module;
-import org.cubeengine.reflect.Reflector;
-import org.cubeengine.libcube.service.command.ModuleCommand;
 import org.cubeengine.libcube.service.event.ModuleListener;
-import org.cubeengine.module.locker.commands.LockerAdminCommands;
-import org.cubeengine.module.locker.commands.LockerCommands;
-import org.cubeengine.module.locker.commands.LockerCreateCommands;
-import org.cubeengine.module.locker.commands.PlayerAccess;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.config.BlockLockConfig.BlockLockerConfigConverter;
 import org.cubeengine.module.locker.config.EntityLockConfig;
 import org.cubeengine.module.locker.config.EntityLockConfig.EntityLockerConfigConverter;
-import org.cubeengine.module.locker.data.ImmutableLockerData;
+import org.cubeengine.module.locker.config.LockerConfig;
 import org.cubeengine.module.locker.data.LockerData;
-import org.cubeengine.module.locker.data.LockerDataBuilder;
-import org.cubeengine.module.locker.storage.LockManager;
-import org.cubeengine.module.locker.storage.TableAccessList;
-import org.cubeengine.module.locker.storage.TableLockLocations;
-import org.cubeengine.module.locker.storage.TableLocks;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.matcher.EntityMatcher;
-import org.cubeengine.libcube.service.matcher.MaterialMatcher;
-import org.cubeengine.libcube.service.task.TaskManager;
-import org.spongepowered.api.Sponge;
+import org.cubeengine.module.locker.data.LockerItems;
+import org.cubeengine.module.locker.data.LockerManager;
+import org.cubeengine.module.locker.listener.LockerAutoProtectListener;
+import org.cubeengine.module.locker.listener.LockerBookListener;
+import org.cubeengine.module.locker.listener.LockerLockedListener;
+import org.cubeengine.processor.Module;
+import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStoppingEvent;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.item.recipe.RecipeRegistration;
 
-// TODO protect lines of redstone
 // TODO Q out of guarded chest works
 // TODO hoppers and protection
 
 @Singleton
-@Module(dependencies = @Dependency(value = SQL_ID, version = SQL_VERSION))
-@ModuleTables({TableLocks.class, TableLockLocations.class, TableAccessList.class})
-public class Locker extends CubeEngineModule
+@Module
+public class Locker
 {
-    private LockerConfig config;
-    @Inject private TaskManager tm;
-    @Inject private LockManager manager;
-    @ModuleCommand private LockerCommands lockerCmd;
-    @ModuleCommand(LockerCommands.class) private LockerCreateCommands lockerCreateCmds;
-    @ModuleCommand(LockerCommands.class) private LockerAdminCommands lockerAdminCmds;
-    @Inject private LockerPerm perms;
-    @ModuleListener private LockerListener listener;
-    @ModuleListener private LockerBlockListener blockListener;
-    private PluginContainer plugin;
-    private Log logger;
-    @Inject private InventoryGuardFactory igf;
-    @Inject private Reflector reflector;
-    @Inject private EntityMatcher entityMatcher;
-    @Inject private MaterialMatcher mm;
-    @Inject private CommandManager cm;
-    @Inject private FileManager fm;
+    @ModuleConfig private LockerConfig config;
+    @Inject private LockerManager manager;
+    @ModuleListener private LockerAutoProtectListener autoProtectListener;
+    @ModuleListener private LockerBookListener bookListener;
+    @ModuleListener private LockerLockedListener lockedListener;
 
     @Inject
-    public Locker(ModuleManager momu)
+    public Locker(Reflector reflector, ModuleManager mm)
     {
-        this.logger = momu.getLoggerFor(Locker.class);
-        this.plugin = momu.getPlugin(Locker.class).get();
-    }
-
-    @Listener
-    public void onPreInit(GamePreInitializationEvent event)
-    {
-        DataRegistration<LockerData, ImmutableLockerData> dr =
-                DataRegistration.<LockerData, ImmutableLockerData>builder()
-                        .dataClass(LockerData.class).immutableClass(ImmutableLockerData.class)
-                        .builder(new LockerDataBuilder()).manipulatorId("locker")
-                        .dataName("CubeEngine Locker Data")
-                        .buildAndRegister(plugin);
-
-        LockerData.LOCK_ID.getQuery();
-
-        Sponge.getDataManager().registerLegacyManipulatorIds(LockerData.class.getName(), dr);
-
-
         ConverterManager cManager = reflector.getDefaultConverterManager();
-        cManager.registerConverter(new BlockLockerConfigConverter(logger, mm), BlockLockConfig.class);
-        cManager.registerConverter(new EntityLockerConfigConverter(logger, entityMatcher), EntityLockConfig.class);
-
-        cm.getProviders().register(this, new PlayerAccess.PlayerAccessParser(), PlayerAccess.class);
-
-        this.config = fm.loadConfig(this, LockerConfig.class);
+        final Log logger = mm.getLoggerFor(Locker.class);
+        cManager.registerConverter(new BlockLockerConfigConverter(logger), BlockLockConfig.class);
+        cManager.registerConverter(new EntityLockerConfigConverter(logger), EntityLockConfig.class);
     }
 
     @Listener
-    public void onDisable(GameStoppingEvent event)
+    public void onRegisterRecipe(RegisterCatalogEvent<RecipeRegistration> event)
     {
-        this.manager.saveAll();
+        LockerItems.registerRecipes(event);
     }
+
+    @Listener
+    public void onRegisterData(RegisterCatalogEvent<DataRegistration>  event)
+    {
+        LockerData.register(event);
+    }
+
 
     public LockerConfig getConfig()
     {
         return this.config;
-    }
-
-    public TaskManager getTaskManager()
-    {
-        return tm;
-    }
-
-    public LockerPerm perms()
-    {
-        return perms;
-    }
-
-    public PluginContainer getPlugin()
-    {
-        return plugin;
-    }
-
-    public Log getLogger()
-    {
-        return this.logger;
-    }
-
-    public InventoryGuardFactory getInventoryGuardFactory() {
-        return igf;
-    }
-
-    public LockManager getManager()
-    {
-        return manager;
     }
 
     /*

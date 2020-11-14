@@ -25,27 +25,19 @@ import org.cubeengine.libcube.service.permission.PermissionManager;
 
 @SuppressWarnings("all")
 @Singleton
-public class LockerPerm extends PermissionContainer
+public class ProtectPerm extends PermissionContainer
 {
     @Inject
-    public LockerPerm(PermissionManager pm)
+    public ProtectPerm(PermissionManager pm)
     {
         super(pm, Locker.class);
     }
 
-    public final Permission SHOW_OWNER = register("show-owner", "");
-    public final Permission BREAK_OTHER = register("break-other", "");
-    public final Permission ACCESS_OTHER = register("access-other", "");
-    public final Permission EXPAND_OTHER = register("expand-other", "");
+    public final Permission ALLOW_INVENTORY = register("allow.container", "Allows interaction with inventories");
+    public final Permission ALLOW_DOOR = register("allow.door", "", null);
+    public final Permission ALLOW_LIVING_ENTITY = register("allow.living-entity", "Allows interaction with living entities");
+    public final Permission ALLOW_ENTITY = register("allow.entity", "Allows interaction with non living entities");
+    public final Permission ALLOW_HANGING = register("allow.hanging", "Allows interaction with hanging entities");
+    public final Permission ALLOW_VEHICLE = register("allow.vehicle", "Allows interaction with vehicles");
 
-    public final Permission PREVENT_NOTIFY = register("prevent-notify", "");
-
-    public final Permission CMD_REMOVE_OTHER = register("command.locker.remove.other", "");
-    public final Permission CMD_KEY_OTHER = register("command.locker.key.other", "");
-    public final Permission CMD_MODIFY_OTHER_FLAGS = register("command.locker.modifyflags.other", "");
-    public final Permission CMD_MODIFY_OTHER_ACCESS = register("command.locker.modifyaccess.other", "");
-    public final Permission CMD_GIVE_OTHER = register("command.locker.give.other", "");
-
-    public final Permission CMD_INFO_OTHER = register("command.locker.info.other", "");
-    public final Permission CMD_INFO_SHOW_OWNER =  register("command.locker.info.show-owner", "");
 }

@@ -15,16 +15,17 @@
  * You should have received a copy of the GNU General Public License
  * along with CubeEngine.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.cubeengine.module.locker.commands;
+package org.cubeengine.module.locker.data;
 
-import org.cubeengine.module.locker.storage.Lock;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent.Builder;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.spongepowered.api.adventure.SpongeComponents;
+import org.spongepowered.api.data.type.HandTypes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.item.inventory.ItemStack;
 
-interface LockAction
+public interface LockerBook
 {
-    void apply(Lock lock, Location<World> location, Entity entity);
 
-    interface LockCreateAction extends LockAction {}
 }

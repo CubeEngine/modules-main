@@ -19,18 +19,11 @@ package org.cubeengine.module.locker.config;
 
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.logscribe.Log;
-import org.cubeengine.module.locker.storage.ProtectedType;
-import org.cubeengine.libcube.service.matcher.MaterialMatcher;
+import org.cubeengine.module.locker.data.ProtectedType;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 
-/**
- * Example:
- * B_DOOR:
- *   auto-protect: PRIVATE
- *   flags:
- *      - BLOCK_REDSTONE
- *      - AUTOCLOSE
- */
 public class BlockLockConfig extends LockConfig<BlockLockConfig, BlockType>
 {
     public BlockLockConfig(BlockType material)
@@ -41,27 +34,20 @@ public class BlockLockConfig extends LockConfig<BlockLockConfig, BlockType>
 
     public String getTitle()
     {
-        return type.getId();
+        return type.getKey().toString();
     }
 
     public static class BlockLockerConfigConverter extends LockConfigConverter<BlockLockConfig>
     {
-        private MaterialMatcher mm;
-
-        public BlockLockerConfigConverter(Log logger, MaterialMatcher mm)
+        public BlockLockerConfigConverter(Log logger)
         {
             super(logger);
-            this.mm = mm;
         }
 
         protected BlockLockConfig fromString(String s) throws ConversionException
         {
-            BlockType material = mm.block(s);
-            if (material == null)
-            {
-                throw ConversionException.of(this, s, "Invalid BlockType!");
-            }
-            return new BlockLockConfig(material);
+            return Sponge.getRegistry().getCatalogRegistry().get(BlockType.class, ResourceKey.resolve(s))
+                  .map(BlockLockConfig::new).orElseThrow(() -> ConversionException.of(this, s, "Invalid BlockType!"));
         }
     }
 }

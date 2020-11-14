@@ -28,8 +28,7 @@ import org.cubeengine.converter.node.Node;
 import org.cubeengine.converter.node.NullNode;
 import org.cubeengine.converter.node.StringNode;
 import org.cubeengine.logscribe.Log;
-import org.cubeengine.module.locker.storage.LockType;
-import org.cubeengine.module.locker.storage.ProtectionFlag;
+import org.cubeengine.module.locker.data.ProtectionFlag;
 
 public abstract class LockConfigConverter<C extends LockConfig<C, ?>> extends SimpleConverter<C>
 {
@@ -51,7 +50,7 @@ public abstract class LockConfigConverter<C extends LockConfig<C, ?>> extends Si
         }
         if (object.autoProtect)
         {
-            config.set("auto-protect", StringNode.of(object.autoProtectType.name()));
+            config.set("auto-protect", BooleanNode.of(true));
         }
         if (object.defaultFlags != null && !object.defaultFlags.isEmpty())
         {
@@ -95,7 +94,6 @@ public abstract class LockConfigConverter<C extends LockConfig<C, ?>> extends Si
                 if (entry.getKey().equals("auto-protect"))
                 {
                     configuration.autoProtect = true;
-                    configuration.autoProtectType = LockType.valueOf(entry.getValue().asText());
                 }
                 if (entry.getKey().equals("default-flags"))
                 {

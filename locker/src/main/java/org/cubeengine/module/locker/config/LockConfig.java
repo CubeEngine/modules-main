@@ -19,15 +19,13 @@ package org.cubeengine.module.locker.config;
 
 import java.util.Arrays;
 import java.util.List;
-import org.cubeengine.module.locker.storage.LockType;
-import org.cubeengine.module.locker.storage.ProtectedType;
-import org.cubeengine.module.locker.storage.ProtectionFlag;
+import org.cubeengine.module.locker.data.ProtectedType;
+import org.cubeengine.module.locker.data.ProtectionFlag;
 
 public abstract class LockConfig<This extends LockConfig,T>
 {
     protected final ProtectedType protectedType;
     protected boolean autoProtect = false;
-    protected LockType autoProtectType;
     protected List<ProtectionFlag> defaultFlags;
     protected boolean enable = true;
     protected T type;
@@ -37,10 +35,9 @@ public abstract class LockConfig<This extends LockConfig,T>
         this.protectedType = protectedType;
     }
 
-    public This autoProtect(LockType type)
+    public This autoProtect()
     {
-        this.autoProtectType = type;
-        this.autoProtect = type != null;
+        this.autoProtect = true;
         return (This)this;
     }
 
@@ -57,6 +54,11 @@ public abstract class LockConfig<This extends LockConfig,T>
 
     public abstract String getTitle();
 
+    public T getType()
+    {
+        return type;
+    }
+
     public short getFlags()
     {
         short result = 0;
@@ -71,10 +73,5 @@ public abstract class LockConfig<This extends LockConfig,T>
     public boolean isAutoProtect()
     {
         return autoProtect;
-    }
-
-    public LockType getAutoProtect()
-    {
-        return autoProtectType;
     }
 }

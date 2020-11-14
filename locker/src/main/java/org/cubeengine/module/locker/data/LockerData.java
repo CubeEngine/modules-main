@@ -17,189 +17,70 @@
  */
 package org.cubeengine.module.locker.data;
 
-import static org.spongepowered.api.data.DataQuery.of;
-
+import java.util.UUID;
 import com.google.common.reflect.TypeToken;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.mutable.common.AbstractData;
-import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.ValueFactory;
-import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.data.value.mutable.Value;
+import org.cubeengine.module.locker.PluginLocker;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.block.entity.BlockEntity;
+import org.spongepowered.api.data.DataHolder.Mutable;
+import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.persistence.DataStore;
+import org.spongepowered.api.data.value.ListValue;
+import org.spongepowered.api.data.value.MapValue;
+import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.util.TypeTokens;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-public class LockerData extends AbstractData<LockerData, ImmutableLockerData>
+public interface LockerData
 {
-    private static TypeToken<Value<Long>> TTV_Long = new TypeToken<Value<Long>>() {};
-    private static TypeToken<ListValue<Byte>> TTLV_Byte = new TypeToken<ListValue<Byte>>() {};
+    TypeToken<MapValue<UUID, Integer>> TTMV_UUIDInteger = new TypeToken<MapValue<UUID, Integer>>() {};
+    TypeToken<ListValue<UUID>> TTLV_UUID = new TypeToken<ListValue<UUID>>() {};
 
-    public static Key<Value<Long>> LOCK_ID = Key.builder().type(TTV_Long).id("data-id").name("ID").query(of("LockID")).build();
-    public static Key<ListValue<Byte>> LOCK_PASS = Key.builder().type(TTLV_Byte).id("data-pass").name("Password").query(of("LockPass")).build();
+    Key<Value<String>> MODE = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "mode")).type(TypeTokens.STRING_VALUE_TOKEN).build();
 
-    private long lockID;
-    private byte[] pass;
+    Key<Value<String>> PASS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "pass")).type(TypeTokens.STRING_VALUE_TOKEN).build();
 
-    public LockerData(long lockID, byte[] pass)
+    Key<Value<UUID>> OWNER = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "owner")).type(TypeTokens.UUID_VALUE_TOKEN).build();
+
+    /**
+     * Bitmasks see {@link ProtectionFlag}
+     */
+    Key<Value<Integer>> FLAGS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "flags")).type(TypeTokens.INTEGER_VALUE_TOKEN).build();
+    Key<MapValue<UUID, Integer>> ACCESS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "access")).type(TTMV_UUIDInteger).build();
+
+    Key<ListValue<UUID>> UNLOCKS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "unlocks")).type(TTLV_UUID).build();
+
+    Key<Value<Long>> LAST_ACCESS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "last_access")).type(TypeTokens.LONG_VALUE_TOKEN).build();
+    Key<Value<Long>> CREATED = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "created")).type(TypeTokens.LONG_VALUE_TOKEN).build();
+
+    static void register(RegisterCatalogEvent<DataRegistration> event)
     {
-        this.lockID = lockID;
-        this.pass = pass;
-        registerGettersAndSetters();
+        event.register(DataRegistration.of(MODE, ItemStack.class));
+
+        event.register(DataRegistration.of(PASS, ItemStack.class, BlockEntity.class, Entity.class));
+
+        event.register(DataRegistration.of(OWNER, ItemStack.class, BlockEntity.class, Entity.class));
+
+        event.register(DataRegistration.of(FLAGS, ItemStack.class, BlockEntity.class, Entity.class));
+
+        final DataStore accessDatastore = DataStore.builder().pluginData(ACCESS.getKey()).holder(ItemStack.class, BlockEntity.class, Entity.class).key(ACCESS).build();
+        DataRegistration.builder().key(ACCESS.getKey()).dataKey(ACCESS).store(accessDatastore).build();
+
+        event.register(DataRegistration.of(LAST_ACCESS, BlockEntity.class, Entity.class));
+        event.register(DataRegistration.of(CREATED, BlockEntity.class, Entity.class));
     }
 
-    @Override
-    protected void registerGettersAndSetters()
+    static void purge(Mutable dataHolder)
     {
-        registerFieldGetter(LOCK_ID, LockerData.this::getLockID);
-        registerFieldSetter(LOCK_ID, LockerData.this::setLockID);
-        registerKeyValue(LOCK_ID, LockerData.this::lockid);
-
-        registerFieldGetter(LOCK_PASS, LockerData.this::getPass);
-        registerFieldSetter(LOCK_PASS, LockerData.this::setPass);
-        registerKeyValue(LOCK_PASS, LockerData.this::pass);
-    }
-
-    private void setPass(List<Byte> bytes)
-    {
-        List<Byte> list = bytes;
-        this.pass = new byte[list.size()];
-        for (int i = 0; i < list.size(); i++)
-        {
-            this.pass[i] = list.get(i);
-        }
-    }
-
-    public ListValue<Byte> pass()
-    {
-        return Sponge.getRegistry().getValueFactory().createListValue(LOCK_PASS, getPass());
-    }
-
-    public List<Byte> getPass()
-    {
-        if (pass == null || pass.length == 0)
-        {
-            return Collections.emptyList();
-        }
-        return passAsList();
-    }
-
-    public Value<Long> lockid()
-    {
-        return Sponge.getRegistry().getValueFactory().createValue(LOCK_ID, lockID);
-    }
-
-    public void setLockID(Long id)
-    {
-        this.lockID = id;
-    }
-
-    public long getLockID()
-    {
-        return lockID;
-    }
-
-    public LockerData()
-    {
-        this(0, null);
-    }
-
-    @Override
-    public Optional<LockerData> fill(DataHolder dataHolder, MergeFunction overlap)
-    {
-        Optional<Long> lockID = dataHolder.get(LOCK_ID);
-        if (lockID.isPresent())
-        {
-            LockerData data = this.copy();
-            data.lockID = lockID.get();
-            data.pass = null;
-            Optional<List<Byte>> pass = dataHolder.get(LOCK_PASS);
-            if (pass.isPresent())
-            {
-                data.pass = new byte[pass.get().size()];
-                for (int i = 0; i < pass.get().size(); i++)
-                {
-                    data.pass[i] = pass.get().get(i);
-                }
-            }
-
-            data = overlap.merge(this, data);
-
-            if (data != this)
-            {
-                this.lockID = data.lockID;
-                this.pass = data.pass;
-            }
-
-            return Optional.of(this);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<LockerData> from(DataContainer container)
-    {
-        Optional<Long> lockID = container.getLong(LOCK_ID.getQuery());
-        if (lockID.isPresent())
-        {
-            this.lockID = lockID.get();
-            Optional<List<Byte>> pass = container.getByteList(LOCK_PASS.getQuery());
-            if (pass.isPresent())
-            {
-                this.pass = new byte[pass.get().size()];
-                for (int i = 0; i < pass.get().size(); i++)
-                {
-                    this.pass[i] = pass.get().get(i);
-                }
-            }
-            return Optional.of(this);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public LockerData copy()
-    {
-        return new LockerData(lockID, pass);
-    }
-
-    @Override
-    public ImmutableLockerData asImmutable()
-    {
-        return new ImmutableLockerData(lockID, pass);
-    }
-
-    @Override
-    public DataContainer toContainer()
-    {
-        DataContainer container = super.toContainer();
-        container.set(LOCK_ID, this.lockID);
-        if (pass == null || pass.length == 0)
-        {
-            return container;
-        }
-        List<Byte> pass = passAsList();
-        return container.set(LOCK_PASS, pass);
-    }
-
-    private List<Byte> passAsList()
-    {
-        List<Byte> list = new ArrayList<>();
-        for (byte b : pass)
-        {
-            list.add(b);
-        }
-        return list;
-    }
-
-    @Override
-    public int getContentVersion()
-    {
-        return 2;
+        dataHolder.remove(PASS);
+        dataHolder.remove(OWNER);
+        dataHolder.remove(FLAGS);
+        dataHolder.remove(ACCESS);
+        dataHolder.remove(UNLOCKS);
+        dataHolder.remove(LAST_ACCESS);
+        dataHolder.remove(CREATED);
     }
 }

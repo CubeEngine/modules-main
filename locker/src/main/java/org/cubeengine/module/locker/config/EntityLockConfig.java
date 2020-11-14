@@ -19,8 +19,9 @@ package org.cubeengine.module.locker.config;
 
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.logscribe.Log;
-import org.cubeengine.module.locker.storage.ProtectedType;
-import org.cubeengine.libcube.service.matcher.EntityMatcher;
+import org.cubeengine.module.locker.data.ProtectedType;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.EntityType;
 
 public class EntityLockConfig extends LockConfig<EntityLockConfig, EntityType>
@@ -33,27 +34,20 @@ public class EntityLockConfig extends LockConfig<EntityLockConfig, EntityType>
 
     public String getTitle()
     {
-        return type.getId();
+        return type.getKey().toString();
     }
 
     public static class EntityLockerConfigConverter extends LockConfigConverter<EntityLockConfig>
     {
-        private EntityMatcher em;
-
-        public EntityLockerConfigConverter(Log logger, EntityMatcher em)
+        public EntityLockerConfigConverter(Log logger)
         {
             super(logger);
-            this.em = em;
         }
 
         protected EntityLockConfig fromString(String s) throws ConversionException
         {
-            EntityType entityType = em.any(s, null);
-            if (entityType == null)
-            {
-                throw ConversionException.of(this, s, "Invalid EntityType!");
-            }
-            return new EntityLockConfig(entityType);
+            return Sponge.getRegistry().getCatalogRegistry().get(EntityType.class, ResourceKey.resolve(s))
+                         .map(EntityLockConfig::new).orElseThrow(() -> ConversionException.of(this, s, "Invalid BlockType!"));
         }
     }
 }
