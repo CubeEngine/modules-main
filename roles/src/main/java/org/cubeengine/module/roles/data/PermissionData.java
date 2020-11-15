@@ -17,7 +17,7 @@
  */
 package org.cubeengine.module.roles.data;
 
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import org.cubeengine.module.roles.PluginRoles;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.DataRegistration;

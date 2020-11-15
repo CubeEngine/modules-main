@@ -18,7 +18,7 @@
 package org.cubeengine.module.locker.data;
 
 import java.util.UUID;
-import com.google.common.reflect.TypeToken;
+import io.leangen.geantyref.TypeToken;
 import org.cubeengine.module.locker.PluginLocker;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.entity.BlockEntity;

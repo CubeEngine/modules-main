@@ -19,7 +19,7 @@ package org.cubeengine.module.vanillaplus.fix;
 
 import java.util.Optional;
 
-import com.google.common.reflect.TypeToken;
+import com.google.gson.reflect.TypeToken;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataQuery;
@@ -32,7 +32,7 @@ public class SafeLoginData extends AbstractBooleanData<SafeLoginData, ImmutableS
 {
 
     public final static Key<Value<Boolean>> FLYMODE = Key.builder().type(new TypeToken<Value<Boolean>>() {}).id("flymode")
-            .name("Flymode on Login").query(DataQuery.of("flymode")).build();
+                                                         .name("Flymode on Login").query(DataQuery.of("flymode")).build();
 
     public SafeLoginData(Boolean value)
     {
