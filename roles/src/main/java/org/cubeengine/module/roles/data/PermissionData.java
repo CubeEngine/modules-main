@@ -25,8 +25,9 @@ import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.persistence.DataStore;
 import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.data.value.MapValue;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
-import org.spongepowered.api.util.TypeTokens;
 
 public interface PermissionData
 {
@@ -44,7 +45,7 @@ public interface PermissionData
         final ResourceKey rkey = ResourceKey.of(PluginRoles.ROLES_ID, "permissiondata");
         final DataStore dataStore = DataStore.builder()
                                              .pluginData(rkey)
-                                             .holder(TypeTokens.SERVER_PLAYER_TOKEN, TypeTokens.USER_TOKEN)
+                                             .holder(ServerPlayer.class, User.class)
 
                       .key(PARENTS, "parents")
                                              .key(PERMISSIONS, "permissions")
