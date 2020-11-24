@@ -80,7 +80,7 @@ public class LockerBookListener
     {
         final ItemStack itemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
         final Optional<String> mode = itemInHand.get(LockerData.MODE);
-        if (mode.isPresent())
+        if (mode.isPresent() && event.getContext().get(EventContextKeys.USED_HAND).map(hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
         {
             if (this.handleLockerBookInteraction(player, LockerMode.valueOf(mode.get()), event.getEntity(), itemInHand))
             {
