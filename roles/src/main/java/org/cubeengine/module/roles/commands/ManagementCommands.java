@@ -35,7 +35,6 @@ import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.collection.FileBasedCollection;
 import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
@@ -70,18 +69,8 @@ public class ManagementCommands extends DispatcherCommand
     @Command(desc = "Reloads all roles from config")
     public void reload(CommandCause context)
     {
-        module.getConfiguration().reload();
-        service.getConfig().reload();
+        service.fullReload();
 
-        // TODO
-        service.getLoadedCollections().values().stream()
-                .filter(c -> c instanceof FileBasedCollection)
-                .map(FileBasedCollection.class::cast)
-                .forEach(FileBasedCollection::reload);
-
-        service.getUserSubjects().reload();
-
-        // TODO remove cached data ; needed?
         i18n.send(context, POSITIVE, "{text:Roles} reload complete!");
     }
 

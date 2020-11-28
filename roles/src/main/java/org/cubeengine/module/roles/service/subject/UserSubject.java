@@ -22,6 +22,7 @@ import java.util.UUID;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.UserSubjectData;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 public class UserSubject extends BaseSubject<UserSubjectData>
@@ -46,6 +47,12 @@ public class UserSubject extends BaseSubject<UserSubjectData>
     public String getIdentifier()
     {
         return uuid.toString();
+    }
+
+    @Override
+    public Optional<String> getFriendlyIdentifier()
+    {
+        return Sponge.getServer().getUserManager().get(uuid).map(User::getName);
     }
 
     public Optional<ServerPlayer> getPlayer()

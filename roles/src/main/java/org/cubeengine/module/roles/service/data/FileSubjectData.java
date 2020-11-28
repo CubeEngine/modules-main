@@ -24,6 +24,7 @@ import org.cubeengine.module.roles.config.RoleConfig;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.FileBasedCollection;
 import org.cubeengine.module.roles.service.subject.FileSubject;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
@@ -32,6 +33,7 @@ import org.spongepowered.api.service.permission.SubjectReference;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +88,7 @@ public class FileSubjectData extends CachingSubjectData
                     throw new IllegalStateException(e);
                 }
                 config.save();// TODO async
+                Sponge.getServer().getOnlinePlayers().forEach(p -> Sponge.getCommandManager().updateCommandTreeForPlayer(p));
             }
             return changed;
         });

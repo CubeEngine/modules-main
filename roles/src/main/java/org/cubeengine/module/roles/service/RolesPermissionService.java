@@ -231,4 +231,19 @@ public class RolesPermissionService implements PermissionService
     {
         return logger;
     }
+
+    public void fullReload()
+    {
+        this.getConfig().reload();
+        // TODO
+        this.getLoadedCollections().values().stream()
+               .filter(c -> c instanceof FileBasedCollection)
+               .map(FileBasedCollection.class::cast)
+               .forEach(FileBasedCollection::reload);
+
+        this.getUserSubjects().reload();
+
+        // TODO remove cached data ; needed?
+    }
+
 }
