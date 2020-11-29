@@ -69,6 +69,12 @@ public class ModuleDocs
         return id;
     }
 
+    public String getModuleId()
+    {
+        return this.moduleId;
+    }
+
+
     public ModuleDocs(PluginContainer plugin, Class module, Reflector reflector, PermissionManager pm, PermissionService ps, ModuleManager mm)
     {
         this.reflector = reflector;
@@ -77,7 +83,7 @@ public class ModuleDocs
         this.moduleName = mm.getModuleName(module).get();
         this.id = plugin.getMetadata().getId();
         this.moduleId = mm.getModuleID(module).get();
-        InputStream is = plugin.getClass().getResourceAsStream("/assets/cubeengine/"+ moduleId + "-info.yml");
+        InputStream is = plugin.getClass().getResourceAsStream("/assets/"+ id + "/info.yml");
         if (is == null)
         {
             this.config = reflector.create(Info.class);
@@ -98,20 +104,24 @@ public class ModuleDocs
         this.commands.putAll(mm.getBaseCommands(module));
     }
 
-    public void generate(Path modulePath, DocType docType, Log log)
+    public void generate(Path modulesPath, DocType docType, Log log)
     {
         String generated = docType.getGenerator()
                 .generate(log, this.id, this.name, this.pc, this.config, this.permissions, this.commands, this.basePermission);
 
-        Path file = modulePath.resolve(this.id + docType.getFileExtension());
+        Path modulePath = modulesPath.resolve(this.moduleId);
+        Path file = modulePath.resolve(this.moduleId + docType.getFileExtension());
+
         try
         {
+            Files.createDirectories(modulePath);
+
             Files.write(file, generated.getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 
             // Copy Markdown pages
             for (String pageName : this.config.pages.values())
             {
-                InputStream is = this.pc.getClass().getResourceAsStream("/assets/cubeengine/" + this.moduleId + "-" + pageName + ".md");
+                InputStream is = this.pc.getClass().getResourceAsStream("/assets/" + this.id + "/pages/" + pageName + ".md");
                 Path pageFileTarget = modulePath.resolve(this.id + "-" + pageName + ".md");
                 Files.copy(is, pageFileTarget);
             }
@@ -134,7 +144,7 @@ public class ModuleDocs
                 sb.append(configInfo);
                 sb.append("\n```\n");
 
-                Files.write(modulePath.resolve(this.id + "-config-" + configClass.getSimpleName().toLowerCase() + ".md"), sb.toString().getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+                Files.write(modulePath.resolve("config-" + configClass.getSimpleName().toLowerCase() + ".md"), sb.toString().getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
             }
 
 

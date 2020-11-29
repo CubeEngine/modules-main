@@ -58,8 +58,7 @@ public class MarkdownGenerator implements Generator
         sb.append("## Modules\n\n");
 
         ModuleDocs doc = modules.get("cubeengine-core");
-        sb.append(" - [").append("Core").append("](modules/").append(doc.getId()).append(".md)\n");
-
+        sb.append(" - [").append("Core").append("](modules/").append(doc.getModuleId()).append("/").append(doc.getModuleId()).append(".md)\n");
 
         List<ModuleDocs> list = new ArrayList<>(modules.values());
         list.sort((a, b) -> Boolean.compare(b.isOnOre(), a.isOnOre()));
@@ -69,7 +68,7 @@ public class MarkdownGenerator implements Generator
             {
                 continue;
             }
-            sb.append(" - [").append(module.getModuleName()).append("](modules/").append(module.getId()).append(".md)");
+            sb.append(" - [").append(module.getModuleName()).append("](modules/").append(module.getModuleId()).append("/").append(module.getModuleId()).append(".md)");
             if (module.isWIP())
             {
                 sb.append(" - [WIP]");

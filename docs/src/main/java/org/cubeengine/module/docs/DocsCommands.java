@@ -19,6 +19,7 @@ package org.cubeengine.module.docs;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
 import org.spongepowered.api.command.CommandCause;
 
@@ -34,7 +35,7 @@ public class DocsCommands
         this.module = module;
     }
 
-// TODO   @Alias({"gd", "docgen", "gendoc"})
+    @Alias(value = "gd", alias = {"docgen", "gendoc"})
     @Command(desc = "Generates documentation")
     public void generateDocs(CommandCause ctx)
     {
