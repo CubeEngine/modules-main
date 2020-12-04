@@ -25,6 +25,8 @@ import org.cubeengine.module.locker.LockerPerm;
 import org.cubeengine.module.locker.data.LockerManager;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.transaction.BlockTransaction;
+import org.spongepowered.api.block.transaction.Operations;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.Transaction;
@@ -116,15 +118,18 @@ public class LockerLockedListener
     }
 
     @Listener
-    public void onBlockBreak(ChangeBlockEvent.Break event, @First ServerPlayer player)
+    public void onBlockBreak(ChangeBlockEvent.All event, @First ServerPlayer player)
     {
         final Set<Vector3i> checkedPos = new HashSet<>();
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions())
+        for (BlockTransaction transaction : event.getTransactions())
         {
-            if (lockerManager.handleBlockBreak(transaction.getOriginal(), player, true, checkedPos))
+            if (transaction.getOperation().equals(Operations.BREAK.get()))
             {
-                event.setCancelled(true);
-                return;
+                if (lockerManager.handleBlockBreak(transaction.getOriginal(), player, true, checkedPos))
+                {
+                    event.setCancelled(true);
+                    return;
+                }
             }
         }
     }
@@ -155,13 +160,21 @@ public class LockerLockedListener
     }
 
     @Listener
-    public void onBlockBreakByBlock(ChangeBlockEvent.Break event, @First BlockSnapshot maybeFire)
+    public void onBlockBreakByBlock(ChangeBlockEvent.All event, @First BlockSnapshot maybeFire)
     {
         if (maybeFire.getState().getType().isAnyOf(BlockTypes.FIRE)) // other types? maybe water/lava
         {
             final Set<Vector3i> checkedPos = new HashSet<>();
             // TODO missing original data
-            event.filter(loc -> !lockerManager.handleBlockBreak(loc.createSnapshot(), null, true, checkedPos));
+            for (BlockTransaction transaction : event.getTransactions())
+            {
+                if (transaction.getOperation().equals(Operations.BREAK.get())
+                    && lockerManager.handleBlockBreak(transaction.getOriginal(), null, true, checkedPos))
+                {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
         }
     }
 

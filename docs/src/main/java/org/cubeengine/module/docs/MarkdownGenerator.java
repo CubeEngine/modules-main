@@ -20,6 +20,7 @@ package org.cubeengine.module.docs;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,14 +30,17 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.AnnotationCommandBuilder;
-import org.cubeengine.libcube.service.command.HelpExecutor;
 import org.cubeengine.libcube.service.command.AnnotationCommandBuilder.Requirements;
+import org.cubeengine.libcube.service.command.HelpExecutor;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.logscribe.Log;
 import org.spongepowered.api.command.Command;
+import org.spongepowered.api.command.Command.Parameterized;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.manager.CommandMapping;
+import org.spongepowered.api.command.parameter.Parameter;
 import org.spongepowered.api.command.parameter.Parameter.Subcommand;
+import org.spongepowered.api.command.parameter.Parameter.Value;
 import org.spongepowered.api.command.registrar.CommandRegistrar;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.plugin.PluginContainer;
@@ -127,7 +131,7 @@ public class MarkdownGenerator implements Generator
             sb.append("\n## Pages:\n");
             for (Map.Entry<String, String> entry : info.pages.entrySet())
             {
-                sb.append(" - [").append(entry.getKey()).append("]").append("(").append(id).append("-").append(entry.getValue()).append(".md)\n");
+                sb.append(" - [").append(entry.getKey()).append("]").append("(pages/").append(entry.getValue()).append(".md)\n");
             }
         }
 
@@ -135,7 +139,7 @@ public class MarkdownGenerator implements Generator
             sb.append("\n## Config:\n");
             for (Class clazz : info.config) {
                 String simpleName = clazz.getSimpleName();
-                sb.append(" - [").append(simpleName).append("]").append("(").append(id).append("-config-").append(simpleName.toLowerCase()).append(".md)\n");
+                sb.append(" - [").append(simpleName).append("]").append("(pages/").append("config-").append(simpleName.toLowerCase()).append(".md)\n");
             }
         }
 
@@ -193,9 +197,15 @@ public class MarkdownGenerator implements Generator
         final List<Subcommand> subCommands = command.subcommands();
         subCommands.sort(Comparator.comparing(s -> s.getAliases().iterator().next()));
 
+        String primaryAlias = mapping.getPrimaryAlias();
+        if (primaryAlias.contains(":"))
+        {
+            primaryAlias = primaryAlias.substring(primaryAlias.indexOf(":") + 1);
+
+        }
         if (overview)
         {
-            commandStack.push("*" + mapping.getPrimaryAlias() + "*");
+            commandStack.push("*" + primaryAlias + "*");
             String fullCmd = String.join(WHITESPACE, commandStack);
             sb.append("| [").append(fullCmd).append("]").append("(#").append(
                 fullCmd.replace("*", "")
@@ -211,22 +221,27 @@ public class MarkdownGenerator implements Generator
 
 
             commandStack.pop();
-            commandStack.push("**" + mapping.getPrimaryAlias() + "**");
+            commandStack.push("**" + primaryAlias + "**");
         }
         else
         {
-            commandStack.push(mapping.getPrimaryAlias());
+            commandStack.push(primaryAlias);
             String fullCmd = String.join(WHITESPACE, commandStack);
             sb.append("\n#### ").append(fullCmd).append("  \n");
 
             sb.append(plainSerializer.serialize(command.getShortDescription(CommandCause.create()).orElse(Component.empty()))).append("  \n");
-            // TODO usage from sponge is rather bad
-            sb.append("**Usage:** `").append(plainSerializer.serialize(command.getUsage(CommandCause.create()))).append("`  \n");
+            sb.append("**Usage:** `").append(getUsage(commandStack, command, plainSerializer)).append("`  \n");
 
-            if (!mapping.getAllAliases().isEmpty())
+            final Set<String> allAliases = new HashSet<>(mapping.getAllAliases());
+            allAliases.remove(primaryAlias);
+            if (commandStack.size() == 1)
+            {
+                allAliases.remove(mapping.getPlugin().getMetadata().getId() + ":" + primaryAlias);
+            }
+            if (!allAliases.isEmpty())
             {
                 sb.append("**Alias:**");
-                for (String alias : mapping.getAllAliases())
+                for (String alias : allAliases)
                 {
                     // TODO alias registered on different dispatchers?
 //                    String[] dispatcher = alias.getDispatcher();
@@ -287,6 +302,37 @@ public class MarkdownGenerator implements Generator
         }
 
         commandStack.pop();
+    }
+
+    private String getUsage(Stack<String> commandStack, Parameterized command, PlainComponentSerializer plainSerializer)
+    {
+        StringBuilder usage = new StringBuilder(String.join(" ", commandStack));
+        for (Parameter parameter : command.parameters())
+        {
+            if (parameter instanceof Parameter.Value)
+            {
+                String paramUsage = ((Value<?>)parameter).getUsage(CommandCause.create());
+                if (!parameter.isOptional())
+                {
+                    paramUsage = "<" + paramUsage + ">";
+                }
+                usage.append(" ").append(paramUsage);
+            }
+            else
+            {
+                if (parameter.isOptional())
+                {
+                    usage.append("[?]");
+                }
+                else
+                {
+                    usage.append("<?>");
+                }
+            }
+        }
+        return usage.toString();
+        // TODO usage from sponge is rather bad :/
+//        return plainSerializer.serialize(command.getUsage(CommandCause.create()));
     }
 
     private static class TmpCommandMapping implements CommandMapping {

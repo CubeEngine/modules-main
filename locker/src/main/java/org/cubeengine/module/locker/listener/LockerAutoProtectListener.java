@@ -25,6 +25,8 @@ import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.config.EntityLockConfig;
 import org.cubeengine.module.locker.data.LockerManager;
 import org.spongepowered.api.block.BlockSnapshot;
+import org.spongepowered.api.block.transaction.BlockTransaction;
+import org.spongepowered.api.block.transaction.Operations;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -35,6 +37,7 @@ import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.TameEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.world.ServerLocation;
+import java.util.List;
 
 @Singleton
 public class LockerAutoProtectListener
@@ -53,19 +56,22 @@ public class LockerAutoProtectListener
 
 
     @Listener
-    public void onPlace(ChangeBlockEvent.Place event, @First ServerPlayer player)
+    public void onPlace(ChangeBlockEvent.All event, @First ServerPlayer player)
     {
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions())
+        for (BlockTransaction transaction : event.getTransactions())
         {
-            for (BlockLockConfig cfg : module.getConfig().block.blocks)
+            if (transaction.getOperation().equals(Operations.BREAK.get()))
             {
-                if (cfg.isAutoProtect() && cfg.getType().equals(transaction.getFinal().getState().getType()))
+                for (BlockLockConfig cfg : module.getConfig().block.blocks)
                 {
-                    final ServerLocation loc = transaction.getFinal().getLocation().get();
-                    final short flags = cfg.getFlags();
-                    if (lockerManager.createLock(loc, player, flags))
+                    if (cfg.isAutoProtect() && cfg.getType().equals(transaction.getFinal().getState().getType()))
                     {
-                        event.setCancelled(true);
+                        final ServerLocation loc = transaction.getFinal().getLocation().get();
+                        final short flags = cfg.getFlags();
+                        if (lockerManager.createLock(loc, player, flags))
+                        {
+                            event.setCancelled(true);
+                        }
                     }
                 }
             }

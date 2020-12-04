@@ -111,6 +111,7 @@ public class ModuleDocs
 
         Path modulePath = modulesPath.resolve(this.moduleId);
         Path file = modulePath.resolve(this.moduleId + docType.getFileExtension());
+        final Path modulePages = modulePath.resolve("pages");
 
         try
         {
@@ -122,7 +123,8 @@ public class ModuleDocs
             for (String pageName : this.config.pages.values())
             {
                 InputStream is = this.pc.getClass().getResourceAsStream("/assets/" + this.id + "/pages/" + pageName + ".md");
-                Path pageFileTarget = modulePath.resolve(this.id + "-" + pageName + ".md");
+                Files.createDirectories(modulePages);
+                Path pageFileTarget = modulePages.resolve(pageName + ".md");
                 Files.copy(is, pageFileTarget);
             }
 
@@ -144,7 +146,8 @@ public class ModuleDocs
                 sb.append(configInfo);
                 sb.append("\n```\n");
 
-                Files.write(modulePath.resolve("config-" + configClass.getSimpleName().toLowerCase() + ".md"), sb.toString().getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+                Files.createDirectories(modulePages);
+                Files.write(modulePages.resolve("config-" + configClass.getSimpleName().toLowerCase() + ".md"), sb.toString().getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
             }
 
 
