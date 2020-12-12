@@ -23,23 +23,27 @@ import java.util.Optional;
 import java.util.UUID;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.module.teleport.permission.TeleportPerm;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.action.InteractEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.cause.entity.MovementTypes;
 import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
+import org.spongepowered.api.event.entity.living.AnimateHandEvent;
 import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 
 import static org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType.ACTION_BAR;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
@@ -92,14 +96,9 @@ public class TeleportListener
     }
 
     @Listener
-    // TODO @Include(value = {InteractBlockEvent.Primary.class, InteractEntityEvent.Primary.class})
-    public void onPrimary(InteractEvent event, @First ServerPlayer player)
+    public void onPrimary(AnimateHandEvent event, @First ServerPlayer player)
     {
-        if (!(event instanceof InteractBlockEvent.Primary))
-        {
-            // TODO remove when include works as intended
-            return;
-        }
+        // TODO prevent double-event-call
         if (!player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS) || !player.hasPermission(perms.COMPASS_JUMPTO_LEFT.getId()))
         {
             return;
@@ -112,19 +111,36 @@ public class TeleportListener
             return;
         }
         player.setLocation(LocationUtil.getLocationUp(loc).add(0.5, 0, 0.5));
+        player.offer(Keys.VELOCITY, Vector3d.ZERO);
+        player.offer(Keys.FALL_DISTANCE, 0d);
         i18n.send(ACTION_BAR, player, NEUTRAL, "Poof!");
         event.setCancelled(true);
     }
 
     @Listener
-    // TODO @Include(value = {InteractBlockEvent.Secondary.class, InteractEntityEvent.Secondary.class})
-    public void onSecondary(InteractEvent event, @First ServerPlayer player)
+    public void onPrimary(InteractBlockEvent.Primary event, @First ServerPlayer player)
     {
-        if (!(event instanceof InteractBlockEvent.Secondary))
+        if (!player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS) || !player.hasPermission(perms.COMPASS_JUMPTO_LEFT.getId()))
         {
-            // TODO remove when include works as intended
             return;
         }
+
+        ServerLocation loc = LocationUtil.getBlockInSight(player);
+        if (loc == null)
+        {
+//            i18n.send(ACTION_BAR, player, NEGATIVE, "No block in sight");
+            return;
+        }
+//        player.setLocation(LocationUtil.getLocationUp(loc).add(0.5, 0, 0.5));
+//        player.offer(Keys.VELOCITY, Vector3d.ZERO);
+//        player.offer(Keys.FALL_DISTANCE, 0d);
+//        i18n.send(ACTION_BAR, player, NEUTRAL, "Poof!");
+        event.setCancelled(true);
+    }
+
+    @Listener
+    public void onSecondary(InteractItemEvent.Secondary event, @First ServerPlayer player)
+    {
         if (!player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS)
                 || !player.hasPermission(perms.COMPASS_JUMPTO_RIGHT.getId()))
         {
@@ -139,6 +155,8 @@ public class TeleportListener
         }
 
         player.setLocation(end.get().add(0.5, 0, 0.5));
+        player.offer(Keys.VELOCITY, Vector3d.ZERO);
+        player.offer(Keys.FALL_DISTANCE, 0d);
         i18n.send(ACTION_BAR, player, NEUTRAL, "You passed through a wall");
         event.setCancelled(true);
     }
