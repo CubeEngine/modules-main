@@ -30,7 +30,7 @@ import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.TypeTokens;
 
@@ -56,7 +56,7 @@ public interface LockerData
     Key<Value<Long>> LAST_ACCESS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "last_access")).type(TypeTokens.LONG_VALUE_TOKEN).build();
     Key<Value<Long>> CREATED = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "created")).type(TypeTokens.LONG_VALUE_TOKEN).build();
 
-    static void register(RegisterCatalogEvent<DataRegistration> event)
+    static void register(RegisterDataEvent event)
     {
         event.register(DataRegistration.of(MODE, ItemStack.class));
 
@@ -67,7 +67,7 @@ public interface LockerData
         event.register(DataRegistration.of(FLAGS, ItemStack.class, BlockEntity.class, Entity.class));
 
         final DataStore accessDatastore = DataStore.builder().pluginData(ACCESS.getKey()).holder(ItemStack.class, BlockEntity.class, Entity.class).key(ACCESS).build();
-        DataRegistration.builder().key(ACCESS.getKey()).dataKey(ACCESS).store(accessDatastore).build();
+        DataRegistration.builder().dataKey(ACCESS).store(accessDatastore).build();
 
         event.register(DataRegistration.of(LAST_ACCESS, BlockEntity.class, Entity.class));
         event.register(DataRegistration.of(CREATED, BlockEntity.class, Entity.class));

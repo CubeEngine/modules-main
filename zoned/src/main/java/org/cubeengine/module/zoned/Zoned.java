@@ -31,10 +31,9 @@ import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -65,7 +64,7 @@ public class Zoned
     }
 
     @Listener
-    public void onRegisterData(RegisterCatalogEvent<DataRegistration> event)
+    public void onRegisterData(RegisterDataEvent event)
     {
         ZonedData.register(event);
     }

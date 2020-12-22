@@ -39,7 +39,8 @@ import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
+import org.spongepowered.api.event.lifecycle.RegisterDataPackValueEvent;
 import org.spongepowered.api.item.recipe.RecipeRegistration;
 
 // TODO Q out of guarded chest works
@@ -65,13 +66,13 @@ public class Locker
     }
 
     @Listener
-    public void onRegisterRecipe(RegisterCatalogEvent<RecipeRegistration> event)
+    public void onRegisterRecipe(RegisterDataPackValueEvent event)
     {
         LockerItems.registerRecipes(event);
     }
 
     @Listener
-    public void onRegisterData(RegisterCatalogEvent<DataRegistration>  event)
+    public void onRegisterData(RegisterDataEvent event)
     {
         LockerData.register(event);
     }

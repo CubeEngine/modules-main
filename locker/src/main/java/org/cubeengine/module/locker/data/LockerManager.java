@@ -796,7 +796,7 @@ public class LockerManager
             }
 
             // Detachable Entities
-            for (Hanging entity : loc.getWorld().getEntities(Hanging.class, new AABB(loc.getBlockPosition().sub(Vector3i.ONE), loc.getBlockPosition().add(Vector3i.ONE))))
+            for (Hanging entity : loc.getWorld().getEntities(Hanging.class, AABB.of(loc.getBlockPosition().sub(Vector3i.ONE), loc.getBlockPosition().add(Vector3i.ONE))))
             {
                 if (entity.getServerLocation().relativeTo(entity.get(Keys.DIRECTION).orElse(Direction.NONE)).getBlockPosition().equals(loc.getBlockPosition()))
                 {

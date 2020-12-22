@@ -34,10 +34,9 @@ import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.processor.Module;
 import org.spongepowered.api.Server;
-import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.ProvideServiceEvent;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -75,7 +74,7 @@ public class Roles
     }
 
     @Listener
-    public void onRegisterData(RegisterCatalogEvent<DataRegistration> event)
+    public void onRegisterData(RegisterDataEvent event)
     {
         PermissionData.register(event);
     }

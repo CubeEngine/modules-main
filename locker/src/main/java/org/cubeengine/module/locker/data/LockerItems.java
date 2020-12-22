@@ -22,7 +22,7 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import org.cubeengine.module.locker.PluginLocker;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterDataPackValueEvent;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.recipe.RecipeRegistration;
@@ -31,7 +31,7 @@ import org.spongepowered.api.item.recipe.crafting.Ingredient;
 
 public interface LockerItems
 {
-    static void registerRecipes(RegisterCatalogEvent<RecipeRegistration> event)
+    static void registerRecipes(RegisterDataPackValueEvent event)
     {
         final ItemStack lockerBook = ItemStack.of(ItemTypes.ENCHANTED_BOOK);
         lockerBook.offer(LockerData.MODE, LockerMode.INFO_CREATE.name());

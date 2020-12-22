@@ -27,7 +27,7 @@ import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.event.lifecycle.RegisterCatalogEvent;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 
 public interface PermissionData
 {
@@ -40,7 +40,7 @@ public interface PermissionData
     Key<MapValue<String, Boolean>> PERMISSIONS = Key.builder().key(ResourceKey.of(PluginRoles.ROLES_ID, "permissions")).type(TTMV_StringBool).build();
     Key<MapValue<String, String>> OPTIONS = Key.builder().key(ResourceKey.of(PluginRoles.ROLES_ID, "options")).type(TTMV_StringString).build();
 
-    static void register(RegisterCatalogEvent<DataRegistration> event)
+    static void register(RegisterDataEvent event)
     {
         final ResourceKey rkey = ResourceKey.of(PluginRoles.ROLES_ID, "permissiondata");
         final DataStore dataStore = DataStore.builder()
@@ -57,7 +57,6 @@ public interface PermissionData
                                                               .dataKey(PERMISSIONS)
                                                               .dataKey(OPTIONS)
                                                               .store(dataStore)
-                                                              .key(rkey)
                                                               .build();
         event.register(registration);
     }

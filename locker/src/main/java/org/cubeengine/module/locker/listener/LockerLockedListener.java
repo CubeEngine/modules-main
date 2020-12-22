@@ -17,6 +17,9 @@
  */
 package org.cubeengine.module.locker.listener;
 
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -29,9 +32,8 @@ import org.spongepowered.api.block.transaction.BlockTransaction;
 import org.spongepowered.api.block.transaction.Operations;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.animal.horse.HorseEntity;
+import org.spongepowered.api.entity.living.animal.horse.HorseLike;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.event.EventContextKeys;
@@ -51,10 +53,6 @@ import org.spongepowered.api.projectile.source.ProjectileSource;
 import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3i;
-
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
 
 @Singleton
 public class LockerLockedListener
@@ -210,7 +208,7 @@ public class LockerLockedListener
     {
         if (dataHolder != null)
         {
-            final boolean isInventory = secondary && !(dataHolder instanceof HorseEntity && !player.get(Keys.IS_SNEAKING).orElse(false)); // Horse Inventory only opens when sneaking
+            final boolean isInventory = secondary && !(dataHolder instanceof HorseLike && !player.get(Keys.IS_SNEAKING).orElse(false)); // Horse Inventory only opens when sneaking
             if (dataHolder instanceof Carrier && isInventory) // Is it an inventory?
             {
                 return lockerManager.handleInventoryOpen(dataHolder, player, ((Carrier)dataHolder).getInventory());
