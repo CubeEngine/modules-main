@@ -18,24 +18,35 @@
 package org.cubeengine.module.teleport.command;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.Broadcaster;
+import org.cubeengine.libcube.service.command.FirstValueParameter;
+import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.command.annotation.Default;
 import org.cubeengine.libcube.service.command.annotation.Flag;
 import org.cubeengine.libcube.service.command.annotation.Named;
 import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
 import org.cubeengine.libcube.service.command.annotation.Restricted;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.teleport.permission.TeleportPerm;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector2d;
+import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
 import static org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType.ACTION_BAR;
@@ -66,59 +77,125 @@ public class TeleportCommands
         this.perms = perms;
     }
 
-    @Command(desc = "Teleport directly to a player.")
-    public void tp(CommandCause context, ServerPlayer player, @Option ServerPlayer target, @Flag boolean force)
+    public static class DestinationParameter implements FirstValueParameter
     {
-        if (target == null)
-        {
-            target = player;
-            if (!(context.getAudience() instanceof ServerPlayer))
+        public ServerPlayer player;
+        public Vector3d location;
+
+        public ServerLocation position(Entity target) {
+            if (player == null)
             {
-                i18n.send(ACTION_BAR, context, NEGATIVE, "You have to provide both players");
-                return;
+                return target.getServerLocation().getWorld().getLocation(location);
             }
-            player = (ServerPlayer)context.getAudience();
+            return player.getServerLocation();
         }
+    }
+
+    @Alias("teleport")
+    @Command(desc = "Teleport directly to a player.")
+    public void tp(CommandCause context, @Option @ParameterPermission Collection<Entity> targets, DestinationParameter destination, @Flag boolean force)
+    {
         force = force && context.hasPermission(perms.COMMAND_TP_FORCE.getId());
-        if (!context.getAudience().equals(player) && !context.hasPermission(perms.COMMAND_TP_OTHER.getId())) // teleport other persons
+
+        if (targets != null && !context.hasPermission(perms.COMMAND_TP_TARGETS.getId())) // teleport other persons
         {
             i18n.send(ACTION_BAR, context, NEGATIVE, "You are not allowed to teleport other people!");
             return;
         }
 
-        if (!context.getAudience().equals(player))
+        List<Entity> actualTargets;
+        if (targets == null)
         {
-            if (!force && player.hasPermission(perms.TELEPORT_PREVENT_TP.getId())) // teleport the user
+            if (context.getSubject() instanceof ServerPlayer)
             {
-                i18n.send(ACTION_BAR, context, NEGATIVE, "You are not allowed to teleport {user}!", player);
+                actualTargets = Arrays.asList(((ServerPlayer)context.getSubject()));
+            }
+            else
+            {
+                i18n.send(ACTION_BAR, context, NEGATIVE, "No target entities provided!");
                 return;
             }
-        } // else equals tp -> no need to check tp perm
-        if (!context.getAudience().equals(target))
+        }
+        else
         {
-            if (!force && target.hasPermission(perms.TELEPORT_PREVENT_TPTO.getId())) // teleport to the target
+            actualTargets = new ArrayList<>(targets);
+        }
+
+        if (!force)
+        {
+            final List<Subject> tpPrevention = actualTargets.stream()
+                  .filter(e -> !e.equals(context.getSubject())) // not self
+                  .filter(e -> e instanceof Subject).map(Subject.class::cast) // only subjects
+                  .filter(subject -> perms.TELEPORT_PREVENT_TP.check(subject)) // with prevent tp permission
+                  .collect(Collectors.toList());
+            if (!tpPrevention.isEmpty())
+            {
+                i18n.sendN(ACTION_BAR, context, NEGATIVE, tpPrevention.size(),
+                           "You are not allowed to teleport {user}!",
+                           "You are not allowed to teleport {1:integer} users.",
+                           tpPrevention.get(0),
+                           tpPrevention.size());
+            }
+            actualTargets.removeAll(tpPrevention);
+        }
+
+        if (!force && destination.player != null && !context.getAudience().equals(destination.player))
+        {
+            if (perms.TELEPORT_PREVENT_TPTO.check(destination.player)) // teleport to the target
             {
                 if (context.hasPermission(perms.COMMAND_TP_FORCE.getId()))
                 {
                     i18n.send(ACTION_BAR, context, POSITIVE, "Use the {text:-force (-f)} flag to teleport to this player."); //Show force flag if has permission
                 }
-                i18n.send(ACTION_BAR, context, NEGATIVE, "You are not allowed to teleport to {user}!", target);
+                i18n.send(ACTION_BAR, context, NEGATIVE, "You are not allowed to teleport to {user}!", destination.player);
                 return;
             }
         } // else equals tphere -> no need to check tpto perm
 
-        if (player.equals(target))
+        if (actualTargets.size() == 1 && actualTargets.contains(destination.player))
         {
-            if (context.getAudience().equals(player))
+            if (context.getAudience().equals(destination.player))
             {
                 i18n.send(ACTION_BAR, context, NEUTRAL, "You found yourself!");
                 return;
             }
-            i18n.send(ACTION_BAR, context, NEUTRAL, "You just teleported {user} to {user}... Not very useful right?", player, player);
+            i18n.send(ACTION_BAR, context, NEUTRAL, "You just teleported {user} to {user}... Not very useful right?", destination.player, destination.player);
             return;
         }
-        player.setLocation(target.getServerLocation());
-        i18n.send(ACTION_BAR, context, POSITIVE, "You teleported to {user}!", target);
+        actualTargets.remove(destination.player); // Dont bother
+        if (actualTargets.isEmpty())
+        {
+            i18n.send(ACTION_BAR, context, NEGATIVE, "Nothing to teleport");
+            return;
+        }
+        for (Entity target : actualTargets)
+        {
+            target.setLocation(destination.position(target));
+            if (target instanceof ServerPlayer)
+            {
+                if (destination.player != null)
+                {
+                    i18n.send(ACTION_BAR, (ServerPlayer) target, POSITIVE, "You got teleported to {user}!", destination.player);
+                }
+                else
+                {
+                    i18n.send(ACTION_BAR, (ServerPlayer) target, POSITIVE, "You got teleported to {vector}!", destination.location.toInt());
+                }
+            }
+        }
+        if (destination.player != null)
+        {
+            i18n.sendN(ACTION_BAR, context, POSITIVE, actualTargets.size(),
+                       "Teleported to {user}!",
+                       "Teleported {1:number} entities to {user}", destination.player, actualTargets.size());
+        }
+        else
+        {
+            i18n.sendN(ACTION_BAR, context, POSITIVE, actualTargets.size(),
+                       "Teleported to {vector}!",
+                       "Teleported {1:number} entities to {vector}", destination.location.toInt(), actualTargets.size());
+        }
+
     }
 
     @Command(desc = "Teleports everyone directly to a player.")

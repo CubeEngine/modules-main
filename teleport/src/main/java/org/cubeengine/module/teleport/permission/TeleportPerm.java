@@ -36,7 +36,7 @@ public class TeleportPerm extends PermissionContainer
     public final Permission CMD_SPAWN_PREVENT = register("command.spawn.prevent", "Prevents from being teleported to spawn by someone else", null);
     public final Permission CMD_SPAWN_FORCE = register("command.spawn.force", "Allows teleporting a player to spawn even if the player has the prevent permission", null);
     public final Permission COMMAND_TP_FORCE = register("command.tp.force", "Ignores all prevent permissions when using the /tp command", null);
-    public final Permission COMMAND_TP_OTHER = register("command.tp.other", "Allows teleporting another player", null);
+    public final Permission COMMAND_TP_TARGETS = register("command.tp.targets", "Allows choosing teleport targets (selector)", null);
 
     public final Permission TELEPORT_PREVENT_TP = register("teleport.prevent.tp", "Prevents from being teleported by someone else", null);
     public final Permission TELEPORT_PREVENT_TPTO = register("teleport.prevent.tpto", "Prevents from teleporting to you", null);
