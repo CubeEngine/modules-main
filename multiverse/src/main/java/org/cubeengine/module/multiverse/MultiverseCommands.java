@@ -18,34 +18,39 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.module.multiverse.player.MultiverseData;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.sound.Sound;
+import net.kyori.adventure.sound.Sound.Source;
+import net.kyori.adventure.text.Component;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.module.multiverse.player.MultiverseData;
+import org.cubeengine.module.multiverse.player.PlayerData;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 @Command(name = "multiverse", desc = "Multiverse commands", alias = "mv")
-public class MultiverseCommands extends ContainerCommand
+public class MultiverseCommands extends DispatcherCommand
 {
     private Multiverse module;
     private I18n i18n;
 
-    public MultiverseCommands(CommandManager base, Multiverse module, I18n i18n)
+    public MultiverseCommands(Multiverse module, I18n i18n)
     {
-        super(base, Multiverse.class);
         this.module = module;
         this.i18n = i18n;
     }
@@ -54,7 +59,7 @@ public class MultiverseCommands extends ContainerCommand
     // TODO command to load inventory from another universe
 
     @Command(desc = "Moves a world into another universe")
-    public void move(CommandSource context, World world, String universe)
+    public void move(CommandCause context, ServerWorld world, String universe)
     {
         // TODO old universe is not removed
         String previous = module.getUniverse(world);
@@ -63,24 +68,27 @@ public class MultiverseCommands extends ContainerCommand
             i18n.send(context, NEGATIVE, "{world} is already in the universe {name}", world, universe);
             return;
         }
-        module.setUniverse(world, universe);
+        module.setUniverse(new ConfigWorld(world), universe);
         i18n.send(context, POSITIVE, "{world} is now in the universe {input}!", world, universe);
 
         Sponge.getServer().getOnlinePlayers().stream().filter(player -> player.getWorld().equals(world)).forEach(
             p -> {
-                MultiverseData data = p.get(MultiverseData.class).get();
-                data.from(previous, world).applyFromPlayer(p);
-                data.from(universe, world).applyToPlayer(p);
+                final Map<String, DataContainer> data = p.get(MultiverseData.DATA).orElse(Collections.emptyMap());
+                // Serialize current data on previous universe
+                data.put(previous, PlayerData.of(data.get(previous), world).applyFromPlayer(p).toContainer());
+                // Deserialize new universe data on player
+                PlayerData.of(data.get(universe), world).applyToPlayer(p);
+
                 i18n.send(p, NEUTRAL, "The sky opens up and sucks in the whole world.");
-                p.playSound(SoundTypes.BLOCK_PORTAL_TRIGGER, p.getLocation().getPosition(), 1);
+                p.playSound(Sound.sound(SoundTypes.BLOCK_PORTAL_TRIGGER, Source.NEUTRAL, 1, 1), p.getLocation().getPosition());
                 p.offer(Keys.POTION_EFFECTS, Arrays.asList(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, 2 * 20)));
                 i18n.send(p, NEUTRAL, "When you open your eyes you now are in {input#univserse}.", universe);
-                p.offer(data);
+                p.offer(MultiverseData.DATA, data);
             });
     }
 
     @Command(desc = "Lists all known universes")
-    public void list(CommandSource context)
+    public void list(CommandCause context)
     {
         // TODO hover & click features
         Set<Entry<String, Set<ConfigWorld>>> universes = module.getConfig().universes.entrySet();
@@ -92,16 +100,16 @@ public class MultiverseCommands extends ContainerCommand
         i18n.send(context, POSITIVE, "The following univserses exits:");
         for (Entry<String, Set<ConfigWorld>> entry : universes)
         {
-            context.sendMessage(Text.of(entry.getKey(), ":"));
+            context.sendMessage(Identity.nil(), Component.text(entry.getKey() + ":"));
             for (ConfigWorld world : entry.getValue())
             {
-                context.sendMessage(Text.of(" - ", world.getName()));
+                context.sendMessage(Identity.nil(), Component.text(" - " + world.getName()));
             }
         }
     }
 
     @Command(desc = "Removes a universe")
-    public void remove(CommandSource context, String universe)
+    public void remove(CommandCause context, String universe)
     {
         Set<ConfigWorld> removed = module.getConfig().universes.remove(universe);
         if (removed == null)
@@ -110,13 +118,13 @@ public class MultiverseCommands extends ContainerCommand
             return;
         }
         removed.stream().filter(cWorld -> cWorld.getWorld() != null)
-                        .forEach(cWorld -> module.setUniverse(cWorld.getWorld(), "unknown"));
+                        .forEach(cWorld -> module.setUniverse(cWorld, "unknown"));
         module.getConfig().save();
         i18n.send(context, POSITIVE, "{name} was removed and {amount} universes moved to {name}", universe, removed.size(), "unknown");
     }
 
     @Command(desc = "Renames a universe")
-    public void rename(CommandSource context, String universe, String newName)
+    public void rename(CommandCause context, String universe, String newName)
     {
         Set<ConfigWorld> worlds = module.getConfig().universes.remove(universe);
         if (worlds == null)

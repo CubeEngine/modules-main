@@ -18,14 +18,10 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.HashMap;
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.event.entity.living.humanoid.player.RespawnPlayerEvent;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
 import org.spongepowered.api.world.World;
 
 public class MultiverseListener
@@ -51,7 +47,7 @@ public class MultiverseListener
 
         if (target instanceof Player)
         {
-            MultiverseData data = target.get(MultiverseData.class).get();
+            MultiverseDataold data = target.get(MultiverseDataold.class).get();
             data.from(module.getUniverse(from), from).applyFromPlayer(((Player)target)); // save playerdata
             data.from(module.getUniverse(to), to).applyToPlayer(((Player)target)); // load playerdata
             target.offer(data);
@@ -67,7 +63,7 @@ public class MultiverseListener
     public void onJoin(ClientConnectionEvent.Join event)
     {
         Player player = event.getTargetEntity();
-        MultiverseData data = player.get(MultiverseData.class).orElse(new MultiverseData(null, new HashMap<>()));
+        MultiverseDataold data = player.get(MultiverseDataold.class).orElse(new MultiverseDataold(null, new HashMap<>()));
         World world = player.getWorld();
         String loginUniverse = module.getUniverse(world);
         if (data.getCurrentUniverse() == null)
@@ -87,7 +83,7 @@ public class MultiverseListener
     public void onQuit(ClientConnectionEvent.Disconnect event)
     {
         Player player = event.getTargetEntity();
-        MultiverseData data = player.get(MultiverseData.class).orElse(null);
+        MultiverseDataold data = player.get(MultiverseDataold.class).orElse(null);
         if (data == null)
         {
             return;
@@ -110,7 +106,7 @@ public class MultiverseListener
             return;
         }
 
-        MultiverseData data = target.get(MultiverseData.class).get();
+        MultiverseDataold data = target.get(MultiverseDataold.class).get();
         data.from(module.getUniverse(from), from).applyFromPlayer(((Player)target)); // save playerdata
         data.from(module.getUniverse(to), to).applyToPlayer(((Player)target)); // load playerdata
         target.offer(data);

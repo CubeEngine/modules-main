@@ -18,37 +18,25 @@
 package org.cubeengine.module.multiverse;
 
 
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.libcube.CubeEngineModule;
-import org.cubeengine.libcube.InjectService;
-import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.libcube.service.event.EventManager;
-import org.cubeengine.libcube.service.filesystem.ModuleConfig;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.module.multiverse.player.ImmutableMultiverseData;
-import org.cubeengine.module.multiverse.player.MultiverseData;
-import org.cubeengine.module.multiverse.player.MultiverseDataBuilder;
-import org.cubeengine.module.multiverse.player.PlayerData;
-import org.cubeengine.processor.Dependency;
-import org.cubeengine.processor.Module;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataRegistration;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePostInitializationEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.world.World;
-
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Map.Entry;
 import java.util.Set;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.InjectService;
+import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.event.ModuleListener;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.logscribe.Log;
+import org.cubeengine.module.multiverse.player.MultiverseData;
+import org.cubeengine.processor.Module;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.world.server.ServerWorld;
 
 /**
  * Group Worlds into Universes
@@ -67,44 +55,25 @@ import javax.inject.Singleton;
  */
 @Singleton
 @Module
-public class Multiverse extends CubeEngineModule
+public class Multiverse
 {
-    public static final String UNKNOWN = "unknown";
-    @Inject private CommandManager cm;
-    @Inject private EventManager em;
-    @Inject private I18n i18n;
-    @Inject private ModuleManager mm;
-    private Log log;
-    @Inject private PluginContainer plugin;
+    public static final String UNKNOWN_UNIVERSE_NAME = "unknown";
+    @Inject private Log log;
     @InjectService private PermissionService ps;
 
     @ModuleConfig private MultiverseConfig config;
-
-    @Inject
-    public Multiverse(PluginContainer plugin)
-    {
-        DataRegistration<MultiverseData, ImmutableMultiverseData> dr = DataRegistration.<MultiverseData, ImmutableMultiverseData>builder()
-                .dataClass(MultiverseData.class).immutableClass(ImmutableMultiverseData.class)
-                .builder(new MultiverseDataBuilder()).manipulatorId("multiverse")
-                .dataName("CubeEngine Multiverse Data")
-                .buildAndRegister(plugin);
-
-        MultiverseData.DATA.getQuery();
-        PlayerData.ACTIVE_EFFECTS.getQuery();
-
-        Sponge.getDataManager().registerLegacyManipulatorIds(MultiverseData.class.getName(), dr);
-    }
+    @ModuleCommand private MultiverseCommands multiverseCommands;
+    @ModuleListener private MultiverseListener listener;
 
     @Listener
-    public void onEnable(GamePreInitializationEvent event) throws IOException
+    public void onRegisterData(RegisterDataEvent event)
     {
-        this.log = mm.getLoggerFor(Multiverse.class);
-        cm.addCommand(new MultiverseCommands(cm, this, i18n));
-        em.registerListener(Multiverse.class, new MultiverseListener(this));
+        MultiverseData.register(event);
     }
 
+
     @Listener
-    public void onPostInit(GamePostInitializationEvent event)
+    public void onPostInit(StartedEngineEvent<Server> event)
     {
         ps.registerContextCalculator(new MultiverseContextCalculator(this));
     }
@@ -114,13 +83,13 @@ public class Multiverse extends CubeEngineModule
         return config;
     }
 
-    public String getUniverse(World world)
+    public String getUniverse(ServerWorld world)
     {
         for (Entry<String, Set<ConfigWorld>> entry : config.universes.entrySet())
         {
             for (ConfigWorld cWorld : entry.getValue())
             {
-                if (world.getName().equals(cWorld.getName()))
+                if (world.getKey().asString().equals(cWorld.getName()))
                 {
                     return entry.getKey();
                 }
@@ -129,44 +98,30 @@ public class Multiverse extends CubeEngineModule
 
         if (config.autoDetectUnivserse)
         {
-            if (world.getName().contains("_"))
+            final String worldKeyValue = world.getKey().getValue();
+            if (worldKeyValue.contains("_"))
             {
-                String name = world.getName().substring(0, world.getName().indexOf("_"));
-                Set<ConfigWorld> list = config.universes.get(name);
-                if (list == null)
-                {
-                    list = new HashSet<>();
-                    config.universes.put(name, list);
-                }
-                list.add(new ConfigWorld(world));
-                log.info("Added {} to the universe {}", world.getName(), name);
-                config.save();
-                return name;
+                String name = worldKeyValue.substring(0, worldKeyValue.indexOf("_"));
+                return saveInUniverse(new ConfigWorld(world), name);
             }
         }
 
-        Set<ConfigWorld> list = config.universes.get(UNKNOWN);
-        if (list == null)
-        {
-            list = new HashSet<>();
-            config.universes.put(UNKNOWN, list);
-        }
-        list.add(new ConfigWorld(world));
-        log.info("Added {} to the universe {}", world.getName(), UNKNOWN);
-        config.save();
-        return UNKNOWN;
+        return saveInUniverse(new ConfigWorld(world), UNKNOWN_UNIVERSE_NAME);
     }
 
-    public void setUniverse(World world, String universe)
+    public String saveInUniverse(ConfigWorld cWorld, String name)
     {
-        ConfigWorld cWorld = new ConfigWorld(world);
+        Set<ConfigWorld> set = config.universes.computeIfAbsent(name, k -> new HashSet<>());
+        set.add(cWorld);
+        log.info("Added {} to the universe {}", cWorld.getName(), name);
+        config.save();
+        return name;
+    }
+
+    public void setUniverse(ConfigWorld cWorld, String universe)
+    {
         config.universes.values().forEach(set -> set.remove(cWorld));
-        Set<ConfigWorld> set = config.universes.get(universe);
-        if (set == null)
-        {
-            set = new HashSet<>();
-            config.universes.put(universe, set);
-        }
+        Set<ConfigWorld> set = config.universes.computeIfAbsent(universe, k -> new HashSet<>());
         set.add(cWorld);
         config.save();
     }

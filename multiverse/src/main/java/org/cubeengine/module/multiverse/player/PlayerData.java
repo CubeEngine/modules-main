@@ -22,32 +22,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import io.leangen.geantyref.TypeToken;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataSerializable;
-import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.Key;
-import org.spongepowered.api.data.Queries;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.persistence.DataQuery;
+import org.spongepowered.api.data.persistence.DataSerializable;
+import org.spongepowered.api.data.persistence.DataView;
+import org.spongepowered.api.data.persistence.Queries;
+import org.spongepowered.api.data.value.ListValue;
+import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.data.value.Value;
-import org.spongepowered.api.data.value.mutable.ListValue;
-import org.spongepowered.api.data.value.mutable.MapValue;
-import org.spongepowered.api.data.value.mutable.Value;
 import org.spongepowered.api.effect.potion.PotionEffect;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.Hotbar;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import static java.util.Collections.emptyList;
-import static org.spongepowered.api.data.DataQuery.of;
 
 public class PlayerData implements DataSerializable
 {
@@ -87,7 +81,7 @@ public class PlayerData implements DataSerializable
 
     // TODO bedspawn?
 
-    public PlayerData(World world)
+    public PlayerData(ServerWorld world)
     {
         gameMode = world.getProperties().getGameMode();
         // TODO defaultdata from world
@@ -138,6 +132,15 @@ public class PlayerData implements DataSerializable
         this.gameMode = Sponge.getRegistry().getType(GameMode.class, value.getString(GAMEMODE.getQuery()).get()).get();
     }
 
+    public static PlayerData of(DataContainer dataContainer, ServerWorld world)
+    {
+        if (dataContainer == null)
+        {
+            return new PlayerData(world);
+        }
+        return new PlayerData(dataContainer);
+    }
+
     @Override
     public DataContainer toContainer()
     {
@@ -159,7 +162,7 @@ public class PlayerData implements DataSerializable
         return result;
     }
 
-    public void applyToPlayer(Player player)
+    public void applyToPlayer(ServerPlayer player)
     {
         Inventory inv = player.getInventory();
         ((Hotbar)inv.query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class))).setSelectedSlotIndex(heldItemSlot);
@@ -212,7 +215,7 @@ public class PlayerData implements DataSerializable
         player.offer(Keys.GAME_MODE, gameMode);
     }
 
-    public void applyFromPlayer(Player player)
+    public PlayerData applyFromPlayer(ServerPlayer player)
     {
         Inventory playerInventory = player.getInventory();
         this.heldItemSlot = ((Hotbar)playerInventory.query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class))).getSelectedSlotIndex();
@@ -251,6 +254,7 @@ public class PlayerData implements DataSerializable
         }
         */
         this.gameMode = player.get(Keys.GAME_MODE).get();
+        return this;
     }
 
     @Override

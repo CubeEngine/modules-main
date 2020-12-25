@@ -17,173 +17,65 @@
  */
 package org.cubeengine.module.multiverse.player;
 
-import static org.spongepowered.api.data.DataQuery.of;
+import io.leangen.geantyref.TypeToken;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.block.entity.BlockEntity;
+import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.persistence.DataStore;
+import org.spongepowered.api.data.value.MapValue;
+import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
+import org.cubeengine.module.multiverse.PlugnMultiverse;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-import com.google.common.reflect.TypeToken;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.DataView;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.mutable.common.AbstractData;
-import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.mutable.MapValue;
-import org.spongepowered.api.data.value.mutable.Value;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.World;
-
-public class MultiverseData extends AbstractData<MultiverseData, ImmutableMultiverseData> implements IMultiverseData
+public interface MultiverseData
 {
-    private static TypeToken<Value<String>> TTV_String = new TypeToken<Value<String>>() {};
-    private static TypeToken<MapValue<String, DataContainer>> TTMV_Data = new TypeToken<MapValue<String, DataContainer>>() {};
+    TypeToken<Value<String>> TTV_String = new TypeToken<Value<String>>() {};
+    TypeToken<MapValue<String, DataContainer>> TTMV_Data = new TypeToken<MapValue<String, DataContainer>>() { };
 
-    public static final Key<Value<String>> WORLD = Key.builder().type(TTV_String).query(of("current")).id("data-world").name("World").build();
-    public static final Key<MapValue<String, DataContainer>> DATA = Key.builder().type(TTMV_Data).query(of("playerdata")).id("data-container").name("DataContainer").build();
+    Key<Value<String>> WORLD = Key.builder()
+                                  .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID), "current-world")
+                                  .type(TTV_String).build();
 
-    public String currentUniverse;
-    private Map<String, PlayerData> playerData;
+    Key<MapValue<String, DataContainer>> DATA = Key.builder()
+                                  .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID), "player-data")
+                                  .type(TTMV_Data).build();
 
-    public MultiverseData(String currentUniverse, Map<String, PlayerData> playerData)
+    static void register(RegisterDataEvent event)
     {
-        this.currentUniverse = currentUniverse;
-        this.playerData = playerData;
-        registerGettersAndSetters();
+        registerCurrentWorldData(event);
+        registerPlayerData(event);
     }
 
-    @Override
-    protected void registerGettersAndSetters()
+    static void registerCurrentWorldData(RegisterDataEvent event)
     {
-        registerFieldGetter(WORLD, this::getCurrentUniverse);
-        registerFieldSetter(WORLD, this::setCurrentUniverse);
-        registerKeyValue(WORLD, this::currentWorld);
+        final ResourceKey rkey = ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "current-world");
+        final DataStore dataStore = DataStore.builder().pluginData(rkey)
+                                             .holder(BlockEntity.class)
+                                             .key(MultiverseData.WORLD, "current-world")
+                                             .build();
 
-        registerFieldGetter(DATA, this::getPlayerData);
-        registerFieldSetter(DATA,this::setPlayerData);
-        registerKeyValue(DATA, this::playerData);
+        final DataRegistration registration = DataRegistration.builder()
+                                                              .dataKey(MultiverseData.WORLD)
+                                                              .store(dataStore)
+                                                              .build();
+        event.register(registration);
     }
 
-    @Override
-    public Optional<MultiverseData> fill(DataHolder dataHolder, MergeFunction overlap)
+    static void registerPlayerData(RegisterDataEvent event)
     {
-        // TODO mergeFunction
-        return apply(dataHolder.get(WORLD), dataHolder.get(DATA));
-    }
+        final ResourceKey rkey = ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "player-data");
+        final DataStore dataStore = DataStore.builder().pluginData(rkey)
+                                             .holder(BlockEntity.class)
+                                             .key(MultiverseData.DATA, "player-data")
+                                             .build();
 
-    private Optional<MultiverseData> apply(Optional<String> world, Optional<Map<String, DataContainer>> data)
-    {
-        if (world.isPresent() && data.isPresent())
-        {
-            setCurrentUniverse(world.get());
-            setPlayerData(data.get());
-            return Optional.of(this);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public Optional<MultiverseData> from(DataContainer container)
-    {
-        Optional<DataView> data = container.getView(DATA.getQuery());
-        if (data.isPresent())
-        {
-            Map<String, DataContainer> map = new HashMap<>();
-            for (DataQuery key : data.get().getKeys(false))
-            {
-                map.put(key.asString("."), data.get().getView(key).get().copy());
-            }
-            return apply(container.getString(WORLD.getQuery()), Optional.of(map));
-        }
-        this.setCurrentUniverse("default");
-        return Optional.of(this);
-    }
-
-    @Override
-    public MultiverseData copy()
-    {
-        return new MultiverseData(currentUniverse, playerData);
-    }
-
-    @Override
-    public ImmutableMultiverseData asImmutable()
-    {
-        return new ImmutableMultiverseData(currentUniverse, playerData);
-    }
-
-    @Override
-    public int getContentVersion()
-    {
-        return 2;
-    }
-
-    @Override
-    public DataContainer toContainer()
-    {
-        DataContainer result = super.toContainer();
-        result.set(WORLD, getCurrentUniverse());
-        result.set(DATA, getPlayerData());
-        return result;
-    }
-
-    public Value<String> currentWorld()
-    {
-        return Sponge.getRegistry().getValueFactory().createValue(WORLD, getCurrentUniverse());
-    }
-
-    public void setCurrentUniverse(String e)
-    {
-        this.currentUniverse = e;
-    }
-
-    public String getCurrentUniverse()
-    {
-        return currentUniverse;
-    }
-
-    public MapValue<String, DataContainer> playerData()
-    {
-        return Sponge.getRegistry().getValueFactory().createMapValue(DATA, getPlayerData());
-    }
-
-    public void setPlayerData(Map<String, DataContainer> e)
-    {
-        this.playerData = new HashMap<>();
-        for (Entry<String, DataContainer> entry : e.entrySet())
-        {
-            this.playerData.put(entry.getKey(), new PlayerData(entry.getValue()));
-        }
-    }
-
-    public Map<String, DataContainer> getPlayerData()
-    {
-        return playerData.entrySet().stream().collect(
-            Collectors.toMap(Entry::getKey, e -> e.getValue().toContainer()));
-    }
-
-    public PlayerData from(String univsere, World world)
-    {
-       return this.from(univsere, world, null);
-    }
-
-    public PlayerData from(String univsere, World world, Player player)
-    {
-        PlayerData data = this.playerData.get(univsere);
-        if (data == null)
-        {
-            data = new PlayerData(world);
-            if (player != null)
-            {
-                data.applyFromPlayer(player);
-            }
-            this.playerData.put(univsere, data);
-        }
-        return data;
+        final DataRegistration registration = DataRegistration.builder()
+                                                              .dataKey(MultiverseData.DATA)
+                                                              .store(dataStore)
+                                                              .build();
+        event.register(registration);
     }
 }
