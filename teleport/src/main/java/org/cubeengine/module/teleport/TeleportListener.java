@@ -23,7 +23,6 @@ import java.util.Optional;
 import java.util.UUID;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.module.teleport.permission.TeleportPerm;
@@ -38,7 +37,6 @@ import org.spongepowered.api.event.cause.entity.MovementTypes;
 import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.event.entity.living.AnimateHandEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.world.ServerLocation;
@@ -96,46 +94,37 @@ public class TeleportListener
     }
 
     @Listener
-    public void onPrimary(AnimateHandEvent event, @First ServerPlayer player)
+    public void onPrimary(InteractItemEvent.Primary event, @First ServerPlayer player)
     {
-        // TODO prevent double-event-call
+        this.onPrimary0(player);
+    }
+
+    @Listener
+    public void onPrimary(InteractBlockEvent.Primary.Start event, @First ServerPlayer player)
+    {
+        if (this.onPrimary0(player)) {
+            event.setCancelled(true);
+        }
+    }
+
+    public boolean onPrimary0(@First ServerPlayer player)
+    {
         if (!player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS) || !player.hasPermission(perms.COMPASS_JUMPTO_LEFT.getId()))
         {
-            return;
+            return false;
         }
 
         ServerLocation loc = LocationUtil.getBlockInSight(player);
         if (loc == null)
         {
             i18n.send(ACTION_BAR, player, NEGATIVE, "No block in sight");
-            return;
+            return true;
         }
         player.setLocation(LocationUtil.getLocationUp(loc).add(0.5, 0, 0.5));
         player.offer(Keys.VELOCITY, Vector3d.ZERO);
         player.offer(Keys.FALL_DISTANCE, 0d);
         i18n.send(ACTION_BAR, player, NEUTRAL, "Poof!");
-        event.setCancelled(true);
-    }
-
-    @Listener
-    public void onPrimary(InteractBlockEvent.Primary event, @First ServerPlayer player)
-    {
-        if (!player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS) || !player.hasPermission(perms.COMPASS_JUMPTO_LEFT.getId()))
-        {
-            return;
-        }
-
-        ServerLocation loc = LocationUtil.getBlockInSight(player);
-        if (loc == null)
-        {
-//            i18n.send(ACTION_BAR, player, NEGATIVE, "No block in sight");
-            return;
-        }
-//        player.setLocation(LocationUtil.getLocationUp(loc).add(0.5, 0, 0.5));
-//        player.offer(Keys.VELOCITY, Vector3d.ZERO);
-//        player.offer(Keys.FALL_DISTANCE, 0d);
-//        i18n.send(ACTION_BAR, player, NEUTRAL, "Poof!");
-        event.setCancelled(true);
+        return true;
     }
 
     @Listener
