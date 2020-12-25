@@ -20,7 +20,6 @@ package org.cubeengine.module.kickban;
 import org.cubeengine.reflect.annotations.Name;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 
-@SuppressWarnings("all")
 public class KickBanConfig extends ReflectedYaml
 {
     @Name("ban.disallow-if-offline-mode")

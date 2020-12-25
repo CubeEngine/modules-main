@@ -17,15 +17,13 @@
  */
 package org.cubeengine.module.kickban;
 
-import org.cubeengine.libcube.CubeEngineModule;
+import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.processor.Module;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 
 /**
  * Overrides and improves Vanilla Kick and Ban Commands:
@@ -38,25 +36,19 @@ import javax.inject.Singleton;
  */
 @Singleton
 @Module
-public class KickBan extends CubeEngineModule
+public class KickBan
 {
-    @Inject private KickBanPerms perms;
     @ModuleConfig private KickBanConfig config;
     @ModuleCommand private KickBanCommands kickBanCommands;
 
     @Listener
-    public void onEnable(GamePreInitializationEvent event)
+    public void onEnable(StartedEngineEvent<Server> event)
     {
-        kickBanCommands.init();
-    }
-
-    public KickBanPerms perms()
-    {
-        return perms;
+        this.kickBanCommands.init();
     }
 
     public KickBanConfig getConfiguration()
     {
-        return config;
+        return this.config;
     }
 }
