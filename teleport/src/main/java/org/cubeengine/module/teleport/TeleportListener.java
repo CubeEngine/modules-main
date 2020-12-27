@@ -61,6 +61,8 @@ public class TeleportListener
     private Map<UUID, UUID> tpToRequests = new HashMap<>();
     private Map<UUID, UUID> tpFromRequests = new HashMap<>();
 
+    private Map<UUID, Long> compassJumpCooldown = new HashMap<>();
+
     @Inject
     public TeleportListener(Teleport module, I18n i18n, TeleportPerm perms)
     {
@@ -113,7 +115,12 @@ public class TeleportListener
         {
             return false;
         }
-
+        final long now = System.currentTimeMillis();
+        if (this.compassJumpCooldown.getOrDefault(player.getUniqueId(), now) > now)
+        {
+            return true;
+        }
+        this.compassJumpCooldown.put(player.getUniqueId(), now + 150); // 150ms cooldown
         ServerLocation loc = LocationUtil.getBlockInSight(player);
         if (loc == null)
         {
