@@ -17,77 +17,57 @@
  */
 package org.cubeengine.module.netherportals;
 
-import org.cubeengine.libcube.CubeEngineModule;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
-import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.netherportals.NetherportalsConfig.WorldSection;
 import org.cubeengine.processor.Module;
-import org.spongepowered.api.entity.Transform;
+import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.event.cause.entity.teleport.TeleportType;
-import org.spongepowered.api.event.cause.entity.teleport.TeleportTypes;
-import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.world.World;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import org.spongepowered.api.event.cause.entity.MovementType;
+import org.spongepowered.api.event.cause.entity.MovementTypes;
+import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
+import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.world.portal.PortalType;
+import org.spongepowered.api.world.portal.PortalTypes;
 
 @Singleton
 @Module
-public class Netherportals extends CubeEngineModule
+public class Netherportals
 {
     @ModuleConfig private NetherportalsConfig config;
-    @Inject private CommandManager cm;
-    @Inject private I18n i18n;
+    @ModuleCommand private NetherportalsCommand netherportalsCommand;
 
     @Listener
-    public void onEnable(GamePreInitializationEvent event)
+    public void onPortal(ChangeEntityWorldEvent.Pre event, @First PortalType portalType)
     {
-        cm.addCommand(new NetherportalsCommand(this, cm, i18n));
-    }
-
-    @Listener
-    public void onPortal(MoveEntityEvent.Teleport.Portal event)
-    {
-        TeleportType type = event.getContext().get(EventContextKeys.TELEPORT_TYPE).orElse(null);
-        if (type != null)
+        final MovementType type = event.getContext().get(EventContextKeys.MOVEMENT_TYPE).orElse(null);
+        if (type != MovementTypes.PORTAL.get())
         {
             return;
         }
-
-        WorldSection section = config.worldSettings.get(new ConfigWorld(event.getFromTransform().getExtent()));
-        if (section != null && section.enablePortalRouting)
+        WorldSection section = config.worldSettings.get(new ConfigWorld(event.getOriginalWorld()));
+        if (section == null || !section.enablePortalRouting)
         {
-            Transform<World> to = event.getToTransform();
-            if (type == TeleportTypes.PORTAL)
+            return;
+        }
+        if (portalType == PortalTypes.END.get())
+        {
+            if (section.endTarget != null)
             {
-                if (section.netherTarget != null)
-                {
-                    to = to.setExtent(section.netherTarget.getWorld());
-
-                    event.setPortalAgent(to.getExtent().getPortalAgent());
-
-                    // TODO netherPortalScale
-
-                    event.setToTransform(to);
-                    // TODO PortalCreation?
-                }
+                event.setDestinationWorld(section.endTarget.getWorld());
+                // TODO endPortalTargetLocation?
+                // TODO cancel PortalCreation if not in end?
             }
-            else if (type == TeleportTypes.PORTAL)
+        }
+        else if (portalType == PortalTypes.NETHER.get())
+        {
+            if (section.netherTarget != null)
             {
-                if (section.endTarget != null)
-                {
-                    to = to.setExtent(section.endTarget.getWorld());
-                    // TODO endPortalTargetLocation?
-                    event.setPortalAgent(to.getExtent().getPortalAgent());
-
-                    event.setToTransform(to);
-                    // TODO cancel PortalCreation if not in end?
-                }
+                event.setDestinationWorld(section.netherTarget.getWorld());
+                // TODO netherPortalScale/location
+                // TODO PortalCreation?
             }
         }
     }

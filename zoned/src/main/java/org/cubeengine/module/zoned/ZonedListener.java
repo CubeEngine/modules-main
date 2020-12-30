@@ -30,8 +30,8 @@ import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
@@ -94,7 +94,11 @@ public class ZonedListener
 
         i18n.send(player, POSITIVE, "{txt} ({integer}, {integer}, {integer}). {txt}", added, block.getBlockX(),
                   block.getBlockY(), block.getBlockZ(), selected);
-        event.setCancelled(true);
+        if (event instanceof Cancellable)
+        {
+            ((Cancellable)event).setCancelled(true);
+        }
+
     }
 
     public ZoneConfig getZone(ServerPlayer player)

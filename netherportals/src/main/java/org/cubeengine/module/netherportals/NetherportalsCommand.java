@@ -19,33 +19,31 @@ package org.cubeengine.module.netherportals;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
+import com.google.inject.Inject;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.world.World;
-
-import javax.inject.Inject;
+import org.spongepowered.api.world.server.ServerWorld;
 
 @Command(name = "netherportals", alias = "np", desc = "Manages Netherportals")
-public class NetherportalsCommand extends ContainerCommand
+public class NetherportalsCommand extends DispatcherCommand
 {
 
     private Netherportals module;
     private I18n i18n;
 
     @Inject
-    public NetherportalsCommand(Netherportals module, CommandManager cm, I18n i18n)
+    public NetherportalsCommand(Netherportals module, I18n i18n)
     {
-        super(cm, Netherportals.class);
         this.module = module;
         this.i18n = i18n;
     }
 
     @Command(alias = "nether", desc = "Sets the NetherPortal Target")
-    public void setNetherTarget(CommandSource context, World world, World target)
+    public void setNetherTarget(CommandCause context, ServerWorld world, ServerWorld target)
     {
         ConfigWorld source = new ConfigWorld(world);
         NetherportalsConfig.WorldSection section =
@@ -57,7 +55,7 @@ public class NetherportalsCommand extends ContainerCommand
     }
 
     @Command(alias = "end", desc = "Sets the EndPortal Target")
-    public void setEndTarget(CommandSource context, World world, World target)
+    public void setEndTarget(CommandCause context, ServerWorld world, ServerWorld target)
     {
         ConfigWorld source = new ConfigWorld(world);
         NetherportalsConfig.WorldSection section =
