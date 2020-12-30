@@ -21,147 +21,155 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.TimeMatcher;
-import org.cubeengine.libcube.service.matcher.WorldMatcher;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.service.task.TaskManager;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.util.MinecraftDayTime;
+import org.spongepowered.api.util.Ticks;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
+@Singleton
 public class TimeCommands extends PermissionContainer
 {
     private final TaskManager tam;
     private I18n i18n;
     private TimeMatcher tm;
-    private final WorldMatcher worldMatcher;
 
-    private Map<UUID, UUID> locked = new HashMap<>();
+    private Map<ResourceKey, UUID> locked = new HashMap<>();
 
-    public TimeCommands(PermissionManager pm, I18n i18n, TimeMatcher tm, WorldMatcher worldMatcher, TaskManager tam)
+    @Inject
+    public TimeCommands(PermissionManager pm, I18n i18n, TimeMatcher tm, TaskManager tam)
     {
         super(pm, VanillaPlus.class);
         this.i18n = i18n;
         this.tm = tm;
-        this.worldMatcher = worldMatcher;
         this.tam = tam;
     }
 
 
     @Command(desc = "Changes the time of a world")
-    public void time(CommandSource context, @Optional String time,
-                     @Named("in") String worlds, // TODO worldlist reader // TODO NParams static label reader
+    public void time(CommandCause context, @Option String time,
+                     @Named("in") String world, // TODO worldlist reader // TODO NParams static label reader
                      @Flag boolean lock)
     {
-        Collection<World> worldList;
-        if (worlds != null)
+        Collection<ServerWorld> worldList;
+        if (world != null)
         {
-            if ("*".equals(worlds))
+            if ("*".equals(world))
             {
-                worldList = Sponge.getServer().getWorlds();
+                worldList = Sponge.getServer().getWorldManager().getWorlds();
             }
             else
             {
-                worldList = worldMatcher.matchWorlds(worlds);
-                for (World world : worldList)
+                final Optional<ServerWorld> foundWorld = Sponge.getServer().getWorldManager().getWorld(ResourceKey.resolve(world));
+                if (!foundWorld.isPresent())
                 {
-                    if (world == null)
-                    {
-                        i18n.send(context, NEGATIVE, "Could not match all worlds! {input#worlds}", worlds);
-                        return;
-                    }
+                    i18n.send(context, NEGATIVE, "Could not find the world! {input#world}", world);
+                    return;
                 }
+                worldList = Collections.singletonList(foundWorld.get());
             }
         }
         else
         {
-            if (!(context instanceof Player))
+            if (!(context instanceof ServerPlayer))
             {
                 i18n.send(context, NEGATIVE, "You have to specify a world when using this command from the console!");
                 return;
             }
-            worldList = Collections.singletonList(((Player)context).getWorld());
+            worldList = Collections.singletonList(((ServerPlayer)context).getWorld());
         }
         if (time != null)
         {
-            Long lTime = tm.matchTimeValue(time);
-            if (lTime == null)
-            {
-                lTime = tm.parseTime(time);
-                if (lTime == null)
-                {
-                    i18n.send(context, NEGATIVE, "The time you entered is not valid!");
-                    return;
-                }
-
-            }
-            String timeNumeric = tm.format(lTime);
-            String timeName = tm.matchTimeName(lTime);
-            if (worldList.size() == 1)
-            {
-                i18n.send(context, POSITIVE,
-                                    "The time of {world} have been set to {input#time} ({input#neartime})!",
-                                    worldList.iterator().next(), timeNumeric, timeName);
-            }
-            else if ("*".equals(worlds))
-            {
-                i18n.send(context, POSITIVE,
-                                    "The time of all worlds have been set to {input#time} ({input#neartime})!",
-                                    timeNumeric, timeName);
-            }
-            else
-            {
-                i18n.send(context, POSITIVE,
-                                    "The time of {amount} worlds have been set to {input#time} ({input#neartime})!",
-                                    worldList.size(), timeNumeric, timeName);
-            }
-            for (World world : worldList)
-            {
-                this.setTime(world, lTime);
-                if (lock)
-                {
-                    toggleTimeLock(context, world, world.getProperties().getWorldTime());
-                }
-            }
+            setTime(context, time, world, lock, worldList);
             return;
         }
         if (lock)
         {
-            for (World world : worldList)
+            for (ServerWorld w : worldList)
             {
-                toggleTimeLock(context, world, world.getProperties().getWorldTime());
+                toggleTimeLock(context, w, w.getProperties().getDayTime().asTicks().getTicks());
             }
             return;
         }
         i18n.send(context, POSITIVE, "The current time is:");
-        for (World world : worldList)
+        for (ServerWorld w : worldList)
         {
-            long worldTime = world.getProperties().getWorldTime();
-            i18n.send(context, NEUTRAL, "{input#time} ({input#neartime}) in {world}.", tm.format(worldTime), tm.matchTimeName(worldTime), world);
+            long worldTime = w.getProperties().getDayTime().asTicks().getTicks();
+            i18n.send(context, NEUTRAL, "{input#time} ({input#neartime}) in {world}.", tm.format(worldTime), tm.matchTimeName(worldTime), w);
         }
     }
 
-    private void toggleTimeLock(CommandSource context, World world, long worldTime)
+    private void setTime(CommandCause context, String time, String world, boolean lock, Collection<ServerWorld> worldList)
     {
-        if (locked.containsKey(world.getUniqueId()))
+        Long lTime = tm.matchTimeValue(time);
+        if (lTime == null)
         {
-            tam.cancelTask(VanillaPlus.class, locked.remove(world.getUniqueId()));
+            lTime = tm.parseTime(time);
+            if (lTime == null)
+            {
+                i18n.send(context, NEGATIVE, "The time you entered is not valid!");
+                return;
+            }
+
+        }
+        String timeNumeric = tm.format(lTime);
+        String timeName = tm.matchTimeName(lTime);
+        if (worldList.size() == 1)
+        {
+            i18n.send(context, POSITIVE,
+                      "The time of {world} have been set to {input#time} ({input#neartime})!",
+                      worldList.iterator().next(), timeNumeric, timeName);
+        }
+        else if ("*".equals(world))
+        {
+            i18n.send(context, POSITIVE,
+                      "The time of all worlds have been set to {input#time} ({input#neartime})!",
+                      timeNumeric, timeName);
+        }
+        else
+        {
+            i18n.send(context, POSITIVE,
+                      "The time of {amount} worlds have been set to {input#time} ({input#neartime})!",
+                      worldList.size(), timeNumeric, timeName);
+        }
+        for (ServerWorld w : worldList)
+        {
+            this.setTime(w, lTime);
+            if (lock)
+            {
+                toggleTimeLock(context, w, w.getProperties().getDayTime().asTicks().getTicks());
+            }
+        }
+    }
+
+    private void toggleTimeLock(CommandCause context, ServerWorld world, long worldTime)
+    {
+        if (locked.containsKey(world.getKey()))
+        {
+            tam.cancelTask(VanillaPlus.class, locked.remove(world.getKey()));
             i18n.send(context, POSITIVE, "Time unlocked for {world}!", world);
         }
         else
         {
-            locked.put(world.getUniqueId(), tam.runTimer(VanillaPlus.class, () -> setTime(world, worldTime), 0, 10));
+            locked.put(world.getKey(), tam.runTimer(VanillaPlus.class, () -> setTime(world, worldTime), 0, 10));
             i18n.send(context, POSITIVE, "Time locked for {world}!", world);
         }
     }
@@ -224,8 +232,8 @@ public class TimeCommands extends PermissionContainer
     }
     //*/
 
-    private void setTime(World world, long time)
+    private void setTime(ServerWorld world, long time)
     {
-        world.getProperties().setWorldTime(time);
+        world.getProperties().setDayTime(MinecraftDayTime.of(Sponge.getServer(), Ticks.of(time)));
     }
 }

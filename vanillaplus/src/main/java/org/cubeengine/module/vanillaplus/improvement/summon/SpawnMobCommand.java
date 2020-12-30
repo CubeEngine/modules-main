@@ -17,34 +17,38 @@
  */
 package org.cubeengine.module.vanillaplus.improvement.summon;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Label;
+import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.blockray.BlockRay;
-import org.spongepowered.api.util.blockray.BlockRayHit;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.util.blockray.RayTrace;
+import org.spongepowered.api.util.blockray.RayTraceResult;
+import org.spongepowered.api.world.LocatableBlock;
+import org.spongepowered.api.world.ServerLocation;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.util.blockray.BlockRay.onlyAirFilter;
 
 /**
  * The /spawnmob command.
  */
+@Singleton
 public class SpawnMobCommand
 {
     private VanillaPlus module;
     private I18n i18n;
     private EntityMatcher em;
 
+    @Inject
     public SpawnMobCommand(VanillaPlus module, I18n i18n, EntityMatcher em)
     {
         this.module = module;
@@ -53,12 +57,12 @@ public class SpawnMobCommand
     }
 
     @Command(desc = "Spawns the specified Mob")
-    public void spawnMob(CommandSource context, @Label("<mob>[:data][,<ridingmob>[:data]]") String data, @Optional Integer amount, @Optional Player player)
+    public void spawnMob(CommandCause context, @Label("<mob>[:data][,<ridingmob>[:data]]") String data, @Option Integer amount, @Option Player player)
     {
-        Location loc;
+        ServerLocation loc;
         if (player != null)
         {
-            loc = player.getLocation();
+            loc = player.getServerLocation();
         }
         else if (!(context instanceof Player))
         {
@@ -67,13 +71,13 @@ public class SpawnMobCommand
         }
         else
         {
-            BlockRayHit<World> hit = BlockRay.from(((Player)context)).distanceLimit(200).stopFilter(onlyAirFilter()).end().orElse(null);
-            if (hit == null)
+            final RayTraceResult<LocatableBlock> result = RayTrace.block().limit(200).select(RayTrace.onlyAir()).execute().orElse(null);
+            if (result == null)
             {
                 i18n.send(context, NEGATIVE, "Cannot find Targetblock");
                 return;
             }
-            loc = hit.getLocation();
+            loc = result.getSelectedObject().getServerLocation();
         }
         amount = amount == null ? 1 : amount;
 
@@ -96,18 +100,18 @@ public class SpawnMobCommand
         Entity entitySpawned = entitiesSpawned[0];
         if (!entitySpawned.get(Keys.PASSENGERS).isPresent())
         {
-            i18n.send(context, POSITIVE, "Spawned {amount} {input#entity}!", amount, entitySpawned.getType().getName());
+            i18n.send(context, POSITIVE, "Spawned {amount} {text#entity}!", amount, entitySpawned.getType().asComponent());
         }
         else
         {
-            Text message = Text.of(entitySpawned.getType().getTranslation());
+            Component message = entitySpawned.getType().asComponent();
             while (entitySpawned.get(Keys.PASSENGERS).isPresent())
             {
-                entitySpawned = entitySpawned.getLocation().getExtent().getEntity(entitySpawned.get(Keys.PASSENGERS).get().get(0)).get();
-                message = i18n.translate(context, NONE, "{input#entity} riding {input}", entitySpawned.getType().getName(), message);
+                entitySpawned = entitySpawned.get(Keys.PASSENGERS).get().get(0);
+                message = i18n.translate(context, "{text#entity} riding {input}", entitySpawned.getType().asComponent(), message);
             }
             message = i18n.translate(context, POSITIVE, "Spawned {amount} {input#message}!", amount, message);
-            context.sendMessage(message);
+            context.sendMessage(Identity.nil(), message);
         }
     }
 }

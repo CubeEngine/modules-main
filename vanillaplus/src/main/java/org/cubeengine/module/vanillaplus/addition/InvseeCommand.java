@@ -17,20 +17,20 @@
  */
 package org.cubeengine.module.vanillaplus.addition;
 
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Flag;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
-import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.Inventory;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
@@ -38,18 +38,16 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 /**
  * Contains commands that allow to modify an inventory.
  * <p>/invsee
- * <p>/clearinventory
- * <p>/stash
  */
+@Singleton
 public class InvseeCommand extends PermissionContainer
 {
-    private InventoryGuardFactory invGuard;
     private I18n i18n;
 
-    public InvseeCommand(PermissionManager pm, InventoryGuardFactory invGuard, I18n i18n)
+    @Inject
+    public InvseeCommand(PermissionManager pm, I18n i18n)
     {
         super(pm, VanillaPlus.class);
-        this.invGuard = invGuard;
         this.i18n = i18n;
     }
 
@@ -61,29 +59,23 @@ public class InvseeCommand extends PermissionContainer
     public final Permission COMMAND_INVSEE_QUIET = register("command.invsee.quiet", "Prevents the other player from being notified when looking into his inventory", null);
 
     @Command(desc = "Allows you to see into the inventory of someone else.")
-    @Restricted(value = Player.class, msg = "This command can only be used by a player!")
-    public void invsee(Player context, User player,
+    @Restricted(msg = "This command can only be used by a player!")
+    public void invsee(ServerPlayer context, User player,
                        @Flag boolean force,
                        @Flag boolean quiet,
-                       @Flag boolean ender
-                      )
+                       @Flag boolean ender)
     {
         boolean denyModify = false;
         Inventory inv;
         if (ender)
         {
-            if (!context.hasPermission(COMMAND_INVSEE_ENDERCHEST.getId()))
+
+            if (!COMMAND_INVSEE_ENDERCHEST.check(context))
             {
                 i18n.send(context, NEGATIVE, "You are not allowed to look into enderchests!");
                 return;
             }
-            inv = player.getPlayer().map(p -> p.getEnderChestInventory()).orElse(null);
-            if (inv == null)
-            {
-                context.sendMessage(Text.of(TextColors.DARK_RED, "Offline Inventories are not yet supported! Waiting for API"));
-                // TODO Offline Enderchest
-                return;
-            }
+            inv = player.getEnderChestInventory();
         }
         else
         {
@@ -101,12 +93,12 @@ public class InvseeCommand extends PermissionContainer
                 i18n.send(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your inventory.", context);
             }
         }
-        InventoryGuardFactory guard = invGuard.prepareInv(inv, context.getUniqueId());
+
+        final InventoryMenu menu = inv.asViewable().get().asMenu();
         if (denyModify)
         {
-            guard.blockPutInAll().blockTakeOutAll();
+            menu.setReadOnly(true);
         }
-        guard.submitInventory(VanillaPlus.class, true);
-
+        menu.open(context);
     }
 }

@@ -21,13 +21,12 @@ import java.util.Optional;
 import java.util.UUID;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.service.user.UserStorageService;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
@@ -43,12 +42,12 @@ public class TamedListener
     @Listener
     public void onInteractWithTamed(InteractEntityEvent event, @First Player player)
     {
-        Optional<UUID> uuid = event.getTargetEntity().get(Keys.TAMED_OWNER).orElse(Optional.empty());
+        Optional<UUID> uuid = event.getEntity().get(Keys.TAMER);
         if (uuid.isPresent())
         {
-            Optional<User> owner = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid.get());
-            i18n.send(player, POSITIVE, "This {name#entity} belongs to {tamer}!",
-                                event.getTargetEntity().getType().getName(), owner.get());
+            final Optional<User> owner = Sponge.getServer().getUserManager().get(uuid.get());
+            i18n.send(player, POSITIVE, "This {text#entity} belongs to {tamer}!",
+                                event.getEntity().getType().asComponent(), owner.get());
         }
     }
 }

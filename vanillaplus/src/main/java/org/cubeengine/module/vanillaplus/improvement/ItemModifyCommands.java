@@ -17,41 +17,41 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-import static org.cubeengine.libcube.service.command.parser.EnchantmentParser.getPossibleEnchantments;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.item.ItemTypes.SKULL;
-import static org.spongepowered.api.text.serializer.TextSerializers.FORMATTING_CODE;
-
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Greed;
-import org.cubeengine.butler.parametric.Optional;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Greedy;
+import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.item.DurabilityData;
-import org.spongepowered.api.data.property.item.UseLimitProperty;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.data.type.SkullTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.enchantment.Enchantment;
 import org.spongepowered.api.item.enchantment.EnchantmentType;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.registry.RegistryTypes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 /**
  * <p>/rename
@@ -59,10 +59,12 @@ import java.util.concurrent.ExecutionException;
  * <p>/enchant
  * <p>/repair
  */
+@Singleton
 public class ItemModifyCommands extends PermissionContainer
 {
     private I18n i18n;
 
+    @Inject
     public ItemModifyCommands(PermissionManager pm, I18n i18n)
     {
         super(pm, VanillaPlus.class);
@@ -71,24 +73,24 @@ public class ItemModifyCommands extends PermissionContainer
 
     @Command(desc = "Changes the display name of the item in your hand.")
     @Restricted(value = Player.class, msg = "Trying to give your {text:toys} a name?")
-    public void rename(Player context, String name, @Optional @Greed(INFINITE) String... lore)
+    public void rename(Player context, String name, @Option @Greedy String... lore)
     {
-        if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
+        if (context.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
         {
             i18n.send(context, NEGATIVE, "You need to hold an item to rename in your hand!");
             return;
         }
-        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).get();
+        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
 
-        item.offer(Keys.DISPLAY_NAME, FORMATTING_CODE.deserialize(name));
+        item.offer(Keys.CUSTOM_NAME, LegacyComponentSerializer.legacyAmpersand().deserialize(name));
         if (lore != null)
         {
-            List<Text> list = new ArrayList<>();
+            List<Component> list = new ArrayList<>();
             for (String line : lore)
             {
-                list.add(FORMATTING_CODE.deserialize(line));
+                list.add(LegacyComponentSerializer.legacyAmpersand().deserialize(line));
             }
-            item.offer(Keys.ITEM_LORE, list);
+            item.offer(Keys.LORE, list);
         }
         context.setItemInHand(HandTypes.MAIN_HAND, item);
         i18n.send(context, POSITIVE, "You now hold {input#name} in your hands!", name);
@@ -96,21 +98,21 @@ public class ItemModifyCommands extends PermissionContainer
 
     @Command(desc = "Changes the lore of the item in your hand.")
     @Restricted(value = Player.class)
-    public void lore(Player context, @Greed(INFINITE) String... lore)
+    public void lore(Player context, @Greedy String... lore)
     {
-        if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
+        if (context.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
         {
             i18n.send(context, NEGATIVE, "You need to hold an item to change the lore of in your hand!");
             return;
         }
-        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).get();
+        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
 
-        List<Text> list = new ArrayList<>();
+        List<Component> list = new ArrayList<>();
         for (String line : lore)
         {
-            list.add(FORMATTING_CODE.deserialize(line));
+            list.add(LegacyComponentSerializer.legacyAmpersand().deserialize(line));
         }
-        item.offer(Keys.ITEM_LORE, list);
+        item.offer(Keys.LORE, list);
         context.setItemInHand(HandTypes.MAIN_HAND, item);
         i18n.send(context, POSITIVE, "You changed the lore.");
     }
@@ -118,17 +120,16 @@ public class ItemModifyCommands extends PermissionContainer
 
     @Command(alias = "skullchange", desc = "Changes a skull to a players skin.")
     @Restricted(value = Player.class, msg = "This will you only give headaches!")
-    public void headchange(Player context, @Optional String name) throws ExecutionException, InterruptedException
+    public void headchange(Player context, @Option String name) throws ExecutionException, InterruptedException
     {
-        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
-        if (item == null || item.getType() != SKULL)
+        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
+        if (item.isEmpty() || item.getType() != ItemTypes.PLAYER_HEAD.get())
         {
             i18n.send(context, NEGATIVE, "You are not holding a head.");
             return;
         }
 
-        item.offer(Keys.SKULL_TYPE, SkullTypes.PLAYER);
-        item.offer(Keys.REPRESENTED_PLAYER, Sponge.getServer().getGameProfileManager().get(name).get());
+        item.offer(Keys.GAME_PROFILE, Sponge.getServer().getGameProfileManager().getProfile(name).get());
 
         context.setItemInHand(HandTypes.MAIN_HAND, item);
         i18n.send(context, POSITIVE, "You now hold {user}'s head in your hands!", name);
@@ -136,15 +137,15 @@ public class ItemModifyCommands extends PermissionContainer
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
     @Restricted(value = Player.class, msg = "Want to be Harry Potter?")
-    public void enchant(Player context, @Default EnchantmentType enchantment, @Optional Integer level,
+    public void enchant(Player context, @Default EnchantmentType enchantment, @Option Integer level,
                         @ParameterPermission @Flag boolean unsafe) // TODO are param permissions working????
     {
-        if (!context.getItemInHand(HandTypes.MAIN_HAND).isPresent())
+        if (context.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
         {
             i18n.send(context, NEUTRAL, "{text:ProTip}: You cannot enchant your fists!");
             return;
         }
-        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).get();
+        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
 
         level = level == null ? enchantment.getMaximumLevel() : level;
         if (level <= 0)
@@ -164,13 +165,13 @@ public class ItemModifyCommands extends PermissionContainer
                 return;
             }
 
-            List<Enchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
+            List<Enchantment> list = item.getOrElse(Keys.APPLIED_ENCHANTMENTS, new ArrayList<>());
             list.add(ench);
-            item.offer(Keys.ITEM_ENCHANTMENTS, list);
+            item.offer(Keys.APPLIED_ENCHANTMENTS, list);
             context.setItemInHand(HandTypes.MAIN_HAND, item);
             i18n.send(context, POSITIVE,
-                                   "Added unsafe enchantment: {input#enchantment} {integer#level} to your item!",
-                                   enchantment.getName(), level); // TODO getTranslation
+                                   "Added unsafe enchantment: {text#enchantment} {integer#level} to your item!",
+                                   enchantment.asComponent(), level);
             return;
         }
 
@@ -178,41 +179,45 @@ public class ItemModifyCommands extends PermissionContainer
         {
             if (level >= enchantment.getMinimumLevel() && level <= enchantment.getMaximumLevel())
             {
-                List<Enchantment> list = item.getOrElse(Keys.ITEM_ENCHANTMENTS, new ArrayList<>());
+                List<Enchantment> list = item.getOrElse(Keys.APPLIED_ENCHANTMENTS, new ArrayList<>());
                 list.add(ench);
-                item.offer(Keys.ITEM_ENCHANTMENTS, list);
+                item.offer(Keys.APPLIED_ENCHANTMENTS, list);
                 context.setItemInHand(HandTypes.MAIN_HAND, item);
-                i18n.send(context, POSITIVE, "Added enchantment: {input#enchantment} {integer#level} to your item!",
-                                    enchantment.getName(), level);  // TODO getTranslation
+                i18n.send(context, POSITIVE, "Added enchantment: {text#enchantment} {integer#level} to your item!",
+                                    enchantment.asComponent(), level);  // TODO getTranslation
                 return;
             }
             i18n.send(context, NEGATIVE, "This enchantment level is not allowed!");
             return;
         }
-        Text possibleEnchs = getPossibleEnchantments(item);
-        if (possibleEnchs != null)
+        final List<Component> possibleEnchantments = Sponge.getGame().registries().registry(RegistryTypes.ENCHANTMENT_TYPE).streamEntries()
+                                                           .filter(e -> e.value().canBeAppliedToStack(item))
+                                                           .map(enchantmentType -> enchantmentType.value().asComponent().color(NamedTextColor.YELLOW)
+                                                                                      .hoverEvent(HoverEvent.showText(Component.text(enchantmentType.key().asString(), NamedTextColor.YELLOW))))
+                                                           .collect(Collectors.toList());
+        if (!possibleEnchantments.isEmpty())
         {
-            i18n.send(context, NEGATIVE, "This enchantment is not allowed for this item!", possibleEnchs);
+            i18n.send(context, NEGATIVE, "This enchantment is not allowed for this item!");
             i18n.send(context, NEUTRAL, "Try one of those instead:");
-            context.sendMessage(possibleEnchs);
+            context.sendMessage(Identity.nil(), Component.join(Component.text(", ", NamedTextColor.WHITE), possibleEnchantments));
             return;
         }
         i18n.send(context, NEGATIVE, "You can not enchant this item!");
     }
 
     @Command(desc = "Toggles the visibility of enchantments")
-    @Restricted(value = Player.class)
-    public void hideEnchantments(Player context, @Optional Boolean hide)
+    @Restricted
+    public void hideEnchantments(ServerPlayer context, @Option Boolean hide)
     {
-        java.util.Optional<ItemStack> item = context.getItemInHand(HandTypes.MAIN_HAND);
-        if (!item.isPresent())
+        final ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
+        if (item.isEmpty())
         {
             i18n.send(context, NEGATIVE, "No item in hand!");
             return;
         }
-        hide = hide == null ? true : hide;
-        item.get().offer(Keys.HIDE_ENCHANTMENTS, hide);
-        context.setItemInHand(HandTypes.MAIN_HAND, item.get());
+        hide = hide == null || hide;
+        item.offer(Keys.HIDE_ENCHANTMENTS, hide);
+        context.setItemInHand(HandTypes.MAIN_HAND, item);
         if (hide)
         {
             i18n.send(context, POSITIVE, "Enchantments are hidden on this item.");
@@ -228,14 +233,14 @@ public class ItemModifyCommands extends PermissionContainer
         if (all)
         {
             int repaired = 0;
-            for (Inventory slot : context.getInventory().slots())
+            for (Slot slot : context.getInventory().slots())
             {
-                if (slot.peek().isPresent())
+                if (!slot.peek().isEmpty())
                 {
-                    ItemStack item = slot.peek().get();
-                    if (item.supports(DurabilityData.class)) // TODO mod-items that use Durability for different types
+                    ItemStack item = slot.peek();
+                    if (item.supports(Keys.ITEM_DURABILITY))
                     {
-                        Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
+                        Integer max = item.get(Keys.MAX_DURABILITY).get();
                         if (!max.equals(item.get(Keys.ITEM_DURABILITY).orElse(0)))
                         {
                             repaired++;
@@ -253,15 +258,15 @@ public class ItemModifyCommands extends PermissionContainer
             i18n.send(context, POSITIVE, "Repaired {amount} items!", repaired);
             return;
         }
-        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
-        if (item == null)
+        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
+        if (item.isEmpty())
         {
             i18n.send(context, NEGATIVE, "No item in hand!");
             return;
         }
-        if (item.supports(DurabilityData.class))
+        if (item.supports(Keys.ITEM_DURABILITY))
         {
-            Integer max = item.getProperty(UseLimitProperty.class).get().getValue();
+            Integer max = item.get(Keys.ITEM_DURABILITY).get();
             if (item.get(Keys.ITEM_DURABILITY).get().equals(max))
             {
                 i18n.send(context, NEUTRAL, "No need to repair this!");

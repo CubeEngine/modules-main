@@ -26,94 +26,90 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.result.CommandResult;
-import org.cubeengine.libcube.util.ChatFormat;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.service.permission.PermissionService;
-import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
-import static org.spongepowered.api.text.format.TextColors.WHITE;
 
+@Singleton
 public class PlayerListCommand
 {
     protected static final Comparator<Player> USER_COMPARATOR = new UserComparator();
     private I18n i18n;
 
+    @Inject
     public PlayerListCommand(I18n i18n)
     {
         this.i18n = i18n;
     }
 
-    protected SortedMap<String, Set<Player>> groupUsers(Set<Player> users)
+    protected SortedMap<String, Set<ServerPlayer>> groupUsers(Set<ServerPlayer> users)
     {
-        SortedMap<String, Set<Player>> grouped = new TreeMap<>();
-        for (Player player : users)
+        SortedMap<String, Set<ServerPlayer>> grouped = new TreeMap<>();
+        for (ServerPlayer player : users)
         {
             String listGroup = player.getOption("list-group").orElse("&6Players");
-            Set<Player> assigned = grouped.computeIfAbsent(listGroup, k -> new LinkedHashSet<>());
-            assigned.add(player);
+            grouped.computeIfAbsent(listGroup, k -> new LinkedHashSet<>()).add(player);
         }
         return grouped;
     }
 
     @Command(desc = "Displays all the online players.")
-    public CommandResult list(CommandSource context)
+    public void list(CommandCause context)
     {
-        final SortedSet<Player> users = new TreeSet<>(USER_COMPARATOR);
+        final SortedSet<ServerPlayer> users = new TreeSet<>(USER_COMPARATOR);
 
-        for (Player user : Sponge.getServer().getOnlinePlayers())
+        for (ServerPlayer user : Sponge.getServer().getOnlinePlayers())
         {
-            // TODO can see
-            /*if (context instanceof Player && !((Player)context).canSee(user))
+            if (context.getSubject() instanceof Player && !((ServerPlayer)context.getSubject()).canSee(user))
             {
                 continue;
             }
-            */
             users.add(user);
         }
 
         if (users.isEmpty())
         {
             i18n.send(context, NEGATIVE, "There are no players online at the moment!");
-            return null;
+            return;
         }
 
-        SortedMap<String, Set<Player>> grouped = this.groupUsers(users);
+        SortedMap<String, Set<ServerPlayer>> grouped = this.groupUsers(users);
         i18n.send(context, POSITIVE, "Players online: {amount#online}/{amount#max}", users.size(), Sponge.getServer().getMaxPlayers());
 
-        for (Entry<String, Set<Player>> entry : grouped.entrySet())
+        for (Entry<String, Set<ServerPlayer>> entry : grouped.entrySet())
         {
-            Iterator<Player> it = entry.getValue().iterator();
+            Iterator<ServerPlayer> it = entry.getValue().iterator();
             if (!it.hasNext())
             {
                 continue;
             }
-            Text.Builder builder = Text.of(ChatFormat.fromLegacy(entry.getKey(), '&'), WHITE, ": ").toBuilder();
-            builder.append(formatUser(it.next()));
+            final TextComponent msg = LegacyComponentSerializer.legacyAmpersand().deserialize(entry.getKey())
+                                                               .append(Component.text(":", NamedTextColor.WHITE)
+                                                               .append(formatUser(it.next())));
             while (it.hasNext())
             {
-                builder.append(Text.of(WHITE, ", "), formatUser(it.next()));
+                msg.append(Component.text(",", NamedTextColor.WHITE)).append(formatUser(it.next()));
             }
-            context.sendMessage(builder.build());
+            context.sendMessage(Identity.nil(), msg);
         }
-
-        return null;
     }
 
-    private Text formatUser(Player user)
+    private Component formatUser(ServerPlayer user)
     {
-        Text result = Text.of(DARK_GREEN, user.getName());
+        final TextComponent result = Component.text(user.getName(), NamedTextColor.DARK_GREEN);
         // TODO chat module pass info that player is afk
         /*
         if (user.attachOrGet(BasicsAttachment.class, module).isAfk())

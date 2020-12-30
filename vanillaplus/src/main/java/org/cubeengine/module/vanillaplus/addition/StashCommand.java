@@ -23,34 +23,42 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
+/**
+ * <p>/stash
+ */
+@Singleton
 public class StashCommand
 {
     private I18n i18n;
 
     private Map<UUID, StashedInventory> stashed = new HashMap<>();
 
+    @Inject
     public StashCommand(I18n i18n)
     {
         this.i18n = i18n;
     }
 
     @Command(desc = "Stashes or unstashes your inventory to reuse later")
-    @Restricted(value = Player.class, msg = "Yeah you better put it away!")
-    public void stash(Player context)
+    @Restricted(msg = "Yeah you better put it away!")
+    public void stash(ServerPlayer context)
     {
         StashedInventory newStash = new StashedInventory();
         for (Inventory slot : context.getInventory().slots())
         {
-            newStash.items.add(slot.poll().orElse(null));
+            newStash.items.add(slot.poll().getPolledItem().createStack());
         }
 
         StashedInventory replaced = stashed.put(context.getUniqueId(), newStash);

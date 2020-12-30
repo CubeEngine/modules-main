@@ -17,27 +17,29 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Greed;
-import org.cubeengine.butler.parametric.Optional;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Greedy;
+import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 
-import static org.cubeengine.butler.parameter.Parameter.INFINITE;
-
+@Singleton
 public class StopCommand
 {
     private VanillaPlus module;
 
+    @Inject
     public StopCommand(VanillaPlus module)
     {
         this.module = module;
     }
 
     @Command(alias = {"shutdown", "killserver", "quit"}, desc = "Shuts down the server")
-    public void stop(CommandSource context, @Optional @Greed(INFINITE) String message)
+    public void stop(CommandCause context, @Option @Greedy String message)
     {
         if (message == null || message.isEmpty())
         {

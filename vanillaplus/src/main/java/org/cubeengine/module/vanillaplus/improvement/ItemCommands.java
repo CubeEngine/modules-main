@@ -17,35 +17,35 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.permission.Permission;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.libcube.util.StringUtils;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.text.Component;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Label;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EnchantMatcher;
 import org.cubeengine.libcube.service.matcher.MaterialMatcher;
+import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.spongepowered.api.command.CommandSource;
+import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.libcube.util.StringUtils;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.entity.Hotbar;
-import org.spongepowered.api.item.inventory.entity.MainPlayerInventory;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.query.QueryTypes;
 import org.spongepowered.api.item.inventory.transaction.InventoryTransactionResult.Type;
-import org.spongepowered.api.item.inventory.type.InventoryRow;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.item.inventory.ItemStackComparators.ITEM_DATA;
-import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
 
 /**
  * item-related commands
@@ -54,6 +54,7 @@ import static org.spongepowered.api.item.inventory.ItemStackComparators.TYPE;
  * <p>/more
  * <p>/stack
  */
+@Singleton
 public class ItemCommands extends PermissionContainer
 {
     private MaterialMatcher materialMatcher;
@@ -65,6 +66,7 @@ public class ItemCommands extends PermissionContainer
 
     public final Permission COMMAND_STACK_FULLSTACK = register("command.stack.fullstack", "", null);
 
+    @Inject
     public ItemCommands(PermissionManager pm, MaterialMatcher materialMatcher, EnchantMatcher enchantMatcher, I18n i18n)
     {
         super(pm, VanillaPlus.class);
@@ -75,7 +77,7 @@ public class ItemCommands extends PermissionContainer
 
     @SuppressWarnings("deprecation")
     @Command(desc = "Gives the specified Item to a player")
-    public void give(CommandSource context, User player, @Label("material[:data]") ItemStack item, @Optional Integer amount)
+    public void give(CommandCause context, User player, @Label("material[:data]") ItemStack item, @Option Integer amount)
     {
         amount = amount == null ? item.getMaxStackQuantity() : amount;
         if (amount <= 0)
@@ -86,11 +88,12 @@ public class ItemCommands extends PermissionContainer
         item.setQuantity(amount);
         if (player.getInventory().offer(item.copy()).getType() == Type.SUCCESS)
         {
-            String matname = materialMatcher.getNameFor(item);
-            i18n.send(context, POSITIVE, "You gave {user} {amount} {input#item}!", player, amount, matname);
+            Component matname = item.get(Keys.DISPLAY_NAME).get();
+            i18n.send(context, POSITIVE, "You gave {user} {amount} {text#item}!", player, amount, matname);
             if (player.isOnline())
             {
-                i18n.send(player.getPlayer().get(), POSITIVE, "{user} just gave you {amount} {input#item}!", context.getName(), amount, matname);
+                i18n.send(player.getPlayer().get(), POSITIVE, "{user} just gave you {amount} {text#item}!",
+                          context.getSubject().getFriendlyIdentifier().orElse(context.getSubject().getIdentifier()), amount, matname);
             }
             return;
         }
@@ -98,10 +101,10 @@ public class ItemCommands extends PermissionContainer
     }
 
     @Command(alias = "i", desc = "Gives the specified Item to you")
-    @Restricted(value = Player.class, msg = "Did you try to use {text:/give} on your new I-Tem?")
+    @Restricted(msg = "Did you try to use {text:/give} on your new I-Tem?")
     @SuppressWarnings("deprecation")
-    public void item(Player context, @Label("material[:data]") ItemStack item,
-                     @Optional Integer amount,
+    public void item(ServerPlayer context, @Label("material[:data]") ItemStack item,
+                     @Option Integer amount,
                      @Named("ench") @Label("enchantment[:level]") String enchantmentString)
     {
         // TODO spawn_egg data
@@ -143,27 +146,27 @@ public class ItemCommands extends PermissionContainer
             i18n.send(context, NEGATIVE, "Not enough space for the item!");
             return;
         }
-        i18n.send(context, NEUTRAL, "Received: {amount} {input#item}", amount, materialMatcher.getNameFor(item));
+        i18n.send(context, NEUTRAL, "Received: {amount} {text#item}", amount, item.get(Keys.DISPLAY_NAME).get());
     }
 
     public Inventory getHotbarFirst(Inventory inventory)
     {
-        return inventory.query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class))
-        .union(inventory.query(QueryOperationTypes.INVENTORY_TYPE.of(MainPlayerInventory.class)));
+        return inventory.query(QueryTypes.PLAYER_PRIMARY_HOTBAR_FIRST.get().toQuery());
     }
 
     @Command(desc = "Refills the stack in hand")
-    @Restricted(value = Player.class, msg = "You can't get enough of it, can you?")
-    public void more(Player context, @Optional Integer amount, @Flag boolean all)
+    @Restricted(msg = "You can't get enough of it, can you?")
+    public void more(ServerPlayer context, @Option Integer amount, @Flag boolean all)
     {
         if (all)
         {
-            for (Inventory slot : context.getInventory().slots())
+            for (Slot slot : context.getInventory().slots())
             {
-                if (slot.peek().isPresent())
+                if (!slot.peek().isEmpty())
                 {
-                    ItemStack item = slot.peek().get();
+                    ItemStack item = slot.peek();
                     item.setQuantity(64);
+                    slot.set(item);
                 }
             }
             i18n.send(context, POSITIVE, "Refilled all stacks!");
@@ -176,14 +179,14 @@ public class ItemCommands extends PermissionContainer
             return;
         }
 
-        java.util.Optional<ItemStack> item = context.getItemInHand(HandTypes.MAIN_HAND);
-        if (!item.isPresent())
+        final ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
+        if (item.isEmpty())
         {
             i18n.send(context, NEUTRAL, "More nothing is still nothing!");
             return;
         }
-        item.get().setQuantity(item.get().getMaxStackQuantity());
-        context.setItemInHand(HandTypes.MAIN_HAND, item.get());
+        item.setQuantity(item.getMaxStackQuantity());
+        context.setItemInHand(HandTypes.MAIN_HAND, item);
         if (amount == 1)
         {
             i18n.send(context, POSITIVE, "Refilled stack in hand!");
@@ -191,93 +194,91 @@ public class ItemCommands extends PermissionContainer
         }
         for (int i = 1; i < amount; ++i)
         {
-            context.getInventory().offer(item.get().copy());
+            context.getInventory().offer(item.copy());
         }
         i18n.send(context, POSITIVE, "Refilled {amount} stacks in hand!", amount);
     }
 
-
-
-    @Command(desc = "Stacks your items up to 64")
-    @Restricted(value = Player.class, msg = "No stacking for you.")
-    public void stack(Player context)
-    {
-        boolean allow64 = context.hasPermission(COMMAND_STACK_FULLSTACK.getId());
-        allow64 = false; // TODO this is currently not working /w Sponge
-        Inventory rows = context.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(InventoryRow.class));
-        ItemStack[] items = new ItemStack[rows.capacity()];
-        int slotIndex = 0;
-        for (Inventory row : rows)
-        {
-            for (Inventory slot : row.slots())
-            {
-                items[slotIndex++] = slot.peek().orElse(null);
-            }
-        }
-
-        int size = items.length;
-        boolean changed = false;
-        for (int i = 0; i < size; i++)
-        {
-            ItemStack item = items[i];
-            // no null / infinite or unstackable items (if not allowed)
-            if (item == null || item.getQuantity() <= 0 || (!allow64 && item.getMaxStackQuantity() == 1))
-            {
-                continue;
-            }
-            int max = allow64 ? 64 : item.getMaxStackQuantity();
-            if (item.getQuantity() < max)
-            {
-                int needed = max - item.getQuantity();
-                for (int j = i + 1; j < size; j++) // search for same item
-                {
-                    ItemStack item2 = items[j];
-                    // no null / infinite or unstackable items (if not allowed)
-                    if (item2 == null || item2.getQuantity() <= 0 || (!allow64 && item.getMaxStackQuantity() == 1))
-                    {
-                        continue;
-                    }
-                    // compare
-                    if (TYPE.compare(item, item2) == 0 && ITEM_DATA.compare(item, item2) == 0)
-                    {
-                        if (item2.getQuantity() > needed) // not enough place -> fill up stack
-                        {
-                            item.setQuantity(max);
-                            item2.setQuantity(item2.getQuantity() - needed);
-                            break;
-                        }
-                        // enough place -> add to stack
-                        {
-                            items[j] = null;
-                            item.setQuantity(item.getQuantity() + item2.getQuantity());
-                            needed = max - item.getQuantity();
-                        }
-                        changed = true;
-                    }
-                }
-            }
-        }
-        if (changed)
-        {
-            int i = 0;
-            for (Inventory row : rows)
-            {
-                for (Inventory slot : row.slots())
-                {
-                    ItemStack item = items[i++];
-                    if (item == null)
-                    {
-                        slot.clear();
-                    }
-                    else
-                    {
-                        slot.set(item);
-                    }
-                }
-            }
-            i18n.send(context, POSITIVE, "Items stacked together!");
-            return;
-        }
-        i18n.send(context, NEUTRAL, "Nothing to stack!");
-    }
+//    @Command(desc = "Stacks your items up to 64")
+//    @Restricted(msg = "No stacking for you.")
+//    public void stack(ServerPlayer context)
+//    {
+//        boolean allow64 = COMMAND_STACK_FULLSTACK.check(context);
+//        allow64 = false; // TODO this is currently not working /w Sponge
+//        Inventory rows = context.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(InventoryRow.class));
+//        ItemStack[] items = new ItemStack[rows.capacity()];
+//        int slotIndex = 0;
+//        for (Inventory row : rows)
+//        {
+//            for (Inventory slot : row.slots())
+//            {
+//                items[slotIndex++] = slot.peek().orElse(null);
+//            }
+//        }
+//
+//        int size = items.length;
+//        boolean changed = false;
+//        for (int i = 0; i < size; i++)
+//        {
+//            ItemStack item = items[i];
+//            // no null / infinite or unstackable items (if not allowed)
+//            if (item == null || item.getQuantity() <= 0 || (!allow64 && item.getMaxStackQuantity() == 1))
+//            {
+//                continue;
+//            }
+//            int max = allow64 ? 64 : item.getMaxStackQuantity();
+//            if (item.getQuantity() < max)
+//            {
+//                int needed = max - item.getQuantity();
+//                for (int j = i + 1; j < size; j++) // search for same item
+//                {
+//                    ItemStack item2 = items[j];
+//                    // no null / infinite or unstackable items (if not allowed)
+//                    if (item2 == null || item2.getQuantity() <= 0 || (!allow64 && item.getMaxStackQuantity() == 1))
+//                    {
+//                        continue;
+//                    }
+//                    // compare
+//                    if (TYPE.compare(item, item2) == 0 && ITEM_DATA.compare(item, item2) == 0)
+//                    {
+//                        if (item2.getQuantity() > needed) // not enough place -> fill up stack
+//                        {
+//                            item.setQuantity(max);
+//                            item2.setQuantity(item2.getQuantity() - needed);
+//                            break;
+//                        }
+//                        // enough place -> add to stack
+//                        {
+//                            items[j] = null;
+//                            item.setQuantity(item.getQuantity() + item2.getQuantity());
+//                            needed = max - item.getQuantity();
+//                        }
+//                        changed = true;
+//                    }
+//                }
+//            }
+//        }
+//        if (changed)
+//        {
+//            int i = 0;
+//            for (Inventory row : rows)
+//            {
+//                for (Inventory slot : row.slots())
+//                {
+//                    ItemStack item = items[i++];
+//                    if (item == null)
+//                    {
+//                        slot.clear();
+//                    }
+//                    else
+//                    {
+//                        slot.set(item);
+//                    }
+//                }
+//            }
+//            i18n.send(context, POSITIVE, "Items stacked together!");
+//            return;
+//        }
+//        i18n.send(context, NEUTRAL, "Nothing to stack!");
+//    }
 }

@@ -18,28 +18,33 @@
 package org.cubeengine.module.vanillaplus.addition;
 
 import java.util.Collection;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Optional;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.Broadcaster;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.libcube.service.command.parser.PlayerList;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
+@Singleton
 public class HealCommand extends PermissionContainer
 {
     private I18n i18n;
     private Broadcaster bc;
 
+    @Inject
     public HealCommand(PermissionManager pm, I18n i18n, Broadcaster bc)
     {
         super(pm, VanillaPlus.class);
@@ -50,7 +55,7 @@ public class HealCommand extends PermissionContainer
     public final Permission COMMAND_HEAL_OTHER = register("command.heal.other", "", null);
 
     @Command(desc = "Heals a player")
-    public void heal(CommandSource context, @Optional PlayerList players)
+    public void heal(CommandCause context, @Option Collection<ServerPlayer> players)
     {
         if (players == null)
         {
@@ -69,10 +74,11 @@ public class HealCommand extends PermissionContainer
             i18n.send(context, NEGATIVE, "You are not allowed to heal other players!");
             return;
         }
-        Collection<Player> userList = players.list();
-        if (players.isAll())
+
+        boolean all = players.containsAll(Sponge.getServer().getOnlinePlayers());
+        if (all)
         {
-            if (userList.isEmpty())
+            if (players.isEmpty())
             {
                 i18n.send(context, NEGATIVE, "There are no players online at the moment!");
                 return;
@@ -82,15 +88,15 @@ public class HealCommand extends PermissionContainer
         }
         else
         {
-            i18n.send(context, POSITIVE, "Healed {amount} players!", userList.size());
+            i18n.send(context, POSITIVE, "Healed {amount} players!", players.size());
         }
-        for (Player user : userList)
+        for (ServerPlayer player : players)
         {
-            if (!players.isAll())
+            if (!all)
             {
-                i18n.send(user, POSITIVE, "You got healed by {sender}!", context);
+                i18n.send(player, POSITIVE, "You got healed by {sender}!", context);
             }
-            user.offer(Keys.HEALTH, user.get(Keys.MAX_HEALTH).get());
+            player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
         }
     }
 }

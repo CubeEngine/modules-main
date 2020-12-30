@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -25,23 +24,25 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.type.Art;
-import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.type.ArtType;
 import org.spongepowered.api.entity.hanging.Painting;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
@@ -65,16 +66,16 @@ public class PaintingListener extends PermissionContainer
     // TODO maybe save painting type when breaking so the same can be placed and allow stacking them somehow
 
     @Listener(order = Order.EARLY)
-    public void onPlayerInteractEntity(InteractEntityEvent.Secondary.MainHand event, @First Player player)
+    public void onPlayerInteractEntity(InteractEntityEvent.Secondary event, @First ServerPlayer player)
     {
-        if (event.getTargetEntity().getType() == EntityTypes.PAINTING)
+        if (event.getEntity() instanceof Painting)
         {
-            if (!player.hasPermission(CHANGEPAINTING.getId()))
+            if (!CHANGEPAINTING.check(player))
             {
                 i18n.send(player, NEGATIVE, "You are not allowed to change this painting.");
                 return;
             }
-            Painting painting = (Painting)event.getTargetEntity();
+            Painting painting = (Painting)event.getEntity();
 
             Painting playerPainting = this.paintingChange.get(player.getUniqueId());
             if(playerPainting == null && this.paintingChange.containsValue(painting))
@@ -126,7 +127,7 @@ public class PaintingListener extends PermissionContainer
                     return;
                 }
 
-                List<Art> arts = new ArrayList<>(Sponge.getRegistry().getAllOf(Art.class));
+                List<ArtType> arts = Sponge.getGame().registries().registry(RegistryTypes.ART_TYPE).stream().collect(Collectors.toList());
                 int artNumber = arts.indexOf(painting.art().get());
                 int change = 1; // TODO this.compareSlots(event.getPreviousSlot(), event.getNewSlot());
                 artNumber += change;
@@ -138,9 +139,9 @@ public class PaintingListener extends PermissionContainer
                 {
                     artNumber = arts.size() - 1;
                 }
-                for (Art art : arts)
+                for (ArtType art : arts)
                 {
-                    if (painting.offer(Keys.ART, arts.get(artNumber)).isSuccessful())
+                    if (painting.offer(Keys.ART_TYPE, arts.get(artNumber)).isSuccessful())
                     {
                         return;
                     }
@@ -161,12 +162,12 @@ public class PaintingListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onPaintingBreakEvent(DestructEntityEvent event)
     {
-        if (!(event.getTargetEntity() instanceof Painting))
+        if (!(event.getEntity() instanceof Painting))
         {
             return;
         }
 
-        Painting painting = (Painting)event.getTargetEntity();
+        Painting painting = (Painting)event.getEntity();
 
         Iterator<Entry<UUID, Painting>> paintingIterator = this.paintingChange.entrySet().iterator();
         while(paintingIterator.hasNext())
@@ -174,11 +175,8 @@ public class PaintingListener extends PermissionContainer
             Entry<UUID, Painting> entry = paintingIterator.next();
             if(entry.getValue().equals(painting))
             {
-                Optional<Player> player = Sponge.getServer().getPlayer(entry.getKey());
-                if (player.isPresent())
-                {
-                    i18n.send(player.get(), NEGATIVE, "The painting broke");
-                }
+                Optional<ServerPlayer> player = Sponge.getServer().getPlayer(entry.getKey());
+                player.ifPresent(serverPlayer -> i18n.send(serverPlayer, NEGATIVE, "The painting broke"));
                 paintingIterator.remove();
             }
         }

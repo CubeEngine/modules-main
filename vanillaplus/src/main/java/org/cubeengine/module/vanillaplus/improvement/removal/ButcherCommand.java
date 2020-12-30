@@ -18,42 +18,47 @@
 package org.cubeengine.module.vanillaplus.improvement.removal;
 
 import java.util.Collection;
-import java.util.function.Predicate;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.permission.Permission;
-import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.ParameterRegistry;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Label;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.StringMatcher;
+import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
+import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.SpawnTypes;
+import org.spongepowered.api.util.AABB;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3i;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
+@Singleton
 public class ButcherCommand extends PermissionContainer
 {
     private VanillaPlus module;
     private I18n i18n;
 
-    public ButcherCommand(PermissionManager pm, VanillaPlus module, I18n i18n, CommandManager cm, StringMatcher sm)
+    @Inject
+    public ButcherCommand(PermissionManager pm, VanillaPlus module, I18n i18n, StringMatcher sm)
     {
         super(pm, VanillaPlus.class);
         this.module = module;
         this.i18n = i18n;
-        cm.getProviders().register(module, new LivingFilterParser(pm, i18n, sm), LivingFilter.class);
+        ParameterRegistry.register(LivingFilter.class, new LivingFilterParser(pm, i18n, sm));
     }
 
     public final Permission COMMAND_BUTCHER_FLAG_LIGHTNING = register("command.butcher.lightning", "", null);
@@ -62,9 +67,9 @@ public class ButcherCommand extends PermissionContainer
 
     @Command(desc = "Gets rid of mobs close to you. Valid types are:\n" +
         "monster, animal, pet, golem, boss, other, creeper, skeleton, spider etc.")
-    public void butcher(CommandSource context, @Label("types...") @Default LivingFilter types,
-                        @Optional Integer radius,
-                        @Default @Named("in") World world,
+    public void butcher(CommandCause context, @Label("types...") @Default LivingFilter types,
+                        @Option Integer radius,
+                        @Default @Named("in") ServerWorld world,
                         @Flag boolean lightning, // die with style
                         @Flag boolean all) // infinite radius
     {
@@ -80,17 +85,20 @@ public class ButcherCommand extends PermissionContainer
         }
         lightning = lightning && context.hasPermission(COMMAND_BUTCHER_FLAG_LIGHTNING.getId());
 
-        Integer rSquared = radius * radius;
-        Predicate<Entity> filter = radius == -1 ? types :
-           types.and(e -> e.getTransform().getPosition().distance(((Player)context).getLocation().getPosition()) <= rSquared);
+        Collection<? extends Entity> remove;
+        if (context.getSubject() instanceof ServerPlayer && ((ServerPlayer)context.getSubject()).getWorld() == world) {
+            remove = ((ServerPlayer)context.getSubject()).getNearbyEntities(radius, types);
+        } else {
+            final Vector3i spawn = world.getProperties().getSpawnPosition();
+            remove = world.getEntities(AABB.of(spawn.sub(Vector3i.ONE.mul(radius)), spawn.sub(Vector3i.ONE.mul(-radius))), types);
+        }
 
-        Collection<Entity> remove = world.getEntities(filter);
-        Sponge.getCauseStackManager().pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
+        Sponge.getServer().getCauseStackManager().pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
         for (Entity entity : remove)
         {
             if (lightning)
             {
-                world.spawnEntity(world.createEntity(EntityTypes.LIGHTNING, entity.getLocation().getPosition()));
+                world.spawnEntity(world.createEntity(EntityTypes.LIGHTNING_BOLT, entity.getLocation().getPosition()));
             }
             entity.remove();
         }

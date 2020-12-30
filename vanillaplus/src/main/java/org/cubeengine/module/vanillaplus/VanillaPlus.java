@@ -17,18 +17,27 @@
  */
 package org.cubeengine.module.vanillaplus;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import org.cubeengine.libcube.CubeEngineModule;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.Broadcaster;
+import org.cubeengine.libcube.service.command.AnnotationCommandBuilder;
+import org.cubeengine.libcube.service.event.EventManager;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
+import org.cubeengine.libcube.service.matcher.EnchantMatcher;
+import org.cubeengine.libcube.service.matcher.EntityMatcher;
+import org.cubeengine.libcube.service.matcher.MaterialMatcher;
+import org.cubeengine.libcube.service.matcher.StringMatcher;
+import org.cubeengine.libcube.service.matcher.TimeMatcher;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.module.vanillaplus.addition.FoodCommands;
 import org.cubeengine.module.vanillaplus.addition.GodCommand;
 import org.cubeengine.module.vanillaplus.addition.HealCommand;
 import org.cubeengine.module.vanillaplus.addition.InformationCommands;
 import org.cubeengine.module.vanillaplus.addition.InvseeCommand;
-import org.cubeengine.module.vanillaplus.addition.ItemDBCommand;
 import org.cubeengine.module.vanillaplus.addition.MovementCommands;
 import org.cubeengine.module.vanillaplus.addition.PlayerInfoCommands;
 import org.cubeengine.module.vanillaplus.addition.PluginCommands;
@@ -38,11 +47,8 @@ import org.cubeengine.module.vanillaplus.addition.UnlimitedFood;
 import org.cubeengine.module.vanillaplus.addition.UnlimitedItems;
 import org.cubeengine.module.vanillaplus.fix.ColoredSigns;
 import org.cubeengine.module.vanillaplus.fix.FlymodeFixListener;
-import org.cubeengine.module.vanillaplus.fix.ImmutableSafeLoginData;
-import org.cubeengine.module.vanillaplus.fix.OverstackedListener;
 import org.cubeengine.module.vanillaplus.fix.PaintingListener;
 import org.cubeengine.module.vanillaplus.fix.SafeLoginData;
-import org.cubeengine.module.vanillaplus.fix.SafeLoginDataBuilder;
 import org.cubeengine.module.vanillaplus.fix.SpawnFixListener;
 import org.cubeengine.module.vanillaplus.fix.TamedListener;
 import org.cubeengine.module.vanillaplus.improvement.BorderCommands;
@@ -62,24 +68,14 @@ import org.cubeengine.module.vanillaplus.improvement.WhitelistCommand;
 import org.cubeengine.module.vanillaplus.improvement.removal.ButcherCommand;
 import org.cubeengine.module.vanillaplus.improvement.removal.RemoveCommands;
 import org.cubeengine.module.vanillaplus.improvement.summon.SpawnMobCommand;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.event.EventManager;
-import org.cubeengine.libcube.service.filesystem.ModuleConfig;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
-import org.cubeengine.libcube.service.matcher.EnchantMatcher;
-import org.cubeengine.libcube.service.matcher.EntityMatcher;
-import org.cubeengine.libcube.service.matcher.MaterialMatcher;
-import org.cubeengine.libcube.service.matcher.StringMatcher;
-import org.cubeengine.libcube.service.matcher.TimeMatcher;
-import org.cubeengine.libcube.service.matcher.WorldMatcher;
-import org.cubeengine.libcube.service.task.TaskManager;
-import org.cubeengine.libcube.service.Broadcaster;
 import org.cubeengine.processor.Module;
-import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.command.Command.Parameterized;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.plugin.PluginContainer;
 
 /**
  * A module to improve vanilla commands:
@@ -129,16 +125,14 @@ import org.spongepowered.api.plugin.PluginContainer;
 
 @Singleton
 @Module
-public class VanillaPlus extends CubeEngineModule
+public class VanillaPlus
 {
-    @Inject private CommandManager cm;
     @Inject private I18n i18n;
     @Inject private MaterialMatcher mm;
     @Inject private EnchantMatcher em;
     @Inject private EntityMatcher enm;
     @Inject private TimeMatcher tm;
     @Inject private ModuleManager momu;
-    @Inject private WorldMatcher wm;
     @Inject private TaskManager tam;
     @Inject private PermissionManager pm;
     @Inject private Broadcaster bc;
@@ -146,96 +140,16 @@ public class VanillaPlus extends CubeEngineModule
     @ModuleConfig private VanillaPlusConfig config;
     @Inject private EventManager evm;
     @Inject private StringMatcher sm;
-
-    private PluginContainer plugin;
-
-    @Inject
-    public VanillaPlus(PluginContainer plugin)
-    {
-        this.plugin = plugin;
-        DataRegistration.<SafeLoginData, ImmutableSafeLoginData>builder()
-                .dataClass(SafeLoginData.class).immutableClass(ImmutableSafeLoginData.class)
-                .builder(new SafeLoginDataBuilder()).manipulatorId("safe_login")
-                .dataName("CubeEngine VanillaPlus Safe Login")
-                .buildAndRegister(plugin);
-        SafeLoginData.FLYMODE.getQuery();
-    }
+    @Inject private AnnotationCommandBuilder commandBuilder;
+    @Inject private PluginContainer plugin;
 
     @Listener
-    public void onEnable(GamePreInitializationEvent event)
+    public void onEnable(StartedEngineEvent<Server> event)
     {
-        enableImprovements();
-        enableFixes();
-        enableAdditions();
-    }
-
-    private void enableAdditions()
-    {
-        if (config.add.commandGod)
-        {
-            cm.addCommands(this, new GodCommand(pm, i18n));
-        }
-        if (config.add.commandHeal)
-        {
-            cm.addCommands(this, new HealCommand(pm, i18n, bc));
-        }
-        if (config.add.commandsInformation)
-        {
-            cm.addCommands(this, new InformationCommands(pm, this, i18n));
-        }
-        if (config.add.commandInvsee)
-        {
-            cm.addCommands(this, new InvseeCommand(pm, invGuard, i18n));
-        }
-        if (config.add.commandItemDB)
-        {
-            cm.addCommands(this, new ItemDBCommand(this, mm, em, i18n));
-        }
-        if (config.add.commandsMovement)
-        {
-            cm.addCommands(this, new MovementCommands(pm, i18n));
-        }
-        if (config.add.commandsFood)
-        {
-            cm.addCommands(this, new FoodCommands(pm, i18n, bc));
-        }
-        if (config.add.commandsPlayerInformation)
-        {
-            cm.addCommands(this, new PlayerInfoCommands(i18n));
-        }
-        if (config.add.commandsPlugins)
-        {
-            cm.addCommands(this, new PluginCommands(i18n, pm, momu));
-        }
-        if (config.add.commandStash)
-        {
-            cm.addCommands(this, new StashCommand(i18n));
-        }
-        if (config.add.commandSudo)
-        {
-            cm.addCommands(this, new SudoCommand(i18n, cm));
-        }
-        if (config.add.commandUnlimited)
-        {
-            UnlimitedItems cmd = new UnlimitedItems(i18n);
-            cm.addCommands(this, cmd);
-            evm.registerListener(VanillaPlus.class, cmd);
-        }
-        if (config.add.unlimitedFood)
-        {
-            new UnlimitedFood(pm, plugin);
-        }
-    }
-
-    private void enableFixes()
-    {
+        // Fixes
         if (config.fix.styledSigns)
         {
             evm.registerListener(VanillaPlus.class, new ColoredSigns(pm));
-        }
-        if (config.fix.preventOverstackedItems)
-        {
-            evm.registerListener(VanillaPlus.class, new OverstackedListener(pm, this));
         }
         if (config.fix.safeLoginFly)
         {
@@ -243,7 +157,7 @@ public class VanillaPlus extends CubeEngineModule
         }
         if (config.fix.safeLoginBorder)
         {
-            evm.registerListener(VanillaPlus.class, new SpawnFixListener(i18n));
+            evm.registerListener(VanillaPlus.class, new SpawnFixListener());
         }
         if (config.fix.paintingSwitcher)
         {
@@ -255,83 +169,144 @@ public class VanillaPlus extends CubeEngineModule
         }
     }
 
-    private void enableImprovements()
-    {
+    public void onRegisterCommand(RegisterCommandEvent<Parameterized> event) {
+        // additions
+        if (config.add.commandGod)
+        {
+            momu.registerCommands(event, plugin, this, GodCommand.class);
+        }
+        if (config.add.commandHeal)
+        {
+            momu.registerCommands(event, plugin, this, HealCommand.class);
+        }
+        if (config.add.commandsInformation)
+        {
+            momu.registerCommands(event, plugin, this, InformationCommands.class);
+        }
+        if (config.add.commandInvsee)
+        {
+            momu.registerCommands(event, plugin, this, InvseeCommand.class);
+        }
+        if (config.add.commandsMovement)
+        {
+            momu.registerCommands(event, plugin, this, MovementCommands.class);
+        }
+        if (config.add.commandsFood)
+        {
+            momu.registerCommands(event, plugin, this, FoodCommands.class);
+        }
+        if (config.add.commandsPlayerInformation)
+        {
+            momu.registerCommands(event, plugin, this, PlayerInfoCommands.class);
+        }
+        if (config.add.commandsPlugins)
+        {
+            momu.registerCommands(event, plugin, this, PluginCommands.class);
+        }
+        if (config.add.commandStash)
+        {
+            momu.registerCommands(event, plugin, this, StashCommand.class);
+        }
+        if (config.add.commandSudo)
+        {
+            momu.registerCommands(event, plugin, this, SudoCommand.class);
+        }
+        if (config.add.commandUnlimited)
+        {
+            final UnlimitedItems cmd = momu.registerCommands(event, plugin, this, UnlimitedItems.class);
+            evm.registerListener(VanillaPlus.class, cmd);
+        }
+        if (config.add.unlimitedFood)
+        {
+            new UnlimitedFood(pm, plugin);
+        }
+
+        // improvements
         if (config.improve.commandRemove)
         {
-            cm.addCommands(this, new RemoveCommands(this, enm, mm, i18n, cm));
+            momu.registerCommands(event, plugin, this, RemoveCommands.class);
         }
         if (config.improve.commandButcher)
         {
-            cm.addCommands(this, new ButcherCommand(pm, this, i18n, cm, sm));
+            momu.registerCommands(event, plugin, this, ButcherCommand.class);
         }
         if (config.improve.commandSummon)
         {
-            cm.addCommands(this, new SpawnMobCommand(this, i18n, enm));
+            momu.registerCommands(event, plugin, this, SpawnMobCommand.class);
         }
         if (config.improve.commandClearinventory)
         {
-            cm.addCommands(this, new ClearInventoryCommand(pm, i18n));
+            momu.registerCommands(event, plugin, this, ClearInventoryCommand.class);
         }
         if (config.improve.commandDifficulty)
         {
-            cm.addCommands(this, new DifficultyCommand(i18n));
+            momu.registerCommands(event, plugin, this, DifficultyCommand.class);
         }
         if (config.improve.commandGamemode)
         {
-            cm.addCommands(this, new GameModeCommand(pm, i18n));
+            momu.registerCommands(event, plugin, this, GameModeCommand.class);
         }
         if (config.improve.commandItem)
         {
-            cm.addCommands(this, new ItemCommands(pm, mm, em, i18n));
+            momu.registerCommands(event, plugin, this, ItemCommands.class);
         }
         if (config.improve.commandItemModify)
         {
-            cm.addCommands(this, new ItemModifyCommands(pm, i18n));
+            momu.registerCommands(event, plugin, this, ItemModifyCommands.class);
         }
         if (config.improve.commandKill)
         {
-            cm.addCommands(this, new KillCommands(pm, i18n));
+            momu.registerCommands(event, plugin, this, KillCommands.class);
         }
         if (config.improve.commandOp)
         {
-            cm.addCommands(this, new OpCommands());
+            momu.registerCommands(event, plugin, this, OpCommands.class);
         }
         if (config.improve.commandList)
         {
-            cm.addCommands(this, new PlayerListCommand(i18n));
+            momu.registerCommands(event, plugin, this, PlayerListCommand.class);
         }
         if (config.improve.commandSave)
         {
-            cm.addCommands(this, new SaveCommands(i18n));
+            momu.registerCommands(event, plugin, this, SaveCommands.class);
         }
         if (config.improve.commandStop)
         {
-            cm.addCommands(this, new StopCommand(this));
+            momu.registerCommands(event, plugin, this, StopCommand.class);
         }
         if (config.improve.commandTime)
         {
-            cm.addCommands(this, new TimeCommands(pm, i18n, tm, wm, tam));
+            momu.registerCommands(event, plugin, this, TimeCommands.class);
         }
         if (config.improve.commandWeather)
         {
-            cm.addCommands(this, new WeatherCommands(i18n, cm));
+            momu.registerCommands(event, plugin, this, WeatherCommands.class);
         }
         if (config.improve.commandWhitelist)
         {
-            cm.addCommand(new WhitelistCommand(cm, i18n));
+            momu.registerCommands(event, plugin, this, WhitelistCommand.class);
         }
         if (config.improve.commandBorderEnable)
         {
-            cm.addCommand(new BorderCommands(i18n, cm, momu.getPlugin(VanillaPlus.class).get(), config.improve.commandBorderMax));
+            momu.registerCommands(event, plugin, this, BorderCommands.class);
+        }
+
+    }
+
+    @Listener
+    public void onRegisterData(RegisterDataEvent event)
+    {
+        if (config.fix.safeLoginFly)
+        {
+            SafeLoginData.register(event);
         }
     }
+
 
     public VanillaPlusConfig getConfig()
     {
         return config;
     }
-
 
     /*
     TODO onlinemode cmd

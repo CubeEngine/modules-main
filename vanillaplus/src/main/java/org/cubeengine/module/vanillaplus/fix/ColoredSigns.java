@@ -17,18 +17,18 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
+import java.util.List;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.tileentity.ChangeSignEvent;
+import org.spongepowered.api.event.block.entity.ChangeSignEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.serializer.TextSerializers;
 
 public class ColoredSigns extends PermissionContainer
 {
@@ -43,25 +43,26 @@ public class ColoredSigns extends PermissionContainer
     @Listener
     public void onSignChange(ChangeSignEvent event, @First Subject cause)
     {
-        ListValue<Text> lines = event.getText().lines();
+        final PlainComponentSerializer plain = PlainComponentSerializer.plain();
+        final List<Component> lines = event.getText().get();
         if (!cause.hasPermission(SIGN_STYLED.getId()))
         {
             for (int i = 0; i < lines.size(); i++)
             {
-                lines.set(i, Text.of(lines.get(i).toPlain().replaceAll("&[klmno]", "")));
+                lines.set(i, Component.text(plain.serialize(lines.get(i)).replaceAll("&[klmno]", "")));
             }
         }
         if (cause.hasPermission(SIGN_COLORED.getId()))
         {
             for (int i = 0; i < lines.size(); i++)
             {
-                lines.set(i, Text.of(lines.get(i).toPlain().replaceAll("&[0123456789abcdef]", "")));
+                lines.set(i, Component.text(plain.serialize(lines.get(i)).replaceAll("&[0123456789abcdef]", "")));
             }
         }
 
         for (int i = 0; i < lines.size(); i++)
         {
-            lines.set(i, TextSerializers.FORMATTING_CODE.deserialize(lines.get(i).toPlain()));
+            lines.set(i, LegacyComponentSerializer.legacyAmpersand().deserialize(plain.serialize(lines.get(i))));
         }
     }
 }

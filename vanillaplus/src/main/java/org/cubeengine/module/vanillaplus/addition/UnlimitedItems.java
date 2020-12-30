@@ -20,13 +20,18 @@ package org.cubeengine.module.vanillaplus.addition;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Optional;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.spongepowered.api.block.transaction.Operations;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
@@ -35,19 +40,21 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
+@Singleton
 public class UnlimitedItems
 {
     private I18n i18n;
     private Set<UUID> unlimitedPlayers = new HashSet<>();
 
+    @Inject
     public UnlimitedItems(I18n i18n)
     {
         this.i18n = i18n;
     }
 
     @Command(desc = "Grants unlimited items")
-    @Restricted(Player.class)
-    public void unlimited(Player context, @Optional Boolean unlimited)
+    @Restricted
+    public void unlimited(ServerPlayer context, @Option Boolean unlimited)
     {
         if (unlimited == null)
         {
@@ -72,20 +79,22 @@ public class UnlimitedItems
     }
 
     @Listener
-    public void blockplace(final ChangeBlockEvent.Place event, @First Player player)
+    public void blockplace(final ChangeBlockEvent.All event, @First Player player)
     {
+
         if (this.unlimitedPlayers.contains(player.getUniqueId()))
         {
-            if (player.getGameModeData().type().get() == GameModes.CREATIVE)
+            if (!event.getTransactions(Operations.PLACE.get()).findAny().isPresent())
             {
                 return;
             }
-            ItemStack item = player.getItemInHand(HandTypes.MAIN_HAND).orElse(null);
-            if (item != null)
+            if (player.get(Keys.GAME_MODE).get() == GameModes.CREATIVE.get())
             {
-                item.setQuantity(item.getQuantity() + 1);
-                player.setItemInHand(HandTypes.MAIN_HAND, item);
+                return;
             }
+            ItemStack item = player.getItemInHand(HandTypes.MAIN_HAND);
+            item.setQuantity(item.getQuantity() + 1);
+            player.setItemInHand(HandTypes.MAIN_HAND, item);
         }
     }
 }

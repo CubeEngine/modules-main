@@ -17,37 +17,38 @@
  */
 package org.cubeengine.module.vanillaplus.addition;
 
+import java.util.concurrent.TimeUnit;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scheduler.Task;
-
-import java.util.concurrent.TimeUnit;
+import org.spongepowered.plugin.PluginContainer;
 
 public class UnlimitedFood extends PermissionContainer implements Runnable
 {
     private final Permission UNLIMITED_FOOD = register("effect.unlimited-food", "Grants unlimited food", null);
+    private final Task unlimitedFoodTask;
 
     public UnlimitedFood(PermissionManager pm, PluginContainer plugin)
     {
         super(pm, VanillaPlus.class);
-        Task.builder().interval(1, TimeUnit.SECONDS).execute(this).submit(plugin);
+        this.unlimitedFoodTask = Task.builder().interval(1, TimeUnit.SECONDS).execute(this).plugin(plugin).build();
+        Sponge.getServer().getScheduler().submit(unlimitedFoodTask);
     }
 
     @Override
     public void run()
     {
-        for (Player player : Sponge.getServer().getOnlinePlayers())
+        for (ServerPlayer player : Sponge.getServer().getOnlinePlayers())
         {
-            if (player.hasPermission(UNLIMITED_FOOD.getId()))
+            if (UNLIMITED_FOOD.check(player))
             {
-                player.offer(Keys.FOOD_LEVEL, player.getValue(Keys.FOOD_LEVEL).get().getMaxValue());
-                player.offer(Keys.SATURATION, player.getValue(Keys.SATURATION).get().getMaxValue());
+                player.offer(Keys.FOOD_LEVEL, player.get(Keys.MAX_FOOD_LEVEL).get());
+                player.offer(Keys.SATURATION, player.get(Keys.MAX_SATURATION).get());
             }
         }
 

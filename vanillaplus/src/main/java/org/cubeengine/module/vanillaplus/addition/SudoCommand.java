@@ -17,39 +17,44 @@
  */
 package org.cubeengine.module.vanillaplus.addition;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Greed;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.text.Component;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Greedy;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.exception.CommandException;
+import org.spongepowered.api.command.manager.CommandManager;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
-import static org.cubeengine.butler.parameter.Parameter.INFINITE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
+@Singleton
 public class SudoCommand
 {
     private I18n i18n;
     private CommandManager cm;
 
-    public SudoCommand(I18n i18n, CommandManager cm)
+    @Inject
+    public SudoCommand(I18n i18n)
     {
         this.i18n = i18n;
-        this.cm = cm;
+        this.cm = Sponge.getCommandManager();
     }
 
     @Command(desc = "Makes a player send a message (including commands)")
-    public void sudo(CommandSource context, Player player, @Greed(INFINITE) String message)
+    public void sudo(CommandCause context, ServerPlayer player, @Greedy String message) throws CommandException
     {
         if (!message.startsWith("/"))
         {
-            player.getMessageChannel().send(player, Text.of(message));
+            player.simulateChat(Component.text(message), Sponge.getServer().getCauseStackManager().getCurrentCause());
             i18n.send(context, POSITIVE, "Forced {user} to chat: {input#message}", player, message);
             return;
         }
-        if (cm.runCommand(player, message.substring(1)))
+        if (cm.process(player, player, message.substring(1)).isSuccess())
         {
             i18n.send(context, POSITIVE, "Command {input#command} executed as {user}", message, player);
             return;

@@ -17,28 +17,33 @@
  */
 package org.cubeengine.module.vanillaplus.addition;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.util.Ticks;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 /**
  * Provides Gamemodelike Protection
  */
+@Singleton
 public class GodCommand extends PermissionContainer
 {
     private I18n i18n;
     public final Permission COMMAND_GOD_OTHER = register("command.god.other",
                                                          "Allows to enable god-mode for other players", null);
 
+    @Inject
     public GodCommand(PermissionManager pm, I18n i18n)
     {
         super(pm, VanillaPlus.class);
@@ -47,10 +52,10 @@ public class GodCommand extends PermissionContainer
 
 
     @Command(desc = "Toggles the god-mode!")
-    public void god(CommandSource context, @Default Player player)
+    public void god(CommandCause context, @Default ServerPlayer player)
     {
         boolean other = false;
-        if (!context.equals(player))
+        if (!context.getSubject().equals(player))
         {
             if (!context.hasPermission(COMMAND_GOD_OTHER.getId()))
             {
@@ -60,10 +65,10 @@ public class GodCommand extends PermissionContainer
             other = true;
         }
 
-        Integer invTime = player.get(Keys.INVULNERABILITY_TICKS).orElse(0);
+        long invTime = player.get(Keys.INVULNERABILITY_TICKS).map(Ticks::getTicks).orElse(0L);
         if (invTime > 0)
         {
-            player.offer(Keys.INVULNERABILITY_TICKS, 0);
+            player.offer(Keys.INVULNERABILITY_TICKS, Ticks.zero());
             if (!other)
             {
                 i18n.send(context, NEUTRAL, "You are no longer invincible!");
@@ -73,7 +78,7 @@ public class GodCommand extends PermissionContainer
             i18n.send(context, NEUTRAL, "{user} is no longer invincible!", player);
             return;
         }
-        player.offer(Keys.INVULNERABILITY_TICKS, Integer.MAX_VALUE);
+        player.offer(Keys.INVULNERABILITY_TICKS, Ticks.of(Integer.MAX_VALUE));
         if (!other)
         {
             i18n.send(context, POSITIVE, "You are now invincible!");

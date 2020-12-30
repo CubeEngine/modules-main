@@ -17,18 +17,14 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.entity.EntityTypes.LIGHTNING;
-import static org.spongepowered.api.event.cause.entity.damage.DamageTypes.CUSTOM;
-
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.libcube.service.command.parser.PlayerList;
-import org.cubeengine.libcube.service.command.parser.UserListInSight;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
@@ -36,23 +32,25 @@ import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import static org.spongepowered.api.entity.EntityTypes.LIGHTNING_BOLT;
+import static org.spongepowered.api.event.cause.entity.damage.DamageTypes.CUSTOM;
 
 /**
  * {@link #kill}
  * {@link #suicide}
  */
+@Singleton
 public class KillCommands extends PermissionContainer
 {
     private I18n i18n;
 
+    @Inject
     public KillCommands(PermissionManager pm, I18n i18n)
     {
         super(pm, VanillaPlus.class);
@@ -67,27 +65,27 @@ public class KillCommands extends PermissionContainer
     public final Permission COMMAND_KILL_NOTIFY = register("command.kill.notify", "Shows who killed you", null);
 
     @Command(alias = "slay", desc = "Kills a player")
-    public void kill(CommandSource context, @Default(UserListInSight.class) PlayerList players,
+    public void kill(CommandCause context, Collection<ServerPlayer> players,
                      @Flag boolean force, @Flag boolean quiet, @Flag boolean lightning)
     {
         lightning = lightning && context.hasPermission(COMMAND_KILL_LIGHTNING.getId());
         force = force && context.hasPermission(COMMAND_KILL_FORCE.getId());
         quiet = quiet && context.hasPermission(COMMAND_KILL_QUIET.getId());
         List<String> killed = new ArrayList<>();
-        Collection<Player> userList = players.list();
-        if (players.isAll())
+        final boolean all = Sponge.getServer().getOnlinePlayers().containsAll(players);
+        if (all)
         {
             if (!context.hasPermission(COMMAND_KILL_ALL.getId()))
             {
                 i18n.send(context, NEGATIVE, "You are not allowed to kill everyone!");
                 return;
             }
-            if (context instanceof Player)
+            if (context.getSubject() instanceof ServerPlayer)
             {
-                userList.remove(context);
+                players.remove(context.getSubject());
             }
         }
-        for (Player user : userList)
+        for (ServerPlayer user : players)
         {
             if (this.kill(user, lightning, context, false, force, quiet))
             {
@@ -103,23 +101,25 @@ public class KillCommands extends PermissionContainer
     }
 
 
-    private boolean kill(Player player, boolean lightning, CommandSource context, boolean showMessage, boolean force, boolean quiet)
+    private boolean kill(ServerPlayer player, boolean lightning, CommandCause context, boolean showMessage, boolean force, boolean quiet)
     {
         if (!force)
         {
-            if (player.hasPermission(COMMAND_KILL_PREVENT.getId()) || player.get(Keys.INVULNERABILITY_TICKS).isPresent())
+
+            if (COMMAND_KILL_PREVENT.check(player) || player.get(Keys.INVULNERABILITY_TICKS).isPresent())
             {
                 i18n.send(context, NEGATIVE, "You cannot kill {user}!", player);
                 return false;
             }
         }
-        Sponge.getCauseStackManager().pushCause(context);
+        Sponge.getServer().getCauseStackManager().pushCause(context);
         if (lightning)
         {
-            player.getWorld().spawnEntity(player.getWorld().createEntity(LIGHTNING, player.getLocation().getPosition()));
+            player.getWorld().spawnEntity(player.getWorld().createEntity(LIGHTNING_BOLT, player.getLocation().getPosition()));
         }
 
-        player.damage(player.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build());
+
+        player.damage(player.get(Keys.MAX_HEALTH).get(), DamageSource.builder().absolute().type(CUSTOM).build());
 
         if (force)
         {
@@ -138,11 +138,11 @@ public class KillCommands extends PermissionContainer
 
 
     @Command(desc = "Kills yourself")
-    @Restricted(value = Player.class, msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}")
-    public void suicide(Player context)
+    @Restricted(msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}")
+    public void suicide(ServerPlayer context)
     {
-        Sponge.getCauseStackManager().pushCause(context);
-        context.damage(context.getHealthData().maxHealth().get(), DamageSource.builder().absolute().type(CUSTOM).build());
+        Sponge.getServer().getCauseStackManager().pushCause(context);
+        context.damage(context.get(Keys.MAX_HEALTH).get(), DamageSource.builder().absolute().type(CUSTOM).build());
         context.offer(Keys.HEALTH, 0d);
         i18n.send(context, NEGATIVE, "You ended your life. Why? {text::(:color=DARK_RED}");
     }

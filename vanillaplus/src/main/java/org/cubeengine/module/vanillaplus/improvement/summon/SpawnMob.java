@@ -21,48 +21,40 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.cubeengine.butler.parameter.IncorrectUsageException;
-import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
+import org.cubeengine.libcube.util.StringUtils;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.event.cause.EventContextKeys;
-import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.SpawnTypes;
+import org.spongepowered.api.world.ServerLocation;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
 public class SpawnMob
 {
-    static Entity[] spawnMobs(CommandSource context, String mobString, Location loc, int amount, EntityMatcher em,
+    static Entity[] spawnMobs(CommandCause context, String mobString, ServerLocation loc, int amount, EntityMatcher em,
                               I18n i18n)
     {
         String[] mobStrings = StringUtils.explode(",", mobString);
         Entity[] mobs = spawnMob(context, mobStrings[0], loc, amount, null, em, i18n); // base mobs
         Entity[] ridingMobs = mobs;
-        try
+        for (int i = 1; i < mobStrings.length; ++i)
         {
-            for (int i = 1; i < mobStrings.length; ++i)
-            {
-                ridingMobs = spawnMob(context, mobStrings[i], loc, amount, ridingMobs, em, i18n);
-            }
-            return mobs;
+            ridingMobs = spawnMob(context, mobStrings[i], loc, amount, ridingMobs, em, i18n);
         }
-        catch (IncorrectUsageException e)
-        {
-            context.sendMessage(Text.of(e.getMessage()));
-            return mobs;
-        }
+        return mobs;
     }
 
-    static Entity[] spawnMob(CommandSource context, String mobString, Location loc, int amount, Entity[] ridingOn,
+    static Entity[] spawnMob(CommandCause context, String mobString, ServerLocation loc, int amount, Entity[] ridingOn,
                              EntityMatcher em, I18n i18n)
     {
         String entityName = mobString;
@@ -72,17 +64,18 @@ public class SpawnMob
         {
             return null;
         }
+        final Locale locale = context.getAudience() instanceof ServerPlayer ? ((ServerPlayer)context.getAudience()).getLocale() : Locale.getDefault();
         if (entityName.contains(":"))
         {
             entityData = Arrays.asList(StringUtils.explode(":", entityName.substring(entityName
                                                                                          .indexOf(":") + 1, entityName
                                                                                          .length())));
             entityName = entityName.substring(0, entityName.indexOf(":"));
-            entityType = em.mob(entityName, context.getLocale());
+            entityType = em.mob(entityName, locale);
         }
         else
         {
-            entityType = em.mob(entityName, context.getLocale());
+            entityType = em.mob(entityName, locale);
         }
         if (entityType == null)
         {
@@ -90,16 +83,18 @@ public class SpawnMob
             return null;
         }
         Entity[] spawnedMobs = new Entity[amount];
-        Sponge.getCauseStackManager().pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
+        Sponge.getServer().getCauseStackManager().pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
         for (int i = 0; i < amount; ++i)
         {
             //CreatureSpawnEvent
-            Entity entity = loc.getExtent().createEntity(entityType, loc.getPosition());
-            loc.getExtent().spawnEntity(entity);
+            Entity entity = loc.getWorld().createEntity(entityType, loc.getPosition());
+            loc.getWorld().spawnEntity(entity);
             spawnedMobs[i] = entity;
             if (ridingOn != null)
             {
-                ridingOn[i].addPassenger(spawnedMobs[i]);
+                final List<Entity> list = ridingOn[i].get(Keys.PASSENGERS).orElse(new ArrayList<>());
+                list.add(spawnedMobs[i]);
+                ridingOn[i].offer(Keys.PASSENGERS, list);
             }
         }
         applyDataToMob(entityData, spawnedMobs);

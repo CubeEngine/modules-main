@@ -21,47 +21,46 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.exception.SilentException;
-import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.DefaultValue;
-import org.cubeengine.butler.parameter.argument.ParserException;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.cubeengine.libcube.service.command.DefaultParameterProvider;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.matcher.StringMatcher;
-import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
+import org.spongepowered.api.command.parameter.CommandContext.Builder;
+import org.spongepowered.api.command.parameter.Parameter.Key;
+import org.spongepowered.api.command.parameter.managed.ValueParser;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Ambient;
 import org.spongepowered.api.entity.living.Hostile;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.Squid;
-import org.spongepowered.api.entity.living.Villager;
 import org.spongepowered.api.entity.living.animal.Animal;
+import org.spongepowered.api.entity.living.aquatic.Squid;
 import org.spongepowered.api.entity.living.golem.Golem;
-import org.spongepowered.api.entity.living.monster.Boss;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.entity.living.monster.boss.Boss;
+import org.spongepowered.api.entity.living.trader.Villager;
+import org.spongepowered.api.registry.RegistryTypes;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.spongepowered.api.text.format.TextColors.WHITE;
 
-public class LivingFilterParser extends PermissionContainer implements ArgumentParser<LivingFilter>, DefaultValue<LivingFilter>
+public class LivingFilterParser extends PermissionContainer implements ValueParser<LivingFilter>, DefaultParameterProvider<LivingFilter>
 {
     private I18n i18n;
     private StringMatcher sm;
@@ -88,9 +87,9 @@ public class LivingFilterParser extends PermissionContainer implements ArgumentP
     private final Predicate<Entity> FILTER_HOSTILE = entity -> entity instanceof Hostile;
     private final Predicate<Entity> FILTER_MONSTER = entity -> entity instanceof Hostile && !(entity instanceof Boss);
     private final Predicate<Entity> FILTER_BOSS = entity -> entity instanceof Boss;
-    private final Predicate<Entity> FILTER_ANIMAL = entity -> (entity instanceof Animal && !entity.get(Keys.TAMED_OWNER).isPresent()) || entity instanceof Squid;
+    private final Predicate<Entity> FILTER_ANIMAL = entity -> (entity instanceof Animal && !entity.get(Keys.TAMER).isPresent()) || entity instanceof Squid;
     private final Predicate<Entity> FILTER_NPC = entity -> entity instanceof Villager;
-    private final Predicate<Entity> FILTER_PET = entity -> entity instanceof Animal && entity.get(Keys.TAMED_OWNER).isPresent();
+    private final Predicate<Entity> FILTER_PET = entity -> entity instanceof Animal && entity.get(Keys.TAMER).isPresent();
     private final Predicate<Entity> FILTER_GOLEM = entity -> entity instanceof Golem;
     private final Predicate<Entity> FILTER_AMBIENT = entity -> entity instanceof Ambient;
 
@@ -107,61 +106,31 @@ public class LivingFilterParser extends PermissionContainer implements ArgumentP
         predicatePerms.put(FILTER_AMBIENT, PERM_AMBIENT);
     }
 
-    private Map<EntityType, Permission> typePerms = new HashMap<>();
 
+
+    @Override
+    public LivingFilter apply(CommandCause commandCause)
     {
-        for (EntityType type : Sponge.getRegistry().getAllOf(EntityType.class))
+        if (PERM_MONSTER.check(commandCause))
         {
-            Class<? extends Entity> eClass = type.getEntityClass();
-            if (Living.class.isAssignableFrom(eClass))
-            {
-                if (Hostile.class.isAssignableFrom(eClass))
-                {
-                    if (Boss.class.isAssignableFrom(eClass))
-                    {
-                        typePerms.put(type, PERM_BOSS);
-                    }
-                    else
-                    {
-                        typePerms.put(type, PERM_MONSTER);
-                    }
-                }
-                else if (Animal.class.isAssignableFrom(eClass) || Squid.class.isAssignableFrom(eClass))
-                {
-                    typePerms.put(type, PERM_ANIMAL);
-                }
-                else if (Golem.class.isAssignableFrom(eClass))
-                {
-                    typePerms.put(type, PERM_GOLEM);
-                }
-                else if (Villager.class.isAssignableFrom(eClass))
-                {
-                    typePerms.put(type, PERM_NPC);
-                }
-                else if (Ambient.class.isAssignableFrom(eClass))
-                {
-                    typePerms.put(type, PERM_AMBIENT);
-                }
-                else
-                {
-                    typePerms.put(type, PERM_ALLTYPE);
-                }
-            }
+            return new LivingFilter(singletonList(FILTER_MONSTER), commandCause.getSubject(), this);
         }
+        return null;
+        // TODO errormessage        throw new PermissionDeniedException(PERM_MONSTER);
     }
 
     @Override
-    public LivingFilter parse(Class aClass, CommandInvocation invocation) throws ParserException
+    public Optional<? extends LivingFilter> getValue(Key<? super LivingFilter> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
-        CommandSource source = (CommandSource)invocation.getCommandSource();
-        String token = invocation.consume(1);
+        final CommandCause source = context.getCause();
+        final String token = reader.parseString();
         if ("*".equals(token))
         {
             if (!source.hasPermission(PERM_ALLTYPE.getId()))
             {
-                throw new PermissionDeniedException(PERM_ALLTYPE);
+                throw reader.createException(Component.text("Missing permission"));
             }
-            return new LivingFilter(emptyList());
+            return Optional.of(new LivingFilter(emptyList(), context.getSubject(), this));
         }
 
         List<Predicate<Entity>> list = new ArrayList<>();
@@ -176,9 +145,14 @@ public class LivingFilterParser extends PermissionContainer implements ArgumentP
         groupMap.put(i18n.getTranslation(source, "golem"), FILTER_GOLEM);
         groupMap.put(i18n.getTranslation(source, "ambient"), FILTER_AMBIENT);
 
-        Map<String, EntityType> map = Sponge.getRegistry().getAllOf(EntityType.class).stream().filter(
-            type -> Living.class.isAssignableFrom(type.getEntityClass())).distinct().collect(
-            toMap(t -> t.getTranslation().get(source.getLocale()), identity()));
+        Map<String, EntityType<?>> map = new HashMap<>();
+        Sponge.getGame().registries().registry(RegistryTypes.ENTITY_TYPE).streamEntries().forEach(entry -> {
+            map.put(entry.key().asString(), entry.value());
+            if ("minecraft".equals(entry.key().getNamespace()))
+            {
+                map.put(entry.key().getValue(), entry.value());
+            }
+        });
 
         for (String part : StringUtils.explode(",", token))
         {
@@ -190,23 +164,17 @@ public class LivingFilterParser extends PermissionContainer implements ArgumentP
                 {
                     i18n.send(source, NEGATIVE, "Could not find a living entity named {input}", part);
                     i18n.send(source, NEUTRAL, "The following are valid entity groups:");
-                    List<Text> groups = groupMap.keySet().stream().map(s -> Text.of(TextColors.GRAY, s)).collect(Collectors.toList());
-                    source.sendMessage(Text.joinWith(Text.of(WHITE, ", "), groups));
+                    List<Component> groups = groupMap.keySet().stream().map(s -> Component.text(s, NamedTextColor.GRAY)).collect(Collectors.toList());
+                    final TextComponent delimiter = Component.text(", ", NamedTextColor.WHITE);
+                    source.sendMessage(Identity.nil(), Component.join(delimiter, groups));
                     i18n.send(source, NEUTRAL, "The following are valid entity types:");
-                    List<Text> types = map.keySet().stream().map(s -> Text.of(TextColors.GRAY, s)).collect(Collectors.toList());
-                    source.sendMessage(Text.joinWith(Text.of(WHITE, ", "),types));
-                    throw new SilentException();
+                    List<Component> types = map.keySet().stream().map(s -> Component.text(s, NamedTextColor.GRAY)).collect(Collectors.toList());
+                    source.sendMessage(Identity.nil(), Component.join(delimiter, types));
+                    return Optional.empty();
                 }
                 EntityType type = map.get(match);
-                Permission perm = typePerms.get(type);
-                if (!source.hasPermission(perm.getId()))
-                {
-                    throw new PermissionDeniedException(perm);
-                }
 
-                list.add(entity -> entity.getType().equals(type) &&
-                        (!entity.get(Keys.TAMED_OWNER).isPresent() ||
-                    source.hasPermission(PERM_PET.getId())));
+                list.add(entity -> entity.getType().equals(type) && (!entity.get(Keys.TAMER).isPresent() || source.hasPermission(PERM_PET.getId())));
             }
             else
             {
@@ -214,24 +182,14 @@ public class LivingFilterParser extends PermissionContainer implements ArgumentP
                 Permission perm = predicatePerms.get(predicate);
                 if (!source.hasPermission(perm.getId()))
                 {
-                    throw new PermissionDeniedException(perm);
+                    throw reader.createException(Component.text("Missing permission"));
                 }
                 list.add(predicate);
             }
         }
 
-        return new LivingFilter(list);
+        return Optional.of(new LivingFilter(list, context.getSubject(), this));
     }
 
 
-    @Override
-    public LivingFilter provide(CommandInvocation invocation)
-    {
-        CommandSource source = (CommandSource)invocation.getCommandSource();
-        if (source.hasPermission(PERM_MONSTER.getId()))
-        {
-            return new LivingFilter(singletonList(FILTER_MONSTER));
-        }
-        throw new PermissionDeniedException(PERM_MONSTER);
-    }
 }

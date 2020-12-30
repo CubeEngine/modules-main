@@ -20,6 +20,7 @@ package org.cubeengine.module.vanillaplus.improvement.removal;
 import java.util.List;
 import java.util.function.Predicate;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.Living;
 
 public class EntityFilter implements Predicate<Entity>
 {
@@ -40,6 +41,10 @@ public class EntityFilter implements Predicate<Entity>
     @Override
     public boolean test(Entity entity)
     {
+        if (entity instanceof Living)
+        {
+            return false;
+        }
         return list.stream().anyMatch(p -> p.test(entity));
     }
 

@@ -17,137 +17,136 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parameter.TooFewArgumentsException;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.TimeUtil;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.plugin.PluginContainer;
-import org.spongepowered.api.world.ChunkPreGenerate;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.plugin.PluginContainer;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 // TODO border cmds
 // TODO prevent tp out of border
 // TODO prevent portal formation out of border
 // TODO torus-world
-
+@Singleton
 @Command(name = "border", desc = "border commands")
-public class BorderCommands extends ContainerCommand
+public class BorderCommands extends DispatcherCommand
 {
     private I18n i18n;
     private PluginContainer plugin;
-    private int commandBorderMax;
+    private VanillaPlus module;
     private long taskStart;
 
-    public BorderCommands(I18n i18n, CommandManager cm, PluginContainer plugin, int commandBorderMax)
+    @Inject
+    public BorderCommands(I18n i18n, PluginContainer plugin, VanillaPlus module)
     {
-        super(cm, VanillaPlus.class);
         this.i18n = i18n;
         this.plugin = plugin;
-        this.commandBorderMax = commandBorderMax;
+        this.module = module;
     }
 
-    private ChunkPreGenerate task;
-
-    @Alias(value = "generateBorder")
-    @Command(desc = "Generates the chunks located in the border")
-    public void generate(CommandSource context, @Default World world, @Flag boolean fulltick, @Flag boolean status)
-    {
-        if (status && task != null && !task.isCancelled())
-        {
-            long timePassed = System.currentTimeMillis() - taskStart;
-            long estimateTime = timePassed / (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) * task.getTargetTotalChunks();
-
-            i18n.send(context, NEUTRAL, "Border generation for {name}:", task.getWorldProperties().getWorldName());
-            i18n.send(context, NEUTRAL, "Estimated remaining time: {}", TimeUtil.format(context.getLocale(), estimateTime - timePassed));
-            i18n.send(context, NEUTRAL, "Chunks generated {}", task.getTotalGeneratedChunks());
-            i18n.send(context, NEUTRAL, "Chunks skipped {}", task.getTotalSkippedChunks());
-            i18n.send(context, NEUTRAL, "Target count {} ({decimal:2}%)", task.getTargetTotalChunks(), 100 * (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) / task.getTargetTotalChunks());
-            return;
-        }
-        if (status)
-        {
-            i18n.send(context, NEUTRAL, "No generation is running.");
-            return;
-        }
-
-        if (task != null && !task.isCancelled())
-        {
-            task.cancel();
-            task = null;
-            i18n.send(context, NEGATIVE, "Chunk generation is already running! Canceled.");
-            return;
-        }
-
-        if (world.getWorldBorder().getDiameter() > this.commandBorderMax)
-        {
-            i18n.send(context, NEUTRAL,
-                    "Generation will not run for WorldBorder diameter bigger than {number} blocks.");
-            i18n.send(context, POSITIVE, "You can change this value in the configuration");
-            return;
-        }
-        ChunkPreGenerate.Builder generate = world.getWorldBorder().newChunkPreGenerate(world);
-        generate.owner(plugin.getInstance().get());
-        if (fulltick)
-        {
-            generate.tickPercentLimit(1);
-            generate.tickInterval(2);
-        }
-        generate.logger(plugin.getLogger());
-        i18n.send(context, NEGATIVE, "Started Chunk generation for {world}. This may take a while.", world);
-        this.task = generate.start();
-        this.taskStart = System.currentTimeMillis();
-    }
+    // TODO generator task is gone in API8 atm.
+//    private ChunkPreGenerate task;
+//
+//    @Alias(value = "generateBorder")
+//    @Command(desc = "Generates the chunks located in the border")
+//    public void generate(CommandCause context, @Default ServerWorld world, @Flag boolean fulltick, @Flag boolean status)
+//    {
+//        if (status && task != null && !task.isCancelled())
+//        {
+//            long timePassed = System.currentTimeMillis() - taskStart;
+//            long estimateTime = timePassed / (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) * task.getTargetTotalChunks();
+//
+//            i18n.send(context, NEUTRAL, "Border generation for {name}:", task.getWorldProperties().getWorldName());
+//            i18n.send(context, NEUTRAL, "Estimated remaining time: {}", TimeUtil.format(context.getLocale(), estimateTime - timePassed));
+//            i18n.send(context, NEUTRAL, "Chunks generated {}", task.getTotalGeneratedChunks());
+//            i18n.send(context, NEUTRAL, "Chunks skipped {}", task.getTotalSkippedChunks());
+//            i18n.send(context, NEUTRAL, "Target count {} ({decimal:2}%)", task.getTargetTotalChunks(), 100 * (task.getTotalSkippedChunks() + task.getTotalGeneratedChunks()) / task.getTargetTotalChunks());
+//            return;
+//        }
+//        if (status)
+//        {
+//            i18n.send(context, NEUTRAL, "No generation is running.");
+//            return;
+//        }
+//
+//        if (task != null && !task.isCancelled())
+//        {
+//            task.cancel();
+//            task = null;
+//            i18n.send(context, NEGATIVE, "Chunk generation is already running! Canceled.");
+//            return;
+//        }
+//
+//        if (world.getWorldBorder().getDiameter() > this.commandBorderMax)
+//        {
+//            i18n.send(context, NEUTRAL,
+//                    "Generation will not run for WorldBorder diameter bigger than {number} blocks.");
+//            i18n.send(context, POSITIVE, "You can change this value in the configuration");
+//            return;
+//        }
+//        ChunkPreGenerate.Builder generate = world.getBorder().newChunkPreGenerate(world);
+//        generate.owner(plugin.getInstance().get());
+//        if (fulltick)
+//        {
+//            generate.tickPercentLimit(1);
+//            generate.tickInterval(2);
+//        }
+//        generate.logger(plugin.getLogger());
+//        i18n.send(context, NEGATIVE, "Started Chunk generation for {world}. This may take a while.", world);
+//        this.task = generate.start();
+//        this.taskStart = System.currentTimeMillis();
+//    }
 
     @Command(desc = "Sets the center for the worldborder", alias = "center")
-    public void setCenter(CommandSource context, @Optional Integer x, @Optional Integer z, @Default @Named("in") World world)
+    public void setCenter(CommandCause context, @Option Vector2i pos, @Default @Named("in") ServerWorld world)
     {
-        if (x == null || z == null)
+        if (pos == null)
         {
-            if (context instanceof Player && x == null && z == null)
+            if (context instanceof Player)
             {
                 Vector3d position = ((Player)context).getLocation().getPosition();
-                x = position.getFloorX();
-                z = position.getFloorZ();
+                pos = new Vector2i(position.getX(), position.getZ());
             }
             else
             {
-                throw new TooFewArgumentsException();
+                i18n.send(context, CRITICAL,"Too few arguments!");
+                return;
             }
         }
-        world.getWorldBorder().setCenter(x + 0.5, z + 0.5);
-        i18n.send(context, POSITIVE, "Set world border of {world} center to {}:{}", world, x, z);
+        world.getBorder().setCenter(pos.getX() + 0.5, pos.getY() + 0.5);
+        i18n.send(context, POSITIVE, "Set world border of {world} center to {vector}", world, pos);
     }
 
     @Command(desc = "Sets the diameter of the worldborder", alias = "set")
-    public void setDiameter(CommandSource context, Integer size, @Optional Integer seconds, @Default @Named("in") World world)
+    public void setDiameter(CommandCause context, int size, @Option Integer seconds, @Default @Named("in") ServerWorld world)
     {
         if (seconds == null)
         {
-            world.getWorldBorder().setDiameter(size);
+            world.getBorder().setDiameter(size);
             i18n.send(context, POSITIVE, "Set world border of {world} to {} blocks wide", world, size);
         }
         else
         {
-            int prevDiameter = (int) world.getWorldBorder().getDiameter();
-            world.getWorldBorder().setDiameter(size, seconds * 1000);
+            int prevDiameter = (int) world.getBorder().getDiameter();
+            world.getBorder().setDiameter(size, seconds, ChronoUnit.SECONDS);
             if (size < prevDiameter)
             {
                 i18n.send(context, POSITIVE, "Shrinking world border of {world} to {} blocks wide from {} over {} seconds",
@@ -162,33 +161,33 @@ public class BorderCommands extends ContainerCommand
     }
 
     @Command(desc = "Sets the diameter of the worldborder")
-    public void add(CommandSource context, Integer size, @Optional Integer time, @Default @Named("in") World world)
+    public void add(CommandCause context, Integer size, @Option Integer time, @Default @Named("in") ServerWorld world)
     {
-        this.setDiameter(context, size + (int)world.getWorldBorder().getDiameter(), time, world);
+        this.setDiameter(context, size + (int)world.getBorder().getDiameter(), time, world);
     }
 
     @Command(desc = "Sets the warning time")
-    public void warningTime(CommandSource context, Integer seconds, @Default World world)
+    public void warningTime(CommandCause context, int seconds, @Default ServerWorld world)
     {
-        world.getWorldBorder().setWarningTime(seconds);
+        world.getBorder().setWarningTime(seconds, ChronoUnit.SECONDS);
         i18n.send(context, POSITIVE, "Set world border of {world} warning to {} seconds away", world, seconds);
     }
 
     @Command(desc = "Sets the warning time")
-    public void warningDistance(CommandSource context, Integer blocks, @Default World world)
+    public void warningDistance(CommandCause context, int blocks, @Default ServerWorld world)
     {
-        world.getWorldBorder().setWarningDistance(blocks);
+        world.getBorder().setWarningDistance(blocks);
         i18n.send(context, POSITIVE, "Set world border of {world} warning to {} blocks away", world, blocks);
     }
 
     @Command(desc = "Shows information about the world border", alias = "get")
-    public void info(CommandSource context, @Default World world)
+    public void info(CommandCause context, @Default ServerWorld world)
     {
-        WorldBorder border = world.getWorldBorder();
+        WorldBorder border = world.getBorder();
         double diameter = border.getDiameter();
         i18n.send(context, POSITIVE, "The world border in {world} is currently {} blocks wide", world,
                             diameter);
-        long secondsRemaining = border.getTimeRemaining() / 1000;
+        long secondsRemaining = border.getTimeRemaining().get(ChronoUnit.SECONDS);
         if (secondsRemaining != 0)
         {
             double newDiameter = border.getNewDiameter();
@@ -208,16 +207,16 @@ public class BorderCommands extends ContainerCommand
     }
 
     @Command(desc = "Sets the world border damage per second per block")
-    public void damage(CommandSource context, Double damage, @Default World world)
+    public void damage(CommandCause context, Double damage, @Default ServerWorld world)
     {
-        world.getWorldBorder().setDamageAmount(damage);
+        world.getBorder().setDamageAmount(damage);
         i18n.send(context, POSITIVE, "Set world border of {world} damage to {} per block per second", world, damage);
     }
 
     @Command(desc = "Sets the world border damage buffer")
-    public void damageBuffer(CommandSource context, Integer blocks, @Default World world)
+    public void damageBuffer(CommandCause context, Integer blocks, @Default ServerWorld world)
     {
-        world.getWorldBorder().setDamageThreshold(blocks);
+        world.getBorder().setDamageThreshold(blocks);
         i18n.send(context, POSITIVE, "Set world border of {world} damage buffer to {} block", world, blocks);
     }
 }

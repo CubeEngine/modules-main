@@ -19,22 +19,23 @@ package org.cubeengine.module.vanillaplus.improvement.removal;
 
 import java.util.Collection;
 import java.util.List;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.ParameterRegistry;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Label;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.cubeengine.libcube.service.matcher.MaterialMatcher;
-import org.spongepowered.api.command.CommandSource;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.Living;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import static java.util.stream.Collectors.toList;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -42,38 +43,41 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 /**
  * A command to remove non-living entities
  */
+@Singleton
 public class RemoveCommands
 {
     public static final int RADIUS_INFINITE = -1;
     private final VanillaPlus module;
     private I18n i18n;
 
-    public RemoveCommands(VanillaPlus module, EntityMatcher em, MaterialMatcher mm, I18n i18n, CommandManager cm)
+    @Inject
+    public RemoveCommands(VanillaPlus module, EntityMatcher em, MaterialMatcher mm, I18n i18n)
     {
         this.i18n = i18n;
         this.module = module;
-        cm.getProviders().register(module, new EntityFilterParser(i18n, em, mm), EntityFilter.class);
+        ParameterRegistry.register(EntityFilter.class, new EntityFilterParser(i18n, em, mm));
     }
 
     @Command(desc = "Removes entities in a world")
-    public void removeAll(CommandSource context, @Label("entityType[:itemMaterial]") EntityFilter filters, @Default @Named("in") World world)
+    public void removeAll(CommandCause context, @Label("entityType[:itemMaterial]") EntityFilter filters, @Default @Named("in") ServerWorld world)
     {
         this.remove(context, filters, RADIUS_INFINITE, world);
     }
 
     @Command(desc = "Removes entities in a radius")
-    public void remove(CommandSource context, @Label("entityType[:itemMaterial]") EntityFilter filters, @Optional Integer radius, @Default @Named("in") World world)
+    public void remove(CommandCause context, @Label("entityType[:itemMaterial]") EntityFilter filters, @Option Integer radius, @Default @Named("in") ServerWorld world)
     {
-        radius = radius == null ? context instanceof Player ? (module.getConfig().improve.commandRemoveDefaultRadius ) : - 1 : radius;
+        final boolean isPlayer = context.getSubject() instanceof ServerPlayer;
+        radius = radius == null ? isPlayer ? (module.getConfig().improve.commandRemoveDefaultRadius ) : - 1 : radius;
         if (radius <= 0 && radius != RADIUS_INFINITE)
         {
             i18n.send(context, NEGATIVE, "The radius has to be a whole number greater than 0!");
             return;
         }
-        Location loc = context instanceof Player ? ((Player)context).getLocation() : null;
-        if (loc != null && !loc.getExtent().equals(world))
+        ServerLocation loc = isPlayer ? ((ServerPlayer)context).getServerLocation() : null;
+        if (loc != null && !loc.getWorld().equals(world))
         {
-            loc = world.getSpawnLocation();
+            loc = world.getLocation(world.getProperties().getSpawnPosition());
         }
         int entitiesRemoved;
         List<Entity> list = world.getEntities().stream().filter(filters).collect(toList());
@@ -103,7 +107,7 @@ public class RemoveCommands
     }
 
 
-    private int removeEntities(Collection<Entity> list, Location loc, int radius)
+    private int removeEntities(Collection<Entity> list, ServerLocation loc, int radius)
     {
         if (radius != -1 && loc == null)
         {
@@ -114,17 +118,11 @@ public class RemoveCommands
         return (int)list.stream().filter(e -> {
             if (!all)
             {
-                Location<World> eLoc = e.getLocation();
+                ServerLocation eLoc = e.getServerLocation();
                 int distance = (int)(eLoc.getPosition().sub(loc.getPosition())).lengthSquared();
-                if (radiusSquared < distance)
-                {
-                    return false;
-                }
+                return radiusSquared >= distance;
             }
             return true;
-        }).map(e -> {
-            e.remove();
-            return e;
-        }).count();
+        }).peek(Entity::remove).count();
     }
 }

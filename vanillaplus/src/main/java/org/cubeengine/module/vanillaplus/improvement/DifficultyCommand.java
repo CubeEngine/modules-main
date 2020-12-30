@@ -17,37 +17,41 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.world.difficulty.Difficulty;
+import org.spongepowered.api.world.server.ServerWorld;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
+@Singleton
 public class DifficultyCommand
 {
     private I18n i18n;
 
+    @Inject
     public DifficultyCommand(I18n i18n)
     {
         this.i18n = i18n;
     }
 
     @Command(desc = "Changes the difficulty level of the server")
-    public void difficulty(CommandSource context, @Optional Difficulty difficulty,
-                           @Default @Named({"world", "w", "in"}) World world)
+    public void difficulty(CommandCause context, @Option Difficulty difficulty,
+                           @Default @Named({"world", "w", "in"}) ServerWorld world)
     {
         if (difficulty != null)
         {
             world.getProperties().setDifficulty(difficulty);
-            i18n.send(context, POSITIVE, "The difficulty has been set to {input}!", difficulty.getTranslation());
+            i18n.send(context, POSITIVE, "The difficulty has been set to {text}!", difficulty.asComponent());
             return;
         }
-        i18n.send(context, POSITIVE, "Current difficulty level: {input}", world.getDifficulty().getTranslation());
+        i18n.send(context, POSITIVE, "Current difficulty level: {text}", world.getDifficulty().asComponent());
         if (world.getProperties().isHardcore())
         {
             i18n.send(context, POSITIVE, "The world {world} has the hardcore mode enabled.", world);

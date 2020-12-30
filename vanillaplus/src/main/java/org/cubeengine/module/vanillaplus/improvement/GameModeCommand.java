@@ -17,28 +17,32 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Optional;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.data.key.Keys.GAME_MODE;
 import static org.spongepowered.api.entity.living.player.gamemode.GameModes.*;
 
+@Singleton
 public class GameModeCommand extends PermissionContainer
 {
     private I18n i18n;
 
     public final Permission COMMAND_GAMEMODE_OTHER = register("command.gamemode.other", "Allows to change the game-mode of other players too");
 
+    @Inject
     public GameModeCommand(PermissionManager pm, I18n i18n)
     {
         super(pm, VanillaPlus.class);
@@ -47,7 +51,7 @@ public class GameModeCommand extends PermissionContainer
 
     // TODO completer
     @Command(alias = "gm", desc = "Changes the gamemode")
-    public void gamemode(CommandSource context, @Optional String gamemode, @Default User player)
+    public void gamemode(CommandCause context, @Option String gamemode, @Default User player)
     {
         if (!context.getIdentifier().equals(player.getIdentifier())
             && !context.hasPermission(COMMAND_GAMEMODE_OTHER.getId()))
@@ -58,18 +62,18 @@ public class GameModeCommand extends PermissionContainer
         GameMode newMode = getGameMode(gamemode);
         if (newMode == null)
         {
-            newMode = toggleGameMode(player.get(GAME_MODE).get());
+            newMode = toggleGameMode(player.get(Keys.GAME_MODE).get());
         }
-        player.offer(GAME_MODE, newMode);
-        if (context.equals(player))
+        player.offer(Keys.GAME_MODE, newMode);
+        if (context.getSubject().equals(player))
         {
-            i18n.send(context, POSITIVE, "You changed your game mode to {input#gamemode}!", newMode.getTranslation());
+            i18n.send(context, POSITIVE, "You changed your game mode to {text#gamemode}!", newMode.asComponent());
             return;
         }
-        i18n.send(context, POSITIVE, "You changed the game mode of {user} to {input#gamemode}!", player, newMode.getTranslation());
+        i18n.send(context, POSITIVE, "You changed the game mode of {user} to {text#gamemode}!", player, newMode.asComponent());
         if (player.isOnline())
         {
-            i18n.send(player.getPlayer().get(), NEUTRAL, "Your game mode has been changed to {input#gamemode}!", newMode.getName());
+            i18n.send(player.getPlayer().get(), NEUTRAL, "Your game mode has been changed to {text#gamemode}!", newMode.asComponent());
         }
 
     }
@@ -85,18 +89,18 @@ public class GameModeCommand extends PermissionContainer
             case "survival":
             case "s":
             case "0":
-                return SURVIVAL;
+                return SURVIVAL.get();
             case "creative":
             case "c":
             case "1":
-                return CREATIVE;
+                return CREATIVE.get();
             case "adventure":
             case "a":
             case "2":
-                return ADVENTURE;
+                return ADVENTURE.get();
             case "spectator":
             case "3":
-                return SPECTATOR;
+                return SPECTATOR.get();
             default:
                 return null;
         }
@@ -105,12 +109,12 @@ public class GameModeCommand extends PermissionContainer
 
     private GameMode toggleGameMode(GameMode mode)
     {
-        if (mode == SURVIVAL)
+        if (mode == SURVIVAL.get())
         {
-            return CREATIVE;
+            return CREATIVE.get();
         }
         //if (mode == ADVENTURE || mode == CREATIVE)
-        return SURVIVAL;
+        return SURVIVAL.get();
     }
 
 }

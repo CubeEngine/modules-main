@@ -17,41 +17,43 @@
  */
 package org.cubeengine.module.vanillaplus.addition;
 
-import static java.text.DateFormat.SHORT;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NONE;
-
-import com.flowpowered.math.vector.Vector3i;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.util.TimeUtil;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.data.manipulator.mutable.entity.InvulnerabilityData;
-import org.spongepowered.api.data.manipulator.mutable.entity.JoinData;
-import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.service.ban.BanService;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.util.ban.Ban.Profile;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-
 import java.text.DateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Date;
+import java.util.Locale;
 import java.util.Optional;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.text.Component;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.util.TimeUtil;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.service.ban.Ban;
+import org.spongepowered.api.service.ban.BanService;
+import org.spongepowered.api.util.Ticks;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.math.vector.Vector3i;
 
+import static java.text.DateFormat.SHORT;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
+
+@Singleton
 public class PlayerInfoCommands
 {
     private I18n i18n;
 
+    @Inject
     public PlayerInfoCommands(I18n i18n)
     {
         this.i18n = i18n;
@@ -60,7 +62,7 @@ public class PlayerInfoCommands
     private static final long SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
     @Command(desc = "Shows when given player was online the last time")
-    public void seen(CommandSource context, User player)
+    public void seen(CommandCause context, User player)
     {
         if (player.isOnline())
         {
@@ -68,25 +70,35 @@ public class PlayerInfoCommands
             return;
         }
 
-        Instant lastPlayed = player.get(Keys.FIRST_DATE_PLAYED).orElse(null);
+        Instant lastPlayed = player.get(Keys.FIRST_DATE_JOINED).orElse(null);
         if (lastPlayed == null)
         {
             i18n.send(context, NEGATIVE, "User has not played here yet.");
             return;
         }
+        final Locale locale = getLocale(context);
         if (System.currentTimeMillis() - lastPlayed.toEpochMilli() <= SEVEN_DAYS) // If less than 7 days show timeframe instead of date
         {
-            i18n.send(context, NEUTRAL, "{user} was last seen {input#date}.", player, TimeUtil.format(
-                context.getLocale(), new Date(lastPlayed.toEpochMilli())));
+            i18n.send(context, NEUTRAL, "{user} was last seen {input#date}.", player,
+                      TimeUtil.format(locale, new Date(lastPlayed.toEpochMilli())));
             return;
         }
         Date date = new Date(lastPlayed.toEpochMilli());
-        DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale());
+        DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, locale);
         i18n.send(context, NEUTRAL, "{user} is offline since {input#time}", player, format.format(date));
     }
 
+    private Locale getLocale(CommandCause context)
+    {
+        if (context.getSubject() instanceof ServerPlayer)
+        {
+            return ((ServerPlayer)context.getSubject()).getLocale();
+        }
+        return Locale.getDefault();
+    }
+
     @Command(desc = "Displays informations from a player!")
-    public void whois(CommandSource context, User player)
+    public void whois(CommandCause context, User player)
     {
         if (player.isOnline())
         {
@@ -96,7 +108,8 @@ public class PlayerInfoCommands
         {
             i18n.send(context, NEUTRAL, "Nickname: {user} ({text:offline})", player);
         }
-        if (player.get(JoinData.class).isPresent() || player.isOnline())
+        final Locale locale = getLocale(context);
+        if (player.get(Keys.FIRST_DATE_JOINED).isPresent() || player.isOnline())
         {
             i18n.send(context, NEUTRAL, "Life: {decimal:0}/{decimal#max:0}", player.get(Keys.HEALTH).get(), player.get(Keys.MAX_HEALTH).get());
             i18n.send(context, NEUTRAL, "Hunger: {integer#foodlvl:0}/{text:20} ({integer#saturation}/{integer#foodlvl:0})", player.get(Keys.FOOD_LEVEL).get(), player.get(Keys.SATURATION).get().intValue(), player.get(Keys.FOOD_LEVEL).get());
@@ -104,8 +117,8 @@ public class PlayerInfoCommands
 
             if (player.isOnline())
             {
-                Location<World> loc = player.getPlayer().get().getLocation();
-                i18n.send(context, NEUTRAL, "Position: {vector} in {world}", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getExtent());
+                ServerLocation loc = player.getPlayer().get().getServerLocation();
+                i18n.send(context, NEUTRAL, "Position: {vector} in {world}", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getWorld());
             }
             if (player.isOnline())
             {
@@ -114,7 +127,7 @@ public class PlayerInfoCommands
             Optional<GameMode> gameMode = player.get(Keys.GAME_MODE);
             if (gameMode.isPresent())
             {
-                i18n.send(context, NEUTRAL, "Gamemode: {input#gamemode}", gameMode.get().getTranslation());
+                i18n.send(context, NEUTRAL, "Gamemode: {text#gamemode}", gameMode.get().asComponent());
             }
             if (player.get(Keys.CAN_FLY).orElse(false))
             {
@@ -132,8 +145,9 @@ public class PlayerInfoCommands
 
             if (!gameMode.isPresent() || !gameMode.get().equals(GameModes.CREATIVE))
             {
-                Optional<InvulnerabilityData> data = player.get(InvulnerabilityData.class);
-                if (data.isPresent())
+                final Optional<Boolean> invulnerable = player.get(Keys.INVULNERABLE);
+                final Optional<Ticks> ticksInvulnerable = player.get(Keys.INVULNERABILITY_TICKS);
+                if (invulnerable.isPresent() || ticksInvulnerable.isPresent())
                 {
                     i18n.send(context, NEUTRAL, "is invulnerable");
                 }
@@ -144,28 +158,28 @@ public class PlayerInfoCommands
                 i18n.sendTranslated(context, NEUTRAL, "AFK: {text:true:color=BRIGHT_GREEN}");
             }
             */
-            String format = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(context.getLocale())
+            String format = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(locale)
                                              .withZone(ZoneId.systemDefault())
-                                             .format(player.get(Keys.FIRST_DATE_PLAYED).get());
+                                             .format(player.get(Keys.FIRST_DATE_JOINED).get());
             i18n.send(context, NEUTRAL, "First played: {input#date}", format);
         }
-        BanService banService = Sponge.getServiceManager().provideUnchecked(BanService.class);
+        final BanService banService = Sponge.getServer().getServiceProvider().banService();
         if (banService.isBanned(player.getProfile()))
         {
-            Profile ban = banService.getBanFor(player.getProfile()).get();
-            Text expires;
-            DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, context.getLocale());
+            final Ban.Profile ban = banService.getBanFor(player.getProfile()).get();
+            Component expires;
+            DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, locale);
 
             if (!ban.getExpirationDate().isPresent())
             {
-                expires = i18n.translate(context, NONE, "for ever");
+                expires = i18n.translate(context, "for ever");
             }
             else
             {
-                expires = Text.of(format.format(ban.getExpirationDate().get()));
+                expires = Component.text(format.format(ban.getExpirationDate().get()));
             }
-            i18n.send(context, NEUTRAL, "Banned by {user} on {input#date}: {input#reason} ({input#expire})",
-                                ban.getBanSource().map(Text::toPlain).orElse("?"), format.format(ban.getCreationDate()),
+            i18n.send(context, NEUTRAL, "Banned by {text#source} on {input#date}: {input#reason} ({input#expire})",
+                                ban.getBanSource().orElse(Component.text("?")), format.format(ban.getCreationDate()),
                                 ban.getReason(), expires);
         }
     }

@@ -17,24 +17,27 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
-import org.cubeengine.libcube.service.command.exception.PermissionDeniedException;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.item.inventory.equipment.EquipmentInventory;
-import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
-import org.spongepowered.api.item.inventory.type.InventoryRow;
+import org.spongepowered.api.item.inventory.entity.StandardInventory;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
+/**
+ * <p>/clearinventory
+ */
+@Singleton
 public class ClearInventoryCommand extends PermissionContainer
 {
     public final Permission COMMAND_CLEARINVENTORY_OTHER = register("command.clearinventory.notify",
@@ -48,7 +51,7 @@ public class ClearInventoryCommand extends PermissionContainer
 
     private I18n i18n;
 
-
+    @Inject
     public ClearInventoryCommand(PermissionManager pm, I18n i18n)
     {
         super(pm, VanillaPlus.class);
@@ -57,9 +60,9 @@ public class ClearInventoryCommand extends PermissionContainer
 
 
     @Command(alias = {"ci", "clear"}, desc = "Clears the inventory")
-    public void clearinventory(CommandSource context, @Default User player,
-                               @Flag(longName = "removeArmor", name = "ra") boolean removeArmor,
-                               @ParameterPermission(value = "quiet", desc = "Prevents the other player being notified when his inventory got cleared")
+    public void clearinventory(CommandCause context, @Default User player,
+                               @Flag(longName = "armor", value = "a") boolean removeArmor,
+                               @ParameterPermission // TODO permission description (value = "quiet", desc = "Prevents the other player being notified when his inventory got cleared")
                                     @Flag boolean quiet,
                                @Flag boolean force)
     {
@@ -69,7 +72,8 @@ public class ClearInventoryCommand extends PermissionContainer
         {
             if (!context.hasPermission(COMMAND_CLEARINVENTORY_OTHER.getId()))
             {
-                throw new PermissionDeniedException(COMMAND_CLEARINVENTORY_OTHER);
+                i18n.send(context, NEGATIVE, "Permission denied");
+                return;
             }
             if (player.hasPermission(COMMAND_CLEARINVENTORY_PREVENT.getId())
                 && !(force && context.hasPermission(COMMAND_CLEARINVENTORY_FORCE.getId())))
@@ -78,10 +82,13 @@ public class ClearInventoryCommand extends PermissionContainer
                 return;
             }
         }
-        player.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(InventoryRow.class)).clear();
+
+        StandardInventory playerInventory = player.isOnline() ? player.getPlayer().get().getInventory() : player.getInventory();
+        playerInventory.getStorage().clear();
         if (removeArmor)
         {
-            player.getInventory().query(QueryOperationTypes.INVENTORY_TYPE.of(EquipmentInventory.class)).clear();
+            playerInventory.getArmor().clear();
+            playerInventory.getOffhand().clear();
         }
         if (self)
         {

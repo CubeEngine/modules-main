@@ -18,26 +18,31 @@
 package org.cubeengine.module.vanillaplus.addition;
 
 import java.util.Collection;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Optional;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import org.cubeengine.libcube.service.Broadcaster;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.permission.PermissionContainer;
-import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.libcube.service.command.parser.PlayerList;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.text.format.TextColors.GREEN;
-import static org.spongepowered.api.text.format.TextFormat.NONE;
 
+@Singleton
 public class FoodCommands extends PermissionContainer
 {
 
@@ -47,6 +52,7 @@ public class FoodCommands extends PermissionContainer
     public final Permission COMMAND_FEED_OTHER = register("command.feed.other", "", null);
     public final Permission COMMAND_STARVE_OTHER = register("command.starve.other", "", null);
 
+    @Inject
     public FoodCommands(PermissionManager pm, I18n i18n, Broadcaster bc)
     {
         super(pm, VanillaPlus.class);
@@ -55,7 +61,7 @@ public class FoodCommands extends PermissionContainer
     }
 
     @Command(desc = "Refills your hunger bar")
-    public void feed(CommandSource context, @Optional PlayerList players)
+    public void feed(CommandCause context, @Option Collection<ServerPlayer> players)
     {
         if (players == null)
         {
@@ -76,40 +82,43 @@ public class FoodCommands extends PermissionContainer
             i18n.send(context, NEGATIVE, "You are not allowed to feed other players!");
             return;
         }
-        Collection<Player> userList = players.list();
-        if (players.isAll())
+
+        boolean all = players.containsAll(Sponge.getServer().getOnlinePlayers());
+        if (all)
         {
-            if (userList.isEmpty())
+            if (players.isEmpty())
             {
                 i18n.send(context, NEGATIVE, "There are no players online at the moment!");
+                return;
             }
             i18n.send(context, POSITIVE, "You made everyone fat!");
-            bc.broadcastStatus(NONE.color(GREEN), "shared food with everyone.", context);
+            bc.broadcastStatus(Style.style(NamedTextColor.GREEN), "shared food with everyone.", context);
         }
         else
         {
-            i18n.send(context, POSITIVE, "Fed {amount} players!", userList.size());
+            i18n.send(context, POSITIVE, "Fed {amount} players!", players.size());
         }
-        for (Player user : userList)
+
+        for (ServerPlayer player : players)
         {
-            if (!players.isAll())
+            if (!all)
             {
-                i18n.send(user, POSITIVE, "You got fed by {user}!", context);
+                i18n.send(player, POSITIVE, "You got fed by {user}!", context);
             }
-            user.offer(Keys.FOOD_LEVEL, 20);
-            user.offer(Keys.SATURATION, 20.0);
-            user.offer(Keys.EXHAUSTION, 0.0);
+            player.offer(Keys.FOOD_LEVEL, 20);
+            player.offer(Keys.SATURATION, 20.0);
+            player.offer(Keys.EXHAUSTION, 0.0);
         }
     }
 
     @Command(desc = "Empties the hunger bar")
-    public void starve(CommandSource context, @Optional PlayerList players)
+    public void starve(CommandCause context, @Option Collection<ServerPlayer> players)
     {
         if (players == null)
         {
             if (!(context instanceof Player))
             {
-                context.sendMessage(Text.of("\n\n\n\n\n\n\n\n\n\n\n\n\n"));
+                context.sendMessage(Identity.nil(), Component.text("\n\n\n\n\n\n\n\n\n\n\n\n\n"));
                 i18n.send(context, NEGATIVE, "I'll give you only one line to eat!");
                 return;
             }
@@ -125,10 +134,11 @@ public class FoodCommands extends PermissionContainer
             i18n.send(context, NEGATIVE, "You are not allowed to let other players starve!");
             return;
         }
-        Collection<Player> userList = players.list();
-        if (players.isAll())
+
+        boolean all = players.containsAll(Sponge.getServer().getOnlinePlayers());
+        if (all)
         {
-            if (userList.isEmpty())
+            if (players.isEmpty())
             {
                 i18n.send(context, NEGATIVE, "There are no players online at the moment!");
                 return;
@@ -138,17 +148,17 @@ public class FoodCommands extends PermissionContainer
         }
         else
         {
-            i18n.send(context, POSITIVE, "Starved {amount} players!", userList.size());
+            i18n.send(context, POSITIVE, "Starved {amount} players!", players.size());
         }
-        for (Player user : userList)
+        for (ServerPlayer player : players)
         {
-            if (!players.isAll())
+            if (!all)
             {
-                i18n.send(user, NEUTRAL, "You are suddenly starving!");
+                i18n.send(player, NEUTRAL, "You are suddenly starving!");
             }
-            user.offer(Keys.FOOD_LEVEL, 0);
-            user.offer(Keys.SATURATION, 0.0);
-            user.offer(Keys.EXHAUSTION, 4.0);
+            player.offer(Keys.FOOD_LEVEL, 0);
+            player.offer(Keys.SATURATION, 0.0);
+            player.offer(Keys.EXHAUSTION, 4.0);
         }
     }
 }

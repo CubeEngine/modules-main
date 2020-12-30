@@ -17,96 +17,54 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.argument.Completer;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.storage.WorldProperties;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.util.Ticks;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.weather.Weather;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Commands changing time. /time /ptime
  */
+@Singleton
 public class WeatherCommands
 {
     private I18n i18n;
 
-    public WeatherCommands(I18n i18n, CommandManager cm)
+    @Inject
+    public WeatherCommands(I18n i18n)
     {
         this.i18n = i18n;
-        cm.getProviders().register(this, new WeatherCompleter(), Weather.class);
-    }
-
-    public enum Weather // TODO completer
-    {
-        SUN, RAIN, STORM
-    }
-
-    public class WeatherCompleter implements Completer
-    {
-        @Override
-        public List<String> suggest(Class type, CommandInvocation invocation)
-        {
-            ArrayList<String> list = new ArrayList<>();
-            String token = invocation.currentToken();
-            for (Weather weather : Weather.values()) {
-                if (weather.name().toLowerCase().startsWith(token.toLowerCase())) {
-                    list.add(weather.name().toLowerCase());
-                }
-            }
-            return list;
-        }
     }
 
     @Command(desc = "Changes the weather")
-    public void weather(CommandSource context, Weather weather, @Optional Integer duration, @Default @Named("in") World world)
+    public void weather(CommandCause context, Weather weather, @Option Integer duration, @Default @Named("in") ServerWorld world)
     {
-        boolean sunny = true;
-        boolean noThunder = true;
         duration = (duration == null ? 10000000 : duration) * 20;
-        switch (weather)
-        {
-            case SUN:
-                sunny = true;
-                noThunder = true;
-                break;
-            case RAIN:
-                sunny = false;
-                noThunder = true;
-                break;
-            case STORM:
-                sunny = false;
-                noThunder = false;
-                break;
-        }
 
-        WorldProperties worldProp = world.getProperties();
-        if (worldProp.isThundering() != noThunder && worldProp.isRaining() != sunny) // weather is not changing
+        final Weather currentWeather = world.getWeather();
+        final String weatherKey = Sponge.getGame().registries().registry(RegistryTypes.WEATHER).valueKey(weather).getValue();
+        if (currentWeather == weather) // weather is not changing
         {
-            i18n.send(context, POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weather.name());
+
+            i18n.send(context, POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weatherKey);
         }
         else
         {
-            i18n.send(context, POSITIVE, "Changed weather in {world} to {input#weather}!", world, weather.name());
+            i18n.send(context, POSITIVE, "Changed weather in {world} to {input#weather}!", world, weatherKey);
         }
-        worldProp.setRaining(!sunny);
-        worldProp.setThundering(!noThunder);
-        worldProp.setRainTime(duration);
-    }
 
-    public enum PlayerWeather
-    {
-        SUN, RAIN, RESET
+        world.setWeather(weather, Ticks.of(duration));
     }
 
     /* TODO wait for https://github.com/SpongePowered/SpongeAPI/issues/393

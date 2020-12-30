@@ -17,72 +17,26 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
-import java.util.Optional;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.data.DataRegistration;
+import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
+import org.spongepowered.api.util.TypeTokens;
 
-import com.google.gson.reflect.TypeToken;
-import org.spongepowered.api.data.DataContainer;
-import org.spongepowered.api.data.DataHolder;
-import org.spongepowered.api.data.DataQuery;
-import org.spongepowered.api.data.key.Key;
-import org.spongepowered.api.data.manipulator.mutable.common.AbstractBooleanData;
-import org.spongepowered.api.data.merge.MergeFunction;
-import org.spongepowered.api.data.value.mutable.Value;
-
-public class SafeLoginData extends AbstractBooleanData<SafeLoginData, ImmutableSafeLoginData>
+public interface SafeLoginData
 {
 
-    public final static Key<Value<Boolean>> FLYMODE = Key.builder().type(new TypeToken<Value<Boolean>>() {}).id("flymode")
-                                                         .name("Flymode on Login").query(DataQuery.of("flymode")).build();
+    Key<Value<Boolean>> FLYMODE = Key.builder()
+//         .key(ResourceKey.of(PluginVanillaPlus.VANILLAPLUS_ID, "flymore"))
+         .type(TypeTokens.BOOLEAN_VALUE_TOKEN).build();
 
-    public SafeLoginData(Boolean value)
+    static void register(RegisterDataEvent event)
     {
-        super(value, FLYMODE, false);
+        final DataRegistration registration = DataRegistration.of(FLYMODE, ServerPlayer.class, User.class);
+        event.register(registration);
     }
 
-    @Override
-    public ImmutableSafeLoginData asImmutable()
-    {
-        return new ImmutableSafeLoginData(getValue());
-    }
-
-    @Override
-    public Optional<SafeLoginData> fill(DataHolder dataHolder, MergeFunction overlap)
-    {
-        Optional<Boolean> flymode = dataHolder.get(FLYMODE);
-        if (flymode.isPresent())
-        {
-            SafeLoginData data = new SafeLoginData(flymode.get());
-            overlap.merge(this, data);
-            if (data != this)
-            {
-                this.setValue(flymode.get());
-            }
-            return Optional.of(this);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public Optional<SafeLoginData> from(DataContainer container)
-    {
-        Optional<Boolean> flymode = container.getBoolean(FLYMODE.getQuery());
-        if (flymode.isPresent())
-        {
-            this.setValue(flymode.get());
-            return Optional.of(this);
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public SafeLoginData copy()
-    {
-        return new SafeLoginData(getValue());
-    }
-
-    @Override
-    public int getContentVersion()
-    {
-        return 1;
-    }
 }

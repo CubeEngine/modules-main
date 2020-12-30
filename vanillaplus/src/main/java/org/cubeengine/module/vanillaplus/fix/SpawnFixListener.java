@@ -17,42 +17,33 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
-import com.flowpowered.math.vector.Vector3d;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.i18n.formatter.MessageType;
-import org.spongepowered.api.entity.Transform;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 
 public class SpawnFixListener
 {
-    private I18n i18n;
-
-    public SpawnFixListener(I18n i18n)
-    {
-        this.i18n = i18n;
-    }
-
     @Listener
-    public void join(final ClientConnectionEvent.Login event)
+    public void join(final ServerSideConnectionEvent.Login event)
     {
-        Transform<World> playerLoc = event.getToTransform();
-        WorldBorder border = playerLoc.getExtent().getWorldBorder();
+        final ServerLocation toLocation = event.getToLocation();
+        final ServerWorld toWorld = toLocation.getWorld();
+        final WorldBorder border = toWorld.getBorder();
         Vector3d center = border.getCenter();
         double radius = border.getDiameter() / 2;
         double minX = center.getX() - radius;
         double maxX = center.getX() + radius;
         double minZ = center.getZ() - radius;
         double maxZ = center.getZ() + radius;
-        double playerX = playerLoc.getLocation().getPosition().getX();
-        double playerZ = playerLoc.getLocation().getPosition().getZ();
+        double playerX = event.getUser().getPosition().getX();
+        double playerZ = event.getUser().getPosition().getZ();
 
         if (playerX > maxX || playerX < minX || playerZ > maxZ || playerZ < minZ)
         {
-            event.setToTransform(event.getToTransform().setLocation(playerLoc.getExtent().getSpawnLocation()));
+            event.setToLocation(toWorld.getLocation(toWorld.getProperties().getSpawnPosition()));
         }
     }
 }

@@ -17,25 +17,25 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
-import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.network.ClientConnectionEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 
 public class FlymodeFixListener
 {
     @Listener
-    public void join(final ClientConnectionEvent.Join event)
+    public void join(final ServerSideConnectionEvent.Join event)
     {
-        if (event.getTargetEntity().get(SafeLoginData.FLYMODE).orElse(false))
+        if (event.getPlayer().get(SafeLoginData.FLYMODE).orElse(false))
         {
-            event.getTargetEntity().offer(Keys.CAN_FLY, true);
-            event.getTargetEntity().offer(Keys.IS_FLYING, true);
+            event.getPlayer().offer(Keys.CAN_FLY, true);
+            event.getPlayer().offer(Keys.IS_FLYING, true);
         }
     }
 
     @Listener
-    public void quit(final ClientConnectionEvent.Disconnect event)
+    public void quit(final ServerSideConnectionEvent.Disconnect event)
     {
-        event.getTargetEntity().offer(new SafeLoginData(event.getTargetEntity().get(Keys.IS_FLYING).orElse(false)));
+        event.getPlayer().offer(SafeLoginData.FLYMODE, event.getPlayer().get(Keys.IS_FLYING).orElse(false));
     }
 }

@@ -20,30 +20,36 @@ package org.cubeengine.module.vanillaplus.improvement.removal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.Predicate;
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.exception.SilentException;
-import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.ParserException;
-import org.cubeengine.libcube.util.StringUtils;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.cubeengine.libcube.service.matcher.MaterialMatcher;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.data.key.Keys;
+import org.cubeengine.libcube.util.StringUtils;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
+import org.spongepowered.api.command.parameter.CommandContext.Builder;
+import org.spongepowered.api.command.parameter.Parameter.Key;
+import org.spongepowered.api.command.parameter.managed.ValueParser;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.Living;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.registry.DefaultedRegistryReference;
 
-import static java.util.Arrays.asList;
-import static org.cubeengine.libcube.util.ChatFormat.YELLOW;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.entity.EntityTypes.*;
 
-public class EntityFilterParser implements ArgumentParser<EntityFilter>
+public class EntityFilterParser implements ValueParser<EntityFilter>
 {
     private I18n i18n;
     private EntityMatcher em;
@@ -57,58 +63,62 @@ public class EntityFilterParser implements ArgumentParser<EntityFilter>
     }
 
     @Override
-    public EntityFilter parse(Class aClass, CommandInvocation invocation) throws ParserException
+    public Optional<? extends EntityFilter> getValue(Key<? super EntityFilter> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
-        CommandSource cmdSource = (CommandSource)invocation.getCommandSource();
-        String token = invocation.consume(1);
+        final CommandCause cmdSource = context.getCause();
+        String token = reader.parseString();
         List<Predicate<Entity>> filters = new ArrayList<>();
         if ("*".equals(token)) // All non living
         {
             filters.add(e -> !(e instanceof Living));
-            return new EntityFilter(filters, true);
+            return Optional.of(new EntityFilter(filters, true));
         }
+        final Locale locale = cmdSource.getAudience() instanceof ServerPlayer ? ((ServerPlayer)cmdSource.getAudience()).getLocale() : Locale.getDefault();
         for (String entityString : StringUtils.explode(",", token))
         {
-            EntityType type;
+            EntityType<?> type;
             ItemType itemType = null;
             if (entityString.contains(":"))
             {
-                type = em.any(entityString.substring(0, entityString.indexOf(":")), invocation.getContext(Locale.class));
-                if (!ITEM.equals(type))
+                type = em.any(entityString.substring(0, entityString.indexOf(":")), locale);
+                if (!ITEM.get().equals(type))
                 {
                     i18n.send(cmdSource, NEGATIVE, "You can only specify data for removing items!");
-                    throw new SilentException();
+                    return Optional.empty();
                 }
                 String itemString = entityString.substring(entityString.indexOf(":") + 1);
-                itemType = mm.material(itemString);
+                itemType = mm.material(itemString, locale);
                 if (itemType == null)
                 {
                     i18n.send(cmdSource, NEGATIVE, "Cannot find itemtype {input}", itemString);
-                    throw new SilentException();
+                    return Optional.empty();
                 }
             }
             else
             {
-                type = em.any(entityString, invocation.getContext(Locale.class));
+                type = em.any(entityString, locale);
             }
             if (type == null)
             {
                 i18n.send(cmdSource, NEGATIVE, "Invalid entity-type!");
                 i18n.send(cmdSource, NEUTRAL, "Try using one of those instead:");
 
-                cmdSource.sendMessage(Text.joinWith(Text.of(YELLOW, ", "), asList(ITEM, /*,TODO ARROW */ RIDEABLE_MINECART,
-                                                                                  PAINTING, ITEM_FRAME, EXPERIENCE_ORB).stream().map(
-                    EntityType::getTranslation).map(t -> Text.of(t)).iterator()));
-                throw new SilentException();
+                final List<Component> types = Stream.of(ITEM, ARROW, MINECART, PAINTING, ITEM_FRAME, EXPERIENCE_ORB)
+                                                    .map(DefaultedRegistryReference::get)
+                                                    .map(EntityType::asComponent)
+                                                    .collect(Collectors.toList());
+                cmdSource.sendMessage(Identity.nil(), Component.join(Component.text(", ", NamedTextColor.YELLOW), types));
+                return Optional.empty();
             }
-            if (Living.class.isAssignableFrom(type.getEntityClass()))
-            {
-                i18n.send(cmdSource, NEGATIVE, "To kill living entities use the {text:/butcher} command!");
-                throw new SilentException();
-            }
+//            if (Living.class.isAssignableFrom(type.getEntityClass()))
+//            {
+//                i18n.send(cmdSource, NEGATIVE, "To kill living entities use the {text:/butcher} command!");
+//                return Optional.empty();
+//            }
             final ItemType item = itemType;
-            filters.add(entity -> entity.getType().equals(type) && (item == null || entity.get(Keys.REPRESENTED_ITEM).get().getType().equals(item)));
+            filters.add(entity -> entity.getType().equals(type) && (item == null || entity.get(Keys.ITEM_STACK_SNAPSHOT).get().getType().equals(item)));
         }
-        return new EntityFilter(filters);
+        return Optional.of(new EntityFilter(filters));
     }
+
 }

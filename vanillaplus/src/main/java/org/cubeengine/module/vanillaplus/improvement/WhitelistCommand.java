@@ -19,24 +19,23 @@ package org.cubeengine.module.vanillaplus.improvement;
 
 import java.util.Collection;
 import java.util.stream.Collectors;
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.module.vanillaplus.VanillaPlus;
-import org.cubeengine.libcube.service.command.ContainerCommand;
+import com.google.inject.Inject;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Delegate;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.command.source.ConsoleSource;
+import org.spongepowered.api.SystemSubject;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.profile.GameProfile;
-import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.whitelist.WhitelistService;
-import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
 
 /**
  * All Whitelist related commands:
@@ -49,38 +48,24 @@ import static org.spongepowered.api.text.format.TextColors.DARK_GREEN;
  * {@link #wipe}
  */
 @Command(name = "whitelist", desc = "Allows you to manage your whitelist")
-public class WhitelistCommand extends ContainerCommand
+@Delegate("list")
+public class WhitelistCommand extends DispatcherCommand
 {
     private I18n i18n;
 
-    public WhitelistCommand(CommandManager base, I18n i18n)
+    @Inject
+    public WhitelistCommand(I18n i18n)
     {
-        super(base, VanillaPlus.class);
         this.i18n = i18n;
     }
 
-    @Override
-    protected boolean selfExecute(CommandInvocation invocation)
-    {
-        if (invocation.isConsumed())
-        {
-            return this.getCommand("list").execute(invocation);
-        }
-        else if (invocation.tokens().size() - invocation.consumed() == 1)
-        {
-            return this.getCommand("add").execute(invocation);
-        }
-        return super.execute(invocation);
-    }
-
-
     private WhitelistService getWhitelistService()
     {
-        return Sponge.getServiceManager().provideUnchecked(WhitelistService.class);
+        return Sponge.getServer().getServiceProvider().whitelistService();
     }
 
     @Command(desc = "Adds a player to the whitelist.")
-    public void add(CommandSource context, User player) // TODO allow players that never played on the server
+    public void add(CommandCause context, User player) // TODO allow players that never played on the server
     {
         WhitelistService service = getWhitelistService();
         if (service.addProfile(player.getProfile()))
@@ -92,7 +77,7 @@ public class WhitelistCommand extends ContainerCommand
     }
 
     @Command(alias = "rm", desc = "Removes a player from the whitelist.")
-    public void remove(CommandSource context, User player)
+    public void remove(CommandCause context, User player)
     {
         WhitelistService service = getWhitelistService();
         if (service.removeProfile(player.getProfile()))
@@ -104,10 +89,10 @@ public class WhitelistCommand extends ContainerCommand
     }
 
     @Command(desc = "Lists all the whitelisted players")
-    public void list(CommandSource context)
+    public void list(CommandCause context)
     {
         WhitelistService service = getWhitelistService();
-        if (!Sponge.getServer().hasWhitelist())
+        if (!Sponge.getServer().isWhitelistEnabled())
         {
             i18n.send(context, NEUTRAL, "The whitelist is currently disabled.");
         }
@@ -115,7 +100,7 @@ public class WhitelistCommand extends ContainerCommand
         {
             i18n.send(context, POSITIVE, "The whitelist is enabled!.");
         }
-        context.sendMessage(Text.EMPTY);
+        context.sendMessage(Identity.nil(), Component.empty());
         Collection<GameProfile> list = service.getWhitelistedProfiles();
         if (list.isEmpty())
         {
@@ -123,11 +108,11 @@ public class WhitelistCommand extends ContainerCommand
         }
         else
         {
-
-            Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder()
-                .title(i18n.translate(context, NEUTRAL, "The following players are whitelisted"))
-                .contents(list.stream().map(p -> Text.of(" - ", DARK_GREEN, p.getName().orElse("??"))).collect(Collectors.toList()))
-                .sendTo(context);
+            Sponge.getGame().getServiceProvider().paginationService().builder()
+                  .title(i18n.translate(context, NEUTRAL, "The following players are whitelisted"))
+                  .contents(list.stream().map(p -> Component.text(" - ").append(Component.text(p.getName().orElse("??"), NamedTextColor.DARK_GREEN)))
+                                .collect(Collectors.toList()))
+                .sendTo(context.getAudience());
         }
 
         /* TODO list ops too
@@ -144,9 +129,9 @@ public class WhitelistCommand extends ContainerCommand
     }
 
     @Command(desc = "Enables the whitelisting")
-    public void on(CommandSource context)
+    public void on(CommandCause context)
     {
-        if (Sponge.getServer().hasWhitelist())
+        if (Sponge.getServer().isWhitelistEnabled())
         {
             i18n.send(context, NEGATIVE, "The whitelist is already enabled!");
             return;
@@ -156,9 +141,9 @@ public class WhitelistCommand extends ContainerCommand
     }
 
     @Command(desc = "Disables the whitelisting")
-    public void off(CommandSource context)
+    public void off(CommandCause context)
     {
-        if (!Sponge.getServer().hasWhitelist())
+        if (!Sponge.getServer().isWhitelistEnabled())
         {
             i18n.send(context, NEGATIVE, "The whitelist is already disabled!");
             return;
@@ -167,9 +152,10 @@ public class WhitelistCommand extends ContainerCommand
         i18n.send(context, POSITIVE, "The whitelist is now disabled.");
     }
 
+
     @Command(desc = "Wipes the whitelist completely")
-    @Restricted(value = ConsoleSource.class, msg = "This command is too dangerous for users!")
-    public void wipe(CommandSource context)
+    @Restricted(value = SystemSubject.class, msg = "This command is too dangerous for users!")
+    public void wipe(CommandCause context)
     {
         WhitelistService service = getWhitelistService();
         service.getWhitelistedProfiles().forEach(service::removeProfile);

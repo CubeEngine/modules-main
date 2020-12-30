@@ -34,10 +34,6 @@ public class VanillaPlusConfig extends ReflectedYaml
         @Comment("Allows using & followed by the appropriate color-code or style-code to write colored signs")
         public boolean styledSigns = true;
 
-        @Comment("Potions or Tools can be put into an Anvil or Brewingstand, allowing to brew/enchant the whole stack instead of just one item\n"
-            + "Turning this on prevents putting unsafe Itemstacks into these inventories")
-        public boolean preventOverstackedItems = true;
-
         @Comment("Retains fly-mode on login")
         public boolean safeLoginFly = true;
 
@@ -138,9 +134,6 @@ public class VanillaPlusConfig extends ReflectedYaml
 
         @Comment("Adds /invsee")
         public boolean commandInvsee = true;
-
-        @Comment("Adds /itemDB")
-        public boolean commandItemDB = true;
 
         @Comment("Adds /walkspeed and /fly")
         public boolean commandsMovement = true;
