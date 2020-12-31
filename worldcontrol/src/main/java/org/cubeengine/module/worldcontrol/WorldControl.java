@@ -18,27 +18,25 @@
 package org.cubeengine.module.worldcontrol;
 
 import java.util.Map.Entry;
-import org.cubeengine.libcube.CubeEngineModule;
-import org.cubeengine.module.worldcontrol.WorldControlConfig.WorldSection;
-import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.processor.Dependency;
+import org.cubeengine.libcube.service.filesystem.ModuleConfig;
+import org.cubeengine.module.worldcontrol.WorldControlConfig.WorldSection;
 import org.cubeengine.processor.Module;
+import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-
-import javax.inject.Singleton;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 
 @Singleton
 @Module
-public class WorldControl extends CubeEngineModule
+public class WorldControl
 {
     // TODO implementation...
     @ModuleConfig private WorldControlConfig config;
 
     @Listener
-    public void onEnable(GamePreInitializationEvent event)
+    public void onEnable(StartedEngineEvent<Server> event)
     {
         for (Entry<ConfigWorld, WorldSection> entry : config.worldSettings.entrySet())
         {
@@ -51,7 +49,7 @@ public class WorldControl extends CubeEngineModule
     {
         if (!event.getEntities().isEmpty())
         {
-            WorldSection section = config.worldSettings.get(new ConfigWorld(event.getEntities().iterator().next().getWorld()));
+            WorldSection section = config.worldSettings.get(new ConfigWorld(event.getEntities().iterator().next().getServerLocation().getWorld()));
             if (section != null)
             {
 
