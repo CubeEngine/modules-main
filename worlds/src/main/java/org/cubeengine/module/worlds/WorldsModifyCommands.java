@@ -17,36 +17,35 @@
  */
 package org.cubeengine.module.worlds;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.world.server.ServerWorldProperties;
+
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.world.storage.WorldProperties;
-
-import javax.inject.Inject;
-
+@Singleton
 @Command(name = "modify", desc = "Worlds modify commands")
-public class WorldsModifyCommands extends ContainerCommand
+public class WorldsModifyCommands extends DispatcherCommand
 {
     private I18n i18n;
 
     @Inject
-    public WorldsModifyCommands(CommandManager cm, I18n i18n)
+    public WorldsModifyCommands(I18n i18n)
     {
-        super(cm, Worlds.class);
         this.i18n = i18n;
     }
 
     @Command(desc = "Sets the autoload behaviour")
-    public void autoload(CommandSource context, WorldProperties world, @Optional Boolean set)
+    public void autoload(CommandCause context, ServerWorldProperties world, @Option Boolean set)
     {
         if (set == null)
         {
-            set = !world.loadOnStartup();
+            set = !world.doesLoadOnStartup();
         }
         world.setLoadOnStartup(set);
         if (set)
@@ -57,14 +56,14 @@ public class WorldsModifyCommands extends ContainerCommand
         i18n.send(context, POSITIVE, "{world} will no longer autoload.", world);
     }
 
-    @Command(desc = "Sets whether structors generate")
-    public void generateStructure(CommandSource context, WorldProperties world, @Optional Boolean set)
+    @Command(desc = "Sets whether features generate")
+    public void generateFeatures(CommandCause context, ServerWorldProperties world, @Option Boolean set)
     {
         if (set == null)
         {
-            set = !world.usesMapFeatures();
+            set = !world.getWorldGenerationSettings().doFeaturesGenerate();
         }
-        world.setMapFeaturesEnabled(set);
+        world.getWorldGenerationSettings().setFeaturesGenerate(set);
         if (set)
         {
             i18n.send(context, POSITIVE, "{world} will now generate structures", world);
