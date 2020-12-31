@@ -23,11 +23,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import net.kyori.adventure.text.Component;
 import org.cubeengine.module.conomy.bank.BankConomyService;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.module.sql.database.Database;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
@@ -35,7 +36,6 @@ import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.ResultType;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
-import org.spongepowered.api.text.Text;
 
 import static java.util.stream.Collectors.toMap;
 import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;
@@ -52,7 +52,7 @@ public abstract class BaseAccount implements Account
     private Database db;
     private Map<Currency, Map<Context, BalanceModel>> balance = new HashMap<>();
 
-    private final Text display;
+    private final Component display;
     private final String id;
 
     public BaseAccount(ConomyService service, AccountModel account, Database db)
@@ -60,7 +60,7 @@ public abstract class BaseAccount implements Account
         this.service = service;
         this.account = account;
         this.db = db;
-        this.display = Text.of(account.getName());
+        this.display = Component.text(account.getName());
         this.id = account.getID();
     }
 
@@ -81,7 +81,7 @@ public abstract class BaseAccount implements Account
         if (balanceModel == null)
         {
             balanceModel = db.getDSL().selectFrom(TABLE_BALANCE).where(TABLE_BALANCE.ACCOUNT_ID.eq(account.getID()))
-                    .and(TABLE_BALANCE.CONTEXT.eq(relevantCtx.get().getType() + "|" + relevantCtx.get().getName()))
+                    .and(TABLE_BALANCE.CONTEXT.eq(relevantCtx.get().getKey() + "|" + relevantCtx.get().getValue()))
                     .and(TABLE_BALANCE.CURRENCY.eq(currency.getCurrencyID())).fetchOne();
             if (balanceModel == null)
             {
@@ -136,32 +136,32 @@ public abstract class BaseAccount implements Account
     }
 
     @Override
-    public TransactionResult setBalance(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts)
+    public TransactionResult setBalance(Currency currency, BigDecimal amount, Set<Context> contexts)
     {
         ConfigCurrency cur = cast(currency);
         Optional<BalanceModel> model = getModel(cur, contexts);
         if (model.isPresent())
         {
             model.get().setBalance(cur.toLong(amount));
-            return new Result(this, currency, amount, contexts, SUCCESS, TRANSFER, cause); // TODO TransactionType?
+            return new Result(this, currency, amount, contexts, SUCCESS, TRANSFER); // TODO TransactionType?
         }
-        return new Result(this, currency, amount, contexts, CONTEXT_MISMATCH, TRANSFER, cause);  // TODO TransactionType?
+        return new Result(this, currency, amount, contexts, CONTEXT_MISMATCH, TRANSFER);  // TODO TransactionType?
     }
 
     @Override
-    public Map<Currency, TransactionResult> resetBalances(Cause cause, Set<Context> contexts)
+    public Map<Currency, TransactionResult> resetBalances(Set<Context> contexts)
     {
-        return service.getCurrencies().stream().collect(toMap(c -> c, c -> resetBalance(c, cause, contexts)));
+        return service.getCurrencies().stream().collect(toMap(c -> c, c -> resetBalance(c, contexts)));
     }
 
     @Override
-    public TransactionResult resetBalance(Currency currency, Cause cause, Set<Context> contexts)
+    public TransactionResult resetBalance(Currency currency, Set<Context> contexts)
     {
-        return setBalance(currency, getDefaultBalance(currency), cause, contexts);
+        return setBalance(currency, getDefaultBalance(currency), contexts);
     }
 
     @Override
-    public TransactionResult deposit(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts)
+    public TransactionResult deposit(Currency currency, BigDecimal amount, Set<Context> contexts)
     {
         ConfigCurrency cur = cast(currency);
         Optional<BalanceModel> model = getModel(cur, contexts);
@@ -169,13 +169,13 @@ public abstract class BaseAccount implements Account
         {
             model.get().setBalance(model.get().getBalance() + cur.toLong(amount));
             // TODO check max
-            return new Result(this, currency, amount, contexts, SUCCESS, DEPOSIT, cause);
+            return new Result(this, currency, amount, contexts, SUCCESS, DEPOSIT);
         }
-        return new Result(this, currency, amount, contexts, CONTEXT_MISMATCH, DEPOSIT, cause);
+        return new Result(this, currency, amount, contexts, CONTEXT_MISMATCH, DEPOSIT);
     }
 
     @Override
-    public TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts)
+    public TransactionResult withdraw(Currency currency, BigDecimal amount, Set<Context> contexts)
     {
         ConfigCurrency cur = cast(currency);
         Optional<BalanceModel> model = getModel(cur, contexts);
@@ -186,41 +186,41 @@ public abstract class BaseAccount implements Account
 
             if (newBalance < min)
             {
-                return new Result(this, currency, amount, contexts, ACCOUNT_NO_FUNDS, WITHDRAW, cause);
+                return new Result(this, currency, amount, contexts, ACCOUNT_NO_FUNDS, WITHDRAW);
             }
             model.get().setBalance(newBalance);
-            return new Result(this, currency, amount, contexts, SUCCESS, WITHDRAW, cause);
+            return new Result(this, currency, amount, contexts, SUCCESS, WITHDRAW);
         }
-        return new Result(this, currency, amount, contexts, CONTEXT_MISMATCH, WITHDRAW, cause);
+        return new Result(this, currency, amount, contexts, CONTEXT_MISMATCH, WITHDRAW);
     }
 
     @Override
-    public TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause, Set<Context> contexts)
+    public TransferResult transfer(Account to, Currency currency, BigDecimal amount, Set<Context> contexts)
     {
         if (this == to)
         {
-            return new Result.Transfer(this, to, currency, amount, contexts, ResultType.SUCCESS, TRANSFER, cause);
+            return new Result.Transfer(this, to, currency, amount, contexts, ResultType.SUCCESS, TRANSFER);
         }
         // TODO disallow user -> bank if not at least member of bank
         // TODO disallow bank -> user if cause is not admin?
         // TODO check for visibility of account for causer
-        TransactionResult result = this.withdraw(currency, amount, cause, contexts);
+        TransactionResult result = this.withdraw(currency, amount, contexts);
         if (result.getResult() == SUCCESS)
         {
-            result = to.deposit(currency, amount, cause, contexts);
+            result = to.deposit(currency, amount, contexts);
             if (result.getResult() == SUCCESS)
             {
-                return new Result.Transfer(this, to, currency, amount, contexts, SUCCESS, TRANSFER, cause);
+                return new Result.Transfer(this, to, currency, amount, contexts, SUCCESS, TRANSFER);
             }
             else
             {
-                this.deposit(currency, amount, cause, contexts); // rollback withdraw action
-                return new Result.Transfer(this, to, currency, amount, contexts, result.getResult(), TRANSFER, cause);
+                this.deposit(currency, amount, contexts); // rollback withdraw action
+                return new Result.Transfer(this, to, currency, amount, contexts, result.getResult(), TRANSFER);
             }
         }
         else
         {
-            return new Result.Transfer(this, to, currency, amount, contexts, result.getResult(), TRANSFER, cause);
+            return new Result.Transfer(this, to, currency, amount, contexts, result.getResult(), TRANSFER);
         }
     }
 
@@ -241,7 +241,7 @@ public abstract class BaseAccount implements Account
     }
 
     @Override
-    public Text getDisplayName()
+    public Component getDisplayName()
     {
         return display;
     }
@@ -297,4 +297,5 @@ public abstract class BaseAccount implements Account
             return account.setName(newName);
         }
     }
+
 }

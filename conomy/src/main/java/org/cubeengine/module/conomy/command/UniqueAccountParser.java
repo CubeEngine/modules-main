@@ -18,82 +18,90 @@
 package org.cubeengine.module.conomy.command;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.argument.Completer;
-import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.DefaultValue;
-import org.cubeengine.butler.parameter.argument.ParserException;
-import org.cubeengine.module.conomy.BaseAccount;
-import org.cubeengine.module.conomy.Conomy;
-import org.cubeengine.module.conomy.ConomyService;
-import org.cubeengine.libcube.service.command.TranslatedParserException;
+import java.util.UUID;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.DefaultParameterProvider;
+import org.cubeengine.libcube.service.command.annotation.ParserFor;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.module.conomy.BaseAccount;
+import org.cubeengine.module.conomy.BaseAccount.Unique;
+import org.cubeengine.module.conomy.ConomyService;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.CommandContext.Builder;
+import org.spongepowered.api.command.parameter.Parameter;
+import org.spongepowered.api.command.parameter.Parameter.Key;
+import org.spongepowered.api.command.parameter.managed.ValueCompleter;
+import org.spongepowered.api.command.parameter.managed.ValueParser;
+import org.spongepowered.api.command.parameter.managed.standard.ResourceKeyedValueParameters;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.service.permission.Subject;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
-public class UniqueAccountParser implements ArgumentParser<BaseAccount.Unique>, DefaultValue<BaseAccount.Unique>, Completer
+@Singleton
+@ParserFor(Unique.class)
+public class UniqueAccountParser implements ValueParser<Unique>, DefaultParameterProvider<Unique>, ValueCompleter
 {
-    private Conomy module;
     private final ConomyService service;
     private final I18n i18n;
 
-    public UniqueAccountParser(Conomy module, ConomyService service, I18n i18n)
+    @Inject
+    public UniqueAccountParser(ConomyService service, I18n i18n)
     {
-        this.module = module;
         this.service = service;
         this.i18n = i18n;
     }
 
     @Override
-    public BaseAccount.Unique parse(Class type, CommandInvocation invocation) throws ParserException
+    public Unique apply(CommandCause commandCause)
     {
-        String arg = invocation.currentToken();
-        User user = (User)invocation.providers().read(User.class, User.class, invocation);
-        Optional<BaseAccount.Unique> target = getAccount(user).filter(a -> {
-                Object cmdSource = invocation.getCommandSource();
-                return !(cmdSource instanceof Subject && a.isHidden()
-                        && !((Subject) cmdSource).hasPermission(module.perms().ACCESS_SEE.getId()));
-            });
-        if (!target.isPresent())
+        if (!(commandCause.getAudience() instanceof ServerPlayer))
         {
-            throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,
-                    "No account found for {user}!", arg));
+            i18n.send(commandCause, NEGATIVE,  "You have to specify a user!");
+            return null;
         }
-        return target.get();
-    }
-
-    @Override
-    public BaseAccount.Unique provide(CommandInvocation invocation)
-    {
-        if (!(invocation.getCommandSource() instanceof User))
-        {
-            throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,
-                    "You have to specify a user!"));
-        }
-        User user = (User) invocation.getCommandSource();
-        Optional<BaseAccount.Unique> account = getAccount(user);
+        ServerPlayer user = (ServerPlayer) commandCause.getAudience();
+        Optional<BaseAccount.Unique> account = getAccount(user.getUniqueId());
         if (!account.isPresent())
         {
-            throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,
-                    "You have no account!"));
+            i18n.send(commandCause, NEGATIVE, "You have no account!");
+            return null;
         }
         return account.get();
     }
 
-    private Optional<BaseAccount.Unique> getAccount(User user)
+    @Override
+    public List<String> complete(CommandContext context, String currentInput)
     {
-        return service.getOrCreateAccount(user.getUniqueId())
+        return ResourceKeyedValueParameters.USER.get().complete(context, currentInput);
+    }
+
+    @Override
+    public Optional<? extends Unique> getValue(Key<? super Unique> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    {
+        final String arg = reader.parseString();
+        final Optional<Unique> account = ResourceKeyedValueParameters.USER.get().getValue(Parameter.key(parameterKey.key(), User.class), reader, context).flatMap(
+            user -> getAccount(user.getUniqueId()).filter(a -> {
+                CommandCause cmdSource = context.getCause();
+                return !a.isHidden() && !service.getPerms().ACCESS_SEE.check(cmdSource);
+            }));
+        if (!account.isPresent())
+        {
+            throw reader.createException(i18n.translate(context.getCause(), NEGATIVE, "No account found for {user}!", arg));
+        }
+        return account;
+    }
+
+    private Optional<BaseAccount.Unique> getAccount(UUID user)
+    {
+        return service.getOrCreateAccount(user)
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast);
     }
 
-    @Override
-    public List<String> suggest(Class type, CommandInvocation invocation)
-    {
-        return invocation.providers().completers().get(User.class).suggest(type, invocation);
-    }
 }

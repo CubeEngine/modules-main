@@ -25,33 +25,38 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import org.cubeengine.reflect.Reflector;
-import org.cubeengine.butler.Dispatcher;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.command.ParameterRegistry;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyConfiguration;
 import org.cubeengine.module.conomy.ConomyService;
 import org.cubeengine.module.conomy.bank.command.BankCommand;
-import org.cubeengine.module.conomy.bank.command.BankManageCommand;
-import org.cubeengine.module.conomy.bank.command.EcoBankCommand;
 import org.cubeengine.module.conomy.bank.command.VirtualAccountParser;
 import org.cubeengine.module.conomy.storage.AccountModel;
-import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.sql.database.Database;
-import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.command.Command.Parameterized;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
+import org.spongepowered.plugin.PluginContainer;
 
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
 
 public class BankConomyService extends ConomyService
 {
-    public BankConomyService(Conomy module, ConomyConfiguration config, Path path, Database db, Reflector reflector)
+
+    private final BankPermission bankPerms;
+
+    public BankConomyService(Conomy module, ConomyConfiguration config, Path path, Database db, Reflector reflector, PermissionManager pm, PluginContainer plugin)
     {
-        super(module, config, path, db, reflector);
+        super(module, config, path, db, reflector, pm, plugin);
+        bankPerms = new BankPermission(pm);
     }
 
     @Override
@@ -164,7 +169,7 @@ public class BankConomyService extends ConomyService
                 .map(BaseAccount.Virtual.class::cast)
                 .collect(Collectors.toList());
 
-        if (level.value == AccessLevel.SEE.value && user.hasPermission(module.bankPerms().ACCESS_SEE.getId()))
+        if (level.value == AccessLevel.SEE.value && bankPerms.ACCESS_SEE.check(user))
         {
             collect.addAll(getBankAccounts());
         }
@@ -181,14 +186,10 @@ public class BankConomyService extends ConomyService
     }
 
     @Override
-    public void registerCommands(CommandManager cm, I18n i18n)
+    public void registerCommands(RegisterCommandEvent<Parameterized> event, ModuleManager mm, I18n i18n)
     {
-        super.registerCommands(cm, i18n);
-        ((Dispatcher) cm.getCommand("eco")).addCommand(new EcoBankCommand(cm, this, i18n));
-        cm.getProviders().register(module, new VirtualAccountParser(this, i18n), BaseAccount.Virtual.class);
-        BankCommand bankCommand = new BankCommand(cm, this, i18n);
-        cm.addCommand(bankCommand);
-        bankCommand.addCommand(new BankManageCommand(cm, this, i18n));
+        super.registerCommands(event, mm, i18n);
+        mm.registerCommands(event, plugin, module, BankCommand.class);
     }
 
     public boolean hasAccess(BaseAccount.Virtual bank, AccessLevel level, Subject context)
@@ -198,25 +199,25 @@ public class BankConomyService extends ConomyService
             case NONE:
                 return true;
             case SEE:
-                if (context.hasPermission(module.bankPerms().ACCESS_SEE.getId()))
+                if (bankPerms.ACCESS_SEE.check(context))
                 {
                     return true;
                 }
                 break;
             case DEPOSIT:
-                if (context.hasPermission(module.bankPerms().ACCESS_DEPOSIT.getId()))
+                if (bankPerms.ACCESS_DEPOSIT.check(context))
                 {
                     return true;
                 }
                 break;
             case WITHDRAW:
-                if (context.hasPermission(module.bankPerms().ACCESS_WITHDRAW.getId()))
+                if (bankPerms.ACCESS_WITHDRAW.check(context))
                 {
                     return true;
                 }
                 break;
             case MANAGE:
-                if (context.hasPermission(module.bankPerms().ACCESS_MANAGE.getId()))
+                if (bankPerms.ACCESS_MANAGE.check(context))
                 {
                     return true;
                 }

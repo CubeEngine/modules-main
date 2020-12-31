@@ -18,26 +18,34 @@
 package org.cubeengine.module.conomy.bank.command;
 
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.DefaultValue;
-import org.cubeengine.butler.parameter.argument.ParserException;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.DefaultParameterProvider;
+import org.cubeengine.libcube.service.command.annotation.ParserFor;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
+import org.cubeengine.module.conomy.BaseAccount.Virtual;
 import org.cubeengine.module.conomy.bank.BankConomyService;
-import org.cubeengine.libcube.service.command.TranslatedParserException;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
+import org.spongepowered.api.command.parameter.CommandContext.Builder;
+import org.spongepowered.api.command.parameter.Parameter.Key;
+import org.spongepowered.api.command.parameter.managed.ValueParser;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 
-public class VirtualAccountParser implements ArgumentParser<BaseAccount.Virtual>, DefaultValue<BaseAccount.Virtual>
+@Singleton
+@ParserFor(Virtual.class)
+public class VirtualAccountParser implements ValueParser<Virtual>, DefaultParameterProvider<Virtual>
 {
     private final BankConomyService service;
     private final I18n i18n;
 
+    @Inject
     public VirtualAccountParser(BankConomyService service, I18n i18n)
     {
         this.service = service;
@@ -45,9 +53,28 @@ public class VirtualAccountParser implements ArgumentParser<BaseAccount.Virtual>
     }
 
     @Override
-    public BaseAccount.Virtual parse(Class type, CommandInvocation invocation) throws ParserException
+    public Virtual apply(CommandCause commandCause)
     {
-        String arg = invocation.consume(1);
+        if (!(commandCause.getAudience() instanceof ServerPlayer))
+        {
+            i18n.send(commandCause, NEGATIVE, "You have to specify a bank!");
+            return null;
+        }
+
+        ServerPlayer user = (ServerPlayer) commandCause.getAudience();
+        final List<Virtual> banks = service.getBanks(user, AccessLevel.SEE);
+        if (banks.isEmpty())
+        {
+            i18n.send(commandCause, NEGATIVE, "You have no banks available!");
+            return null;
+        }
+        return banks.get(0);
+    }
+
+    @Override
+    public Optional<? extends Virtual> getValue(Key<? super Virtual> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    {
+        final String arg = reader.parseString();
         Optional<BaseAccount.Virtual> target = Optional.empty();
         if (service.hasAccount(arg))
         {
@@ -55,26 +82,10 @@ public class VirtualAccountParser implements ArgumentParser<BaseAccount.Virtual>
         }
         if (!target.isPresent())
         {
-            throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE, "There is no bank account named {input#name}!", arg));
+            throw reader.createException(i18n.translate(context.getCause(), NEGATIVE, "There is no bank account named {input#name}!", arg));
         }
-        return target.get();
+        return target;
     }
 
-    @Override
-    public BaseAccount.Virtual provide(CommandInvocation invocation)
-    {
-        if (invocation.getCommandSource() instanceof User)
-        {
-            User user = (User) invocation.getCommandSource();
-            List<BaseAccount.Virtual> banks = service.getBanks(user, AccessLevel.SEE);
-            if (banks.isEmpty())
-            {
-                throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,
-                        "You have no banks available!"));
-            }
-            return banks.get(0);
-        }
-        throw new TranslatedParserException(i18n.translate(invocation.getContext(Locale.class), NEGATIVE,
-                "You have to specify a bank!"));
-    }
+
 }

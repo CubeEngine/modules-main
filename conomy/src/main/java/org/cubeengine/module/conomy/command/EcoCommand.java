@@ -18,58 +18,52 @@
 package org.cubeengine.module.conomy.command;
 
 import java.math.BigDecimal;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.module.conomy.BaseAccount;
-import org.cubeengine.module.conomy.Conomy;
-import org.cubeengine.module.conomy.ConomyService;
-import org.cubeengine.libcube.service.command.ContainerCommand;
+import java.util.Collection;
+import net.kyori.adventure.text.Component;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Using;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.command.parser.PlayerList;
-import org.spongepowered.api.command.CommandSource;
+import org.cubeengine.module.conomy.BaseAccount;
+import org.cubeengine.module.conomy.ConomyService;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
-import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
+@Using(UniqueAccountParser.class)
 @Command(name = "eco", desc = "Administrative commands for Conomy")
-public class EcoCommand extends ContainerCommand
+public class EcoCommand extends DispatcherCommand
 {
     private final ConomyService service;
     private I18n i18n;
 
-    public EcoCommand(CommandManager base, ConomyService service, I18n i18n)
+    public EcoCommand(ConomyService service, I18n i18n)
     {
-        super(base, Conomy.class);
         this.service = service;
         this.i18n = i18n;
     }
 
     @Command(alias = "grant", desc = "Gives money to one or all players.")
-    public void give(CommandSource context,
-                     @Label("*|<players>") PlayerList users,
-                     Double amount)
+    public void give(CommandCause context, Collection<User> users, Double amount)
     {
-        for (User user : users.list())
+        for (User user : users)
         {
             UniqueAccount target = getAccount(context, user);
             if (target != null)
             {
                 Currency cur = service.getDefaultCurrency();
-                TransactionResult result = target.deposit(cur, new BigDecimal(amount), causeOf(context));
-                Text formatAmount = cur.format(result.getAmount());
+                TransactionResult result = target.deposit(cur, new BigDecimal(amount));
+                Component formatAmount = cur.format(result.getAmount());
                 switch (result.getResult())
                 {
                     case SUCCESS:
 
                         i18n.send(context, POSITIVE, "You gave {txt} to {user}!", formatAmount, user.getName());
-                        if (!context.equals(user) && user.isOnline())
+                        if (!user.isOnline() && context.getSubject().equals(user.getPlayer().get()))
                         {
                             i18n.send(user.getPlayer().get(), POSITIVE, "You were granted {txt}.", formatAmount);
                         }
@@ -82,7 +76,7 @@ public class EcoCommand extends ContainerCommand
         }
     }
 
-    private BaseAccount.Unique getAccount(CommandSource context, User user)
+    private BaseAccount.Unique getAccount(CommandCause context, User user)
     {
         BaseAccount.Unique target = service.getOrCreateAccount(user.getUniqueId())
                 .filter(a -> a instanceof BaseAccount.Unique)
@@ -95,21 +89,21 @@ public class EcoCommand extends ContainerCommand
     }
 
     @Command(alias = "remove", desc = "Takes money from given user")
-    public void take(CommandSource context, @Label("*|<players>") PlayerList users, Double amount)
+    public void take(CommandCause context, Collection<User> users, Double amount)
     {
-        for (User user : users.list())
+        for (User user : users)
         {
             UniqueAccount target = getAccount(context, user);
             if (target != null)
             {
                 Currency cur = service.getDefaultCurrency();
-                TransactionResult result = target.withdraw(cur, new BigDecimal(amount), causeOf(context));
-                Text formatAmount = cur.format(result.getAmount());
+                TransactionResult result = target.withdraw(cur, new BigDecimal(amount));
+                Component formatAmount = cur.format(result.getAmount());
                 switch (result.getResult())
                 {
                     case SUCCESS:
                         i18n.send(context, POSITIVE, "You took {txt} from {user}!", formatAmount, user);
-                        if (!context.equals(user) && user.isOnline())
+                        if (!user.isOnline() && context.getSubject().equals(user.getPlayer().get()))
                         {
                             i18n.send(user.getPlayer().get(), NEUTRAL, "Withdrew {txt} from your account.", formatAmount);
                         }
@@ -122,27 +116,22 @@ public class EcoCommand extends ContainerCommand
         }
     }
 
-    private Cause causeOf(CommandSource context)
-    {
-        return Cause.of(EventContext.empty(), context);
-    }
-
     @Command(desc = "Reset the money from given user")
-    public void reset(CommandSource context, @Label("*|<players>") PlayerList users)
+    public void reset(CommandCause context, Collection<User> users)
     {
-        for (User user : users.list())
+        for (User user : users)
         {
             UniqueAccount target = getAccount(context, user);
             if (target != null)
             {
                 Currency cur = service.getDefaultCurrency();
-                TransactionResult result = target.resetBalance(cur, causeOf(context));
-                Text formatAmount = cur.format(result.getAmount());
+                TransactionResult result = target.resetBalance(cur);
+                Component formatAmount = cur.format(result.getAmount());
                 switch (result.getResult())
                 {
                     case SUCCESS:
                         i18n.send(context, POSITIVE, "{user} account reset to {txt}!", user, formatAmount);
-                        if (!context.equals(user) && user.isOnline())
+                        if (!user.isOnline() && context.getSubject().equals(user.getPlayer().get()))
                         {
                             i18n.send(user.getPlayer().get(), NEUTRAL, "Your balance got reset to {txt}.", formatAmount);
                         }
@@ -156,21 +145,21 @@ public class EcoCommand extends ContainerCommand
     }
 
     @Command(desc = "Sets the money of a given player")
-    public void set(CommandSource context, @Label("*|<players>") PlayerList users, Double amount)
+    public void set(CommandCause context, Collection<User> users, Double amount)
     {
-        for (User user : users.list())
+        for (User user : users)
         {
             UniqueAccount target = getAccount(context, user);
             if (target != null)
             {
                 Currency cur = service.getDefaultCurrency();
-                TransactionResult result = target.setBalance(cur, new BigDecimal(amount), causeOf(context));
-                Text formatAmount = cur.format(result.getAmount());
+                TransactionResult result = target.setBalance(cur, new BigDecimal(amount));
+                Component formatAmount = cur.format(result.getAmount());
                 switch (result.getResult())
                 {
                     case SUCCESS:
                         i18n.send(context, POSITIVE, "{user} account set to {txt}!", user, formatAmount);
-                        if (!context.equals(user) && user.isOnline())
+                        if (!user.isOnline() && context.getSubject().equals(user.getPlayer().get()))
                         {
                             i18n.send(user.getPlayer().get(), NEUTRAL, "Your balance got set to {txt}.", formatAmount);
                         }
@@ -184,9 +173,9 @@ public class EcoCommand extends ContainerCommand
     }
 
     @Command(desc = "Hides the account of a given player")
-    public void hide(CommandSource context, @Label("*|<players>") PlayerList users)
+    public void hide(CommandCause context, Collection<User> users)
     {
-        for (User user : users.list())
+        for (User user : users)
         {
             BaseAccount.Unique target = getAccount(context, user);
             if (target != null)
@@ -205,9 +194,9 @@ public class EcoCommand extends ContainerCommand
     }
 
     @Command(desc = "Unhides the account of a given player")
-    public void unhide(CommandSource context, @Label("*|<players>") PlayerList users)
+    public void unhide(CommandCause context, Collection<User> users)
     {
-        for (User user : users.list())
+        for (User user : users)
         {
             BaseAccount.Unique target = getAccount(context, user);
             if (target != null)

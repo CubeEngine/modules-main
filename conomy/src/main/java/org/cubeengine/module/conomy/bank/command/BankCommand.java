@@ -21,52 +21,51 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.filter.Restricted;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Restricted;
+import org.cubeengine.libcube.service.command.annotation.Using;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
-import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.bank.BankConomyService;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.module.conomy.command.UniqueAccountParser;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
-import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.spongepowered.api.text.format.TextColors.GOLD;
 
+@Using({UniqueAccountParser.class, VirtualAccountParser.class})
+@Singleton
 @Command(name = "bank", desc = "Manages your money in banks.")
-public class BankCommand extends ContainerCommand
+public class BankCommand extends DispatcherCommand
 {
     private BankConomyService service;
     private I18n i18n;
-
-    public BankCommand(CommandManager base, BankConomyService service, I18n i18n)
+    @Inject
+    public BankCommand(BankManageCommand manage, BankEcoCommand eco, BankConomyService service, I18n i18n)
     {
-        super(base, Conomy.class);
+        super(manage, eco);
         this.service = service;
         this.i18n = i18n;
     }
 
     @Alias(value = "bbalance")
     @Command(desc = "Shows the balance of the specified bank")
-    public void balance(CommandSource context, @Default BaseAccount.Virtual bank)
+    public void balance(CommandCause context, @Default BaseAccount.Virtual bank)
     {
         Map<Currency, BigDecimal> balances = bank.getBalances(context.getActiveContexts());
 
@@ -78,18 +77,13 @@ public class BankCommand extends ContainerCommand
         i18n.send(context, POSITIVE, "Bank {account} Balance:", bank);
         for (Map.Entry<Currency, BigDecimal> entry : balances.entrySet())
         {
-            context.sendMessage(Text.of(" - ", GOLD, entry.getKey().format(entry.getValue())));
+            context.sendMessage(Identity.nil(), Component.text(" - ").append(entry.getKey().format(entry.getValue()).color(NamedTextColor.GOLD)));
         }
     }
 
-    private Cause causeOf(CommandSource context)
-    {
-        return Cause.of(EventContext.empty(), context);
-    }
-
     @Command(desc = "Deposits given amount of money into the bank")
-    @Restricted(value = Player.class, msg =  "You cannot deposit into a bank as console!")
-    public void deposit(Player context, BaseAccount.Virtual bank, Double amount)
+    @Restricted(msg =  "You cannot deposit into a bank as console!")
+    public void deposit(ServerPlayer context, BaseAccount.Virtual bank, Double amount)
     {
         Optional<UniqueAccount> account = service.getOrCreateAccount(context.getUniqueId());
         if (!account.isPresent())
@@ -104,7 +98,7 @@ public class BankCommand extends ContainerCommand
             return;
         }
 
-        TransferResult result = account.get().transfer(bank, service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
+        TransferResult result = account.get().transfer(bank, service.getDefaultCurrency(), new BigDecimal(amount));
         switch (result.getResult())
         {
             case SUCCESS:
@@ -122,8 +116,8 @@ public class BankCommand extends ContainerCommand
     }
 
     @Command(desc = "Withdraws given amount of money from the bank")
-    @Restricted(value = Player.class, msg = "You cannot withdraw from a bank as console!")
-    public void withdraw(Player context, BaseAccount.Virtual bank, Double amount) //takes money from the bank
+    @Restricted(msg = "You cannot withdraw from a bank as console!")
+    public void withdraw(ServerPlayer context, BaseAccount.Virtual bank, Double amount) //takes money from the bank
     {
         Optional<UniqueAccount> account = service.getOrCreateAccount(context.getUniqueId());
         if (!account.isPresent())
@@ -137,7 +131,7 @@ public class BankCommand extends ContainerCommand
             i18n.send(context, NEGATIVE, "You are not allowed to withdraw money from that bank!");
         }
 
-        TransferResult result = account.get().transfer(bank, service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
+        TransferResult result = account.get().transfer(bank, service.getDefaultCurrency(), new BigDecimal(amount));
         switch (result.getResult())
         {
             case SUCCESS:
@@ -156,7 +150,7 @@ public class BankCommand extends ContainerCommand
     }
 
     @Command(desc = "Pays given amount of money as bank to another bank")
-    public void pay(CommandSource context, BaseAccount.Virtual bank, BaseAccount.Virtual otherBank, Double amount)
+    public void pay(CommandCause context, BaseAccount.Virtual bank, BaseAccount.Virtual otherBank, Double amount)
     {
         if (amount < 0)
         {
@@ -170,7 +164,7 @@ public class BankCommand extends ContainerCommand
             return;
         }
 
-        TransferResult result = bank.transfer(otherBank, service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
+        TransferResult result = bank.transfer(otherBank, service.getDefaultCurrency(), new BigDecimal(amount));
         switch (result.getResult())
         {
             case SUCCESS:
@@ -188,7 +182,7 @@ public class BankCommand extends ContainerCommand
     }
 
     @Command(desc = "Pays given amount of money as bank to a user account")
-    public void payUser(CommandSource context, BaseAccount.Virtual bank, BaseAccount.Unique user, Double amount)
+    public void payUser(CommandCause context, BaseAccount.Virtual bank, BaseAccount.Unique user, Double amount)
     {
         if (!service.hasAccess(bank, AccessLevel.WITHDRAW, context))
         {
@@ -196,7 +190,7 @@ public class BankCommand extends ContainerCommand
             return;
         }
 
-        TransferResult result = bank.transfer(user, service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
+        TransferResult result = bank.transfer(user, service.getDefaultCurrency(), new BigDecimal(amount));
         switch (result.getResult())
         {
             case SUCCESS:
@@ -217,7 +211,7 @@ public class BankCommand extends ContainerCommand
     // TODO dirigent formatter for BaseAccount.Virtual
 
     @Command(desc = "Lists all banks")
-    public void list(CommandSource context, @Default User owner) //Lists all banks [of given player]
+    public void list(CommandCause context, @Default User owner) //Lists all banks [of given player]
     {
         if (owner != null)
         {
@@ -231,7 +225,7 @@ public class BankCommand extends ContainerCommand
 
             for (BaseAccount.Virtual bank : namedAccounts)
             {
-                context.sendMessage(Text.of(" - ", TextColors.YELLOW, bank.getDisplayName()));
+                context.sendMessage(Identity.nil(), Component.text(" - ").append(bank.getDisplayName().color(NamedTextColor.YELLOW)));
             }
             return;
         }
@@ -245,12 +239,12 @@ public class BankCommand extends ContainerCommand
         i18n.send(context, POSITIVE, "The following banks are available:");
         for (BaseAccount.Virtual bank : namedAccounts)
         {
-            context.sendMessage(Text.of(" - ", TextColors.YELLOW, bank.getDisplayName()));
+            context.sendMessage(Identity.nil(), Component.text(" - ").append(bank.getDisplayName().color(NamedTextColor.YELLOW)));
         }
     }
 
     @Command(desc = "Shows bank information")
-    public void info(CommandSource context, BaseAccount.Virtual bank)
+    public void info(CommandCause context, BaseAccount.Virtual bank)
     {
         i18n.send(context, POSITIVE, "Bank Information for {account}:", bank);
         i18n.send(context, POSITIVE, "Current Balance: {txt}", service.getDefaultCurrency().format(bank.getBalance(service.getDefaultCurrency())));
@@ -264,7 +258,7 @@ public class BankCommand extends ContainerCommand
     }
 
     @Command(desc = "Lists the access levels for a bank")
-    public void listaccess(CommandSource context, @Default BaseAccount.Virtual bank)
+    public void listaccess(CommandCause context, @Default BaseAccount.Virtual bank)
     {
         i18n.send(context, POSITIVE, "Access Levels for {account}:", bank);
 
@@ -272,7 +266,7 @@ public class BankCommand extends ContainerCommand
         // Everyone can SEE(hidden) DEPOSIT(needInvite)
         // Noone can ...
 
-        for (Subject subject : Sponge.getServiceManager().provideUnchecked(PermissionService.class).getUserSubjects().getLoadedSubjects())
+        for (Subject subject : Sponge.getServer().getServiceProvider().permissionService().getUserSubjects().getLoadedSubjects())
         {
             Optional<String> option = subject.getOption(bank.getActiveContexts(), "conomy.bank.access-level." + bank.getIdentifier());
             if (option.isPresent())

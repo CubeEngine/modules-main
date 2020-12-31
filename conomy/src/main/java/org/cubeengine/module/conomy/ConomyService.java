@@ -29,37 +29,42 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-
-import org.cubeengine.reflect.Reflector;
+import java.util.stream.Stream;
+import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.command.ParameterRegistry;
+import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.conomy.command.EcoCommand;
 import org.cubeengine.module.conomy.command.MoneyCommand;
 import org.cubeengine.module.conomy.command.UniqueAccountParser;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
-import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.module.sql.database.Database;
-import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
-import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.reflect.Reflector;
 import org.jooq.Condition;
 import org.jooq.Record4;
 import org.jooq.SelectConditionStep;
 import org.jooq.SelectJoinStep;
 import org.jooq.impl.DSL;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.Command.Parameterized;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.registry.CatalogRegistryModule;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.EconomyService;
 import org.spongepowered.api.service.economy.account.Account;
+import org.spongepowered.api.service.economy.account.AccountDeletionResultType;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
-import org.spongepowered.api.service.user.UserStorageService;
+import org.spongepowered.api.service.economy.account.VirtualAccount;
+import org.spongepowered.plugin.PluginContainer;
 
 import static org.cubeengine.module.conomy.storage.TableAccount.TABLE_ACCOUNT;
 import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;
 
-public class ConomyService implements EconomyService, CatalogRegistryModule<Currency>
+public class ConomyService implements EconomyService
 {
     private ConfigCurrency defaultCurrency;
     private List<ContextCalculator<Account>> contextCalculators = new ArrayList<>();
@@ -68,20 +73,22 @@ public class ConomyService implements EconomyService, CatalogRegistryModule<Curr
     private Map<String, ConfigCurrency> currencies = new HashMap<>();
     protected Conomy module;
     protected Database db;
+    protected PluginContainer plugin;
 
-    public ConomyService(Conomy module, ConomyConfiguration config, Path path, Database db, Reflector reflector)
+    protected ConomyPermission perms;
+
+    public ConomyService(Conomy module, ConomyConfiguration config, Path path, Database db, Reflector reflector, PermissionManager pm, PluginContainer plugin)
     {
+        this.perms = new ConomyPermission(pm);
         this.module = module;
         this.db = db;
+        this.plugin = plugin;
         try
         {
             for (Path file : Files.newDirectoryStream(path, FileExtensionFilter.YAML))
             {
                 ConfigCurrency cc = new ConfigCurrency(reflector.load(CurrencyConfiguration.class, file.toFile()));
                 currencies.put(cc.getCurrencyID(), cc);
-
-                Sponge.getRegistry().registerModule(Currency.class, this);
-
             }
         }
         catch (IOException e)
@@ -108,28 +115,51 @@ public class ConomyService implements EconomyService, CatalogRegistryModule<Curr
          */
     }
 
-    @Override
-    public Optional<Currency> getById(String id)
+    public ConomyPermission getPerms()
     {
-        return Optional.ofNullable(currencies.get(id));
+        return perms;
     }
 
     @Override
-    public Collection<Currency> getAll()
+    public Stream<UniqueAccount> streamUniqueAccounts()
     {
-        return new ArrayList<>(currencies.values());
+        return null;
+    }
+
+    @Override
+    public Collection<UniqueAccount> getUniqueAccounts()
+    {
+        return null;
+    }
+
+    @Override
+    public Stream<VirtualAccount> streamVirtualAccounts()
+    {
+        return null;
+    }
+
+    @Override
+    public Collection<VirtualAccount> getVirtualAccounts()
+    {
+        return null;
+    }
+
+    @Override
+    public AccountDeletionResultType deleteAccount(UUID uuid)
+    {
+        return null;
+    }
+
+    @Override
+    public AccountDeletionResultType deleteAccount(String identifier)
+    {
+        return null;
     }
 
     @Override
     public Currency getDefaultCurrency()
     {
         return defaultCurrency;
-    }
-
-    @Override
-    public Set<Currency> getCurrencies()
-    {
-        return new HashSet<>(currencies.values());
     }
 
     @Override
@@ -207,7 +237,7 @@ public class ConomyService implements EconomyService, CatalogRegistryModule<Curr
 
     private AccountModel createModel(UUID uuid)
     {
-        Optional<User> user = Sponge.getServiceManager().provideUnchecked(UserStorageService.class).get(uuid);
+        Optional<User> user = Sponge.getServer().getUserManager().get(uuid);
         AccountModel model = db.getDSL().newRecord(TABLE_ACCOUNT).newAccount(uuid, user.map(User::getName).orElse(uuid.toString()), false, false);
         model.store();
         return model;
@@ -271,10 +301,14 @@ public class ConomyService implements EconomyService, CatalogRegistryModule<Curr
         return this.currencies.get(currency);
     }
 
-    public void registerCommands(CommandManager cm, I18n i18n)
+    public void registerCommands(RegisterCommandEvent<Parameterized> event, ModuleManager mm, I18n i18n)
     {
-        cm.getProviders().register(module, new UniqueAccountParser(module, this, i18n), BaseAccount.Unique.class);
-        cm.addCommand(new MoneyCommand(cm, module, this, i18n));
-        cm.addCommand(new EcoCommand(cm, this, i18n));
+        mm.registerCommands(event, plugin, module, MoneyCommand.class);
+        mm.registerCommands(event, plugin, module, EcoCommand.class);
+    }
+
+    public Collection<ConfigCurrency> getCurrencies()
+    {
+        return this.currencies.values();
     }
 }

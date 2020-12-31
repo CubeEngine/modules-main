@@ -25,13 +25,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import org.cubeengine.libcube.util.FileUtil;
+import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.util.StringUtils;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.UniqueAccount;
-import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.util.ContextUtil.GLOBAL;
 
@@ -66,38 +64,37 @@ public class ConfigCurrency implements Currency
         }
     }
 
-    @Override
+
     public String getId()
     {
         return this.getCurrencyID();
     }
 
-    @Override
     public String getName()
     {
         return config.name;
     }
 
     @Override
-    public Text getDisplayName()
+    public Component getDisplayName()
     {
-        return Text.of(config.name);
+        return Component.text(config.name);
     }
 
     @Override
-    public Text getPluralDisplayName()
+    public Component getPluralDisplayName()
     {
-        return Text.of(config.namePlural);
+        return Component.text(config.namePlural);
     }
 
     @Override
-    public Text getSymbol()
+    public Component getSymbol()
     {
-        return Text.of(config.symbol);
+        return Component.text(config.symbol);
     }
 
     @Override
-    public Text format(BigDecimal amount, int numFractionDigits)
+    public Component format(BigDecimal amount, int numFractionDigits)
     {
         String result = config.format;
         DecimalFormat decimalFormat = new DecimalFormat();
@@ -108,7 +105,7 @@ public class ConfigCurrency implements Currency
         result = result.replace("{SYMBOL}", config.symbol)
                        .replace("{AMOUNT}", decimalFormat.format(amount))
                        .replace("{NAME}", name) ;
-        return Text.of(result);
+        return Component.text(result);
     }
 
     @Override

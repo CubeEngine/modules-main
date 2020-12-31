@@ -17,12 +17,12 @@
  */
 package org.cubeengine.module.conomy;
 
-import static org.cubeengine.module.sql.PluginSql.SQL_ID;
-import static org.cubeengine.module.sql.PluginSql.SQL_VERSION;
-
-import org.cubeengine.libcube.CubeEngineModule;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.command.CommandManager;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.logging.LogProvider;
@@ -37,67 +37,43 @@ import org.cubeengine.module.sql.database.ModuleTables;
 import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.Server;
+import org.spongepowered.api.command.Command.Parameterized;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.lifecycle.ProvideServiceEvent;
+import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
+import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.service.economy.EconomyService;
+import org.spongepowered.plugin.PluginContainer;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import static org.cubeengine.module.sql.PluginSql.SQL_ID;
+import static org.cubeengine.module.sql.PluginSql.SQL_VERSION;
 
 @Singleton
 @Module(dependencies = @Dependency(value = SQL_ID, version = SQL_VERSION))
 @ModuleTables({TableAccount.class, TableBalance.class})
-public class Conomy extends CubeEngineModule
+public class Conomy
 {
     @ModuleConfig private ConomyConfiguration config;
-    @Inject private ConomyPermission perms;
 
     @Inject private Database db;
     @Inject private PermissionManager pm;
     @Inject private I18n i18n;
-    @Inject private CommandManager cm;
     @Inject private Reflector reflector;
     @Inject private LogProvider logProvider;
     @Inject private ModuleManager mm;
+    @Inject private PluginContainer plugin;
     private Path modulePath;
 
-    private BankPermission bankPerms;
     private ConomyService service;
     private Log log;
 
     @Listener
-    public void onEnable(GamePreInitializationEvent event)
+    public void onEnable(StartedEngineEvent<Server> event)
     {
         this.log = logProvider.getLogger(Conomy.class, "Conomy", true);
         i18n.getCompositor().registerFormatter(new BaseAccountFormatter());
         this.modulePath = mm.getPathFor(Conomy.class);
-        Path curencyPath = modulePath.resolve("currencies");
-        try
-        {
-            Files.createDirectories(curencyPath);
-        }
-        catch (IOException e)
-        {
-            throw new IllegalStateException(e);
-        }
-        if (config.enableBanks)
-        {
-            service = new BankConomyService(this, config, curencyPath, db, reflector);
-            bankPerms = new BankPermission(pm);
-        }
-        else
-        {
-            service = new ConomyService(this, config, curencyPath, db, reflector);
-        }
-        Sponge.getServiceManager().setProvider(this.mm.getPlugin(Conomy.class).get(), EconomyService.class, service);
-
-        service.registerCommands(cm, i18n);
-
         // TODO logging transactions / can be done via events
         // TODO logging new accounts not! workaround set start value using transaction
 
@@ -105,22 +81,45 @@ public class Conomy extends CubeEngineModule
 
     }
 
+    @Listener
+    public void onRegisterCommands(RegisterCommandEvent<Parameterized> event)
+    {
+        service.registerCommands(event, mm, i18n);
+    }
+
+    @Listener
+    public void onRegisterEconomyService(ProvideServiceEvent<EconomyService> event)
+    {
+        event.suggest(this::getService);
+    }
+
     public ConomyConfiguration getConfig()
     {
         return this.config;
     }
 
-    public ConomyPermission perms()
-    {
-        return perms;
-    }
-    public BankPermission bankPerms()
-    {
-        return bankPerms;
-    }
-
     public ConomyService getService()
     {
+        if (service == null)
+        {
+            Path curencyPath = modulePath.resolve("currencies");
+            try
+            {
+                Files.createDirectories(curencyPath);
+            }
+            catch (IOException e)
+            {
+                throw new IllegalStateException(e);
+            }
+            if (config.enableBanks)
+            {
+                service = new BankConomyService(this, config, curencyPath, db, reflector, pm, plugin);
+            }
+            else
+            {
+                service = new ConomyService(this, config, curencyPath, db, reflector, pm, plugin);
+            }
+        }
         return service;
     }
 

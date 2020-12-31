@@ -17,37 +17,38 @@
  */
 package org.cubeengine.module.conomy.bank.command;
 
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
-import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.bank.BankConomyService;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
+@Singleton
 @Command(name = "manage", desc = "Management commands for Conomy Banks.")
-public class BankManageCommand extends ContainerCommand
+public class BankManageCommand extends DispatcherCommand
 {
     private BankConomyService service;
     private I18n i18n;
-
-    public BankManageCommand(CommandManager base, BankConomyService service, I18n i18n)
+    @Inject
+    public BankManageCommand(BankConomyService service, I18n i18n)
     {
-        super(base, Conomy.class);
         this.service = service;
         this.i18n = i18n;
     }
 
     @Command(desc = "Sets the access level for a player in a bank")
-    public void access(CommandSource context, User player, AccessLevel level, @Default BaseAccount.Virtual bank)
+    public void access(CommandCause context, User player, AccessLevel level, @Default BaseAccount.Virtual bank)
     {
         player.getSubjectData().setOption(bank.getActiveContexts(),
                 "conomy.bank.access-level." + bank.getIdentifier(), String.valueOf(level.value));
@@ -107,9 +108,9 @@ public class BankManageCommand extends ContainerCommand
     }
 
     @Command(desc = "Creates a new bank")
-    public void create(CommandSource context, String name,
-                       @Flag(longName = "hidden", name = "h") boolean hidden,
-                       @Flag(longName = "invite", name = "i") boolean invite)
+    public void create(CommandCause context, String name,
+                       @Flag(longName = "hidden", value = "h") boolean hidden,
+                       @Flag(longName = "invite", value = "i") boolean invite)
     {
         if (service.hasAccount(name))
         {
@@ -128,12 +129,12 @@ public class BankManageCommand extends ContainerCommand
     }
 
     @Command(desc = "Deletes a bank")
-    public void delete(CommandSource context, BaseAccount.Virtual bank)
+    public void delete(CommandCause context, BaseAccount.Virtual bank)
     {
         if (true)
         {
             // TODO
-            context.sendMessage(Text.of("NOT IMPLEMENTED YET"));
+            context.sendMessage(Identity.nil(), Component.text("NOT IMPLEMENTED YET"));
             return;
         }
 
@@ -147,7 +148,7 @@ public class BankManageCommand extends ContainerCommand
     }
 
     @Command(desc = "Renames a bank")
-    public void rename(CommandSource context, BaseAccount.Virtual bank, String newName)
+    public void rename(CommandCause context, BaseAccount.Virtual bank, String newName)
     {
         if (!service.hasAccess(bank, AccessLevel.MANAGE, context))
         {

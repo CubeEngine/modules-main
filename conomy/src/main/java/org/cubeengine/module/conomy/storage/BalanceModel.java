@@ -37,7 +37,7 @@ public class BalanceModel extends AsyncRecord<BalanceModel>
     {
         this.setValue(TABLE_BALANCE.ACCOUNT_ID, account.getValue(TABLE_ACCOUNT.ID));
         this.setValue(TABLE_BALANCE.CURRENCY, ((ConfigCurrency) currency).getCurrencyID());
-        this.setValue(TABLE_BALANCE.CONTEXT, context.getType() + "|" + context.getName());
+        this.setValue(TABLE_BALANCE.CONTEXT, context.getKey() + "|" + context.getValue());
         this.setValue(TABLE_BALANCE.BALANCE, ((ConfigCurrency) currency).toLong(balance));
         return this;
     }

@@ -20,75 +20,69 @@ package org.cubeengine.module.conomy.command;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.alias.Alias;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Label;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.command.CommandManager;
+import java.util.UUID;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Delegate;
+import org.cubeengine.libcube.service.command.annotation.Label;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.ConfigCurrency;
 import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyService;
 import org.cubeengine.module.conomy.storage.BalanceModel;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.command.parser.PlayerList;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.event.EventContext;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
 import org.spongepowered.api.service.pagination.PaginationList;
-import org.spongepowered.api.service.pagination.PaginationService;
-import org.spongepowered.api.text.Text;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.text.format.TextColors.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
+@Singleton
+@Delegate("balance")
 @Command(name = "money", desc = "Manage your money")
-public class MoneyCommand extends ContainerCommand
+public class MoneyCommand extends DispatcherCommand
 {
     // TODO add in context to commands
     private final Conomy module;
     private ConomyService service;
     private I18n i18n;
 
-    public MoneyCommand(CommandManager base, Conomy module, ConomyService conomy, I18n i18n)
+    @Inject
+    public MoneyCommand(Conomy module, ConomyService conomy, I18n i18n)
     {
-        super(base, Conomy.class);
         this.module = module;
         this.service = conomy;
         this.i18n = i18n;
     }
 
-    @Override
-    protected boolean selfExecute(CommandInvocation invocation)
+    private BaseAccount.Unique getUserAccount(UUID user)
     {
-        return this.getCommand("balance").execute(invocation);
-    }
-
-    private BaseAccount.Unique getUserAccount(User user)
-    {
-        return service.getOrCreateAccount(user.getUniqueId())
+        return service.getOrCreateAccount(user)
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast).orElse(null);
     }
 
-    @Alias(value = {"balance", "moneybalance", "pmoney"})
+    @Alias(value = "balance", alias = {"moneybalance", "pmoney"})
     @Command(desc = "Shows your balance")
-    public void balance(CommandSource context, @Default BaseAccount.Unique account)
+    public void balance(CommandCause context, @Default BaseAccount.Unique account)
     {
         Map<Currency, BigDecimal> balances = account.getBalances();
         if (balances.isEmpty())
@@ -99,13 +93,13 @@ public class MoneyCommand extends ContainerCommand
         i18n.send(context, POSITIVE, "{account}'s Balance:", account);
         for (Map.Entry<Currency, BigDecimal> entry : balances.entrySet())
         {
-            context.sendMessage(Text.of(GOLD, entry.getKey().format(entry.getValue())));
+            context.sendMessage(Identity.nil(), entry.getKey().format(entry.getValue()).color(NamedTextColor.GOLD));
         }
     }
 
-    @Alias(value = {"toplist", "balancetop", "topmoney"})
+    @Alias(value = "toplist", alias = {"balancetop", "topmoney"})
     @Command(desc = "Shows the players with the highest balance.")
-    public void top(CommandSource context, @Optional @Label("[fromRank-]toRank") String range)
+    public void top(CommandCause context, @Option @Label("[fromRank-]toRank") String range)
     {
         int fromRank = 1;
         int toRank = 10;
@@ -126,45 +120,44 @@ public class MoneyCommand extends ContainerCommand
                 return;
             }
         }
-        Collection<BalanceModel> models = this.service.getTopBalance(true, false, fromRank, toRank,
-                context.hasPermission(module.perms().ACCESS_SEE.getId()));
+        Collection<BalanceModel> models = this.service.getTopBalance(true, false, fromRank, toRank, service.getPerms().ACCESS_SEE.check(context));
         int i = fromRank;
 
 
-        PaginationList.Builder pagination = Sponge.getServiceManager().provideUnchecked(PaginationService.class).builder();
-        pagination.padding(Text.of("-"));
+        PaginationList.Builder pagination = Sponge.getGame().getServiceProvider().paginationService().builder();
+        pagination.padding(Component.text("-"));
         if (fromRank == 1)
         {
             pagination.title(i18n.translate(context, POSITIVE, "Top Balance ({amount})", models.size()));
         }
         else
         {
-            pagination.title(i18n.translate(context, POSITIVE, "Top Balance from {integer} to {integer}",
-                    fromRank, fromRank + models.size() - 1));
+            pagination.title(i18n.translate(context, POSITIVE, "Top Balance from {integer} to {integer}", fromRank, fromRank + models.size() - 1));
         }
-        List<Text> texts = new ArrayList<>();
+        List<Component> texts = new ArrayList<>();
         for (BalanceModel balance : models)
         {
             Account account = service.getOrCreateAccount(balance.getAccountID()).get();
             ConfigCurrency currency = service.getCurrency(balance.getCurrency());
             if (currency == null)
             {
-                texts.add(Text.of(CRITICAL, "?", balance.getCurrency(), "? : ", balance.getBalance()));
+                texts.add(Component.text( "?" + balance.getCurrency() + "? : " + balance.getBalance(), CRITICAL));
             }
             else
             {
-                texts.add(Text.of(i++, WHITE, " - ",
-                        DARK_GREEN, account.getDisplayName(), WHITE, ": ",
-                        GOLD, currency.format(currency.fromLong(balance.getBalance()))));
+                texts.add(Component.text(i++).append(Component.text(" - ", NamedTextColor.WHITE))
+                         .append(account.getDisplayName().color(NamedTextColor.DARK_GREEN))
+                         .append(Component.text(":", NamedTextColor.WHITE))
+                         .append(Component.text(currency.fromLong(balance.getBalance()).longValue(), NamedTextColor.GOLD)));
             }
         }
         pagination.contents(texts);
-        pagination.sendTo(context);
+        pagination.sendTo(context.getAudience());
     }
 
     @Alias(value = "pay")
     @Command(alias = "give", desc = "Transfer the given amount to another account.")
-    public void pay(CommandSource context, @Label("*|<players>") PlayerList users, Double amount, @Default @Named("as") BaseAccount.Unique source)
+    public void pay(CommandCause context, Collection<User> users, Double amount, @Default @Named("as") BaseAccount.Unique source)
     {
         if (amount < 0)
         {
@@ -175,7 +168,7 @@ public class MoneyCommand extends ContainerCommand
         boolean asSomeOneElse = false;
         if (!source.getIdentifier().equals(context.getIdentifier()))
         {
-            if (!context.hasPermission(module.perms().ACCESS_WITHDRAW.getId()))
+            if (!service.getPerms().ACCESS_WITHDRAW.check(context))
             {
                 i18n.send(context, NEGATIVE, "You are not allowed to pay money as someone else!");
                 return;
@@ -183,36 +176,36 @@ public class MoneyCommand extends ContainerCommand
             asSomeOneElse = true;
         }
 
-        for (User user : users.list())
+        for (User player : users)
         {
-            if (user.equals(source))
+            if (player.getUniqueId().equals(source.getUniqueId()))
             {
-                i18n.send(context, NEGATIVE, "Source and target are the same!", user);
+                i18n.send(context, NEGATIVE, "Source and target are the same!", player);
                 continue;
             }
-            Account target = getUserAccount(user);
+            Account target = getUserAccount(player.getUniqueId());
             if (target == null)
             {
-                i18n.send(context, NEGATIVE, "{user} does not have an account!", user);
+                i18n.send(context, NEGATIVE, "{user} does not have an account!", player);
                 continue;
             }
             Currency cur = service.getDefaultCurrency();
-            TransferResult result = source.transfer(target, cur, new BigDecimal(amount), causeOf(context));
-            Text formatAmount = cur.format(result.getAmount());
+            TransferResult result = source.transfer(target, cur, new BigDecimal(amount), Collections.emptySet());
+            Component formatAmount = cur.format(result.getAmount());
             switch (result.getResult())
             {
                 case SUCCESS:
                     if (asSomeOneElse)
                     {
-                        i18n.send(context, POSITIVE, "{txt#amount} transferred from {account}'s to {user}'s account!", formatAmount, source, user);
+                        i18n.send(context, POSITIVE, "{txt#amount} transferred from {account}'s to {user}'s account!", formatAmount, source, player);
                     }
                     else
                     {
-                        i18n.send(context, POSITIVE, "{txt#amount} transferred to {user}'s account!", formatAmount, user);
+                        i18n.send(context, POSITIVE, "{txt#amount} transferred to {user}'s account!", formatAmount, player);
                     }
-                    if (user.isOnline())
+                    if (player.isOnline())
                     {
-                        i18n.send(user.getPlayer().get(), POSITIVE, "{account} just paid you {txt#amount}!", source, formatAmount);
+                        i18n.send(player.getPlayer().get(), POSITIVE, "{account} just paid you {txt#amount}!", source, formatAmount);
                     }
                     break;
                 case ACCOUNT_NO_FUNDS:
@@ -232,8 +225,4 @@ public class MoneyCommand extends ContainerCommand
         }
     }
 
-    private static Cause causeOf(CommandSource context)
-    {
-        return Cause.of(EventContext.empty(), context);
-    }
 }

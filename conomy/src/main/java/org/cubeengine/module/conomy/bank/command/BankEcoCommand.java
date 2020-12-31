@@ -18,45 +18,44 @@
 package org.cubeengine.module.conomy.bank.command;
 
 import java.math.BigDecimal;
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.text.Component;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.conomy.AccessLevel;
 import org.cubeengine.module.conomy.BaseAccount;
-import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.bank.BankConomyService;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.event.cause.Cause;
-import org.spongepowered.api.event.cause.EventContext;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.service.economy.transaction.TransactionResult;
-import org.spongepowered.api.text.Text;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
-@Command(name = "bank", desc = "Administrative commands for Conomy Banks.")
-public class EcoBankCommand extends ContainerCommand
+@Singleton
+@Command(name = "eco", desc = "Administrative commands for Conomy Banks.")
+public class BankEcoCommand extends DispatcherCommand
 {
     private BankConomyService service;
     private I18n i18n;
 
-    public EcoBankCommand(CommandManager base, BankConomyService service, I18n i18n)
+    @Inject
+    public BankEcoCommand(BankConomyService service, I18n i18n)
     {
-        super(base, Conomy.class);
         this.service = service;
         this.i18n = i18n;
     }
 
     @Command(alias = "grant", desc = "Gives money to a bank or all banks")
-    public void give(CommandSource context, BaseAccount.Virtual bank, Double amount)
+    public void give(CommandCause context, BaseAccount.Virtual bank, Double amount)
     {
-        TransactionResult result = bank.deposit(service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
+        TransactionResult result = bank.deposit(service.getDefaultCurrency(), new BigDecimal(amount));
         switch (result.getResult())
         {
             case SUCCESS:
-                Text formatAmount = result.getCurrency().format(result.getAmount());
+                Component formatAmount = result.getCurrency().format(result.getAmount());
                 i18n.send(context, POSITIVE, "You gave {txt#amount} to the bank {account}!",
                         formatAmount, bank);
                 Sponge.getServer().getOnlinePlayers().stream()
@@ -71,13 +70,13 @@ public class EcoBankCommand extends ContainerCommand
     }
 
     @Command(alias = "remove", desc = "Takes money from given bank or all banks")
-    public void take(CommandSource context, BaseAccount.Virtual bank, Double amount)
+    public void take(CommandCause context, BaseAccount.Virtual bank, Double amount)
     {
-        TransactionResult result = bank.withdraw(service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
+        TransactionResult result = bank.withdraw(service.getDefaultCurrency(), new BigDecimal(amount));
         switch (result.getResult())
         {
             case SUCCESS:
-                Text formatAmount = result.getCurrency().format(result.getAmount());
+                Component formatAmount = result.getCurrency().format(result.getAmount());
                 i18n.send(context, POSITIVE, "You took {input#amount} from the bank {account}!",
                         formatAmount, bank);
                 Sponge.getServer().getOnlinePlayers().stream()
@@ -93,13 +92,13 @@ public class EcoBankCommand extends ContainerCommand
     }
 
     @Command(desc = "Reset the money from given banks")
-    public void reset(CommandSource context, BaseAccount.Virtual bank)
+    public void reset(CommandCause context, BaseAccount.Virtual bank)
     {
-        TransactionResult result = bank.resetBalance(service.getDefaultCurrency(), causeOf(context));
+        TransactionResult result = bank.resetBalance(service.getDefaultCurrency());
         switch (result.getResult())
         {
             case SUCCESS:
-                Text formatAmount = result.getCurrency().format(result.getAmount());
+                Component formatAmount = result.getCurrency().format(result.getAmount());
                 i18n.send(context, POSITIVE, "The account of the bank {account} got reset to {txt#balance}!",
                         bank, formatAmount);
                 Sponge.getServer().getOnlinePlayers().stream()
@@ -115,13 +114,13 @@ public class EcoBankCommand extends ContainerCommand
     }
 
     @Command(desc = "Sets the money from given banks")
-    public void set(CommandSource context, BaseAccount.Virtual bank, Double amount)
+    public void set(CommandCause context, BaseAccount.Virtual bank, Double amount)
     {
-        TransactionResult result = bank.setBalance(service.getDefaultCurrency(), new BigDecimal(amount), causeOf(context));
+        TransactionResult result = bank.setBalance(service.getDefaultCurrency(), new BigDecimal(amount));
         switch (result.getResult())
         {
             case SUCCESS:
-                Text formatAmount = result.getCurrency().format(result.getAmount());
+                Component formatAmount = result.getCurrency().format(result.getAmount());
                 i18n.send(context, POSITIVE, "The money of bank account {account} got set to {txt#balance}!",
                         bank, formatAmount);
                 Sponge.getServer().getOnlinePlayers().stream()
@@ -136,7 +135,7 @@ public class EcoBankCommand extends ContainerCommand
     }
 
     @Command(desc = "Hides the account of given bank")
-    public void hide(CommandSource context, BaseAccount.Virtual bank)
+    public void hide(CommandCause context, BaseAccount.Virtual bank)
     {
         if (bank.isHidden())
         {
@@ -148,7 +147,7 @@ public class EcoBankCommand extends ContainerCommand
     }
 
     @Command(desc = "Unhides the account of given banks")
-    public void unhide(CommandSource context, BaseAccount.Virtual bank)
+    public void unhide(CommandCause context, BaseAccount.Virtual bank)
     {
         if (!bank.isHidden())
         {
@@ -157,10 +156,5 @@ public class EcoBankCommand extends ContainerCommand
         }
         bank.setHidden(false);
         i18n.send(context, POSITIVE, "The bank {account} is no longer hidden!", bank);
-    }
-
-    private static Cause causeOf(CommandSource context)
-    {
-        return Cause.of(EventContext.empty(), context);
     }
 }

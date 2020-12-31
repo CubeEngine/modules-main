@@ -19,8 +19,9 @@ package org.cubeengine.module.conomy;
 
 import java.math.BigDecimal;
 import java.util.Set;
+import java.util.function.Supplier;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.event.cause.Cause;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.economy.EconomyTransactionEvent;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
@@ -39,16 +40,16 @@ public class Result implements TransactionResult
     private ResultType result;
     private TransactionType type;
 
-    public Result(Account account, Currency currency, BigDecimal amount, Set<Context> contexts, ResultType result, TransactionType type, Cause cause)
+    public Result(Account account, Currency currency, BigDecimal amount, Set<Context> contexts, ResultType result, Supplier<TransactionType> type)
     {
         this.account = account;
         this.currency = currency;
         this.amount = amount;
         this.contexts = contexts;
         this.result = result;
-        this.type = type;
+        this.type = type.get();
 
-        Sponge.getEventManager().post(new ResultEvent(cause, this));
+        Sponge.getEventManager().post(new ResultEvent( this));
     }
 
     @Override
@@ -91,9 +92,9 @@ public class Result implements TransactionResult
     {
         private Account accountTo;
 
-        public Transfer(Account account, Account accountTo, Currency currency, BigDecimal amount, Set<Context> contexts, ResultType result, TransactionType type, Cause cause)
+        public Transfer(Account account, Account accountTo, Currency currency, BigDecimal amount, Set<Context> contexts, ResultType result, Supplier<TransactionType> type)
         {
-            super(account, currency, amount, contexts, result, type, cause);
+            super(account, currency, amount, contexts, result, type);
             this.accountTo = accountTo;
         }
 
@@ -109,9 +110,9 @@ public class Result implements TransactionResult
         private Cause cause;
         private TransactionResult transaction;
 
-        public ResultEvent(Cause cause, TransactionResult transaction)
+        public ResultEvent(TransactionResult transaction)
         {
-            this.cause = cause;
+            this.cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
             this.transaction = transaction;
         }
 
