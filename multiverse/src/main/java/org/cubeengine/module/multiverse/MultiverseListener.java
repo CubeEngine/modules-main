@@ -18,11 +18,19 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import org.cubeengine.module.multiverse.player.MultiverseData;
+import org.cubeengine.module.multiverse.player.PlayerData;
+import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.MoveEntityEvent;
-import org.spongepowered.api.world.World;
+import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
+import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.api.world.server.ServerWorld;
 
 public class MultiverseListener
 {
@@ -34,24 +42,32 @@ public class MultiverseListener
     }
 
     @Listener
-    public void onWorldChange(MoveEntityEvent.Teleport event)
+    public void onWorldChange(ChangeEntityWorldEvent.Reposition event)
     {
-        World from = event.getFromTransform().getExtent();
-        World to = event.getToTransform().getExtent();
-        Entity target = event.getTargetEntity();
+        ServerWorld from = event.getOriginalWorld();
+        ServerWorld to = event.getOriginalDestinationWorld();
+        Entity target = event.getEntity();
 
-        if (from.equals(to) || module.getUniverse(from).equals(module.getUniverse(to)))
+        final String toUniverse = module.getUniverse(to);
+        final String fromUniverse = module.getUniverse(from);
+        if (from.equals(to) || fromUniverse.equals(toUniverse))
         {
             return;
         }
 
-        if (target instanceof Player)
+        if (target instanceof ServerPlayer)
         {
-            MultiverseDataold data = target.get(MultiverseDataold.class).get();
-            data.from(module.getUniverse(from), from).applyFromPlayer(((Player)target)); // save playerdata
-            data.from(module.getUniverse(to), to).applyToPlayer(((Player)target)); // load playerdata
-            target.offer(data);
-            module.getLogger().info("{} entered the universe {}", ((Player)target).getName(), module.getUniverse(to));
+            final Map<String, DataContainer> map = target.get(MultiverseData.DATA).orElse(new HashMap<>());
+            final DataContainer dataContainerFrom = map.get(fromUniverse);
+            final PlayerData fromPlayerData = PlayerData.of(dataContainerFrom, from).applyFromPlayer(((ServerPlayer)target));// save playerdata
+            map.put(fromUniverse, fromPlayerData.toContainer());
+
+            final DataContainer dataContainerTo = map.get(toUniverse);
+            PlayerData.of(dataContainerTo, to).applyToPlayer(((ServerPlayer)target));  // load playerdata
+
+            target.offer(MultiverseData.DATA, map);
+            target.offer(MultiverseData.UNIVERSE, toUniverse);
+            module.getLogger().info("{} entered the universe {}", ((Player)target).getName(), toUniverse);
         }
         else
         {
@@ -60,55 +76,60 @@ public class MultiverseListener
     }
 
     @Listener
-    public void onJoin(ClientConnectionEvent.Join event)
+    public void onJoin(ServerSideConnectionEvent.Join event)
     {
-        Player player = event.getTargetEntity();
-        MultiverseDataold data = player.get(MultiverseDataold.class).orElse(new MultiverseDataold(null, new HashMap<>()));
-        World world = player.getWorld();
+        ServerPlayer player = event.getPlayer();
+        final Map<String, DataContainer> data = player.get(MultiverseData.DATA).orElse(new HashMap<>());
+        final Optional<String> currentUniverse = player.get(MultiverseData.UNIVERSE);
+        ServerWorld world = player.getWorld();
         String loginUniverse = module.getUniverse(world);
-        if (data.getCurrentUniverse() == null)
+        if (!currentUniverse.isPresent())
         {
-            data.setCurrentUniverse(loginUniverse); // set universe
+            player.offer(MultiverseData.UNIVERSE, loginUniverse); // set universe
         }
-        else if (!data.getCurrentUniverse().equals(loginUniverse)) // Player is not in the expected universe
+        else if (!currentUniverse.get().equals(loginUniverse)) // Player is not in the expected universe
         {
-            data.setCurrentUniverse(loginUniverse); // update universe
-            data.from(loginUniverse, world, player).applyToPlayer(player); // load playerdata
+            player.offer(MultiverseData.UNIVERSE, loginUniverse); // update universe
+            PlayerData.of(data.get(loginUniverse), world).applyToPlayer(player); // load playerdata
         }
-        player.offer(data);
     }
 
 
     @Listener
-    public void onQuit(ClientConnectionEvent.Disconnect event)
+    public void onQuit(ServerSideConnectionEvent.Disconnect event)
     {
-        Player player = event.getTargetEntity();
-        MultiverseDataold data = player.get(MultiverseDataold.class).orElse(null);
+        ServerPlayer player = event.getPlayer();
+        final Map<String, DataContainer> data = player.get(MultiverseData.DATA).orElse(null);
         if (data == null)
         {
             return;
             // TODO how?
         }
         String universe = module.getUniverse(player.getWorld());
-        data.from(universe, player.getWorld()).applyFromPlayer(player);
-        player.offer(data);
+        final PlayerData playerData = PlayerData.of(data.get(universe), player.getWorld()).applyFromPlayer(player);
+        data.put(universe, playerData.toContainer());
+        player.offer(MultiverseData.DATA, data);
+        player.offer(MultiverseData.UNIVERSE, universe);
     }
 
     @Listener
     public void onRespawn(RespawnPlayerEvent event)
     {
-        World from = event.getFromTransform().getExtent();
-        World to = event.getToTransform().getExtent();
-        Entity target = event.getTargetEntity();
+        ServerWorld from = event.getOriginalWorld();
+        ServerWorld to = event.getOriginalDestinationWorld();
+        ServerPlayer target = event.getEntity();
 
-        if (from.equals(to) || module.getUniverse(from).equals(module.getUniverse(to)))
+        final String fromUniverse = module.getUniverse(from);
+        final String toUniverse = module.getUniverse(to);
+        if (from.equals(to) || fromUniverse.equals(toUniverse))
         {
             return;
         }
 
-        MultiverseDataold data = target.get(MultiverseDataold.class).get();
-        data.from(module.getUniverse(from), from).applyFromPlayer(((Player)target)); // save playerdata
-        data.from(module.getUniverse(to), to).applyToPlayer(((Player)target)); // load playerdata
-        target.offer(data);
+        final Map<String, DataContainer> data = target.get(MultiverseData.DATA).orElse(new HashMap<>());
+        data.put(fromUniverse, PlayerData.of(data.get(fromUniverse), from).applyFromPlayer(target).toContainer()); // save playerdata
+        PlayerData.of(data.get(toUniverse), to).applyToPlayer(target);
+        target.offer(MultiverseData.UNIVERSE, toUniverse);
+        target.offer(MultiverseData.DATA, data);
     }
 }

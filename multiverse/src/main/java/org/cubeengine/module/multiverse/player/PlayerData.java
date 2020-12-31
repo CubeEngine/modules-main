@@ -21,48 +21,40 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import io.leangen.geantyref.TypeToken;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataQuery;
 import org.spongepowered.api.data.persistence.DataSerializable;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.persistence.Queries;
-import org.spongepowered.api.data.value.ListValue;
-import org.spongepowered.api.data.value.MapValue;
-import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.entity.Hotbar;
+import org.spongepowered.api.item.inventory.Slot;
+import org.spongepowered.api.item.inventory.entity.PlayerInventory;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.server.ServerWorld;
 
 import static java.util.Collections.emptyList;
 
 public class PlayerData implements DataSerializable
 {
-    private static TypeToken<Value<Integer>> TTV_Int = new TypeToken<Value<Integer>>() {};
-    private static TypeToken<Value<Double>> TTV_Double = new TypeToken<Value<Double>>() {};
-    private static TypeToken<Value<String>> TTV_String = new TypeToken<Value<String>>() {};
-    private static TypeToken<ListValue<PotionEffect>> TTLV_PotionEffect = new TypeToken<ListValue<PotionEffect>>() {};
-    private static TypeToken<MapValue<Integer, ItemStack>> TTMV_Inventory = new TypeToken<MapValue<Integer, ItemStack>>() {};
-
-    public static final Key<Value<Integer>> HELD_ITEM = Key.builder().type(TTV_Int).query(of("heldItemSlot")).id("player-helditem").name("Held Item Index").build();
-    public static final Key<Value<Double>> HEALTH = Key.builder().type(TTV_Double).query(of("health")).id("player-health").name("Health").build();
-    public static final Key<Value<Double>> MAX_HEALTH = Key.builder().type(TTV_Double).query(of("maxHealth")).id("player-max-health").name("Max Health").build();
-    public static final Key<Value<Integer>> FOOD = Key.builder().type(TTV_Int).query(of("foodLevel")).id("player-food").name("Food").build();
-    public static final Key<Value<Double>> SATURATION = Key.builder().type(TTV_Double).query(of("saturation")).id("player-saturation").name("Saturation").build();
-    public static final Key<Value<Double>> EXHAUSTION = Key.builder().type(TTV_Double).query(of("exhaustion")).id("player-exhaustion").name("Exhaustion").build();
-    public static final Key<Value<Integer>> EXP = Key.builder().type(TTV_Int).query(of("exp")).id("player-exp").name("Exp").build();
-    public static final Key<Value<Integer>> FIRE_TICKS = Key.builder().type(TTV_Int).query(of("fireticks")).id("player-fireticks").name("Fire-Ticks").build();
-    public static final Key<ListValue<PotionEffect>> ACTIVE_EFFECTS = Key.builder().type(TTLV_PotionEffect).query(of("activeEffects")).id("player-effects").name("Effects").build();
-    public static final Key<MapValue<Integer, ItemStack>> INVENTORY = Key.builder().type(TTMV_Inventory).query(of("inventory")).id("player-inventory").name("Inventory").build();
-    public static final Key<MapValue<Integer, ItemStack>> ENDER_INVENTORY = Key.builder().type(TTMV_Inventory).query(of("enderInventory")).id("player-enderchest").name("Enderchest").build();
-    public static final Key<Value<String>> GAMEMODE = Key.builder().type(TTV_String).query(of("gamemode")).id("player-gamemode").name("Gamemode").build();
+    public static final DataQuery HELD_ITEM = DataQuery.of("heldItemSlot");
+    public static final DataQuery HEALTH = DataQuery.of("health");
+    public static final DataQuery MAX_HEALTH = DataQuery.of("maxHealth");
+    public static final DataQuery FOOD = DataQuery.of("foodLevel");
+    public static final DataQuery SATURATION = DataQuery.of("saturation");
+    public static final DataQuery EXHAUSTION = DataQuery.of("exhaustion");
+    public static final DataQuery EXP = DataQuery.of("exp");
+    public static final DataQuery FIRE_TICKS = DataQuery.of("fireticks");
+    public static final DataQuery ACTIVE_EFFECTS = DataQuery.of("activeEffects");
+    public static final DataQuery INVENTORY = DataQuery.of("inventory");
+    public static final DataQuery ENDER_INVENTORY = DataQuery.of("enderInventory");
+    public static final DataQuery GAMEMODE = DataQuery.of("gamemode");
 
     public int heldItemSlot = 0;
     public double health = 20;
@@ -71,7 +63,7 @@ public class PlayerData implements DataSerializable
     public double saturation = 20;
     public double exhaustion = 0;
     public int exp = 0;
-    public int fireTicks = 0;
+    public long fireTicks = 0;
 
     public List<PotionEffect> activePotionEffects = new ArrayList<>();
     public Map<Integer, ItemStack> inventory  = new HashMap<>();
@@ -94,18 +86,18 @@ public class PlayerData implements DataSerializable
             throw new IllegalStateException("Different Version");
         }
 
-        this.heldItemSlot = value.getInt(HELD_ITEM.getQuery()).get();
-        this.health = value.getDouble(HEALTH.getQuery()).get();
-        this.maxHealth = value.getDouble(MAX_HEALTH.getQuery()).get();
-        this.foodLevel = value.getInt(FOOD.getQuery()).get();
-        this.saturation = value.getDouble(SATURATION.getQuery()).get();
-        this.exhaustion = value.getDouble(EXHAUSTION.getQuery()).get();
-        this.exp = value.getInt(EXP.getQuery()).get();
-        this.fireTicks = value.getInt(FIRE_TICKS.getQuery()).get();
-        this.activePotionEffects = value.getSerializableList(ACTIVE_EFFECTS.getQuery(), PotionEffect.class).orElse(new ArrayList<>());
+        this.heldItemSlot = value.getInt(HELD_ITEM).get();
+        this.health = value.getDouble(HEALTH).get();
+        this.maxHealth = value.getDouble(MAX_HEALTH).get();
+        this.foodLevel = value.getInt(FOOD).get();
+        this.saturation = value.getDouble(SATURATION).get();
+        this.exhaustion = value.getDouble(EXHAUSTION).get();
+        this.exp = value.getInt(EXP).get();
+        this.fireTicks = value.getInt(FIRE_TICKS).get();
+        this.activePotionEffects = value.getSerializableList(ACTIVE_EFFECTS, PotionEffect.class).orElse(new ArrayList<>());
 
         inventory.clear();
-        DataView inventoryView = value.getView(INVENTORY.getQuery()).orElse(DataContainer.createNew());
+        DataView inventoryView = value.getView(INVENTORY).orElse(DataContainer.createNew());
         for (DataQuery key : inventoryView.getKeys(false))
         {
             try
@@ -123,13 +115,13 @@ public class PlayerData implements DataSerializable
         }
 
         enderChest.clear();
-        inventoryView = value.getView(ENDER_INVENTORY.getQuery()).orElse(DataContainer.createNew());
+        inventoryView = value.getView(ENDER_INVENTORY).orElse(DataContainer.createNew());
         for (DataQuery key : inventoryView.getKeys(false))
         {
             enderChest.put(Integer.valueOf(key.asString("")), ItemStack.builder().fromContainer(inventoryView.getView(key).get()).build());
         }
 
-        this.gameMode = Sponge.getRegistry().getType(GameMode.class, value.getString(GAMEMODE.getQuery()).get()).get();
+        this.gameMode = Sponge.getGame().registries().registry(RegistryTypes.GAME_MODE).value(ResourceKey.resolve(value.getString(GAMEMODE).get()));
     }
 
     public static PlayerData of(DataContainer dataContainer, ServerWorld world)
@@ -158,32 +150,32 @@ public class PlayerData implements DataSerializable
             .set(ACTIVE_EFFECTS, activePotionEffects)
             .set(INVENTORY, inventory)
             .set(ENDER_INVENTORY, enderChest)
-            .set(GAMEMODE, gameMode.getId());
+            .set(GAMEMODE, Sponge.getGame().registries().registry(RegistryTypes.GAME_MODE).valueKey(gameMode).asString());
         return result;
     }
 
-    public void applyToPlayer(ServerPlayer player)
+    public PlayerData applyToPlayer(ServerPlayer player)
     {
-        Inventory inv = player.getInventory();
-        ((Hotbar)inv.query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class))).setSelectedSlotIndex(heldItemSlot);
+        final PlayerInventory inv = player.getInventory();
+        inv.getHotbar().setSelectedSlotIndex(heldItemSlot);
         player.offer(Keys.MAX_HEALTH, maxHealth);
         player.offer(Keys.HEALTH, health);
         player.offer(Keys.FOOD_LEVEL, foodLevel);
         player.offer(Keys.SATURATION, saturation);
         player.offer(Keys.EXHAUSTION, exhaustion);
-        player.offer(Keys.TOTAL_EXPERIENCE, exp);
+        player.offer(Keys.EXPERIENCE, exp);
         if (fireTicks != 0)
         {
-            player.offer(Keys.FIRE_TICKS, fireTicks);
+            player.offer(Keys.FIRE_TICKS, Ticks.of(fireTicks));
         }
 
         player.remove(Keys.POTION_EFFECTS);
         player.offer(Keys.POTION_EFFECTS, activePotionEffects);
 
         int i = 0;
-        for (Inventory slot : inv.slots())
+        for (Slot slot : inv.slots())
         {
-            ItemStack item = inventory.get(i);
+            ItemStack item = this.inventory.get(i);
             if (item != null)
             {
                 slot.set(item);
@@ -195,9 +187,8 @@ public class PlayerData implements DataSerializable
             i++;
         }
 
-         /* TODO EnderChet
         i = 0;
-        for (Inventory slot : player.getEnderChest().slots())
+        for (Slot slot : player.getEnderChestInventory().slots())
         {
             ItemStack item = enderChest.get(i);
             if (item != null)
@@ -210,49 +201,47 @@ public class PlayerData implements DataSerializable
             }
             i++;
         }
-        */
 
         player.offer(Keys.GAME_MODE, gameMode);
+        return this;
     }
 
     public PlayerData applyFromPlayer(ServerPlayer player)
     {
-        Inventory playerInventory = player.getInventory();
-        this.heldItemSlot = ((Hotbar)playerInventory.query(QueryOperationTypes.INVENTORY_TYPE.of(Hotbar.class))).getSelectedSlotIndex();
+        PlayerInventory playerInventory = player.getInventory();
+        this.heldItemSlot = playerInventory.getHotbar().getSelectedSlotIndex();
         this.maxHealth = player.get(Keys.MAX_HEALTH).get();
         this.health = player.get(Keys.HEALTH).get();
         this.foodLevel = player.get(Keys.FOOD_LEVEL).get();
         this.saturation = player.get(Keys.SATURATION).get();
         this.exhaustion = player.get(Keys.EXHAUSTION).get();
-        this.exp = player.get(Keys.TOTAL_EXPERIENCE).get();
-        this.fireTicks = player.get(Keys.FIRE_TICKS).orElse(0);
+        this.exp = player.get(Keys.EXPERIENCE).get();
+        this.fireTicks = player.get(Keys.FIRE_TICKS).map(Ticks::getTicks).orElse(0L);
         this.activePotionEffects = player.get(Keys.POTION_EFFECTS).orElse(emptyList());
 
         this.inventory = new HashMap<>();
         int i = 0;
-        for (Inventory slot : playerInventory.slots())
+        for (Slot slot : playerInventory.slots())
         {
-            Optional<ItemStack> item = slot.peek();
-            if (item.isPresent())
+            final ItemStack item = slot.peek();
+            if (!item.isEmpty())
             {
-                this.inventory.put(i, item.get());
+                this.inventory.put(i, item);
             }
             i++;
         }
 
         this.enderChest = new HashMap<>();
-        /* TODO EnderChest
         i = 0;
-        for (Inventory slot : player.getEnderChest().slots())
+        for (Slot slot : player.getEnderChestInventory().slots())
         {
-            Optional<ItemStack> item = slot.peek();
-            if (item.isPresent())
+            final ItemStack item = slot.peek();
+            if (!item.isEmpty())
             {
-                this.enderChest.put(i, item.get());
+                this.enderChest.put(i, item);
             }
             i++;
         }
-        */
         this.gameMode = player.get(Keys.GAME_MODE).get();
         return this;
     }

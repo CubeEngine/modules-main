@@ -18,6 +18,8 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.Set;
+import java.util.UUID;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
 import org.spongepowered.api.service.permission.Subject;
@@ -25,7 +27,7 @@ import org.spongepowered.api.world.Locatable;
 
 public class MultiverseContextCalculator implements ContextCalculator<Subject> // TODO for User is should be possible to get the world too
 {
-    private static final String TYPE = "universe";
+    private static final String TYPE_UNIVERSE = "universe";
     private Multiverse module;
 
     public MultiverseContextCalculator(Multiverse module)
@@ -36,18 +38,28 @@ public class MultiverseContextCalculator implements ContextCalculator<Subject> /
     @Override
     public void accumulateContexts(Subject subject, Set<Context> set)
     {
-        if (subject.getCommandSource().isPresent() && subject.getCommandSource().get() instanceof Locatable)
+        if (subject instanceof Locatable)
         {
-            set.add(new Context(TYPE, module.getUniverse(((Locatable)subject.getCommandSource().get()).getWorld())));
+            set.add(new Context(TYPE_UNIVERSE, module.getUniverse(((Locatable)subject).getServerLocation().getWorld())));
+        }
+        else
+        {
+            // TODO better way to get player
+            if (subject.getContainingCollection() == Sponge.getServer().getServiceProvider().permissionService().getUserSubjects())
+            {
+                final String playerId = subject.getIdentifier();
+                final UUID uuid = UUID.fromString(playerId);
+                Sponge.getServer().getPlayer(uuid).ifPresent(player -> set.add(new Context(TYPE_UNIVERSE, module.getUniverse(player.getWorld()))));
+            }
         }
     }
 
     @Override
     public boolean matches(Context context, Subject subject)
     {
-        if (subject instanceof Locatable && context.getType().equals(TYPE))
+        if (subject instanceof Locatable && context.getKey().equals(TYPE_UNIVERSE))
         {
-            return module.getUniverse(((Locatable)subject).getWorld()).equals(context.getValue());
+            return module.getUniverse(((Locatable)subject).getServerLocation().getWorld()).equals(context.getValue());
         }
         return false;
     }

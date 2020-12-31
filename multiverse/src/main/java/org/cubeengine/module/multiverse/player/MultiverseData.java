@@ -27,7 +27,7 @@ import org.spongepowered.api.data.persistence.DataStore;
 import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
-import org.cubeengine.module.multiverse.PlugnMultiverse;
+import org.cubeengine.module.multiverse.PluginMultiverse;
 
 
 public interface MultiverseData
@@ -35,12 +35,12 @@ public interface MultiverseData
     TypeToken<Value<String>> TTV_String = new TypeToken<Value<String>>() {};
     TypeToken<MapValue<String, DataContainer>> TTMV_Data = new TypeToken<MapValue<String, DataContainer>>() { };
 
-    Key<Value<String>> WORLD = Key.builder()
-                                  .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID), "current-world")
-                                  .type(TTV_String).build();
+    Key<Value<String>> UNIVERSE = Key.builder()
+                                     .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "current-universe"))
+                                     .type(TTV_String).build();
 
     Key<MapValue<String, DataContainer>> DATA = Key.builder()
-                                  .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID), "player-data")
+                                  .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "player-data"))
                                   .type(TTMV_Data).build();
 
     static void register(RegisterDataEvent event)
@@ -51,14 +51,14 @@ public interface MultiverseData
 
     static void registerCurrentWorldData(RegisterDataEvent event)
     {
-        final ResourceKey rkey = ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "current-world");
+        final ResourceKey rkey = ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "current-universe");
         final DataStore dataStore = DataStore.builder().pluginData(rkey)
                                              .holder(BlockEntity.class)
-                                             .key(MultiverseData.WORLD, "current-world")
+                                             .key(MultiverseData.UNIVERSE, "current-universe")
                                              .build();
 
         final DataRegistration registration = DataRegistration.builder()
-                                                              .dataKey(MultiverseData.WORLD)
+                                                              .dataKey(MultiverseData.UNIVERSE)
                                                               .store(dataStore)
                                                               .build();
         event.register(registration);

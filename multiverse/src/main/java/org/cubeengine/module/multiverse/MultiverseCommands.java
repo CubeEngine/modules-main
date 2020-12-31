@@ -84,6 +84,7 @@ public class MultiverseCommands extends DispatcherCommand
                 p.offer(Keys.POTION_EFFECTS, Arrays.asList(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, 2 * 20)));
                 i18n.send(p, NEUTRAL, "When you open your eyes you now are in {input#univserse}.", universe);
                 p.offer(MultiverseData.DATA, data);
+                p.offer(MultiverseData.UNIVERSE, universe);
             });
     }
 
