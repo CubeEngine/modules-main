@@ -17,61 +17,55 @@
  */
 package org.cubeengine.module.protector.command;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
-
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Using;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.Protector;
-import org.cubeengine.module.protector.RegionManager;
+import org.cubeengine.module.protector.command.parser.TristateParser;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionParser;
-import org.cubeengine.module.zoned.ZoneManager;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
-import org.spongepowered.api.command.CommandMapping;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.manager.CommandMapping;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
+
+@Using({RegionParser.class, TristateParser.class})
 @Command(name = "control", desc = "Manages the region settings")
 public class SettingsCommands extends AbstractSettingsCommand
 {
-
     private PermissionManager pm;
 
-    public SettingsCommands(ZoneManager zoneMan, RegionManager manager, I18n i18n, PermissionService ps, PermissionManager pm, EventManager em, CommandManager cm)
+    @Inject
+    public SettingsCommands(SettingsListener listener, I18n i18n, PermissionService ps, PermissionManager pm, EventManager em, BlockDamageSettingsCommands bdsCmd, EntityDamageSettingsCommands edsCmd, PlayerDamageSettingsCommands pdsCmd)
     {
-        super(cm, Protector.class, i18n, new SettingsListener(manager, pm.getBasePermission(Protector.class), pm, i18n), ps);
+        super(i18n, listener, ps, bdsCmd, edsCmd, pdsCmd);
         this.pm = pm;
-        cm.getProviders().register(this, new RegionParser(zoneMan, manager, i18n), Region.class);
         em.registerListener(Protector.class, this.psl);
-
-        this.addCommand(new BlockDamageSettingsCommands(cm, i18n, psl, ps));
-        this.addCommand(new EntityDamageSettingsCommands(cm, i18n, psl, ps));
-        this.addCommand(new PlayerDamageSettingsCommands(cm, i18n, psl, ps));
     }
 
     @Command(desc = "Controls teleport movement")
-    public void teleport(CommandSource context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
+    public void teleport(CommandCause context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
     {
         this.move(context, SettingsListener.MoveType.TELEPORT, set, region, role);
     }
 
     @Command(desc = "Controls movement")
-    public void move(CommandSource context, SettingsListener.MoveType type, Tristate set,
+    public void move(CommandCause context, SettingsListener.MoveType type, Tristate set,
             @Default @Named("in") Region region,
             @Named("bypass") String role) // TODO role completer/reader
     {
@@ -88,9 +82,8 @@ public class SettingsCommands extends AbstractSettingsCommand
         i18n.send(context, POSITIVE,"Region {region}: Move Settings updated", region);
     }
 
-
     @Command(desc = "Controls player building")
-    public void build(CommandSource context, Tristate set,
+    public void build(CommandCause context, Tristate set,
             @Default @Named("in") Region region,
             @Named("bypass") String role) // TODO role completer/reader
     {
@@ -105,7 +98,7 @@ public class SettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls players interacting with blocks")
-    public void useAll(CommandSource context, SettingsListener.UseType type, Tristate set,
+    public void useAll(CommandCause context, SettingsListener.UseType type, Tristate set,
             @Default @Named("in") Region region, @Named("bypass") String role)
     {
         if (role != null)
@@ -136,7 +129,7 @@ public class SettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls player interacting with blocks")
-    public void useBlock(CommandSource context, BlockType type, Tristate set,
+    public void useBlock(CommandCause context, BlockType type, Tristate set,
             @Default @Named("in") Region region,
             @Named("bypass") String role) // TODO role completer/reader
     {
@@ -151,7 +144,7 @@ public class SettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls player interactive with items")
-    public void useItem(CommandSource context, ItemType type, Tristate set,
+    public void useItem(CommandCause context, ItemType type, Tristate set,
             @Default @Named("in") Region region,
             @Named("bypass") String role) // TODO role completer/reader
     {
@@ -167,8 +160,8 @@ public class SettingsCommands extends AbstractSettingsCommand
 
     @Command(desc = "Controls spawning of entities")
     // TODO completer for SpawnType & EntityType
-    public void spawn(CommandSource context, SettingsListener.SpawnType type, EntityType what, Tristate set,
-            @Default @Named("in") Region region, @Named("bypass") String role)
+    public void spawn(CommandCause context, SettingsListener.SpawnType type, EntityType what, Tristate set,
+                      @Default @Named("in") Region region, @Named("bypass") String role)
     {
         if (role != null)
         {
@@ -202,11 +195,11 @@ public class SettingsCommands extends AbstractSettingsCommand
 
     @Command(desc = "Controls executing commands")
     // TODO completer for commands
-    public void command(CommandSource context, String command, Tristate set,
+    public void command(CommandCause context, String command, Tristate set,
             @Default @Named("in") Region region, @Named("bypass") String role,
             @Flag boolean force)
     {
-        CommandMapping mapping = Sponge.getGame().getCommandManager().get(command).orElse(null);
+        CommandMapping mapping = Sponge.getGame().getCommandManager().getCommandMapping(command).orElse(null);
         boolean all = "*".equals(command);
         if (mapping == null && !all)
         {
@@ -244,7 +237,7 @@ public class SettingsCommands extends AbstractSettingsCommand
 
 
     @Command(desc = "Controls redstone circuits commands")
-    public void deadCircuit(CommandSource context, Tristate set, @Default @Named("in") Region region)
+    public void deadCircuit(CommandCause context, Tristate set, @Default @Named("in") Region region)
     {
         region.getSettings().deadCircuit = set;
         region.save();

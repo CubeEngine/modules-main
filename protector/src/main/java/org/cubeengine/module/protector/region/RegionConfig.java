@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.protector.region;
 
-import com.flowpowered.math.vector.Vector3i;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.reflect.Section;
@@ -25,9 +24,10 @@ import org.cubeengine.reflect.annotations.Comment;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.extra.fluid.FluidType;
+import org.spongepowered.api.fluid.FluidType;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.util.Tristate;
+import org.spongepowered.math.vector.Vector3i;
 
 import java.util.HashMap;
 import java.util.Map;

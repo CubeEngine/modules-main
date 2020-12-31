@@ -17,43 +17,8 @@
  */
 package org.cubeengine.module.protector;
 
-import static org.cubeengine.module.locker.data.LockType.PRIVATE;
-import static org.cubeengine.module.locker.data.ProtectionFlag.AUTOCLOSE;
-import static org.cubeengine.module.locker.data.ProtectionFlag.BLOCK_REDSTONE;
-import static org.cubeengine.module.locker.data.ProtectionFlag.HOPPER_IN;
-import static org.cubeengine.module.locker.data.ProtectionFlag.HOPPER_OUT;
-import static org.spongepowered.api.block.BlockTypes.ACACIA_DOOR;
-import static org.spongepowered.api.block.BlockTypes.ACACIA_FENCE_GATE;
-import static org.spongepowered.api.block.BlockTypes.BIRCH_DOOR;
-import static org.spongepowered.api.block.BlockTypes.BIRCH_FENCE_GATE;
-import static org.spongepowered.api.block.BlockTypes.BREWING_STAND;
-import static org.spongepowered.api.block.BlockTypes.CHEST;
-import static org.spongepowered.api.block.BlockTypes.DARK_OAK_DOOR;
-import static org.spongepowered.api.block.BlockTypes.DARK_OAK_FENCE_GATE;
-import static org.spongepowered.api.block.BlockTypes.DISPENSER;
-import static org.spongepowered.api.block.BlockTypes.DROPPER;
-import static org.spongepowered.api.block.BlockTypes.FURNACE;
-import static org.spongepowered.api.block.BlockTypes.HOPPER;
-import static org.spongepowered.api.block.BlockTypes.IRON_DOOR;
-import static org.spongepowered.api.block.BlockTypes.IRON_TRAPDOOR;
-import static org.spongepowered.api.block.BlockTypes.JUNGLE_DOOR;
-import static org.spongepowered.api.block.BlockTypes.JUNGLE_FENCE_GATE;
-import static org.spongepowered.api.block.BlockTypes.OAK_DOOR;
-import static org.spongepowered.api.block.BlockTypes.OAK_SIGN;
-import static org.spongepowered.api.block.BlockTypes.SPRUCE_FENCE_GATE;
-import static org.spongepowered.api.block.BlockTypes.TRAPPED_CHEST;
-import static org.spongepowered.api.entity.EntityTypes.HOPPER_MINECART;
-import static org.spongepowered.api.entity.EntityTypes.HORSE;
-import static org.spongepowered.api.entity.EntityTypes.ITEM_FRAME;
-import static org.spongepowered.api.entity.EntityTypes.PAINTING;
-
-import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.reflect.annotations.Comment;
 import org.cubeengine.reflect.annotations.Name;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 @SuppressWarnings("all")
 public class GlobalProtectionConfig extends ReflectedYaml
@@ -74,7 +39,6 @@ public class GlobalProtectionConfig extends ReflectedYaml
     @Name("settings.protect.entity.from-rightclick")
     public boolean protectEntityFromRClick = true;
 
-
     @Name("settings.protect.blocks.from-break")
     public boolean protectFromBlockBreak = true;
     @Name("settings.protect.blocks.from-pistonmove")
@@ -82,7 +46,6 @@ public class GlobalProtectionConfig extends ReflectedYaml
 
     @Name("settings.protect.blocks.from-redstone")
     public boolean protectFromRedstone = true;
-
 
 }
 

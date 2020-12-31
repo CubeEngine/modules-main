@@ -17,50 +17,49 @@
  */
 package org.cubeengine.module.protector.command;
 
-import static java.util.stream.Collectors.toList;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.spongepowered.api.text.format.TextColors.GOLD;
-import static org.spongepowered.api.text.format.TextColors.GRAY;
-import static org.spongepowered.api.text.format.TextColors.WHITE;
-import static org.spongepowered.api.text.format.TextColors.YELLOW;
-
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Flag;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.butler.parametric.Optional;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
-import org.cubeengine.libcube.service.event.EventManager;
-import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.task.TaskManager;
-import org.cubeengine.libcube.util.math.shape.Cuboid;
-import org.cubeengine.module.protector.Protector;
-import org.cubeengine.module.protector.RegionManager;
-import org.cubeengine.module.protector.region.Region;
-import org.cubeengine.module.protector.region.RegionConfig;
-import org.spongepowered.api.CatalogType;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextFormat;
-import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.world.Locatable;
-import org.spongepowered.api.world.World;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import net.kyori.adventure.identity.Identity;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Option;
+import org.cubeengine.libcube.service.command.annotation.Using;
+import org.cubeengine.libcube.service.event.EventManager;
+import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.task.TaskManager;
+import org.cubeengine.libcube.util.math.shape.Cuboid;
+import org.cubeengine.module.protector.Protector;
+import org.cubeengine.module.protector.RegionManager;
+import org.cubeengine.module.protector.command.parser.TristateParser;
+import org.cubeengine.module.protector.region.Region;
+import org.cubeengine.module.protector.region.RegionConfig;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.item.ItemType;
+import org.spongepowered.api.util.Tristate;
+import org.spongepowered.api.world.Locatable;
+import org.spongepowered.api.world.server.ServerWorld;
 
+import static java.util.stream.Collectors.toList;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+
+@Singleton
+@Using(TristateParser.class)
 @Command(name = "protect", desc = "Manages the regions")
-public class RegionCommands extends ContainerCommand
+public class RegionCommands extends DispatcherCommand
 {
     private final Protector module;
     private RegionManager manager;
@@ -68,9 +67,10 @@ public class RegionCommands extends ContainerCommand
     private TaskManager tm;
     private final EventManager em;
 
-    public RegionCommands(CommandManager base, Protector module, RegionManager manager, I18n i18n, TaskManager tm, EventManager em)
+    @Inject
+    public RegionCommands(Protector module, RegionManager manager, I18n i18n, TaskManager tm, EventManager em, SettingsCommands settingsCmd)
     {
-        super(base, Protector.class);
+        super(settingsCmd);
         this.module = module;
         this.manager = manager;
         this.i18n = i18n;
@@ -79,15 +79,15 @@ public class RegionCommands extends ContainerCommand
     }
 
     @Command(desc = "Lists protected zones")
-    public void list(CommandSource context, @Optional String match, @Named("in") World world)
+    public void list(CommandCause context, @Option String match, @Named("in") ServerWorld world)
     {
         // TODO clickable to select
-        World w = world;
+        ServerWorld w = world;
         if (world == null && context instanceof Locatable)
         {
-            w = ((Locatable) context).getWorld();
+            w = ((Locatable) context).getServerLocation().getWorld();
         }
-        Map<UUID, Map<String, Region>> regions = manager.getRegions();
+        Map<ResourceKey, Map<String, Region>> regions = manager.getRegions();
         List<Region> list = new ArrayList<>();
         if (w == null)
         {
@@ -113,7 +113,7 @@ public class RegionCommands extends ContainerCommand
         }
         else
         {
-            list.add(manager.getWorldRegion(world.getUniqueId()));
+            list.add(manager.getWorldRegion(world.getKey()));
         }
 
         if (list.isEmpty())
@@ -126,20 +126,33 @@ public class RegionCommands extends ContainerCommand
         list.sort(Comparator.comparingInt(Region::getPriority).reversed());
         for (Region region : list)
         {
-            Text prio = i18n.translate(context, TextFormat.of(YELLOW), "priority: {amount}", region.getPriority());
+            Component prio = i18n.translate(context, "priority: {amount}", region.getPriority()).color(NamedTextColor.YELLOW);
             if (region.isGlobal())
             {
-                context.sendMessage(Text.of(" - ", GOLD, "global ",
-                        GRAY, i18n.getTranslation(context, "(all worlds)"), " ", prio));
+                context.sendMessage(Identity.nil(), Component.text(" - ")
+                                         .append(Component.text("global", NamedTextColor.GOLD))
+                                         .append(i18n.translate(context, "(all worlds)").color(NamedTextColor.GRAY))
+                                         .append(Component.space())
+                                         .append(prio));
             }
             else if (region.isWorldRegion())
             {
-                context.sendMessage(Text.of(" - ", GOLD, region.getWorld().getName(), WHITE, ".", GOLD, "world ",
-                        GRAY, i18n.getTranslation(context, "(entire world)"), " ", prio));
+                context.sendMessage(Identity.nil(), Component.text(" - ")
+                                                             .append(Component.text(region.getWorldName(), NamedTextColor.GOLD))
+                                                             .append(Component.text(".", NamedTextColor.WHITE))
+                                                             .append(Component.text("world", NamedTextColor.GOLD))
+                                                             .append(i18n.translate(context, "(entire world)").color(NamedTextColor.GRAY))
+                                                             .append(Component.space())
+                                                             .append(prio));
             }
             else
             {
-                context.sendMessage(Text.of(" - ", GOLD, region.getWorld().getName(), WHITE, ".", GOLD, region.getName(), " ", prio));
+                context.sendMessage(Identity.nil(), Component.text(" - ")
+                                                             .append(Component.text(region.getWorldName(), NamedTextColor.GOLD))
+                                                             .append(Component.text(".", NamedTextColor.WHITE))
+                                                             .append(Component.text(region.getName(), NamedTextColor.GOLD))
+                                                             .append(Component.space())
+                                                             .append(prio));
             }
 
         }
@@ -147,7 +160,7 @@ public class RegionCommands extends ContainerCommand
     }
 
     @Command(desc = "Changes protection zone priority")
-    public void priority(CommandSource context, @Optional Integer priority, @Default Region region)
+    public void priority(CommandCause context, @Option Integer priority, @Default Region region)
     {
         if (priority == null)
         {
@@ -162,7 +175,7 @@ public class RegionCommands extends ContainerCommand
     // TODO region here / at / there? print all regions at position
 
     @Command(desc = "Displays Region info")
-    public void info(CommandSource context, @Default Region region, @Flag boolean allSettings)
+    public void info(CommandCause context, @Default Region region, @Flag boolean allSettings)
     {
         if (region.getWorld() == null)
         {
@@ -221,15 +234,15 @@ public class RegionCommands extends ContainerCommand
         // TODO remaining settings
     }
 
-    private void showSetting(CommandSource cs, String name, Tristate value, boolean allSettings)
+    private void showSetting(CommandCause cs, String name, Tristate value, boolean allSettings)
     {
         if (value != Tristate.UNDEFINED || allSettings)
         {
-            cs.sendMessage(Text.of(YELLOW, name, ": ", GOLD, toText(cs, value)));
+            cs.sendMessage(Identity.nil(), Component.text(name, NamedTextColor.YELLOW).append(toText(cs, value).color(NamedTextColor.GOLD)));
         }
     }
 
-    private void showSetting(CommandSource cs, String name, Map<?, Tristate> values, boolean allSettings)
+    private void showSetting(CommandCause cs, String name, Map<?, Tristate> values, boolean allSettings)
     {
         int pos = 0;
         int neg = 0;
@@ -247,66 +260,66 @@ public class RegionCommands extends ContainerCommand
 
         if (values.size() > 0 || allSettings)
         {
-            Text trueText = Text.of(YELLOW, i18n.getTranslation(cs, "Enabled"), " ", GOLD, pos);
-            Text falseText = Text.of(YELLOW, i18n.getTranslation(cs, "Disabled"), " ", GOLD, neg);
-            cs.sendMessage(Text.of(YELLOW, name, ": ", trueText, " ", falseText));
-            Map<Tristate, List<String>> settings = new HashMap<>();
+            Component trueText = i18n.translate(cs, "Enabled").color(NamedTextColor.YELLOW).append(Component.space()).append(Component.text(pos, NamedTextColor.GOLD));
+            Component falseText = i18n.translate(cs, "Disabled").color(NamedTextColor.YELLOW).append(Component.space()).append(Component.text(neg, NamedTextColor.GOLD));
+            cs.sendMessage(Identity.nil(), Component.text(name, NamedTextColor.YELLOW).append(Component.text(":")).append(trueText).append(Component.space()).append(falseText));
+            Map<Tristate, List<ComponentLike>> settings = new HashMap<>();
             for (Map.Entry<?, Tristate> entry : values.entrySet())
             {
-                String key;
+                ComponentLike key;
                 if (entry.getKey() instanceof Enum)
                 {
-                    key = ((Enum) entry.getKey()).name();
+                    key = Component.text(((Enum) entry.getKey()).name());
                 }
-                else if (entry.getKey() instanceof CatalogType)
+                else if (entry.getKey() instanceof ComponentLike)
                 {
-                    key = ((CatalogType) entry.getKey()).getName();
+                    key = ((ItemType) entry.getKey());
                 }
                 else if (entry.getKey() instanceof String)
                 {
-                    key = ((String) entry.getKey());
+                    key = Component.text((String) entry.getKey());
                 }
                 else
                 {
                     throw new IllegalArgumentException("Unsupported KeyType for map: " + entry.getKey().getClass().getSimpleName());
                 }
-                List<String> list = settings.computeIfAbsent(entry.getValue(), k -> new ArrayList<>());
+                List<ComponentLike> list = settings.computeIfAbsent(entry.getValue(), k -> new ArrayList<>());
                 list.add(key);
             }
-            for (Map.Entry<Tristate, List<String>> entry : settings.entrySet())
+            for (Map.Entry<Tristate, List<ComponentLike>> entry : settings.entrySet())
             {
-                Text.Builder builder = Text.of(" - ", toText(cs, entry.getKey()), YELLOW, ": ").toBuilder();
+                final TextComponent text = Component.text(" - ").append(toText(cs, entry.getKey())).append(Component.text(": ", NamedTextColor.YELLOW));
                 boolean first = true;
-                for (String val : entry.getValue())
+                for (ComponentLike val : entry.getValue())
                 {
                     if (!first)
                     {
-                        builder.append(Text.of(GRAY, ", "));
+                        text.append(Component.text(", ", NamedTextColor.GRAY));
                     }
                     first = false;
-                    builder.append(Text.of(YELLOW, val));
+                    text.append(val.asComponent().color(NamedTextColor.YELLOW));
                 }
-                cs.sendMessage(builder.build());
+                cs.sendMessage(Identity.nil(), text);
             }
 
         }
     }
 
-    private Text toText(CommandSource cs, Tristate val)
+    private Component toText(CommandCause cs, Tristate val)
     {
         switch (val)
         {
             case TRUE:
-                return Text.of(TextColors.DARK_GREEN, i18n.getTranslation(cs,"Enabled"));
+                return i18n.translate(cs, "Enabled").color(NamedTextColor.DARK_GREEN);
             case FALSE:
-                return Text.of(TextColors.DARK_RED, i18n.getTranslation(cs,"Disabled"));
+                return i18n.translate(cs,"Disabled").color(NamedTextColor.DARK_RED);
             default:
-                return Text.of(TextColors.GOLD, i18n.getTranslation(cs,"Undefined"));
+                return i18n.translate(cs,"Undefined").color(NamedTextColor.GOLD);
         }
     }
 
     @Command(desc = "Clears a zones protection settings")
-    public void clear(CommandSource context, Region region)
+    public void clear(CommandCause context, Region region)
     {
         if (!manager.deleteRegion(region))
         {
@@ -316,7 +329,7 @@ public class RegionCommands extends ContainerCommand
         i18n.send(context, POSITIVE, "The region {name} was deleted.", region.toString());
     }
 
-    public void parent(CommandSource context, Region parent, @Default Region region)
+    public void parent(CommandCause context, Region parent, @Default Region region)
     {
 
     }

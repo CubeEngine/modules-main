@@ -17,25 +17,6 @@
  */
 package org.cubeengine.module.protector;
 
-import com.flowpowered.math.vector.Vector2i;
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
-import org.cubeengine.libcube.service.config.ConfigWorld;
-import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
-import org.cubeengine.libcube.util.math.shape.Cuboid;
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.module.protector.region.Region;
-import org.cubeengine.module.protector.region.RegionConfig;
-import org.cubeengine.module.zoned.config.ZoneConfig;
-import org.cubeengine.module.zoned.Zoned;
-import org.cubeengine.reflect.Reflector;
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandSource;
-import org.spongepowered.api.util.Identifiable;
-import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.storage.WorldProperties;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -46,9 +27,26 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
+import org.cubeengine.libcube.util.math.shape.Cuboid;
+import org.cubeengine.logscribe.Log;
+import org.cubeengine.module.protector.region.Region;
+import org.cubeengine.module.protector.region.RegionConfig;
+import org.cubeengine.module.zoned.Zoned;
+import org.cubeengine.module.zoned.config.ZoneConfig;
+import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.util.Identifiable;
+import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector2i;
+import org.spongepowered.math.vector.Vector3d;
+import org.spongepowered.math.vector.Vector3i;
 
 public class RegionManager
 {
@@ -56,10 +54,10 @@ public class RegionManager
     private final Reflector reflector;
     private Log logger;
     private Zoned zonedModule;
-    private Map<UUID, Map<String, Region>> byName = new HashMap<>();
-    private Map<UUID, Map<Vector2i, List<Region>>> byChunk = new HashMap<>();
+    private Map<ResourceKey, Map<String, Region>> byName = new HashMap<>();
+    private Map<ResourceKey, Map<Vector2i, List<Region>>> byChunk = new HashMap<>();
 
-    private Map<UUID, Region> worldRegions = new HashMap<>();
+    private Map<ResourceKey, Region> worldRegions = new HashMap<>();
     private Region globalRegion;
 
     private Map<UUID, Region> activeRegion = new HashMap<>(); // playerUUID -> Region
@@ -85,16 +83,16 @@ public class RegionManager
 
     private Region loadRegion(Region region)
     {
-        World world = region.getWorld();
+        ServerWorld world = region.getWorld();
         if (world == null) {
             logger.warn("Region {} was not loaded: Could not find world {}.", region.getName(), region.getWorldName());
             return region;
         }
-        byName.computeIfAbsent(world.getUniqueId(), k -> new HashMap<>()).put(region.getName().toLowerCase(), region);
+        byName.computeIfAbsent(world.getKey(), k -> new HashMap<>()).put(region.getName().toLowerCase(), region);
 
         Vector3d max = region.getCuboid().getMaximumPoint();
         Vector3d min = region.getCuboid().getMinimumPoint();
-        Map<Vector2i, List<Region>> chunkMap = byChunk.computeIfAbsent(region.getWorld().getUniqueId(), k -> new HashMap<>());
+        Map<Vector2i, List<Region>> chunkMap = byChunk.computeIfAbsent(region.getWorld().getKey(), k -> new HashMap<>());
         for (Vector2i chunkLoc : getChunks(min.toInt(), max.toInt()))
         {
             chunkMap.computeIfAbsent(chunkLoc, k -> new ArrayList<>()).add(region);
@@ -131,26 +129,26 @@ public class RegionManager
         return result;
     }
 
-    private Map<UUID, Map<Vector3i, List<Region>>> regionCache = new HashMap<>();
+    private Map<ResourceKey, Map<Vector3i, List<Region>>> regionCache = new HashMap<>();
 
-    public List<Region> getRegionsAt(Location<World> loc)
+    public List<Region> getRegionsAt(ServerLocation loc)
     {
-        Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(loc.getExtent().getUniqueId(), k -> new HashMap<>());
-        return cache.computeIfAbsent(loc.getBlockPosition(), v -> getRegions(loc.getExtent(), loc.getBlockPosition()));
+        Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(loc.getWorld().getKey(), k -> new HashMap<>());
+        return cache.computeIfAbsent(loc.getBlockPosition(), v -> getRegions(loc.getWorld(), loc.getBlockPosition()));
     }
 
-    public List<Region> getRegionsAt(World world, Vector3i pos) {
-        Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(world.getUniqueId(), k -> new HashMap<>());
+    public List<Region> getRegionsAt(ServerWorld world, Vector3i pos) {
+        Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(world.getKey(), k -> new HashMap<>());
         return cache.computeIfAbsent(pos, v -> getRegions(world, pos));
     }
 
-    private List<Region> getRegions(World world, Vector3i pos)
+    private List<Region> getRegions(ServerWorld world, Vector3i pos)
     {
         int chunkX = pos.getX() >> 4;
         int chunkZ = pos.getZ() >> 4;
         List<Region> regions = new ArrayList<>();
         regions.add(globalRegion);
-        regions.add(getWorldRegion(world.getUniqueId()));
+        regions.add(getWorldRegion(world.getKey()));
         regions.addAll(byChunk.getOrDefault(world.getUniqueId(), Collections.emptyMap())
                 .getOrDefault(new Vector2i(chunkX, chunkZ), Collections.emptyList())
                             .stream().filter(r -> r.contains(pos.toDouble()))
@@ -159,27 +157,27 @@ public class RegionManager
         return regions;
     }
 
-    public Region getActiveRegion(CommandSource src)
+    public Region getActiveRegion(CommandCause src)
     {
         return activeRegion.get(toUUID(src));
     }
 
-    private UUID toUUID(CommandSource src)
+    private UUID toUUID(CommandCause src)
     {
-        return src instanceof Identifiable ? ((Identifiable) src).getUniqueId() : UUID.nameUUIDFromBytes(src.getIdentifier().getBytes());
+        return src.getSubject() instanceof Identifiable ? ((Identifiable) src.getSubject()).getUniqueId() : UUID.nameUUIDFromBytes(src.getSubject().getIdentifier().getBytes());
     }
 
-    public void setActiveRegion(CommandSource src, Region region)
+    public void setActiveRegion(CommandCause src, Region region)
     {
         this.activeRegion.put(toUUID(src), region);
     }
 
-    public Map<String, Region> getRegions(UUID world)
+    public Map<String, Region> getRegions(ResourceKey world)
     {
         return this.byName.getOrDefault(world, Collections.emptyMap());
     }
 
-    public Map<UUID, Map<String,Region>> getRegions()
+    public Map<ResourceKey, Map<String,Region>> getRegions()
     {
         return this.byName;
     }
@@ -210,8 +208,8 @@ public class RegionManager
                             logger.info("Converting old region to zone format");
                             zone = reflector.create(ZoneConfig.class);
                             zone.world = config.world;
-                            zone.shape = new Cuboid(config.corner1.toDouble(), config.corner2.toDouble().sub(config.corner1.toDouble()));
-                            zonedModule.getManager().define(Sponge.getServer().getConsole(), config.name, zone, false);
+                            zone.shape = convertedCuboid(config);
+                            zonedModule.getManager().define(Sponge.getGame().getSystemSubject(), config.name, zone, false);
                         }
                         loadRegion(new Region(zone, config, this));
                     }
@@ -224,26 +222,31 @@ public class RegionManager
         }
     }
 
+    @SuppressWarnings("deprecation")
+    private Cuboid convertedCuboid(RegionConfig config)
+    {
+        return new Cuboid(config.corner1.toDouble(), config.corner2.toDouble().sub(config.corner1.toDouble()));
+    }
+
     public int getRegionCount()
     {
         return this.byName.values().stream().mapToInt(Map::size).sum();
     }
 
-    public boolean hasRegion(World world, String name)
+    public boolean hasRegion(ServerWorld world, String name)
     {
-        return getRegions(world.getUniqueId()).containsKey(name.toLowerCase());
+        return getRegions(world.getKey()).containsKey(name.toLowerCase());
     }
 
     public Region getGlobalRegion() {
         return globalRegion;
     }
 
-    public Region getWorldRegion(UUID world)
+    public Region getWorldRegion(ResourceKey world)
     {
         if (!this.worldRegions.containsKey(world))
         {
-            Optional<WorldProperties> prop = Sponge.getServer().getWorldProperties(world);
-            Path path = modulePath.resolve("region").resolve(prop.get().getWorldName());
+            Path path = modulePath.resolve("region").resolve(world.getNamespace()).resolve(world.getValue());
             try
             {
                 Files.createDirectories(path);
@@ -253,7 +256,7 @@ public class RegionManager
                 throw new IllegalStateException(e);
             }
             RegionConfig config = reflector.load(RegionConfig.class, path.resolve("world.yml").toFile());
-            config.world = new ConfigWorld(prop.get().getWorldName());
+            config.world = new ConfigWorld(world.asString());
             config.save();
             this.worldRegions.put(world, new Region(null, config, this));
         }

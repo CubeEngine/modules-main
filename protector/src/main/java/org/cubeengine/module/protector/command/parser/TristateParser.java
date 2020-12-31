@@ -17,36 +17,28 @@
  */
 package org.cubeengine.module.protector.command.parser;
 
-import org.cubeengine.butler.CommandInvocation;
-import org.cubeengine.butler.parameter.argument.ArgumentParser;
-import org.cubeengine.butler.parameter.argument.Completer;
-import org.cubeengine.butler.parameter.argument.ParserException;
-import org.spongepowered.api.util.Tristate;
-
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import net.kyori.adventure.text.Component;
+import org.cubeengine.libcube.service.command.annotation.ParserFor;
+import org.spongepowered.api.command.exception.ArgumentParseException;
+import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
+import org.spongepowered.api.command.parameter.CommandContext;
+import org.spongepowered.api.command.parameter.CommandContext.Builder;
+import org.spongepowered.api.command.parameter.Parameter.Key;
+import org.spongepowered.api.command.parameter.managed.ValueCompleter;
+import org.spongepowered.api.command.parameter.managed.ValueParser;
+import org.spongepowered.api.util.Tristate;
 
-public class TristateParser implements ArgumentParser<Tristate>, Completer
+@ParserFor(Tristate.class)
+public class TristateParser implements ValueParser<Tristate>, ValueCompleter
 {
-    @Override
-    public Tristate parse(Class aClass, CommandInvocation commandInvocation) throws ParserException
-    {
-        String token = commandInvocation.consume(1);
-        switch (token.toLowerCase())
-        {
-            case "allow":
-                return Tristate.TRUE;
-            case "deny":
-                return Tristate.FALSE;
-            case "reset":
-                return Tristate.UNDEFINED;
-        }
-        throw new ParserException("Unknown token " + token + " use allow/deny/reset");
-    }
 
     @Override
-    public List<String> suggest(Class aClass, CommandInvocation commandInvocation) {
-        String token = commandInvocation.currentToken().toLowerCase();
+    public List<String> complete(CommandContext context, String currentInput)
+    {
+        String token = currentInput.toLowerCase();
         List<String> list = new ArrayList<>();
         if ("allow".startsWith(token))
         {
@@ -62,4 +54,21 @@ public class TristateParser implements ArgumentParser<Tristate>, Completer
         }
         return list;
     }
+
+    @Override
+    public Optional<? extends Tristate> getValue(Key<? super Tristate> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    {
+        String token = reader.parseString();
+        switch (token.toLowerCase())
+        {
+            case "allow":
+                return Optional.of(Tristate.TRUE);
+            case "deny":
+                return Optional.of(Tristate.FALSE);
+            case "reset":
+                return Optional.of(Tristate.UNDEFINED);
+        }
+        throw reader.createException(Component.text("Unknown token " + token + " use allow/deny/reset"));
+    }
+
 }

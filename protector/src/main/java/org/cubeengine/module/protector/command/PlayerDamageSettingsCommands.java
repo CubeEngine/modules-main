@@ -17,30 +17,37 @@
  */
 package org.cubeengine.module.protector.command;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Using;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.module.protector.Protector;
+import org.cubeengine.module.protector.command.parser.TristateParser;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
-import org.spongepowered.api.command.CommandSource;
+import org.cubeengine.module.protector.region.RegionParser;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+
+@Singleton
+@Using({RegionParser.class, TristateParser.class})
 @Command(name = "playerDamage", alias = "player", desc = "Manages the region player-damage settings")
 public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
 {
-    public PlayerDamageSettingsCommands(CommandManager base, I18n i18n, SettingsListener psl, PermissionService ps)
+    @Inject
+    public PlayerDamageSettingsCommands(I18n i18n, SettingsListener psl, PermissionService ps)
     {
-        super(base, Protector.class, i18n, psl, ps);
+        super(i18n, psl, ps);
     }
 
+    @Inject
     @Command(desc = "Controls player damage")
-    public void all(CommandSource context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
+    public void all(CommandCause context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
     {
         if (role != null)
         {
@@ -54,7 +61,7 @@ public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls player damage by living entities")
-    public void living(CommandSource context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
+    public void living(CommandCause context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
     {
         if (role != null)
         {
@@ -68,7 +75,7 @@ public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls pvp damage")
-    public void pvp(CommandSource context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
+    public void pvp(CommandCause context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
     {
         if (role != null)
         {
@@ -81,7 +88,7 @@ public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls mobs targeting players")
-    public void targeting(CommandSource context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
+    public void targeting(CommandCause context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
     {
         if (role != null)
         {

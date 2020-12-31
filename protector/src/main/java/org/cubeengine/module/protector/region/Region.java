@@ -17,16 +17,15 @@
  */
 package org.cubeengine.module.protector.region;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.flowpowered.math.vector.Vector3i;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.World;
-
-import javax.annotation.Nullable;
+import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector3d;
 
 public class Region
 {
@@ -47,7 +46,7 @@ public class Region
         return config;
     }
 
-    public boolean contains(Location<World> loc)
+    public boolean contains(ServerLocation loc)
     {
         if (this.config.world == null)
         {
@@ -55,7 +54,7 @@ public class Region
         }
         if (this.config.name == null) // world
         {
-            return loc.getExtent().equals(this.config.world.getWorld());
+            return loc.getWorld().equals(this.config.world.getWorld());
         }
         return this.contains(loc.getPosition()); // zone
     }
@@ -94,7 +93,7 @@ public class Region
         return config.name;
     }
 
-    public World getWorld()
+    public ServerWorld getWorld()
     {
         if (this.config.world == null)
         {

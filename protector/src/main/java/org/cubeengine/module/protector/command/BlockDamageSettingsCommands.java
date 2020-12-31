@@ -17,40 +17,43 @@
  */
 package org.cubeengine.module.protector.command;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
-
-import org.cubeengine.butler.parametric.Command;
-import org.cubeengine.butler.parametric.Default;
-import org.cubeengine.butler.parametric.Named;
-import org.cubeengine.libcube.service.command.CommandManager;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
+import org.cubeengine.libcube.service.command.annotation.Named;
+import org.cubeengine.libcube.service.command.annotation.Using;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.module.protector.Protector;
+import org.cubeengine.module.protector.command.parser.TristateParser;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
+import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
+
+@Singleton
+@Using(TristateParser.class)
 @Command(name = "blockdamage", alias = "block", desc = "Manages the region block-damage settings")
 public class BlockDamageSettingsCommands extends AbstractSettingsCommand
 {
     private I18n i18n;
     private SettingsListener psl;
-    private PermissionService ps;
 
-    public BlockDamageSettingsCommands(CommandManager base, I18n i18n, SettingsListener psl, PermissionService ps)
+    @Inject
+    public BlockDamageSettingsCommands(I18n i18n, SettingsListener psl, PermissionService ps)
     {
-        super(base, Protector.class, i18n, psl, ps);
+        super(i18n, psl, ps);
         this.i18n = i18n;
         this.psl = psl;
-        this.ps = ps;
     }
 
     @Command(desc = "Controls entities breaking blocks")
-    public void monster(CommandSource context, Tristate set, @Default @Named("in") Region region)
+    public void monster(CommandCause context, Tristate set, @Default @Named("in") Region region)
     {
         region.getSettings().blockDamage.monster = set;
         region.save();
@@ -58,7 +61,7 @@ public class BlockDamageSettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls blocks breaking blocks")
-    public void block(CommandSource context, BlockType by, Tristate set, @Default @Named("in") Region region)
+    public void block(CommandCause context, BlockType by, Tristate set, @Default @Named("in") Region region)
     {
         setOrUnset(region.getSettings().blockDamage.block, by, set);
         region.save();
@@ -66,7 +69,7 @@ public class BlockDamageSettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls explosions breaking blocks")
-    public void explosion(CommandSource context, Tristate set, @Default @Named("in") Region region)
+    public void explosion(CommandCause context, Tristate set, @Default @Named("in") Region region)
     {
         region.getSettings().blockDamage.allExplosion = set;
         region.save();
@@ -74,7 +77,7 @@ public class BlockDamageSettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls explosions caused by players breaking blocks")
-    public void playerExplosion(CommandSource context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
+    public void playerExplosion(CommandCause context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
     {
         if (role != null)
         {
@@ -87,14 +90,13 @@ public class BlockDamageSettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls fire breaking blocks")
-    public void fire(CommandSource context, Tristate set, @Default @Named("in") Region region)
+    public void fire(CommandCause context, Tristate set, @Default @Named("in") Region region)
     {
-        this.block(context, BlockTypes.FIRE, set, region);
+        this.block(context, BlockTypes.FIRE.get(), set, region);
     }
 
-
     @Command(desc = "Controls lightning fire")
-    public void lightningFire(CommandSource context, Tristate set, @Default @Named("in") Region region)
+    public void lightningFire(CommandCause context, Tristate set, @Default @Named("in") Region region)
     {
         region.getSettings().blockDamage.lightning = set;
         region.save();

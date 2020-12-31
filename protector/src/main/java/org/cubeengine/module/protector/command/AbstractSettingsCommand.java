@@ -21,31 +21,31 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 import com.google.common.collect.ImmutableSet;
-import org.cubeengine.libcube.service.command.CommandManager;
-import org.cubeengine.libcube.service.command.ContainerCommand;
+import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
-import org.spongepowered.api.command.CommandSource;
+import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.util.Tristate;
 
-public abstract class AbstractSettingsCommand extends ContainerCommand {
+public abstract class AbstractSettingsCommand extends DispatcherCommand
+{
 
     protected final I18n i18n;
     protected final SettingsListener psl;
     protected final PermissionService ps;
 
-    public AbstractSettingsCommand(CommandManager base, Class owner, I18n i18n, SettingsListener psl, PermissionService ps)
+    public AbstractSettingsCommand(I18n i18n, SettingsListener psl, PermissionService ps, Object... subCommands)
     {
-        super(base, owner);
+        super(subCommands);
         this.i18n = i18n;
         this.psl = psl;
         this.ps = ps;
     }
 
-    protected void setPermission(CommandSource context, Tristate set, Region region, String role, String perm)
+    protected void setPermission(CommandCause context, Tristate set, Region region, String role, String perm)
     {
         ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
             if (!b)
