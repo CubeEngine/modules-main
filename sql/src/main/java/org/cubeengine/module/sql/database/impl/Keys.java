@@ -24,21 +24,22 @@ import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.UniqueKey;
 import org.jooq.impl.AbstractKeys;
+import org.jooq.impl.Internal;
 
-public class Keys extends AbstractKeys
+public class Keys
 {
     public static <R extends Record, T> Identity<R, T> identity(Table<R> table, TableField<R, T> field)
     {
-        return createIdentity(table, field);
+        return Internal.createIdentity(table, field);
     }
 
     public static <R extends Record, U extends Record> ForeignKey<R, U> foreignKey(UniqueKey<U> key, Table<R> table, TableField <R, ?>... fields)
     {
-        return createForeignKey(key, table, fields);
+        return Internal.createForeignKey(key, table, fields);
     }
 
     public static <R extends Record> UniqueKey<R> uniqueKey(Table<R> table, TableField<R, ?>... fields)
     {
-        return createUniqueKey(table, fields);
+        return Internal.createUniqueKey(table, fields);
     }
 }
