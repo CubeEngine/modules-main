@@ -71,13 +71,12 @@ public class Roles
     @Inject private RolesPermissionService service;
     @ModuleCommand private RoleCommands roleCommands;
 
-    @Inject private Path path;
     private boolean firstRun;
 
     @Listener
     public void onSetup(StartingEngineEvent<Server> event)
     {
-        this.firstRun = !Files.exists(path.resolve("delete_me_if_you_need_permissions"));
+        this.firstRun = !Files.exists(mm.getPathFor(Roles.class).resolve("delete_me_if_you_need_permissions"));
         this.permLogger = factory.getLog(LogFactory.class, "Permissions");
         ThreadFactory threadFactory = mm.getThreadFactory(Roles.class);
         this.permLogger.addTarget(
@@ -111,7 +110,7 @@ public class Roles
         {
             try
             {
-                Files.createFile(path.resolve("delete_me_if_you_need_permissions"));
+                Files.createFile(mm.getPathFor(Roles.class).resolve("delete_me_if_you_need_permissions"));
                 this.firstRun = false;
             }
             catch (IOException e)
