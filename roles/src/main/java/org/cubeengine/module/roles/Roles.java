@@ -19,7 +19,6 @@ package org.cubeengine.module.roles;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.concurrent.ThreadFactory;
 import com.google.inject.Inject;
@@ -40,13 +39,13 @@ import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.processor.Module;
 import org.spongepowered.api.Server;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.ProvideServiceEvent;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
-import org.spongepowered.api.network.ServerSideConnection;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
@@ -121,7 +120,7 @@ public class Roles
             i18n.send(event.getPlayer(), MessageType.POSITIVE, "Welcome to your new Minecraft Server. You are the first to join this server!");
             i18n.send(event.getPlayer(), MessageType.POSITIVE, "As such {text:Roles} gave you temporarily all roles permissions.");
             i18n.send(event.getPlayer(), MessageType.CRITICAL, "Before you leave, remember to give yourself actual permissions!");
-
+            Sponge.getCommandManager().updateCommandTreeForPlayer(event.getPlayer());
         }
     }
 

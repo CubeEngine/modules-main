@@ -17,12 +17,8 @@
  */
 package org.cubeengine.module.roles.commands;
 
-import static java.util.Collections.emptySet;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-import static org.cubeengine.libcube.util.ContextUtil.toSet;
-
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.kyori.adventure.identity.Identity;
@@ -36,12 +32,12 @@ import org.cubeengine.libcube.service.command.annotation.Flag;
 import org.cubeengine.libcube.service.command.annotation.Named;
 import org.cubeengine.libcube.service.command.annotation.Parser;
 import org.cubeengine.libcube.service.command.annotation.Using;
+import org.cubeengine.libcube.service.command.parser.ContextParser;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.Roles;
-import org.cubeengine.libcube.service.command.parser.ContextParser;
-import org.cubeengine.module.roles.commands.provider.TristateParser;
 import org.cubeengine.module.roles.commands.provider.FileSubjectParser;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
+import org.cubeengine.module.roles.commands.provider.TristateParser;
 import org.cubeengine.module.roles.exception.CircularRoleDependencyExceptionHandler;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.FileSubject;
@@ -52,8 +48,9 @@ import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.SubjectReference;
 import org.spongepowered.api.util.Tristate;
 
-import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import static java.util.Collections.emptySet;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.util.ContextUtil.toSet;
 
 @Singleton
 @Alias("manuser")
