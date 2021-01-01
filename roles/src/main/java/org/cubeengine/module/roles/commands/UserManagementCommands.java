@@ -72,7 +72,7 @@ public class UserManagementCommands extends DispatcherCommand
     @Alias(value = "manUAdd", alias = {"assignURole", "addURole", "giveURole"})
     @Command(alias = {"add", "give"}, desc = "Assign a role to the player [-temp]")
     @ExceptionHandler(CircularRoleDependencyExceptionHandler.class)
-    public void assign(CommandCause ctx, @Default User player, FileSubject role, @Flag boolean temp)
+    public void assign(CommandCause ctx, User player, FileSubject role, @Flag boolean temp)
     {
 
         if (!role.canAssignAndRemove(ctx))
@@ -109,7 +109,7 @@ public class UserManagementCommands extends DispatcherCommand
 
     @Alias(value = "remURole", alias = "manUDel")
     @Command(desc = "Removes a role from the player")
-    public void remove(CommandCause ctx, @Default User player, FileSubject role)
+    public void remove(CommandCause ctx, User player, FileSubject role)
     {
         if (!role.canAssignAndRemove(ctx))
         {
@@ -128,7 +128,7 @@ public class UserManagementCommands extends DispatcherCommand
     @Alias(value = "clearURole", alias = "manUClear")
     @Command(desc = "Clears all roles from the player and sets the defaultroles [in context]")
     @ExceptionHandler(CircularRoleDependencyExceptionHandler.class)
-    public void clear(CommandCause ctx, @Default User player)
+    public void clear(CommandCause ctx, User player)
     {
         player.getSubjectData().clearParents(emptySet());
         i18n.send(ctx, NEUTRAL, "Cleared the roles of {user}.", player);
@@ -146,7 +146,7 @@ public class UserManagementCommands extends DispatcherCommand
 
     @Alias(value = "setUPerm")
     @Command(alias = "setPerm", desc = "Sets a permission for this user [in context]")
-    public void setPermission(CommandCause ctx, @Default User player, @Parser(completer = PermissionCompleter.class) String permission, @Default Tristate type, @Named("in") @Default Context context)
+    public void setPermission(CommandCause ctx, User player, @Parser(completer = PermissionCompleter.class) String permission, @Default Tristate type, @Named("in") @Default Context context)
     {
         if (type == Tristate.UNDEFINED)
         {
@@ -186,7 +186,7 @@ public class UserManagementCommands extends DispatcherCommand
 
     @Alias(value = "setUOption", alias = "setUData")
     @Command(alias = "setData", desc = "Sets options for this user [in context]")
-    public void setOption(CommandCause ctx, @Default User player, String key, String value, @Named("in") @Default Context context)
+    public void setOption(CommandCause ctx, User player, String key, String value, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         player.getSubjectData().setOption(contexts, key, value).thenAccept(b -> {
@@ -201,7 +201,7 @@ public class UserManagementCommands extends DispatcherCommand
 
     @Alias(value = "resetUOption", alias = "resetUData")
     @Command(alias = {"resetData", "deleteOption", "deleteData"}, desc = "Resets options for this user [in context]")
-    public void resetOption(CommandCause ctx, @Default User player, String key, @Named("in") @Default Context context)
+    public void resetOption(CommandCause ctx, User player, String key, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         player.getSubjectData().setOption(contexts, key, null).thenAccept(b -> {
@@ -216,7 +216,7 @@ public class UserManagementCommands extends DispatcherCommand
 
     @Alias(value = "clearUOption", alias = "clearUData")
     @Command(alias = "clearData", desc = "Resets options for this user [in context]")
-    public void clearOption(CommandCause ctx, @Default User player, @Named("in") @Default Context context)
+    public void clearOption(CommandCause ctx, User player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
         player.getSubjectData().clearOptions(contexts).thenAccept(b -> {
