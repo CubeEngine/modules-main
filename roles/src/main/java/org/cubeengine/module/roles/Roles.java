@@ -17,6 +17,10 @@
  */
 package org.cubeengine.module.roles;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.concurrent.ThreadFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -24,7 +28,9 @@ import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.libcube.service.logging.LoggingUtil;
+import org.cubeengine.libcube.util.ContextUtil;
 import org.cubeengine.logscribe.Log;
 import org.cubeengine.logscribe.LogFactory;
 import org.cubeengine.logscribe.target.file.AsyncFileTarget;
@@ -39,7 +45,10 @@ import org.spongepowered.api.event.lifecycle.ProvideServiceEvent;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
+import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.api.network.ServerSideConnection;
 import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.util.Tristate;
 
 /*
 TODO generate sample configs on the first run AND/OR cmd to generate samples
@@ -62,9 +71,13 @@ public class Roles
     @Inject private RolesPermissionService service;
     @ModuleCommand private RoleCommands roleCommands;
 
+    @Inject private Path path;
+    private boolean firstRun;
+
     @Listener
     public void onSetup(StartingEngineEvent<Server> event)
     {
+        this.firstRun = !Files.exists(path.resolve("delete_me_if_you_need_permissions"));
         this.permLogger = factory.getLog(LogFactory.class, "Permissions");
         ThreadFactory threadFactory = mm.getThreadFactory(Roles.class);
         this.permLogger.addTarget(
@@ -89,6 +102,28 @@ public class Roles
     public void onEnable(StartedEngineEvent<Server> event)
     {
         i18n.getCompositor().registerFormatter(new RoleFormatter());
+    }
+
+    @Listener
+    public void onFirstJoin(ServerSideConnectionEvent.Join event)
+    {
+        if (this.firstRun)
+        {
+            try
+            {
+                Files.createFile(path.resolve("delete_me_if_you_need_permissions"));
+                this.firstRun = false;
+            }
+            catch (IOException e)
+            {
+                throw new IllegalStateException();
+            }
+            event.getPlayer().getTransientSubjectData().setPermission(Collections.singleton(ContextUtil.GLOBAL), "*", Tristate.TRUE);
+            i18n.send(event.getPlayer(), MessageType.POSITIVE, "Welcome to your new Minecraft Server. You are the first to join this server!");
+            i18n.send(event.getPlayer(), MessageType.POSITIVE, "As such {text:Roles} gave you temporarily all permissions.");
+            i18n.send(event.getPlayer(), MessageType.CRITICAL, "Before you leave, remember to give yourself actual permissions!");
+
+        }
     }
 
     public RolesConfig getConfiguration()
