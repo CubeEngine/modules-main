@@ -88,7 +88,7 @@ public class ItemCommands extends PermissionContainer
         item.setQuantity(amount);
         if (player.getInventory().offer(item.copy()).getType() == Type.SUCCESS)
         {
-            Component matname = item.get(Keys.DISPLAY_NAME).get();
+            Component matname = item.get(Keys.CUSTOM_NAME).get();
             i18n.send(context, POSITIVE, "You gave {user} {amount} {text#item}!", player, amount, matname);
             if (player.isOnline())
             {
@@ -146,7 +146,7 @@ public class ItemCommands extends PermissionContainer
             i18n.send(context, NEGATIVE, "Not enough space for the item!");
             return;
         }
-        i18n.send(context, NEUTRAL, "Received: {amount} {text#item}", amount, item.get(Keys.DISPLAY_NAME).get());
+        i18n.send(context, NEUTRAL, "Received: {amount} {text#item}", amount, item.get(Keys.CUSTOM_NAME).get());
     }
 
     public Inventory getHotbarFirst(Inventory inventory)

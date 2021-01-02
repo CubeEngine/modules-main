@@ -35,7 +35,7 @@ public interface LockerItems
     {
         final ItemStack lockerBook = ItemStack.of(ItemTypes.ENCHANTED_BOOK);
         lockerBook.offer(LockerData.MODE, LockerMode.INFO_CREATE.name());
-        lockerBook.offer(Keys.DISPLAY_NAME, Component.text("Locker ").append(ItemTypes.BOOK.get().asComponent()).color(NamedTextColor.DARK_PURPLE));
+        lockerBook.offer(Keys.CUSTOM_NAME, Component.text("Locker ").append(ItemTypes.BOOK.get().asComponent()).color(NamedTextColor.DARK_PURPLE));
         final RecipeRegistration lockerBookRecipe = CraftingRecipe.shapedBuilder()
             .aisle("kkk", "kbk", "kkk")
             .where('k', Ingredient.of(ItemTypes.TRIPWIRE_HOOK))

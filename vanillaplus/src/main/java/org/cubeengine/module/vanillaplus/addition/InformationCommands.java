@@ -253,7 +253,7 @@ public class InformationCommands extends PermissionContainer
         else if (entity instanceof Item)
         {
             final ItemStack stack = entity.get(Keys.ITEM_STACK_SNAPSHOT).get().createStack();
-            s = stack.get(Keys.DISPLAY_NAME).get().color(NamedTextColor.GRAY);
+            s = stack.get(Keys.CUSTOM_NAME).get().color(NamedTextColor.GRAY);
         }
         else
         {

@@ -420,7 +420,7 @@ public class EntityDataChanger<EntityInterface>
                                     @Override
                                     public void applyEntity(Living entity, String input)
                                     {
-                                        entity.offer(Keys.DISPLAY_NAME, LegacyComponentSerializer.legacyAmpersand().deserialize(input));
+                                        entity.offer(Keys.CUSTOM_NAME, LegacyComponentSerializer.legacyAmpersand().deserialize(input));
                                     }
 
                                     @Override
