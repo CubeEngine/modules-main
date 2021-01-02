@@ -145,7 +145,6 @@ public class BankConomyService extends ConomyService
                             manage.add(key);
                             break;
                         default:
-                            module.getLog().warn("Invalid value for option: {} -> {}", e.getKey(), e.getValue());
                             break;
                     }
                 });

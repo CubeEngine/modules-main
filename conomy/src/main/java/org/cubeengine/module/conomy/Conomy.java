@@ -66,12 +66,10 @@ public class Conomy
     private Path modulePath;
 
     private ConomyService service;
-    private Log log;
 
     @Listener
     public void onEnable(StartedEngineEvent<Server> event)
     {
-        this.log = logProvider.getLogger(Conomy.class, "Conomy", true);
         i18n.getCompositor().registerFormatter(new BaseAccountFormatter());
         this.modulePath = mm.getPathFor(Conomy.class);
         // TODO logging transactions / can be done via events
@@ -121,9 +119,5 @@ public class Conomy
             }
         }
         return service;
-    }
-
-    public Log getLog() {
-        return log;
     }
 }

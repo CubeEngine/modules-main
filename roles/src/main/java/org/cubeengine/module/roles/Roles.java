@@ -20,19 +20,13 @@ package org.cubeengine.module.roles;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collections;
-import java.util.concurrent.ThreadFactory;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
-import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
-import org.cubeengine.libcube.service.logging.LoggingUtil;
 import org.cubeengine.libcube.util.ContextUtil;
-import org.cubeengine.logscribe.Log;
-import org.cubeengine.logscribe.LogFactory;
-import org.cubeengine.logscribe.target.file.AsyncFileTarget;
 import org.cubeengine.module.roles.commands.RoleCommands;
 import org.cubeengine.module.roles.commands.formatter.RoleFormatter;
 import org.cubeengine.module.roles.data.PermissionData;
@@ -60,13 +54,8 @@ TODO SubjectDataUpdateEvent
 @Module
 public class Roles
 {
-    @Inject private FileManager fm;
     @Inject private I18n i18n;
-
-    @Inject private LogFactory factory;
     @Inject private ModuleManager mm;
-
-    private Log permLogger;
     @Inject private RolesPermissionService service;
     @ModuleCommand private RoleCommands roleCommands;
 
@@ -76,12 +65,6 @@ public class Roles
     public void onSetup(StartingEngineEvent<Server> event)
     {
         this.firstRun = !Files.exists(mm.getPathFor(Roles.class).resolve("delete_me_if_you_need_permissions"));
-        this.permLogger = factory.getLog(LogFactory.class, "Permissions");
-        ThreadFactory threadFactory = mm.getThreadFactory(Roles.class);
-        this.permLogger.addTarget(
-                new AsyncFileTarget.Builder(LoggingUtil.getLogFile(fm, "Permissions").toPath(),
-                        LoggingUtil.getFileFormat(false, true)
-                ).setAppend(true).setCycler(LoggingUtil.getCycler()).setThreadFactory(threadFactory).build());
     }
 
     @Listener

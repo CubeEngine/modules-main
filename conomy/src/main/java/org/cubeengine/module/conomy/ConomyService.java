@@ -102,17 +102,6 @@ public class ConomyService implements EconomyService
             defaultCurrency = new ConfigCurrency(defConfig);
             currencies.put(defaultCurrency.getCurrencyID(), defaultCurrency);
         }
-
-        /* TODO LOGGER
-                this.logger = lf.getLog(Conomy.class, "Conomy-Transactions");
-        this.logger.addTarget(new AsyncFileTarget(LoggingUtil.getLogFile(fm, "Conomy-Transactions"),
-                                                  LoggingUtil.getFileFormat(true, false), true, LoggingUtil.getCycler(),
-                                                  tf));
-                                                  if (!this.module.getConfig().enableLogging)
-        {
-            logger.setLevel(LogLevel.NONE);
-        }
-         */
     }
 
     public ConomyPermission getPerms()
