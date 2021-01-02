@@ -17,10 +17,17 @@
  */
 package org.cubeengine.module.locker.data;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
-
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.kyori.adventure.identity.Identity;
@@ -70,17 +77,8 @@ import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.math.vector.Vector3i;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.stream.Collectors;
+
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 @Singleton
 public class LockerManager
@@ -89,13 +87,15 @@ public class LockerManager
     private I18n i18n;
     private LockerPerm perms;
     private Locker module;
+    private TaskManager tm;
 
     @Inject
-    public LockerManager(I18n i18n, LockerPerm perms, Locker module)
+    public LockerManager(I18n i18n, LockerPerm perms, Locker module, TaskManager tm)
     {
         this.i18n = i18n;
         this.perms = perms;
         this.module = module;
+        this.tm = tm;
     }
 
     private List<Mutable> getMultiBlocks(Mutable dataHolder)
@@ -526,11 +526,11 @@ public class LockerManager
         {
             if (perms.SHOW_OWNER.check(player))
             {
-                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "A magical lock from {user} prevents you from accessing this inventory!", ownerName);
+                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from accessing this inventory of {user}!", ownerName);
             }
             else
             {
-                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "A magical lock prevents you from accessing this inventory!");
+                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from accessing this inventory!");
             }
             return true; // Cancel open inventory
         }
@@ -575,7 +575,7 @@ public class LockerManager
         }
     }
 
-    public int canAccess(Mutable dataHolder, @Nullable ServerPlayer player, UUID owner, @Nullable Permission byPassPerm)
+    public int canAccess(DataHolder dataHolder, @Nullable ServerPlayer player, UUID owner, @Nullable Permission byPassPerm)
     {
         // TODO global check
         final boolean isOwner = player != null && player.getUniqueId().equals(owner);
@@ -606,7 +606,7 @@ public class LockerManager
         return ProtectionFlag.NONE;
     }
 
-    public boolean isValidKeyBook(Mutable dataHolder, ServerPlayer player)
+    public boolean isValidKeyBook(DataHolder dataHolder, ServerPlayer player)
     {
         final ItemStack itemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
         if (true) {
@@ -773,17 +773,23 @@ public class LockerManager
         }
         final ServerLocation loc = snap.getLocation().get();
         checkedPositions.add(loc.getBlockPosition());
-        final Mutable dataHolder = getDataHolderAtLoc(loc);
-        final Integer flags = dataHolder.get(LockerData.FLAGS).orElse(null);
+        final Integer flags = snap.get(LockerData.FLAGS).orElse(null);
+
         if (flags == null)
         {
             return false;
         }
 
-        final int accessFlags = player == null ? ProtectionFlag.NONE : dataHolder.get(LockerData.ACCESS).orElse(Collections.emptyMap()).getOrDefault(player.getUniqueId(), ProtectionFlag.NONE);
+        final UUID owner = snap.get(LockerData.OWNER).orElse(null);
+        final int accessFlags = this.canAccess(snap, player, owner, perms.BREAK_OTHER);
         if (ProtectionFlag.BLOCK_BREAK.isBlocked(flags, accessFlags))
         {
-            if (player != null)
+            if (player != null && perms.SHOW_OWNER.check(player))
+            {
+                final String ownerName = Sponge.getServer().getUserManager().get(owner).map(User::getName).orElse("???");
+                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from breaking this protection of {user}!", ownerName);
+            }
+            else
             {
                 i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from breaking this protection!");
             }
@@ -813,7 +819,8 @@ public class LockerManager
                 }
             }
         }
-        LockerData.purge(dataHolder);
+
+        tm.runTask(Locker.class, () -> removeLock(getDataHolderAtLoc(loc), player));
         return true;
     }
 

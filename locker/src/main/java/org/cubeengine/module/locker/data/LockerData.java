@@ -21,11 +21,11 @@ import java.util.UUID;
 import io.leangen.geantyref.TypeToken;
 import org.cubeengine.module.locker.PluginLocker;
 import org.spongepowered.api.ResourceKey;
+import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.data.DataHolder.Mutable;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.Key;
-import org.spongepowered.api.data.persistence.DataStore;
 import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.data.value.Value;
@@ -59,16 +59,10 @@ public interface LockerData
     static void register(RegisterDataEvent event)
     {
         event.register(DataRegistration.of(MODE, ItemStack.class));
-
-        event.register(DataRegistration.of(PASS, ItemStack.class, BlockEntity.class, Entity.class));
-
-        event.register(DataRegistration.of(OWNER, ItemStack.class, BlockEntity.class, Entity.class));
-
-        event.register(DataRegistration.of(FLAGS, ItemStack.class, BlockEntity.class, Entity.class));
-
-        final DataStore accessDatastore = DataStore.builder().pluginData(ACCESS.getKey()).holder(ItemStack.class, BlockEntity.class, Entity.class).key(ACCESS).build();
-        DataRegistration.builder().dataKey(ACCESS).store(accessDatastore).build();
-
+        event.register(DataRegistration.of(PASS, ItemStack.class, BlockEntity.class, Entity.class, BlockSnapshot.class));
+        event.register(DataRegistration.of(OWNER, ItemStack.class, BlockEntity.class, Entity.class, BlockSnapshot.class));
+        event.register(DataRegistration.of(FLAGS, ItemStack.class, BlockEntity.class, Entity.class, BlockSnapshot.class));
+        event.register(DataRegistration.of(ACCESS, ItemStack.class, BlockEntity.class, Entity.class, BlockSnapshot.class));
         event.register(DataRegistration.of(LAST_ACCESS, BlockEntity.class, Entity.class));
         event.register(DataRegistration.of(CREATED, BlockEntity.class, Entity.class));
     }

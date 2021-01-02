@@ -69,11 +69,11 @@ public class DoorManager
             if (perms.SHOW_OWNER.check(player))
             {
                 final String ownerName = Sponge.getServer().getUserManager().get(owner).map(User::getName).orElse("???");
-                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "A magical lock from {user} prevents you from using this door!", ownerName);
+                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from using this door of {user}!", ownerName);
             }
             else
             {
-                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "A magical lock prevents you from using this door!");
+                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from using this door!");
             }
             return true;
         }
