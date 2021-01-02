@@ -58,10 +58,9 @@ public class LockerAutoProtectListener
     @Listener
     public void onPlace(ChangeBlockEvent.All event, @First ServerPlayer player)
     {
-        for (BlockTransaction transaction : event.getTransactions())
+        if (module.getConfig().block.enable)
         {
-            if (transaction.getOperation().equals(Operations.BREAK.get()))
-            {
+            event.getTransactions(Operations.PLACE.get()).forEach(transaction -> {
                 for (BlockLockConfig cfg : module.getConfig().block.blocks)
                 {
                     if (cfg.isAutoProtect() && cfg.getType().equals(transaction.getFinal().getState().getType()))
@@ -74,7 +73,7 @@ public class LockerAutoProtectListener
                         }
                     }
                 }
-            }
+            });
         }
     }
 
