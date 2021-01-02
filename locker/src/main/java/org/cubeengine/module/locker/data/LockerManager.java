@@ -609,10 +609,13 @@ public class LockerManager
     public boolean isValidKeyBook(Mutable dataHolder, ServerPlayer player)
     {
         final ItemStack itemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
+        if (true) {
+            return false;
+        }
         // TODO check
         i18n.send(ChatType.ACTION_BAR, player, NEUTRAL, "You try to open the container with your KeyBook but nothing happens!");
         i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "As you approach with your KeyBook the magic lock disappears!");
-        return false;
+        return true;
     }
 
     public static void playUnlockSound(ServerPlayer player, final ServerLocation effectLocation, TaskManager tm)
@@ -780,7 +783,10 @@ public class LockerManager
         final int accessFlags = player == null ? ProtectionFlag.NONE : dataHolder.get(LockerData.ACCESS).orElse(Collections.emptyMap()).getOrDefault(player.getUniqueId(), ProtectionFlag.NONE);
         if (ProtectionFlag.BLOCK_BREAK.isBlocked(flags, accessFlags))
         {
-            i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from breaking this protection!");
+            if (player != null)
+            {
+                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from breaking this protection!");
+            }
             return true;
         }
 
