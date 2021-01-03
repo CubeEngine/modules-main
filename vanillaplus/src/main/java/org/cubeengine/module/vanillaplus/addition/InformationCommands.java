@@ -62,9 +62,9 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.world.biome.BiomeType;
+import org.spongepowered.api.world.biome.Biome;
 import org.spongepowered.api.world.chunk.Chunk;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.imaginary.Quaterniond;
 import org.spongepowered.math.vector.Vector2i;
@@ -105,7 +105,7 @@ public class InformationCommands extends PermissionContainer
             world = loc.getWorld();
             blockPos = new Vector2i(loc.getBlockX(), loc.getBlockZ());
         }
-        BiomeType biome = world.getBiome(blockPos.getX(), 0, blockPos.getY());
+        Biome biome = world.getBiome(blockPos.getX(), 0, blockPos.getY());
         i18n.send(context, NEUTRAL, "Biome at {vector:x\\=:z\\=}: {biome}", blockPos, biome);
     }
 
@@ -122,7 +122,7 @@ public class InformationCommands extends PermissionContainer
 
             world = ((ServerPlayer)context.getSubject()).getWorld();
         }
-        i18n.send(context, NEUTRAL, "Seed of {world} is {long#seed}", world, world.getProperties().getWorldGenerationSettings().getSeed());
+        i18n.send(context, NEUTRAL, "Seed of {world} is {long#seed}", world, world.getProperties().worldGenerationSettings().seed());
     }
 
     @Command(desc = "Displays the direction in which you are looking.")
@@ -314,7 +314,7 @@ public class InformationCommands extends PermissionContainer
         color = memUsePercent > 90 ? memUsePercent > 95 ? NamedTextColor.DARK_RED : NamedTextColor.RED : memUsePercent > 60 ? NamedTextColor.YELLOW : NamedTextColor.DARK_GREEN;
         i18n.send(context, POSITIVE, "Memory Usage: {txt#memused}/{integer#memcom}/{integer#memMax} MB", Component.text(memUse, color), memCom, memMax);
         //Worlds with loaded Chunks / Entities
-        for (ServerWorld world : Sponge.getServer().getWorldManager().getWorlds())
+        for (ServerWorld world : Sponge.getServer().getWorldManager().worlds())
         {
             int loadedChunks;
             if (world.getLoadedChunks() instanceof Collection)
@@ -355,7 +355,7 @@ public class InformationCommands extends PermissionContainer
     public void listWorlds(CommandCause context)
     {
         i18n.send(context, POSITIVE, "Loaded worlds:");
-        for (ServerWorld world : Sponge.getServer().getWorldManager().getWorlds())
+        for (ServerWorld world : Sponge.getServer().getWorldManager().worlds())
         {
             Component text = Component.space().append(Component.text("- ", NamedTextColor.WHITE))
 //                     .append(world.getProperties().getName().color(NamedTextColor.GOLD)) // TODO getName when its there

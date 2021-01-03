@@ -75,7 +75,7 @@ import org.spongepowered.api.item.inventory.type.ViewableInventory;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3i;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;

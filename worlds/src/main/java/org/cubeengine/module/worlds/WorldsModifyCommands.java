@@ -24,7 +24,7 @@ import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.api.world.server.ServerWorldProperties;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
@@ -45,7 +45,7 @@ public class WorldsModifyCommands extends DispatcherCommand
     {
         if (set == null)
         {
-            set = !world.doesLoadOnStartup();
+            set = !world.loadOnStartup();
         }
         world.setLoadOnStartup(set);
         if (set)
@@ -61,9 +61,9 @@ public class WorldsModifyCommands extends DispatcherCommand
     {
         if (set == null)
         {
-            set = !world.getWorldGenerationSettings().doFeaturesGenerate();
+            set = !world.worldGenerationSettings().generateFeatures();
         }
-        world.getWorldGenerationSettings().setFeaturesGenerate(set);
+        world.worldGenerationSettings().generateFeatures(set);
         if (set)
         {
             i18n.send(context, POSITIVE, "{world} will now generate structures", world);

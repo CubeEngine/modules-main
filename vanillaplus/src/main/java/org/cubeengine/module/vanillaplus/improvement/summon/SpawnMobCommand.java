@@ -34,7 +34,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.util.blockray.RayTrace;
 import org.spongepowered.api.util.blockray.RayTraceResult;
 import org.spongepowered.api.world.LocatableBlock;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 

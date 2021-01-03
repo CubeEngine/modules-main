@@ -80,7 +80,7 @@ import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.LocatableBlock;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;

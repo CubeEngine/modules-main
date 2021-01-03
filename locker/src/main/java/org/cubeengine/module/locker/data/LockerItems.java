@@ -31,7 +31,7 @@ import org.spongepowered.api.item.recipe.crafting.Ingredient;
 
 public interface LockerItems
 {
-    static void registerRecipes(RegisterDataPackValueEvent event)
+    static void registerRecipes(RegisterDataPackValueEvent<RecipeRegistration>event)
     {
         final ItemStack lockerBook = ItemStack.of(ItemTypes.ENCHANTED_BOOK);
         lockerBook.offer(LockerData.MODE, LockerMode.INFO_CREATE.name());

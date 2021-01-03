@@ -66,7 +66,7 @@ public class Locker
     }
 
     @Listener
-    public void onRegisterRecipe(RegisterDataPackValueEvent event)
+    public void onRegisterRecipe(RegisterDataPackValueEvent<RecipeRegistration>event)
     {
         LockerItems.registerRecipes(event);
     }

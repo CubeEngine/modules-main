@@ -36,7 +36,7 @@ import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.entity.SpawnEntityEvent;
 import org.spongepowered.api.event.entity.TameEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import java.util.List;
 
 @Singleton

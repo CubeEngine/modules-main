@@ -20,7 +20,7 @@ package org.cubeengine.module.vanillaplus.fix;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.world.WorldBorder;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -43,7 +43,7 @@ public class SpawnFixListener
 
         if (playerX > maxX || playerX < minX || playerZ > maxZ || playerZ < minZ)
         {
-            event.setToLocation(toWorld.getLocation(toWorld.getProperties().getSpawnPosition()));
+            event.setToLocation(toWorld.getLocation(toWorld.getProperties().spawnPosition()));
         }
     }
 }

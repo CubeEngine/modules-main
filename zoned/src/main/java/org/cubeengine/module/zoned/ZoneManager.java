@@ -34,7 +34,7 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.cubeengine.reflect.Reflector;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;

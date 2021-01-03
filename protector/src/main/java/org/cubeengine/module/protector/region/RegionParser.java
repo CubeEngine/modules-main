@@ -186,7 +186,7 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
         {
             String worldName = token.replaceAll(".world$", "");
             final ResourceKey worldKey = ResourceKey.resolve(worldName);
-            if (Sponge.getServer().getWorldManager().getWorld(worldKey).isPresent())
+            if (Sponge.getServer().getWorldManager().world(worldKey).isPresent())
             {
                 return Optional.of(manager.getWorldRegion(worldKey));
             }

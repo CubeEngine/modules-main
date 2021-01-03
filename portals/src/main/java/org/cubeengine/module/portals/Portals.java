@@ -123,8 +123,8 @@ public class Portals
 
     public Pair<Integer, Vector3i> getRandomDestinationSetting(ServerWorld world)
     {
-        Vector3i pos = world.getProperties().getSpawnPosition();
-        Integer radius = Math.min((int)world.getProperties().getWorldBorder().getDiameter() / 2, 60 * 16);
+        Vector3i pos = world.getProperties().spawnPosition();
+        Integer radius = Math.min((int)world.getProperties().worldBorder().getDiameter() / 2, 60 * 16);
         return new Pair<>(radius, pos);
     }
 

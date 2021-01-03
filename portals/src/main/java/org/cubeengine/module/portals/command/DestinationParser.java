@@ -84,7 +84,7 @@ public class DestinationParser implements ValueParser<Destination>, ValueComplet
         }
         else // world
         {
-            Optional<ServerWorld> world = Sponge.getServer().getWorldManager().getWorld(ResourceKey.resolve(token));
+            Optional<ServerWorld> world = Sponge.getServer().getWorldManager().world(ResourceKey.resolve(token));
             if (!world.isPresent())
             {
                 throw reader.createException(i18n.translate(context.getCause(), "World {input} not found!", token));
@@ -121,7 +121,7 @@ public class DestinationParser implements ValueParser<Destination>, ValueComplet
         }
         else
         {
-            for (ServerWorld world : Sponge.getServer().getWorldManager().getWorlds())
+            for (ServerWorld world : Sponge.getServer().getWorldManager().worlds())
             {
                 if (world.getKey().toString().startsWith(currentInput))
                 {

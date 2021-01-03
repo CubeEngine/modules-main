@@ -75,7 +75,7 @@ public class PlayerData implements DataSerializable
 
     public PlayerData(ServerWorld world)
     {
-        gameMode = world.getProperties().getGameMode();
+        gameMode = world.getProperties().gameMode();
         // TODO defaultdata from world
     }
 

@@ -52,7 +52,7 @@ public class DifficultyCommand
             return;
         }
         i18n.send(context, POSITIVE, "Current difficulty level: {text}", world.getDifficulty().asComponent());
-        if (world.getProperties().isHardcore())
+        if (world.getProperties().hardcore())
         {
             i18n.send(context, POSITIVE, "The world {world} has the hardcore mode enabled.", world);
         }

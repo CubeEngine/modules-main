@@ -34,7 +34,7 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 
 import static java.util.stream.Collectors.toList;
@@ -77,7 +77,7 @@ public class RemoveCommands
         ServerLocation loc = isPlayer ? ((ServerPlayer)context).getServerLocation() : null;
         if (loc != null && !loc.getWorld().equals(world))
         {
-            loc = world.getLocation(world.getProperties().getSpawnPosition());
+            loc = world.getLocation(world.getProperties().spawnPosition());
         }
         int entitiesRemoved;
         List<Entity> list = world.getEntities().stream().filter(filters).collect(toList());

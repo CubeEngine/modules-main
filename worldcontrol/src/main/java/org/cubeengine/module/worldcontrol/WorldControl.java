@@ -40,7 +40,7 @@ public class WorldControl
     {
         for (Entry<ConfigWorld, WorldSection> entry : config.worldSettings.entrySet())
         {
-            entry.getKey().getWorld().getProperties().setPVPEnabled(entry.getValue().pvp);
+            entry.getKey().getWorld().getProperties().setPvp(entry.getValue().pvp);
         }
     }
 

@@ -51,7 +51,7 @@ import org.spongepowered.api.event.world.ExplosionEvent;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.projectile.source.ProjectileSource;
 import org.spongepowered.api.world.LocatableBlock;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.math.vector.Vector3i;
 
 @Singleton

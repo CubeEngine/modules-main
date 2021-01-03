@@ -34,7 +34,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
@@ -95,7 +95,7 @@ public class SpawnCommands
     @Command(desc = "Teleports all players to spawn")
     public void spawnAll(CommandCause context, ServerWorld world, @Flag boolean force)
     {
-        ServerLocation loc = world.getLocation(world.getProperties().getSpawnPosition().add(0.5, 0, 0.5));
+        ServerLocation loc = world.getLocation(world.getProperties().spawnPosition().add(0.5, 0, 0.5));
         for (ServerPlayer aPlayer : Sponge.getServer().getOnlinePlayers())
         {
             if (!force && aPlayer.hasPermission(perms.CMD_SPAWN_PREVENT.getId()))
@@ -123,7 +123,7 @@ public class SpawnCommands
             i18n.send(ACTION_BAR, context, NEGATIVE, "You are not allowed to spawn {user}!", player);
             return;
         }
-        final ServerLocation spawnLocation = world.getLocation(world.getProperties().getSpawnPosition().add(0.5, 0, 0.5));
+        final ServerLocation spawnLocation = world.getLocation(world.getProperties().spawnPosition().add(0.5, 0, 0.5));
         Vector3d rotation = player.getRotation();
         player.setLocation(spawnLocation);
         player.setRotation(rotation);
@@ -134,7 +134,7 @@ public class SpawnCommands
     @Restricted(msg = "Pro Tip: Teleport does not work IRL!")
     public void tpworld(ServerPlayer context, ServerWorld world)
     {
-        final ServerLocation spawnLocation = world.getLocation(world.getProperties().getSpawnPosition().add(0.5, 0, 0.5));
+        final ServerLocation spawnLocation = world.getLocation(world.getProperties().spawnPosition().add(0.5, 0, 0.5));
         final ResourceKey worldKey = world.getProperties().getKey();
         if (!context.hasPermission(worldPerms.getPermission(worldKey.getNamespace() + "." + worldKey.getValue()).getId()))
         {

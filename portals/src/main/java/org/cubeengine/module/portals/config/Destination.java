@@ -25,7 +25,7 @@ import org.cubeengine.module.portals.Portals;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 
@@ -85,7 +85,7 @@ public class Destination
             rotation = destPortal.getPortalRot();
             break;
         case WORLD:
-            loc = world.getLocation(world.getProperties().getSpawnPosition()).add(0.5, 0, 0.5);
+            loc = world.getLocation(world.getProperties().spawnPosition()).add(0.5, 0, 0.5);
             break;
         case LOCATION:
             loc = world.getLocation(this.position);

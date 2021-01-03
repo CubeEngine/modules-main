@@ -42,10 +42,11 @@ import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.world.ServerLocation;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.gamerule.GameRule;
 import org.spongepowered.api.world.server.ServerWorld;
-import org.spongepowered.api.world.server.ServerWorldProperties;
+import org.spongepowered.api.world.server.WorldTemplate;
+import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 import org.spongepowered.api.world.server.WorldManager;
 import org.spongepowered.math.vector.Vector3i;
 
@@ -212,21 +213,17 @@ public class WorldsCommands extends DispatcherCommand
         }
 
         final WorldManager wm = Sponge.getServer().getWorldManager();
-        Optional<ServerWorldProperties> defWorld = wm.getDefaultProperties();
-        if (!defWorld.isPresent())
-        {
-            i18n.send(context, NEUTRAL, "Could not unload {world}. No default world to evacuate to.", world);
-            return;
-        }
 
-        ServerWorld evacuation = wm.getWorld(defWorld.get().getKey()).get();
+        final ServerWorld defWorld = wm.defaultWorld();
+
+        ServerWorld evacuation = wm.world(defWorld.getKey()).get();
         if (evacuation == world)
         {
             world.getPlayers().forEach(p -> p.kick(i18n.translate(p, NEGATIVE, "Main world unloading. Flee!")));
         }
         else
         {
-            final Vector3i pos = evacuation.getProperties().getSpawnPosition();
+            final Vector3i pos = evacuation.getProperties().spawnPosition();
             final ServerLocation loc = evacuation.getLocation(pos);
             world.getPlayers().forEach(p -> p.setLocation(Sponge.getServer().getTeleportHelper().getSafeLocation(loc).orElse(loc)));
         }
@@ -251,7 +248,7 @@ public class WorldsCommands extends DispatcherCommand
                        @Flag @ParameterPermission // TODO (value = "remove-worldfolder", desc = "Allows deleting the world folder")
                            boolean folder, @Flag boolean unload)
     {
-        final Optional<ServerWorld> loadedWorld = Sponge.getServer().getWorldManager().getWorld(world);
+        final Optional<ServerWorld> loadedWorld = Sponge.getServer().getWorldManager().world(world);
         if (loadedWorld.isPresent())
         {
             if (!unload)
@@ -269,7 +266,8 @@ public class WorldsCommands extends DispatcherCommand
                 }
                 if (!folder)
                 {
-                    Sponge.getServer().getWorldManager().getProperties(world).get().setEnabled(false);
+                    final WorldTemplate build = WorldTemplate.builder().from(Sponge.getServer().getWorldManager().loadTemplate(world).get()).enabled(false).build();
+                    Sponge.getServer().getWorldManager().saveTemplate(build);
                     i18n.send(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
                     return CompletableFuture.completedFuture(false);
                 }
@@ -299,22 +297,23 @@ public class WorldsCommands extends DispatcherCommand
         Component tNotLoaded = i18n.translate(context, "not loaded");
         Component tNotEnabled = i18n.translate(context, "not enabled");
 
-        Sponge.getServer().getWorldManager().getAllProperties().stream().sorted(Comparator.comparing(o -> o.getKey().asString())).forEach(prop -> {
+        Sponge.getServer().getWorldManager().worldKeys().stream().sorted(Comparator.comparing(o -> o.asString())).forEach(worldKey -> {
             Component builder =
-                Component.text(" - ").append(Component.text(prop.getKey().asString(), NamedTextColor.GOLD)) // TODO worldname
+                Component.text(" - ").append(Component.text(worldKey.asString(), NamedTextColor.GOLD)) // TODO worldname
                 .append(Component.space())
-                .append(Component.text(prop.getKey().asString(), NamedTextColor.DARK_AQUA));
+                .append(Component.text(worldKey.asString(), NamedTextColor.DARK_AQUA));
 
             final TextComponent infoText = Component.text("(?)", NamedTextColor.YELLOW)
-                                                    .clickEvent(ClickEvent.runCommand("/worlds info" + prop.getKey().asString()))
+                                                    .clickEvent(ClickEvent.runCommand("/worlds info" + worldKey.asString()))
                                                     .hoverEvent(HoverEvent.showText(i18n.translate(context, "Click to show world info")));
 
-            if (!Sponge.getServer().getWorldManager().getWorld(prop.getKey()).isPresent())
+            if (!Sponge.getServer().getWorldManager().world(worldKey).isPresent())
             {
                 builder.append(Component.space());
-                if (prop.isEnabled())
+
+                if (Sponge.getServer().getWorldManager().loadTemplate(worldKey).get().enabled())
                 {
-                    final TextComponent loadText = loadWorldText(context, prop.getKey());
+                    final TextComponent loadText = loadWorldText(context, worldKey);
                     builder.append(tNotEnabled.color(NamedTextColor.RED).append(Component.space()).append(loadText));
                 }
                 else
@@ -339,22 +338,22 @@ public class WorldsCommands extends DispatcherCommand
         context.sendMessage(Identity.nil(), Component.empty());
         i18n.send(context, POSITIVE, "World information for {world}:", world);
 
-        if (!world.isEnabled())
+        if (!world.enabled())
         {
             i18n.send(context, NEUTRAL, "This world is disabled.");
         }
-        else if (!Sponge.getServer().getWorldManager().getWorld(world.getKey()).isPresent())
+        else if (!Sponge.getServer().getWorldManager().world(world.getKey()).isPresent())
         {
             Component load = loadWorldText(context, world.getKey());
             i18n.send(context, NEGATIVE, "This world is not loaded. {txt#load}", load);
         }
-        if (!world.isInitialized())
+        if (!world.initialized())
         {
             i18n.send(context, NEUTRAL, "This world has not been initialized.");
         }
-        i18n.send(context, NEUTRAL, "Gamemode: {text}", world.getGameMode().asComponent());
-        i18n.send(context, NEUTRAL, "DimensionType: {input}", world.getDimensionType());
-        if (world.getWorldGenerationSettings().doFeaturesGenerate())
+        i18n.send(context, NEUTRAL, "Gamemode: {text}", world.gameMode().asComponent());
+        i18n.send(context, NEUTRAL, "DimensionType: {input}", world.worldType());
+        if (world.worldGenerationSettings().generateFeatures())
         {
 //            i18n.send(context, NEUTRAL, "WorldType: {input} with features", world.getGeneratorType().getName());
         }
@@ -363,20 +362,20 @@ public class WorldsCommands extends DispatcherCommand
 //            i18n.send(context, NEUTRAL, "WorldType: {input} no features", world.getGeneratorType().getName());
         }
 
-        i18n.send(context, NEUTRAL, "Difficulty {text}", world.getDifficulty().asComponent());
-        if (world.isHardcore())
+        i18n.send(context, NEUTRAL, "Difficulty {text}", world.difficulty().asComponent());
+        if (world.hardcore())
         {
             i18n.send(context, NEUTRAL, "Hardcoremode active");
         }
-        if (!world.isPVPEnabled())
+        if (!world.pvp())
         {
             i18n.send(context, NEUTRAL, "PVP disabled");
         }
-        if (!world.areCommandsEnabled() && Sponge.getPlatform().getType() == Type.CLIENT)
+        if (!world.commands() && Sponge.getPlatform().getType() == Type.CLIENT)
         {
             i18n.send(context, NEUTRAL, "Commands are not allowed");
         }
-        i18n.send(context, NEUTRAL, "Seed: {long}", world.getWorldGenerationSettings().getSeed());
+        i18n.send(context, NEUTRAL, "Seed: {long}", world.worldGenerationSettings().seed());
 //        if (!world.getGeneratorModifiers().isEmpty())
 //        {
 //            i18n.send(context, NEUTRAL, "Generation is modified by:");
@@ -385,11 +384,11 @@ public class WorldsCommands extends DispatcherCommand
 //                context.sendMessage(Text.of(YELLOW, " - ", GOLD, modifier.getName()).toBuilder().onHover(TextActions.showText(Text.of(GOLD, modifier.getId()))).build());
 //            }
 //        }
-        if (!world.doesLoadOnStartup())
+        if (!world.loadOnStartup())
         {
             i18n.send(context, NEUTRAL, "This world will not load automatically on startup!");
         }
-        Vector3i spawn = world.getSpawnPosition();
+        Vector3i spawn = world.spawnPosition();
         i18n.send(context, NEUTRAL, "This worlds spawn is at {vector}", new Vector3i(spawn.getX(), spawn.getY(), spawn.getZ()));
         if (showGameRules && !world.getGameRules().isEmpty()) // Show gamerules
         {

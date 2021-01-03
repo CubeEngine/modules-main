@@ -89,7 +89,7 @@ public class ButcherCommand extends PermissionContainer
         if (context.getSubject() instanceof ServerPlayer && ((ServerPlayer)context.getSubject()).getWorld() == world) {
             remove = ((ServerPlayer)context.getSubject()).getNearbyEntities(radius, types);
         } else {
-            final Vector3i spawn = world.getProperties().getSpawnPosition();
+            final Vector3i spawn = world.getProperties().spawnPosition();
             remove = world.getEntities(AABB.of(spawn.sub(Vector3i.ONE.mul(radius)), spawn.sub(Vector3i.ONE.mul(-radius))), types);
         }
 
