@@ -21,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
@@ -31,13 +32,11 @@ import org.spongepowered.plugin.PluginContainer;
 public class UnlimitedFood extends PermissionContainer implements Runnable
 {
     private final Permission UNLIMITED_FOOD = register("effect.unlimited-food", "Grants unlimited food", null);
-    private final Task unlimitedFoodTask;
 
-    public UnlimitedFood(PermissionManager pm, PluginContainer plugin)
+    public UnlimitedFood(PermissionManager pm, TaskManager tm)
     {
         super(pm, VanillaPlus.class);
-        this.unlimitedFoodTask = Task.builder().interval(1, TimeUnit.SECONDS).execute(this).plugin(plugin).build();
-        Sponge.getServer().getScheduler().submit(unlimitedFoodTask);
+        tm.runTimer(this, 0, 1000);
     }
 
     @Override

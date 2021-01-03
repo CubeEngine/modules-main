@@ -31,6 +31,7 @@ import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.command.annotation.Parser;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
@@ -53,16 +54,16 @@ public class ManagementCommands extends DispatcherCommand
     private Roles module;
     private RolesPermissionService service;
     private I18n i18n;
-    private PluginContainer plugin;
+    private final TaskManager taskManager;
 
     @Inject
-    public ManagementCommands(Roles module, RolesPermissionService service, I18n i18n, PluginContainer plugin)
+    public ManagementCommands(Roles module, RolesPermissionService service, I18n i18n, TaskManager taskManager)
     {
         super(Roles.class);
         this.module = module;
         this.service = service;
         this.i18n = i18n;
-        this.plugin = plugin;
+        this.taskManager = taskManager;
     }
 
     @Alias(value = "manload")
@@ -102,8 +103,7 @@ public class ManagementCommands extends DispatcherCommand
                 seconds = seconds > 60 ? 60 : seconds < 0 ? 1 : seconds; // Min 1 Max 60
                 i18n.send(context, POSITIVE, "Debug enabled for {number} seconds", seconds);
 
-                final Task task = Task.builder().delay(seconds, TimeUnit.SECONDS).execute(() -> RolesUtil.debug = false).plugin(plugin).build();
-                Sponge.getServer().getScheduler().submit(task);
+                taskManager.runTaskDelayed(() -> RolesUtil.debug = false, seconds * 1000);
             }
             else
             {

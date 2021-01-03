@@ -218,7 +218,7 @@ public class VanillaPlus
         }
         if (config.add.unlimitedFood)
         {
-            new UnlimitedFood(pm, plugin);
+            new UnlimitedFood(pm, tam);
         }
 
         // improvements
