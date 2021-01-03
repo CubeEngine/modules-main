@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.roles.commands;
 
+import java.time.Duration;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
@@ -103,7 +104,7 @@ public class ManagementCommands extends DispatcherCommand
                 seconds = seconds > 60 ? 60 : seconds < 0 ? 1 : seconds; // Min 1 Max 60
                 i18n.send(context, POSITIVE, "Debug enabled for {number} seconds", seconds);
 
-                taskManager.runTaskDelayed(() -> RolesUtil.debug = false, seconds * 1000);
+                taskManager.runTaskDelayed(() -> RolesUtil.debug = false, Duration.ofSeconds(seconds));
             }
             else
             {

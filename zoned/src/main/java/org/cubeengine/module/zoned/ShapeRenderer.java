@@ -33,6 +33,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.math.vector.Vector3d;
 
 public class ShapeRenderer
@@ -41,15 +42,15 @@ public class ShapeRenderer
 
     public static boolean toggleShowActiveZone(TaskManager tm, ServerPlayer player, Zoned module)
     {
-        ScheduledTask task = showRegionTasks.remove(player.getUniqueId());
-        if (task != null)
+        final ScheduledTask oldTask = showRegionTasks.remove(player.getUniqueId());
+        if (oldTask != null)
         {
-            task.cancel();
+            oldTask.cancel();
             return false;
         }
-        task = tm.runTimer(() -> ShapeRenderer.showActiveRegion(tm, player.getUniqueId(), module.getActiveZone(player)),
-                           10, 10);
-        showRegionTasks.put(player.getUniqueId(), task);
+        final ScheduledTask newTask = tm.runTimer(t -> ShapeRenderer.showActiveRegion(tm, player.getUniqueId(), module.getActiveZone(player)),
+                           Ticks.of(10), Ticks.of(10));
+        showRegionTasks.put(player.getUniqueId(), newTask);
         return true;
     }
 

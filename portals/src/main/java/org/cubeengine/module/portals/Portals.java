@@ -54,8 +54,10 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Color;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
@@ -96,12 +98,12 @@ public class Portals
 
         this.portalsDir = Files.createDirectories(path.resolve("portals"));
         this.loadPortals();
-        tm.runTimer(this::checkForEntitiesInPortals, 5, 5);
-        tm.runTimer(this::spawnPortalParticles, 20, 20);
+        tm.runTimer(this::checkForEntitiesInPortals, Ticks.of(5), Ticks.of(5));
+        tm.runTimer(this::spawnPortalParticles, Ticks.of(20), Ticks.of(20));
         this.zoned = (Zoned) mm.getModule(Zoned.class);
     }
 
-    private void spawnPortalParticles()
+    private void spawnPortalParticles(ScheduledTask task)
     {
         for (Portal portal : portals.values())
         {
@@ -170,7 +172,7 @@ public class Portals
         return getPortals().stream().filter(portal -> portal.getWorld().equals(world)).collect(toSet());
     }
 
-    private void checkForEntitiesInPortals()
+    private void checkForEntitiesInPortals(ScheduledTask task)
     {
         this.portals.values().stream()
                     .filter(portal -> portal.config.teleportNonPlayers)

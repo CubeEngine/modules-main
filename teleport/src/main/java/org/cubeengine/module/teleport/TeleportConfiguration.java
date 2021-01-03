@@ -33,7 +33,7 @@ public class TeleportConfiguration extends ReflectedYaml
 
     @Comment({"The seconds until a teleport request is automatically denied.",
               "Use -1 to never automatically deny. (Will lose information after some time when disconnecting)"})
-    public int teleportRequestWait = -1;
+    public long teleportRequestWait = -1;
 
     public NavigationSection navigation;
 

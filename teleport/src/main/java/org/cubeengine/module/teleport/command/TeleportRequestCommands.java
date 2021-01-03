@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.teleport.command;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 import com.google.inject.Inject;
@@ -74,17 +75,16 @@ public class TeleportRequestCommands
         tl.setToRequest(player, context);
         tl.removeFromRequest(player);
         i18n.send(context, POSITIVE, "Teleport request sent to {user}!", player);
-        int waitTime = this.module.getConfig().teleportRequestWait * 20;
+        long waitTime = this.module.getConfig().teleportRequestWait;
         if (waitTime > 0)
         {
             final Player sendingUser = context;
             final ScheduledTask task = taskManager.runTaskDelayed(() -> {
-
                 tl.removeRequestTask(player);
                 tl.removeToRequest(player);
                 i18n.send(sendingUser, NEGATIVE, "{user} did not accept your teleport request.", player);
                 i18n.send(player, NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
-            }, waitTime); // wait x - seconds
+            }, Duration.ofSeconds(waitTime)); // wait x - seconds
             ScheduledTask oldTask = tl.getRequestTask(player);
             if (oldTask != null)
             {
@@ -109,7 +109,7 @@ public class TeleportRequestCommands
         tl.setFromRequest(player, context);
         tl.removeToRequest(player);
         i18n.send(context, POSITIVE, "Teleport request send to {user}!", player);
-        int waitTime = this.module.getConfig().teleportRequestWait * 20;
+        long waitTime = this.module.getConfig().teleportRequestWait;
         if (waitTime > 0)
         {
             final Player sendingUser = context;
@@ -118,7 +118,7 @@ public class TeleportRequestCommands
                 tl.removeFromRequest(player);
                 i18n.send(sendingUser, NEGATIVE, "{user} did not accept your teleport request.", player);
                 i18n.send(player, NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
-            }, waitTime); // wait x - seconds
+            }, Duration.ofSeconds(waitTime)); // wait x - seconds
             ScheduledTask oldTask = tl.getRequestTask(player);
             if (oldTask != null)
             {

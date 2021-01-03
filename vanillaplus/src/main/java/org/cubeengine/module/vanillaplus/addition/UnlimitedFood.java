@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.vanillaplus.addition;
 
-import java.util.concurrent.TimeUnit;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
@@ -26,22 +25,21 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.plugin.PluginContainer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 
-public class UnlimitedFood extends PermissionContainer implements Runnable
+import java.util.function.Consumer;
+
+public class UnlimitedFood extends PermissionContainer implements Consumer<ScheduledTask>
 {
     private final Permission UNLIMITED_FOOD = register("effect.unlimited-food", "Grants unlimited food", null);
 
     public UnlimitedFood(PermissionManager pm, TaskManager tm)
     {
         super(pm, VanillaPlus.class);
-        tm.runTimer(this, 0, 1000);
     }
 
     @Override
-    public void run()
-    {
+    public void accept(ScheduledTask scheduledTask) {
         for (ServerPlayer player : Sponge.getServer().getOnlinePlayers())
         {
             if (UNLIMITED_FOOD.check(player))
@@ -50,6 +48,5 @@ public class UnlimitedFood extends PermissionContainer implements Runnable
                 player.offer(Keys.SATURATION, player.get(Keys.MAX_SATURATION).get());
             }
         }
-
     }
 }

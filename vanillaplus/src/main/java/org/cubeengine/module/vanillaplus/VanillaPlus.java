@@ -75,6 +75,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterCommandEvent;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.plugin.PluginContainer;
 
 /**
@@ -218,7 +219,8 @@ public class VanillaPlus
         }
         if (config.add.unlimitedFood)
         {
-            new UnlimitedFood(pm, tam);
+
+            tam.runTimer(new UnlimitedFood(pm, tam), Ticks.of(1000));
         }
 
         // improvements

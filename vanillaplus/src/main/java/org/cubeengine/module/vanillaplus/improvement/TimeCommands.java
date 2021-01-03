@@ -170,7 +170,7 @@ public class TimeCommands extends PermissionContainer
         }
         else
         {
-            locked.put(world.getKey(), tam.runTimer(() -> setTime(world, worldTime), 0, 10));
+            locked.put(world.getKey(), tam.runTimer(t -> setTime(world, worldTime), Ticks.of(10)));
             i18n.send(context, POSITIVE, "Time locked for {world}!", world);
         }
     }
