@@ -28,6 +28,7 @@ import org.cubeengine.module.locker.LockerPerm;
 import org.cubeengine.module.locker.data.LockerManager;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.entity.carrier.Campfire;
 import org.spongepowered.api.block.transaction.BlockTransaction;
 import org.spongepowered.api.block.transaction.Operations;
 import org.spongepowered.api.data.DataHolder;
@@ -211,7 +212,10 @@ public class LockerLockedListener
             final boolean isInventory = secondary && !(dataHolder instanceof HorseLike && !player.get(Keys.IS_SNEAKING).orElse(false)); // Horse Inventory only opens when sneaking
             if (dataHolder instanceof Carrier && isInventory) // Is it an inventory?
             {
-                return lockerManager.handleInventoryOpen(dataHolder, player, ((Carrier)dataHolder).getInventory());
+                if (!(dataHolder instanceof Campfire))
+                {
+                    return lockerManager.handleInventoryOpen(dataHolder, player, ((Carrier)dataHolder).getInventory());
+                }
             }
             else if (dataHolder instanceof Entity)
             {
