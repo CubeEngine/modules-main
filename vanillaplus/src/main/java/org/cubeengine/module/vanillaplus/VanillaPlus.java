@@ -150,23 +150,23 @@ public class VanillaPlus
         // Fixes
         if (config.fix.styledSigns)
         {
-            evm.registerListener(VanillaPlus.class, new ColoredSigns(pm));
+            evm.registerListener(new ColoredSigns(pm));
         }
         if (config.fix.safeLoginFly)
         {
-            evm.registerListener(VanillaPlus.class, new FlymodeFixListener());
+            evm.registerListener(new FlymodeFixListener());
         }
         if (config.fix.safeLoginBorder)
         {
-            evm.registerListener(VanillaPlus.class, new SpawnFixListener());
+            evm.registerListener(new SpawnFixListener());
         }
         if (config.fix.paintingSwitcher)
         {
-            evm.registerListener(VanillaPlus.class, new PaintingListener(pm, this, i18n));
+            evm.registerListener(new PaintingListener(pm, this, i18n));
         }
         if (config.fix.showTamer)
         {
-            evm.registerListener(VanillaPlus.class, new TamedListener(i18n));
+            evm.registerListener(new TamedListener(i18n));
         }
     }
 
@@ -215,7 +215,7 @@ public class VanillaPlus
         if (config.add.commandUnlimited)
         {
             final UnlimitedItems cmd = momu.registerCommands(event, plugin, this, UnlimitedItems.class);
-            evm.registerListener(VanillaPlus.class, cmd);
+            evm.registerListener(cmd);
         }
         if (config.add.unlimitedFood)
         {

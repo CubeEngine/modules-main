@@ -55,7 +55,7 @@ public class SettingsCommands extends AbstractSettingsCommand
     {
         super(i18n, listener, ps, bdsCmd, edsCmd, pdsCmd);
         this.pm = pm;
-        em.registerListener(Protector.class, this.psl);
+        em.registerListener(this.psl);
     }
 
     @Command(desc = "Controls teleport movement")

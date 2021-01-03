@@ -29,14 +29,8 @@ import org.apache.logging.log4j.core.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.ModuleInjector;
 import org.cubeengine.libcube.service.filesystem.FileManager;
-import org.cubeengine.libcube.service.logging.LoggingUtil;
 import org.cubeengine.libcube.util.Version;
 import org.cubeengine.logscribe.Log;
-import org.cubeengine.logscribe.LogFactory;
-import org.cubeengine.logscribe.LogLevel;
-import org.cubeengine.logscribe.LogTarget;
-import org.cubeengine.logscribe.filter.PrefixFilter;
-import org.cubeengine.logscribe.target.file.AsyncFileTarget;
 import org.cubeengine.module.sql.database.AbstractDatabase;
 import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.DatabaseConfiguration;
@@ -73,46 +67,36 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
     private final DatabaseConfiguration config;
     private DataSource dataSource;
     private ModuleManager mm;
+    private final Log logger;
 
     private Settings settings;
     private MappedSchema mappedSchema;
-    private Log logger;
     private final JooqLogger jooqLogger = new JooqLogger(this);
     private Configuration jooqConfig;
 
     @Inject
-    public SQLDatabase(Reflector reflector, ModuleManager mm, FileManager fm, LogFactory logFactory)
+    public SQLDatabase(Reflector reflector, ModuleManager mm, FileManager fm, Log log)
     {
         this.mm = mm;
+        this.logger = log;
         this.mm.registerBinding(Database.class, this);
         File pluginFolder = mm.getBasePath();
 
         // Disable HikariPool Debug ConsoleSpam
-        ((Logger)LogManager.getLogger("com.zaxxer.hikari.pool.HikariPool")).setLevel(Level.INFO);
-        ((Logger)LogManager.getLogger("com.zaxxer.hikari.pool.PoolBase")).setLevel(Level.INFO); // really? now pkg-private
-        ((Logger)LogManager.getLogger("com.zaxxer.hikari.HikariConfig")).setLevel(Level.INFO);
-
-        // Setting up Logger...
-        this.logger = mm.getLoggerFor(Database.class);
-        AsyncFileTarget target =
-                new AsyncFileTarget.Builder(LoggingUtil.getLogFile(fm, "Database").toPath(),
-                        LoggingUtil.getFileFormat(true, false)
-                ).setAppend(true).setCycler(LoggingUtil.getCycler()).setThreadFactory(threadFactory).build();
-
-        target.setLevel(LogLevel.DEBUG);
-        logger.addTarget(target);
-
-
-        LogTarget parentTarget = logger.addDelegate(logFactory.getLog(LogFactory.class));
-        parentTarget.appendFilter(new PrefixFilter("[DB] "));
-        parentTarget.setLevel(LogLevel.INFO);
-
+        silenceLogger("com.zaxxer.hikari.pool.HikariPool");
+        silenceLogger("com.zaxxer.hikari.pool.PoolBase"); // really? now pkg-private
+        silenceLogger("com.zaxxer.hikari.HikariConfig");
 
         reflector.getDefaultConverterManager().registerConverter(new SQLDialectConverter(), SQLDialect.class);
 
         this.config = reflector.load(DatabaseConfiguration.class, new File(pluginFolder, "database.yml"));
 
 
+    }
+
+    private static void silenceLogger(String name)
+    {
+        ((Logger)LogManager.getLogger(name)).setLevel(Level.INFO);
     }
 
     @Override
