@@ -820,7 +820,7 @@ public class LockerManager
             }
         }
 
-        tm.runTask(Locker.class, () -> removeLock(getDataHolderAtLoc(loc), player));
+        tm.runTask(() -> removeLock(getDataHolderAtLoc(loc), player));
         return true;
     }
 

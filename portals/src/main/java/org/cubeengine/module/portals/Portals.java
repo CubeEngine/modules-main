@@ -96,8 +96,8 @@ public class Portals
 
         this.portalsDir = Files.createDirectories(path.resolve("portals"));
         this.loadPortals();
-        tm.runTimer(Portals.class, this::checkForEntitiesInPortals, 5, 5);
-        tm.runTimer(Portals.class, this::spawnPortalParticles, 20, 20);
+        tm.runTimer(this::checkForEntitiesInPortals, 5, 5);
+        tm.runTimer(this::spawnPortalParticles, 20, 20);
         this.zoned = (Zoned) mm.getModule(Zoned.class);
     }
 

@@ -31,23 +31,23 @@ import org.spongepowered.api.effect.particle.ParticleOptions;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.math.vector.Vector3d;
 
 public class ShapeRenderer
 {
-    private static final Map<UUID, UUID> showRegionTasks = new HashMap<>();
+    private static final Map<UUID, ScheduledTask> showRegionTasks = new HashMap<>();
 
     public static boolean toggleShowActiveZone(TaskManager tm, ServerPlayer player, Zoned module)
     {
-        UUID task = showRegionTasks.remove(player.getUniqueId());
+        ScheduledTask task = showRegionTasks.remove(player.getUniqueId());
         if (task != null)
         {
-            tm.cancelTask(Zoned.class, task);
+            task.cancel();
             return false;
         }
-        task = tm.runTimer(Zoned.class,
-                           () -> ShapeRenderer.showActiveRegion(tm, player.getUniqueId(), module.getActiveZone(player)),
+        task = tm.runTimer(() -> ShapeRenderer.showActiveRegion(tm, player.getUniqueId(), module.getActiveZone(player)),
                            10, 10);
         showRegionTasks.put(player.getUniqueId(), task);
         return true;
@@ -63,10 +63,10 @@ public class ShapeRenderer
         final ServerPlayer player = Sponge.getServer().getPlayer(playerUuid).orElse(null);
         if (player == null)
         {
-            UUID task = showRegionTasks.remove(playerUuid);
+            ScheduledTask task = showRegionTasks.remove(playerUuid);
             if (task != null)
             {
-                tm.cancelTask(Zoned.class, task);
+                task.cancel();
             }
             return;
         }

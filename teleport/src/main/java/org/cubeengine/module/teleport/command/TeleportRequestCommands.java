@@ -30,6 +30,7 @@ import org.cubeengine.module.teleport.TeleportListener;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 
 import static org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType.ACTION_BAR;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -77,19 +78,19 @@ public class TeleportRequestCommands
         if (waitTime > 0)
         {
             final Player sendingUser = context;
-            final UUID taskID = taskManager.runTaskDelayed(Teleport.class, () -> {
+            final ScheduledTask task = taskManager.runTaskDelayed(() -> {
 
                 tl.removeRequestTask(player);
                 tl.removeToRequest(player);
                 i18n.send(sendingUser, NEGATIVE, "{user} did not accept your teleport request.", player);
                 i18n.send(player, NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
             }, waitTime); // wait x - seconds
-            UUID oldtaskID = tl.getRequestTask(player);
-            if (oldtaskID != null)
+            ScheduledTask oldTask = tl.getRequestTask(player);
+            if (oldTask != null)
             {
-                taskManager.cancelTask(Teleport.class, oldtaskID);
+                oldTask.cancel();
             }
-            tl.setRequestTask(player    , taskID);
+            tl.setRequestTask(player, task);
         }
     }
 
@@ -112,18 +113,18 @@ public class TeleportRequestCommands
         if (waitTime > 0)
         {
             final Player sendingUser = context;
-            final UUID taskID = taskManager.runTaskDelayed(Teleport.class, () -> {
+            final ScheduledTask task = taskManager.runTaskDelayed(() -> {
                 tl.removeRequestTask(player);
                 tl.removeFromRequest(player);
                 i18n.send(sendingUser, NEGATIVE, "{user} did not accept your teleport request.", player);
                 i18n.send(player, NEGATIVE, "Teleport request of {sender} timed out.", sendingUser);
             }, waitTime); // wait x - seconds
-            UUID oldtaskID = tl.getRequestTask(player);
-            if (oldtaskID != null)
+            ScheduledTask oldTask = tl.getRequestTask(player);
+            if (oldTask != null)
             {
-                taskManager.cancelTask(Teleport.class, oldtaskID);
+                oldTask.cancel();
             }
-            tl.setRequestTask(player, taskID);
+            tl.setRequestTask(player, task);
         }
     }
 
@@ -165,11 +166,11 @@ public class TeleportRequestCommands
             i18n.send(player.get(), POSITIVE, "{user} accepted your teleport request!", context);
             i18n.send(context, POSITIVE, "You accepted a teleport to {user}!", player.get());
         }
-        UUID taskID = tl.getRequestTask(context);
-        if (taskID != null)
+        ScheduledTask task = tl.getRequestTask(context);
+        if (task != null)
         {
             tl.getRequestTask(context);
-            taskManager.cancelTask(Teleport.class, taskID);
+            task.cancel();
         }
     }
 
@@ -208,11 +209,11 @@ public class TeleportRequestCommands
             i18n.send(ACTION_BAR, sender, NEGATIVE, "You don't have any pending requests!");
             return;
         }
-        UUID taskID = tl.getRequestTask(sender);
-        if (taskID != null)
+        ScheduledTask task = tl.getRequestTask(sender);
+        if (task != null)
         {
             tl.removeRequestTask(sender);
-            taskManager.cancelTask(Teleport.class, taskID);
+            task.cancel();
         }
     }
 }

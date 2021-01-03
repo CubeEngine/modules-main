@@ -39,6 +39,7 @@ import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.world.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
@@ -57,7 +58,7 @@ public class TeleportListener
 
     private Map<UUID, ServerLocation> deathLocations = new HashMap<>();
     private Map<UUID, ServerLocation> lastLocations = new HashMap<>();
-    private Map<UUID, UUID> requestCancelTasks = new HashMap<>();
+    private Map<UUID, ScheduledTask> requestCancelTasks = new HashMap<>();
     private Map<UUID, UUID> tpToRequests = new HashMap<>();
     private Map<UUID, UUID> tpFromRequests = new HashMap<>();
 
@@ -199,14 +200,14 @@ public class TeleportListener
         tpToRequests.remove(player.getUniqueId());
     }
 
-    public UUID getRequestTask(Player player)
+    public ScheduledTask getRequestTask(Player player)
     {
         return requestCancelTasks.get(player.getUniqueId());
     }
 
-    public void setRequestTask(Player player, UUID taskID)
+    public void setRequestTask(Player player, ScheduledTask task)
     {
-        requestCancelTasks.put(player.getUniqueId(), taskID);
+        requestCancelTasks.put(player.getUniqueId(), task);
     }
 
     public void setFromRequest(Player player, Player target)

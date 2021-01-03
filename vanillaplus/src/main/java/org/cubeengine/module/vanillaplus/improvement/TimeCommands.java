@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.command.annotation.Command;
@@ -39,6 +38,7 @@ import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.util.MinecraftDayTime;
 import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.server.ServerWorld;
@@ -49,10 +49,10 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 public class TimeCommands extends PermissionContainer
 {
     private final TaskManager tam;
-    private I18n i18n;
-    private TimeMatcher tm;
+    private final I18n i18n;
+    private final TimeMatcher tm;
 
-    private Map<ResourceKey, UUID> locked = new HashMap<>();
+    private final Map<ResourceKey, ScheduledTask> locked = new HashMap<>();
 
     @Inject
     public TimeCommands(PermissionManager pm, I18n i18n, TimeMatcher tm, TaskManager tam)
@@ -162,14 +162,15 @@ public class TimeCommands extends PermissionContainer
 
     private void toggleTimeLock(CommandCause context, ServerWorld world, long worldTime)
     {
-        if (locked.containsKey(world.getKey()))
+        ScheduledTask oldTask = locked.remove(world.getKey());
+        if (oldTask != null)
         {
-            tam.cancelTask(VanillaPlus.class, locked.remove(world.getKey()));
+            oldTask.cancel();
             i18n.send(context, POSITIVE, "Time unlocked for {world}!", world);
         }
         else
         {
-            locked.put(world.getKey(), tam.runTimer(VanillaPlus.class, () -> setTime(world, worldTime), 0, 10));
+            locked.put(world.getKey(), tam.runTimer(() -> setTime(world, worldTime), 0, 10));
             i18n.send(context, POSITIVE, "Time locked for {world}!", world);
         }
     }
