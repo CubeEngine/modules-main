@@ -65,12 +65,12 @@ public class FoodCommands extends PermissionContainer
     {
         if (players == null)
         {
-            if (!(context instanceof Player))
+            if (!(context.getSubject() instanceof ServerPlayer))
             {
                 i18n.send(context, NEGATIVE, "Don't feed the troll!");
                 return;
             }
-            User sender = (User)context;
+            final ServerPlayer sender = (ServerPlayer)context.getSubject();
             sender.offer(Keys.FOOD_LEVEL, 20);
             sender.offer(Keys.SATURATION, 20.0);
             sender.offer(Keys.EXHAUSTION, 0.0);
@@ -116,13 +116,13 @@ public class FoodCommands extends PermissionContainer
     {
         if (players == null)
         {
-            if (!(context instanceof Player))
+            if (!(context.getSubject() instanceof ServerPlayer))
             {
                 context.sendMessage(Identity.nil(), Component.text("\n\n\n\n\n\n\n\n\n\n\n\n\n"));
                 i18n.send(context, NEGATIVE, "I'll give you only one line to eat!");
                 return;
             }
-            User sender = (User)context;
+            final ServerPlayer sender = (ServerPlayer)context.getSubject();
             sender.offer(Keys.FOOD_LEVEL, 0);
             sender.offer(Keys.SATURATION, 0.0);
             sender.offer(Keys.EXHAUSTION, 4.0);

@@ -59,12 +59,12 @@ public class HealCommand extends PermissionContainer
     {
         if (players == null)
         {
-            if (!(context instanceof Player))
+            if (!(context.getSubject() instanceof ServerPlayer))
             {
                 i18n.send(context, NEGATIVE, "Only time can heal your wounds!");
                 return;
             }
-            Player sender = (Player)context;
+            ServerPlayer sender = (ServerPlayer)context.getSubject();
             sender.offer(Keys.HEALTH, sender.get(Keys.MAX_HEALTH).get());
             i18n.send(sender, POSITIVE, "You are now healed!");
             return;

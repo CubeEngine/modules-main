@@ -19,6 +19,8 @@ package org.cubeengine.module.vanillaplus.addition;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.command.annotation.Flag;
 import org.cubeengine.libcube.service.command.annotation.Restricted;
@@ -27,10 +29,15 @@ import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.item.inventory.Inventory;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ContainerTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.entity.StandardInventory;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
+import org.spongepowered.api.item.inventory.type.ViewableInventory;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
@@ -65,8 +72,22 @@ public class InvseeCommand extends PermissionContainer
                        @Flag boolean quiet,
                        @Flag boolean ender)
     {
-        boolean denyModify = false;
-        Inventory inv;
+        ViewableInventory viewable;
+        boolean canModify = COMMAND_INVSEE_MODIFY.check(context) && ((force && COMMAND_INVSEE_MODIFY_FORCE.check(context)) || !COMMAND_INVSEE_MODIFY_PREVENT.check(player));
+        if (player.isOnline() && player.hasPermission(COMMAND_INVSEE_NOTIFY.getId()))
+        {
+            if (!(quiet && context.hasPermission(COMMAND_INVSEE_QUIET.getId())))
+            {
+                if (ender)
+                {
+                    i18n.send(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your ender chest.", context);
+                }
+                else
+                {
+                    i18n.send(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your inventory.", context);
+                }
+            }
+        }
         if (ender)
         {
 
@@ -75,30 +96,37 @@ public class InvseeCommand extends PermissionContainer
                 i18n.send(context, NEGATIVE, "You are not allowed to look into enderchests!");
                 return;
             }
-            inv = player.getEnderChestInventory();
+            viewable = ViewableInventory.builder().type(ContainerTypes.GENERIC_9X3)
+                                        .slots(player.getEnderChestInventory().slots(), 0)
+                                        .completeStructure()
+                                        .build();
         }
         else
         {
-            inv = player.getInventory();
-        }
-        if (context.hasPermission(COMMAND_INVSEE_MODIFY.getId()))
-        {
-            denyModify = !(force && context.hasPermission(COMMAND_INVSEE_MODIFY_FORCE.getId()))
-                && player.hasPermission(COMMAND_INVSEE_MODIFY_PREVENT.getId());
-        }
-        if (player.isOnline() && player.hasPermission(COMMAND_INVSEE_NOTIFY.getId()))
-        {
-            if (!(quiet && context.hasPermission(COMMAND_INVSEE_QUIET.getId())))
-            {
-                i18n.send(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your inventory.", context);
-            }
+            final ItemStack barrier = ItemStack.of(ItemTypes.BARRIER);
+            barrier.offer(Keys.CUSTOM_NAME, Component.text("Unused Slot", NamedTextColor.BLACK));
+            final StandardInventory playerInventory = player.isOnline() ? player.getPlayer().get().getInventory() : player.getInventory();
+            viewable = ViewableInventory.builder().type(ContainerTypes.GENERIC_9X5)
+                                        .slots(playerInventory.getArmor().slots(), 0)
+                                        .dummySlots(4, 4).item(barrier.createSnapshot())
+                                        .slots(playerInventory.getOffhand().slots(), 8)
+                                        .slots(playerInventory.getStorage().slots(), 9)
+                                        .slots(playerInventory.getHotbar().slots(), 4*9)
+                                        .completeStructure()
+                                        .build();
         }
 
-        final InventoryMenu menu = inv.asViewable().get().asMenu();
-        if (denyModify)
+        final InventoryMenu menu = viewable.asMenu();
+        if (!canModify)
         {
             menu.setReadOnly(true);
         }
+        else if (!ender)
+        {
+            menu.registerSlotClick((cause, container, slot, slotIndex, clickType) -> !(slotIndex >= 4 && slotIndex < 8));
+            menu.registerChange((cause, container, slot, slotIndex, oldStack, newStack) -> !(slotIndex >= 4 && slotIndex < 8));
+        }
         menu.open(context);
     }
+
 }

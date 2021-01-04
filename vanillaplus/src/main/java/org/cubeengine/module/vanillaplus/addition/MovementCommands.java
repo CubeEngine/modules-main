@@ -89,7 +89,7 @@ public class MovementCommands extends PermissionContainer
     }
 
     @Command(desc = "Lets you fly away")
-    public void fly(CommandCause context, @Option Float flyspeed, @Default @Named("player") Player player)
+    public void fly(CommandCause context, @Option Double flyspeed, @Default @Named("player") ServerPlayer player)
     {
         // new cmd system does not provide a way for defaultProvider to give custom messages
         //i18n.sendTranslated(context, NEUTRAL, "{text:ProTip}: If your server flies away it will go offline.");

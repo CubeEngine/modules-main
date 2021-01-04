@@ -20,17 +20,9 @@ package org.cubeengine.module.vanillaplus;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.Broadcaster;
-import org.cubeengine.libcube.service.command.AnnotationCommandBuilder;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.inventoryguard.InventoryGuardFactory;
-import org.cubeengine.libcube.service.matcher.EnchantMatcher;
-import org.cubeengine.libcube.service.matcher.EntityMatcher;
-import org.cubeengine.libcube.service.matcher.MaterialMatcher;
-import org.cubeengine.libcube.service.matcher.StringMatcher;
-import org.cubeengine.libcube.service.matcher.TimeMatcher;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.module.vanillaplus.addition.FoodCommands;
@@ -129,19 +121,11 @@ import org.spongepowered.plugin.PluginContainer;
 public class VanillaPlus
 {
     @Inject private I18n i18n;
-    @Inject private MaterialMatcher mm;
-    @Inject private EnchantMatcher em;
-    @Inject private EntityMatcher enm;
-    @Inject private TimeMatcher tm;
     @Inject private ModuleManager momu;
     @Inject private TaskManager tam;
     @Inject private PermissionManager pm;
-    @Inject private Broadcaster bc;
-    @Inject private InventoryGuardFactory invGuard;
-    @ModuleConfig private VanillaPlusConfig config;
+    @ModuleConfig(early = true) private VanillaPlusConfig config;
     @Inject private EventManager evm;
-    @Inject private StringMatcher sm;
-    @Inject private AnnotationCommandBuilder commandBuilder;
     @Inject private PluginContainer plugin;
 
     @Listener
@@ -170,6 +154,7 @@ public class VanillaPlus
         }
     }
 
+    @Listener
     public void onRegisterCommand(RegisterCommandEvent<Parameterized> event) {
         // additions
         if (config.add.commandGod)

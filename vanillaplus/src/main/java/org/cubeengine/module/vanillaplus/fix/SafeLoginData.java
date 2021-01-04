@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.vanillaplus.fix;
 
+import org.cubeengine.module.vanillaplus.PluginVanillaPlus;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.Key;
@@ -30,7 +31,7 @@ public interface SafeLoginData
 {
 
     Key<Value<Boolean>> FLYMODE = Key.builder()
-//         .key(ResourceKey.of(PluginVanillaPlus.VANILLAPLUS_ID, "flymore"))
+         .key(ResourceKey.of(PluginVanillaPlus.VANILLAPLUS_ID, "flymore"))
          .type(TypeTokens.BOOLEAN_VALUE_TOKEN).build();
 
     static void register(RegisterDataEvent event)

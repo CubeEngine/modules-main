@@ -31,6 +31,7 @@ import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.util.blockray.RayTrace;
 import org.spongepowered.api.util.blockray.RayTraceResult;
 import org.spongepowered.api.world.LocatableBlock;
@@ -57,7 +58,7 @@ public class SpawnMobCommand
     }
 
     @Command(desc = "Spawns the specified Mob")
-    public void spawnMob(CommandCause context, @Label("<mob>[:data][,<ridingmob>[:data]]") String data, @Option Integer amount, @Option Player player)
+    public void spawnMob(CommandCause context, @Label("<mob>[:data][,<ridingmob>[:data]]") String data, @Option Integer amount, @Option ServerPlayer player)
     {
         ServerLocation loc;
         if (player != null)

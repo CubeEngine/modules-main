@@ -72,8 +72,8 @@ public class ItemModifyCommands extends PermissionContainer
     }
 
     @Command(desc = "Changes the display name of the item in your hand.")
-    @Restricted(value = Player.class, msg = "Trying to give your {text:toys} a name?")
-    public void rename(Player context, String name, @Option @Greedy String... lore)
+    @Restricted(msg = "Trying to give your {text:toys} a name?")
+    public void rename(ServerPlayer context, String name, @Option @Greedy List<String> lore)
     {
         if (context.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
         {
@@ -97,8 +97,8 @@ public class ItemModifyCommands extends PermissionContainer
     }
 
     @Command(desc = "Changes the lore of the item in your hand.")
-    @Restricted(value = Player.class)
-    public void lore(Player context, @Greedy String... lore)
+    @Restricted
+    public void lore(ServerPlayer context, @Greedy List<String> lore)
     {
         if (context.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
         {
@@ -119,8 +119,8 @@ public class ItemModifyCommands extends PermissionContainer
 
 
     @Command(alias = "skullchange", desc = "Changes a skull to a players skin.")
-    @Restricted(value = Player.class, msg = "This will you only give headaches!")
-    public void headchange(Player context, @Option String name) throws ExecutionException, InterruptedException
+    @Restricted(msg = "This will you only give headaches!")
+    public void headchange(ServerPlayer context, @Option String name) throws ExecutionException, InterruptedException
     {
         ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
         if (item.isEmpty() || item.getType() != ItemTypes.PLAYER_HEAD.get())
@@ -136,8 +136,8 @@ public class ItemModifyCommands extends PermissionContainer
     }
 
     @Command(desc = "Adds an Enchantment to the item in your hand")
-    @Restricted(value = Player.class, msg = "Want to be Harry Potter?")
-    public void enchant(Player context, @Default EnchantmentType enchantment, @Option Integer level,
+    @Restricted(msg = "Want to be Harry Potter?")
+    public void enchant(ServerPlayer context, EnchantmentType enchantment, @Option Integer level,
                         @ParameterPermission @Flag boolean unsafe) // TODO are param permissions working????
     {
         if (context.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
@@ -227,8 +227,8 @@ public class ItemModifyCommands extends PermissionContainer
     }
 
     @Command(desc = "Repairs your items")
-    @Restricted(value = Player.class, msg = "If you do this you'll loose your warranty!")
-    public void repair(Player context, @Flag boolean all)
+    @Restricted(msg = "If you do this you'll loose your warranty!")
+    public void repair(ServerPlayer context, @Flag boolean all)
     {
         if (all)
         {

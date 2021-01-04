@@ -97,7 +97,7 @@ public class PlayerListCommand
                 continue;
             }
             final TextComponent msg = LegacyComponentSerializer.legacyAmpersand().deserialize(entry.getKey())
-                                                               .append(Component.text(":", NamedTextColor.WHITE)
+                                                               .append(Component.text(": ", NamedTextColor.WHITE)
                                                                .append(formatUser(it.next())));
             while (it.hasNext())
             {
@@ -110,6 +110,7 @@ public class PlayerListCommand
     private Component formatUser(ServerPlayer user)
     {
         final TextComponent result = Component.text(user.getName(), NamedTextColor.DARK_GREEN);
+
         // TODO chat module pass info that player is afk
         /*
         if (user.attachOrGet(BasicsAttachment.class, module).isAfk())
