@@ -26,20 +26,19 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import org.cubeengine.libcube.util.ContextUtil;
 import org.cubeengine.module.roles.data.PermissionData;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.FileSubject;
-import org.cubeengine.libcube.util.ContextUtil;
 import org.cubeengine.module.roles.service.subject.UserSubject;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Key;
-import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
@@ -61,9 +60,14 @@ public class UserSubjectData extends CachingSubjectData
 
     private <E> Optional<E> getData(Key<? extends Value<E>> key)
     {
+        final Optional<ServerPlayer> player = Sponge.getServer().getPlayer(uuid);
+        if (player.isPresent())
+        {
+            return player.get().get(key);
+        }
         final UserManager userManager = Sponge.getServer().getUserManager();
-        User player = userManager.get(uuid).get();
-        return player.get(key);
+        User user = userManager.get(uuid).get();
+        return user.get(key);
     }
 
     @Override
