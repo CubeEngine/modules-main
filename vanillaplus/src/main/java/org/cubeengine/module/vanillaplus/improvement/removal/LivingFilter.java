@@ -105,7 +105,7 @@ public class LivingFilter extends EntityFilter
                 }
             }
 
-            return super.test(entity);
+            return this.list.stream().anyMatch(p -> p.test(entity));
         }
         return false;
     }

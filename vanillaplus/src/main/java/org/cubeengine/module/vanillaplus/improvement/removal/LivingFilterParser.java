@@ -18,10 +18,13 @@
 package org.cubeengine.module.vanillaplus.improvement.removal;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import net.kyori.adventure.identity.Identity;
@@ -40,8 +43,10 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
+import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.CommandContext.Builder;
 import org.spongepowered.api.command.parameter.Parameter.Key;
+import org.spongepowered.api.command.parameter.managed.ValueCompleter;
 import org.spongepowered.api.command.parameter.managed.ValueParser;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -56,11 +61,12 @@ import org.spongepowered.api.entity.living.trader.Villager;
 import org.spongepowered.api.registry.RegistryTypes;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.rotate;
 import static java.util.Collections.singletonList;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 
-public class LivingFilterParser extends PermissionContainer implements ValueParser<LivingFilter>, DefaultParameterProvider<LivingFilter>
+public class LivingFilterParser extends PermissionContainer implements ValueParser<LivingFilter>, DefaultParameterProvider<LivingFilter>, ValueCompleter
 {
     private I18n i18n;
     private StringMatcher sm;
@@ -117,6 +123,29 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
         }
         return null;
         // TODO errormessage        throw new PermissionDeniedException(PERM_MONSTER);
+    }
+
+    @Override
+    public List<String> complete(CommandContext context, String currentInput)
+    {
+        List<String> types = Arrays.asList(
+            i18n.getTranslation(context.getCause(), "hostile"),
+            i18n.getTranslation(context.getCause(), "monster"),
+            i18n.getTranslation(context.getCause(), "boss"),
+            i18n.getTranslation(context.getCause(), "animal"),
+            i18n.getTranslation(context.getCause(), "npc"),
+            i18n.getTranslation(context.getCause(), "pet"),
+            i18n.getTranslation(context.getCause(), "golem"),
+            i18n.getTranslation(context.getCause(), "ambient"));
+        final Set<String> closeMatches = new HashSet<>(sm.getBestMatches(currentInput, types, 2));
+        for (String type : types)
+        {
+            if (type.startsWith(currentInput))
+            {
+                closeMatches.add(type);
+            }
+        }
+        return new ArrayList<>(closeMatches);
     }
 
     @Override

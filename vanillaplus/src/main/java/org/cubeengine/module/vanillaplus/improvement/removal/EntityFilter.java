@@ -24,7 +24,7 @@ import org.spongepowered.api.entity.living.Living;
 
 public class EntityFilter implements Predicate<Entity>
 {
-    private List<Predicate<Entity>> list;
+    protected List<Predicate<Entity>> list;
     private boolean all = false;
 
     public EntityFilter(List<Predicate<Entity>> list)

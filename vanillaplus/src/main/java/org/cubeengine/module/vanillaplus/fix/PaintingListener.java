@@ -33,9 +33,12 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.ArtType;
+import org.spongepowered.api.data.type.HandType;
+import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.hanging.Painting;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
@@ -66,10 +69,14 @@ public class PaintingListener extends PermissionContainer
     // TODO maybe save painting type when breaking so the same can be placed and allow stacking them somehow
 
     @Listener(order = Order.EARLY)
-    public void onPlayerInteractEntity(InteractEntityEvent.Secondary event, @First ServerPlayer player)
+    public void onPlayerInteractEntity(InteractEntityEvent.Secondary.On event, @First ServerPlayer player)
     {
         if (event.getEntity() instanceof Painting)
         {
+            if (event.getContext().get(EventContextKeys.USED_HAND).get() != HandTypes.MAIN_HAND.get())
+            {
+                return;
+            }
             if (!CHANGEPAINTING.check(player))
             {
                 i18n.send(player, NEGATIVE, "You are not allowed to change this painting.");
@@ -129,7 +136,7 @@ public class PaintingListener extends PermissionContainer
 
                 List<ArtType> arts = Sponge.getGame().registries().registry(RegistryTypes.ART_TYPE).stream().collect(Collectors.toList());
                 int artNumber = arts.indexOf(painting.art().get());
-                int change = 1; // TODO this.compareSlots(event.getPreviousSlot(), event.getNewSlot());
+                int change = this.compareSlots(event.getOriginalSlot().get(Keys.SLOT_INDEX).get(), event.getFinalSlot().get(Keys.SLOT_INDEX).get());
                 artNumber += change;
                 if (artNumber >= arts.size())
                 {

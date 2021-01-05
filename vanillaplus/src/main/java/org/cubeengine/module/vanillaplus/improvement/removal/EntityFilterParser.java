@@ -31,11 +31,14 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.matcher.EntityMatcher;
 import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.cubeengine.libcube.util.StringUtils;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
+import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.CommandContext.Builder;
 import org.spongepowered.api.command.parameter.Parameter.Key;
+import org.spongepowered.api.command.parameter.managed.ValueCompleter;
 import org.spongepowered.api.command.parameter.managed.ValueParser;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
@@ -49,7 +52,7 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.entity.EntityTypes.*;
 
-public class EntityFilterParser implements ValueParser<EntityFilter>
+public class EntityFilterParser implements ValueParser<EntityFilter>, ValueCompleter
 {
     private I18n i18n;
     private EntityMatcher em;
@@ -60,6 +63,15 @@ public class EntityFilterParser implements ValueParser<EntityFilter>
         this.i18n = i18n;
         this.em = em;
         this.mm = mm;
+    }
+
+    @Override
+    public List<String> complete(CommandContext context, String currentInput)
+    {
+        return Stream.of(ITEM, ARROW, MINECART, PAINTING, ITEM_FRAME, EXPERIENCE_ORB)
+              .map(DefaultedRegistryReference::location)
+              .filter(key -> currentInput.startsWith(key.asString()) || "minecraft".equals(key.getNamespace()) && currentInput.startsWith(key.getValue()))
+              .map(ResourceKey::asString).collect(Collectors.toList());
     }
 
     @Override

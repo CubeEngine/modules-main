@@ -74,7 +74,7 @@ public class RemoveCommands
             i18n.send(context, NEGATIVE, "The radius has to be a whole number greater than 0!");
             return;
         }
-        ServerLocation loc = isPlayer ? ((ServerPlayer)context).getServerLocation() : null;
+        ServerLocation loc = isPlayer ? ((ServerPlayer)context.getSubject()).getServerLocation() : null;
         if (loc != null && !loc.getWorld().equals(world))
         {
             loc = world.getLocation(world.getProperties().spawnPosition());

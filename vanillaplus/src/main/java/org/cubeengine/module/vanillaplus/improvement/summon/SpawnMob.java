@@ -17,110 +17,60 @@
  */
 package org.cubeengine.module.vanillaplus.improvement.summon;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import net.kyori.adventure.audience.Audience;
+import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.matcher.EntityMatcher;
-import org.cubeengine.libcube.util.StringUtils;
+import org.cubeengine.libcube.util.LocationUtil;
+import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
+import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.CauseStackManager.StackFrame;
 import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.cause.entity.SpawnTypes;
 import org.spongepowered.api.world.server.ServerLocation;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 
 public class SpawnMob
 {
-    static Entity[] spawnMobs(CommandCause context, String mobString, ServerLocation loc, int amount, EntityMatcher em,
-                              I18n i18n)
+    static Entity createMob(Audience context, EntityType type, List<String> data, ServerLocation loc, I18n i18n)
     {
-        String[] mobStrings = StringUtils.explode(",", mobString);
-        Entity[] mobs = spawnMob(context, mobStrings[0], loc, amount, null, em, i18n); // base mobs
-        Entity[] ridingMobs = mobs;
-        for (int i = 1; i < mobStrings.length; ++i)
+        Entity entity = loc.getWorld().createEntity(type, loc.getPosition());
+        if (!(entity instanceof Living))
         {
-            ridingMobs = spawnMob(context, mobStrings[i], loc, amount, ridingMobs, em, i18n);
+            i18n.send(context, NEGATIVE, "Invalid mob-type: {input#entityname} is not living!", type.asComponent());
+            return null;
         }
-        return mobs;
-    }
 
-    static Entity[] spawnMob(CommandCause context, String mobString, ServerLocation loc, int amount, Entity[] ridingOn,
-                             EntityMatcher em, I18n i18n)
-    {
-        String entityName = mobString;
-        EntityType entityType;
-        List<String> entityData = new ArrayList<>();
-        if (entityName.isEmpty())
-        {
-            return null;
-        }
-        final Locale locale = context.getAudience() instanceof ServerPlayer ? ((ServerPlayer)context.getAudience()).getLocale() : Locale.getDefault();
-        if (entityName.contains(":"))
-        {
-            entityData = Arrays.asList(StringUtils.explode(":", entityName.substring(entityName
-                                                                                         .indexOf(":") + 1, entityName
-                                                                                         .length())));
-            entityName = entityName.substring(0, entityName.indexOf(":"));
-            entityType = em.mob(entityName, locale);
-        }
-        else
-        {
-            entityType = em.mob(entityName, locale);
-        }
-        if (entityType == null)
-        {
-            i18n.send(context, NEGATIVE, "Unknown mob-type: {input#entityname} not found!", entityName);
-            return null;
-        }
-        Entity[] spawnedMobs = new Entity[amount];
-        Sponge.getServer().getCauseStackManager().pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
-        for (int i = 0; i < amount; ++i)
-        {
-            //CreatureSpawnEvent
-            Entity entity = loc.getWorld().createEntity(entityType, loc.getPosition());
-            loc.getWorld().spawnEntity(entity);
-            spawnedMobs[i] = entity;
-            if (ridingOn != null)
-            {
-                final List<Entity> list = ridingOn[i].get(Keys.PASSENGERS).orElse(new ArrayList<>());
-                list.add(spawnedMobs[i]);
-                ridingOn[i].offer(Keys.PASSENGERS, list);
-            }
-        }
-        applyDataToMob(entityData, spawnedMobs);
-        return spawnedMobs;
+        applyDataToMob(data, entity);
+        return entity;
     }
 
     /**
      * Applies a list of data in Strings onto given entities
      *
      * @param datas the data to apply
-     * @param entities one or multiple entities of the same type
+     * @param entity one or multiple entities of the same type
      */
     @SuppressWarnings("unchecked")
-    static void applyDataToMob(List<String> datas, Entity... entities)
+    static void applyDataToMob(List<String> datas, Entity entity)
     {
-        if (entities.length == 0) throw new IllegalArgumentException("You need to provide at least one entity to apply the data to!");
-        for (Entity entity : entities)
-        {
-            if (!entities[0].getType().equals(entity.getType())) throw new IllegalArgumentException("All the entities need to be of the same type");
-        }
         Map<EntityDataChanger, Object> changers = new HashMap<>();
         for (String data : datas)
         {
             for (EntityDataChanger entityDataChanger : EntityDataChanger.entityDataChangers)
             {
-                if (entityDataChanger.canApply(entities[0]))
+                if (entityDataChanger.canApply(entity))
                 {
                     Object typeValue = entityDataChanger.changer.getTypeValue(data);
                     if (typeValue != null) // valid typeValue for given data?
@@ -131,12 +81,56 @@ public class SpawnMob
                 }
             }
         }
-        for (Entity entity : entities)
+        for (Entry<EntityDataChanger, Object> entry : changers.entrySet())
         {
-            for (Entry<EntityDataChanger, Object> entry : changers.entrySet())
+            entry.getKey().changer.applyEntity(entity, entry.getValue());
+        }
+    }
+
+    static void spawnMob(ServerPlayer context, List<Entity> toSpawn, Integer amount, ServerLocation loc, I18n i18n, VanillaPlus module)
+    {
+        amount = amount == null ? 1 : amount;
+        if (amount <= 0)
+        {
+            i18n.send(context, NEUTRAL, "And how am i supposed to know which mobs to despawn?");
+            return;
+        }
+        if (amount > module.getConfig().improve.spawnmobLimit)
+        {
+            i18n.send(context, NEGATIVE, "The serverlimit is set to {amount}, you cannot spawn more mobs at once!", module.getConfig().improve.spawnmobLimit);
+            return;
+        }
+        try (StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame())
+        {
+            frame.pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
+            for (int i = 0; i < amount; i++)
             {
-                entry.getKey().changer.applyEntity(entity, entry.getValue());
+                Entity previousEntity = toSpawn.get(0).copy();
+                loc.spawnEntity(previousEntity);
+                for (int j = 1; j < toSpawn.size(); j++)
+                {
+                    final Entity entity = toSpawn.get(j).copy();
+                    loc.spawnEntity(entity);
+                    previousEntity.offer(Keys.PASSENGERS, Arrays.asList(entity));
+                    previousEntity = entity;
+                }
             }
         }
+    }
+
+    static ServerLocation getSpawnLoc(ServerPlayer sourcePlayer, ServerPlayer at, I18n i18n)
+    {
+        if (at != null)
+        {
+            return at.getServerLocation();
+        }
+
+        final ServerLocation result = LocationUtil.getBlockInSight(sourcePlayer);
+        if (result == null)
+        {
+            i18n.send(sourcePlayer, NEGATIVE, "Cannot find Targetblock");
+            return null;
+        }
+        return Sponge.getServer().getTeleportHelper().getSafeLocation(result).orElse(result);
     }
 }

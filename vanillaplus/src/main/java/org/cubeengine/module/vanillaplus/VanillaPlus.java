@@ -60,6 +60,7 @@ import org.cubeengine.module.vanillaplus.improvement.WhitelistCommand;
 import org.cubeengine.module.vanillaplus.improvement.removal.ButcherCommand;
 import org.cubeengine.module.vanillaplus.improvement.removal.RemoveCommands;
 import org.cubeengine.module.vanillaplus.improvement.summon.SpawnMobCommand;
+import org.cubeengine.module.vanillaplus.improvement.summon.SpawnMobStackCommand;
 import org.cubeengine.processor.Module;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.command.Command.Parameterized;
@@ -220,6 +221,7 @@ public class VanillaPlus
         if (config.improve.commandSummon)
         {
             momu.registerCommands(event, plugin, this, SpawnMobCommand.class);
+            momu.registerCommands(event, plugin, this, SpawnMobStackCommand.class);
         }
         if (config.improve.commandClearinventory)
         {

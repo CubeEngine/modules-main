@@ -25,10 +25,10 @@ import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.entity.ChangeSignEvent;
 import org.spongepowered.api.event.filter.cause.First;
-import org.spongepowered.api.service.permission.Subject;
 
 public class ColoredSigns extends PermissionContainer
 {
@@ -41,7 +41,7 @@ public class ColoredSigns extends PermissionContainer
     public final Permission SIGN_STYLED = register("sign.styled", "", null);
 
     @Listener
-    public void onSignChange(ChangeSignEvent event, @First Subject cause)
+    public void onSignChange(ChangeSignEvent event, @First ServerPlayer cause)
     {
         final PlainComponentSerializer plain = PlainComponentSerializer.plain();
         final List<Component> lines = event.getText().get();
@@ -52,7 +52,7 @@ public class ColoredSigns extends PermissionContainer
                 lines.set(i, Component.text(plain.serialize(lines.get(i)).replaceAll("&[klmno]", "")));
             }
         }
-        if (cause.hasPermission(SIGN_COLORED.getId()))
+        if (!cause.hasPermission(SIGN_COLORED.getId()))
         {
             for (int i = 0; i < lines.size(); i++)
             {
