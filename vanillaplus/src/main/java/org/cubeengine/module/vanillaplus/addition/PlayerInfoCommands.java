@@ -70,7 +70,7 @@ public class PlayerInfoCommands
             return;
         }
 
-        Instant lastPlayed = player.get(Keys.FIRST_DATE_JOINED).orElse(null);
+        Instant lastPlayed = player.get(Keys.LAST_DATE_PLAYED).orElse(null);
         if (lastPlayed == null)
         {
             i18n.send(context, NEGATIVE, "User has not played here yet.");
@@ -127,7 +127,7 @@ public class PlayerInfoCommands
             Optional<GameMode> gameMode = player.get(Keys.GAME_MODE);
             if (gameMode.isPresent())
             {
-                i18n.send(context, NEUTRAL, "Gamemode: {text#gamemode}", gameMode.get().asComponent());
+                i18n.send(context, NEUTRAL, "Gamemode: {name#gamemode}", gameMode.get().asComponent());
             }
             if (player.get(Keys.CAN_FLY).orElse(false))
             {
@@ -143,7 +143,7 @@ public class PlayerInfoCommands
                 i18n.sendTranslated(context, NEUTRAL, "OP: {text:true:color=BRIGHT_GREEN}");
             }*/
 
-            if (!gameMode.isPresent() || !gameMode.get().equals(GameModes.CREATIVE))
+            if (!gameMode.isPresent() || !gameMode.get().equals(GameModes.CREATIVE.get()))
             {
                 final Optional<Boolean> invulnerable = player.get(Keys.INVULNERABLE);
                 final Optional<Ticks> ticksInvulnerable = player.get(Keys.INVULNERABILITY_TICKS);

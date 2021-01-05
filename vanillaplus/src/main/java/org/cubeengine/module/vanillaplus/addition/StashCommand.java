@@ -78,7 +78,7 @@ public class StashCommand
         i18n.send(context, POSITIVE, "Swapped stashed Inventory!");
     }
 
-    private class StashedInventory
+    private static class StashedInventory
     {
         public List<ItemStack> items = new ArrayList<>();
     }

@@ -36,8 +36,6 @@ import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -45,12 +43,11 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 @Singleton
 public class FoodCommands extends PermissionContainer
 {
-
     private I18n i18n;
     private Broadcaster bc;
 
-    public final Permission COMMAND_FEED_OTHER = register("command.feed.other", "", null);
-    public final Permission COMMAND_STARVE_OTHER = register("command.starve.other", "", null);
+    public final Permission COMMAND_FEED_OTHER = register("command.feed.other", "Allows feeding other players");
+    public final Permission COMMAND_STARVE_OTHER = register("command.starve.other", "Allows starving other players");
 
     @Inject
     public FoodCommands(PermissionManager pm, I18n i18n, Broadcaster bc)

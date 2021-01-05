@@ -19,6 +19,8 @@ package org.cubeengine.module.vanillaplus.addition;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.google.inject.Inject;
@@ -45,6 +47,7 @@ import org.spongepowered.plugin.metadata.PluginMetadata;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 import static org.spongepowered.api.Platform.Component.API;
+import static org.spongepowered.api.Platform.Component.GAME;
 import static org.spongepowered.api.Platform.Component.IMPLEMENTATION;
 
 @Singleton
@@ -66,8 +69,8 @@ public class PluginCommands extends PermissionContainer
     @Command(desc = "Lists all loaded plugins")
     public void plugins(CommandCause context)
     {
-        Collection<PluginContainer> plugins = new ArrayList<>(Sponge.getPluginManager().getPlugins());
-        Collection<PluginContainer> modules = new ArrayList<>(mm.getModulePlugins().values());
+        List<PluginContainer> plugins = new ArrayList<>(Sponge.getPluginManager().getPlugins());
+        List<PluginContainer> modules = new ArrayList<>(mm.getModulePlugins().values());
         plugins.removeAll(modules);
         PluginContainer core = mm.getPlugin(LibCube.class).get();
         modules.remove(core);
@@ -80,32 +83,41 @@ public class PluginCommands extends PermissionContainer
         // TODO no pagination for console and hover id for player
         List<Component> list = new ArrayList<>();
 
-        list.add(
-            Component.text(" - ").append(Component.text("CubeEngine", NamedTextColor.GREEN))
-                     .append(Component.space())
-                     .append(Component.text(core.getMetadata().getId(), NamedTextColor.GRAY))
-                     .append(Component.space())
-                     .append(Component.text("(" + getVersionOf(core) + ")"))
-                     .append(i18n.translate(context, NEUTRAL, "with {amount} Modules:", modules.size())));
-
-        for (PluginContainer module : modules)
-        {
-            final PluginMetadata meta = module.getMetadata();
-            list.add(
-                Component.text(" - ").append(Component.text(simplifyCEName(meta.getName().orElse(meta.getId())), NamedTextColor.GREEN))
-                         .append(Component.text(meta.getId(), NamedTextColor.GRAY))
-                         .append(Component.space())
-                         .append(Component.text("(" + getVersionOf(module) + ")")));
-        }
+        final PluginContainer game = Sponge.getGame().getPlatform().getContainer(GAME);
+        final PluginContainer api = Sponge.getGame().getPlatform().getContainer(API);
+        final PluginContainer impl = Sponge.getGame().getPlatform().getContainer(IMPLEMENTATION);
+        plugins.remove(game);
+        plugins.remove(api);
+        plugins.remove(impl);
+        Collections.sort(plugins, Comparator.comparing(p -> p.getMetadata().getName().orElse(p.getMetadata().getId())));
+        Collections.sort(modules, Comparator.comparing(p -> p.getMetadata().getName().orElse(p.getMetadata().getId())));
 
         for (PluginContainer plugin : plugins)
         {
             final PluginMetadata meta = plugin.getMetadata();
-            list.add(
-                Component.text(" - ").append(Component.text(meta.getName().orElse(meta.getId()), NamedTextColor.GREEN))
+            list.add(Component.text(" - ").append(Component.text(meta.getName().orElse(meta.getId()), NamedTextColor.GREEN))
                          .append(Component.space())
-                         .append(Component.text(core.getMetadata().getId(), NamedTextColor.GRAY))
-                         .append(Component.text("(" + getVersionOf(plugin) + ")")));
+                         .append(Component.text(meta.getId(), NamedTextColor.GRAY))
+                         .append(Component.text(" (" + getVersionOf(plugin) + ")")));
+        }
+
+        list.add(Component.empty());
+
+        list.add(Component.text(" - ").append(Component.text("CubeEngine", NamedTextColor.GREEN))
+                     .append(Component.space())
+                     .append(Component.text(core.getMetadata().getId(), NamedTextColor.GRAY))
+                     .append(Component.space())
+                     .append(Component.text("(" + getVersionOf(core) + ")"))
+                     .append(i18n.translate(context, NEUTRAL, " with {amount} Modules:", modules.size())));
+
+        for (PluginContainer module : modules)
+        {
+            final PluginMetadata meta = module.getMetadata();
+            list.add(Component.text("  - ").append(Component.text(simplifyCEName(meta.getName().orElse(meta.getId())), NamedTextColor.YELLOW))
+                         .append(Component.space())
+                         .append(Component.text(meta.getId(), NamedTextColor.GRAY))
+                         .append(Component.space())
+                         .append(Component.text("(" + getVersionOf(module) + ")")));
         }
 
         builder.contents(list).sendTo(context.getAudience());
@@ -135,7 +147,7 @@ public class PluginCommands extends PermissionContainer
     }
 
     @Command(desc = "Displays the version of the server or a given plugin")
-    public void version(CommandCause context, @Option String plugin)
+    public void version(CommandCause context, @Option String plugin) // TODO completer
     {
         if (plugin == null)
         {
@@ -158,10 +170,10 @@ public class PluginCommands extends PermissionContainer
                                         meta.getName().orElse(meta.getId()), platform.getMinecraftVersion().getName(), meta.getVersion());
             }
 
-            i18n.send(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getContainer(API));
+            i18n.send(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getContainer(API).getMetadata().getVersion());
             context.sendMessage(Identity.nil(), Component.empty());
 
-            i18n.send(context, NEUTRAL, "Expanded and improved by {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.mm.getPlugin(LibCube.class).get().getMetadata().getVersion());
+            i18n.send(context, NEUTRAL, "with {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.mm.getPlugin(LibCube.class).get().getMetadata().getVersion());
             return;
         }
         if (!COMMAND_VERSION_PLUGINS.check(context))
@@ -188,10 +200,11 @@ public class PluginCommands extends PermissionContainer
         }
         final PluginMetadata meta = instance.get().getMetadata();
         i18n.send(context, NEUTRAL, "{name#plugin} is currently running in version {input#version:color=INDIGO}.",
-                  meta.getName(), meta.getVersion());
+                  meta.getName().orElse(meta.getId()), meta.getVersion());
         context.sendMessage(Identity.nil(), Component.empty());
-        i18n.send(context, NEUTRAL, "Plugin information:");
-        context.sendMessage(Identity.nil(), Component.empty());
+// TODO
+        //        i18n.send(context, NEUTRAL, "Plugin information:");
+//        context.sendMessage(Identity.nil(), Component.empty());
     }
 
 }

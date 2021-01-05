@@ -34,14 +34,13 @@ import org.spongepowered.api.util.Ticks;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 /**
- * Provides Gamemodelike Protection
+ * Provides create gamemode like Protection
  */
 @Singleton
 public class GodCommand extends PermissionContainer
 {
     private I18n i18n;
-    public final Permission COMMAND_GOD_OTHER = register("command.god.other",
-                                                         "Allows to enable god-mode for other players", null);
+    public final Permission COMMAND_GOD_OTHER = register("command.god.other", "Allows to enable god-mode for other players");
 
     @Inject
     public GodCommand(PermissionManager pm, I18n i18n)
@@ -49,7 +48,6 @@ public class GodCommand extends PermissionContainer
         super(pm, VanillaPlus.class);
         this.i18n = i18n;
     }
-
 
     @Command(desc = "Toggles the god-mode!")
     public void god(CommandCause context, @Default ServerPlayer player)
