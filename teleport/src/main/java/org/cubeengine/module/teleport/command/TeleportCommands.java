@@ -272,11 +272,15 @@ public class TeleportCommands
     }
 
     @Command(desc = "Direct teleport to a coordinate.")
-    public void tppos(CommandCause context, Integer x, @Option Integer y, Integer z, // TODO optional y coord
-                      @Default @Named({"world", "w"}) ServerWorld world, // TODO named param not working
+    public void tppos(CommandCause context, Integer x, @Option Integer y, Integer z, // TODO optional y coord breaks named params
+                      @Default @Named({"in"}) ServerWorld world,
                       @Default @Named({"player", "p"}) ServerPlayer player,
                       @Flag boolean unsafe)
     {
+        if (y == null)
+        {
+            y = world.getHighestYAt(x, z);
+        }
         ServerLocation loc = world.getLocation(x,y,z).add(0.5, 0, 0.5);
         unsafe = unsafe && context.hasPermission(perms.COMMAND_TPPOS_UNSAFE.getId());
         if (unsafe)
