@@ -84,7 +84,7 @@ public class ClearInventoryCommand extends PermissionContainer
         }
 
         StandardInventory playerInventory = player.isOnline() ? player.getPlayer().get().getInventory() : player.getInventory();
-        playerInventory.getStorage().clear();
+        playerInventory.getPrimary().clear();
         if (removeArmor)
         {
             playerInventory.getArmor().clear();

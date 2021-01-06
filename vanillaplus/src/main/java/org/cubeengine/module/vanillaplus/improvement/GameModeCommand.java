@@ -23,6 +23,7 @@ import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.command.annotation.Default;
 import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
@@ -65,15 +66,15 @@ public class GameModeCommand extends PermissionContainer
             newMode = toggleGameMode(player.get(Keys.GAME_MODE).get());
         }
         player.offer(Keys.GAME_MODE, newMode);
-        if (context.getSubject().equals(player))
+        if (context.getSubject().equals(player.getPlayer().orElse(null)))
         {
-            i18n.send(context, POSITIVE, "You changed your game mode to {text#gamemode}!", newMode.asComponent());
+            i18n.send(ChatType.ACTION_BAR, context, POSITIVE, "You changed your game mode to {input#gamemode}!", newMode.asComponent());
             return;
         }
-        i18n.send(context, POSITIVE, "You changed the game mode of {user} to {text#gamemode}!", player, newMode.asComponent());
-        if (player.isOnline())
+        i18n.send(context, POSITIVE, "You changed the game mode of {user} to {input#gamemode}!", player, newMode.asComponent());
+        if (player.isOnline() && !context.getSubject().equals(player.getPlayer().get()))
         {
-            i18n.send(player.getPlayer().get(), NEUTRAL, "Your game mode has been changed to {text#gamemode}!", newMode.asComponent());
+            i18n.send(player.getPlayer().get(), NEUTRAL, "Your game mode has been changed to {input#gamemode}!", newMode.asComponent());
         }
 
     }

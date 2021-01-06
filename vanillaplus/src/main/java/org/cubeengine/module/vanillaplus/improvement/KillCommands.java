@@ -42,7 +42,7 @@ import static org.spongepowered.api.entity.EntityTypes.LIGHTNING_BOLT;
 import static org.spongepowered.api.event.cause.entity.damage.DamageTypes.CUSTOM;
 
 /**
- * {@link #kill}
+ * {@link #kill0}
  * {@link #suicide}
  */
 @Singleton
@@ -87,7 +87,7 @@ public class KillCommands extends PermissionContainer
         }
         for (ServerPlayer user : players)
         {
-            if (this.kill(user, lightning, context, false, force, quiet))
+            if (this.kill0(user, lightning, context, false, force, quiet))
             {
                 killed.add(user.getName());
             }
@@ -101,7 +101,7 @@ public class KillCommands extends PermissionContainer
     }
 
 
-    private boolean kill(ServerPlayer player, boolean lightning, CommandCause context, boolean showMessage, boolean force, boolean quiet)
+    private boolean kill0(ServerPlayer player, boolean lightning, CommandCause context, boolean showMessage, boolean force, boolean quiet)
     {
         if (!force)
         {

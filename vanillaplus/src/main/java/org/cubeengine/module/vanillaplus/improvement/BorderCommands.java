@@ -33,6 +33,7 @@ import org.cubeengine.libcube.util.TimeUtil;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.WorldBorder;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector2i;
@@ -62,7 +63,7 @@ public class BorderCommands extends DispatcherCommand
         this.module = module;
     }
 
-    // TODO generator task is gone in API8 atm.
+    // TODO generator task is gone in API8 atm. replace with issueing tickets to the chunkmanager
 //    private ChunkPreGenerate task;
 //
 //    @Alias(value = "generateBorder")
@@ -120,9 +121,9 @@ public class BorderCommands extends DispatcherCommand
     {
         if (pos == null)
         {
-            if (context instanceof Player)
+            if (context.getSubject() instanceof ServerPlayer)
             {
-                Vector3d position = ((Player)context).getLocation().getPosition();
+                Vector3d position = ((ServerPlayer)context.getSubject()).getLocation().getPosition();
                 pos = new Vector2i(position.getX(), position.getZ());
             }
             else
@@ -142,21 +143,19 @@ public class BorderCommands extends DispatcherCommand
         {
             world.getBorder().setDiameter(size);
             i18n.send(context, POSITIVE, "Set world border of {world} to {} blocks wide", world, size);
+            return;
+        }
+        int prevDiameter = (int) world.getBorder().getDiameter();
+        world.getBorder().setDiameter(size, seconds, ChronoUnit.SECONDS);
+        if (size < prevDiameter)
+        {
+            i18n.send(context, POSITIVE, "Shrinking world border of {world} to {} blocks wide from {} over {} seconds",
+                                world, size, prevDiameter, seconds);
         }
         else
         {
-            int prevDiameter = (int) world.getBorder().getDiameter();
-            world.getBorder().setDiameter(size, seconds, ChronoUnit.SECONDS);
-            if (size < prevDiameter)
-            {
-                i18n.send(context, POSITIVE, "Shrinking world border of {world} to {} blocks wide from {} over {} seconds",
-                                    world, size, prevDiameter, seconds);
-            }
-            else
-            {
-                i18n.send(context, POSITIVE, "Growing world border of {world} to {} blocks wide from {} over {} seconds",
-                                    world, size, prevDiameter, seconds);
-            }
+            i18n.send(context, POSITIVE, "Growing world border of {world} to {} blocks wide from {} over {} seconds",
+                                world, size, prevDiameter, seconds);
         }
     }
 
@@ -193,16 +192,14 @@ public class BorderCommands extends DispatcherCommand
             double newDiameter = border.getNewDiameter();
             if (newDiameter < diameter)
             {
-                i18n.send(context, POSITIVE, "Currently shrinking to {} blocks wide over {} seconds",
-                                    newDiameter, secondsRemaining);
+                i18n.send(context, POSITIVE, "Currently shrinking to {} blocks wide over {} seconds", newDiameter, secondsRemaining);
             }
             else
             {
-                i18n.send(context, POSITIVE, "Currently growing to {} blocks wide over {} seconds",
-                                    newDiameter, secondsRemaining);
+                i18n.send(context, POSITIVE, "Currently growing to {} blocks wide over {} seconds", newDiameter, secondsRemaining);
             }
         }
-        i18n.send(context, POSITIVE, "Warnings will show within {} seconds or {} blocks from the border", border.getWarningTime(), border.getWarningDistance());
+        i18n.send(context, POSITIVE, "Warnings will show within {} seconds or {} blocks from the border", border.getWarningTime().get(ChronoUnit.SECONDS), border.getWarningDistance());
         i18n.send(context, POSITIVE, "When more than {} blocks outside the border players will take {} damage per block per second", border.getDamageThreshold(), border.getDamageAmount());
     }
 

@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.vanillaplus.improvement.summon;
 
+import java.util.Arrays;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.command.annotation.Command;
@@ -29,13 +30,7 @@ import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.server.ServerLocation;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 /**
  * The /spawnmob command.

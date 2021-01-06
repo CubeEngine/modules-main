@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.LocationUtil;
 import org.cubeengine.module.vanillaplus.VanillaPlus;

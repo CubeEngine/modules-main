@@ -154,7 +154,7 @@ public class WhitelistCommand extends DispatcherCommand
 
 
     @Command(desc = "Wipes the whitelist completely")
-    @Restricted(value = SystemSubject.class, msg = "This command is too dangerous for users!")
+    @Restricted(value = SystemSubject.class) // TODO , msg = "This command is too dangerous for users!"
     public void wipe(CommandCause context)
     {
         WhitelistService service = getWhitelistService();

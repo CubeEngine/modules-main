@@ -19,8 +19,6 @@ package org.cubeengine.module.vanillaplus.improvement;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
@@ -38,9 +36,9 @@ import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.util.MinecraftDayTime;
 import org.spongepowered.api.util.Ticks;
+import org.spongepowered.api.world.gamerule.GameRules;
 import org.spongepowered.api.world.server.ServerWorld;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -51,8 +49,6 @@ public class TimeCommands extends PermissionContainer
     private final TaskManager tam;
     private final I18n i18n;
     private final TimeMatcher tm;
-
-    private final Map<ResourceKey, ScheduledTask> locked = new HashMap<>();
 
     @Inject
     public TimeCommands(PermissionManager pm, I18n i18n, TimeMatcher tm, TaskManager tam)
@@ -89,12 +85,12 @@ public class TimeCommands extends PermissionContainer
         }
         else
         {
-            if (!(context instanceof ServerPlayer))
+            if (!(context.getSubject() instanceof ServerPlayer))
             {
                 i18n.send(context, NEGATIVE, "You have to specify a world when using this command from the console!");
                 return;
             }
-            worldList = Collections.singletonList(((ServerPlayer)context).getWorld());
+            worldList = Collections.singletonList(((ServerPlayer)context.getSubject()).getWorld());
         }
         if (time != null)
         {
@@ -162,16 +158,15 @@ public class TimeCommands extends PermissionContainer
 
     private void toggleTimeLock(CommandCause context, ServerWorld world, long worldTime)
     {
-        ScheduledTask oldTask = locked.remove(world.getKey());
-        if (oldTask != null)
+        final Boolean oldRule = world.getProperties().getGameRule(GameRules.DO_DAYLIGHT_CYCLE.get());
+        world.getProperties().setGameRule(GameRules.DO_DAYLIGHT_CYCLE.get(), !oldRule);
+        if (oldRule)
         {
-            oldTask.cancel();
-            i18n.send(context, POSITIVE, "Time unlocked for {world}!", world);
+            i18n.send(context, POSITIVE, "Time locked for {world}!", world);
         }
         else
         {
-            locked.put(world.getKey(), tam.runTimer(t -> setTime(world, worldTime), Ticks.of(10)));
-            i18n.send(context, POSITIVE, "Time locked for {world}!", world);
+            i18n.send(context, POSITIVE, "Time unlocked for {world}!", world);
         }
     }
 

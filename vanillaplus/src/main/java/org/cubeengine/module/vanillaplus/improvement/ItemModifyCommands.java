@@ -129,7 +129,15 @@ public class ItemModifyCommands extends PermissionContainer
             return;
         }
 
-        item.offer(Keys.GAME_PROFILE, Sponge.getServer().getGameProfileManager().getProfile(name).get());
+        if (name == null)
+        {
+            item.remove(Keys.GAME_PROFILE);
+            name = i18n.getTranslation("noone");
+        }
+        else
+        {
+            item.offer(Keys.GAME_PROFILE, Sponge.getServer().getGameProfileManager().getProfile(name).get());
+        }
 
         context.setItemInHand(HandTypes.MAIN_HAND, item);
         i18n.send(context, POSITIVE, "You now hold {user}'s head in your hands!", name);
@@ -169,9 +177,7 @@ public class ItemModifyCommands extends PermissionContainer
             list.add(ench);
             item.offer(Keys.APPLIED_ENCHANTMENTS, list);
             context.setItemInHand(HandTypes.MAIN_HAND, item);
-            i18n.send(context, POSITIVE,
-                                   "Added unsafe enchantment: {text#enchantment} {integer#level} to your item!",
-                                   enchantment.asComponent(), level);
+            i18n.send(context, POSITIVE, "Added unsafe enchantment: {input#enchantment} {integer#level} to your item!", enchantment.asComponent(), level);
             return;
         }
 
@@ -183,8 +189,7 @@ public class ItemModifyCommands extends PermissionContainer
                 list.add(ench);
                 item.offer(Keys.APPLIED_ENCHANTMENTS, list);
                 context.setItemInHand(HandTypes.MAIN_HAND, item);
-                i18n.send(context, POSITIVE, "Added enchantment: {text#enchantment} {integer#level} to your item!",
-                                    enchantment.asComponent(), level);  // TODO getTranslation
+                i18n.send(context, POSITIVE, "Added enchantment: {input#enchantment} {integer#level} to your item!", enchantment.asComponent(), level);
                 return;
             }
             i18n.send(context, NEGATIVE, "This enchantment level is not allowed!");
@@ -266,7 +271,7 @@ public class ItemModifyCommands extends PermissionContainer
         }
         if (item.supports(Keys.ITEM_DURABILITY))
         {
-            Integer max = item.get(Keys.ITEM_DURABILITY).get();
+            Integer max = item.get(Keys.MAX_DURABILITY).get();
             if (item.get(Keys.ITEM_DURABILITY).get().equals(max))
             {
                 i18n.send(context, NEUTRAL, "No need to repair this!");

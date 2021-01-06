@@ -109,7 +109,6 @@ import org.spongepowered.plugin.PluginContainer;
  * /pweather {@link WeatherCommands#pweather}
  * /ptime {@link TimeCommands#ptime}
  * /more {@link ItemCommands#more}
- * /stack {@link ItemCommands#stack}
  * /rename {@link ItemModifyCommands#rename}
  * /headchange {@link ItemModifyCommands#headchange}
  * /repair {@link ItemModifyCommands#repair}
@@ -291,46 +290,9 @@ public class VanillaPlus
         }
     }
 
-
     public VanillaPlusConfig getConfig()
     {
         return config;
     }
 
-    /*
-    TODO onlinemode cmd
-
-    @Command(desc = "Shows the online mode")
-    public void onlinemode(CommandSource context)
-    {
-        if (Sponge.getServer().getOnlineMode())
-        {
-            i18n.sendTranslated(context, POSITIVE, "The Server is running in online mode");
-            return;
-        }
-        i18n.sendTranslated(context, POSITIVE, "The Server is running in offline mode");
-        /* Changing online mode is no longer supported on a running server
-        BukkitUtils.setOnlineMode(newState);
-        if (newState)
-        {
-            context.sendTranslated(POSITIVE, "The server is now in online-mode.");
-        }
-        else
-        {
-            context.sendTranslated(POSITIVE, "The server is not in offline-mode.");
-        }
-        *//*
-}
-
-     @Command(alias = "finduser", desc = "Searches for a user in the database")
-    public void searchuser(CommandContext context, @Reader(FindUserReader.class) @Desc("The name to search for") User name)
-    {
-        if (name.getName().equalsIgnoreCase(context.getString(0)))
-        {
-            i18n.sendTranslated(context.getSource(), POSITIVE, "Matched exactly! User: {user}", name);
-            return;
-        }
-        i18n.sendTranslated(context.getSource(), POSITIVE, "Matched not exactly! User: {user}", name);
-    }
-    */
 }
