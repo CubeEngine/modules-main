@@ -115,7 +115,6 @@ public class ZoneConfig extends ReflectedYaml
     public ZoneConfig clone(Reflector reflector)
     {
         ZoneConfig clone = reflector.create(ZoneConfig.class);
-        clone.setFile(this.getFile());
         clone.name = this.name;
         clone.shape = this.shape;
         clone.vectors = new HashMap<>(this.vectors);

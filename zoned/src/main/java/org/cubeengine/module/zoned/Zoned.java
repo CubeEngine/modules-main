@@ -47,6 +47,11 @@ public class Zoned
     @ModuleCommand private SelectorCommand selectorCommand;
     @Inject private ZoneManager manager;
 
+    public Zoned()
+    {
+        System.out.println("Created Zoned instance");
+    }
+
     @Listener
     public void onEnable(StartingEngineEvent<Server> event)
     {

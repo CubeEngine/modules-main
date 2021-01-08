@@ -113,7 +113,8 @@ public class ZoneManager
             return;
         }
         cfg.name(name);
-        cfg.save(file.toFile());
+        cfg.setFile(file.toFile());
+        cfg.save();
         zones.put(name, cfg);
         i18n.send(cmdSource, POSITIVE, "Saved zone as {name}", name);
     }

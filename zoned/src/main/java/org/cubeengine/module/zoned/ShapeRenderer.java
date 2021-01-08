@@ -92,11 +92,11 @@ public class ShapeRenderer
         Map<Color, List<Vector3d>> particles = new HashMap<>();
         List<Vector3d> red = new ArrayList<>();
         particles.put(Color.RED, red);
-        int stepZ = ((int)mmm.distance(mmx)) * 5;
-        linePoints(red, mmm, xmm, stepZ);
-        linePoints(red, mmx, xmx, stepZ);
-        linePoints(red, xxx, mxx, stepZ);
-        linePoints(red, xxm, mxm, stepZ);
+        int stepX = ((int)mmm.distance(xmm)) * 5;
+        linePoints(red, mmm, xmm, stepX);
+        linePoints(red, mmx, xmx, stepX);
+        linePoints(red, xxx, mxx, stepX);
+        linePoints(red, xxm, mxm, stepX);
 
         List<Vector3d> green = new ArrayList<>();
         particles.put(Color.GREEN, green);
@@ -108,11 +108,11 @@ public class ShapeRenderer
 
         List<Vector3d> blue = new ArrayList<>();
         particles.put(Color.BLUE, blue);
-        int stepX = ((int)mmm.distance(xmm)) * 5;
-        linePoints(blue, mmm, mmx, stepX);
-        linePoints(blue, mxx, mxm, stepX);
-        linePoints(blue, xxx, xxm, stepX);
-        linePoints(blue, xmx, xmm, stepX);
+        int stepZ = ((int)mmm.distance(mmx)) * 5;
+        linePoints(blue, mmm, mmx, stepZ);
+        linePoints(blue, mxx, mxm, stepZ);
+        linePoints(blue, xxx, xxm, stepZ);
+        linePoints(blue, xmx, xmm, stepZ);
 
         draw(player, new Vector3d(0.5, 0.5, 0.5), particles);
     }

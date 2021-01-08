@@ -99,7 +99,6 @@ public class ZonedCommands extends DispatcherCommand
     {
         ZoneConfig cfg = this.module.getActiveZone(context);
         zone.shape = cfg.shape;
-        zone.name = cfg.name;
         zone.world = cfg.world;
         module.getManager().define(context, zone.name, zone, true);
     }
