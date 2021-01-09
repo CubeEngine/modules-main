@@ -29,21 +29,20 @@ import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionParser;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.EntityType;
-import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
 
 @Using({RegionParser.class, TristateParser.class})
-@Command(name = "entityDamage", alias = "entity", desc = "Manages the region entity-damage settings")
+@Command(name = "entityDamage", desc = "Manages the region entity-damage settings")
 public class EntityDamageSettingsCommands extends AbstractSettingsCommand
 {
 
     @Inject
-    public EntityDamageSettingsCommands(I18n i18n, SettingsListener psl, PermissionService ps)
+    public EntityDamageSettingsCommands(I18n i18n, SettingsListener psl)
     {
-        super(i18n, psl, ps);
+        super(i18n, psl);
     }
 
     @Command(desc = "Controls entity damage")
@@ -73,7 +72,7 @@ public class EntityDamageSettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls damage by entities")
-    public void entity(CommandCause context, EntityType<?> type, Tristate set, @Default @Named("in") Region region)
+    public void entity(CommandCause context, EntityType type, Tristate set, @Default @Named("in") Region region)
     {
         setOrUnset(region.getSettings().entityDamage.byEntity, type, set);
         region.save();

@@ -23,11 +23,13 @@ import java.util.Map;
 import java.util.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.DefaultParameterProvider;
 import org.cubeengine.libcube.service.command.annotation.ParserFor;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.zoned.ZoneManager;
+import org.cubeengine.module.zoned.Zoned;
 import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
@@ -55,9 +57,9 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
     private I18n i18n;
 
     @Inject
-    public RegionParser(ZoneManager zoneMan, RegionManager manager, I18n i18n)
+    public RegionParser(ModuleManager mm, RegionManager manager, I18n i18n)
     {
-        this.zoneMan = zoneMan;
+        this.zoneMan = ((Zoned)mm.getModule(Zoned.class)).getManager();
         this.manager = manager;
         this.i18n = i18n;
     }
@@ -146,6 +148,11 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
             {
                 list.add(worldName + ".world");
             }
+        }
+        // Add Zones
+        if (isLocatable)
+        {
+            zoneMan.getZones(token, world).stream().map(cfg -> cfg.name).forEach(list::add);
         }
 
         return list;

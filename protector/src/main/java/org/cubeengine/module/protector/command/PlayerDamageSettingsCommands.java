@@ -29,23 +29,21 @@ import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionParser;
 import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 @Singleton
 @Using({RegionParser.class, TristateParser.class})
-@Command(name = "playerDamage", alias = "player", desc = "Manages the region player-damage settings")
+@Command(name = "playerDamage", desc = "Manages the region player-damage settings")
 public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
 {
     @Inject
-    public PlayerDamageSettingsCommands(I18n i18n, SettingsListener psl, PermissionService ps)
+    public PlayerDamageSettingsCommands(I18n i18n, SettingsListener psl)
     {
-        super(i18n, psl, ps);
+        super(i18n, psl);
     }
 
-    @Inject
     @Command(desc = "Controls player damage")
     public void all(CommandCause context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
     {

@@ -38,7 +38,6 @@ import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.manager.CommandMapping;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.item.ItemType;
-import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -51,9 +50,9 @@ public class SettingsCommands extends AbstractSettingsCommand
     private PermissionManager pm;
 
     @Inject
-    public SettingsCommands(SettingsListener listener, I18n i18n, PermissionService ps, PermissionManager pm, EventManager em, BlockDamageSettingsCommands bdsCmd, EntityDamageSettingsCommands edsCmd, PlayerDamageSettingsCommands pdsCmd)
+    public SettingsCommands(SettingsListener listener, I18n i18n, PermissionManager pm, EventManager em, BlockDamageSettingsCommands bdsCmd, EntityDamageSettingsCommands edsCmd, PlayerDamageSettingsCommands pdsCmd)
     {
-        super(i18n, listener, ps, bdsCmd, edsCmd, pdsCmd);
+        super(i18n, listener, bdsCmd, edsCmd, pdsCmd);
         this.pm = pm;
         em.registerListener(this.psl);
     }

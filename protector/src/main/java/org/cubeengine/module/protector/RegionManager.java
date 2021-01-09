@@ -29,6 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
@@ -48,12 +51,14 @@ import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
+@Singleton
 public class RegionManager
 {
     private final Path modulePath;
+    private ModuleManager mm;
     private final Reflector reflector;
     private Log logger;
-    private Zoned zonedModule;
+    private Zoned zoned;
     private Map<ResourceKey, Map<String, Region>> byName = new HashMap<>();
     private Map<ResourceKey, Map<Vector2i, List<Region>>> byChunk = new HashMap<>();
 
@@ -62,12 +67,13 @@ public class RegionManager
 
     private Map<UUID, Region> activeRegion = new HashMap<>(); // playerUUID -> Region
 
-    public RegionManager(Path modulePath, Reflector reflector, Log logger, Zoned zonedModule)
+    @Inject
+    public RegionManager(ModuleManager mm, Reflector reflector)
     {
-        this.modulePath = modulePath;
+        this.logger = mm.getLoggerFor(Protector.class);
+        this.modulePath = mm.getPathFor(Protector.class);
+        this.mm = mm;
         this.reflector = reflector;
-        this.logger = logger;
-        this.zonedModule = zonedModule;
         Path path = modulePath.resolve("region");
         try
         {
@@ -149,7 +155,7 @@ public class RegionManager
         List<Region> regions = new ArrayList<>();
         regions.add(globalRegion);
         regions.add(getWorldRegion(world.getKey()));
-        regions.addAll(byChunk.getOrDefault(world.getUniqueId(), Collections.emptyMap())
+        regions.addAll(byChunk.getOrDefault(world.getKey(), Collections.emptyMap())
                 .getOrDefault(new Vector2i(chunkX, chunkZ), Collections.emptyList())
                             .stream().filter(r -> r.contains(pos.toDouble()))
                 .collect(Collectors.toList()));
@@ -186,10 +192,13 @@ public class RegionManager
     {
         try
         {
+            Path regionsPath = modulePath.resolve("region");
+            RegionConfig globalConfig = reflector.load(RegionConfig.class, regionsPath.resolve("global.yml").toFile());
+            this.globalRegion = new Region(null, globalConfig, this);
+
             this.byChunk.clear();
             this.byName.clear();
             this.markDirty();
-            Path regionsPath = modulePath.resolve("region");
             Files.createDirectories(regionsPath);
             for (Path worldPath : Files.newDirectoryStream(regionsPath))
             {
@@ -202,14 +211,14 @@ public class RegionManager
                             continue;
                         }
                         RegionConfig config = reflector.load(RegionConfig.class, configPath.toFile());
-                        ZoneConfig zone = zonedModule.getManager().getZone(config.name);
+                        ZoneConfig zone = getZoned().getManager().getZone(config.name);
                         if (zone == null)
                         {
                             logger.info("Converting old region to zone format");
                             zone = reflector.create(ZoneConfig.class);
                             zone.world = config.world;
                             zone.shape = convertedCuboid(config);
-                            zonedModule.getManager().define(Sponge.getGame().getSystemSubject(), config.name, zone, false);
+                            getZoned().getManager().define(Sponge.getGame().getSystemSubject(), config.name, zone, false);
                         }
                         loadRegion(new Region(zone, config, this));
                     }
@@ -304,4 +313,14 @@ public class RegionManager
         config.save();
         return region;
     }
+
+    public Zoned getZoned()
+    {
+        if (this.zoned == null)
+        {
+            this.zoned = (Zoned) mm.getModule(Zoned.class);
+        }
+        return zoned;
+    }
+
 }

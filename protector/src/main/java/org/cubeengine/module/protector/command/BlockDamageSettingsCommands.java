@@ -30,7 +30,6 @@ import org.cubeengine.module.protector.region.Region;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
@@ -38,16 +37,16 @@ import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
 
 @Singleton
 @Using(TristateParser.class)
-@Command(name = "blockdamage", alias = "block", desc = "Manages the region block-damage settings")
+@Command(name = "blockdamage", desc = "Manages the region block-damage settings")
 public class BlockDamageSettingsCommands extends AbstractSettingsCommand
 {
     private I18n i18n;
     private SettingsListener psl;
 
     @Inject
-    public BlockDamageSettingsCommands(I18n i18n, SettingsListener psl, PermissionService ps)
+    public BlockDamageSettingsCommands(I18n i18n, SettingsListener psl)
     {
-        super(i18n, psl, ps);
+        super(i18n, psl);
         this.i18n = i18n;
         this.psl = psl;
     }

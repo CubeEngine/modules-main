@@ -152,6 +152,6 @@ public class Region
 
     public boolean isWorldRegion()
     {
-        return this.config.corner1 == null;
+        return this.zone == null;
     }
 }

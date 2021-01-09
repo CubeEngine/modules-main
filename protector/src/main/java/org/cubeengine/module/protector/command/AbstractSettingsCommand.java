@@ -25,6 +25,7 @@ import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -35,18 +36,17 @@ public abstract class AbstractSettingsCommand extends DispatcherCommand
 
     protected final I18n i18n;
     protected final SettingsListener psl;
-    protected final PermissionService ps;
 
-    public AbstractSettingsCommand(I18n i18n, SettingsListener psl, PermissionService ps, Object... subCommands)
+    public AbstractSettingsCommand(I18n i18n, SettingsListener psl, Object... subCommands)
     {
         super(subCommands);
         this.i18n = i18n;
         this.psl = psl;
-        this.ps = ps;
     }
 
     protected void setPermission(CommandCause context, Tristate set, Region region, String role, String perm)
     {
+        PermissionService ps = Sponge.getServer().getServiceProvider().permissionService();
         ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
             if (!b)
             {

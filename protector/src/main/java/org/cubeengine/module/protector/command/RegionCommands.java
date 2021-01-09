@@ -37,18 +37,15 @@ import org.cubeengine.libcube.service.command.annotation.Flag;
 import org.cubeengine.libcube.service.command.annotation.Named;
 import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.command.annotation.Using;
-import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
-import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.command.parser.TristateParser;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
+import org.cubeengine.module.protector.region.RegionParser;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.util.Tristate;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.server.ServerWorld;
@@ -57,25 +54,19 @@ import static java.util.stream.Collectors.toList;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
 @Singleton
-@Using(TristateParser.class)
+@Using({TristateParser.class, RegionParser.class})
 @Command(name = "protect", desc = "Manages the regions")
 public class RegionCommands extends DispatcherCommand
 {
-    private final Protector module;
     private RegionManager manager;
     private I18n i18n;
-    private TaskManager tm;
-    private final EventManager em;
 
     @Inject
-    public RegionCommands(Protector module, RegionManager manager, I18n i18n, TaskManager tm, EventManager em, SettingsCommands settingsCmd)
+    public RegionCommands(RegionManager manager, I18n i18n, SettingsCommands settingsCmd)
     {
         super(settingsCmd);
-        this.module = module;
         this.manager = manager;
         this.i18n = i18n;
-        this.tm = tm;
-        this.em = em;
     }
 
     @Command(desc = "Lists protected zones")
@@ -198,7 +189,11 @@ public class RegionCommands extends DispatcherCommand
             i18n.send(context, POSITIVE, "Inside Cuboid of {vector} to {vector}", cuboid.getMinimumPoint(), cuboid.getMaximumPoint());
         }
 
-        // TODO priority
+        if (region.getPriority() != 0)
+        {
+            i18n.send(context, POSITIVE, "With Priority: {number}", region.getPriority());
+        }
+
         RegionConfig.Settings settings = region.getSettings();
         showSetting(context, i18n.getTranslation(context, "build"), settings.build, allSettings);
         showSetting(context, i18n.getTranslation(context, "move"), settings.move, allSettings);
@@ -238,7 +233,7 @@ public class RegionCommands extends DispatcherCommand
     {
         if (value != Tristate.UNDEFINED || allSettings)
         {
-            cs.sendMessage(Identity.nil(), Component.text(name, NamedTextColor.YELLOW).append(toText(cs, value).color(NamedTextColor.GOLD)));
+            cs.sendMessage(Identity.nil(), Component.text(name, NamedTextColor.YELLOW).append(Component.text(": ")).append(toText(cs, value)));
         }
     }
 
@@ -260,9 +255,9 @@ public class RegionCommands extends DispatcherCommand
 
         if (values.size() > 0 || allSettings)
         {
-            Component trueText = i18n.translate(cs, "Enabled").color(NamedTextColor.YELLOW).append(Component.space()).append(Component.text(pos, NamedTextColor.GOLD));
-            Component falseText = i18n.translate(cs, "Disabled").color(NamedTextColor.YELLOW).append(Component.space()).append(Component.text(neg, NamedTextColor.GOLD));
-            cs.sendMessage(Identity.nil(), Component.text(name, NamedTextColor.YELLOW).append(Component.text(":")).append(trueText).append(Component.space()).append(falseText));
+            Component trueText = i18n.translate(cs, "Enabled").color(NamedTextColor.DARK_GREEN).append(Component.space()).append(Component.text(pos, NamedTextColor.GOLD));
+            Component falseText = i18n.translate(cs, "Disabled").color(NamedTextColor.DARK_RED).append(Component.space()).append(Component.text(neg, NamedTextColor.GOLD));
+            cs.sendMessage(Identity.nil(), Component.text(name, NamedTextColor.YELLOW).append(Component.text(": ")).append(trueText).append(Component.space()).append(falseText));
             Map<Tristate, List<ComponentLike>> settings = new HashMap<>();
             for (Map.Entry<?, Tristate> entry : values.entrySet())
             {
@@ -273,7 +268,7 @@ public class RegionCommands extends DispatcherCommand
                 }
                 else if (entry.getKey() instanceof ComponentLike)
                 {
-                    key = ((ItemType) entry.getKey());
+                    key = (ComponentLike) entry.getKey();
                 }
                 else if (entry.getKey() instanceof String)
                 {
@@ -288,7 +283,7 @@ public class RegionCommands extends DispatcherCommand
             }
             for (Map.Entry<Tristate, List<ComponentLike>> entry : settings.entrySet())
             {
-                final TextComponent text = Component.text(" - ").append(toText(cs, entry.getKey())).append(Component.text(": ", NamedTextColor.YELLOW));
+                TextComponent text = Component.text(" - ").append(toText(cs, entry.getKey())).append(Component.text(": ", NamedTextColor.YELLOW));
                 boolean first = true;
                 for (ComponentLike val : entry.getValue())
                 {
@@ -297,7 +292,7 @@ public class RegionCommands extends DispatcherCommand
                         text.append(Component.text(", ", NamedTextColor.GRAY));
                     }
                     first = false;
-                    text.append(val.asComponent().color(NamedTextColor.YELLOW));
+                    text = text.append(val.asComponent().color(NamedTextColor.YELLOW));
                 }
                 cs.sendMessage(Identity.nil(), text);
             }
@@ -314,7 +309,7 @@ public class RegionCommands extends DispatcherCommand
             case FALSE:
                 return i18n.translate(cs,"Disabled").color(NamedTextColor.DARK_RED);
             default:
-                return i18n.translate(cs,"Undefined").color(NamedTextColor.GOLD);
+                return i18n.translate(cs,"Undefined").color(NamedTextColor.DARK_GRAY);
         }
     }
 

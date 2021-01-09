@@ -17,6 +17,8 @@
  */
 package org.cubeengine.module.protector;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.cubeengine.module.protector.region.Region;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.service.context.Context;
@@ -28,10 +30,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+@Singleton
 public class RegionContextCalculator implements ContextCalculator<Subject>
 {
     private RegionManager manager;
 
+    @Inject
     public RegionContextCalculator(RegionManager manager)
     {
         this.manager = manager;

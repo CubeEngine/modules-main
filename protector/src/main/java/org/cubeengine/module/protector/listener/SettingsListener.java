@@ -29,7 +29,9 @@ import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
 import org.cubeengine.libcube.service.permission.Permission;
+import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
@@ -55,6 +57,7 @@ import org.spongepowered.api.event.Cancellable;
 import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
@@ -87,7 +90,7 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE
 import static org.spongepowered.api.util.Tristate.*;
 
 @Singleton
-public class SettingsListener
+public class SettingsListener extends PermissionContainer
 {
 
     private RegionManager manager;
@@ -110,38 +113,39 @@ public class SettingsListener
     public final Permission playerTargeting;
 
     @Inject
-    public SettingsListener(RegionManager manager, Permission base, PermissionManager pm, I18n i18n)
+    public SettingsListener(RegionManager manager, PermissionManager pm, I18n i18n)
     {
+        super(pm, Protector.class);
         this.manager = manager;
         this.pm = pm;
         this.i18n = i18n;
         // TODO description
         // TODO ENTER remember last valid pos.
-        movePerms.put(MoveType.MOVE, pm.register(SettingsListener.class, "bypass.move.move", "Region bypass for moving in a region", base));
-        movePerms.put(MoveType.EXIT, pm.register(SettingsListener.class, "bypass.move.exit", "Region bypass for exiting a region", base));
-        movePerms.put(MoveType.ENTER, pm.register(SettingsListener.class, "bypass.move.enter", "Region bypass for entering a region", base));
-        movePerms.put(MoveType.TELEPORT, pm.register(SettingsListener.class, "bypass.move.teleport", "Region bypass for teleport in a region", base));
-        movePerms.put(MoveType.TELEPORT_PORTAL, pm.register(SettingsListener.class, "bypass.move.teleport-portal", "Region bypass for teleport using portals in a region", base));
-        buildPerm = pm.register(SettingsListener.class, "bypass.build", "Region bypass for building", base);
-        useBlockPerm = pm.register(SettingsListener.class, "bypass.use", "Region bypass for using anything", base);
-        useItemPerm = pm.register(SettingsListener.class, "bypass.use-item", "Region bypass for using items", base);
-        spawnEntityPlayerPerm = pm.register(SettingsListener.class, "bypass.spawn.player", "Region bypass for players spawning entities", base);
-        explodePlayer = pm.register(SettingsListener.class, "bypass.blockdamage.explode.player", "Region bypass for players causing blockdamage with explosions", base);
-        command = pm.register(SettingsListener.class, "bypass.command", "Region bypass for using all commands", base);
-        usePermission.put(UseType.BLOCK, pm.register(SettingsListener.class, "bypass.use-all.block", "Region bypass for using blocks", base));
-        usePermission.put(UseType.CONTAINER, pm.register(SettingsListener.class, "bypass.use-all.container", "Region bypass for using containers", base));
-        usePermission.put(UseType.ITEM, pm.register(SettingsListener.class, "bypass.use-all.item", "Region bypass for using items", base));
-        usePermission.put(UseType.OPEN, pm.register(SettingsListener.class, "bypass.use-all.open", "Region bypass for opening anything", base));
-        usePermission.put(UseType.REDSTONE, pm.register(SettingsListener.class, "bypass.use-all.redstone", "Region bypass for using redstone", base));
-        entityDamageAll = pm.register(SettingsListener.class, "bypass.entity-damage.all", "", base);
-        entityDamageLiving = pm.register(SettingsListener.class, "bypass.entity-damage.living", "", base);
-        playerDamgeAll = pm.register(SettingsListener.class, "bypass.player-damage.all", "", base);
-        playerDamgeLiving = pm.register(SettingsListener.class, "bypass.player-damage.living", "", base);
-        playerDamgePVP = pm.register(SettingsListener.class, "bypass.player-damage.pvp", "", base);
-        playerTargeting = pm.register(SettingsListener.class, "bypass.player-targeting", "", base);
+        movePerms.put(MoveType.MOVE, this.register("bypass.move.move", "Region bypass for moving in a region"));
+        movePerms.put(MoveType.EXIT, this.register("bypass.move.exit", "Region bypass for exiting a region"));
+        movePerms.put(MoveType.ENTER, this.register("bypass.move.enter", "Region bypass for entering a region"));
+        movePerms.put(MoveType.TELEPORT, this.register("bypass.move.teleport", "Region bypass for teleport in a region"));
+        movePerms.put(MoveType.TELEPORT_PORTAL, this.register("bypass.move.teleport-portal", "Region bypass for teleport using portals in a region"));
+        buildPerm = this.register("bypass.build", "Region bypass for building");
+        useBlockPerm = this.register("bypass.use", "Region bypass for using anything");
+        useItemPerm = this.register("bypass.use-item", "Region bypass for using items");
+        spawnEntityPlayerPerm = this.register("bypass.spawn.player", "Region bypass for players spawning entities");
+        explodePlayer = this.register("bypass.blockdamage.explode.player", "Region bypass for players causing blockdamage with explosions");
+        command = this.register("bypass.command", "Region bypass for using all commands");
+        usePermission.put(UseType.BLOCK, this.register("bypass.use-all.block", "Region bypass for using blocks"));
+        usePermission.put(UseType.CONTAINER, this.register("bypass.use-all.container", "Region bypass for using containers"));
+        usePermission.put(UseType.ITEM, this.register("bypass.use-all.item", "Region bypass for using items"));
+        usePermission.put(UseType.OPEN, this.register("bypass.use-all.open", "Region bypass for opening anything"));
+        usePermission.put(UseType.REDSTONE, this.register("bypass.use-all.redstone", "Region bypass for using redstone"));
+        entityDamageAll = this.register("bypass.entity-damage.all", "");
+        entityDamageLiving = this.register("bypass.entity-damage.living", "");
+        playerDamgeAll = this.register("bypass.player-damage.all", "");
+        playerDamgeLiving = this.register("bypass.player-damage.living", "");
+        playerDamgePVP = this.register("bypass.player-damage.pvp", "");
+        playerTargeting = this.register("bypass.player-targeting", "");
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onMove(MoveEntityEvent event, @Getter("getEntity") ServerPlayer player)
     {
         List<Region> from = manager.getRegionsAt(player.getWorld().getLocation(event.getOriginalPosition()));
@@ -235,7 +239,7 @@ public class SettingsListener
         MOVE, ENTER, EXIT, TELEPORT, TELEPORT_PORTAL
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onPreBuild(ChangeBlockEvent.Pre event, @First ServerPlayer player)
     {
         if (this.buildPerm.check(player))
@@ -254,7 +258,7 @@ public class SettingsListener
         }
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onBuild(ChangeBlockEvent.All event, @First ServerPlayer player)
     {
         if (this.buildPerm.check(player))
@@ -312,7 +316,7 @@ public class SettingsListener
         return allow;
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onUse(InteractBlockEvent.Secondary event, @Root ServerPlayer player)
     {
         final ServerLocation loc = player.getWorld().getLocation(event.getInteractionPoint());
@@ -369,7 +373,7 @@ public class SettingsListener
         }
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onUseItem(InteractItemEvent.Secondary event, @Root ServerPlayer player)
     {
         ItemType item = event.getItemStack().getType();
@@ -383,7 +387,7 @@ public class SettingsListener
         }
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onSpawn(SpawnEntityEvent event)
     {
         for (Entity entity : event.getEntities())
@@ -428,7 +432,7 @@ public class SettingsListener
         }
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onPreChangeBlock(ChangeBlockEvent.Pre event, @Root LocatableBlock block)
     {
         for (ServerLocation loc : event.getLocations()) {
@@ -443,42 +447,44 @@ public class SettingsListener
         }
     }
 
-    @Listener
-    public void onChangeBlock(ChangeBlockEvent.All event)
+    @Listener(order = Order.EARLY)
+    public void onChangeBlock(ExplosionEvent.Detonate event)
     {
         Object rootCause = event.getCause().root();
         // Check Explosions first...
-        if (event instanceof ExplosionEvent)
+
+        for (ServerLocation loc : event.getAffectedLocations())
         {
-            for (Transaction<BlockSnapshot> trans : event.getTransactions())
+            List<Region> regionsAt = manager.getRegionsAt(loc);
+            this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.allExplosion, UNDEFINED);
+            ServerPlayer player = event.getCause().getContext().get(EventContextKeys.CREATOR).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast).orElse(null);
+            if (player == null)
             {
-                List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
-                this.checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.allExplosion, UNDEFINED);
-                ServerPlayer player = event.getCause().getContext().get(EventContextKeys.CREATOR).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast).orElse(null);
-                if (player == null)
-                {
-                    player = event.getCause().getContext().get(EventContextKeys.IGNITER).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast).orElse(null);
-                }
-                if (rootCause instanceof ServerPlayer)
-                {
-                    player = ((ServerPlayer) rootCause);
-                }
-                if (player != null)
-                {
-                    this.checkSetting(event, player, regionsAt, () -> explodePlayer, (s) -> s.blockDamage.playerExplosion, UNDEFINED);
-                    if (event.isCancelled())
-                    {
-                        i18n.send(ChatType.ACTION_BAR, player, CRITICAL, "You are not allowed to let stuff explode here!");
-                    }
-                }
+                player = event.getCause().getContext().get(EventContextKeys.IGNITER).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast).orElse(null);
+            }
+            if (rootCause instanceof ServerPlayer)
+            {
+                player = ((ServerPlayer) rootCause);
+            }
+            if (player != null)
+            {
+                this.checkSetting(event, player, regionsAt, () -> explodePlayer, (s) -> s.blockDamage.playerExplosion, UNDEFINED);
                 if (event.isCancelled())
                 {
-                    return;
+                    i18n.send(ChatType.ACTION_BAR, player, CRITICAL, "You are not allowed to let stuff explode here!");
                 }
             }
-            return;
+            if (event.isCancelled())
+            {
+                return;
+            }
         }
+    }
 
+    @Listener(order = Order.EARLY)
+    public void onChangeBlock(ChangeBlockEvent.All event)
+    {
+        Object rootCause = event.getCause().root();
         // Hostile Mob causes BlockChange?
         if (rootCause instanceof Hostile)
         {
@@ -518,7 +524,7 @@ public class SettingsListener
         }
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onCommand(ExecuteCommandEvent.Pre event, @Root ServerPlayer player)
     {
         CommandMapping mapping = Sponge.getGame().getCommandManager().getCommandMapping(event.getCommand()).orElse(null);
@@ -563,7 +569,7 @@ public class SettingsListener
                 ;
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onRedstoneChangeNotify(NotifyNeighborBlockEvent event, @Root LocatableBlock block)
     {
         for (Map.Entry<Direction, BlockState> entry : event.getOriginalNeighbors().entrySet())
@@ -595,7 +601,7 @@ public class SettingsListener
         }
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onEntityDamage(DamageEntityEvent event)
     {
         Entity target = event.getEntity();
@@ -609,7 +615,7 @@ public class SettingsListener
         }
     }
 
-    @Listener
+    @Listener(order = Order.EARLY)
     public void onTargetPlayer(SetAITargetEvent event, @Getter("getTarget") ServerPlayer player)
     {
         List<Region> regions = manager.getRegionsAt(player.getServerLocation());
