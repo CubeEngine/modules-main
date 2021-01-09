@@ -33,7 +33,9 @@ import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.zoned.config.ZoneConfig;
+import org.cubeengine.module.zoned.event.ZoneEvent;
 import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 
@@ -117,6 +119,7 @@ public class ZoneManager
         cfg.save();
         zones.put(name, cfg);
         i18n.send(cmdSource, POSITIVE, "Saved zone as {name}", name);
+        Sponge.getEventManager().post(new ZoneEvent(cfg));
     }
 
     public ZoneConfig getZone(String token)
