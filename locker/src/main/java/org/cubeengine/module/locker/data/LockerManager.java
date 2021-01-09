@@ -789,7 +789,7 @@ public class LockerManager
                 final String ownerName = Sponge.getServer().getUserManager().get(owner).map(User::getName).orElse("???");
                 i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from breaking this protection of {user}!", ownerName);
             }
-            else
+            else if (player != null)
             {
                 i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from breaking this protection!");
             }
