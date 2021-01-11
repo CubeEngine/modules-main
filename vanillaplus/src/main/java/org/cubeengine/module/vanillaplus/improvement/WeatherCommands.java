@@ -52,8 +52,8 @@ public class WeatherCommands
     {
         duration = (duration == null ? 10000000 : duration) * 20;
 
-        final Weather currentWeather = world.getWeather();
-        final String weatherKey = Sponge.getGame().registries().registry(RegistryTypes.WEATHER).valueKey(weather).getValue();
+        final Weather currentWeather = world.weather();
+        final String weatherKey = Sponge.getGame().registries().registry(RegistryTypes.WEATHER_TYPE).valueKey(weather.type()).getValue();
         if (currentWeather == weather) // weather is not changing
         {
 
@@ -64,7 +64,7 @@ public class WeatherCommands
             i18n.send(context, POSITIVE, "Changed weather in {world} to {input#weather}!", world, weatherKey);
         }
 
-        world.setWeather(weather, Ticks.of(duration));
+        world.setWeather(weather.type(), Ticks.of(duration));
     }
 
     /* TODO wait for https://github.com/SpongePowered/SpongeAPI/issues/393

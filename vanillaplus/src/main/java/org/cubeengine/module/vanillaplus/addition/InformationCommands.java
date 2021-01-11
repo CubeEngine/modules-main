@@ -134,7 +134,7 @@ public class InformationCommands extends PermissionContainer
 
             world = ((ServerPlayer)context.getSubject()).getWorld();
         }
-        final long seed = world.getProperties().worldGenerationSettings().seed();
+        final long seed = world.getProperties().worldGenerationConfig().seed();
         i18n.send(context, NEUTRAL, "Seed of {world} is {input#seed}", world, Component.text(seed)
                 .clickEvent(ClickEvent.copyToClipboard(String.valueOf(seed)))
                 .hoverEvent(HoverEvent.showText(i18n.translate(context, "click to copy"))));
