@@ -266,7 +266,7 @@ public class WorldsCommands extends DispatcherCommand
                 }
                 if (!folder)
                 {
-                    final WorldTemplate build = WorldTemplate.builder().from(Sponge.getServer().getWorldManager().loadTemplate(world).get()).enabled(false).build();
+                    final WorldTemplate build = WorldTemplate.builder().from(Sponge.getServer().getWorldManager().loadTemplate(world).join().get()).enabled(false).build();
                     Sponge.getServer().getWorldManager().saveTemplate(build);
                     i18n.send(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
                     return CompletableFuture.completedFuture(false);
@@ -311,7 +311,7 @@ public class WorldsCommands extends DispatcherCommand
             {
                 builder.append(Component.space());
 
-                if (Sponge.getServer().getWorldManager().loadTemplate(worldKey).get().enabled())
+                if (Sponge.getServer().getWorldManager().loadTemplate(worldKey).join().get().enabled())
                 {
                     final TextComponent loadText = loadWorldText(context, worldKey);
                     builder.append(tNotEnabled.color(NamedTextColor.RED).append(Component.space()).append(loadText));
@@ -353,7 +353,7 @@ public class WorldsCommands extends DispatcherCommand
         }
         i18n.send(context, NEUTRAL, "Gamemode: {text}", world.gameMode().asComponent());
         i18n.send(context, NEUTRAL, "DimensionType: {input}", world.worldType());
-        if (world.worldGenerationSettings().generateFeatures())
+        if (world.worldGenerationConfig().generateFeatures())
         {
 //            i18n.send(context, NEUTRAL, "WorldType: {input} with features", world.getGeneratorType().getName());
         }
@@ -375,7 +375,7 @@ public class WorldsCommands extends DispatcherCommand
         {
             i18n.send(context, NEUTRAL, "Commands are not allowed");
         }
-        i18n.send(context, NEUTRAL, "Seed: {long}", world.worldGenerationSettings().seed());
+        i18n.send(context, NEUTRAL, "Seed: {long}", world.worldGenerationConfig().seed());
 //        if (!world.getGeneratorModifiers().isEmpty())
 //        {
 //            i18n.send(context, NEUTRAL, "Generation is modified by:");

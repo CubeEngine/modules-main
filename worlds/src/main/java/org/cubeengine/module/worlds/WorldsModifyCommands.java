@@ -61,9 +61,9 @@ public class WorldsModifyCommands extends DispatcherCommand
     {
         if (set == null)
         {
-            set = !world.worldGenerationSettings().generateFeatures();
+            set = !world.worldGenerationConfig().generateFeatures();
         }
-        world.worldGenerationSettings().generateFeatures(set);
+        world.worldGenerationConfig().setGenerateFeatures(set);
         if (set)
         {
             i18n.send(context, POSITIVE, "{world} will now generate structures", world);
