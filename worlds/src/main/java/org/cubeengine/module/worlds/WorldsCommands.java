@@ -266,7 +266,7 @@ public class WorldsCommands extends DispatcherCommand
                 }
                 if (!folder)
                 {
-                    final WorldTemplate build = WorldTemplate.builder().from(Sponge.getServer().getWorldManager().loadTemplate(world).join().get()).enabled(false).build();
+                    final WorldTemplate build = WorldTemplate.builder().from(Sponge.getServer().getWorldManager().loadTemplate(world).join().get()).loadOnStartup(false).build();
                     Sponge.getServer().getWorldManager().saveTemplate(build);
                     i18n.send(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
                     return CompletableFuture.completedFuture(false);
@@ -311,15 +311,8 @@ public class WorldsCommands extends DispatcherCommand
             {
                 builder.append(Component.space());
 
-                if (Sponge.getServer().getWorldManager().loadTemplate(worldKey).join().get().enabled())
-                {
-                    final TextComponent loadText = loadWorldText(context, worldKey);
-                    builder.append(tNotEnabled.color(NamedTextColor.RED).append(Component.space()).append(loadText));
-                }
-                else
-                {
-                    builder.append(tNotEnabled.color(NamedTextColor.RED));
-                }
+                final TextComponent loadText = loadWorldText(context, worldKey);
+                builder.append(tNotEnabled.color(NamedTextColor.RED).append(Component.space()).append(loadText));
             }
             builder.append(Component.space()).append(infoText);
             context.sendMessage(Identity.nil(), builder);
@@ -338,11 +331,7 @@ public class WorldsCommands extends DispatcherCommand
         context.sendMessage(Identity.nil(), Component.empty());
         i18n.send(context, POSITIVE, "World information for {world}:", world);
 
-        if (!world.enabled())
-        {
-            i18n.send(context, NEUTRAL, "This world is disabled.");
-        }
-        else if (!Sponge.getServer().getWorldManager().world(world.getKey()).isPresent())
+        if (!Sponge.getServer().getWorldManager().world(world.getKey()).isPresent())
         {
             Component load = loadWorldText(context, world.getKey());
             i18n.send(context, NEGATIVE, "This world is not loaded. {txt#load}", load);
