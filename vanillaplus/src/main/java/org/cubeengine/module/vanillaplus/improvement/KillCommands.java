@@ -142,7 +142,6 @@ public class KillCommands extends PermissionContainer
     public void suicide(ServerPlayer context)
     {
         Sponge.getServer().getCauseStackManager().pushCause(context);
-        context.damage(context.get(Keys.MAX_HEALTH).get(), DamageSource.builder().absolute().type(CUSTOM).build());
         context.offer(Keys.HEALTH, 0d);
         i18n.send(context, NEGATIVE, "You ended your life. Why? {text::(:color=DARK_RED}");
     }
