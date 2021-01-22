@@ -284,7 +284,7 @@ public class UserInformationCommands extends DispatcherCommand
                          .append(Component.text(owner.getFriendlyIdentifier().orElse(owner.getIdentifier()), NamedTextColor.YELLOW))
                          .build();
                 final TextComponent key = Component.text(entry.getKey(), NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(hoverText));
-                ctx.sendMessage(Identity.nil(), i18n.composeMessage(ctx, Style.empty(), "- {text} {text:\\::color=WHITE} {name:color=GOLD}", key, entry.getValue().value));
+                ctx.sendMessage(Identity.nil(), i18n.composeMessage(ctx, Style.empty(), "- {txt}{text:\\::color=WHITE} {name:color=GOLD}", key, entry.getValue().value));
             }
         }
         catch (InterruptedException | ExecutionException e)
