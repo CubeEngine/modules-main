@@ -18,7 +18,6 @@
 package org.cubeengine.module.vanillaplus.improvement;
 
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -26,6 +25,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.kyori.adventure.identity.Identity;
@@ -73,7 +73,7 @@ public class PlayerListCommand
 
         for (ServerPlayer user : Sponge.getServer().getOnlinePlayers())
         {
-            if (context.getSubject() instanceof Player && !((ServerPlayer)context.getSubject()).canSee(user))
+            if (context.getSubject() instanceof ServerPlayer && !((ServerPlayer)context.getSubject()).canSee(user))
             {
                 continue;
             }
@@ -91,18 +91,14 @@ public class PlayerListCommand
 
         for (Entry<String, Set<ServerPlayer>> entry : grouped.entrySet())
         {
-            Iterator<ServerPlayer> it = entry.getValue().iterator();
-            if (!it.hasNext())
+            if (entry.getValue().isEmpty())
             {
                 continue;
             }
+            final TextComponent playerList = Component.join(Component.text(",", NamedTextColor.WHITE), entry.getValue().stream().map(this::formatUser).collect(Collectors.toList()));
             final TextComponent msg = LegacyComponentSerializer.legacyAmpersand().deserialize(entry.getKey())
-                                                               .append(Component.text(": ", NamedTextColor.WHITE)
-                                                               .append(formatUser(it.next())));
-            while (it.hasNext())
-            {
-                msg.append(Component.text(",", NamedTextColor.WHITE)).append(formatUser(it.next()));
-            }
+                                                               .append(Component.text(": ", NamedTextColor.WHITE))
+                                                               .append(playerList);
             context.sendMessage(Identity.nil(), msg);
         }
     }
