@@ -23,13 +23,19 @@ import org.cubeengine.libcube.service.command.annotation.Default;
 import org.cubeengine.libcube.service.command.annotation.Flag;
 import org.cubeengine.libcube.service.command.annotation.Named;
 import org.cubeengine.libcube.service.command.annotation.Using;
-import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.command.parser.TristateParser;
+import org.cubeengine.module.protector.listener.BlockSettingsListener;
+import org.cubeengine.module.protector.listener.InteractSettingsListener;
+import org.cubeengine.module.protector.listener.InteractSettingsListener.UseType;
+import org.cubeengine.module.protector.listener.MoveSettingsListener;
+import org.cubeengine.module.protector.listener.MoveSettingsListener.MoveType;
 import org.cubeengine.module.protector.listener.SettingsListener;
+import org.cubeengine.module.protector.listener.SpawnSettingsListener;
+import org.cubeengine.module.protector.listener.SpawnSettingsListener.SpawnType;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionParser;
 import org.spongepowered.api.Sponge;
@@ -48,29 +54,42 @@ import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
 public class SettingsCommands extends AbstractSettingsCommand
 {
     private PermissionManager pm;
+    private MoveSettingsListener moveListener;
+    private BlockSettingsListener blockListener;
+    private InteractSettingsListener interactListener;
+    private SpawnSettingsListener spawnListener;
 
     @Inject
-    public SettingsCommands(SettingsListener listener, I18n i18n, PermissionManager pm, EventManager em, BlockDamageSettingsCommands bdsCmd, EntityDamageSettingsCommands edsCmd, PlayerDamageSettingsCommands pdsCmd)
+    public SettingsCommands(I18n i18n, PermissionManager pm,
+                            SettingsListener listener,
+                            MoveSettingsListener moveListener,
+                            BlockSettingsListener blockListener,
+                            InteractSettingsListener interactListener,
+                            SpawnSettingsListener spawnListener,
+                            BlockDamageSettingsCommands bdsCmd, EntityDamageSettingsCommands edsCmd, PlayerDamageSettingsCommands pdsCmd)
     {
         super(i18n, listener, bdsCmd, edsCmd, pdsCmd);
         this.pm = pm;
-        em.registerListener(this.psl);
+        this.moveListener = moveListener;
+        this.blockListener = blockListener;
+        this.interactListener = interactListener;
+        this.spawnListener = spawnListener;
     }
 
     @Command(desc = "Controls teleport movement")
     public void teleport(CommandCause context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
     {
-        this.move(context, SettingsListener.MoveType.TELEPORT, set, region, role);
+        this.move(context, MoveType.TELEPORT, set, region, role);
     }
 
     @Command(desc = "Controls movement")
-    public void move(CommandCause context, SettingsListener.MoveType type, Tristate set,
+    public void move(CommandCause context, MoveType type, Tristate set,
             @Default @Named("in") Region region,
             @Named("bypass") String role) // TODO role completer/reader
     {
         if (role != null)
         {
-            this.setPermission(context, set, region, role, psl.movePerms.get(type).getId());
+            this.setPermission(context, set, region, role, moveListener.movePerms.get(type).getId());
             return;
         }
         //for (MoveListener.MoveType type : types)
@@ -88,7 +107,7 @@ public class SettingsCommands extends AbstractSettingsCommand
     {
         if (role != null)
         {
-            this.setPermission(context, set, region, role, psl.buildPerm.getId());
+            this.setPermission(context, set, region, role, blockListener.buildPerm.getId());
             return;
         }
         region.getSettings().build = set;
@@ -97,12 +116,12 @@ public class SettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls players interacting with blocks")
-    public void useAll(CommandCause context, SettingsListener.UseType type, Tristate set,
-            @Default @Named("in") Region region, @Named("bypass") String role)
+    public void useAll(CommandCause context, UseType type, Tristate set,
+                       @Default @Named("in") Region region, @Named("bypass") String role)
     {
         if (role != null)
         {
-            this.setPermission(context, set, region, role, psl.usePermission.get(type).getId());
+            this.setPermission(context, set, region, role, interactListener.usePermission.get(type).getId());
             return;
         }
         switch (type)
@@ -134,7 +153,7 @@ public class SettingsCommands extends AbstractSettingsCommand
     {
         if (role != null)
         {
-            this.setPermission(context, set, region, role, psl.useBlockPerm.getId());
+            this.setPermission(context, set, region, role, interactListener.useBlockPerm.getId());
             return;
         }
         setOrUnset(region.getSettings().use.block, type, set);
@@ -149,7 +168,7 @@ public class SettingsCommands extends AbstractSettingsCommand
     {
         if (role != null)
         {
-            this.setPermission(context, set, region, role, psl.useItemPerm.getId());
+            this.setPermission(context, set, region, role, interactListener.useItemPerm.getId());
             return;
         }
         setOrUnset(region.getSettings().use.item, type, set);
@@ -159,7 +178,7 @@ public class SettingsCommands extends AbstractSettingsCommand
 
     @Command(desc = "Controls spawning of entities")
     // TODO completer for SpawnType & EntityType
-    public void spawn(CommandCause context, SettingsListener.SpawnType type, EntityType what, Tristate set,
+    public void spawn(CommandCause context, SpawnType type, EntityType what, Tristate set,
                       @Default @Named("in") Region region, @Named("bypass") String role)
     {
         if (role != null)
@@ -167,7 +186,7 @@ public class SettingsCommands extends AbstractSettingsCommand
             switch (type)
             {
                 case PLAYER:
-                    this.setPermission(context, set, region, role, psl.spawnEntityPlayerPerm.getId());
+                    this.setPermission(context, set, region, role, spawnListener.spawnEntityPlayerPerm.getId());
                     return;
                 case NATURALLY:
                 case PLUGIN:

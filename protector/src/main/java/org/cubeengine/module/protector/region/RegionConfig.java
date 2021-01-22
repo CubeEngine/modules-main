@@ -18,6 +18,7 @@
 package org.cubeengine.module.protector.region;
 
 import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.module.protector.listener.MoveSettingsListener.MoveType;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.reflect.Section;
 import org.cubeengine.reflect.annotations.Comment;
@@ -49,7 +50,7 @@ public class RegionConfig extends ReflectedYaml
     public static class Settings implements Section
     {
 
-        public Map<SettingsListener.MoveType, Tristate> move = new HashMap<>();
+        public Map<MoveType, Tristate> move = new HashMap<>();
         public Tristate build = Tristate.UNDEFINED;
         public Use use = new Use();
         public static class Use implements Section

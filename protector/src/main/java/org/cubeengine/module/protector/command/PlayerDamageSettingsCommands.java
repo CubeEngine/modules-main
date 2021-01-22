@@ -25,6 +25,7 @@ import org.cubeengine.libcube.service.command.annotation.Named;
 import org.cubeengine.libcube.service.command.annotation.Using;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.protector.command.parser.TristateParser;
+import org.cubeengine.module.protector.listener.DamageSettingsListener;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionParser;
@@ -38,10 +39,13 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE
 @Command(name = "playerDamage", desc = "Manages the region player-damage settings")
 public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
 {
+    private final DamageSettingsListener dmgListener;
+
     @Inject
-    public PlayerDamageSettingsCommands(I18n i18n, SettingsListener psl)
+    public PlayerDamageSettingsCommands(I18n i18n, SettingsListener psl, DamageSettingsListener dmgListener)
     {
         super(i18n, psl);
+        this.dmgListener = dmgListener;
     }
 
     @Command(desc = "Controls player damage")
@@ -49,7 +53,7 @@ public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
     {
         if (role != null)
         {
-            String perm = psl.playerDamgeAll.getId();
+            String perm = dmgListener.playerDamgeAll.getId();
             setPermission(context, set, region, role, perm);
             return;
         }
@@ -63,7 +67,7 @@ public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
     {
         if (role != null)
         {
-            String perm = psl.playerDamgeLiving.getId();
+            String perm = dmgListener.playerDamgeLiving.getId();
             setPermission(context, set, region, role, perm);
             return;
         }
@@ -77,7 +81,7 @@ public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
     {
         if (role != null)
         {
-            setPermission(context, set, region, role, psl.playerDamgePVP.getId());
+            setPermission(context, set, region, role, dmgListener.playerDamgePVP.getId());
             return;
         }
         region.getSettings().playerDamage.pvp = set;
@@ -90,7 +94,7 @@ public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
     {
         if (role != null)
         {
-            setPermission(context, set, region, role, psl.playerTargeting.getId());
+            setPermission(context, set, region, role, dmgListener.playerTargeting.getId());
             return;
         }
         region.getSettings().playerDamage.aiTargeting = set;

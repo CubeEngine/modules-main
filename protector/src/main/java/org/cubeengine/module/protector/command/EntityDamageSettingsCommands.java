@@ -24,6 +24,7 @@ import org.cubeengine.libcube.service.command.annotation.Named;
 import org.cubeengine.libcube.service.command.annotation.Using;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.protector.command.parser.TristateParser;
+import org.cubeengine.module.protector.listener.DamageSettingsListener;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionParser;
@@ -39,10 +40,13 @@ import static org.cubeengine.module.protector.region.RegionConfig.setOrUnset;
 public class EntityDamageSettingsCommands extends AbstractSettingsCommand
 {
 
+    private DamageSettingsListener dmgListener;
+
     @Inject
-    public EntityDamageSettingsCommands(I18n i18n, SettingsListener psl)
+    public EntityDamageSettingsCommands(I18n i18n, SettingsListener psl, DamageSettingsListener damageSettingsListener)
     {
         super(i18n, psl);
+        this.dmgListener = damageSettingsListener;
     }
 
     @Command(desc = "Controls entity damage")
@@ -50,7 +54,7 @@ public class EntityDamageSettingsCommands extends AbstractSettingsCommand
     {
         if (role != null)
         {
-            this.setPermission(context, set, region, role, psl.entityDamageAll.getId());
+            this.setPermission(context, set, region, role, dmgListener.entityDamageAll.getId());
             return;
         }
         region.getSettings().entityDamage.all = set;
@@ -63,7 +67,7 @@ public class EntityDamageSettingsCommands extends AbstractSettingsCommand
     {
         if (role != null)
         {
-            this.setPermission(context, set, region, role, psl.entityDamageLiving.getId());
+            this.setPermission(context, set, region, role, dmgListener.entityDamageLiving.getId());
             return;
         }
         region.getSettings().entityDamage.byLiving = set;

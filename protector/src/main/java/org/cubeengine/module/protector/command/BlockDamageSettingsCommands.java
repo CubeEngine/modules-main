@@ -25,6 +25,7 @@ import org.cubeengine.libcube.service.command.annotation.Named;
 import org.cubeengine.libcube.service.command.annotation.Using;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.protector.command.parser.TristateParser;
+import org.cubeengine.module.protector.listener.BlockSettingsListener;
 import org.cubeengine.module.protector.listener.SettingsListener;
 import org.cubeengine.module.protector.region.Region;
 import org.spongepowered.api.block.BlockType;
@@ -42,13 +43,15 @@ public class BlockDamageSettingsCommands extends AbstractSettingsCommand
 {
     private I18n i18n;
     private SettingsListener psl;
+    private BlockSettingsListener blockListener;
 
     @Inject
-    public BlockDamageSettingsCommands(I18n i18n, SettingsListener psl)
+    public BlockDamageSettingsCommands(I18n i18n, SettingsListener psl, BlockSettingsListener blockListener)
     {
         super(i18n, psl);
         this.i18n = i18n;
         this.psl = psl;
+        this.blockListener = blockListener;
     }
 
     @Command(desc = "Controls entities breaking blocks")
@@ -80,7 +83,7 @@ public class BlockDamageSettingsCommands extends AbstractSettingsCommand
     {
         if (role != null)
         {
-            this.setPermission(context, set, region, role,  psl.explodePlayer.getId());
+            this.setPermission(context, set, region, role,  blockListener.explodePlayer.getId());
             return;
         }
         region.getSettings().blockDamage.playerExplosion = set;

@@ -21,8 +21,16 @@ import com.google.inject.Inject;
 import org.cubeengine.libcube.InjectService;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
+import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.module.protector.command.PlayerDamageSettingsCommands;
 import org.cubeengine.module.protector.command.RegionCommands;
+import org.cubeengine.module.protector.listener.BlockSettingsListener;
+import org.cubeengine.module.protector.listener.DamageSettingsListener;
+import org.cubeengine.module.protector.listener.InteractSettingsListener;
+import org.cubeengine.module.protector.listener.MoveSettingsListener;
+import org.cubeengine.module.protector.listener.SettingsListener;
+import org.cubeengine.module.protector.listener.SpawnSettingsListener;
 import org.cubeengine.module.protector.region.RegionFormatter;
 import org.cubeengine.module.zoned.event.ZoneEvent;
 import org.cubeengine.processor.Module;
@@ -42,6 +50,14 @@ public class Protector
     @InjectService private PermissionService ps;
     @Inject private ModuleManager mm;
     @ModuleCommand private RegionCommands regionCommands;
+
+    @ModuleListener private BlockSettingsListener blockSettingsListener;
+    @ModuleListener private DamageSettingsListener damageSettingsListener;
+    @ModuleListener private InteractSettingsListener interactSettingsListener;
+    @ModuleListener private MoveSettingsListener moveSettingsListener;
+    @ModuleListener private SettingsListener settingsListener;
+    @ModuleListener private SpawnSettingsListener spawnSettingsListener;
+
     @Inject private RegionManager manager;
 
     @Listener

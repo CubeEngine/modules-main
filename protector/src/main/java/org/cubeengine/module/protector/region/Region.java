@@ -23,13 +23,11 @@ import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.world.server.ServerLocation;
-import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector3d;
 
 public class Region
 {
-
     private ZoneConfig zone;
     private RegionConfig config;
     private Context context;
