@@ -78,7 +78,7 @@ public class TeleportListener
         if (event.getEntity() instanceof ServerPlayer && event.getContext().get(EventContextKeys.MOVEMENT_TYPE)
                           .map(mt -> mt.equals(MovementTypes.COMMAND.get()) || mt.equals(MovementTypes.PLUGIN.get())).orElse(false))
         {
-            final ServerWorld world = event instanceof ChangeEntityWorldEvent ? ((ChangeEntityWorldEvent)event).getDestinationWorld() : ((ServerPlayer)event.getEntity()).getWorld();
+            final ServerWorld world = event instanceof ChangeEntityWorldEvent ? ((ChangeEntityWorldEvent)event).getOriginalWorld() : ((ServerPlayer)event.getEntity()).getWorld();
             lastLocations.put(event.getEntity().getUniqueId(), world.getLocation(event.getOriginalPosition()));
         }
     }
