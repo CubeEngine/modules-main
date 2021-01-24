@@ -98,10 +98,9 @@ public class InteractSettingsListener extends PermissionContainer
     public void onEntityUse(InteractEntityEvent.Secondary event, @Root ServerPlayer player)
     {
         List<Region> regionsAt = manager.getRegionsAt(player.getServerLocation());
-        Tristate set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ENTITY), s -> s.use.all.item, UNDEFINED);
-        if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.use.all.entity, set) == FALSE)
+        if (checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ENTITY), (s) -> s.use.all.entity, UNDEFINED) == FALSE)
         {
-            i18n.send(ChatType.ACTION_BAR, player, CRITICAL, "You are not allowed to interact with this here.");
+            i18n.send(ChatType.ACTION_BAR, player, CRITICAL, "You are not allowed to interact with this entity here.");
         }
     }
 

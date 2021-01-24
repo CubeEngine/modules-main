@@ -204,6 +204,7 @@ public class RegionCommands extends DispatcherCommand
         showSetting(context, i18n.getTranslation(context, "useall container"), settings.use.all.container, allSettings);
         showSetting(context, i18n.getTranslation(context, "useall openables"), settings.use.all.open, allSettings);
         showSetting(context, i18n.getTranslation(context, "useall redstone"), settings.use.all.redstone, allSettings);
+        showSetting(context, i18n.getTranslation(context, "useall entity"), settings.use.all.entity, allSettings);
 
         showSetting(context, i18n.getTranslation(context, "spawn naturally"), settings.spawn.naturally, allSettings);
         showSetting(context, i18n.getTranslation(context, "spawn player"), settings.spawn.player, allSettings);
