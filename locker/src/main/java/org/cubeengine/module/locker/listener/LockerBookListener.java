@@ -17,18 +17,19 @@
  */
 package org.cubeengine.module.locker.listener;
 
-import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.kyori.adventure.inventory.Book;
-import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
-import org.cubeengine.module.locker.data.LockerManager;
 import org.cubeengine.module.locker.data.LockerData;
+import org.cubeengine.module.locker.data.LockerManager;
 import org.cubeengine.module.locker.data.LockerMode;
+import org.cubeengine.module.locker.data.ProtectionFlag;
 import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.data.DataHolder.Mutable;
 import org.spongepowered.api.data.Keys;
@@ -37,7 +38,9 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.world.Location;
@@ -74,6 +77,38 @@ public class LockerBookListener
         }
     }
 
+    @Listener
+    public void onPunch(DamageEntityEvent event, @First ServerPlayer player)
+    {
+        if (!(event.getEntity() instanceof ServerPlayer))
+        {
+            return;
+        }
+        if (lockerManager.getAccessBookPunchers().remove(player.getUniqueId()))
+        {
+            final ItemStack bookItem = player.getItemInHand(HandTypes.MAIN_HAND);
+            final Optional<String> mode = bookItem.get(LockerData.MODE);
+            if (mode.isPresent())
+            {
+                if (mode.get().equals(LockerMode.UPDATE_ACCESS.name()))
+                {
+                    final Map<UUID, Integer> accessMap = bookItem.get(LockerData.ACCESS).orElse(new HashMap<>());
+                    final UUID eUuid = event.getEntity().getUniqueId();
+                    if (!accessMap.containsKey(eUuid))
+                    {
+                        accessMap.put(eUuid, ProtectionFlag.FULL);
+                        bookItem.offer(LockerData.ACCESS, accessMap);
+                        player.setItemInHand(HandTypes.MAIN_HAND, bookItem);
+                        i18n.send(player, MessageType.POSITIVE, "{name} added", ((ServerPlayer)event.getEntity()).getName());
+                    }
+                    else
+                    {
+                        i18n.send(player, MessageType.NEUTRAL, "{name} already added", ((ServerPlayer)event.getEntity()).getName());
+                    }
+                }
+            }
+        }
+    }
 
     @Listener
     public void onInteractEntity(InteractEntityEvent.Secondary event, @Root ServerPlayer player)

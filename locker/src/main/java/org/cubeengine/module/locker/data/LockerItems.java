@@ -35,6 +35,12 @@ public interface LockerItems
     {
         final ItemStack lockerBook = ItemStack.of(ItemTypes.ENCHANTED_BOOK);
         lockerBook.offer(LockerData.MODE, LockerMode.INFO_CREATE.name());
+        lockerBook.offer(LockerData.FLAGS, ProtectionFlag.BLOCK_INTERACT.flagValue |
+                                           ProtectionFlag.BLOCK_BREAK.flagValue |
+                                           ProtectionFlag.BLOCK_EXPLOSION.flagValue |
+                                           ProtectionFlag.ENTITY_INTERACT.flagValue |
+                                           ProtectionFlag.ENTITY_DAMAGE.flagValue |
+                                           ProtectionFlag.NOTIFY_ACCESS.flagValue);
         lockerBook.offer(Keys.CUSTOM_NAME, Component.text("Locker ").append(ItemTypes.BOOK.get().asComponent()).color(NamedTextColor.DARK_PURPLE));
         final RecipeRegistration lockerBookRecipe = CraftingRecipe.shapedBuilder()
             .aisle("kkk", "kbk", "kkk")

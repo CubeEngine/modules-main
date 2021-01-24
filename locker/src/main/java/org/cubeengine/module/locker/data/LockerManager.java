@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,8 +36,11 @@ import net.kyori.adventure.inventory.Book;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.TextComponent.Builder;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
@@ -89,6 +93,8 @@ public class LockerManager
     private Locker module;
     private TaskManager tm;
 
+    private Set<UUID> accessBookPunchers = new HashSet<>();
+
     @Inject
     public LockerManager(I18n i18n, LockerPerm perms, Locker module, TaskManager tm)
     {
@@ -96,6 +102,11 @@ public class LockerManager
         this.perms = perms;
         this.module = module;
         this.tm = tm;
+    }
+
+    public Set<UUID> getAccessBookPunchers()
+    {
+        return accessBookPunchers;
     }
 
     private List<Mutable> getMultiBlocks(Mutable dataHolder)
@@ -377,14 +388,16 @@ public class LockerManager
                 final String userName = Sponge.getServer().getUserManager().get(entry.getKey()).map(User::getName).orElse(entry.getKey().toString());
                 TextComponent text = Component.text(" - ", NamedTextColor.GRAY).append(Component.text(userName, NamedTextColor.GREEN));
                 final Builder builder = Component.text();
+                builder.append(i18n.translate(player, POSITIVE, "Bypassing the following flags"));
                 for (ProtectionFlag flag : ProtectionFlag.values())
                 {
                     if (flag.isSet(flags) && flag.isSet(entry.getValue()))
                     {
+                        builder.append(Component.newline());
                         builder.append(Component.text(" - ", NamedTextColor.GRAY).append(Component.text(flag.flagname, NamedTextColor.YELLOW)));
                     }
                 }
-                final TextComponent flagsText = Component.text("[Flags] ", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(builder.build()));
+                final TextComponent flagsText = Component.text(" [Flags] ", NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(builder.build()));
                 text = text.append(flagsText);
                 if (ProtectionFlag.ADMIN.isSet(entry.getValue()))
                 {
@@ -843,7 +856,7 @@ public class LockerManager
         {
             if (currentMode.equals(mode))
             {
-                builder.append(Component.text(mode.name(), NamedTextColor.GOLD)).append(Component.newline());
+                builder.append(Component.text(mode.name(), NamedTextColor.GOLD).clickEvent(ClickEvent.changePage(2))).append(Component.newline());
             }
             else
             {
@@ -862,6 +875,8 @@ public class LockerManager
 
     private List<Component> modeData(ServerPlayer player, ItemStack lockerBook, LockerMode currentMode)
     {
+        final Style titleStyle = Style.style(TextDecoration.UNDERLINED).color(NamedTextColor.GRAY);
+
         final List<Component> pages = new ArrayList<>();
         final int flags = lockerBook.get(LockerData.FLAGS).orElse(0);
         final Map<UUID, Integer> accessMap = lockerBook.get(LockerData.ACCESS).orElse(Collections.emptyMap());
@@ -874,8 +889,7 @@ public class LockerManager
             case UPDATE_FLAGS:
                 {
                     final Builder builder = Component.text();
-                    builder.append(Component.text("Flags")).append(Component.newline());
-                    builder.append(Component.text("Block Settings:")).append(Component.newline());
+                    builder.append(Component.text("Block Flags:").style(titleStyle)).append(Component.newline()).append(Component.newline());
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.BLOCK_INTERACT);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.BLOCK_BREAK);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.BLOCK_EXPLOSION);
@@ -884,8 +898,7 @@ public class LockerManager
                 }
                 {
                     final Builder builder = Component.text();
-                    builder.append(Component.text("Flags")).append(Component.newline());
-                    builder.append(Component.text("Inventory Settings:")).append(Component.newline());
+                    builder.append(Component.text("Inventory Flags:").style(titleStyle)).append(Component.newline()).append(Component.newline());
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.INVENTORY_TAKE);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.INVENTORY_PUT);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.INVENTORY_HOPPER_TAKE);
@@ -894,8 +907,7 @@ public class LockerManager
                 }
                 {
                     final Builder builder = Component.text();
-                    builder.append(Component.text("Flags")).append(Component.newline());
-                    builder.append(Component.text("Entity Settings:")).append(Component.newline());
+                    builder.append(Component.text("Entity Flags:").style(titleStyle)).append(Component.newline()).append(Component.newline());
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.ENTITY_INTERACT);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.ENTITY_DAMAGE);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.ENTITY_DAMAGE_ENVIRONMENT);
@@ -903,8 +915,7 @@ public class LockerManager
                 }
                 {
                     final Builder builder = Component.text();
-                    builder.append(Component.text("Flags")).append(Component.newline());
-                    builder.append(Component.text("Other Settings:")).append(Component.newline());
+                    builder.append(Component.text("Other:").style(titleStyle)).append(Component.newline()).append(Component.newline());
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.NOTIFY_ACCESS);
                     pages.add(builder.build());
                 }
@@ -913,37 +924,40 @@ public class LockerManager
                 {
                     final Builder builder = Component.text();
                     builder.append(Component.text("Access")).append(Component.newline()).append(Component.newline());
-                    if (accessMap.isEmpty())
-                    {
+                    builder.append(i18n.translate(player, "Add new access").color(NamedTextColor.GOLD).clickEvent(SpongeComponents.executeCallback(c -> {
+                        i18n.send(player, POSITIVE, "Punch your friend");
+                        accessBookPunchers.add(c.getCause().first(ServerPlayer.class).get().getUniqueId());
+                    })));
 
-                    }
-                    else
+                    builder.append(Component.newline()).append(Component.newline());
+                    for (Entry<UUID, Integer> entry : accessMap.entrySet())
                     {
-                        for (Entry<UUID, Integer> entry : accessMap.entrySet())
+                        final String userName = Sponge.getServer().getUserManager().get(entry.getKey()).map(User::getName)
+                                        .orElseGet(() -> Sponge.getServer().getGameProfileManager().getBasicProfile(entry.getKey()).join().getName().orElse(entry.getKey().toString()));
+                        builder.append(Component.text(userName, NamedTextColor.DARK_GREEN));
+                        builder.append(Component.text(" (-)", NamedTextColor.DARK_RED).clickEvent(SpongeComponents.executeCallback(c -> {
+                            accessMap.remove(entry.getKey());
+                            lockerBook.offer(LockerData.ACCESS, accessMap);
+                            player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
+                            i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Removed access from {user}", userName);
+                        })));
+                        if (ProtectionFlag.ADMIN.isSet(entry.getValue()))
                         {
-                            final String userName = Sponge.getServer().getUserManager().get(entry.getKey()).map(User::getName).orElse(entry.getKey().toString());
-                            builder.append(Component.text(userName, NamedTextColor.DARK_GREEN));
-                            builder.append(Component.text("(-)", NamedTextColor.DARK_RED).clickEvent(SpongeComponents.executeCallback(c -> {
-                                accessMap.remove(entry.getKey());
+                            builder.append(Component.text(" @ ", NamedTextColor.GOLD).append(Component.text("(-)", NamedTextColor.DARK_RED).clickEvent(SpongeComponents.executeCallback(c -> {
+                                accessMap.put(entry.getKey(), entry.getValue() & ~ProtectionFlag.ADMIN.flagValue);
+                                lockerBook.offer(LockerData.ACCESS, accessMap);
                                 player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
-                                i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Removed access from {user}", userName);
-                            })));
-                            if (ProtectionFlag.ADMIN.isSet(entry.getValue()))
-                            {
-                                builder.append(Component.text("@ ", NamedTextColor.GOLD).append(Component.text("(-)", NamedTextColor.DARK_RED).clickEvent(SpongeComponents.executeCallback(c -> {
-                                    accessMap.put(entry.getKey(), entry.getValue() & ~ProtectionFlag.ADMIN.flagValue);
-                                    player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
-                                    i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Revoked admin access from {user}", userName);
-                                }))));
-                            }
-                            else
-                            {
-                                builder.append(Component.text("@ ").append(Component.text("(+)", NamedTextColor.DARK_GREEN).clickEvent(SpongeComponents.executeCallback(c -> {
-                                    accessMap.put(entry.getKey(), entry.getValue() | ProtectionFlag.ADMIN.flagValue);
-                                    player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
-                                    i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Granted admin access to {user}", userName);
-                                }))));
-                            }
+                                i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Revoked admin access from {user}", userName);
+                            }))));
+                        }
+                        else
+                        {
+                            builder.append(Component.text(" @ ").append(Component.text("(+)", NamedTextColor.DARK_GREEN).clickEvent(SpongeComponents.executeCallback(c -> {
+                                accessMap.put(entry.getKey(), entry.getValue() | ProtectionFlag.ADMIN.flagValue);
+                                lockerBook.offer(LockerData.ACCESS, accessMap);
+                                player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
+                                i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Granted admin access to {user}", userName);
+                            }))));
                         }
                     }
                     // TODO more pages
@@ -951,8 +965,10 @@ public class LockerManager
                 }
                 break;
             case TRUST:
+                // TODO
                 break;
             case KEYBOOK:
+                // TODO
                 break;
         }
         return pages;
