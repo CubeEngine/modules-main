@@ -221,6 +221,7 @@ public class RegionCommands extends DispatcherCommand
 
         showSetting(context, i18n.getTranslation(context, "playerdamage all"), settings.playerDamage.all, allSettings);
         showSetting(context, i18n.getTranslation(context, "playerdamage pvp"), settings.playerDamage.pvp, allSettings);
+        showSetting(context, i18n.getTranslation(context, "playerdamage targeting"), settings.playerDamage.aiTargeting, allSettings);
         showSetting(context, i18n.getTranslation(context, "playerdamage byliving"), settings.entityDamage.byLiving, allSettings);
 
         showSetting(context, i18n.getTranslation(context, "blocked commands"), settings.blockedCommands, allSettings);
