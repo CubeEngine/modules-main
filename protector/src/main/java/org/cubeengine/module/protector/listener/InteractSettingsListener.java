@@ -91,13 +91,28 @@ public class InteractSettingsListener extends PermissionContainer
         usePermission.put(UseType.ITEM, this.register("bypass.use-all.item", "Region bypass for using items"));
         usePermission.put(UseType.OPEN, this.register("bypass.use-all.open", "Region bypass for opening anything"));
         usePermission.put(UseType.REDSTONE, this.register("bypass.use-all.redstone", "Region bypass for using redstone"));
+        usePermission.put(UseType.ENTITY, this.register("bypass.use-all.entity", "Region bypass for using entities"));
     }
 
     @Listener
     public void onEntityUse(InteractEntityEvent.Secondary event, @Root ServerPlayer player)
     {
-        // TODO
+        List<Region> regionsAt = manager.getRegionsAt(player.getServerLocation());
+        Tristate set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ENTITY), s -> s.use.all.item, UNDEFINED);
+        if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.use.all.entity, set) == FALSE)
+        {
+            i18n.send(ChatType.ACTION_BAR, player, CRITICAL, "You are not allowed to interact with this here.");
+        }
     }
+
+// TODO event not called
+//    @Listener
+//    public void onEntityUse(CollideEntityEvent event, @Root ServerPlayer player)
+//    {
+//        List<Region> regionsAt = manager.getRegionsAt(player.getServerLocation());
+//        Tristate set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ENTITY), s -> s.use.all.item, UNDEFINED);
+//        checkSetting(event, player, regionsAt, () -> null, (s) -> s.use.all.entity, set); // no message
+//    }
 
     @Listener(order = Order.EARLY)
     public void onUseItem(InteractItemEvent.Secondary event, @Root ServerPlayer player)
@@ -225,6 +240,6 @@ public class InteractSettingsListener extends PermissionContainer
 
     public enum UseType
     {
-        ITEM, BLOCK, CONTAINER, OPEN, REDSTONE
+        ITEM, BLOCK, CONTAINER, OPEN, REDSTONE, ENTITY
     }
 }

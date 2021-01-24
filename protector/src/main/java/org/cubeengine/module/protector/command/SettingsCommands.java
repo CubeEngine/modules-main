@@ -141,6 +141,9 @@ public class SettingsCommands extends AbstractSettingsCommand
             case REDSTONE:
                 region.getSettings().use.all.redstone = set;
                 break;
+            case ENTITY:
+                region.getSettings().use.all.entity = set;
+                break;
         }
         region.save();
         i18n.send(context, POSITIVE,"Region {region}: Use Settings updated", region);
@@ -161,7 +164,7 @@ public class SettingsCommands extends AbstractSettingsCommand
         i18n.send(context, POSITIVE,"Region {region}: Use Block Settings updated", region);
     }
 
-    @Command(desc = "Controls player interactive with items")
+    @Command(desc = "Controls player interacting with items")
     public void useItem(CommandCause context, ItemType type, Tristate set,
             @Default @Named("in") Region region,
             @Named("bypass") String role) // TODO role completer/reader

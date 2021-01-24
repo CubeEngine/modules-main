@@ -68,6 +68,7 @@ public class RegionConfig extends ReflectedYaml
                 public Tristate container = Tristate.UNDEFINED;
                 public Tristate open = Tristate.UNDEFINED;
                 public Tristate redstone = Tristate.UNDEFINED;
+                public Tristate entity = Tristate.UNDEFINED;
             }
         }
         public Spawn spawn = new Spawn();
