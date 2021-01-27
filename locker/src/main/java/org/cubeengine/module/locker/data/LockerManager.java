@@ -18,6 +18,7 @@
 package org.cubeengine.module.locker.data;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -887,13 +888,19 @@ public class LockerManager
                 break;
             case INFO_CREATE:
             case UPDATE_FLAGS:
-                {
+              {
                     final Builder builder = Component.text();
                     builder.append(Component.text("Block Flags:").style(titleStyle)).append(Component.newline()).append(Component.newline());
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.BLOCK_INTERACT);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.BLOCK_BREAK);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.BLOCK_EXPLOSION);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.BLOCK_REDSTONE);
+                    builder.append(Component.newline());
+                    builder.append(Component.text("Presets:").style(titleStyle)).append(Component.newline()).append(Component.newline());
+                    buildPresetLine(player, lockerBook, flags, i18n.translate(player, "private"), builder,
+                                    Arrays.asList(ProtectionFlag.BLOCK_REDSTONE), ProtectionFlag.BLOCK_INTERACT, ProtectionFlag.BLOCK_BREAK, ProtectionFlag.BLOCK_EXPLOSION);
+                    buildPresetLine(player, lockerBook, flags, i18n.translate(player, "public"), builder,
+                                    Arrays.asList(ProtectionFlag.BLOCK_REDSTONE, ProtectionFlag.BLOCK_INTERACT, ProtectionFlag.BLOCK_BREAK, ProtectionFlag.BLOCK_EXPLOSION));
                     pages.add(builder.build());
                 }
                 {
@@ -903,6 +910,16 @@ public class LockerManager
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.INVENTORY_PUT);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.INVENTORY_HOPPER_TAKE);
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.INVENTORY_HOPPER_PUT);
+
+                    builder.append(Component.newline());
+                    builder.append(Component.text("Presets:").style(titleStyle)).append(Component.newline()).append(Component.newline());
+                    buildPresetLine(player, lockerBook, flags, i18n.translate(player, "protected"), builder,
+                                    Arrays.asList(ProtectionFlag.BLOCK_INTERACT), ProtectionFlag.INVENTORY_TAKE, ProtectionFlag.INVENTORY_PUT);
+                    buildPresetLine(player, lockerBook, flags, i18n.translate(player, "donation"), builder,
+                                    Arrays.asList(ProtectionFlag.BLOCK_INTERACT, ProtectionFlag.INVENTORY_PUT), ProtectionFlag.INVENTORY_TAKE);
+                    buildPresetLine(player, lockerBook, flags, i18n.translate(player, "free"), builder,
+                                    Arrays.asList(ProtectionFlag.BLOCK_INTERACT, ProtectionFlag.INVENTORY_TAKE), ProtectionFlag.INVENTORY_PUT);
+
                     pages.add(builder.build());
                 }
                 {
@@ -923,8 +940,8 @@ public class LockerManager
             case UPDATE_ACCESS:
                 {
                     final Builder builder = Component.text();
-                    builder.append(Component.text("Access")).append(Component.newline()).append(Component.newline());
-                    builder.append(i18n.translate(player, "Add new access").color(NamedTextColor.GOLD).clickEvent(SpongeComponents.executeCallback(c -> {
+                    builder.append(Component.text("Access "));
+                    builder.append(i18n.translate(player, "(Add new)").color(NamedTextColor.GOLD).clickEvent(SpongeComponents.executeCallback(c -> {
                         i18n.send(player, POSITIVE, "Punch your friend");
                         accessBookPunchers.add(c.getCause().first(ServerPlayer.class).get().getUniqueId());
                     })));
@@ -935,7 +952,9 @@ public class LockerManager
                         final String userName = Sponge.getServer().getUserManager().get(entry.getKey()).map(User::getName)
                                         .orElseGet(() -> Sponge.getServer().getGameProfileManager().getBasicProfile(entry.getKey()).join().getName().orElse(entry.getKey().toString()));
                         builder.append(Component.text(userName, NamedTextColor.DARK_GREEN));
-                        builder.append(Component.text(" (-)", NamedTextColor.DARK_RED).clickEvent(SpongeComponents.executeCallback(c -> {
+                        builder.append(Component.text(" (-)", NamedTextColor.DARK_RED)
+                                                .hoverEvent(HoverEvent.showText(i18n.translate(player, "revoke access")))
+                                                .clickEvent(SpongeComponents.executeCallback(c -> {
                             accessMap.remove(entry.getKey());
                             lockerBook.offer(LockerData.ACCESS, accessMap);
                             player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
@@ -943,7 +962,9 @@ public class LockerManager
                         })));
                         if (ProtectionFlag.ADMIN.isSet(entry.getValue()))
                         {
-                            builder.append(Component.text(" @ ", NamedTextColor.GOLD).append(Component.text("(-)", NamedTextColor.DARK_RED).clickEvent(SpongeComponents.executeCallback(c -> {
+                            builder.append(Component.text(" @ ", NamedTextColor.GOLD).append(Component.text("(-)", NamedTextColor.DARK_RED)
+                                                                                                      .hoverEvent(HoverEvent.showText(i18n.translate(player, "revoke admin access")))
+                                                                                                      .clickEvent(SpongeComponents.executeCallback(c -> {
                                 accessMap.put(entry.getKey(), entry.getValue() & ~ProtectionFlag.ADMIN.flagValue);
                                 lockerBook.offer(LockerData.ACCESS, accessMap);
                                 player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
@@ -952,7 +973,9 @@ public class LockerManager
                         }
                         else
                         {
-                            builder.append(Component.text(" @ ").append(Component.text("(+)", NamedTextColor.DARK_GREEN).clickEvent(SpongeComponents.executeCallback(c -> {
+                            builder.append(Component.text(" @ ").append(Component.text("(+)", NamedTextColor.DARK_GREEN)
+                                                                                 .hoverEvent(HoverEvent.showText(i18n.translate(player, "grant admin access")))
+                                                                                 .clickEvent(SpongeComponents.executeCallback(c -> {
                                 accessMap.put(entry.getKey(), entry.getValue() | ProtectionFlag.ADMIN.flagValue);
                                 lockerBook.offer(LockerData.ACCESS, accessMap);
                                 player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
@@ -977,12 +1000,47 @@ public class LockerManager
     private void buildFlagToggleLine(ServerPlayer player, ItemStack lockerBook, int flags, Builder builder, ProtectionFlag flag)
     {
         final boolean isSet = flag.isSet(flags);
-        builder.append(Component.text(flag.flagname).append(Component.text(": ")).append(Component.text(isSet, isSet ? NamedTextColor.DARK_GREEN : NamedTextColor.DARK_RED))
+        builder.append(Component.text(flag.flagname).append(Component.text(": ")).append(Component.text(isSet, isSet ? NamedTextColor.DARK_GREEN : NamedTextColor.DARK_RED)
+                                                                                        .hoverEvent(HoverEvent.showText(i18n.translate(player, "click to toggle"))))
                .clickEvent(SpongeComponents.executeCallback(c -> {
                    lockerBook.offer(LockerData.FLAGS, flags ^ flag.flagValue);
                    player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
                    i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Toggled flag {name} to {txt#value}", flag.flagname, Component.text(!isSet, !isSet ? NamedTextColor.DARK_GREEN : NamedTextColor.DARK_RED));
                })))
+               .append(Component.newline());
+    }
+
+    private void buildPresetLine(ServerPlayer player, ItemStack lockerBook, int flags, Component presetName, Builder builder, List<ProtectionFlag> unsetFlags, ProtectionFlag... setFlags)
+    {
+        final Builder setFlagsText = Component.text();
+        setFlagsText.append(i18n.translate(player, "Setting:"));
+        for (ProtectionFlag setFlag : setFlags)
+        {
+            setFlagsText.append(Component.newline());
+            setFlagsText.append(Component.text(" - " + setFlag.flagname).color(NamedTextColor.GREEN));
+        }
+        setFlagsText.append(Component.newline());
+        setFlagsText.append(i18n.translate(player, "Unsetting:"));
+        for (ProtectionFlag unsetFlag : unsetFlags)
+        {
+            setFlagsText.append(Component.newline());
+            setFlagsText.append(Component.text(" - " + unsetFlag.flagname).color(NamedTextColor.RED));
+        }
+        builder.append(presetName.hoverEvent(HoverEvent.showText(setFlagsText))
+                                .clickEvent(SpongeComponents.executeCallback(c -> {
+                                    int newFlags = flags;
+                                    for (ProtectionFlag unsetFlag : unsetFlags)
+                                    {
+                                        newFlags &= ~unsetFlag.flagValue;
+                                    }
+                                    for (ProtectionFlag unsetFlag : setFlags)
+                                    {
+                                        newFlags |= unsetFlag.flagValue;
+                                    }
+                                    lockerBook.offer(LockerData.FLAGS, newFlags);
+                                    player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
+                                    i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Using preset {txt}", presetName);
+                                })))
                .append(Component.newline());
     }
 
