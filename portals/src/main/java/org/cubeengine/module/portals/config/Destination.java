@@ -88,6 +88,10 @@ public class Destination
             loc = world.getLocation(world.getProperties().spawnPosition()).add(0.5, 0, 0.5);
             break;
         case LOCATION:
+            if (this.position == null)
+            {
+                return;
+            }
             loc = world.getLocation(this.position);
             rotation = this.rotation;
             break;
