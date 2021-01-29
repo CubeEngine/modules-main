@@ -152,6 +152,12 @@ public class VanillaPlus
         {
             evm.registerListener(new TamedListener(i18n));
         }
+
+        if (config.add.unlimitedFood)
+        {
+            tam.runTimer(new UnlimitedFood(pm, tam), Ticks.of(1000));
+        }
+
     }
 
     @Listener
@@ -201,11 +207,6 @@ public class VanillaPlus
         {
             final UnlimitedItems cmd = momu.registerCommands(event, plugin, this, UnlimitedItems.class);
             evm.registerListener(cmd);
-        }
-        if (config.add.unlimitedFood)
-        {
-
-            tam.runTimer(new UnlimitedFood(pm, tam), Ticks.of(1000));
         }
 
         // improvements

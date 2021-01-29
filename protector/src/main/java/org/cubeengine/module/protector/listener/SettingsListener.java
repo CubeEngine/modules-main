@@ -100,7 +100,7 @@ public class SettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onCommand(ExecuteCommandEvent.Pre event, @Root ServerPlayer player)
     {
-        CommandMapping mapping = Sponge.getGame().getCommandManager().getCommandMapping(event.getCommand()).orElse(null);
+        CommandMapping mapping = Sponge.getServer().getCommandManager().getCommandMapping(event.getCommand()).orElse(null);
         if (mapping == null)
         {
             return;

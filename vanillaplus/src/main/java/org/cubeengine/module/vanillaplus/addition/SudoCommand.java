@@ -26,7 +26,6 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.exception.CommandException;
-import org.spongepowered.api.command.manager.CommandManager;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
@@ -36,13 +35,11 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE
 public class SudoCommand
 {
     private I18n i18n;
-    private CommandManager cm;
 
     @Inject
     public SudoCommand(I18n i18n)
     {
         this.i18n = i18n;
-        this.cm = Sponge.getCommandManager();
     }
 
     @Command(desc = "Makes a player send a message (including commands)")
@@ -54,7 +51,7 @@ public class SudoCommand
             i18n.send(context, POSITIVE, "Forced {user} to chat: {input#message}", player, message);
             return;
         }
-        if (cm.process(player, player, message.substring(1)).isSuccess())
+        if (Sponge.getServer().getCommandManager().process(player, player, message.substring(1)).isSuccess())
         {
             i18n.send(context, POSITIVE, "Command {input#command} executed as {user}", message, player);
             return;

@@ -88,7 +88,7 @@ public class FileSubjectData extends CachingSubjectData
                     throw new IllegalStateException(e);
                 }
                 config.save();// TODO async
-                Sponge.getServer().getOnlinePlayers().forEach(p -> Sponge.getCommandManager().updateCommandTreeForPlayer(p));
+                Sponge.getServer().getOnlinePlayers().forEach(p -> Sponge.getServer().getCommandManager().updateCommandTreeForPlayer(p));
             }
             return changed;
         });

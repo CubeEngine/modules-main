@@ -92,7 +92,7 @@ public class UserSubjectData extends CachingSubjectData
                 user.offer(PermissionData.PERMISSIONS, permissions);
                 user.offer(PermissionData.OPTIONS, options);
 
-                Sponge.getServer().getPlayer(uuid).ifPresent(p -> Sponge.getCommandManager().updateCommandTreeForPlayer(p));
+                Sponge.getServer().getPlayer(uuid).ifPresent(p -> Sponge.getServer().getCommandManager().updateCommandTreeForPlayer(p));
             }
             return changed;
         });

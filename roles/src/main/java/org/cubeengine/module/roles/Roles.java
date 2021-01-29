@@ -103,7 +103,7 @@ public class Roles
             i18n.send(event.getPlayer(), MessageType.POSITIVE, "Welcome to your new Minecraft Server. You are the first to join this server!");
             i18n.send(event.getPlayer(), MessageType.POSITIVE, "As such {text:Roles} gave you temporarily all roles permissions.");
             i18n.send(event.getPlayer(), MessageType.CRITICAL, "Before you leave, remember to give yourself actual permissions!");
-            Sponge.getCommandManager().updateCommandTreeForPlayer(event.getPlayer());
+            Sponge.getServer().getCommandManager().updateCommandTreeForPlayer(event.getPlayer());
         }
     }
 

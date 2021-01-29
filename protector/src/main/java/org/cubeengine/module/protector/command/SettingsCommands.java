@@ -220,7 +220,7 @@ public class SettingsCommands extends AbstractSettingsCommand
             @Default @Named("in") Region region, @Named("bypass") String role,
             @Flag boolean force)
     {
-        CommandMapping mapping = Sponge.getGame().getCommandManager().getCommandMapping(command).orElse(null);
+        CommandMapping mapping = Sponge.getServer().getCommandManager().getCommandMapping(command).orElse(null);
         boolean all = "*".equals(command);
         if (mapping == null && !all)
         {
