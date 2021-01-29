@@ -33,6 +33,7 @@ import org.spongepowered.api.block.transaction.BlockTransaction;
 import org.spongepowered.api.block.transaction.Operations;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.animal.horse.HorseLike;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -196,7 +197,7 @@ public class LockerLockedListener
         }
         else if (source.getSource() instanceof Projectile)
         {
-            final ProjectileSource projectileSource = ((Projectile)source.getSource()).shooter().get();
+            final ProjectileSource projectileSource = ((Projectile)source.getSource()).shooter().map(Value::get).orElse(null);
             if (projectileSource instanceof ServerPlayer)
             {
                 player = ((ServerPlayer)projectileSource);
