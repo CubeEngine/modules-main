@@ -21,7 +21,6 @@ import java.lang.management.ManagementFactory;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -29,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.kyori.adventure.identity.Identity;
@@ -64,7 +64,6 @@ import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.world.biome.Biome;
-import org.spongepowered.api.world.chunk.Chunk;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.imaginary.Quaterniond;
@@ -334,19 +333,7 @@ public class InformationCommands extends PermissionContainer
         //Worlds with loaded Chunks / Entities
         for (ServerWorld world : Sponge.getServer().getWorldManager().worlds())
         {
-            int loadedChunks;
-            if (world.getLoadedChunks() instanceof Collection)
-            {
-                loadedChunks = ((Collection)world.getLoadedChunks()).size();
-            }
-            else
-            {
-                loadedChunks = 0;
-                for (Chunk chunk : world.getLoadedChunks())
-                {
-                    loadedChunks++;
-                }
-            }
+            final long loadedChunks = StreamSupport.stream(world.getLoadedChunks().spliterator(), false).count();
             int entities = world.getEntities().size();
             i18n.send(context, POSITIVE, "{world}: {amount} chunks {amount} entities", world, loadedChunks, entities);
 
