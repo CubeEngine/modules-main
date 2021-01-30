@@ -95,7 +95,7 @@ public class PlayerListCommand
             {
                 continue;
             }
-            final TextComponent playerList = Component.join(Component.text(",", NamedTextColor.WHITE), entry.getValue().stream().map(this::formatUser).collect(Collectors.toList()));
+            final TextComponent playerList = Component.join(Component.text(", ", NamedTextColor.WHITE), entry.getValue().stream().map(this::formatUser).collect(Collectors.toList()));
             final TextComponent msg = LegacyComponentSerializer.legacyAmpersand().deserialize(entry.getKey())
                                                                .append(Component.text(": ", NamedTextColor.WHITE))
                                                                .append(playerList);

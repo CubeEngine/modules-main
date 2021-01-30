@@ -982,6 +982,7 @@ public class LockerManager
                                 i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Granted admin access to {user}", userName);
                             }))));
                         }
+                        builder.append(Component.newline());
                     }
                     // TODO more pages
                     pages.add(builder.build());
