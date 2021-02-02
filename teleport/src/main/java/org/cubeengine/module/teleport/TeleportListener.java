@@ -37,6 +37,7 @@ import org.spongepowered.api.event.cause.entity.MovementTypes;
 import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.entity.DestructEntityEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
+import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
 import org.spongepowered.api.scheduler.ScheduledTask;
@@ -73,13 +74,13 @@ public class TeleportListener
     }
 
     @Listener
-    public void onTeleport(MoveEntityEvent event)
+    public void onTeleport(MoveEntityEvent event, @Getter("getEntity") ServerPlayer player)
     {
-        if (event.getEntity() instanceof ServerPlayer && event.getContext().get(EventContextKeys.MOVEMENT_TYPE)
+        if (event.getContext().get(EventContextKeys.MOVEMENT_TYPE)
                           .map(mt -> mt.equals(MovementTypes.COMMAND.get()) || mt.equals(MovementTypes.PLUGIN.get())).orElse(false))
         {
-            final ServerWorld world = event instanceof ChangeEntityWorldEvent ? ((ChangeEntityWorldEvent)event).getOriginalWorld() : ((ServerPlayer)event.getEntity()).getWorld();
-            lastLocations.put(event.getEntity().getUniqueId(), world.getLocation(event.getOriginalPosition()));
+            final ServerWorld world = event instanceof ChangeEntityWorldEvent ? ((ChangeEntityWorldEvent)event).getOriginalWorld() : player.getWorld();
+            lastLocations.put(player.getUniqueId(), world.getLocation(event.getOriginalPosition()));
         }
     }
 

@@ -17,10 +17,9 @@
  */
 package org.cubeengine.module.protector.listener;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
-import static org.spongepowered.api.util.Tristate.FALSE;
-import static org.spongepowered.api.util.Tristate.UNDEFINED;
-
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -36,13 +35,16 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
+import org.spongepowered.api.event.entity.ChangeEntityWorldEvent.Reposition;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.event.filter.Getter;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.util.Tristate;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.spongepowered.api.world.server.ServerWorld;
+
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
+import static org.spongepowered.api.util.Tristate.FALSE;
+import static org.spongepowered.api.util.Tristate.UNDEFINED;
 
 @Singleton
 public class MoveSettingsListener extends PermissionContainer
@@ -75,13 +77,6 @@ public class MoveSettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onMove(MoveEntityEvent event, @Getter("getEntity") ServerPlayer player)
     {
-        List<Region> from = manager.getRegionsAt(player.getWorld().getLocation(event.getOriginalPosition()));
-        List<Region> to = manager.getRegionsAt(player.getWorld().getLocation(event.getDestinationPosition()));
-        if (from.isEmpty() && to.isEmpty())
-        {
-            return;
-        }
-
         // Ignore subblock movements
         if (event.getDestinationPosition().toInt().equals(event.getOriginalPosition().toInt()))
         {
@@ -90,34 +85,59 @@ public class MoveSettingsListener extends PermissionContainer
 
         if (event instanceof ChangeEntityWorldEvent.Reposition)
         {
-            if (checkMove(event, player, from, to, MoveType.TELEPORT, false))
+            List<Region> from = manager.getRegionsAt(((Reposition)event).getOriginalWorld(), event.getOriginalPosition().toInt());
+            List<Region> to = manager.getRegionsAt(((Reposition)event).getDestinationWorld(), event.getDestinationPosition().toInt());
+            if (from.isEmpty() && to.isEmpty())
             {
-                return; // Teleport out denied
+                return;
             }
 
-            if (checkMove(event, player, to, from, MoveType.TELEPORT, false))
+            // If no region has a Teleport setting set ignore this.
+            if (from.stream().anyMatch(region -> region.getSettings().move.getOrDefault(MoveType.TELEPORT, UNDEFINED) != UNDEFINED))
             {
-                return; // Teleport in denied
+                if (checkMove(event, player, from, to, MoveType.TELEPORT, false))
+                {
+                    return; // Teleport out denied
+                }
+
+                if (checkMove(event, player, to, from, MoveType.TELEPORT, false))
+                {
+                    return; // Teleport in denied
+                }
             }
         }
-        else if (event.getCause().root() instanceof Player)
+        else
         {
-            if (checkMove(event, player, from, to, MoveType.MOVE, false))
+            List<Region> from = manager.getRegionsAt(player.getWorld(), event.getOriginalPosition().toInt());
+            List<Region> to = manager.getRegionsAt(player.getWorld(), event.getDestinationPosition().toInt());
+            if (from.isEmpty() && to.isEmpty())
             {
-                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "You are not allowed to move in here.");
-                return; // Move in from denied
+                return;
             }
 
-            if (checkMove(event, player, from, to, MoveType.EXIT, true))
+            if (from.stream().anyMatch(region -> region.getSettings().move.getOrDefault(MoveType.MOVE, UNDEFINED) != UNDEFINED))
             {
-                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "You are not allowed to exit this area.");
-                return; // Move out of from denied
+                if (checkMove(event, player, from, to, MoveType.MOVE, false))
+                {
+                    i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "You are not allowed to move in here.");
+                    return; // Move in from denied
+                }
             }
-
-            if (checkMove(event, player, to, from, MoveType.ENTER, true))
+            if (from.stream().anyMatch(region -> region.getSettings().move.getOrDefault(MoveType.EXIT, UNDEFINED) != UNDEFINED))
             {
-                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "You are not allowed to enter this area.");
-                return; // Move into to denied
+                if (checkMove(event, player, from, to, MoveType.EXIT, true))
+                {
+                    i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "You are not allowed to exit this area.");
+                    return; // Move out of from denied
+                }
+            }
+            if (from.stream().anyMatch(region -> region.getSettings().move.getOrDefault(MoveType.ENTER, UNDEFINED) != UNDEFINED))
+            {
+                if (checkMove(event, player, to, from, MoveType.ENTER, true))
+                {
+                    i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "You are not allowed to enter this area.");
+                    return; // Move into to denied
+                }
             }
         }
     }
