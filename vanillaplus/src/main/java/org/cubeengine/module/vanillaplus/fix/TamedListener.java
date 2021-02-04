@@ -47,7 +47,7 @@ public class TamedListener
         {
             final Optional<User> owner = Sponge.getServer().getUserManager().get(uuid.get());
             i18n.send(player, POSITIVE, "This {input#entity} belongs to {user#tamer}!",
-                                event.getEntity().getType().asComponent(), owner.get());
+                                event.getEntity().getType().asComponent(), owner.map(User::getName).orElse(uuid.get().toString()));
         }
     }
 }
