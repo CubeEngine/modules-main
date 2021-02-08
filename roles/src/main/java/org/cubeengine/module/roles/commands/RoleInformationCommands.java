@@ -51,22 +51,25 @@ import org.cubeengine.libcube.service.command.annotation.Flag;
 import org.cubeengine.libcube.service.command.annotation.Named;
 import org.cubeengine.libcube.service.command.annotation.Parser;
 import org.cubeengine.libcube.service.command.annotation.Using;
+import org.cubeengine.libcube.service.command.parser.ContextParser;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.RolesUtil.FoundOption;
 import org.cubeengine.module.roles.RolesUtil.FoundPermission;
-import org.cubeengine.libcube.service.command.parser.ContextParser;
 import org.cubeengine.module.roles.commands.provider.FileSubjectParser;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.config.PermissionTreeConverter;
 import org.cubeengine.module.roles.config.Priority;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.FileSubject;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.Contextual;
+import org.spongepowered.api.service.pagination.PaginationList.Builder;
+import org.spongepowered.api.service.pagination.PaginationService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
 
@@ -161,34 +164,41 @@ public class RoleInformationCommands extends DispatcherCommand
     @Command(alias = "listPerm", desc = "Lists all permissions of given role [in context]")
     public void listPermission(CommandCause ctx, FileSubject role, @Flag boolean all, @Named("in") @Default Context context)
     {
-        i18n.send(ctx, NEUTRAL, "Permission list for {role}", role);
+        final PaginationService paginator = Sponge.getGame().getServiceProvider().paginationService();
+        final Builder builder = paginator.builder();
+        Component header = i18n.translate(ctx, NEUTRAL, "Permission list for {role}", role);
         Set<Context> contextSet = toSet(context);
+        final List<Component> permList = new ArrayList<>();
         if (all)
         {
-            listPermission(ctx, true, contextSet, RolesUtil.fillPermissions(role, contextSet, new TreeMap<>(), service));
+            header = header.append(Component.space()).append(i18n.translate(ctx, POSITIVE, "(Including inherited permissions)"));
+            listPermission(ctx, permList, role, true, contextSet, RolesUtil.fillPermissions(role, contextSet, new TreeMap<>(), service));
         }
         else if (contextSet.isEmpty())
         {
-            role.getSubjectData().getAllPermissions().forEach((key, value) -> listPermission(ctx, false, key, value));
+            header = header.append(Component.space()).append(i18n.translate(ctx, NEUTRAL, "set directly"));
+            role.getSubjectData().getAllPermissions().forEach((key, value) -> listPermission(ctx, permList, role, false, key, value));
         }
         else
         {
-            listPermission(ctx, false, contextSet, new TreeMap<>(role.getSubjectData().getPermissions(contextSet)));
+            String ctxText = getContextString(contextSet);
+            header = header.append(Component.space()).append(i18n.translate(ctx, POSITIVE, "in {input#context}:", ctxText));
+            listPermission(ctx, permList, role, false, contextSet, new TreeMap<>(role.getSubjectData().getPermissions(contextSet)));
         }
+        builder.header(header).contents(permList).build().sendTo(ctx.getAudience());
     }
 
-    private void listPermission(CommandCause ctx, boolean all, Set<Context> context, Map<String, Boolean> permissions)
+    private void listPermission(CommandCause ctx, List<Component> permList, FileSubject role, boolean all, Set<Context> context, Map<String, Boolean> permissions)
     {
         String ctxText = getContextString(context);
         if (permissions.isEmpty())
         {
-            //i18n.sendTranslated(ctx, NEGATIVE, "No permissions set in {input#context}.", ctxText);
+            permList.add(i18n.translate(ctx, NEGATIVE, "No permissions set for {role} in {input#context}.", role, ctxText));
             return;
         }
-        i18n.send(ctx, POSITIVE, "in {input#context}:", ctxText);
-        if (all)
+        if (!context.isEmpty() || all)
         {
-            i18n.send(ctx, POSITIVE, "(Including inherited permissions)");
+            permList.add(i18n.translate(ctx, POSITIVE, "in {input#context}:", ctxText));
         }
 
         Map<String, Object> easyMap = new LinkedHashMap<>();
@@ -199,11 +209,12 @@ public class RoleInformationCommands extends DispatcherCommand
 
         ListNode list = PermissionTreeConverter.organizeTree(easyMap);
 
-        listPermissions0(ctx, i18n.getTranslation(ctx, "true"), i18n.getTranslation(ctx, "false"), list, 0, new Stack<>());
+        permList.addAll(listPermissions0(ctx, i18n.getTranslation(ctx, "true"), i18n.getTranslation(ctx, "false"), list, 0, new Stack<>()));
     }
 
-    private void listPermissions0(CommandCause ctx, String tT, String fT, ListNode list, int level, Stack<String> permStack)
+    private List<Component> listPermissions0(CommandCause ctx, String tT, String fT, ListNode list, int level, Stack<String> permStack)
     {
+        List<Component> permList = new ArrayList<>();
         int i = 0;
         for (Node value : list.getValue())
         {
@@ -223,24 +234,24 @@ public class RoleInformationCommands extends DispatcherCommand
                 permStack.push(perm);
                 Component permText = Component.text(perm).hoverEvent(HoverEvent.showText(Component.text(StringUtils.implode(".", permStack), NamedTextColor.YELLOW)));
                 String tree = prefix + (i == 1 && level != 0 ? (list.getValue().size() == 1 ? "-" : "┬") : "├") + " ";
-                ctx.sendMessage(Identity.nil(), Component.text().append(Component.text(tree, NamedTextColor.WHITE).append(permText.color(NamedTextColor.YELLOW))
-                    .append(Component.text(": ", NamedTextColor.WHITE)).append(Component.text(neg ? fT : tT, color))).build());
+                permList.add(Component.text().append(Component.text(tree, NamedTextColor.WHITE).append(permText.color(NamedTextColor.YELLOW))
+                                                              .append(Component.text(": ", NamedTextColor.WHITE)).append(Component.text(neg ? fT : tT, color))).build());
             }
             if (value instanceof MapNode)
             {
                 for (Entry<String, Node> entry : ((MapNode) value).getMappedNodes().entrySet())
                 {
                     String tree = prefix + (i == 1 ? "┬" : "├") + " ";
-                    ctx.sendMessage(Identity.nil(),
-                                    Component.text().append(Component.text(tree, NamedTextColor.WHITE))
-                                    .append(Component.text(entry.getKey(), NamedTextColor.YELLOW))
-                                    .append(Component.text(":", NamedTextColor.WHITE)).build());
+                    permList.add(Component.text().append(Component.text(tree, NamedTextColor.WHITE))
+                                 .append(Component.text(entry.getKey(), NamedTextColor.YELLOW))
+                                 .append(Component.text(":", NamedTextColor.WHITE)).build());
                     permStack.push(entry.getKey());
-                    listPermissions0(ctx, tT, fT, ((ListNode) entry.getValue()), level + 1, permStack);
+                    permList.addAll(listPermissions0(ctx, tT, fT, ((ListNode) entry.getValue()), level + 1, permStack));
                 }
             }
             permStack.pop();
         }
+        return permList;
     }
 
     private String getContextString(Set<Context> context)
