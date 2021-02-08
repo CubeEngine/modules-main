@@ -26,6 +26,7 @@ import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.data.DataHolder.Mutable;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.Key;
+import org.spongepowered.api.data.persistence.DataStore;
 import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.data.value.Value;
@@ -33,6 +34,7 @@ import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.TypeTokens;
+import javax.xml.crypto.Data;
 
 public interface LockerData
 {
@@ -58,13 +60,17 @@ public interface LockerData
 
     static void register(RegisterDataEvent event)
     {
-        event.register(DataRegistration.of(MODE, ItemStack.class));
-        event.register(DataRegistration.of(PASS, ItemStack.class, BlockEntity.class, Entity.class, BlockSnapshot.class));
-        event.register(DataRegistration.of(OWNER, ItemStack.class, BlockEntity.class, Entity.class, BlockSnapshot.class));
-        event.register(DataRegistration.of(FLAGS, ItemStack.class, BlockEntity.class, Entity.class, BlockSnapshot.class));
-        event.register(DataRegistration.of(ACCESS, ItemStack.class, BlockEntity.class, Entity.class, BlockSnapshot.class));
-        event.register(DataRegistration.of(LAST_ACCESS, BlockEntity.class, Entity.class));
-        event.register(DataRegistration.of(CREATED, BlockEntity.class, Entity.class));
+        DataStore bookDataStore = DataStore.builder().pluginData(ResourceKey.of(PluginLocker.LOCKER_ID, "book"))
+                                       .holder(ItemStack.class)
+                                       .keys(MODE, PASS, OWNER, FLAGS, ACCESS)
+                                       .build();
+        event.register(DataRegistration.builder().dataKey(MODE, PASS, OWNER, FLAGS, ACCESS).store(bookDataStore).build());
+
+        DataStore lockDataStore = DataStore.builder().pluginData(ResourceKey.of(PluginLocker.LOCKER_ID, "lock"))
+                                .holder(BlockEntity.class, Entity.class, BlockSnapshot.class)
+                                .keys(PASS, OWNER, FLAGS, ACCESS, LAST_ACCESS, CREATED)
+                                .build();
+        event.register(DataRegistration.builder().dataKey(PASS, OWNER, FLAGS, ACCESS, LAST_ACCESS, CREATED).store(lockDataStore).build());
     }
 
     static void purge(Mutable dataHolder)
