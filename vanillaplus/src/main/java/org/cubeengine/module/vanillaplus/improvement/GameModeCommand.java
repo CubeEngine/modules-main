@@ -50,9 +50,8 @@ public class GameModeCommand extends PermissionContainer
         this.i18n = i18n;
     }
 
-    // TODO completer
     @Command(alias = "gm", desc = "Changes the gamemode")
-    public void gamemode(CommandCause context, @Option String gamemode, @Default User player)
+    public void gamemode(CommandCause context, @Option GameMode gamemode, @Default User player)
     {
         if (!context.getIdentifier().equals(player.getIdentifier())
             && !context.hasPermission(COMMAND_GAMEMODE_OTHER.getId()))
@@ -60,7 +59,7 @@ public class GameModeCommand extends PermissionContainer
             i18n.send(context, NEGATIVE, "You are not allowed to change the game mode of an other player!");
             return;
         }
-        GameMode newMode = getGameMode(gamemode);
+        GameMode newMode = gamemode;
         if (newMode == null)
         {
             newMode = toggleGameMode(player.get(Keys.GAME_MODE).get());
@@ -78,35 +77,6 @@ public class GameModeCommand extends PermissionContainer
         }
 
     }
-
-    private GameMode getGameMode(String name)
-    {
-        if (name == null)
-        {
-            return null;
-        }
-        switch (name.trim().toLowerCase())
-        {
-            case "survival":
-            case "s":
-            case "0":
-                return SURVIVAL.get();
-            case "creative":
-            case "c":
-            case "1":
-                return CREATIVE.get();
-            case "adventure":
-            case "a":
-            case "2":
-                return ADVENTURE.get();
-            case "spectator":
-            case "3":
-                return SPECTATOR.get();
-            default:
-                return null;
-        }
-    }
-
 
     private GameMode toggleGameMode(GameMode mode)
     {
