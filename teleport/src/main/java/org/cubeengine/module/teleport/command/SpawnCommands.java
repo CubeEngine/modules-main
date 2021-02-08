@@ -117,7 +117,7 @@ public class SpawnCommands
         {
             world = player.getWorld();
         }
-        force = force && context.hasPermission(perms.CMD_SPAWN_FORCE.getId()) || context.equals( player);
+        force = force && context.hasPermission(perms.CMD_SPAWN_FORCE.getId()) || context.getSubject().equals(player);
         if (!force && player.hasPermission(perms.CMD_SPAWN_PREVENT.getId()))
         {
             i18n.send(ACTION_BAR, context, NEGATIVE, "You are not allowed to spawn {user}!", player);
