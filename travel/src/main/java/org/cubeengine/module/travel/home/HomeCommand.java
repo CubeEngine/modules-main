@@ -144,7 +144,7 @@ public class HomeCommand extends DispatcherCommand
             i18n.send(context, NEGATIVE, "Homes may not have names that are longer then 32 characters nor contain colon(:)'s!");
             return;
         }
-        if (this.manager.has(context.getUser(), name))
+        if (this.manager.has(context.getUniqueId(), name))
         {
             i18n.send(context, NEGATIVE, "The home already exists! You can move it with {text:/home move}");
             return;
@@ -160,7 +160,7 @@ public class HomeCommand extends DispatcherCommand
                          @Default @Named("owner") User owner,
                          @Flag boolean append)
     {
-        Home h = this.manager.get(owner, home).orElse(null);
+        Home h = this.manager.get(owner.getUniqueId(), home).orElse(null);
         if (h == null)
         {
             homeNotFoundMessage(sender.getAudience(), owner, home);
@@ -191,7 +191,7 @@ public class HomeCommand extends DispatcherCommand
     public void move(ServerPlayer sender, @Parser(completer = HomeCompleter.class) @Option String name, @Default User owner)
     {
         name = name == null ? "home" : name;
-        Home home = this.manager.get(owner, name).orElse(null);
+        Home home = this.manager.get(owner.getUniqueId(), name).orElse(null);
         if (home == null)
         {
             homeNotFoundMessage(sender, owner, name);
@@ -218,7 +218,7 @@ public class HomeCommand extends DispatcherCommand
     public void remove(CommandCause sender, @Parser(completer = HomeCompleter.class) @Option String name, @Default User owner)
     {
         name = name == null ? "home" : name;
-        Home home = this.manager.get(owner, name).orElse(null);
+        Home home = this.manager.get(owner.getUniqueId(), name).orElse(null);
         if (home == null)
         {
             homeNotFoundMessage(sender.getAudience(), owner, name);
@@ -241,7 +241,7 @@ public class HomeCommand extends DispatcherCommand
     @Command(desc = "Rename a home")
     public void rename(CommandCause sender, @Parser(completer = HomeCompleter.class) String home, @Label("new name") String newName, @Default @Option User owner)
     {
-        Home h = manager.get(owner, home).orElse(null);
+        Home h = manager.get(owner.getUniqueId(), home).orElse(null);
         if (h == null)
         {
             homeNotFoundMessage(sender.getAudience(), owner, home);
@@ -315,13 +315,13 @@ public class HomeCommand extends DispatcherCommand
         for (Home home : homes)
         {
             Component teleport = i18n.translate(sender, "(tp)").color(NamedTextColor.BLUE)
-                                     .clickEvent(ClickEvent.runCommand("/home tp " + home.name + " " + home.getOwner().getName()))
+                                     .clickEvent(ClickEvent.runCommand("/home tp " + home.name + " " + home.getOwner().getName().get()))
                                      .hoverEvent(HoverEvent.showText(i18n.translate(sender, POSITIVE, "Click to teleport to {name}", home.name)));
             if (home.isOwner(sender))
             {
                 sender.sendMessage(Identity.nil(), Component.text().append(Component.text("   - "))
-                                                                   .append(Component.text(home.name + " ", NamedTextColor.GOLD))
-                                                                   .append(teleport).build());
+                                                            .append(Component.text(home.name + " ", NamedTextColor.GOLD))
+                                                            .append(teleport).build());
             }
             else
             {
@@ -370,7 +370,7 @@ public class HomeCommand extends DispatcherCommand
                 final String name = Sponge.getServer().getUserManager().get(invite).get().getName();
                 final Component unInvite = Component.text("(-)", NamedTextColor.RED).hoverEvent(
                     HoverEvent.showText(i18n.translate(sender, NEUTRAL, "Click to uninvite {user} from {name}", name, home.name)))
-                              .clickEvent(ClickEvent.runCommand("/home uninvite " + name + " " + home.name));
+                                                    .clickEvent(ClickEvent.runCommand("/home uninvite " + name + " " + home.name));
                 sender.sendMessage(Identity.nil(), unInvite);
             }
         }
@@ -381,7 +381,7 @@ public class HomeCommand extends DispatcherCommand
     public void invite(ServerPlayer sender, User player, @Parser(completer = HomeCompleter.class) @Option String home)
     {
         home = home == null ? "home" : home;
-        Home h = this.manager.get(sender.getUser(), home).orElse(null);
+        Home h = this.manager.get(sender.getUniqueId(), home).orElse(null);
         if (h == null || !h.owner.equals(sender.getUniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You do not own a home named {name#home}!", home);
@@ -402,8 +402,8 @@ public class HomeCommand extends DispatcherCommand
         if (player.isOnline())
         {
             i18n.send(player.getPlayer().get(), NEUTRAL,
-                                "{user} invited you to their home. To teleport to it use: /home {name#home} {name}", sender,
-                                h.name, sender.getName());
+                      "{user} invited you to their home. To teleport to it use: /home {name#home} {name}", sender,
+                      h.name, sender.getName());
         }
         i18n.send(sender, POSITIVE, "{user} is now invited to your home {name}", player, h.name);
     }
@@ -413,7 +413,7 @@ public class HomeCommand extends DispatcherCommand
     public void unInvite(ServerPlayer sender, User player, @Parser(completer = HomeCompleter.class) @Option String home)
     {
         home = home == null ? "home" : home;
-        Home h = this.manager.get(sender.getUser(), home).orElse(null);
+        Home h = this.manager.get(sender.getUniqueId(), home).orElse(null);
         if (h == null || !h.owner.equals(sender.getUniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You do not own a home named {name#home}!", home);
@@ -448,7 +448,7 @@ public class HomeCommand extends DispatcherCommand
     @Alias("clearhomes")
     @Command(desc = "Clear all homes [of a player]")
     public void clear(final CommandCause context, @Option final User owner,
-                               @Flag(value = "sel", longName = "selection") final boolean selection)
+                      @Flag(value = "sel", longName = "selection") final boolean selection)
     {
         if (this.module.getConfig().clearOnlyFromConsole && !(context.getAudience() instanceof SystemSubject))
         {
@@ -510,10 +510,10 @@ public class HomeCommand extends DispatcherCommand
             {
                 Cuboid cuboid = new Cuboid(firstPoint.getPosition(), secondPoint.getPosition());
                 predicate = predicate.and(h -> {
-                        Vector3d chp = h.transform.getPosition();
-                        return h.world.getWorld().equals(firstPoint.getWorld())
-                            && cuboid.contains(new Vector3d(chp.getX(), chp.getY(), chp.getZ()));
-                    });
+                    Vector3d chp = h.transform.getPosition();
+                    return h.world.getWorld().equals(firstPoint.getWorld())
+                        && cuboid.contains(new Vector3d(chp.getX(), chp.getY(), chp.getZ()));
+                });
                 manager.massDelete(predicate);
                 if (owner != null)
                 {

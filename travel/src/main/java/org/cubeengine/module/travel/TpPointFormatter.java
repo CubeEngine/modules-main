@@ -27,6 +27,7 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.component.StyledComponent;
 import org.cubeengine.module.travel.config.Home;
 import org.cubeengine.module.travel.config.TeleportPoint;
+import org.spongepowered.api.profile.GameProfile;
 
 import static org.cubeengine.libcube.service.i18n.formatter.component.ClickComponent.runCommand;
 import static org.cubeengine.libcube.service.i18n.formatter.component.HoverComponent.hoverText;
@@ -44,7 +45,9 @@ public class TpPointFormatter extends AbstractFormatter<TeleportPoint>
     @Override
     public Component format(TeleportPoint object, Context context, Arguments args)
     {
-        String cmd = "/" + (object instanceof Home ? "home" : "warp") + " tp " + object.name + " " + object.getOwner().getName();
-        return StyledComponent.styled(Style.style(TextDecoration.UNDERLINED), runCommand(cmd, hoverText(i18n.translate(context, Style.empty(), "Click to teleport to {}", object.name), object.getOwner().getName())));
+        final GameProfile owner = object.getOwner();
+        final String name = owner.getName().orElse(owner.getUniqueId().toString());
+        String cmd = "/" + (object instanceof Home ? "home" : "warp") + " tp " + object.name + " " + name;
+        return StyledComponent.styled(Style.style(TextDecoration.UNDERLINED), runCommand(cmd, hoverText(i18n.translate(context, Style.empty(), "Click to teleport to {}", object.name), name)));
     }
 }

@@ -69,7 +69,7 @@ public class HomeManager
 
     public Home create(User owner, String name, ServerWorld world, Transform transform)
     {
-        if (this.has(owner, name))
+        if (this.has(owner.getUniqueId(), name))
         {
             throw new IllegalArgumentException("Tried to create duplicate home!");
         }
@@ -91,20 +91,20 @@ public class HomeManager
         config.save();
     }
 
-    public boolean has(User user, String name)
+    public boolean has(UUID user, String name)
     {
         return get(user, name).isPresent();
     }
 
-    public Optional<Home> get(User user, String name)
+    public Optional<Home> get(UUID user, String name)
     {
-        return config.homes.stream().filter(home -> home.owner.equals(user.getUniqueId()) && home.name.equals(name)).findFirst();
+        return config.homes.stream().filter(home -> home.owner.equals(user) && home.name.equals(name)).findFirst();
     }
 
     public Optional<Home> find(ServerPlayer player, String name, @Nullable User owner)
     {
         owner = owner == null ? player.getUser() : owner; // No owner specified?
-        Optional<Home> home = get(owner, name); // Get home by name and owner
+        Optional<Home> home = get(owner.getUniqueId(), name); // Get home by name and owner
         if (!home.isPresent() && owner.getUniqueId().equals(player.getUniqueId())) // Not found and not looking for a specific home
         {
             List<UUID> globalInvites = config.globalInvites.getOrDefault(player.getUniqueId(), Collections.emptyList());
@@ -127,7 +127,7 @@ public class HomeManager
 
     public boolean rename(Home point, String name)
     {
-        if (has(point.getOwner(), name))
+        if (has(point.getOwner().getUniqueId(), name))
         {
             return false;
         }
@@ -170,7 +170,7 @@ public class HomeManager
         {
             return;
         }
-        Optional<Home> home = this.get(player.getUser(), "home");
+        Optional<Home> home = this.get(player.getUniqueId(), "home");
         if (home.isPresent())
         {
             home.get().setTransform(player.getWorld(), player.getTransform());

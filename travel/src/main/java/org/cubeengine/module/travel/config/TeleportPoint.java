@@ -24,6 +24,8 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.profile.GameProfile;
+import org.spongepowered.api.profile.GameProfileManager;
 import org.spongepowered.api.util.Transform;
 import org.spongepowered.api.world.server.ServerWorld;
 
@@ -43,9 +45,10 @@ public class TeleportPoint implements Section
         this.world = new ConfigWorld(world);
     }
 
-    public User getOwner()
+    public GameProfile getOwner()
     {
-        return Sponge.getServer().getUserManager().get(this.owner).orElse(null);
+        final GameProfileManager manager = Sponge.getServer().getGameProfileManager();
+        return manager.getBasicProfile(this.owner).join();
     }
 
     public boolean isOwner(User user)

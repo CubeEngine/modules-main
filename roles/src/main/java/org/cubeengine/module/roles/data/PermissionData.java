@@ -46,8 +46,7 @@ public interface PermissionData
         final DataStore dataStore = DataStore.builder()
                                              .pluginData(rkey)
                                              .holder(ServerPlayer.class, User.class)
-
-                      .key(PARENTS, "parents")
+                                             .key(PARENTS, "parents")
                                              .key(PERMISSIONS, "permissions")
                                              .key(OPTIONS, "options")
                                              .build();
