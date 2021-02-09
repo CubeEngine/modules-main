@@ -63,10 +63,10 @@ public class GodCommand extends PermissionContainer
             other = true;
         }
 
-        long invTime = player.get(Keys.INVULNERABILITY_TICKS).map(Ticks::getTicks).orElse(0L);
-        if (invTime > 0)
+        final Boolean invulnerable = player.get(Keys.INVULNERABLE).orElse(false);
+        if (invulnerable)
         {
-            player.offer(Keys.INVULNERABILITY_TICKS, Ticks.zero());
+            player.offer(Keys.INVULNERABLE, false);
             if (!other)
             {
                 i18n.send(context, NEUTRAL, "You are no longer invincible!");
@@ -76,7 +76,7 @@ public class GodCommand extends PermissionContainer
             i18n.send(context, NEUTRAL, "{user} is no longer invincible!", player);
             return;
         }
-        player.offer(Keys.INVULNERABILITY_TICKS, Ticks.of(Integer.MAX_VALUE));
+        player.offer(Keys.INVULNERABLE, true);
         if (!other)
         {
             i18n.send(context, POSITIVE, "You are now invincible!");
