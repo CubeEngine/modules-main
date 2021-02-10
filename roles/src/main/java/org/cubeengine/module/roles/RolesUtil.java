@@ -126,9 +126,9 @@ public class RolesUtil
             }
 
             // Attempt to find permission in parents
-            List<Subject> list = getParents(contexts, subject);
+            List<Subject> list = new ArrayList<>(getParents(contexts, subject));
             list.sort(FileSubject::compare);
-            // TODO CME?
+
             for (Subject parentSubject : list)
             {
                 if (checked.contains(parentSubject))
