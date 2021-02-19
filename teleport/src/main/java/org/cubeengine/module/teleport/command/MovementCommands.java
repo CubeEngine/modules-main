@@ -224,7 +224,7 @@ public class MovementCommands
             if (loc != null)
             {
                 ServerLocation deathLoc = loc;
-                ServerLocation  safeDeathLoc = Sponge.getServer().getTeleportHelper().getSafeLocation(deathLoc, 5, 20).orElse(null);
+                ServerLocation safeDeathLoc = Sponge.getServer().getTeleportHelper().getSafeLocation(deathLoc, 5, 20).orElse(null);
                 if (safeDeathLoc != null && deathLoc.getPosition().distance(safeDeathLoc.getPosition()) < 5 || unsafe)
                 {
                     context.setLocation(unsafe ? deathLoc : safeDeathLoc);

@@ -81,6 +81,7 @@ public class TeleportListener
         {
             final ServerWorld world = event instanceof ChangeEntityWorldEvent ? ((ChangeEntityWorldEvent)event).getOriginalWorld() : player.getWorld();
             lastLocations.put(player.getUniqueId(), world.getLocation(event.getOriginalPosition()));
+            this.setDeathLocation(player, null);
         }
     }
 
@@ -164,7 +165,7 @@ public class TeleportListener
         return deathLocations.get(player.getUniqueId());
     }
 
-    public void setDeathLocation(Player player, ServerLocation loc)
+    public void setDeathLocation(ServerPlayer player, ServerLocation loc)
     {
         if (loc == null)
         {
