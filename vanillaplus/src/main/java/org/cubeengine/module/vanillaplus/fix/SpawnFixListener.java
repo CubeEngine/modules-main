@@ -38,8 +38,8 @@ public class SpawnFixListener
         double maxX = center.getX() + radius;
         double minZ = center.getZ() - radius;
         double maxZ = center.getZ() + radius;
-        double playerX = event.getUser().getPosition().getX();
-        double playerZ = event.getUser().getPosition().getZ();
+        double playerX = toLocation.getPosition().getX();
+        double playerZ = toLocation.getPosition().getZ();
 
         if (playerX > maxX || playerX < minX || playerZ > maxZ || playerZ < minZ)
         {
