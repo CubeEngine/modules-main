@@ -19,11 +19,18 @@ package org.cubeengine.module.locker.data;
 
 public enum LockerMode
 {
-    INFO, // Show Info on R-Click
-    INFO_CREATE, // Show Info on R-Click or if unprotected create protection
-    REMOVE, // Remove protection
-    UPDATE_FLAGS, // Update protection flags with settings from book
-    UPDATE_ACCESS, // Update protection access with settings from book
-    TRUST, // Granting another player full access to all protections
-    KEYBOOK
+    INFO("Show Info"), // Show Info on R-Click
+    INFO_CREATE("Show Info or Create"), // Show Info on R-Click or if unprotected create protection
+    REMOVE("Remove"), // Remove protection
+    UPDATE("Update"), // Update protection flags/access with settings from book
+    TRUST("Global Trust"), // Granting another player full access to all protections
+    KEYBOOK("");
+
+    public final String text;
+
+    LockerMode(String text)
+    {
+        this.text = text;
+    }
+
 }

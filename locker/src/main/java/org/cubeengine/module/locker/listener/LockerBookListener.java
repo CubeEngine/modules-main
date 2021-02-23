@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.locker.listener;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -90,7 +91,7 @@ public class LockerBookListener
             final Optional<String> mode = bookItem.get(LockerData.MODE);
             if (mode.isPresent())
             {
-                if (mode.get().equals(LockerMode.UPDATE_ACCESS.name()))
+                if (mode.get().equals(LockerMode.UPDATE.name()))
                 {
                     final Map<UUID, Integer> accessMap = bookItem.get(LockerData.ACCESS).orElse(new HashMap<>());
                     final UUID eUuid = event.getEntity().getUniqueId();
@@ -105,6 +106,33 @@ public class LockerBookListener
                     {
                         i18n.send(player, MessageType.NEUTRAL, "{name} already added", ((ServerPlayer)event.getEntity()).getName());
                     }
+                    lockerManager.openBook(player);
+                }
+            }
+        }
+        else if (lockerManager.getTrustBookPunchers().remove(player.getUniqueId()))
+        {
+            final ItemStack bookItem = player.getItemInHand(HandTypes.MAIN_HAND);
+            final Optional<String> mode = bookItem.get(LockerData.MODE);
+            if (mode.isPresent())
+            {
+                if (mode.get().equals(LockerMode.TRUST.name()))
+                {
+                    final Map<UUID, Integer> trustMap = player.get(LockerData.TRUST).orElse(new HashMap<>());
+
+                    final UUID eUuid = event.getEntity().getUniqueId();
+                    if (!trustMap.containsKey(eUuid))
+                    {
+                        trustMap.put(eUuid, ProtectionFlag.FULL);
+                        player.offer(LockerData.TRUST, trustMap);
+                        lockerManager.invalidateTrustCache(player.getUniqueId());
+                        i18n.send(player, MessageType.POSITIVE, "{name} trusted", ((ServerPlayer)event.getEntity()).getName());
+                    }
+                    else
+                    {
+                        i18n.send(player, MessageType.NEUTRAL, "{name} already trusted", ((ServerPlayer)event.getEntity()).getName());
+                    }
+                    lockerManager.openBook(player);
                 }
             }
         }
@@ -128,7 +156,7 @@ public class LockerBookListener
     {
         if (player.get(Keys.IS_SNEAKING).orElse(false))
         {
-            lockerManager.openBook(dataHolder, player);
+            lockerManager.openBook(player);
             return true;
         }
 
@@ -144,17 +172,20 @@ public class LockerBookListener
             {
                 case INFO:
                 case REMOVE:
-                case UPDATE_ACCESS:
+                case UPDATE:
                     i18n.send(ChatType.ACTION_BAR, player, MessageType.NEUTRAL, "Target is not locked");
                     return true;
                 case TRUST:
                     if (dataHolder instanceof ServerPlayer)
                     {
-                        // TODO set global trust of player
-                    }
-                    else
-                    {
-                        // TODO open book to modify global trust
+                        if (player.get(LockerData.TRUST).orElse(Collections.emptyMap()).get(((ServerPlayer)dataHolder).getUniqueId()) != null)
+                        {
+                            i18n.send(ChatType.ACTION_BAR, player, MessageType.POSITIVE, "{player} is trusted", dataHolder);
+                        }
+                        else
+                        {
+                            i18n.send(ChatType.ACTION_BAR, player, MessageType.NEGATIVE, "{player} is not trusted", dataHolder);
+                        }
                     }
                     return false;
                 case INFO_CREATE:
@@ -180,10 +211,8 @@ public class LockerBookListener
             case REMOVE:
                 lockerManager.removeLock(dataHolder, player);
                 return true;
-            case UPDATE_FLAGS:
+            case UPDATE:
                 lockerManager.updateLockFlags(dataHolder, player, itemInHand);
-                return true;
-            case UPDATE_ACCESS:
                 lockerManager.updateLockAccess(dataHolder, player, itemInHand);
                 return true;
         }

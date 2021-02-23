@@ -31,10 +31,11 @@ import org.spongepowered.api.data.value.ListValue;
 import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.TypeTokens;
-import javax.xml.crypto.Data;
 
 public interface LockerData
 {
@@ -52,6 +53,8 @@ public interface LockerData
      */
     Key<Value<Integer>> FLAGS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "flags")).type(TypeTokens.INTEGER_VALUE_TOKEN).build();
     Key<MapValue<UUID, Integer>> ACCESS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "access")).type(TTMV_UUIDInteger).build();
+
+    Key<MapValue<UUID, Integer>> TRUST = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "trust")).type(TTMV_UUIDInteger).build();
 
     Key<ListValue<UUID>> UNLOCKS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "unlocks")).type(TTLV_UUID).build();
 
@@ -71,6 +74,13 @@ public interface LockerData
                                 .keys(PASS, OWNER, FLAGS, ACCESS, LAST_ACCESS, CREATED)
                                 .build();
         event.register(DataRegistration.builder().dataKey(PASS, OWNER, FLAGS, ACCESS, LAST_ACCESS, CREATED).store(lockDataStore).build());
+
+
+        DataStore globalTrust = DataStore.builder().pluginData(ResourceKey.of(PluginLocker.LOCKER_ID, "trust"))
+                                           .holder(ServerPlayer.class, User.class)
+                                           .keys(TRUST)
+                                           .build();
+        event.register(DataRegistration.builder().dataKey(TRUST).store(globalTrust).build());
     }
 
     static void purge(Mutable dataHolder)

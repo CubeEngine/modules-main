@@ -43,9 +43,7 @@ import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.RegisterDataPackValueEvent;
 import org.spongepowered.api.item.recipe.RecipeRegistration;
 
-// TODO Q out of guarded chest works
 // TODO hoppers and protection
-
 @Singleton
 @Module
 public class Locker

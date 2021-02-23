@@ -95,6 +95,8 @@ public class LockerManager
     private TaskManager tm;
 
     private Set<UUID> accessBookPunchers = new HashSet<>();
+    private Set<UUID> trustBookPunchers = new HashSet<>();
+    private Map<UUID, Map<UUID, Integer>> trustCache = new HashMap<>();
 
     @Inject
     public LockerManager(I18n i18n, LockerPerm perms, Locker module, TaskManager tm)
@@ -108,6 +110,11 @@ public class LockerManager
     public Set<UUID> getAccessBookPunchers()
     {
         return accessBookPunchers;
+    }
+
+    public Set<UUID> getTrustBookPunchers()
+    {
+        return trustBookPunchers;
     }
 
     private List<Mutable> getMultiBlocks(Mutable dataHolder)
@@ -339,7 +346,7 @@ public class LockerManager
     public void showFullLock(Mutable dataHolder, ServerPlayer player)
     {
         final UUID ownerUUID = dataHolder.get(LockerData.OWNER).get();
-        final String ownerName = Sponge.getServer().getUserManager().get(ownerUUID).map(User::getName).orElse(ownerUUID.toString());
+        final String ownerName = uuidToName(ownerUUID, ownerUUID.toString());
         i18n.send(player, POSITIVE, "Protection by {user}", ownerName);
         final Optional<Long> created = dataHolder.get(LockerData.CREATED);
         if (created.isPresent())
@@ -386,7 +393,7 @@ public class LockerManager
             i18n.send(player, POSITIVE, "The following users have access to this protection");
             for (Entry<UUID, Integer> entry : accessMap.entrySet())
             {
-                final String userName = Sponge.getServer().getUserManager().get(entry.getKey()).map(User::getName).orElse(entry.getKey().toString());
+                final String userName = uuidToName(entry.getKey(), entry.getKey().toString());
                 TextComponent text = Component.text(" - ", NamedTextColor.GRAY).append(Component.text(userName, NamedTextColor.GREEN));
                 final Builder builder = Component.text();
                 builder.append(i18n.translate(player, POSITIVE, "Bypassing the following flags"));
@@ -425,7 +432,7 @@ public class LockerManager
         if (perms.CMD_INFO_SHOW_OWNER.check(player))
         {
             final UUID ownerUUID = dataHolder.get(LockerData.OWNER).get();
-            final String ownerName = Sponge.getServer().getUserManager().get(ownerUUID).map(User::getName).orElse(ownerUUID.toString());
+            final String ownerName = uuidToName(ownerUUID, ownerUUID.toString());
             i18n.send(player, POSITIVE, "Protection by {user}", ownerName);
         }
 
@@ -484,7 +491,7 @@ public class LockerManager
     public void setGlobalAccess(ServerPlayer player, UUID user, int flags)
     {
         // TODO
-        final String userName = Sponge.getServer().getUserManager().get(user).map(User::getName).orElse(user.toString());
+        final String userName = uuidToName(user, user.toString());
         i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Global access for {user} set!", userName);
         i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Updated global access level for {user}!", userName);
         i18n.send(ChatType.ACTION_BAR, player, NEUTRAL, "{user} had no global access!", userName);
@@ -526,7 +533,7 @@ public class LockerManager
             return false;
         }
         final UUID owner = dataHolder.get(LockerData.OWNER).get();
-        final String ownerName = Sponge.getServer().getUserManager().get(owner).map(User::getName).orElse("???");
+        final String ownerName = uuidToName(owner, owner.toString());
         if (perms.SHOW_OWNER.check(player))
         {
             i18n.send(ChatType.ACTION_BAR, player, NEUTRAL, "This inventory is protected by {name}", ownerName);
@@ -577,6 +584,11 @@ public class LockerManager
         return true;
     }
 
+    public String uuidToName(UUID owner, String s)
+    {
+        return Sponge.getServer().getGameProfileManager().getBasicProfile(owner).join().getName().orElse(s);
+    }
+
     private void notify(UUID owner, ServerPlayer player, Mutable dataHolder, int flags)
     {
         if (ProtectionFlag.NOTIFY_ACCESS.isSet(flags) && !perms.PREVENT_NOTIFY.check(player))
@@ -591,11 +603,15 @@ public class LockerManager
 
     public int canAccess(DataHolder dataHolder, @Nullable ServerPlayer player, UUID owner, @Nullable Permission byPassPerm)
     {
-        // TODO global check
         final boolean isOwner = player != null && player.getUniqueId().equals(owner);
         if (isOwner)
         {
             return ProtectionFlag.ALL; // allowed by owner
+        }
+        final Map<UUID, Integer> trust = this.getTrust(owner);
+        if (trust.containsKey(player.getUniqueId()))
+        {
+            return trust.get(player.getUniqueId());
         }
         final boolean hasValidKeyBook = player != null && isValidKeyBook(dataHolder, player);
         if (hasValidKeyBook)
@@ -618,6 +634,25 @@ public class LockerManager
             return dataHolder.get(LockerData.ACCESS).orElse(Collections.emptyMap()).getOrDefault(player.getUniqueId(), ProtectionFlag.NONE);
         }
         return ProtectionFlag.NONE;
+    }
+
+    private Map<UUID, Integer> getTrust(UUID owner)
+    {
+        final Map<UUID, Integer> trust = this.trustCache.get(owner);
+        if (trust == null)
+        {
+            final Optional<Map<UUID, Integer>> onlineTrust = Sponge.getServer().getPlayer(owner).flatMap(p -> p.get(LockerData.TRUST));
+            if (onlineTrust.isPresent())
+            {
+                this.trustCache.put(owner, onlineTrust.get());
+            }
+            else
+            {
+                final Map<UUID, Integer> offlineTrust = Sponge.getServer().getUserManager().get(owner).flatMap(p -> p.get(LockerData.TRUST)).orElse(Collections.emptyMap());
+                this.trustCache.put(owner, offlineTrust);
+            }
+        }
+        return this.trustCache.get(owner);
     }
 
     public boolean isValidKeyBook(DataHolder dataHolder, ServerPlayer player)
@@ -651,7 +686,7 @@ public class LockerManager
             return false;
         }
         final UUID owner = dataHolder.get(LockerData.OWNER).get();
-        final String ownerName = Sponge.getServer().getUserManager().get(owner).map(User::getName).orElse("???");
+        final String ownerName = uuidToName(owner, owner.toString());
         if (perms.SHOW_OWNER.check(player))
         {
             i18n.send(ChatType.ACTION_BAR, player, NEUTRAL, "This entity is protected by {name}", ownerName);
@@ -744,7 +779,7 @@ public class LockerManager
             return false;
         }
         final UUID owner = dataHolder.get(LockerData.OWNER).get();
-        final String ownerName = Sponge.getServer().getUserManager().get(owner).map(User::getName).orElse("???");
+        final String ownerName = uuidToName(owner, owner.toString());
         if (perms.SHOW_OWNER.check(player))
         {
             i18n.send(ChatType.ACTION_BAR, player, NEUTRAL, "This block is protected by {user}", ownerName);
@@ -800,7 +835,7 @@ public class LockerManager
         {
             if (player != null && perms.SHOW_OWNER.check(player))
             {
-                final String ownerName = Sponge.getServer().getUserManager().get(owner).map(User::getName).orElse("???");
+                final String ownerName = uuidToName(owner, owner.toString());
                 i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Magic prevents you from breaking this protection of {user}!", ownerName);
             }
             else if (player != null)
@@ -838,13 +873,10 @@ public class LockerManager
         return true;
     }
 
-    public void openBook(Mutable dataHolder, ServerPlayer player)
+    public void openBook(ServerPlayer player)
     {
         final ItemStack lockerBook = player.getItemInHand(HandTypes.MAIN_HAND);
         player.openBook(Book.book(Component.empty(), Component.empty(), buildPages(player, lockerBook)));
-//        itemInHand.offer(LockerData.MODE, mode.name());
-//        player.setItemInHand(HandTypes.MAIN_HAND, itemInHand);
-//        i18n.send(player, MessageType.POSITIVE, "Mode changed to {name}", mode.name());
     }
 
     private List<Component> buildPages(ServerPlayer player, ItemStack lockerBook)
@@ -857,14 +889,15 @@ public class LockerManager
         {
             if (currentMode.equals(mode))
             {
-                builder.append(Component.text(mode.name(), NamedTextColor.GOLD).clickEvent(ClickEvent.changePage(2))).append(Component.newline());
+                builder.append(Component.text(mode.text, NamedTextColor.GOLD).clickEvent(ClickEvent.changePage(2))).append(Component.newline());
             }
             else
             {
-                builder.append(Component.text(mode.name()).clickEvent(SpongeComponents.executeCallback(c -> {
+                builder.append(Component.text(mode.text).clickEvent(SpongeComponents.executeCallback(c -> {
                     lockerBook.offer(LockerData.MODE, mode.name());
                     player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
                     i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Changed mode to {name}", mode.name());
+                    openBook(player);
                 }))).append(Component.newline());
             }
         }
@@ -887,7 +920,7 @@ public class LockerManager
             case REMOVE:
                 break;
             case INFO_CREATE:
-            case UPDATE_FLAGS:
+            case UPDATE:
               {
                     final Builder builder = Component.text();
                     builder.append(Component.text("Block Flags:").style(titleStyle)).append(Component.newline()).append(Component.newline());
@@ -936,8 +969,6 @@ public class LockerManager
                     buildFlagToggleLine(player, lockerBook, flags, builder, ProtectionFlag.NOTIFY_ACCESS);
                     pages.add(builder.build());
                 }
-                return pages;
-            case UPDATE_ACCESS:
                 {
                     final Builder builder = Component.text();
                     builder.append(Component.text("Access "));
@@ -949,8 +980,7 @@ public class LockerManager
                     builder.append(Component.newline()).append(Component.newline());
                     for (Entry<UUID, Integer> entry : accessMap.entrySet())
                     {
-                        final String userName = Sponge.getServer().getUserManager().get(entry.getKey()).map(User::getName)
-                                        .orElseGet(() -> Sponge.getServer().getGameProfileManager().getBasicProfile(entry.getKey()).join().getName().orElse(entry.getKey().toString()));
+                        final String userName = uuidToName(entry.getKey(), entry.getKey().toString());
                         builder.append(Component.text(userName, NamedTextColor.DARK_GREEN));
                         builder.append(Component.text(" (-)", NamedTextColor.DARK_RED)
                                                 .hoverEvent(HoverEvent.showText(i18n.translate(player, "revoke access")))
@@ -958,6 +988,7 @@ public class LockerManager
                             accessMap.remove(entry.getKey());
                             lockerBook.offer(LockerData.ACCESS, accessMap);
                             player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
+                            openBook(player);
                             i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Removed access from {user}", userName);
                         })));
                         if (ProtectionFlag.ADMIN.isSet(entry.getValue()))
@@ -968,6 +999,7 @@ public class LockerManager
                                 accessMap.put(entry.getKey(), entry.getValue() & ~ProtectionFlag.ADMIN.flagValue);
                                 lockerBook.offer(LockerData.ACCESS, accessMap);
                                 player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
+                                openBook(player);
                                 i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Revoked admin access from {user}", userName);
                             }))));
                         }
@@ -979,6 +1011,7 @@ public class LockerManager
                                 accessMap.put(entry.getKey(), entry.getValue() | ProtectionFlag.ADMIN.flagValue);
                                 lockerBook.offer(LockerData.ACCESS, accessMap);
                                 player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
+                                openBook(player);
                                 i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Granted admin access to {user}", userName);
                             }))));
                         }
@@ -989,7 +1022,56 @@ public class LockerManager
                 }
                 break;
             case TRUST:
-                // TODO
+                {
+                    final Builder builder = Component.text();
+                    builder.append(Component.text("Trust "));
+                    builder.append(i18n.translate(player, "(Add new)").color(NamedTextColor.GOLD).clickEvent(SpongeComponents.executeCallback(c -> {
+                        i18n.send(player, POSITIVE, "Punch your trusted friend");
+                        trustBookPunchers.add(c.getCause().first(ServerPlayer.class).get().getUniqueId());
+                    })));
+                    builder.append(Component.newline()).append(Component.newline());
+                    final Map<UUID, Integer> trustMap = player.get(LockerData.TRUST).orElse(new HashMap<>());
+                    for (Entry<UUID, Integer> entry : trustMap.entrySet())
+                    {
+                        final String userName = uuidToName(entry.getKey(), entry.getKey().toString());
+                        builder.append(Component.text(userName, NamedTextColor.DARK_GREEN));
+                        builder.append(Component.text(" (-)", NamedTextColor.DARK_RED)
+                                                .hoverEvent(HoverEvent.showText(i18n.translate(player, "revoke trust")))
+                                                .clickEvent(SpongeComponents.executeCallback(c -> {
+                                                    trustMap.remove(entry.getKey());
+                                                    player.offer(LockerData.TRUST, trustMap);
+                                                    this.invalidateTrustCache(player.getUniqueId());
+                                                    openBook(player);
+                                                    i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Removed trust from {user}", userName);
+                                                })));
+                        if (ProtectionFlag.ADMIN.isSet(entry.getValue()))
+                        {
+                            builder.append(Component.text(" @ ", NamedTextColor.GOLD).append(Component.text("(-)", NamedTextColor.DARK_RED)
+                                      .hoverEvent(HoverEvent.showText(i18n.translate(player, "revoke admin trust")))
+                                      .clickEvent(SpongeComponents.executeCallback(c -> {
+                                          trustMap.put(entry.getKey(), entry.getValue() & ~ProtectionFlag.ADMIN.flagValue);
+                                          player.offer(LockerData.TRUST, trustMap);
+                                          this.invalidateTrustCache(player.getUniqueId());
+                                          openBook(player);
+                                          i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Revoked admin trust from {user}", userName);
+                                      }))));
+                        }
+                        else
+                        {
+                            builder.append(Component.text(" @ ").append(Component.text("(+)", NamedTextColor.DARK_GREEN)
+                                     .hoverEvent(HoverEvent.showText(i18n.translate(player, "grant admin trust")))
+                                     .clickEvent(SpongeComponents.executeCallback(c -> {
+                                         trustMap.put(entry.getKey(), entry.getValue() | ProtectionFlag.ADMIN.flagValue);
+                                         player.offer(LockerData.TRUST, trustMap);
+                                         this.invalidateTrustCache(player.getUniqueId());
+                                         openBook(player);
+                                         i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Granted admin trust to {user}", userName);
+                                     }))));
+                        }
+                        builder.append(Component.newline());
+                    }
+                    pages.add(builder.build());
+                }
                 break;
             case KEYBOOK:
                 // TODO
@@ -1007,6 +1089,7 @@ public class LockerManager
                    lockerBook.offer(LockerData.FLAGS, flags ^ flag.flagValue);
                    player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
                    i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Toggled flag {name} to {txt#value}", flag.flagname, Component.text(!isSet, !isSet ? NamedTextColor.DARK_GREEN : NamedTextColor.DARK_RED));
+                   openBook(player);
                })))
                .append(Component.newline());
     }
@@ -1041,8 +1124,14 @@ public class LockerManager
                                     lockerBook.offer(LockerData.FLAGS, newFlags);
                                     player.setItemInHand(HandTypes.MAIN_HAND, lockerBook);
                                     i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Using preset {txt}", presetName);
+                                    openBook(player);
                                 })))
                .append(Component.newline());
+    }
+
+    public void invalidateTrustCache(UUID owner)
+    {
+        this.trustCache.remove(owner);
     }
 
     private static class ProtectedInventory implements SlotChangeHandler
