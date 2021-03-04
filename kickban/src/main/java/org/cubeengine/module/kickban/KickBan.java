@@ -34,6 +34,7 @@ import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
  * /kick 	Kicks a player off a server.
  * /pardon 	Removes entries from the banlist.
  */
+// fake ban thing
 @Singleton
 @Module
 public class KickBan
