@@ -24,19 +24,26 @@ import java.util.Map;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.entity.EntityType;
 
+import static org.cubeengine.module.locker.data.ProtectionFlag.BLOCK_BREAK;
+import static org.cubeengine.module.locker.data.ProtectionFlag.BLOCK_EXPLOSION;
+import static org.cubeengine.module.locker.data.ProtectionFlag.BLOCK_INTERACT;
 import static org.cubeengine.module.locker.data.ProtectionFlag.BLOCK_REDSTONE;
+import static org.cubeengine.module.locker.data.ProtectionFlag.ENTITY_DAMAGE;
+import static org.cubeengine.module.locker.data.ProtectionFlag.ENTITY_INTERACT;
+import static org.cubeengine.module.locker.data.ProtectionFlag.INVENTORY_HOPPER_PUT;
+import static org.cubeengine.module.locker.data.ProtectionFlag.INVENTORY_HOPPER_TAKE;
 import static org.spongepowered.api.block.BlockTypes.*;
 import static org.spongepowered.api.entity.EntityTypes.*;
 
 public enum ProtectedType
 {
-    CONTAINER(BLOCK_REDSTONE),
-    BLOCK(BLOCK_REDSTONE),
-    ENTITY_CONTAINER(),
-    ENTITY_LIVING(),
-    ENTITY_VEHICLE(),
-    ENTITY(),
-    ENTITY_CONTAINER_LIVING(),
+    CONTAINER(BLOCK_BREAK, BLOCK_EXPLOSION, BLOCK_INTERACT, BLOCK_REDSTONE, INVENTORY_HOPPER_PUT, INVENTORY_HOPPER_TAKE),
+    BLOCK(BLOCK_BREAK, BLOCK_EXPLOSION, BLOCK_INTERACT, BLOCK_REDSTONE),
+    ENTITY_CONTAINER(ENTITY_INTERACT, ENTITY_DAMAGE),
+    ENTITY_LIVING(ENTITY_INTERACT, ENTITY_DAMAGE),
+    ENTITY_VEHICLE(ENTITY_INTERACT, ENTITY_DAMAGE),
+    ENTITY(ENTITY_INTERACT, ENTITY_DAMAGE),
+    ENTITY_CONTAINER_LIVING(ENTITY_INTERACT, ENTITY_DAMAGE),
     ;
 
     private final static Map<BlockType, ProtectedType> blocks = new HashMap<>();
