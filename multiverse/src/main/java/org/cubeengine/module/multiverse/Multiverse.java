@@ -89,7 +89,7 @@ public class Multiverse
         {
             for (ConfigWorld cWorld : entry.getValue())
             {
-                if (world.getKey().asString().equals(cWorld.getName()))
+                if (world.key().asString().equals(cWorld.getName()))
                 {
                     return entry.getKey();
                 }
@@ -98,7 +98,7 @@ public class Multiverse
 
         if (config.autoDetectUnivserse)
         {
-            final String worldKeyValue = world.getKey().getValue();
+            final String worldKeyValue = world.key().value();
             if (worldKeyValue.contains("_"))
             {
                 String name = worldKeyValue.substring(0, worldKeyValue.indexOf("_"));

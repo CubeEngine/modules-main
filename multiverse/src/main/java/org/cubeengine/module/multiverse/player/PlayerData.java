@@ -75,13 +75,13 @@ public class PlayerData implements DataSerializable
 
     public PlayerData(ServerWorld world)
     {
-        gameMode = world.getProperties().gameMode();
+        gameMode = world.properties().gameMode();
         // TODO defaultdata from world
     }
 
     public PlayerData(DataContainer value)
     {
-        if (!value.getInt(Queries.CONTENT_VERSION).get().equals(getContentVersion()))
+        if (!value.getInt(Queries.CONTENT_VERSION).get().equals(contentVersion()))
         {
             throw new IllegalStateException("Different Version");
         }
@@ -98,7 +98,7 @@ public class PlayerData implements DataSerializable
 
         inventory.clear();
         DataView inventoryView = value.getView(INVENTORY).orElse(DataContainer.createNew());
-        for (DataQuery key : inventoryView.getKeys(false))
+        for (DataQuery key : inventoryView.keys(false))
         {
             try
             {
@@ -116,12 +116,12 @@ public class PlayerData implements DataSerializable
 
         enderChest.clear();
         inventoryView = value.getView(ENDER_INVENTORY).orElse(DataContainer.createNew());
-        for (DataQuery key : inventoryView.getKeys(false))
+        for (DataQuery key : inventoryView.keys(false))
         {
             enderChest.put(Integer.valueOf(key.asString("")), ItemStack.builder().fromContainer(inventoryView.getView(key).get()).build());
         }
 
-        this.gameMode = Sponge.getGame().registries().registry(RegistryTypes.GAME_MODE).value(ResourceKey.resolve(value.getString(GAMEMODE).get()));
+        this.gameMode = Sponge.game().registries().registry(RegistryTypes.GAME_MODE).value(ResourceKey.resolve(value.getString(GAMEMODE).get()));
     }
 
     public static PlayerData of(DataContainer dataContainer, ServerWorld world)
@@ -136,7 +136,7 @@ public class PlayerData implements DataSerializable
     @Override
     public DataContainer toContainer()
     {
-        DataContainer result = DataContainer.createNew().set(Queries.CONTENT_VERSION, getContentVersion());
+        DataContainer result = DataContainer.createNew().set(Queries.CONTENT_VERSION, contentVersion());
 
         result.set(HELD_ITEM, heldItemSlot)
             .set(HEALTH, health)
@@ -150,14 +150,14 @@ public class PlayerData implements DataSerializable
             .set(ACTIVE_EFFECTS, activePotionEffects)
             .set(INVENTORY, inventory)
             .set(ENDER_INVENTORY, enderChest)
-            .set(GAMEMODE, Sponge.getGame().registries().registry(RegistryTypes.GAME_MODE).valueKey(gameMode).asString());
+            .set(GAMEMODE, Sponge.game().registries().registry(RegistryTypes.GAME_MODE).valueKey(gameMode).asString());
         return result;
     }
 
     public PlayerData applyToPlayer(ServerPlayer player)
     {
-        final PlayerInventory inv = player.getInventory();
-        inv.getHotbar().setSelectedSlotIndex(heldItemSlot);
+        final PlayerInventory inv = player.inventory();
+        inv.hotbar().setSelectedSlotIndex(heldItemSlot);
         player.offer(Keys.MAX_HEALTH, maxHealth);
         player.offer(Keys.HEALTH, health);
         player.offer(Keys.FOOD_LEVEL, foodLevel);
@@ -188,7 +188,7 @@ public class PlayerData implements DataSerializable
         }
 
         i = 0;
-        for (Slot slot : player.getEnderChestInventory().slots())
+        for (Slot slot : player.enderChestInventory().slots())
         {
             ItemStack item = enderChest.get(i);
             if (item != null)
@@ -208,15 +208,15 @@ public class PlayerData implements DataSerializable
 
     public PlayerData applyFromPlayer(ServerPlayer player)
     {
-        PlayerInventory playerInventory = player.getInventory();
-        this.heldItemSlot = playerInventory.getHotbar().getSelectedSlotIndex();
+        PlayerInventory playerInventory = player.inventory();
+        this.heldItemSlot = playerInventory.hotbar().selectedSlotIndex();
         this.maxHealth = player.get(Keys.MAX_HEALTH).get();
         this.health = player.get(Keys.HEALTH).get();
         this.foodLevel = player.get(Keys.FOOD_LEVEL).get();
         this.saturation = player.get(Keys.SATURATION).get();
         this.exhaustion = player.get(Keys.EXHAUSTION).get();
         this.exp = player.get(Keys.EXPERIENCE).get();
-        this.fireTicks = player.get(Keys.FIRE_TICKS).map(Ticks::getTicks).orElse(0L);
+        this.fireTicks = player.get(Keys.FIRE_TICKS).map(Ticks::ticks).orElse(0L);
         this.activePotionEffects = player.get(Keys.POTION_EFFECTS).orElse(emptyList());
 
         this.inventory = new HashMap<>();
@@ -233,7 +233,7 @@ public class PlayerData implements DataSerializable
 
         this.enderChest = new HashMap<>();
         i = 0;
-        for (Slot slot : player.getEnderChestInventory().slots())
+        for (Slot slot : player.enderChestInventory().slots())
         {
             final ItemStack item = slot.peek();
             if (!item.isEmpty())
@@ -247,7 +247,7 @@ public class PlayerData implements DataSerializable
     }
 
     @Override
-    public int getContentVersion()
+    public int contentVersion()
     {
         return 1;
     }

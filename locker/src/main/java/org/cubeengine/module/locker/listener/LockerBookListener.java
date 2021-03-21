@@ -62,15 +62,15 @@ public class LockerBookListener
     @Listener
     public void onInteractBlock(InteractBlockEvent.Secondary event, @Root ServerPlayer player)
     {
-        if (!event.getContext().get(EventContextKeys.USED_HAND).map(hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        if (!event.context().get(EventContextKeys.USED_HAND).map(hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
         {
             return;
         }
-        final ItemStack itemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
         final Optional<String> mode = itemInHand.get(LockerData.MODE);
         if (mode.isPresent())
         {
-            final BlockEntity blockEntity = event.getBlock().getLocation().flatMap(Location::getBlockEntity).orElse(null);
+            final BlockEntity blockEntity = event.block().location().flatMap(Location::blockEntity).orElse(null);
             if (this.handleLockerBookInteraction(player, LockerMode.valueOf(mode.get()), blockEntity, itemInHand))
             {
                 event.setCancelled(true);
@@ -81,38 +81,38 @@ public class LockerBookListener
     @Listener
     public void onPunch(DamageEntityEvent event, @First ServerPlayer player)
     {
-        if (!(event.getEntity() instanceof ServerPlayer))
+        if (!(event.entity() instanceof ServerPlayer))
         {
             return;
         }
-        if (lockerManager.getAccessBookPunchers().remove(player.getUniqueId()))
+        if (lockerManager.getAccessBookPunchers().remove(player.uniqueId()))
         {
-            final ItemStack bookItem = player.getItemInHand(HandTypes.MAIN_HAND);
+            final ItemStack bookItem = player.itemInHand(HandTypes.MAIN_HAND);
             final Optional<String> mode = bookItem.get(LockerData.MODE);
             if (mode.isPresent())
             {
                 if (mode.get().equals(LockerMode.UPDATE.name()))
                 {
                     final Map<UUID, Integer> accessMap = bookItem.get(LockerData.ACCESS).orElse(new HashMap<>());
-                    final UUID eUuid = event.getEntity().getUniqueId();
+                    final UUID eUuid = event.entity().uniqueId();
                     if (!accessMap.containsKey(eUuid))
                     {
                         accessMap.put(eUuid, ProtectionFlag.FULL);
                         bookItem.offer(LockerData.ACCESS, accessMap);
                         player.setItemInHand(HandTypes.MAIN_HAND, bookItem);
-                        i18n.send(player, MessageType.POSITIVE, "{name} added", ((ServerPlayer)event.getEntity()).getName());
+                        i18n.send(player, MessageType.POSITIVE, "{name} added", ((ServerPlayer)event.entity()).name());
                     }
                     else
                     {
-                        i18n.send(player, MessageType.NEUTRAL, "{name} already added", ((ServerPlayer)event.getEntity()).getName());
+                        i18n.send(player, MessageType.NEUTRAL, "{name} already added", ((ServerPlayer)event.entity()).name());
                     }
                     lockerManager.openBook(player);
                 }
             }
         }
-        else if (lockerManager.getTrustBookPunchers().remove(player.getUniqueId()))
+        else if (lockerManager.getTrustBookPunchers().remove(player.uniqueId()))
         {
-            final ItemStack bookItem = player.getItemInHand(HandTypes.MAIN_HAND);
+            final ItemStack bookItem = player.itemInHand(HandTypes.MAIN_HAND);
             final Optional<String> mode = bookItem.get(LockerData.MODE);
             if (mode.isPresent())
             {
@@ -120,17 +120,17 @@ public class LockerBookListener
                 {
                     final Map<UUID, Integer> trustMap = player.get(LockerData.TRUST).orElse(new HashMap<>());
 
-                    final UUID eUuid = event.getEntity().getUniqueId();
+                    final UUID eUuid = event.entity().uniqueId();
                     if (!trustMap.containsKey(eUuid))
                     {
                         trustMap.put(eUuid, ProtectionFlag.FULL);
                         player.offer(LockerData.TRUST, trustMap);
-                        lockerManager.invalidateTrustCache(player.getUniqueId());
-                        i18n.send(player, MessageType.POSITIVE, "{name} trusted", ((ServerPlayer)event.getEntity()).getName());
+                        lockerManager.invalidateTrustCache(player.uniqueId());
+                        i18n.send(player, MessageType.POSITIVE, "{name} trusted", ((ServerPlayer)event.entity()).name());
                     }
                     else
                     {
-                        i18n.send(player, MessageType.NEUTRAL, "{name} already trusted", ((ServerPlayer)event.getEntity()).getName());
+                        i18n.send(player, MessageType.NEUTRAL, "{name} already trusted", ((ServerPlayer)event.entity()).name());
                     }
                     lockerManager.openBook(player);
                 }
@@ -141,11 +141,11 @@ public class LockerBookListener
     @Listener
     public void onInteractEntity(InteractEntityEvent.Secondary event, @Root ServerPlayer player)
     {
-        final ItemStack itemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
         final Optional<String> mode = itemInHand.get(LockerData.MODE);
-        if (mode.isPresent() && event.getContext().get(EventContextKeys.USED_HAND).map(hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        if (mode.isPresent() && event.context().get(EventContextKeys.USED_HAND).map(hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
         {
-            if (this.handleLockerBookInteraction(player, LockerMode.valueOf(mode.get()), event.getEntity(), itemInHand))
+            if (this.handleLockerBookInteraction(player, LockerMode.valueOf(mode.get()), event.entity(), itemInHand))
             {
                 event.setCancelled(true);
             }
@@ -178,7 +178,7 @@ public class LockerBookListener
                 case TRUST:
                     if (dataHolder instanceof ServerPlayer)
                     {
-                        if (player.get(LockerData.TRUST).orElse(Collections.emptyMap()).get(((ServerPlayer)dataHolder).getUniqueId()) != null)
+                        if (player.get(LockerData.TRUST).orElse(Collections.emptyMap()).get(((ServerPlayer)dataHolder).uniqueId()) != null)
                         {
                             i18n.send(ChatType.ACTION_BAR, player, MessageType.POSITIVE, "{player} is trusted", dataHolder);
                         }

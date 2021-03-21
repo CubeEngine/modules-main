@@ -80,8 +80,8 @@ public class UserInformationCommands extends DispatcherCommand
     @Command(desc = "Lists roles of a user")
     public void list(CommandCause ctx, @Default User player)
     {
-        List<SubjectReference> parents = player.getSubjectData().getParents(GLOBAL_CONTEXT);
-        List<SubjectReference> transientParents = player.getTransientSubjectData().getParents(GLOBAL_CONTEXT);
+        List<SubjectReference> parents = player.subjectData().parents(GLOBAL_CONTEXT);
+        List<SubjectReference> transientParents = player.transientSubjectData().parents(GLOBAL_CONTEXT);
 
         Component translation = i18n.translate(ctx, NEUTRAL, "Roles of {user}:", player);
         if (ctx.hasPermission("cubeengine.roles.command.roles.user.assign"))
@@ -91,13 +91,13 @@ public class UserInformationCommands extends DispatcherCommand
                     sender -> {
                         i18n.send(sender, POSITIVE, "Click on the role you want to add to {user}.", player);
 
-                        for (Subject subject : service.getGroupSubjects().getLoadedSubjects())
+                        for (Subject subject : service.groupSubjects().loadedSubjects())
                         {
                             // TODO perm check for each role
                             if (!parents.contains(subject.asSubjectReference()) && subject instanceof FileSubject)
                             {
-                                sender.sendMessage(Identity.nil(), Component.text(" - " + subject.getIdentifier(), NamedTextColor.YELLOW).clickEvent(
-                                    ClickEvent.runCommand("/roles user assign " + player.getName() + " " + subject.getIdentifier())));
+                                sender.sendMessage(Identity.nil(), Component.text(" - " + subject.identifier(), NamedTextColor.YELLOW).clickEvent(
+                                    ClickEvent.runCommand("/roles user assign " + player.name() + " " + subject.identifier())));
                             }
                         }
                     })).hoverEvent(HoverEvent.showText(i18n.translate(ctx, POSITIVE, "Click to add role"))));
@@ -118,21 +118,21 @@ public class UserInformationCommands extends DispatcherCommand
                 // TODO perm check for each role
                 final Component removeText = Component.text("(-)", NamedTextColor.RED).clickEvent(SpongeComponents.executeCallback(sender -> {
                     i18n.send(sender, NEGATIVE, "Do you really want to remove {role} from {user}?", parent, player);
-                    ctx.sendMessage(Identity.nil(), i18n.translate(sender, Style.style(NamedTextColor.DARK_GREEN), "Confirm").clickEvent(ClickEvent.runCommand("/roles user remove " + player.getName() + " " + parent.getIdentifier())));
+                    ctx.sendMessage(Identity.nil(), i18n.translate(sender, Style.style(NamedTextColor.DARK_GREEN), "Confirm").clickEvent(ClickEvent.runCommand("/roles user remove " + player.name() + " " + parent.identifier())));
                 })).hoverEvent(HoverEvent.showText(removeText1));
 
-                ctx.sendMessage(Identity.nil(), Component.text().append(Component.text("- ")).append(Component.text(parent.getIdentifier(), NamedTextColor.GOLD)).append(Component.space().append(removeText)).build());
+                ctx.sendMessage(Identity.nil(), Component.text().append(Component.text("- ")).append(Component.text(parent.identifier(), NamedTextColor.GOLD)).append(Component.space().append(removeText)).build());
             });
         }
         else
         {
 
-            parents.forEach(parent -> ctx.sendMessage(Identity.nil(), Component.text().append(Component.text("- ")).append(Component.text(parent.getSubjectIdentifier(), NamedTextColor.GOLD)).build()));
+            parents.forEach(parent -> ctx.sendMessage(Identity.nil(), Component.text().append(Component.text("- ")).append(Component.text(parent.subjectIdentifier(), NamedTextColor.GOLD)).build()));
         }
         String transientText = i18n.getTranslation(ctx, "transient");
         final Component transientComponent = i18n.composeMessage(ctx, Style.style(NamedTextColor.GRAY), " ({name:color=YELLOW})", transientText);
         transientParents.forEach(parent -> ctx.sendMessage(Identity.nil(),
-                   Component.text().append(Component.text("- ")).append(Component.text(parent.getSubjectIdentifier(), NamedTextColor.GOLD)).append(transientComponent).build()));
+                   Component.text().append(Component.text("- ")).append(Component.text(parent.subjectIdentifier(), NamedTextColor.GOLD)).append(transientComponent).build()));
     }
 
 
@@ -144,7 +144,7 @@ public class UserInformationCommands extends DispatcherCommand
 
         Component permText = RolesUtil.permText(ctx, permission, service, i18n);
         FoundPermission found = RolesUtil.findPermission(service, player, permission, contexts);
-        FoundPermission foundNow = RolesUtil.findPermission(service, player, permission, player.getActiveContexts());
+        FoundPermission foundNow = RolesUtil.findPermission(service, player, permission, player.activeContexts());
 
         i18n.send(ctx, NEUTRAL, "Player {user} permission check {txt#permission}", player, permText);
         if (found != null)
@@ -192,7 +192,7 @@ public class UserInformationCommands extends DispatcherCommand
         {
             from = Component.text().append(i18n.translate(ctx, NEUTRAL, "Permission inherited from:")).append(Component.newline()).append(
                     RolesUtil.permText(ctx, found.permission, service, i18n).color(NamedTextColor.GOLD)).append(Component.newline()).append(
-                           i18n.translate(ctx, NEUTRAL, "in the role {name}!", found.subject.getIdentifier())).build();
+                           i18n.translate(ctx, NEUTRAL, "in the role {name}!", found.subject.identifier())).build();
         }
         from = Component.text("(?)").hoverEvent(HoverEvent.showText(from));
         return from;
@@ -210,7 +210,7 @@ public class UserInformationCommands extends DispatcherCommand
         }
         else
         {
-            permissions.putAll(player.getSubjectData().getPermissions(contexts));
+            permissions.putAll(player.subjectData().permissions(contexts));
         }
         if (permissions.isEmpty())
         {
@@ -245,13 +245,13 @@ public class UserInformationCommands extends DispatcherCommand
         }
 
         i18n.send(ctx, NEUTRAL, "{input#key}: {input#value} is set for {user} in {context}.", key, option.get().value, player, context);
-        if (option.get().subject.getIdentifier().equals(player.getIdentifier()))
+        if (option.get().subject.identifier().equals(player.identifier()))
         {
             i18n.send(ctx, NEUTRAL, "Options is directly assigned to the user!");
         }
         else
         {
-            i18n.send(ctx, NEUTRAL, "Options inherited from the role {name}!", option.get().subject.getIdentifier());
+            i18n.send(ctx, NEUTRAL, "Options inherited from the role {name}!", option.get().subject.identifier());
         }
     }
 
@@ -262,7 +262,7 @@ public class UserInformationCommands extends DispatcherCommand
         Set<Context> contexts = toSet(context);
         if (!all)
         {
-            Map<String, String> options = (player.getSubjectData()).getOptions(contexts);
+            Map<String, String> options = (player.subjectData()).options(contexts);
             i18n.send(ctx, NEUTRAL, "Options of {user} directly set in {context}:", player, context);
             for (Map.Entry<String, String> entry : options.entrySet())
             {
@@ -272,16 +272,16 @@ public class UserInformationCommands extends DispatcherCommand
         }
         try
         {
-            Subject subject = service.getUserSubjects().loadSubject(player.getIdentifier()).get();
+            Subject subject = service.userSubjects().loadSubject(player.identifier()).get();
             Map<String, FoundOption> options = new HashMap<>();
             RolesUtil.fillOptions(subject, contexts, options, service);
             i18n.send(ctx, NEUTRAL, "Options of {user} in {context}:", player, context);
             for (Map.Entry<String, FoundOption> entry : options.entrySet())
             {
                 Subject owner = entry.getValue().subject;
-                final Component hoverText = Component.text().append(Component.text(owner.getContainingCollection().getIdentifier(), NamedTextColor.YELLOW))
+                final Component hoverText = Component.text().append(Component.text(owner.containingCollection().identifier(), NamedTextColor.YELLOW))
                          .append(Component.text(":", NamedTextColor.GRAY))
-                         .append(Component.text(owner.getFriendlyIdentifier().orElse(owner.getIdentifier()), NamedTextColor.YELLOW))
+                         .append(Component.text(owner.friendlyIdentifier().orElse(owner.identifier()), NamedTextColor.YELLOW))
                          .build();
                 final TextComponent key = Component.text(entry.getKey(), NamedTextColor.YELLOW).hoverEvent(HoverEvent.showText(hoverText));
                 ctx.sendMessage(Identity.nil(), i18n.composeMessage(ctx, Style.empty(), "- {txt}{text:\\::color=WHITE} {name:color=GOLD}", key, entry.getValue().value));

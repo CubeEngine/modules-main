@@ -220,7 +220,7 @@ public class SettingsCommands extends AbstractSettingsCommand
             @Default @Named("in") Region region, @Named("bypass") String role,
             @Flag boolean force)
     {
-        CommandMapping mapping = Sponge.getServer().getCommandManager().getCommandMapping(command).orElse(null);
+        CommandMapping mapping = Sponge.server().commandManager().commandMapping(command).orElse(null);
         boolean all = "*".equals(command);
         if (mapping == null && !all)
         {
@@ -247,7 +247,7 @@ public class SettingsCommands extends AbstractSettingsCommand
         }
 
         // Block primary alias instead of parameter if found
-        setOrUnset(region.getSettings().blockedCommands, mapping == null ? command : mapping.getPrimaryAlias(), set);
+        setOrUnset(region.getSettings().blockedCommands, mapping == null ? command : mapping.primaryAlias(), set);
         if (set == Tristate.UNDEFINED)
         {
             region.getSettings().blockedCommands.remove(command);

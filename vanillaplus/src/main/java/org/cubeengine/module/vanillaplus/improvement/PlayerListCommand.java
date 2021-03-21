@@ -60,7 +60,7 @@ public class PlayerListCommand
         SortedMap<String, Set<ServerPlayer>> grouped = new TreeMap<>();
         for (ServerPlayer player : users)
         {
-            String listGroup = player.getOption("list-group").orElse("&6Players");
+            String listGroup = player.option("list-group").orElse("&6Players");
             grouped.computeIfAbsent(listGroup, k -> new LinkedHashSet<>()).add(player);
         }
         return grouped;
@@ -71,9 +71,9 @@ public class PlayerListCommand
     {
         final SortedSet<ServerPlayer> users = new TreeSet<>(USER_COMPARATOR);
 
-        for (ServerPlayer user : Sponge.getServer().getOnlinePlayers())
+        for (ServerPlayer user : Sponge.server().onlinePlayers())
         {
-            if (context.getSubject() instanceof ServerPlayer && !((ServerPlayer)context.getSubject()).canSee(user))
+            if (context.subject() instanceof ServerPlayer && !((ServerPlayer)context.subject()).canSee(user))
             {
                 continue;
             }
@@ -87,7 +87,7 @@ public class PlayerListCommand
         }
 
         SortedMap<String, Set<ServerPlayer>> grouped = this.groupUsers(users);
-        i18n.send(context, POSITIVE, "Players online: {amount#online}/{amount#max}", users.size(), Sponge.getServer().getMaxPlayers());
+        i18n.send(context, POSITIVE, "Players online: {amount#online}/{amount#max}", users.size(), Sponge.server().maxPlayers());
 
         for (Entry<String, Set<ServerPlayer>> entry : grouped.entrySet())
         {
@@ -105,7 +105,7 @@ public class PlayerListCommand
 
     private Component formatUser(ServerPlayer user)
     {
-        final TextComponent result = Component.text(user.getName(), NamedTextColor.DARK_GREEN);
+        final TextComponent result = Component.text(user.name(), NamedTextColor.DARK_GREEN);
 
         // TODO chat module pass info that player is afk
         /*
@@ -122,7 +122,7 @@ public class PlayerListCommand
         @Override
         public int compare(Player user1, Player user2)
         {
-            return String.CASE_INSENSITIVE_ORDER.compare(user1.getName(), user2.getName());
+            return String.CASE_INSENSITIVE_ORDER.compare(user1.name(), user2.name());
         }
     }
 }

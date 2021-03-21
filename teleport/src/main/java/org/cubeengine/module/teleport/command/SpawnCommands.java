@@ -81,22 +81,22 @@ public class SpawnCommands
                 return;
 //                throw new TooFewArgumentsException();
             }
-            final ServerLocation loc = ((ServerPlayer)context).getServerLocation();
-            x = loc.getBlockX();
-            y = loc.getBlockY();
-            z = loc.getBlockZ();
-            direction = ((Player)context).getRotation();
+            final ServerLocation loc = ((ServerPlayer)context).serverLocation();
+            x = loc.blockX();
+            y = loc.blockY();
+            z = loc.blockZ();
+            direction = ((Player)context).rotation();
         }
         //em.fireEvent(new WorldSetSpawnEvent(this.module, world, new Location<>(world, x, y, z), direction, context));
-        world.getProperties().setSpawnPosition(new Vector3i(x, y, z));
+        world.properties().setSpawnPosition(new Vector3i(x, y, z));
         i18n.send(context, POSITIVE, "The spawn in {world} is now set to {vector:x\\=:y\\=:z\\=}", world, new Vector3i(x, y, z));
     }
 
     @Command(desc = "Teleports all players to spawn")
     public void spawnAll(CommandCause context, ServerWorld world, @Flag boolean force)
     {
-        ServerLocation loc = world.getLocation(world.getProperties().spawnPosition().add(0.5, 0, 0.5));
-        for (ServerPlayer aPlayer : Sponge.getServer().getOnlinePlayers())
+        ServerLocation loc = world.location(world.properties().spawnPosition().add(0.5, 0, 0.5));
+        for (ServerPlayer aPlayer : Sponge.server().onlinePlayers())
         {
             if (!force && aPlayer.hasPermission(perms.CMD_SPAWN_PREVENT.getId()))
             {
@@ -115,16 +115,16 @@ public class SpawnCommands
         world = world == null ? module.getConfig().getMainWorld() : world;
         if (world == null)
         {
-            world = player.getWorld();
+            world = player.world();
         }
-        force = force && context.hasPermission(perms.CMD_SPAWN_FORCE.getId()) || context.getSubject().equals(player);
+        force = force && context.hasPermission(perms.CMD_SPAWN_FORCE.getId()) || context.subject().equals(player);
         if (!force && player.hasPermission(perms.CMD_SPAWN_PREVENT.getId()))
         {
             i18n.send(ACTION_BAR, context, NEGATIVE, "You are not allowed to spawn {user}!", player);
             return;
         }
-        final ServerLocation spawnLocation = world.getLocation(world.getProperties().spawnPosition().add(0.5, 0, 0.5));
-        Vector3d rotation = player.getRotation();
+        final ServerLocation spawnLocation = world.location(world.properties().spawnPosition().add(0.5, 0, 0.5));
+        Vector3d rotation = player.rotation();
         player.setLocation(spawnLocation);
         player.setRotation(rotation);
         i18n.send(ACTION_BAR, context, POSITIVE, "You are now standing at the spawn in {world}!", world);
@@ -134,14 +134,14 @@ public class SpawnCommands
     @Restricted(msg = "Pro Tip: Teleport does not work IRL!")
     public void tpworld(ServerPlayer context, ServerWorld world)
     {
-        final ServerLocation spawnLocation = world.getLocation(world.getProperties().spawnPosition().add(0.5, 0, 0.5));
-        final ResourceKey worldKey = world.getProperties().getKey();
-        if (!context.hasPermission(worldPerms.getPermission(worldKey.getNamespace() + "." + worldKey.getValue()).getId()))
+        final ServerLocation spawnLocation = world.location(world.properties().spawnPosition().add(0.5, 0, 0.5));
+        final ResourceKey worldKey = world.properties().key();
+        if (!context.hasPermission(worldPerms.getPermission(worldKey.namespace() + "." + worldKey.value()).getId()))
         {
             i18n.send(ACTION_BAR, context, NEGATIVE, "You are not allowed to teleport to this world!");
             return;
         }
-        Vector3d rotation = context.getRotation();
+        Vector3d rotation = context.rotation();
         context.setLocation(spawnLocation);
         i18n.send(ACTION_BAR, context, POSITIVE, "Teleported to the spawn of world {world}!", world);
         context.setRotation(rotation);

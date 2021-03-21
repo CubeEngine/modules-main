@@ -42,12 +42,12 @@ public class Netherportals
     @Listener
     public void onPortal(ChangeEntityWorldEvent.Pre event, @First PortalType portalType)
     {
-        final MovementType type = event.getContext().get(EventContextKeys.MOVEMENT_TYPE).orElse(null);
+        final MovementType type = event.context().get(EventContextKeys.MOVEMENT_TYPE).orElse(null);
         if (type != MovementTypes.PORTAL.get())
         {
             return;
         }
-        WorldSection section = config.worldSettings.get(new ConfigWorld(event.getOriginalWorld()));
+        WorldSection section = config.worldSettings.get(new ConfigWorld(event.originalWorld()));
         if (section == null || !section.enablePortalRouting)
         {
             return;

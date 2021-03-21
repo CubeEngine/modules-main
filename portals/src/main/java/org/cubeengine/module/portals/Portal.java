@@ -57,10 +57,10 @@ public class Portal
 
     public boolean has(ServerLocation location)
     {
-        return location.getWorld().getKey().equals(config.world.getWorld().getKey()) &&
-            isBetween(config.location.from.getX(), config.location.to.getX(), location.getBlockX()) &&
-            isBetween(config.location.from.getY(), config.location.to.getY(), location.getBlockY()) &&
-            isBetween(config.location.from.getZ(), config.location.to.getZ(), location.getBlockZ());
+        return location.world().key().equals(config.world.getWorld().key()) &&
+            isBetween(config.location.from.getX(), config.location.to.getX(), location.blockX()) &&
+            isBetween(config.location.from.getY(), config.location.to.getY(), location.blockY()) &&
+            isBetween(config.location.from.getZ(), config.location.to.getZ(), location.blockZ());
     }
 
     private static boolean isBetween(int a, int b, int x)
@@ -75,7 +75,7 @@ public class Portal
             if (entity instanceof Player)
             {
                 i18n.send(((Player)entity), NEUTRAL, "This portal {name} has no destination yet!", this.getName());
-                module.getPortalsAttachment(entity.getUniqueId()).setInPortal(true);
+                module.getPortalsAttachment(entity.uniqueId()).setInPortal(true);
             }
         }
         else
@@ -91,12 +91,12 @@ public class Portal
             Vector3i midpoint = MathHelper.midpoint(this.config.location.to, this.config.location.from);
             return ServerLocation.of(this.config.world.getWorld(), midpoint.getX() + 0.5, midpoint.getY(), midpoint.getZ() + 0.5);
         }
-        return this.config.world.getWorld().getLocation(this.config.location.destination.getPosition());
+        return this.config.world.getWorld().location(this.config.location.destination.position());
     }
 
     public Vector3d getPortalRot()
     {
-        return this.config.location.destination.getRotation();
+        return this.config.location.destination.rotation();
     }
 
     public void delete()

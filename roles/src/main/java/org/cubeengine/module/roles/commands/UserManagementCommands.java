@@ -82,12 +82,12 @@ public class UserManagementCommands extends DispatcherCommand
         }
         if (temp)
         {
-            if (!player.getPlayer().isPresent())
+            if (!player.player().isPresent())
             {
                 i18n.send(ctx, NEGATIVE, "You cannot assign a temporary role to a offline player!");
                 return;
             }
-            player.getTransientSubjectData().addParent(emptySet(), role.asSubjectReference()).thenAccept(b -> {
+            player.transientSubjectData().addParent(emptySet(), role.asSubjectReference()).thenAccept(b -> {
                 if (b)
                 {
                     i18n.send(ctx, POSITIVE, "Added the role {role} temporarily to {user}.", role, player);
@@ -97,7 +97,7 @@ public class UserManagementCommands extends DispatcherCommand
             });
             return;
         }
-        player.getSubjectData().addParent(emptySet(), role.asSubjectReference()).thenAccept(b -> {
+        player.subjectData().addParent(emptySet(), role.asSubjectReference()).thenAccept(b -> {
             if (b)
             {
                 i18n.send(ctx, POSITIVE, "Added the role {role} to {user}.", role, player);
@@ -117,8 +117,8 @@ public class UserManagementCommands extends DispatcherCommand
             return;
         }
 
-        CompletableFuture<Boolean> tData = player.getTransientSubjectData().removeParent(emptySet(), role.asSubjectReference());
-        CompletableFuture<Boolean> pData = player.getSubjectData().removeParent(emptySet(), role.asSubjectReference());
+        CompletableFuture<Boolean> tData = player.transientSubjectData().removeParent(emptySet(), role.asSubjectReference());
+        CompletableFuture<Boolean> pData = player.subjectData().removeParent(emptySet(), role.asSubjectReference());
         tData.thenCombine(pData, (b1, b2) -> b1 || b2).thenAccept(r -> {
             if (r) i18n.send(ctx, POSITIVE, "Removed the role {role} from {user}.", role, player);
             else   i18n.send(ctx, NEUTRAL, "{user} did not have the role {role}.", player, role);
@@ -130,16 +130,16 @@ public class UserManagementCommands extends DispatcherCommand
     @ExceptionHandler(CircularRoleDependencyExceptionHandler.class)
     public void clear(CommandCause ctx, User player)
     {
-        player.getSubjectData().clearParents(emptySet());
+        player.subjectData().clearParents(emptySet());
         i18n.send(ctx, NEUTRAL, "Cleared the roles of {user}.", player);
-        SubjectData defaultData = service.getDefaults().getSubjectData();
-        if (defaultData.getParents(emptySet()).isEmpty())
+        SubjectData defaultData = service.defaults().subjectData();
+        if (defaultData.parents(emptySet()).isEmpty())
         {
             i18n.send(ctx, NEUTRAL, "Default roles assigned:");
-            for (SubjectReference subject : defaultData.getParents(emptySet()))
+            for (SubjectReference subject : defaultData.parents(emptySet()))
             {
-                player.getTransientSubjectData().addParent(emptySet(), subject);
-                ctx.sendMessage(Identity.nil(), i18n.composeMessage(ctx, Style.empty(), "- {name:color=YELLOW}", subject.getSubjectIdentifier()));
+                player.transientSubjectData().addParent(emptySet(), subject);
+                ctx.sendMessage(Identity.nil(), i18n.composeMessage(ctx, Style.empty(), "- {name:color=YELLOW}", subject.subjectIdentifier()));
             }
         }
     }
@@ -154,7 +154,7 @@ public class UserManagementCommands extends DispatcherCommand
             return;
         }
         Set<Context> contexts = toSet(context);
-        player.getSubjectData().setPermission(contexts, permission, type).thenAccept(b -> {
+        player.subjectData().setPermission(contexts, permission, type).thenAccept(b -> {
             if (!b)
             {
                 i18n.send(ctx, NEGATIVE, "Permission {input} of {user} was already set to {bool} in {context}!", permission, player, type.asBoolean(), context);
@@ -174,7 +174,7 @@ public class UserManagementCommands extends DispatcherCommand
     public void resetPermission(CommandCause ctx, @Default User player, String permission, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        player.getSubjectData().setPermission(contexts, permission, Tristate.UNDEFINED).thenAccept(b -> {
+        player.subjectData().setPermission(contexts, permission, Tristate.UNDEFINED).thenAccept(b -> {
             if (b)
             {
                 i18n.send(ctx, NEUTRAL, "Permission {input} of {user} reset in {context}!", permission, player, context);
@@ -189,7 +189,7 @@ public class UserManagementCommands extends DispatcherCommand
     public void setOption(CommandCause ctx, User player, String key, String value, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        player.getSubjectData().setOption(contexts, key, value).thenAccept(b -> {
+        player.subjectData().setOption(contexts, key, value).thenAccept(b -> {
             if (b)
             {
                 i18n.send(ctx, POSITIVE, "Options {input#key} of {user} set to {input#value} in {context}!", key, player, value, context);
@@ -204,7 +204,7 @@ public class UserManagementCommands extends DispatcherCommand
     public void resetOption(CommandCause ctx, User player, String key, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        player.getSubjectData().setOption(contexts, key, null).thenAccept(b -> {
+        player.subjectData().setOption(contexts, key, null).thenAccept(b -> {
             if (b)
             {
                 i18n.send(ctx, NEUTRAL, "Options {input#key} of {user} removed in {context}!", key, player, context);
@@ -219,7 +219,7 @@ public class UserManagementCommands extends DispatcherCommand
     public void clearOption(CommandCause ctx, User player, @Named("in") @Default Context context)
     {
         Set<Context> contexts = toSet(context);
-        player.getSubjectData().clearOptions(contexts).thenAccept(b -> {
+        player.subjectData().clearOptions(contexts).thenAccept(b -> {
             if (b)
             {
                 i18n.send(ctx, NEUTRAL, "Options of {user} cleared in {context}!", player, context);

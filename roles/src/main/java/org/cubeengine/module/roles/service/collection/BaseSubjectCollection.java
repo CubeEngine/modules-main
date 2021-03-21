@@ -55,13 +55,13 @@ public abstract class BaseSubjectCollection implements SubjectCollection
     }
 
     @Override
-    public String getIdentifier()
+    public String identifier()
     {
         return identifier;
     }
 
     @Override
-    public Predicate<String> getIdentifierValidityPredicate()
+    public Predicate<String> identifierValidityPredicate()
     {
         return this::isValid;
     }
@@ -80,7 +80,7 @@ public abstract class BaseSubjectCollection implements SubjectCollection
     protected abstract Subject loadSubject0(String identifier);
 
     @Override
-    public final Optional<Subject> getSubject(String identifier)
+    public final Optional<Subject> subject(String identifier)
     {
         return Optional.ofNullable(subjects.get(identifier));
     }
@@ -96,7 +96,7 @@ public abstract class BaseSubjectCollection implements SubjectCollection
         Map<String, Subject> map = new HashMap<>();
         for (String id : ids)
         {
-            Optional<Subject> subject = this.getSubject(id);
+            Optional<Subject> subject = this.subject(id);
             if (subject.isPresent())
             {
                 map.put(id, subject.get());
@@ -110,7 +110,7 @@ public abstract class BaseSubjectCollection implements SubjectCollection
     }
 
     @Override
-    public Collection<Subject> getLoadedSubjects()
+    public Collection<Subject> loadedSubjects()
     {
         List<Subject> list = new ArrayList<>();
         list.addAll(this.subjects.values());
@@ -120,7 +120,7 @@ public abstract class BaseSubjectCollection implements SubjectCollection
     @Override
     public SubjectReference newSubjectReference(String subjectIdentifier)
     {
-        if (this.getIdentifierValidityPredicate().test(subjectIdentifier))
+        if (this.identifierValidityPredicate().test(subjectIdentifier))
         {
             return new RolesSubjectReference(subjectIdentifier, this);
         }
@@ -128,19 +128,19 @@ public abstract class BaseSubjectCollection implements SubjectCollection
     }
 
     @Override
-    public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(String permission)
+    public CompletableFuture<Map<SubjectReference, Boolean>> allWithPermission(String permission)
     {
-        return getAllIdentifiers().thenApply(s -> loadSubjects0(s)).thenApply(s -> {
+        return allIdentifiers().thenApply(this::loadSubjects0).thenApply(s -> {
             final Map<SubjectReference, Boolean> result = new HashMap<>();
-            s.values().forEach(elem -> collectPermRef(elem, permission, elem.getActiveContexts(), result));
+            s.values().forEach(elem -> collectPermRef(elem, permission, elem.activeContexts(), result));
             return Collections.unmodifiableMap(result);
         });
     }
 
     @Override
-    public CompletableFuture<Map<SubjectReference, Boolean>> getAllWithPermission(Set<Context> contexts, String permission)
+    public CompletableFuture<Map<SubjectReference, Boolean>> allWithPermission(Set<Context> contexts, String permission)
     {
-        return getAllIdentifiers().thenApply(s -> loadSubjects0(s)).thenApply(s -> {
+        return allIdentifiers().thenApply(this::loadSubjects0).thenApply(s -> {
             final Map<SubjectReference, Boolean> result = new HashMap<>();
             s.values().forEach(elem -> collectPermRef(elem, permission, contexts, result));
             return Collections.unmodifiableMap(result);
@@ -148,15 +148,15 @@ public abstract class BaseSubjectCollection implements SubjectCollection
     }
 
     @Override
-    public Map<Subject, Boolean> getLoadedWithPermission(String permission)
+    public Map<Subject, Boolean> loadedWithPermission(String permission)
     {
         final Map<Subject, Boolean> result = new HashMap<>();
-        subjects.values().forEach(elem -> collectPerm(elem, permission, elem.getActiveContexts(), result));
+        subjects.values().forEach(elem -> collectPerm(elem, permission, elem.activeContexts(), result));
         return Collections.unmodifiableMap(result);
     }
 
     @Override
-    public Map<Subject, Boolean> getLoadedWithPermission(Set<Context> contexts, String permission)
+    public Map<Subject, Boolean> loadedWithPermission(Set<Context> contexts, String permission)
     {
         final Map<Subject, Boolean> result = new HashMap<>();
         subjects.values().forEach(elem -> collectPerm(elem, permission, contexts, result));
@@ -164,11 +164,11 @@ public abstract class BaseSubjectCollection implements SubjectCollection
     }
 
     @Override
-    public Subject getDefaults()
+    public Subject defaults()
     {
         try
         {
-            return service.getCollection(PermissionService.SUBJECTS_DEFAULT).get().loadSubject(getIdentifier()).get();
+            return service.collection(PermissionService.SUBJECTS_DEFAULT).get().loadSubject(identifier()).get();
         }
         catch (ExecutionException | InterruptedException e)
         {
@@ -178,7 +178,7 @@ public abstract class BaseSubjectCollection implements SubjectCollection
 
     private void collectPerm(Subject subject, String permission, Set<Context> contexts, Map<Subject, Boolean> result)
     {
-        Tristate state = subject.getPermissionValue(contexts, permission);
+        Tristate state = subject.permissionValue(contexts, permission);
         if (state != UNDEFINED)
         {
             result.put(subject, state.asBoolean());
@@ -187,10 +187,10 @@ public abstract class BaseSubjectCollection implements SubjectCollection
 
     private void collectPermRef(Subject subject, String permission, Set<Context> contexts, Map<SubjectReference, Boolean> result)
     {
-        Tristate state = subject.getPermissionValue(contexts, permission);
+        Tristate state = subject.permissionValue(contexts, permission);
         if (state != UNDEFINED)
         {
-            result.put(subject.getContainingCollection().newSubjectReference(subject.getIdentifier()), state.asBoolean());
+            result.put(subject.containingCollection().newSubjectReference(subject.identifier()), state.asBoolean());
         }
     }
 }

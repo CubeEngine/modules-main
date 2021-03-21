@@ -51,19 +51,19 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     }
 
     @Override
-    public SubjectData getTransientSubjectData()
+    public SubjectData transientSubjectData()
     {
         return transientData;
     }
 
     @Override
-    public Optional<String> getOption(Set<Context> contexts, String key)
+    public Optional<String> option(Set<Context> contexts, String key)
     {
         return RolesUtil.getOption(service, this, key, contexts, true).map(found -> found.value);
     }
 
     @Override
-    public Tristate getPermissionValue(Set<Context> contexts, String permission)
+    public Tristate permissionValue(Set<Context> contexts, String permission)
     {
         if (permission == null)
         {
@@ -80,14 +80,14 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     @Override
     public boolean isChildOf(Set<Context> contexts, SubjectReference parent)
     {
-        return getTransientSubjectData().getParents(contexts).contains(parent) || getSubjectData().getParents(contexts).contains(parent);
+        return transientSubjectData().parents(contexts).contains(parent) || subjectData().parents(contexts).contains(parent);
     }
 
     @Override
-    public List<SubjectReference> getParents(Set<Context> contexts)
+    public List<SubjectReference> parents(Set<Context> contexts)
     {
-        List<SubjectReference> parents = new ArrayList<>(getTransientSubjectData().getParents(contexts));
-        parents.addAll(getSubjectData().getParents(contexts));
+        List<SubjectReference> parents = new ArrayList<>(transientSubjectData().parents(contexts));
+        parents.addAll(subjectData().parents(contexts));
         return unmodifiableList(parents);
     }
 
@@ -96,19 +96,19 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     {
         if (this.ref == null)
         {
-            this.ref = new RolesSubjectReference(getIdentifier(), getContainingCollection());
+            this.ref = new RolesSubjectReference(identifier(), containingCollection());
         }
         return this.ref;
     }
 
     @Override
-    public SubjectCollection getContainingCollection()
+    public SubjectCollection containingCollection()
     {
         return collection;
     }
 
     @Override
-    public Set<Context> getActiveContexts()
+    public Set<Context> activeContexts()
     {
         Set<Context> contexts = new HashSet<>();
         service.getContextCalculators().forEach(c -> c.accumulateContexts(this, contexts));

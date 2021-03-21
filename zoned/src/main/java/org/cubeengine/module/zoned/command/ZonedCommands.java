@@ -177,16 +177,16 @@ public class ZonedCommands extends DispatcherCommand
     {
         Cuboid boundingCuboid = zone.shape.getBoundingCuboid();
         Vector3d middle = boundingCuboid.getMinimumPoint().add(boundingCuboid.getMaximumPoint()).div(2);
-        ServerLocation loc = zone.world.getWorld().getLocation(middle);
+        ServerLocation loc = zone.world.getWorld().location(middle);
         GameMode mode = context.get(Keys.GAME_MODE).orElse(null);
         if (mode != GameModes.SPECTATOR)
         {
             int h = (int)boundingCuboid.getHeight() / 2 + 1;
             int w = (int)Math.max(boundingCuboid.getWidth() / 2 + 1, boundingCuboid.getDepth() / 2 + 1);
-            java.util.Optional<ServerLocation> adjusted = Sponge.getServer().getTeleportHelper()
-                .getSafeLocation(loc, Math.max(h, 5), Math.max(w, 5),
+            java.util.Optional<ServerLocation> adjusted = Sponge.server().teleportHelper()
+                .findSafeLocation(loc, Math.max(h, 5), Math.max(w, 5),
                                  ((int)boundingCuboid.getHeight()),
-                                 mode == GameModes.CREATIVE ? TeleportHelperFilters.FLYING.get() : TeleportHelperFilters.DEFAULT.get());
+                                 mode == GameModes.CREATIVE.get() ? TeleportHelperFilters.FLYING.get() : TeleportHelperFilters.DEFAULT.get());
             if (!adjusted.isPresent() && !force)
             {
                 i18n.send(ACTION_BAR, context, POSITIVE,
@@ -203,7 +203,7 @@ public class ZonedCommands extends DispatcherCommand
     public void circuitSelect(ServerPlayer player)
     {
         Set<Direction> directions = EnumSet.of(Direction.DOWN, Direction.UP, Direction.NORTH, Direction.EAST, Direction.SOUTH, Direction.WEST);
-        em.listenUntil(this.module.getClass(), InteractBlockEvent.Secondary.class, e -> e.getCause().root().equals(player), e -> this.circuitSelect(e, player, directions));
+        em.listenUntil(this.module.getClass(), InteractBlockEvent.Secondary.class, e -> e.cause().root().equals(player), e -> this.circuitSelect(e, player, directions));
         i18n.send(player, POSITIVE, "Select a piece of your redstone circuit.");
     }
 
@@ -226,13 +226,13 @@ public class ZonedCommands extends DispatcherCommand
 
     private boolean circuitSelect(InteractBlockEvent.Secondary e, ServerPlayer player, Set<Direction> directions)
     {
-        if (!e.getContext().get(EventContextKeys.USED_HAND).map(h -> h.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        if (!e.context().get(EventContextKeys.USED_HAND).map(h -> h.equals(HandTypes.MAIN_HAND.get())).orElse(false))
         {
             return false;
         }
         e.setCancelled(true);
-        final ServerWorld world = player.getWorld();
-        Vector3i start = e.getBlock().getPosition();
+        final ServerWorld world = player.world();
+        Vector3i start = e.block().position();
         if (!isPowering(world, start))
         {
             i18n.send(player, NEGATIVE, "Click a redstone powered block!");
@@ -293,8 +293,8 @@ public class ZonedCommands extends DispatcherCommand
 
     private boolean isPowering(ServerWorld world, Vector3i pos)
     {
-        final BlockState state = world.getBlock(pos);
-        return state.supports(Keys.POWER) || state.supports(Keys.IS_POWERED) || state.getType().isAnyOf(
+        final BlockState state = world.block(pos);
+        return state.supports(Keys.POWER) || state.supports(Keys.IS_POWERED) || state.type().isAnyOf(
             BlockTypes.REDSTONE_TORCH, BlockTypes.REDSTONE_WALL_TORCH, BlockTypes.REPEATER, BlockTypes.PISTON,
             BlockTypes.PISTON_HEAD, BlockTypes.MOVING_PISTON, BlockTypes.STICKY_PISTON, BlockTypes.SLIME_BLOCK);
     }

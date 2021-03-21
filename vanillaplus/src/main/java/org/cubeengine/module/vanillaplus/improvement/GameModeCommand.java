@@ -53,7 +53,7 @@ public class GameModeCommand extends PermissionContainer
     @Command(alias = "gm", desc = "Changes the gamemode")
     public void gamemode(CommandCause context, @Option GameMode gamemode, @Default User player)
     {
-        if (!context.getIdentifier().equals(player.getIdentifier())
+        if (!context.identifier().equals(player.identifier())
             && !context.hasPermission(COMMAND_GAMEMODE_OTHER.getId()))
         {
             i18n.send(context, NEGATIVE, "You are not allowed to change the game mode of an other player!");
@@ -65,15 +65,15 @@ public class GameModeCommand extends PermissionContainer
             newMode = toggleGameMode(player.get(Keys.GAME_MODE).get());
         }
         player.offer(Keys.GAME_MODE, newMode);
-        if (context.getSubject().equals(player.getPlayer().orElse(null)))
+        if (context.subject().equals(player.player().orElse(null)))
         {
             i18n.send(ChatType.ACTION_BAR, context, POSITIVE, "You changed your game mode to {input#gamemode}!", newMode.asComponent());
             return;
         }
         i18n.send(context, POSITIVE, "You changed the game mode of {user} to {input#gamemode}!", player, newMode.asComponent());
-        if (player.isOnline() && !context.getSubject().equals(player.getPlayer().get()))
+        if (player.isOnline() && !context.subject().equals(player.player().get()))
         {
-            i18n.send(player.getPlayer().get(), NEUTRAL, "Your game mode has been changed to {input#gamemode}!", newMode.asComponent());
+            i18n.send(player.player().get(), NEUTRAL, "Your game mode has been changed to {input#gamemode}!", newMode.asComponent());
         }
 
     }

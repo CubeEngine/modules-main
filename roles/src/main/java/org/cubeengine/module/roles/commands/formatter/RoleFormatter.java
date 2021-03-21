@@ -31,12 +31,12 @@ public class RoleFormatter extends ReflectedFormatter
     @Format
     public Component format(FileSubject object)
     {
-        return new Text(object.getIdentifier());
+        return new Text(object.identifier());
     }
 
     @Format
     public Component format(SubjectReference object)
     {
-        return new Text(object.getSubjectIdentifier());
+        return new Text(object.subjectIdentifier());
     }
 }

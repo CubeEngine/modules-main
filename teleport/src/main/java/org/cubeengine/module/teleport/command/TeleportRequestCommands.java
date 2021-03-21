@@ -64,7 +64,7 @@ public class TeleportRequestCommands
     @Restricted(msg = "{text:Pro Tip}: Teleport does not work IRL!")
     public void tpa(ServerPlayer context, ServerPlayer player)
     {
-        if (player.getUniqueId().equals(context.getUniqueId()))
+        if (player.uniqueId().equals(context.uniqueId()))
         {
             i18n.send(ACTION_BAR, context, NEUTRAL, "Teleporting you to yourself? Done.");
             return;
@@ -98,7 +98,7 @@ public class TeleportRequestCommands
     @Restricted(msg = "{text:Pro Tip}: Teleport does not work IRL!")
     public void tpahere(ServerPlayer context, ServerPlayer player)
     {
-        if (player.getUniqueId().equals(context.getUniqueId()))
+        if (player.uniqueId().equals(context.uniqueId()))
         {
             i18n.send(ACTION_BAR, context, NEUTRAL, "Teleporting yourself to you? Done.");
             return;
@@ -143,26 +143,26 @@ public class TeleportRequestCommands
                 return;
             }
             tl.removeFromRequest(context);
-            Optional<ServerPlayer> player = Sponge.getServer().getPlayer(uuid);
+            Optional<ServerPlayer> player = Sponge.server().player(uuid);
             if (!player.isPresent())
             {
                 i18n.send(ACTION_BAR, context, NEGATIVE, "That player seems to have disappeared.");
                 return;
             }
-            context.setLocation(player.get().getServerLocation());
+            context.setLocation(player.get().serverLocation());
             i18n.send(player.get(), POSITIVE, "{user} accepted your teleport request!", context);
             i18n.send(context, POSITIVE, "You accepted a teleport to {user}!", player.get());
         }
         else
         {
             tl.removeToRequest(context);
-            Optional<ServerPlayer> player = Sponge.getServer().getPlayer(uuid);
+            Optional<ServerPlayer> player = Sponge.server().player(uuid);
             if (!player.isPresent())
             {
                 i18n.send(ACTION_BAR, context, NEGATIVE, "That player seems to have disappeared.");
                 return;
             }
-            player.get().setLocation(context.getServerLocation());
+            player.get().setLocation(context.serverLocation());
             i18n.send(player.get(), POSITIVE, "{user} accepted your teleport request!", context);
             i18n.send(context, POSITIVE, "You accepted a teleport to {user}!", player.get());
         }
@@ -185,7 +185,7 @@ public class TeleportRequestCommands
         {
             tl.removeToRequest(sender);
 
-            Optional<ServerPlayer> player = Sponge.getServer().getPlayer(tpa);
+            Optional<ServerPlayer> player = Sponge.server().player(tpa);
             if (!player.isPresent())
             {
                 throw new IllegalStateException("Player saved in \"pendingTpToRequest\" was not found!");
@@ -196,7 +196,7 @@ public class TeleportRequestCommands
         else if (tpahere != null)
         {
             tl.removeFromRequest(sender);
-            Optional<ServerPlayer> player = Sponge.getServer().getPlayer(tpahere);
+            Optional<ServerPlayer> player = Sponge.server().player(tpahere);
             if (!player.isPresent())
             {
                 throw new IllegalStateException("User saved in \"pendingTpFromRequest\" was not found!");

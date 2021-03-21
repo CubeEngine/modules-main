@@ -38,13 +38,13 @@ public class BasicSubject extends BaseSubject<BaseSubjectData>
     }
 
     @Override
-    public BaseSubjectData getSubjectData()
+    public BaseSubjectData subjectData()
     {
         return this.data;
     }
 
     @Override
-    public String getIdentifier()
+    public String identifier()
     {
         return identifier;
     }
@@ -64,13 +64,13 @@ public class BasicSubject extends BaseSubject<BaseSubjectData>
 //    }
 
     @Override
-    public Set<Context> getActiveContexts()
+    public Set<Context> activeContexts()
     {
-        if (getContainingCollection().getIdentifier().equals(PermissionService.SUBJECTS_ROLE_TEMPLATE))
+        if (containingCollection().identifier().equals(PermissionService.SUBJECTS_ROLE_TEMPLATE))
         {
             return Collections.emptySet();
         }
-        return super.getActiveContexts();
+        return super.activeContexts();
     }
 
     @Override

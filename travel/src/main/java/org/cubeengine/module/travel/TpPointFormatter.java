@@ -46,7 +46,7 @@ public class TpPointFormatter extends AbstractFormatter<TeleportPoint>
     public Component format(TeleportPoint object, Context context, Arguments args)
     {
         final GameProfile owner = object.getOwner();
-        final String name = owner.getName().orElse(owner.getUniqueId().toString());
+        final String name = owner.name().orElse(owner.uniqueId().toString());
         String cmd = "/" + (object instanceof Home ? "home" : "warp") + " tp " + object.name + " " + name;
         return StyledComponent.styled(Style.style(TextDecoration.UNDERLINED), runCommand(cmd, hoverText(i18n.translate(context, Style.empty(), "Click to teleport to {}", object.name), name)));
     }

@@ -67,20 +67,20 @@ public class RemoveCommands
     @Command(desc = "Removes entities in a radius")
     public void remove(CommandCause context, @Label("entityType[:itemMaterial]") EntityFilter filters, @Option Integer radius, @Default @Named("in") ServerWorld world)
     {
-        final boolean isPlayer = context.getSubject() instanceof ServerPlayer;
+        final boolean isPlayer = context.subject() instanceof ServerPlayer;
         radius = radius == null ? isPlayer ? (module.getConfig().improve.commandRemoveDefaultRadius ) : - 1 : radius;
         if (radius <= 0 && radius != RADIUS_INFINITE)
         {
             i18n.send(context, NEGATIVE, "The radius has to be a whole number greater than 0!");
             return;
         }
-        ServerLocation loc = isPlayer ? ((ServerPlayer)context.getSubject()).getServerLocation() : null;
-        if (loc != null && !loc.getWorld().equals(world))
+        ServerLocation loc = isPlayer ? ((ServerPlayer)context.subject()).serverLocation() : null;
+        if (loc != null && !loc.world().equals(world))
         {
-            loc = world.getLocation(world.getProperties().spawnPosition());
+            loc = world.location(world.properties().spawnPosition());
         }
         int entitiesRemoved;
-        List<Entity> list = world.getEntities().stream().filter(filters).collect(toList());
+        List<Entity> list = world.entities().stream().filter(filters).collect(toList());
         entitiesRemoved = removeEntities(list, loc, radius);
 
         if (entitiesRemoved == 0)
@@ -118,8 +118,8 @@ public class RemoveCommands
         return (int)list.stream().filter(e -> {
             if (!all)
             {
-                ServerLocation eLoc = e.getServerLocation();
-                int distance = (int)(eLoc.getPosition().sub(loc.getPosition())).lengthSquared();
+                ServerLocation eLoc = e.serverLocation();
+                int distance = (int)(eLoc.position().sub(loc.position())).lengthSquared();
                 return radiusSquared >= distance;
             }
             return true;

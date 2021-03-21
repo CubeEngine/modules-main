@@ -47,6 +47,6 @@ public class StopCommand
         }
         message = ChatFormat.parseFormats(message);
 
-        Sponge.getServer().shutdown(ChatFormat.fromLegacy(message, '&'));
+        Sponge.server().shutdown(ChatFormat.fromLegacy(message, '&'));
     }
 }

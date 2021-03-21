@@ -47,11 +47,11 @@ public class SudoCommand
     {
         if (!message.startsWith("/"))
         {
-            player.simulateChat(Component.text(message), Sponge.getServer().getCauseStackManager().getCurrentCause());
+            player.simulateChat(Component.text(message), Sponge.server().causeStackManager().currentCause());
             i18n.send(context, POSITIVE, "Forced {user} to chat: {input#message}", player, message);
             return;
         }
-        if (Sponge.getServer().getCommandManager().process(player, player, message.substring(1)).isSuccess())
+        if (Sponge.server().commandManager().process(player, player, message.substring(1)).isSuccess())
         {
             i18n.send(context, POSITIVE, "Command {input#command} executed as {user}", message, player);
             return;

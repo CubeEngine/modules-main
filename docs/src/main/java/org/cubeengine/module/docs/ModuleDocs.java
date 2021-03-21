@@ -93,9 +93,9 @@ public class ModuleDocs
             this.config = reflector.load(Info.class, new InputStreamReader(is));
         }
         this.basePermission = pm.getBasePermission(module);
-        for (PermissionDescription perm : ps.getDescriptions())
+        for (PermissionDescription perm : ps.descriptions())
         {
-            if (perm.getId().startsWith(basePermission.getId() + ".") || perm.getId().equals(basePermission.getId()))
+            if (perm.id().startsWith(basePermission.getId() + ".") || perm.id().equals(basePermission.getId()))
             {
                 this.permissions.add(perm);
             }

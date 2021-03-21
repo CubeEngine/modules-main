@@ -43,8 +43,8 @@ public class Destination
     public Destination(ServerLocation location, Vector3d rotation, I18n i18n)
     {
         this.i18n = i18n;
-        this.world = new ConfigWorld(location.getWorld());
-        this.position = location.getPosition();
+        this.world = new ConfigWorld(location.world());
+        this.position = location.position();
         this.rotation = rotation;
         this.type = Type.LOCATION;
     }
@@ -85,14 +85,14 @@ public class Destination
             rotation = destPortal.getPortalRot();
             break;
         case WORLD:
-            loc = world.getLocation(world.getProperties().spawnPosition()).add(0.5, 0, 0.5);
+            loc = world.location(world.properties().spawnPosition()).add(0.5, 0, 0.5);
             break;
         case LOCATION:
             if (this.position == null)
             {
                 return;
             }
-            loc = world.getLocation(this.position);
+            loc = world.location(this.position);
             rotation = this.rotation;
             break;
         default:
@@ -101,7 +101,7 @@ public class Destination
         // TODO check if this is working when riding on a horse
         if (safe)
         {
-            final Optional<ServerLocation> safeLoc = Sponge.getServer().getTeleportHelper().getSafeLocation(loc);
+            final Optional<ServerLocation> safeLoc = Sponge.server().teleportHelper().findSafeLocation(loc);
             if (safeLoc.isPresent())
             {
                 entity.setLocation(safeLoc.get());

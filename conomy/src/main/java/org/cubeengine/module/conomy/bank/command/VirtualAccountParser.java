@@ -55,13 +55,13 @@ public class VirtualAccountParser implements ValueParser<Virtual>, DefaultParame
     @Override
     public Virtual apply(CommandCause commandCause)
     {
-        if (!(commandCause.getAudience() instanceof ServerPlayer))
+        if (!(commandCause.audience() instanceof ServerPlayer))
         {
             i18n.send(commandCause, NEGATIVE, "You have to specify a bank!");
             return null;
         }
 
-        ServerPlayer user = (ServerPlayer) commandCause.getAudience();
+        ServerPlayer user = (ServerPlayer) commandCause.audience();
         final List<Virtual> banks = service.getBanks(user, AccessLevel.SEE);
         if (banks.isEmpty())
         {
@@ -72,17 +72,17 @@ public class VirtualAccountParser implements ValueParser<Virtual>, DefaultParame
     }
 
     @Override
-    public Optional<? extends Virtual> getValue(Key<? super Virtual> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    public Optional<? extends Virtual> parseValue(Key<? super Virtual> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
         final String arg = reader.parseString();
         Optional<BaseAccount.Virtual> target = Optional.empty();
         if (service.hasAccount(arg))
         {
-            target = service.getOrCreateAccount(arg).filter(a -> a instanceof BaseAccount.Virtual).map(BaseAccount.Virtual.class::cast);
+            target = service.orCreateAccount(arg).filter(a -> a instanceof BaseAccount.Virtual).map(BaseAccount.Virtual.class::cast);
         }
         if (!target.isPresent())
         {
-            throw reader.createException(i18n.translate(context.getCause(), NEGATIVE, "There is no bank account named {input#name}!", arg));
+            throw reader.createException(i18n.translate(context.cause(), NEGATIVE, "There is no bank account named {input#name}!", arg));
         }
         return target;
     }

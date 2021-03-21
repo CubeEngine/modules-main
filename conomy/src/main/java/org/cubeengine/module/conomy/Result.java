@@ -49,41 +49,41 @@ public class Result implements TransactionResult
         this.result = result;
         this.type = type.get();
 
-        Sponge.getEventManager().post(new ResultEvent( this));
+        Sponge.eventManager().post(new ResultEvent( this));
     }
 
     @Override
-    public Account getAccount()
+    public Account account()
     {
         return this.account;
     }
 
     @Override
-    public Currency getCurrency()
+    public Currency currency()
     {
         return this.currency;
     }
 
     @Override
-    public BigDecimal getAmount()
+    public BigDecimal amount()
     {
         return amount;
     }
 
     @Override
-    public Set<Context> getContexts()
+    public Set<Context> contexts()
     {
         return contexts;
     }
 
     @Override
-    public ResultType getResult()
+    public ResultType result()
     {
         return result;
     }
 
     @Override
-    public TransactionType getType()
+    public TransactionType type()
     {
         return type;
     }
@@ -99,7 +99,7 @@ public class Result implements TransactionResult
         }
 
         @Override
-        public Account getAccountTo()
+        public Account accountTo()
         {
             return this.accountTo;
         }
@@ -112,18 +112,18 @@ public class Result implements TransactionResult
 
         public ResultEvent(TransactionResult transaction)
         {
-            this.cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
+            this.cause = Sponge.server().causeStackManager().currentCause();
             this.transaction = transaction;
         }
 
         @Override
-        public TransactionResult getTransactionResult()
+        public TransactionResult transactionResult()
         {
             return transaction;
         }
 
         @Override
-        public Cause getCause()
+        public Cause cause()
         {
             return cause;
         }

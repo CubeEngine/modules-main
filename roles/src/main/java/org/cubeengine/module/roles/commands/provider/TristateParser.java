@@ -71,7 +71,7 @@ public class TristateParser implements DefaultParameterProvider<Tristate>, Value
     }
 
     @Override
-    public Optional<? extends Tristate> getValue(Key<? super Tristate> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    public Optional<? extends Tristate> parseValue(Key<? super Tristate> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
         final String token = reader.parseString();
         try
@@ -80,7 +80,7 @@ public class TristateParser implements DefaultParameterProvider<Tristate>, Value
         }
         catch (IllegalArgumentException e)
         {
-            throw reader.createException(i18n.translate(context.getCause(), "Invalid Tristate value"));
+            throw reader.createException(i18n.translate(context.cause(), "Invalid Tristate value"));
         }
     }
 }

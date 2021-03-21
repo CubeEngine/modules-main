@@ -35,7 +35,7 @@ public class EntityLockConfig extends LockConfig<EntityLockConfig, EntityType>
 
     public String getTitle()
     {
-        return Sponge.getGame().registries().registry(RegistryTypes.ENTITY_TYPE).valueKey(type).toString();
+        return Sponge.game().registries().registry(RegistryTypes.ENTITY_TYPE).valueKey(type).toString();
     }
 
     public static class EntityLockerConfigConverter extends LockConfigConverter<EntityLockConfig>
@@ -47,7 +47,7 @@ public class EntityLockConfig extends LockConfig<EntityLockConfig, EntityType>
 
         protected EntityLockConfig fromString(String s) throws ConversionException
         {
-            return Sponge.getGame().registries().registry(RegistryTypes.ENTITY_TYPE).findValue(ResourceKey.resolve(s))
+            return Sponge.game().registries().registry(RegistryTypes.ENTITY_TYPE).findValue(ResourceKey.resolve(s))
                          .map(EntityLockConfig::new).orElseThrow(() -> ConversionException.of(this, s, "Invalid EntityType!"));
         }
     }

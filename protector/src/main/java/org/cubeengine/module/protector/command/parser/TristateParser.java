@@ -56,7 +56,7 @@ public class TristateParser implements ValueParser<Tristate>, ValueCompleter
     }
 
     @Override
-    public Optional<? extends Tristate> getValue(Key<? super Tristate> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    public Optional<? extends Tristate> parseValue(Key<? super Tristate> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
         String token = reader.parseString();
         switch (token.toLowerCase())

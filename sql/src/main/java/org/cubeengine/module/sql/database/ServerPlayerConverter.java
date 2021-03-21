@@ -36,7 +36,7 @@ public class ServerPlayerConverter extends AbstractConverter<String, ServerPlaye
         {
             return null;
         }
-        return Sponge.getServer().getPlayer(UUID.fromString(databaseObject)).orElse(null);
+        return Sponge.server().player(UUID.fromString(databaseObject)).orElse(null);
     }
 
     @Override
@@ -46,6 +46,6 @@ public class ServerPlayerConverter extends AbstractConverter<String, ServerPlaye
         {
             return null;
         }
-        return userObject.getUniqueId().toString();
+        return userObject.uniqueId().toString();
     }
 }

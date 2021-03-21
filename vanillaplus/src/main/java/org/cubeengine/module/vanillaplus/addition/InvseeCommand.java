@@ -80,11 +80,11 @@ public class InvseeCommand extends PermissionContainer
             {
                 if (ender)
                 {
-                    i18n.send(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your ender chest.", context);
+                    i18n.send(player.player().get(), NEUTRAL, "{sender} is looking into your ender chest.", context);
                 }
                 else
                 {
-                    i18n.send(player.getPlayer().get(), NEUTRAL, "{sender} is looking into your inventory.", context);
+                    i18n.send(player.player().get(), NEUTRAL, "{sender} is looking into your inventory.", context);
                 }
             }
         }
@@ -97,7 +97,7 @@ public class InvseeCommand extends PermissionContainer
                 return;
             }
             viewable = ViewableInventory.builder().type(ContainerTypes.GENERIC_9X3)
-                                        .slots(player.getEnderChestInventory().slots(), 0)
+                                        .slots(player.enderChestInventory().slots(), 0)
                                         .completeStructure()
                                         .build();
         }
@@ -105,13 +105,13 @@ public class InvseeCommand extends PermissionContainer
         {
             final ItemStack barrier = ItemStack.of(ItemTypes.BARRIER);
             barrier.offer(Keys.CUSTOM_NAME, Component.text("Unused Slot", NamedTextColor.BLACK));
-            final StandardInventory playerInventory = player.isOnline() ? player.getPlayer().get().getInventory() : player.getInventory();
+            final StandardInventory playerInventory = player.isOnline() ? player.player().get().inventory() : player.inventory();
             viewable = ViewableInventory.builder().type(ContainerTypes.GENERIC_9X5)
-                                        .slots(playerInventory.getArmor().slots(), 0)
+                                        .slots(playerInventory.armor().slots(), 0)
                                         .dummySlots(4, 4).item(barrier.createSnapshot())
-                                        .slots(playerInventory.getOffhand().slots(), 8)
-                                        .slots(playerInventory.getStorage().slots(), 9)
-                                        .slots(playerInventory.getHotbar().slots(), 4*9)
+                                        .slots(playerInventory.offhand().slots(), 8)
+                                        .slots(playerInventory.storage().slots(), 9)
+                                        .slots(playerInventory.hotbar().slots(), 4*9)
                                         .completeStructure()
                                         .build();
         }

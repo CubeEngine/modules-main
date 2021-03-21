@@ -90,7 +90,7 @@ public class RolesPermissionService implements PermissionService
         collections.put(SUBJECTS_USER, new UserCollection(this));
         collections.put(SUBJECTS_GROUP, new FileBasedCollection(modulePath, this, reflector, SUBJECTS_GROUP, true));
 
-        this.getLoadedCollections().values().stream()
+        this.loadedCollections().values().stream()
                 .filter(c -> c instanceof FileBasedCollection)
                 .map(FileBasedCollection.class::cast)
                 .forEach(FileBasedCollection::reload);
@@ -101,23 +101,23 @@ public class RolesPermissionService implements PermissionService
     }
 
     @Override
-    public UserCollection getUserSubjects()
+    public UserCollection userSubjects()
     {
         return (UserCollection)collections.get(SUBJECTS_USER);
     }
 
     @Override
-    public FileBasedCollection getGroupSubjects()
+    public FileBasedCollection groupSubjects()
     {
         return (FileBasedCollection)collections.get(SUBJECTS_GROUP);
     }
 
     @Override
-    public Subject getDefaults()
+    public Subject defaults()
     {
         try
         {
-            return getCollection(SUBJECTS_DEFAULT).get().loadSubject(SUBJECTS_DEFAULT).get();
+            return collection(SUBJECTS_DEFAULT).get().loadSubject(SUBJECTS_DEFAULT).get();
         }
         catch (ExecutionException | InterruptedException e)
         {
@@ -126,13 +126,13 @@ public class RolesPermissionService implements PermissionService
     }
 
     @Override
-    public Optional<SubjectCollection> getCollection(String identifier)
+    public Optional<SubjectCollection> collection(String identifier)
     {
         return Optional.of(this.collections.computeIfAbsent(identifier, i -> new FileBasedCollection(modulePath, this, reflector, i).reload()));
     }
 
     @Override
-    public Map<String, SubjectCollection> getLoadedCollections()
+    public Map<String, SubjectCollection> loadedCollections()
     {
         return Collections.unmodifiableMap(collections);
     }
@@ -160,13 +160,13 @@ public class RolesPermissionService implements PermissionService
     }
 
     @Override
-    public Optional<PermissionDescription> getDescription(String permission)
+    public Optional<PermissionDescription> description(String permission)
     {
         return Optional.ofNullable(descriptionMap.get(permission.toLowerCase()));
     }
 
     @Override
-    public Collection<PermissionDescription> getDescriptions()
+    public Collection<PermissionDescription> descriptions()
     {
         if (descriptions == null)
         {
@@ -177,15 +177,15 @@ public class RolesPermissionService implements PermissionService
 
     protected PermissionDescription addDescription(RolesPermissionDescription desc, Map<String, Tristate> roleAssignments)
     {
-        SubjectCollection subjects = getCollection(SUBJECTS_ROLE_TEMPLATE).get(); // TODO prevent infinite recursion
+        SubjectCollection subjects = this.collection(SUBJECTS_ROLE_TEMPLATE).get(); // TODO prevent infinite recursion
         roleAssignments.forEach((key, value) ->
-            subjects.loadSubject(key).thenAccept(s -> s.getTransientSubjectData().setPermission(GLOBAL_CONTEXT, desc.getId(), value)));
+            subjects.loadSubject(key).thenAccept(s -> s.transientSubjectData().setPermission(GLOBAL_CONTEXT, desc.id(), value)));
 
-        if (descriptionMap.put(desc.getId().toLowerCase(), desc) == null)
+        if (descriptionMap.put(desc.id().toLowerCase(), desc) == null)
         {
             if (config.debug)
             {
-                logger.debug(desc.getId().toLowerCase());
+                logger.debug(desc.id().toLowerCase());
             }
         }
         descriptions = null;
@@ -194,14 +194,14 @@ public class RolesPermissionService implements PermissionService
 
 
     @Override
-    public Predicate<String> getIdentifierValidityPredicate()
+    public Predicate<String> identifierValidityPredicate()
     {
         return input -> true;
     }
 
     @Override
     public CompletableFuture<SubjectCollection> loadCollection(String identifier) {
-        return CompletableFuture.completedFuture(this.getCollection(identifier).get());
+        return CompletableFuture.completedFuture(this.collection(identifier).get());
     }
 
     @Override
@@ -211,7 +211,7 @@ public class RolesPermissionService implements PermissionService
     }
 
     @Override
-    public CompletableFuture<Set<String>> getAllIdentifiers()
+    public CompletableFuture<Set<String>> allIdentifiers()
     {
         return CompletableFuture.completedFuture(this.collections.keySet());
     }
@@ -219,7 +219,7 @@ public class RolesPermissionService implements PermissionService
     @Override
     public SubjectReference newSubjectReference(String collectionIdentifier, String subjectIdentifier)
     {
-        return new RolesSubjectReference(subjectIdentifier, getCollection(collectionIdentifier).get());
+        return new RolesSubjectReference(subjectIdentifier, collection(collectionIdentifier).get());
     }
 
     public PermissionManager getPermissionManager()
@@ -236,12 +236,12 @@ public class RolesPermissionService implements PermissionService
     {
         this.getConfig().reload();
         // TODO
-        this.getLoadedCollections().values().stream()
+        this.loadedCollections().values().stream()
                .filter(c -> c instanceof FileBasedCollection)
                .map(FileBasedCollection.class::cast)
                .forEach(FileBasedCollection::reload);
 
-        this.getUserSubjects().reload();
+        this.userSubjects().reload();
 
         // TODO remove cached data ; needed?
     }

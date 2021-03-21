@@ -70,14 +70,14 @@ public class EntityFilterParser implements ValueParser<EntityFilter>, ValueCompl
     {
         return Stream.of(ITEM, ARROW, MINECART, PAINTING, ITEM_FRAME, EXPERIENCE_ORB)
               .map(DefaultedRegistryReference::location)
-              .filter(key -> currentInput.startsWith(key.asString()) || "minecraft".equals(key.getNamespace()) && currentInput.startsWith(key.getValue()))
+              .filter(key -> currentInput.startsWith(key.asString()) || "minecraft".equals(key.namespace()) && currentInput.startsWith(key.value()))
               .map(ResourceKey::asString).collect(Collectors.toList());
     }
 
     @Override
-    public Optional<? extends EntityFilter> getValue(Key<? super EntityFilter> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    public Optional<? extends EntityFilter> parseValue(Key<? super EntityFilter> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
-        final CommandCause cmdSource = context.getCause();
+        final CommandCause cmdSource = context.cause();
         String token = reader.parseString();
         List<Predicate<Entity>> filters = new ArrayList<>();
         if ("*".equals(token)) // All non living
@@ -85,7 +85,7 @@ public class EntityFilterParser implements ValueParser<EntityFilter>, ValueCompl
             filters.add(e -> !(e instanceof Living));
             return Optional.of(new EntityFilter(filters, true));
         }
-        final Locale locale = cmdSource.getAudience() instanceof ServerPlayer ? ((ServerPlayer)cmdSource.getAudience()).getLocale() : Locale.getDefault();
+        final Locale locale = cmdSource.audience() instanceof ServerPlayer ? ((ServerPlayer)cmdSource.audience()).locale() : Locale.getDefault();
         for (String entityString : StringUtils.explode(",", token))
         {
             EntityType<?> type;
@@ -128,7 +128,7 @@ public class EntityFilterParser implements ValueParser<EntityFilter>, ValueCompl
 //                return Optional.empty();
 //            }
             final ItemType item = itemType;
-            filters.add(entity -> entity.getType().equals(type) && (item == null || entity.get(Keys.ITEM_STACK_SNAPSHOT).get().getType().equals(item)));
+            filters.add(entity -> entity.type().equals(type) && (item == null || entity.get(Keys.ITEM_STACK_SNAPSHOT).get().type().equals(item)));
         }
         return Optional.of(new EntityFilter(filters));
     }

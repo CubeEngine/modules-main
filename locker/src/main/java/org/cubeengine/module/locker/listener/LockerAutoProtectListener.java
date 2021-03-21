@@ -60,12 +60,12 @@ public class LockerAutoProtectListener
     {
         if (module.getConfig().block.enable)
         {
-            event.getTransactions(Operations.PLACE.get()).forEach(transaction -> {
+            event.transactions(Operations.PLACE.get()).forEach(transaction -> {
                 for (BlockLockConfig cfg : module.getConfig().block.blocks)
                 {
-                    if (cfg.isAutoProtect() && cfg.getType().equals(transaction.getFinal().getState().getType()))
+                    if (cfg.isAutoProtect() && cfg.getType().equals(transaction.finalReplacement().state().type()))
                     {
-                        final ServerLocation loc = transaction.getFinal().getLocation().get();
+                        final ServerLocation loc = transaction.finalReplacement().location().get();
                         final short flags = cfg.getFlags();
                         if (lockerManager.createLock(loc, player, flags))
                         {
@@ -82,10 +82,10 @@ public class LockerAutoProtectListener
     {
         for (EntityLockConfig cfg : module.getConfig().entity.entities)
         {
-            if (cfg.isAutoProtect() && cfg.getType().equals(event.getEntity().getType()))
+            if (cfg.isAutoProtect() && cfg.getType().equals(event.entity().type()))
             {
                 final short flags = cfg.getFlags();
-                lockerManager.createLock(event.getEntity(), player, flags);
+                lockerManager.createLock(event.entity(), player, flags);
             }
         }
     }
@@ -93,13 +93,13 @@ public class LockerAutoProtectListener
     @Listener
     public void onSpawn(SpawnEntityEvent event, @First ServerPlayer player)
     {
-        for (Entity entity : event.getEntities())
+        for (Entity entity : event.entities())
         {
             if (entity instanceof Vehicle)
             {
                 for (EntityLockConfig cfg : module.getConfig().entity.entities)
                 {
-                    if (cfg.isAutoProtect() && cfg.getType().equals(entity.getType()))
+                    if (cfg.isAutoProtect() && cfg.getType().equals(entity.type()))
                     {
                         final short flags = cfg.getFlags();
                         lockerManager.createLock(entity, player, flags);

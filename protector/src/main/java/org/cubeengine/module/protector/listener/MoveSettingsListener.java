@@ -78,15 +78,15 @@ public class MoveSettingsListener extends PermissionContainer
     public void onMove(MoveEntityEvent event, @Getter("getEntity") ServerPlayer player)
     {
         // Ignore subblock movements
-        if (event.getDestinationPosition().toInt().equals(event.getOriginalPosition().toInt()))
+        if (event.destinationPosition().toInt().equals(event.originalPosition().toInt()))
         {
             return;
         }
 
         if (event instanceof ChangeEntityWorldEvent.Reposition)
         {
-            List<Region> from = manager.getRegionsAt(((Reposition)event).getOriginalWorld(), event.getOriginalPosition().toInt());
-            List<Region> to = manager.getRegionsAt(((Reposition)event).getDestinationWorld(), event.getDestinationPosition().toInt());
+            List<Region> from = manager.getRegionsAt(((Reposition)event).originalWorld(), event.originalPosition().toInt());
+            List<Region> to = manager.getRegionsAt(((Reposition)event).destinationWorld(), event.destinationPosition().toInt());
             if (from.isEmpty() && to.isEmpty())
             {
                 return;
@@ -108,8 +108,8 @@ public class MoveSettingsListener extends PermissionContainer
         }
         else
         {
-            List<Region> from = manager.getRegionsAt(player.getWorld(), event.getOriginalPosition().toInt());
-            List<Region> to = manager.getRegionsAt(player.getWorld(), event.getDestinationPosition().toInt());
+            List<Region> from = manager.getRegionsAt(player.world(), event.originalPosition().toInt());
+            List<Region> to = manager.getRegionsAt(player.world(), event.destinationPosition().toInt());
             if (from.isEmpty() && to.isEmpty())
             {
                 return;

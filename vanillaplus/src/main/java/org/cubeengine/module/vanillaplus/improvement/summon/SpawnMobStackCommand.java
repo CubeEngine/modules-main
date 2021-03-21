@@ -62,8 +62,8 @@ public class SpawnMobStackCommand extends DispatcherCommand
     @Command(desc = "Builds mobstack")
     public void build(ServerPlayer context, EntityType type, @Option String data) // TODO data completer and/or parser
     {
-        final Entity entity = SpawnMob.createMob(context, type, Arrays.asList(StringUtils.explode(":", data == null ? "" : data)), context.getServerLocation(), i18n);
-        final List<Entity> mobStack = mobStacks.computeIfAbsent(context.getUniqueId(), k -> new ArrayList<>());
+        final Entity entity = SpawnMob.createMob(context, type, Arrays.asList(StringUtils.explode(":", data == null ? "" : data)), context.serverLocation(), i18n);
+        final List<Entity> mobStack = mobStacks.computeIfAbsent(context.uniqueId(), k -> new ArrayList<>());
         mobStack.add(entity);
         i18n.send(ChatType.ACTION_BAR, context, POSITIVE, "Added {name} to your mobstack.", type.asComponent());
     }
@@ -71,7 +71,7 @@ public class SpawnMobStackCommand extends DispatcherCommand
     @Command(desc = "Clears the mobstack")
     public void clear(ServerPlayer context)
     {
-        mobStacks.remove(context.getUniqueId());
+        mobStacks.remove(context.uniqueId());
         i18n.send(ChatType.ACTION_BAR, context, POSITIVE, "Cleared your mobstack.");
     }
 
@@ -83,16 +83,16 @@ public class SpawnMobStackCommand extends DispatcherCommand
         {
             return;
         }
-        final List<Entity> stack = this.mobStacks.get(context.getUniqueId());
+        final List<Entity> stack = this.mobStacks.get(context.uniqueId());
         if (stack.isEmpty())
         {
             i18n.send(context, NEGATIVE, "Your mobstack is empty.");
         }
 
-        Component message = stack.get(0).getType().asComponent();
+        Component message = stack.get(0).type().asComponent();
         for (int i = 1; i < stack.size(); i++)
         {
-            message = i18n.translate(context, "{input#entity} riding {input}", stack.get(i).getType().asComponent(), message);
+            message = i18n.translate(context, "{input#entity} riding {input}", stack.get(i).type().asComponent(), message);
         }
 
         loc = loc.add(0.5, 0, 0.5);

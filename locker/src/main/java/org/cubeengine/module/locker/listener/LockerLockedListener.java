@@ -76,7 +76,7 @@ public class LockerLockedListener
     @Listener
     public void onInteractBlock(InteractBlockEvent.Secondary event, @Root ServerPlayer player)
     {
-        final Optional<ServerLocation> serverLoc = event.getBlock().getLocation();
+        final Optional<ServerLocation> serverLoc = event.block().location();
         final DataHolder.Mutable blockEntityOrLocation = lockerManager.getDataHolderAtLoc(serverLoc.orElse(null));
         if (this.handleLockedInteraction(player, blockEntityOrLocation, true))
         {
@@ -88,7 +88,7 @@ public class LockerLockedListener
     public void onInteractEntity(InteractEntityEvent event, @Root ServerPlayer player)
     {
         // TODO Living handled by AttackEntityEvent instead?
-        if (this.handleLockedInteraction(player, event.getEntity(), event instanceof InteractEntityEvent.Secondary))
+        if (this.handleLockedInteraction(player, event.entity(), event instanceof InteractEntityEvent.Secondary))
         {
             event.setCancelled(true);
         }
@@ -98,7 +98,7 @@ public class LockerLockedListener
     public void onAttackEntity(AttackEntityEvent event, @First EntityDamageSource source)
     {
         ServerPlayer player = findDamageSource(source);
-        if (this.handleLockedInteraction(player, event.getEntity(), false))
+        if (this.handleLockedInteraction(player, event.entity(), false))
         {
             event.setCancelled(true);
         }
@@ -107,12 +107,12 @@ public class LockerLockedListener
     @Listener
     public void onRedstone(NotifyNeighborBlockEvent event)
     {
-        final BlockSnapshot snap = event.getContext().get(EventContextKeys.NEIGHBOR_NOTIFY_SOURCE).orElse(null);
+        final BlockSnapshot snap = event.context().get(EventContextKeys.NEIGHBOR_NOTIFY_SOURCE).orElse(null);
         if (snap == null)
         {
             return;
         }
-        final ServerLocation loc = snap.getLocation().get();
+        final ServerLocation loc = snap.location().get();
         // TODO maybe the blockstate could have the data copied over?
         event.filterDirections(direction -> !lockerManager.handleRedstoneInteract(loc.relativeTo(direction)));
     }
@@ -121,11 +121,11 @@ public class LockerLockedListener
     public void onBlockBreak(ChangeBlockEvent.All event, @First ServerPlayer player)
     {
         final Set<Vector3i> checkedPos = new HashSet<>();
-        for (BlockTransaction transaction : event.getTransactions())
+        for (BlockTransaction transaction : event.transactions())
         {
-            if (transaction.getOperation().equals(Operations.BREAK.get()))
+            if (transaction.operation().equals(Operations.BREAK.get()))
             {
-                if (lockerManager.handleBlockBreak(transaction.getOriginal(), player, true, checkedPos))
+                if (lockerManager.handleBlockBreak(transaction.original(), player, true, checkedPos))
                 {
                     event.setCancelled(true);
                     return;
@@ -153,7 +153,7 @@ public class LockerLockedListener
     @Listener
     public void onHopper(TransferInventoryEvent.Pre event)
     {
-        if (lockerManager.handleHopperInteract(event.getSourceInventory(), event.getTargetInventory()))
+        if (lockerManager.handleHopperInteract(event.sourceInventory(), event.targetInventory()))
         {
             event.setCancelled(true);
         }
@@ -162,14 +162,14 @@ public class LockerLockedListener
     @Listener
     public void onBlockBreakByBlock(ChangeBlockEvent.All event, @First BlockSnapshot maybeFire)
     {
-        if (maybeFire.getState().getType().isAnyOf(BlockTypes.FIRE)) // other types? maybe water/lava
+        if (maybeFire.state().type().isAnyOf(BlockTypes.FIRE)) // other types? maybe water/lava
         {
             final Set<Vector3i> checkedPos = new HashSet<>();
             // TODO missing original data
-            for (BlockTransaction transaction : event.getTransactions())
+            for (BlockTransaction transaction : event.transactions())
             {
-                if (transaction.getOperation().equals(Operations.BREAK.get())
-                    && lockerManager.handleBlockBreak(transaction.getOriginal(), null, true, checkedPos))
+                if (transaction.operation().equals(Operations.BREAK.get())
+                    && lockerManager.handleBlockBreak(transaction.original(), null, true, checkedPos))
                 {
                     event.setCancelled(true);
                     return;
@@ -191,13 +191,13 @@ public class LockerLockedListener
     public ServerPlayer findDamageSource(EntityDamageSource source)
     {
         ServerPlayer player = null;
-        if (source.getSource() instanceof ServerPlayer)
+        if (source.source() instanceof ServerPlayer)
         {
-            player = (ServerPlayer) source.getSource();
+            player = (ServerPlayer) source.source();
         }
-        else if (source.getSource() instanceof Projectile)
+        else if (source.source() instanceof Projectile)
         {
-            final ProjectileSource projectileSource = ((Projectile)source.getSource()).shooter().map(Value::get).orElse(null);
+            final ProjectileSource projectileSource = ((Projectile)source.source()).shooter().map(Value::get).orElse(null);
             if (projectileSource instanceof ServerPlayer)
             {
                 player = ((ServerPlayer)projectileSource);
@@ -215,7 +215,7 @@ public class LockerLockedListener
             {
                 if (!(dataHolder instanceof Campfire))
                 {
-                    return lockerManager.handleInventoryOpen(dataHolder, player, ((Carrier)dataHolder).getInventory());
+                    return lockerManager.handleInventoryOpen(dataHolder, player, ((Carrier)dataHolder).inventory());
                 }
             }
             else if (dataHolder instanceof Entity)

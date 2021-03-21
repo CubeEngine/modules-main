@@ -75,12 +75,12 @@ public class ItemModifyCommands extends PermissionContainer
     @Restricted(msg = "Trying to give your {text:toys} a name?")
     public void rename(ServerPlayer context, String name, @Option @Greedy List<String> lore)
     {
-        if (context.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
+        if (context.itemInHand(HandTypes.MAIN_HAND).isEmpty())
         {
             i18n.send(context, NEGATIVE, "You need to hold an item to rename in your hand!");
             return;
         }
-        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
+        ItemStack item = context.itemInHand(HandTypes.MAIN_HAND);
 
         item.offer(Keys.CUSTOM_NAME, LegacyComponentSerializer.legacyAmpersand().deserialize(name));
         if (lore != null)
@@ -100,12 +100,12 @@ public class ItemModifyCommands extends PermissionContainer
     @Restricted
     public void lore(ServerPlayer context, @Greedy List<String> lore)
     {
-        if (context.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
+        if (context.itemInHand(HandTypes.MAIN_HAND).isEmpty())
         {
             i18n.send(context, NEGATIVE, "You need to hold an item to change the lore of in your hand!");
             return;
         }
-        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
+        ItemStack item = context.itemInHand(HandTypes.MAIN_HAND);
 
         List<Component> list = new ArrayList<>();
         for (String line : lore)
@@ -122,8 +122,8 @@ public class ItemModifyCommands extends PermissionContainer
     @Restricted(msg = "This will you only give headaches!")
     public void headchange(ServerPlayer context, @Option String name) throws ExecutionException, InterruptedException
     {
-        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
-        if (item.isEmpty() || item.getType() != ItemTypes.PLAYER_HEAD.get())
+        ItemStack item = context.itemInHand(HandTypes.MAIN_HAND);
+        if (item.isEmpty() || item.type() != ItemTypes.PLAYER_HEAD.get())
         {
             i18n.send(context, NEGATIVE, "You are not holding a head.");
             return;
@@ -136,7 +136,7 @@ public class ItemModifyCommands extends PermissionContainer
         }
         else
         {
-            item.offer(Keys.GAME_PROFILE, Sponge.getServer().getGameProfileManager().getProfile(name).get());
+            item.offer(Keys.GAME_PROFILE, Sponge.server().gameProfileManager().profile(name).get());
         }
 
         context.setItemInHand(HandTypes.MAIN_HAND, item);
@@ -148,14 +148,14 @@ public class ItemModifyCommands extends PermissionContainer
     public void enchant(ServerPlayer context, EnchantmentType enchantment, @Option Integer level,
                         @ParameterPermission @Flag boolean unsafe) // TODO are param permissions working????
     {
-        if (context.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
+        if (context.itemInHand(HandTypes.MAIN_HAND).isEmpty())
         {
             i18n.send(context, NEUTRAL, "{text:ProTip}: You cannot enchant your fists!");
             return;
         }
-        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
+        ItemStack item = context.itemInHand(HandTypes.MAIN_HAND);
 
-        level = level == null ? enchantment.getMaximumLevel() : level;
+        level = level == null ? enchantment.maximumLevel() : level;
         if (level <= 0)
         {
             i18n.send(context, NEGATIVE, "The enchantment level has to be a number greater than 0!");
@@ -183,7 +183,7 @@ public class ItemModifyCommands extends PermissionContainer
 
         if (enchantment.canBeAppliedToStack(item))
         {
-            if (level >= enchantment.getMinimumLevel() && level <= enchantment.getMaximumLevel())
+            if (level >= enchantment.minimumLevel() && level <= enchantment.maximumLevel())
             {
                 List<Enchantment> list = item.getOrElse(Keys.APPLIED_ENCHANTMENTS, new ArrayList<>());
                 list.add(ench);
@@ -195,7 +195,7 @@ public class ItemModifyCommands extends PermissionContainer
             i18n.send(context, NEGATIVE, "This enchantment level is not allowed!");
             return;
         }
-        final List<Component> possibleEnchantments = Sponge.getGame().registries().registry(RegistryTypes.ENCHANTMENT_TYPE).streamEntries()
+        final List<Component> possibleEnchantments = Sponge.game().registries().registry(RegistryTypes.ENCHANTMENT_TYPE).streamEntries()
                                                            .filter(e -> e.value().canBeAppliedToStack(item))
                                                            .map(enchantmentType -> enchantmentType.value().asComponent().color(NamedTextColor.YELLOW)
                                                                                       .hoverEvent(HoverEvent.showText(Component.text(enchantmentType.key().asString(), NamedTextColor.YELLOW))))
@@ -214,7 +214,7 @@ public class ItemModifyCommands extends PermissionContainer
     @Restricted
     public void hideEnchantments(ServerPlayer context, @Option Boolean hide)
     {
-        final ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack item = context.itemInHand(HandTypes.MAIN_HAND);
         if (item.isEmpty())
         {
             i18n.send(context, NEGATIVE, "No item in hand!");
@@ -238,7 +238,7 @@ public class ItemModifyCommands extends PermissionContainer
         if (all)
         {
             int repaired = 0;
-            for (Slot slot : context.getInventory().slots())
+            for (Slot slot : context.inventory().slots())
             {
                 if (!slot.peek().isEmpty())
                 {
@@ -263,7 +263,7 @@ public class ItemModifyCommands extends PermissionContainer
             i18n.send(context, POSITIVE, "Repaired {amount} items!", repaired);
             return;
         }
-        ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
+        ItemStack item = context.itemInHand(HandTypes.MAIN_HAND);
         if (item.isEmpty())
         {
             i18n.send(context, NEGATIVE, "No item in hand!");

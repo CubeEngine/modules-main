@@ -46,18 +46,18 @@ public class RegionContextCalculator implements ContextCalculator<Subject>
     {
         if (subject instanceof Locatable)
         {
-            List<Region> regions = manager.getRegionsAt(((Locatable) subject).getServerLocation());
+            List<Region> regions = manager.getRegionsAt(((Locatable) subject).serverLocation());
             regions.stream().map(Region::getContext).forEach(set::add);
         }
         else
         {
             // TODO better way to get player
-            if (subject.getContainingCollection() == Sponge.getServer().getServiceProvider().permissionService().getUserSubjects())
+            if (subject.containingCollection() == Sponge.server().serviceProvider().permissionService().userSubjects())
             {
-                final String playerId = subject.getIdentifier();
+                final String playerId = subject.identifier();
                 final UUID uuid = UUID.fromString(playerId);
-                Sponge.getServer().getPlayer(uuid).ifPresent(player -> {
-                    List<Region> regions = manager.getRegionsAt(player.getServerLocation());
+                Sponge.server().player(uuid).ifPresent(player -> {
+                    List<Region> regions = manager.getRegionsAt(player.serverLocation());
                     regions.stream().map(Region::getContext).forEach(set::add);
                 });
 
@@ -70,7 +70,7 @@ public class RegionContextCalculator implements ContextCalculator<Subject>
     {
         if ("region".equals(context.getKey()) && subject instanceof Locatable)
         {
-            List<Region> regions = manager.getRegionsAt(((Locatable) subject).getServerLocation());
+            List<Region> regions = manager.getRegionsAt(((Locatable) subject).serverLocation());
             return regions.stream().map(Region::getContext)
                                    .map(Context::getValue)
                                    .anyMatch(m -> m.equals(context.getValue()));

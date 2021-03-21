@@ -30,7 +30,7 @@ public class ZoneEvent extends AbstractEvent
     public ZoneEvent(ZoneConfig config)
     {
         this.config = config;
-        this.cause = Sponge.getServer().getCauseStackManager().getCurrentCause();
+        this.cause = Sponge.server().causeStackManager().currentCause();
     }
 
     public ZoneConfig getChangedZone()
@@ -39,7 +39,7 @@ public class ZoneEvent extends AbstractEvent
     }
 
     @Override
-    public Cause getCause()
+    public Cause cause()
     {
         return this.cause;
     }

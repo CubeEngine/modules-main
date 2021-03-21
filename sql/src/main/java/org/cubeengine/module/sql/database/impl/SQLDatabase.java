@@ -105,12 +105,12 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
         // Now go connect to the database:
         this.logger.info("Connecting to the database...");
 
-        SqlManager manager = Sponge.getSqlManager();
-        String url = manager.getConnectionUrlFromAlias(SQL_ID).orElse("jdbc:sqlite:cubeengine.db");
+        SqlManager manager = Sponge.sqlManager();
+        String url = manager.connectionUrlFromAlias(SQL_ID).orElse("jdbc:sqlite:cubeengine.db");
 
         try
         {
-            this.dataSource = manager.getDataSource(url);
+            this.dataSource = manager.dataSource(url);
         }
         catch (SQLException e)
         {

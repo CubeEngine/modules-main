@@ -86,7 +86,7 @@ public class WarpCommand extends DispatcherCommand
             warpNotFoundMessage(sender,  warp);
             return;
         }
-        if (!w.isOwner(sender.getUser()) && !w.isAllowed(sender.getUser()) && !perms.WARP_TP_OTHER.check(sender, i18n))
+        if (!w.isOwner(sender.user()) && !w.isAllowed(sender.user()) && !perms.WARP_TP_OTHER.check(sender, i18n))
         {
             return;
         }
@@ -96,7 +96,7 @@ public class WarpCommand extends DispatcherCommand
             sender.sendMessage(Identity.nil(), Component.text(w.welcomeMsg));
             return;
         }
-        if (w.isOwner(sender.getUser()))
+        if (w.isOwner(sender.user()))
         {
             i18n.send(ChatType.ACTION_BAR, sender, POSITIVE, "You have been teleported to your warp {name}!", w.name);
             return;
@@ -130,7 +130,7 @@ public class WarpCommand extends DispatcherCommand
             i18n.send(sender, NEGATIVE, "The warp already exists! You can move it with {text:/warp move}");
             return;
         }
-        Warp warp = manager.create(sender.getUser(), name, sender.getWorld(), sender.getTransform());
+        Warp warp = manager.create(sender.user(), name, sender.world(), sender.transform());
         i18n.send(sender, POSITIVE, "Your warp {name} has been created!", warp.name);
     }
 
@@ -143,7 +143,7 @@ public class WarpCommand extends DispatcherCommand
         Warp w = this.manager.get(warp).orElse(null);
         if (w == null)
         {
-            warpNotFoundMessage(sender.getAudience(), warp);
+            warpNotFoundMessage(sender.audience(), warp);
             return;
         }
         if (append)
@@ -176,13 +176,13 @@ public class WarpCommand extends DispatcherCommand
             warpNotFoundMessage(sender, warp);
             return;
         }
-        if (!w.isOwner(sender.getUser()) && !perms.WARP_MOVE_OTHER.check(sender, i18n))
+        if (!w.isOwner(sender.user()) && !perms.WARP_MOVE_OTHER.check(sender, i18n))
         {
             return;
         }
-        w.setTransform(sender.getWorld(), sender.getTransform());
+        w.setTransform(sender.world(), sender.transform());
         manager.save();
-        if (w.isOwner(sender.getUser()))
+        if (w.isOwner(sender.user()))
         {
             i18n.send(sender, POSITIVE, "Your warp {name} has been moved to your current location!", w.name);
             return;
@@ -197,11 +197,11 @@ public class WarpCommand extends DispatcherCommand
         Warp w = manager.get(warp).orElse(null);
         if (w == null)
         {
-            warpNotFoundMessage(sender.getAudience(), warp);
+            warpNotFoundMessage(sender.audience(), warp);
             return;
         }
         final boolean isOwner = w.isOwner(sender);
-        if (!isOwner && perms.WARP_REMOVE_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
+        if (!isOwner && perms.WARP_REMOVE_OTHER.check(sender.subject(), sender.audience(), i18n))
         {
             return;
         }
@@ -220,11 +220,11 @@ public class WarpCommand extends DispatcherCommand
         Warp w = manager.get(warp).orElse(null);
         if (w == null)
         {
-            warpNotFoundMessage(sender.getAudience(), warp);
+            warpNotFoundMessage(sender.audience(), warp);
             return;
         }
         final boolean isOwner = w.isOwner(sender);
-        if (!isOwner && !perms.WARP_RENAME_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
+        if (!isOwner && !perms.WARP_RENAME_OTHER.check(sender.subject(), sender.audience(), i18n))
         {
             return;
         }
@@ -249,9 +249,9 @@ public class WarpCommand extends DispatcherCommand
     @Command(desc = "List warps of a player")
     public void list(CommandCause context, @Option User owner)
     {
-        if (owner != null && !(context.getAudience() instanceof ServerPlayer && ((ServerPlayer)context.getAudience()).getUniqueId().equals(owner.getUniqueId())))
+        if (owner != null && !(context.audience() instanceof ServerPlayer && ((ServerPlayer)context.audience()).uniqueId().equals(owner.uniqueId())))
         {
-            if (!perms.WARP_LIST_OTHER.check(context.getSubject(), context.getAudience(), i18n))
+            if (!perms.WARP_LIST_OTHER.check(context.subject(), context.audience(), i18n))
             {
                 return;
             }
@@ -275,7 +275,7 @@ public class WarpCommand extends DispatcherCommand
             }
             else
             {
-                context.sendMessage(Identity.nil(), Component.text("  "+ warp.getOwner().getName() + ":" + warp.name + " ", NamedTextColor.YELLOW).append(teleport));
+                context.sendMessage(Identity.nil(), Component.text("  "+ warp.getOwner().name() + ":" + warp.name + " ", NamedTextColor.YELLOW).append(teleport));
             }
         }
     }
@@ -284,7 +284,7 @@ public class WarpCommand extends DispatcherCommand
     @Command(desc = "Clear all warps [of a player]")
     public void clear(final CommandCause context, @Option User owner)
     {
-        if (this.module.getConfig().clearOnlyFromConsole && !(context.getAudience() instanceof SystemSubject))
+        if (this.module.getConfig().clearOnlyFromConsole && !(context.audience() instanceof SystemSubject))
         {
             i18n.send(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return;
@@ -298,7 +298,7 @@ public class WarpCommand extends DispatcherCommand
             i18n.send(context, NEGATIVE, "Are you sure you want to delete all warps ever created on this server!?");
         }
         Component confirmText = i18n.translate(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the warps");
-        ConfirmManager.requestConfirmation(i18n, confirmText, context.getAudience(), () -> {
+        ConfirmManager.requestConfirmation(i18n, confirmText, context.audience(), () -> {
             Predicate<Warp> predicate = warp -> true;
             if (owner != null)
             {

@@ -94,11 +94,11 @@ public class RegionManager
             logger.warn("Region {} was not loaded: Could not find world {}.", region.getName(), region.getWorldName());
             return region;
         }
-        byName.computeIfAbsent(world.getKey(), k -> new HashMap<>()).put(region.getName().toLowerCase(), region);
+        byName.computeIfAbsent(world.key(), k -> new HashMap<>()).put(region.getName().toLowerCase(), region);
 
         Vector3d max = region.getCuboid().getMaximumPoint();
         Vector3d min = region.getCuboid().getMinimumPoint();
-        Map<Vector2i, List<Region>> chunkMap = byChunk.computeIfAbsent(region.getWorld().getKey(), k -> new HashMap<>());
+        Map<Vector2i, List<Region>> chunkMap = byChunk.computeIfAbsent(region.getWorld().key(), k -> new HashMap<>());
         for (Vector2i chunkLoc : getChunks(min.toInt(), max.toInt()))
         {
             chunkMap.computeIfAbsent(chunkLoc, k -> new ArrayList<>()).add(region);
@@ -139,12 +139,12 @@ public class RegionManager
 
     public List<Region> getRegionsAt(ServerLocation loc)
     {
-        Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(loc.getWorld().getKey(), k -> new HashMap<>());
-        return cache.computeIfAbsent(loc.getBlockPosition(), v -> getRegions(loc.getWorld(), loc.getBlockPosition()));
+        Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(loc.world().key(), k -> new HashMap<>());
+        return cache.computeIfAbsent(loc.blockPosition(), v -> getRegions(loc.world(), loc.blockPosition()));
     }
 
     public List<Region> getRegionsAt(ServerWorld world, Vector3i pos) {
-        Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(world.getKey(), k -> new HashMap<>());
+        Map<Vector3i, List<Region>> cache = regionCache.computeIfAbsent(world.key(), k -> new HashMap<>());
         return cache.computeIfAbsent(pos, v -> getRegions(world, pos));
     }
 
@@ -154,8 +154,8 @@ public class RegionManager
         int chunkZ = pos.getZ() >> 4;
         List<Region> regions = new ArrayList<>();
         regions.add(globalRegion);
-        regions.add(getWorldRegion(world.getKey()));
-        regions.addAll(byChunk.getOrDefault(world.getKey(), Collections.emptyMap())
+        regions.add(getWorldRegion(world.key()));
+        regions.addAll(byChunk.getOrDefault(world.key(), Collections.emptyMap())
                 .getOrDefault(new Vector2i(chunkX, chunkZ), Collections.emptyList())
                             .stream().filter(r -> r.contains(pos.toDouble()))
                 .collect(Collectors.toList()));
@@ -170,7 +170,7 @@ public class RegionManager
 
     private UUID toUUID(CommandCause src)
     {
-        return src.getSubject() instanceof Identifiable ? ((Identifiable) src.getSubject()).getUniqueId() : UUID.nameUUIDFromBytes(src.getSubject().getIdentifier().getBytes());
+        return src.subject() instanceof Identifiable ? ((Identifiable) src.subject()).uniqueId() : UUID.nameUUIDFromBytes(src.subject().identifier().getBytes());
     }
 
     public void setActiveRegion(CommandCause src, Region region)
@@ -218,7 +218,7 @@ public class RegionManager
                             zone = reflector.create(ZoneConfig.class);
                             zone.world = config.world;
                             zone.shape = convertedCuboid(config);
-                            getZoned().getManager().define(Sponge.getGame().getSystemSubject(), config.name, zone, false);
+                            getZoned().getManager().define(Sponge.game().systemSubject(), config.name, zone, false);
                         }
                         loadRegion(new Region(zone, config, this));
                     }
@@ -244,7 +244,7 @@ public class RegionManager
 
     public boolean hasRegion(ServerWorld world, String name)
     {
-        return getRegions(world.getKey()).containsKey(name.toLowerCase());
+        return getRegions(world.key()).containsKey(name.toLowerCase());
     }
 
     public Region getGlobalRegion() {
@@ -255,7 +255,7 @@ public class RegionManager
     {
         if (!this.worldRegions.containsKey(world))
         {
-            Path path = modulePath.resolve("region").resolve(world.getNamespace()).resolve(world.getValue());
+            Path path = modulePath.resolve("region").resolve(world.namespace()).resolve(world.value());
             try
             {
                 Files.createDirectories(path);

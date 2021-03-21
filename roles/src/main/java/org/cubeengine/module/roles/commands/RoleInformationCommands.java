@@ -97,9 +97,9 @@ public class RoleInformationCommands extends DispatcherCommand
     @Command(desc = "Lists all roles")
     public void list(CommandCause cause)
     {
-        final Audience cContext = cause.getAudience();
+        final Audience cContext = cause.audience();
         List<Subject> roles = new ArrayList<>();
-        roles.addAll(service.getGroupSubjects().getLoadedSubjects());
+        roles.addAll(service.groupSubjects().loadedSubjects());
         if (roles.isEmpty())
         {
             i18n.send(cContext, NEGATIVE, "There are no roles!");
@@ -115,23 +115,23 @@ public class RoleInformationCommands extends DispatcherCommand
         Component defaultClick = i18n.translate(cContext, NEUTRAL, "Click to toggle default");
         String defaultRole = i18n.getTranslation(cContext, "default");
         String noDefaultRole = i18n.getTranslation(cContext, "not default");
-        roles.sort(Comparator.comparing(Contextual::getIdentifier));
-        List<SubjectReference> defaults = service.getDefaults().getSubjectData().getParents(Collections.emptySet());
+        roles.sort(Comparator.comparing(Contextual::identifier));
+        List<SubjectReference> defaults = service.defaults().subjectData().parents(Collections.emptySet());
         for (Subject r : roles)
         {
 
             final Component perms = i18n.composeMessage(cause, Style.style(NamedTextColor.GRAY), "[{name:color=yellow}]", permTrans)
-                .hoverEvent(HoverEvent.showText(permClick)).clickEvent(ClickEvent.runCommand("/roles role listpermission " + r.getIdentifier()));
+                .hoverEvent(HoverEvent.showText(permClick)).clickEvent(ClickEvent.runCommand("/roles role listpermission " + r.identifier()));
             final Component opts = i18n.composeMessage(cause, Style.style(NamedTextColor.GRAY), "[{name:color=yellow}]", optTrans)
-                .hoverEvent(HoverEvent.showText(optClick)).clickEvent(ClickEvent.runCommand("/roles role listoption " + r.getIdentifier()));
+                .hoverEvent(HoverEvent.showText(optClick)).clickEvent(ClickEvent.runCommand("/roles role listoption " + r.identifier()));
             final Component parents = i18n.composeMessage(cause, Style.style(NamedTextColor.GRAY), "[{name:color=yellow}]", parentTrans)
-                .hoverEvent(HoverEvent.showText(parentClick)).clickEvent(ClickEvent.runCommand("/roles role listparent " + r.getIdentifier()));
+                .hoverEvent(HoverEvent.showText(parentClick)).clickEvent(ClickEvent.runCommand("/roles role listparent " + r.identifier()));
             // TODO downloads
             final Component def = i18n.composeMessage(cause, Style.style(NamedTextColor.GRAY), "[{name:color=yellow}]", defaults.contains(r.asSubjectReference()) ? defaultRole : noDefaultRole)
-                .hoverEvent(HoverEvent.showText(defaultClick)).clickEvent(ClickEvent.runCommand("/roles role toggledefault " + r.getIdentifier()));
+                .hoverEvent(HoverEvent.showText(defaultClick)).clickEvent(ClickEvent.runCommand("/roles role toggledefault " + r.identifier()));
 
             cContext.sendMessage(Identity.nil(), i18n.composeMessage(cause, Style.empty(),
-                 "- {name} {txt#perm} {txt#opts} {txt#parents} {txt#def}", r.getIdentifier(), perms, opts, parents, def));
+                 "- {name} {txt#perm} {txt#opts} {txt#parents} {txt#def}", r.identifier(), perms, opts, parents, def));
         }
     }
 
@@ -157,14 +157,14 @@ public class RoleInformationCommands extends DispatcherCommand
         }
         i18n.send(ctx, NEUTRAL, "Permission inherited from:");
         i18n.send(ctx, NEUTRAL, "{txt#permission} in the role {name}!",
-            permText(ctx, perm.permission, service, i18n), perm.subject.getIdentifier());
+            permText(ctx, perm.permission, service, i18n), perm.subject.identifier());
     }
 
     @Alias(value = "listRPerm")
     @Command(alias = "listPerm", desc = "Lists all permissions of given role [in context]")
     public void listPermission(CommandCause ctx, FileSubject role, @Flag boolean all, @Named("in") @Default Context context)
     {
-        final PaginationService paginator = Sponge.getGame().getServiceProvider().paginationService();
+        final PaginationService paginator = Sponge.game().serviceProvider().paginationService();
         final Builder builder = paginator.builder();
         Component header = i18n.translate(ctx, NEUTRAL, "Permission list for {role}", role);
         Set<Context> contextSet = toSet(context);
@@ -177,15 +177,15 @@ public class RoleInformationCommands extends DispatcherCommand
         else if (contextSet.isEmpty())
         {
             header = header.append(Component.space()).append(i18n.translate(ctx, NEUTRAL, "set directly"));
-            role.getSubjectData().getAllPermissions().forEach((key, value) -> listPermission(ctx, permList, role, false, key, value));
+            role.subjectData().allPermissions().forEach((key, value) -> listPermission(ctx, permList, role, false, key, value));
         }
         else
         {
             String ctxText = getContextString(contextSet);
             header = header.append(Component.space()).append(i18n.translate(ctx, POSITIVE, "in {input#context}:", ctxText));
-            listPermission(ctx, permList, role, false, contextSet, new TreeMap<>(role.getSubjectData().getPermissions(contextSet)));
+            listPermission(ctx, permList, role, false, contextSet, new TreeMap<>(role.subjectData().permissions(contextSet)));
         }
-        builder.header(header).contents(permList).build().sendTo(ctx.getAudience());
+        builder.header(header).contents(permList).build().sendTo(ctx.audience());
     }
 
     private void listPermission(CommandCause ctx, List<Component> permList, FileSubject role, boolean all, Set<Context> context, Map<String, Boolean> permissions)
@@ -276,11 +276,11 @@ public class RoleInformationCommands extends DispatcherCommand
         }
         else if (contextSet.isEmpty())
         {
-            role.getSubjectData().getAllOptions().forEach((key, value) -> listOption(ctx, false, key, value));
+            role.subjectData().allOptions().forEach((key, value) -> listOption(ctx, false, key, value));
         }
         else
         {
-            listOption(ctx, false, contextSet, role.getSubjectData().getOptions(contextSet));
+            listOption(ctx, false, contextSet, role.subjectData().options(contextSet));
         }
     }
 
@@ -303,9 +303,9 @@ public class RoleInformationCommands extends DispatcherCommand
             {
                 Subject owner = ((RolesUtil.FoundOption) entry.getValue()).subject;
 
-                Component hoverText = Component.text().append(Component.text(owner.getContainingCollection().getIdentifier(), NamedTextColor.YELLOW))
+                Component hoverText = Component.text().append(Component.text(owner.containingCollection().identifier(), NamedTextColor.YELLOW))
                          .append(Component.text(":", NamedTextColor.GRAY))
-                         .append(Component.text(owner.getFriendlyIdentifier().orElse(owner.getIdentifier()), NamedTextColor.YELLOW))
+                         .append(Component.text(owner.friendlyIdentifier().orElse(owner.identifier()), NamedTextColor.YELLOW))
                          .build();
 
                 Component key = Component.text(entry.getKey(), NamedTextColor.YELLOW)
@@ -333,7 +333,7 @@ public class RoleInformationCommands extends DispatcherCommand
     @Command(desc = "Lists all parents of given role [in context]")
     public void listParent(CommandCause ctx, FileSubject role, @Named("in") @Default Context context)
     {
-        List<SubjectReference> parents = role.getSubjectData().getParents(toSet(context));
+        List<SubjectReference> parents = role.subjectData().parents(toSet(context));
         i18n.send(ctx, NEUTRAL, "Parent list for {role}", role);
         if (parents.isEmpty())
         {
@@ -343,7 +343,7 @@ public class RoleInformationCommands extends DispatcherCommand
         i18n.send(ctx, POSITIVE, "in {context}:", context);
         for (SubjectReference parent : parents)
         {
-            ctx.sendMessage(Identity.nil(), i18n.composeMessage(ctx, Style.empty(), "- {name:color=YELLOW}", parent.getSubjectIdentifier()));
+            ctx.sendMessage(Identity.nil(), i18n.composeMessage(ctx, Style.empty(), "- {name:color=YELLOW}", parent.subjectIdentifier()));
         }
     }
 
@@ -357,7 +357,7 @@ public class RoleInformationCommands extends DispatcherCommand
     @Command(alias = {"default","defaultRoles","listDefRoles"}, desc = "Lists all default roles")
     public void listDefaultRoles(CommandCause cContext)
     {
-        List<SubjectReference> parents = service.getUserSubjects().getDefaults().getSubjectData().getParents(Collections.emptySet());
+        List<SubjectReference> parents = service.userSubjects().defaults().subjectData().parents(Collections.emptySet());
         if (parents.isEmpty())
         {
             i18n.send(cContext, NEGATIVE, "There are no default roles set!");
@@ -366,7 +366,7 @@ public class RoleInformationCommands extends DispatcherCommand
         i18n.send(cContext, POSITIVE, "The following roles are default roles:");
         for (SubjectReference role : parents)
         {
-            cContext.sendMessage(Identity.nil(), i18n.composeMessage(cContext, Style.empty(), "- {name:color=YELLOW}", role.getSubjectIdentifier()));
+            cContext.sendMessage(Identity.nil(), i18n.composeMessage(cContext, Style.empty(), "- {name:color=YELLOW}", role.subjectIdentifier()));
         }
     }
 }

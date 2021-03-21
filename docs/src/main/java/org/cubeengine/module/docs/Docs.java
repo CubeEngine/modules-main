@@ -61,7 +61,7 @@ public class Docs
         this.generateDocumentation();
         if ("true".equals(System.getenv("CUBEENGINE_DOCS_SHUTDOWN")))
         {
-            Sponge.getServer().shutdown();
+            Sponge.server().shutdown();
         }
     }
 

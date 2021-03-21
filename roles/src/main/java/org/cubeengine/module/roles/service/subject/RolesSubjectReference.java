@@ -38,13 +38,13 @@ public class RolesSubjectReference implements SubjectReference
     }
 
     @Override
-    public String getCollectionIdentifier()
+    public String collectionIdentifier()
     {
-        return this.collection.getIdentifier();
+        return this.collection.identifier();
     }
 
     @Override
-    public String getSubjectIdentifier()
+    public String subjectIdentifier()
     {
         return this.identifier;
     }
@@ -68,12 +68,12 @@ public class RolesSubjectReference implements SubjectReference
         }
         RolesSubjectReference that = (RolesSubjectReference) o;
         return Objects.equals(identifier, that.identifier) &&
-                Objects.equals(collection.getIdentifier(), that.collection.getIdentifier());
+                Objects.equals(collection.identifier(), that.collection.identifier());
     }
 
     @Override
     public int hashCode()
     {
-        return Objects.hash(identifier, collection.getIdentifier());
+        return Objects.hash(identifier, collection.identifier());
     }
 }

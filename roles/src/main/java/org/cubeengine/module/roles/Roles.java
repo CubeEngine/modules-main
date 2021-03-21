@@ -99,11 +99,11 @@ public class Roles
             {
                 throw new IllegalStateException();
             }
-            event.getPlayer().getTransientSubjectData().setPermission(Collections.singleton(ContextUtil.GLOBAL), "cubeengine.roles", Tristate.TRUE);
-            i18n.send(event.getPlayer(), MessageType.POSITIVE, "Welcome to your new Minecraft Server. You are the first to join this server!");
-            i18n.send(event.getPlayer(), MessageType.POSITIVE, "As such {text:Roles} gave you temporarily all roles permissions.");
-            i18n.send(event.getPlayer(), MessageType.CRITICAL, "Before you leave, remember to give yourself actual permissions!");
-            Sponge.getServer().getCommandManager().updateCommandTreeForPlayer(event.getPlayer());
+            event.player().transientSubjectData().setPermission(Collections.singleton(ContextUtil.GLOBAL), "cubeengine.roles", Tristate.TRUE);
+            i18n.send(event.player(), MessageType.POSITIVE, "Welcome to your new Minecraft Server. You are the first to join this server!");
+            i18n.send(event.player(), MessageType.POSITIVE, "As such {text:Roles} gave you temporarily all roles permissions.");
+            i18n.send(event.player(), MessageType.CRITICAL, "Before you leave, remember to give yourself actual permissions!");
+            Sponge.server().commandManager().updateCommandTreeForPlayer(event.player());
         }
     }
 

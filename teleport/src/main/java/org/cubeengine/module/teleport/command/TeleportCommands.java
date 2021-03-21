@@ -85,9 +85,9 @@ public class TeleportCommands
         public ServerLocation position(Entity target) {
             if (player == null)
             {
-                return target.getServerLocation().getWorld().getLocation(location);
+                return target.serverLocation().world().location(location);
             }
-            return player.getServerLocation();
+            return player.serverLocation();
         }
     }
 
@@ -106,9 +106,9 @@ public class TeleportCommands
         List<Entity> actualTargets;
         if (targets == null)
         {
-            if (context.getSubject() instanceof ServerPlayer)
+            if (context.subject() instanceof ServerPlayer)
             {
-                actualTargets = Arrays.asList(((ServerPlayer)context.getSubject()));
+                actualTargets = Arrays.asList(((ServerPlayer)context.subject()));
             }
             else
             {
@@ -124,7 +124,7 @@ public class TeleportCommands
         if (!force)
         {
             final List<Subject> tpPrevention = actualTargets.stream()
-                  .filter(e -> !e.equals(context.getSubject())) // not self
+                  .filter(e -> !e.equals(context.subject())) // not self
                   .filter(e -> e instanceof Subject).map(Subject.class::cast) // only subjects
                   .filter(subject -> perms.TELEPORT_PREVENT_TP.check(subject)) // with prevent tp permission
                   .collect(Collectors.toList());
@@ -139,7 +139,7 @@ public class TeleportCommands
             actualTargets.removeAll(tpPrevention);
         }
 
-        if (!force && destination.player != null && !context.getAudience().equals(destination.player))
+        if (!force && destination.player != null && !context.audience().equals(destination.player))
         {
             if (perms.TELEPORT_PREVENT_TPTO.check(destination.player)) // teleport to the target
             {
@@ -154,7 +154,7 @@ public class TeleportCommands
 
         if (actualTargets.size() == 1 && actualTargets.contains(destination.player))
         {
-            if (context.getAudience().equals(destination.player))
+            if (context.audience().equals(destination.player))
             {
                 i18n.send(ACTION_BAR, context, NEUTRAL, "You found yourself!");
                 return;
@@ -208,12 +208,12 @@ public class TeleportCommands
             return;
         }
         ArrayList<String> noTp = new ArrayList<>();
-        ServerLocation target = player.getServerLocation();
-        for (ServerPlayer p : Sponge.getServer().getOnlinePlayers())
+        ServerLocation target = player.serverLocation();
+        for (ServerPlayer p : Sponge.server().onlinePlayers())
         {
             if (!force && p.hasPermission(perms.TELEPORT_PREVENT_TP.getId()))
             {
-                noTp.add(p.getName());
+                noTp.add(p.name());
                 continue;
             }
             p.setLocation(target);
@@ -241,7 +241,7 @@ public class TeleportCommands
             return;
         }
 
-        player.setLocation(context.getServerLocation());
+        player.setLocation(context.serverLocation());
         i18n.send(ACTION_BAR, context, POSITIVE, "You teleported {user} to you!", player);
         i18n.send(ACTION_BAR, player, POSITIVE, "You were teleported to {sender}", context);
     }
@@ -252,12 +252,12 @@ public class TeleportCommands
     {
         force = force && context.hasPermission(perms.COMMAND_TPHEREALL_FORCE.getId());
         ArrayList<String> noTp = new ArrayList<>();
-        ServerLocation target = context.getServerLocation();
-        for (ServerPlayer p : Sponge.getServer().getOnlinePlayers())
+        ServerLocation target = context.serverLocation();
+        for (ServerPlayer p : Sponge.server().onlinePlayers())
         {
             if (!force && p.hasPermission(perms.TELEPORT_PREVENT_TP.getId()))
             {
-                noTp.add(p.getName());
+                noTp.add(p.name());
                 continue;
             }
             p.setLocation(target);
@@ -279,9 +279,9 @@ public class TeleportCommands
     {
         if (y == null)
         {
-            y = world.getHighestYAt(x, z);
+            y = world.highestYAt(x, z);
         }
-        ServerLocation loc = world.getLocation(x,y,z).add(0.5, 0, 0.5);
+        ServerLocation loc = world.location(x,y,z).add(0.5, 0, 0.5);
         unsafe = unsafe && context.hasPermission(perms.COMMAND_TPPOS_UNSAFE.getId());
         if (unsafe)
         {
@@ -289,7 +289,7 @@ public class TeleportCommands
         }
         else
         {
-            final Optional<ServerLocation> safe = Sponge.getServer().getTeleportHelper().getSafeLocation(loc);
+            final Optional<ServerLocation> safe = Sponge.server().teleportHelper().findSafeLocation(loc);
             if (!safe.isPresent())
             {
                 i18n.send(ACTION_BAR, context, NEGATIVE, "Unsafe Target!");

@@ -72,7 +72,7 @@ public class KillCommands extends PermissionContainer
         force = force && context.hasPermission(COMMAND_KILL_FORCE.getId());
         quiet = quiet && context.hasPermission(COMMAND_KILL_QUIET.getId());
         List<String> killed = new ArrayList<>();
-        final boolean all = Sponge.getServer().getOnlinePlayers().containsAll(players);
+        final boolean all = Sponge.server().onlinePlayers().containsAll(players);
         if (all)
         {
             if (!context.hasPermission(COMMAND_KILL_ALL.getId()))
@@ -80,16 +80,16 @@ public class KillCommands extends PermissionContainer
                 i18n.send(context, NEGATIVE, "You are not allowed to kill everyone!");
                 return;
             }
-            if (context.getSubject() instanceof ServerPlayer)
+            if (context.subject() instanceof ServerPlayer)
             {
-                players.remove(context.getSubject());
+                players.remove(context.subject());
             }
         }
         for (ServerPlayer user : players)
         {
             if (this.kill0(user, lightning, context, false, force, quiet))
             {
-                killed.add(user.getName());
+                killed.add(user.name());
             }
         }
         if (killed.isEmpty())
@@ -112,10 +112,10 @@ public class KillCommands extends PermissionContainer
                 return false;
             }
         }
-        Sponge.getServer().getCauseStackManager().pushCause(context);
+        Sponge.server().causeStackManager().pushCause(context);
         if (lightning)
         {
-            player.getWorld().spawnEntity(player.getWorld().createEntity(LIGHTNING_BOLT, player.getLocation().getPosition()));
+            player.world().spawnEntity(player.world().createEntity(LIGHTNING_BOLT, player.location().position()));
         }
 
 
@@ -141,7 +141,7 @@ public class KillCommands extends PermissionContainer
     @Restricted(msg = "You want to kill yourself? {text:The command for that is stop!:color=BRIGHT_GREEN}")
     public void suicide(ServerPlayer context)
     {
-        Sponge.getServer().getCauseStackManager().pushCause(context);
+        Sponge.server().causeStackManager().pushCause(context);
         context.offer(Keys.HEALTH, 0d);
         i18n.send(context, NEGATIVE, "You ended your life. Why? {text::(:color=DARK_RED}");
     }

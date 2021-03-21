@@ -58,12 +58,12 @@ public class HealCommand extends PermissionContainer
     {
         if (players == null)
         {
-            if (!(context.getSubject() instanceof ServerPlayer))
+            if (!(context.subject() instanceof ServerPlayer))
             {
                 i18n.send(context, NEGATIVE, "Only time can heal your wounds!");
                 return;
             }
-            ServerPlayer sender = (ServerPlayer)context.getSubject();
+            ServerPlayer sender = (ServerPlayer)context.subject();
             sender.offer(Keys.HEALTH, sender.get(Keys.MAX_HEALTH).get());
             i18n.send(sender, POSITIVE, "You are now healed!");
             return;
@@ -74,7 +74,7 @@ public class HealCommand extends PermissionContainer
             return;
         }
 
-        boolean all = players.containsAll(Sponge.getServer().getOnlinePlayers());
+        boolean all = players.containsAll(Sponge.server().onlinePlayers());
         if (all)
         {
             if (players.isEmpty())

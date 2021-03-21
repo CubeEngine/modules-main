@@ -35,7 +35,7 @@ public class BlockLockConfig extends LockConfig<BlockLockConfig, BlockType>
 
     public String getTitle()
     {
-        return Sponge.getGame().registries().registry(RegistryTypes.BLOCK_TYPE).valueKey(type).toString();
+        return Sponge.game().registries().registry(RegistryTypes.BLOCK_TYPE).valueKey(type).toString();
     }
 
     public static class BlockLockerConfigConverter extends LockConfigConverter<BlockLockConfig>
@@ -47,7 +47,7 @@ public class BlockLockConfig extends LockConfig<BlockLockConfig, BlockType>
 
         protected BlockLockConfig fromString(String s) throws ConversionException
         {
-            return Sponge.getGame().registries().registry(RegistryTypes.BLOCK_TYPE).findValue(ResourceKey.resolve(s))
+            return Sponge.game().registries().registry(RegistryTypes.BLOCK_TYPE).findValue(ResourceKey.resolve(s))
                   .map(BlockLockConfig::new).orElseThrow(() -> ConversionException.of(this, s, "Invalid BlockType!"));
         }
     }

@@ -59,21 +59,21 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
     public ZoneConfig apply(CommandCause cause)
     {
         // TODO for other command-sources?
-        if (cause.getAudience() instanceof ServerPlayer)
+        if (cause.audience() instanceof ServerPlayer)
         {
-            ZoneConfig zone = module.getActiveZone(((ServerPlayer)cause.getAudience()));
+            ZoneConfig zone = module.getActiveZone(((ServerPlayer)cause.audience()));
             if (zone != null)
             {
                 return zone;
             }
-            List<ZoneConfig> zones = manager.getZonesAt(((ServerPlayer)cause.getAudience()).getServerLocation());
+            List<ZoneConfig> zones = manager.getZonesAt(((ServerPlayer)cause.audience()).serverLocation());
             if (!zones.isEmpty())
             {
                 return zones.get(0);
             }
         }
 
-        i18n.send(cause.getAudience(), MessageType.NEGATIVE, "You need to provide a zone");
+        i18n.send(cause.audience(), MessageType.NEGATIVE, "You need to provide a zone");
         return null;
     }
 
@@ -83,10 +83,10 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
         String token = currentInput.toLowerCase();
         List<String> list = new ArrayList<>();
         ServerWorld world = null;
-        boolean isLocatable = context.getCause().getAudience() instanceof Locatable;
+        boolean isLocatable = context.cause().audience() instanceof Locatable;
         if (isLocatable)
         {
-            world = ((Locatable)context.getCause().getAudience()).getServerLocation().getWorld();
+            world = ((Locatable)context.cause().audience()).serverLocation().world();
             for (ZoneConfig zone : manager.getZones(null, world))
             {
                 if (zone.name == null)
@@ -108,8 +108,8 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
                 list.add("global");
             }
              */
-            if (world != null && zone.world.getWorld().getUniqueId().equals(world.getUniqueId())
-                && !world.getKey().toString().startsWith(token.replace(".", "")))
+            if (world != null && zone.world.getWorld().uniqueId().equals(world.uniqueId())
+                && !world.key().toString().startsWith(token.replace(".", "")))
             {
                 continue; // Skip if already without world ; except when token starts with world
             }
@@ -154,16 +154,16 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
     }
 
     @Override
-    public Optional<? extends ZoneConfig> getValue(Parameter.Key<? super ZoneConfig> parameterKey,
+    public Optional<? extends ZoneConfig> parseValue(Parameter.Key<? super ZoneConfig> parameterKey,
                                                    ArgumentReader.Mutable reader,
                                                    CommandContext.Builder context) throws ArgumentParseException
     {
-        final Audience audience = context.getCause().getAudience();
+        final Audience audience = context.cause().audience();
 
         final String token = reader.parseUnquotedString().toLowerCase();
         if (audience instanceof Locatable)
         {
-            ServerWorld world = ((Locatable)audience).getServerLocation().getWorld();
+            ServerWorld world = ((Locatable)audience).serverLocation().world();
             ZoneConfig zone = manager.getZone(token);
             if (zone != null)
             {

@@ -74,7 +74,7 @@ public class ZonedListener
     @Listener
     public void onInteract(InteractItemEvent event, @First ServerPlayer player)
     {
-        if (!event.getContext().get(EventContextKeys.USED_HAND).map(
+        if (!event.context().get(EventContextKeys.USED_HAND).map(
             hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
         {
             return;
@@ -92,11 +92,11 @@ public class ZonedListener
         ZoneConfig config = getZone(player);
         if (config.world == null)
         {
-            config.world = new ConfigWorld(player.getWorld());
+            config.world = new ConfigWorld(player.world());
         }
         else
         {
-            if (config.world.getWorld() != player.getWorld())
+            if (config.world.getWorld() != player.world())
             {
                 i18n.send(player, NEUTRAL, "No Zone selected in this world yet.");
                 return;
@@ -110,7 +110,7 @@ public class ZonedListener
     @Listener
     public void onInteract(InteractBlockEvent event, @First ServerPlayer player)
     {
-        if (!event.getContext().get(EventContextKeys.USED_HAND).map(
+        if (!event.context().get(EventContextKeys.USED_HAND).map(
             hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
         {
             return;
@@ -120,8 +120,8 @@ public class ZonedListener
         {
             return;
         }
-        final ServerLocation block = player.getWorld().getLocation(event.getBlock().getPosition());
-        if (block.getBlockType().isAnyOf(AIR))
+        final ServerLocation block = player.world().location(event.block().position());
+        if (block.blockType().isAnyOf(AIR))
         {
             return;
         }
@@ -129,11 +129,11 @@ public class ZonedListener
         ZoneConfig config = getZone(player);
         if (config.world == null)
         {
-            config.world = new ConfigWorld(player.getWorld());
+            config.world = new ConfigWorld(player.world());
         }
         else
         {
-            if (config.world.getWorld() != player.getWorld())
+            if (config.world.getWorld() != player.world())
             {
                 i18n.send(player, NEUTRAL, "Position in new World detected. Clearing all previous Positions.");
                 config.clear();
@@ -147,11 +147,11 @@ public class ZonedListener
         }
         else
         {
-            Component added = config.addPoint(i18n, player, event instanceof InteractBlockEvent.Primary, block.getPosition());
+            Component added = config.addPoint(i18n, player, event instanceof InteractBlockEvent.Primary, block.position());
             Component selected = config.getSelected(i18n, player);
 
-            i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "{txt} ({integer}, {integer}, {integer}). {txt}", added, block.getBlockX(),
-                      block.getBlockY(), block.getBlockZ(), selected);
+            i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "{txt} ({integer}, {integer}, {integer}). {txt}", added, block.blockX(),
+                      block.blockY(), block.blockZ(), selected);
         }
 
         if (event instanceof Cancellable)
@@ -168,16 +168,16 @@ public class ZonedListener
            return;
         }
 
-        if (!SelectionTool.isTool(event.getOriginalSlot().peek()) || !player.hasPermission(selectPerm.getId()))
+        if (!SelectionTool.isTool(event.originalSlot().peek()) || !player.hasPermission(selectPerm.getId()))
         {
             return;
         }
         ZoneConfig config = getZone(player);
         if (config.world == null)
         {
-            config.world = new ConfigWorld(player.getWorld());
+            config.world = new ConfigWorld(player.world());
         }
-        int scrollDirection = this.compareSlots(event.getOriginalSlot().get(Keys.SLOT_INDEX).get(), event.getFinalSlot().get(Keys.SLOT_INDEX).get());
+        int scrollDirection = this.compareSlots(event.originalSlot().get(Keys.SLOT_INDEX).get(), event.finalSlot().get(Keys.SLOT_INDEX).get());
         if (scrollDirection == 0)
         {
             return;
@@ -207,7 +207,7 @@ public class ZonedListener
             return true;
         }
 
-        final Direction direction = Direction.getClosest(player.getHeadDirection(), Division.CARDINAL);
+        final Direction direction = Direction.closest(player.headDirection(), Division.CARDINAL);
         final Shape shape = config.shape;
         if (shape instanceof Cuboid)
         {
@@ -266,7 +266,7 @@ public class ZonedListener
         }
         else
         {
-            i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Contracted towards {txt#direction}. {txt#selected}", direction.getOpposite().toString(), selected);
+            i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Contracted towards {txt#direction}. {txt#selected}", direction.opposite().toString(), selected);
         }
         return false;
     }
@@ -279,7 +279,7 @@ public class ZonedListener
             return true;
         }
 
-        final Direction direction = Direction.getClosest(player.getHeadDirection(), Division.CARDINAL);
+        final Direction direction = Direction.closest(player.headDirection(), Division.CARDINAL);
         final Shape shape = config.shape;
         if (shape instanceof Cuboid)
         {
@@ -300,17 +300,17 @@ public class ZonedListener
 
         Component selected = config.getSelected(i18n, player);
 
-        i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Moved towards {txt#direction}. {txt#selected}", forward ? direction.toString() : direction.getOpposite().toString(), selected);
+        i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Moved towards {txt#direction}. {txt#selected}", forward ? direction.toString() : direction.opposite().toString(), selected);
         return false;
     }
 
     public ZoneConfig getZone(ServerPlayer player)
     {
-        return zonesByPlayer.computeIfAbsent(player.getUniqueId(), k -> reflector.create(ZoneConfig.class));
+        return zonesByPlayer.computeIfAbsent(player.uniqueId(), k -> reflector.create(ZoneConfig.class));
     }
 
     public void setZone(ServerPlayer player, ZoneConfig zone)
     {
-        zonesByPlayer.put(player.getUniqueId(), zone.clone(reflector));
+        zonesByPlayer.put(player.uniqueId(), zone.clone(reflector));
     }
 }

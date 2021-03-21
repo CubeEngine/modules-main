@@ -31,13 +31,13 @@ public class BaseAccountFormatter extends ReflectedFormatter
     @Format
     public Component format(BaseAccount.Unique userAcc)
     {
-        return new StyledComponent(NamedTextColor.DARK_GREEN, new TextComponent(userAcc.getDisplayName()));
+        return new StyledComponent(NamedTextColor.DARK_GREEN, new TextComponent(userAcc.displayName()));
     }
 
     @Format
     public Component format(BaseAccount.Virtual bankAcc)
     {
-        return new StyledComponent(NamedTextColor.GOLD, new TextComponent(bankAcc.getDisplayName()));
+        return new StyledComponent(NamedTextColor.GOLD, new TextComponent(bankAcc.displayName()));
     }
 
 }

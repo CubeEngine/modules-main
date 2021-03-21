@@ -72,9 +72,9 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
         {
             return activeRegion;
         }
-        if (commandCause.getSubject() instanceof ServerPlayer)
+        if (commandCause.subject() instanceof ServerPlayer)
         {
-            List<Region> regions = manager.getRegionsAt(((ServerPlayer)commandCause.getSubject()).getServerLocation());
+            List<Region> regions = manager.getRegionsAt(((ServerPlayer)commandCause.subject()).serverLocation());
             if (!regions.isEmpty())
             {
                 return regions.get(0);
@@ -90,11 +90,11 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
         String token = currentInput.toLowerCase();
         List<String> list = new ArrayList<>();
         ServerWorld world = null;
-        boolean isLocatable = context.getSubject() instanceof Locatable;
+        boolean isLocatable = context.subject() instanceof Locatable;
         if (isLocatable)
         {
-            world = ((Locatable)context.getSubject()).getServerLocation().getWorld();
-            Map<String, Region> regions = manager.getRegions(world.getKey());
+            world = ((Locatable)context.subject()).serverLocation().world();
+            Map<String, Region> regions = manager.getRegions(world.key());
 
             for (Map.Entry<String, Region> entry : regions.entrySet())
             {
@@ -107,8 +107,8 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
         }
         for (Map.Entry<ResourceKey, Map<String, Region>> perWorld : manager.getRegions().entrySet())
         {
-            if (world != null && perWorld.getKey().equals(world.getKey())
-                && !world.getKey().asString().startsWith(token.replace(".", ""))) // TODO correct?
+            if (world != null && perWorld.getKey().equals(world.key())
+                && !world.key().asString().startsWith(token.replace(".", ""))) // TODO correct?
             {
                 continue; // Skip if already without world ; except when token starts with world
             }
@@ -139,7 +139,7 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
         }
         for (Region region : manager.getWorldRegions())
         {
-            String worldName = region.getWorld().getKey().asString();
+            String worldName = region.getWorld().key().asString();
             if (worldName.startsWith(token))
             {
                 list.add(worldName);
@@ -159,20 +159,20 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
     }
 
     @Override
-    public Optional<? extends Region> getValue(Key<? super Region> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    public Optional<? extends Region> parseValue(Key<? super Region> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
         String token = reader.parseString();
-        if (context.getSubject() instanceof Locatable)
+        if (context.subject() instanceof Locatable)
         {
-            final ServerWorld world = ((Locatable)context.getSubject()).getServerLocation().getWorld();
-            Region region = manager.getRegions(world.getKey()).get(token);
+            final ServerWorld world = ((Locatable)context.subject()).serverLocation().world();
+            Region region = manager.getRegions(world.key()).get(token);
             if (region != null)
             {
                 return Optional.of(region);
             }
             if ("world".equals(token))
             {
-                region = manager.getWorldRegion(world.getKey());
+                region = manager.getWorldRegion(world.key());
                 if (region != null)
                 {
                     return Optional.of(region);
@@ -193,13 +193,13 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
         {
             String worldName = token.replaceAll(".world$", "");
             final ResourceKey worldKey = ResourceKey.resolve(worldName);
-            if (Sponge.getServer().getWorldManager().world(worldKey).isPresent())
+            if (Sponge.server().worldManager().world(worldKey).isPresent())
             {
                 return Optional.of(manager.getWorldRegion(worldKey));
             }
             else
             {
-                throw reader.createException(i18n.translate(context.getCause(), NEGATIVE, "Unknown World {name} for world-region", token, worldName));
+                throw reader.createException(i18n.translate(context.cause(), NEGATIVE, "Unknown World {name} for world-region", token, worldName));
             }
         }
         if ("global".equals(token))
@@ -212,7 +212,7 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
         {
             return Optional.of(manager.newRegion(zone));
         }
-        throw reader.createException(i18n.translate(context.getCause(), NEGATIVE, "There is no such Region as {name}", token));
+        throw reader.createException(i18n.translate(context.cause(), NEGATIVE, "There is no such Region as {name}", token));
     }
 
 }

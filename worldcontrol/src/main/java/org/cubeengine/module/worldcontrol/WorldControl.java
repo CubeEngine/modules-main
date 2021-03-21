@@ -40,16 +40,16 @@ public class WorldControl
     {
         for (Entry<ConfigWorld, WorldSection> entry : config.worldSettings.entrySet())
         {
-            entry.getKey().getWorld().getProperties().setPvp(entry.getValue().pvp);
+            entry.getKey().getWorld().properties().setPvp(entry.getValue().pvp);
         }
     }
 
     @Listener
     public void onSpawnEntity(SpawnEntityEvent event)
     {
-        if (!event.getEntities().isEmpty())
+        if (!event.entities().isEmpty())
         {
-            WorldSection section = config.worldSettings.get(new ConfigWorld(event.getEntities().iterator().next().getServerLocation().getWorld()));
+            WorldSection section = config.worldSettings.get(new ConfigWorld(event.entities().iterator().next().serverLocation().world()));
             if (section != null)
             {
 

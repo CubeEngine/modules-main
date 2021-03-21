@@ -77,22 +77,22 @@ public class MovementCommands
             i18n.send(context, NEGATIVE, "Invalid height. The height has to be a whole number greater than 0!");
             return;
         }
-        ServerLocation loc = context.getServerLocation().add(0, height - 1, 0);
+        ServerLocation loc = context.serverLocation().add(0, height - 1, 0);
 
-        if (loc.getBlockY() > loc.getWorld().getMaximumHeight()) // Over highest loc
+        if (loc.blockY() > loc.world().maximumHeight()) // Over highest loc
         {
-            loc.add(0, loc.getWorld().getMaximumHeight() - loc.getY(), 0);
+            loc.add(0, loc.world().maximumHeight() - loc.y(), 0);
         }
         ServerLocation up1 = loc.relativeTo(UP);
-        if (!(up1.getBlockType().isAnyOf(AIR) && up1.relativeTo(UP).getBlockType().isAnyOf(AIR)))
+        if (!(up1.blockType().isAnyOf(AIR) && up1.relativeTo(UP).blockType().isAnyOf(AIR)))
         {
             i18n.send(ACTION_BAR, context, NEGATIVE, "Your destination seems to be obstructed!");
             return;
         }
-        if (loc.getBlockType().isAnyOf(AIR))
+        if (loc.blockType().isAnyOf(AIR))
         {
-            Sponge.getServer().getCauseStackManager().pushCause(context);
-            loc.setBlock(GLASS.get().getDefaultState());
+            Sponge.server().causeStackManager().pushCause(context);
+            loc.setBlock(GLASS.get().defaultState());
         }
         context.setLocation(loc.relativeTo(UP));
         i18n.send(ACTION_BAR, context, POSITIVE, "You have just been lifted!");
@@ -102,8 +102,8 @@ public class MovementCommands
     @Restricted(msg = "Pro Tip: Teleport does not work IRL!")
     public void top(ServerPlayer context)
     {
-        final Vector3i pos = context.getWorld().getHighestPositionAt(context.getBlockPosition()).add(0.5, 1, 0.5);
-        context.setLocation(context.getWorld().getLocation(pos));
+        final Vector3i pos = context.world().highestPositionAt(context.blockPosition()).add(0.5, 1, 0.5);
+        context.setLocation(context.world().location(pos));
         i18n.send(ACTION_BAR, context, POSITIVE, "You are now on top!");
     }
 
@@ -111,14 +111,14 @@ public class MovementCommands
     @Restricted(msg = "Pro Tip: Teleport does not work IRL!")
     public void ascend(ServerPlayer context)
     {
-        ServerLocation loc = context.getServerLocation();
+        ServerLocation loc = context.serverLocation();
         ServerLocation curLoc = loc.add(0, 2, 0);
-        final int maxHeight = curLoc.getWorld().getMaximumHeight();
+        final int maxHeight = curLoc.world().maximumHeight();
         //go upwards until hitting solid blocks
-        while (curLoc.getBlockType().isAnyOf(AIR) && curLoc.getY() < maxHeight)
+        while (curLoc.blockType().isAnyOf(AIR) && curLoc.y() < maxHeight)
         {
             ServerLocation rel = curLoc.relativeTo(UP);
-            if (rel.getY() < loc.getBlockY())
+            if (rel.y() < loc.blockY())
             {
                 i18n.send(ACTION_BAR, context, NEGATIVE, "You cannot ascend here");
                 return;
@@ -127,21 +127,21 @@ public class MovementCommands
         }
         curLoc = curLoc.relativeTo(UP);
         // go upwards until hitting 2 airblocks again
-        while (!(curLoc.getBlockType().isAnyOf(AIR) && curLoc.relativeTo(UP).getBlockType().isAnyOf(AIR)) && curLoc.getY() < maxHeight)
+        while (!(curLoc.blockType().isAnyOf(AIR) && curLoc.relativeTo(UP).blockType().isAnyOf(AIR)) && curLoc.y() < maxHeight)
         {
             ServerLocation rel = curLoc.relativeTo(UP);
-            if (rel.getY() == 0)
+            if (rel.y() == 0)
             {
                 break;
             }
             curLoc = rel;
         }
-        if (curLoc.getY() >= maxHeight)
+        if (curLoc.y() >= maxHeight)
         {
             i18n.send(ACTION_BAR, context, NEGATIVE, "You cannot ascend here");
             return;
         }
-        curLoc = curLoc.add(0, - (curLoc.getY() - curLoc.getBlockY()), 0);
+        curLoc = curLoc.add(0, - (curLoc.y() - curLoc.blockY()), 0);
         context.setLocation(curLoc);
         i18n.send(ACTION_BAR, context, POSITIVE, "Ascended a level!");
     }
@@ -150,27 +150,27 @@ public class MovementCommands
     @Restricted(msg = "Pro Tip: Teleport does not work IRL!")
     public void descend(ServerPlayer context)
     {
-        ServerLocation curLoc = context.getServerLocation();
+        ServerLocation curLoc = context.serverLocation();
         //go downwards until hitting solid blocks
-        while (curLoc.getBlockType().isAnyOf(AIR) && curLoc.getBlockY() > 0)
+        while (curLoc.blockType().isAnyOf(AIR) && curLoc.blockY() > 0)
         {
             curLoc = curLoc.add(0, -1, 0);
         }
         // go downwards until hitting 2 airblocks & a solid block again
-        while (!((curLoc.getBlockType().isAnyOf(AIR))
-            && (curLoc.relativeTo(UP).getBlockType().isAnyOf(AIR))
-            && (!curLoc.relativeTo(DOWN).getBlockType().isAnyOf(AIR)))
-            && curLoc.getBlockY() > 0)
+        while (!((curLoc.blockType().isAnyOf(AIR))
+            && (curLoc.relativeTo(UP).blockType().isAnyOf(AIR))
+            && (!curLoc.relativeTo(DOWN).blockType().isAnyOf(AIR)))
+            && curLoc.blockY() > 0)
         {
             curLoc = curLoc.relativeTo(DOWN);
         }
-        if (curLoc.getY() <= 1)
+        if (curLoc.y() <= 1)
         {
             i18n.send(ACTION_BAR, context, NEGATIVE, "You cannot descend here");
             return;
         }
         //reached new location
-        curLoc = curLoc.add(0, - (curLoc.getY() - curLoc.getBlockY()), 0);
+        curLoc = curLoc.add(0, - (curLoc.y() - curLoc.blockY()), 0);
         context.setLocation(curLoc);
         i18n.send(ACTION_BAR, context, POSITIVE, "Descended a level!");
     }
@@ -224,8 +224,8 @@ public class MovementCommands
             if (loc != null)
             {
                 ServerLocation deathLoc = loc;
-                ServerLocation safeDeathLoc = Sponge.getServer().getTeleportHelper().getSafeLocation(deathLoc, 5, 20).orElse(null);
-                if (safeDeathLoc != null && deathLoc.getPosition().distance(safeDeathLoc.getPosition()) < 5 || unsafe)
+                ServerLocation safeDeathLoc = Sponge.server().teleportHelper().findSafeLocation(deathLoc, 5, 20).orElse(null);
+                if (safeDeathLoc != null && deathLoc.position().distance(safeDeathLoc.position()) < 5 || unsafe)
                 {
                     context.setLocation(unsafe ? deathLoc : safeDeathLoc);
                     i18n.send(ACTION_BAR, context, POSITIVE, "Teleported to your death point!");
@@ -252,7 +252,7 @@ public class MovementCommands
             ServerLocation loc = trans;
             if (!unsafe)
             {
-                loc = Sponge.getServer().getTeleportHelper().getSafeLocation(loc, 5, 20).orElse(null);
+                loc = Sponge.server().teleportHelper().findSafeLocation(loc, 5, 20).orElse(null);
             }
             if (loc == null)
             {
@@ -287,9 +287,9 @@ public class MovementCommands
     @Command(desc = "Swaps you and another players position")
     public void swap(CommandCause context, ServerPlayer player, @Default @Label("player") ServerPlayer sender)
     {
-        if (player.equals(context.getAudience()))
+        if (player.equals(context.audience()))
         {
-            if (context.getAudience() instanceof ServerPlayer)
+            if (context.audience() instanceof ServerPlayer)
             {
                 i18n.send(ACTION_BAR, context, NEGATIVE, "Swapping positions with yourself!? Are you kidding me?");
                 return;
@@ -297,13 +297,13 @@ public class MovementCommands
             i18n.send(ACTION_BAR, context, NEUTRAL, "Truly a hero! Trying to swap a users position with himself...");
             return;
         }
-        ServerLocation userLoc = player.getServerLocation();
-        Vector3d userRot = player.getRotation();
-        player.setLocation(sender.getServerLocation());
-        player.setRotation(sender.getRotation());
+        ServerLocation userLoc = player.serverLocation();
+        Vector3d userRot = player.rotation();
+        player.setLocation(sender.serverLocation());
+        player.setRotation(sender.rotation());
         sender.setLocation(userLoc);
         sender.setRotation(userRot);
-        if (!context.getAudience().equals(sender))
+        if (!context.audience().equals(sender))
         {
             i18n.send(ACTION_BAR, context, POSITIVE, "Swapped position of {user} and {user}!", player, sender);
             return;

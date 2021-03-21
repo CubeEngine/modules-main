@@ -62,12 +62,12 @@ public class FoodCommands extends PermissionContainer
     {
         if (players == null)
         {
-            if (!(context.getSubject() instanceof ServerPlayer))
+            if (!(context.subject() instanceof ServerPlayer))
             {
                 i18n.send(context, NEGATIVE, "Don't feed the troll!");
                 return;
             }
-            final ServerPlayer sender = (ServerPlayer)context.getSubject();
+            final ServerPlayer sender = (ServerPlayer)context.subject();
             sender.offer(Keys.FOOD_LEVEL, 20);
             sender.offer(Keys.SATURATION, 20.0);
             sender.offer(Keys.EXHAUSTION, 0.0);
@@ -80,7 +80,7 @@ public class FoodCommands extends PermissionContainer
             return;
         }
 
-        boolean all = players.containsAll(Sponge.getServer().getOnlinePlayers());
+        boolean all = players.containsAll(Sponge.server().onlinePlayers());
         if (all)
         {
             if (players.isEmpty())
@@ -113,13 +113,13 @@ public class FoodCommands extends PermissionContainer
     {
         if (players == null)
         {
-            if (!(context.getSubject() instanceof ServerPlayer))
+            if (!(context.subject() instanceof ServerPlayer))
             {
                 context.sendMessage(Identity.nil(), Component.text("\n\n\n\n\n\n\n\n\n\n\n\n\n"));
                 i18n.send(context, NEGATIVE, "I'll give you only one line to eat!");
                 return;
             }
-            final ServerPlayer sender = (ServerPlayer)context.getSubject();
+            final ServerPlayer sender = (ServerPlayer)context.subject();
             sender.offer(Keys.FOOD_LEVEL, 0);
             sender.offer(Keys.SATURATION, 0.0);
             sender.offer(Keys.EXHAUSTION, 4.0);
@@ -132,7 +132,7 @@ public class FoodCommands extends PermissionContainer
             return;
         }
 
-        boolean all = players.containsAll(Sponge.getServer().getOnlinePlayers());
+        boolean all = players.containsAll(Sponge.server().onlinePlayers());
         if (all)
         {
             if (players.isEmpty())

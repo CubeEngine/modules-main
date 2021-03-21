@@ -28,7 +28,6 @@ import org.cubeengine.module.conomy.bank.BankConomyService;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.module.sql.database.Database;
-import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
@@ -85,7 +84,7 @@ public abstract class BaseAccount implements Account
                     .and(TABLE_BALANCE.CURRENCY.eq(currency.getCurrencyID())).fetchOne();
             if (balanceModel == null)
             {
-                balanceModel = db.getDSL().newRecord(TABLE_BALANCE).newBalance(account, currency, relevantCtx.get(), getDefaultBalance(currency));
+                balanceModel = db.getDSL().newRecord(TABLE_BALANCE).newBalance(account, currency, relevantCtx.get(), defaultBalance(currency));
                 balanceModel.store();
                 balances.put(relevantCtx.get(), balanceModel);
             }
@@ -100,11 +99,11 @@ public abstract class BaseAccount implements Account
         {
             return (ConfigCurrency) currency;
         }
-        throw new IllegalArgumentException("Unknown Currency: " + currency.getDisplayName() + " " + currency.getClass().getName());
+        throw new IllegalArgumentException("Unknown Currency: " + currency.displayName() + " " + currency.getClass().getName());
     }
 
     @Override
-    public BigDecimal getDefaultBalance(Currency currency)
+    public BigDecimal defaultBalance(Currency currency)
     {
         return ((ConfigCurrency) currency).getDefaultBalance(this);
     }
@@ -117,7 +116,7 @@ public abstract class BaseAccount implements Account
     }
 
     @Override
-    public BigDecimal getBalance(Currency currency, Set<Context> contexts)
+    public BigDecimal balance(Currency currency, Set<Context> contexts)
     {
         // TODO javadocs are unclear what to do if currency is not found in context
         // If no Balance available then ZERO
@@ -129,10 +128,10 @@ public abstract class BaseAccount implements Account
     }
 
     @Override
-    public Map<Currency, BigDecimal> getBalances(Set<Context> ctxs)
+    public Map<Currency, BigDecimal> balances(Set<Context> ctxs)
     {
         return service.getCurrencies().stream()
-                .collect(toMap(c -> c, c -> getBalance(c, ctxs)));
+                .collect(toMap(c -> c, c -> balance(c, ctxs)));
     }
 
     @Override
@@ -157,7 +156,7 @@ public abstract class BaseAccount implements Account
     @Override
     public TransactionResult resetBalance(Currency currency, Set<Context> contexts)
     {
-        return setBalance(currency, getDefaultBalance(currency), contexts);
+        return setBalance(currency, defaultBalance(currency), contexts);
     }
 
     @Override
@@ -205,27 +204,27 @@ public abstract class BaseAccount implements Account
         // TODO disallow bank -> user if cause is not admin?
         // TODO check for visibility of account for causer
         TransactionResult result = this.withdraw(currency, amount, contexts);
-        if (result.getResult() == SUCCESS)
+        if (result.result() == SUCCESS)
         {
             result = to.deposit(currency, amount, contexts);
-            if (result.getResult() == SUCCESS)
+            if (result.result() == SUCCESS)
             {
                 return new Result.Transfer(this, to, currency, amount, contexts, SUCCESS, TRANSFER);
             }
             else
             {
                 this.deposit(currency, amount, contexts); // rollback withdraw action
-                return new Result.Transfer(this, to, currency, amount, contexts, result.getResult(), TRANSFER);
+                return new Result.Transfer(this, to, currency, amount, contexts, result.result(), TRANSFER);
             }
         }
         else
         {
-            return new Result.Transfer(this, to, currency, amount, contexts, result.getResult(), TRANSFER);
+            return new Result.Transfer(this, to, currency, amount, contexts, result.result(), TRANSFER);
         }
     }
 
     @Override
-    public Set<Context> getActiveContexts()
+    public Set<Context> activeContexts()
     {
         return service.getActiveContexts(this);
     }
@@ -241,13 +240,13 @@ public abstract class BaseAccount implements Account
     }
 
     @Override
-    public Component getDisplayName()
+    public Component displayName()
     {
         return display;
     }
 
     @Override
-    public String getIdentifier()
+    public String identifier()
     {
         return id;
     }
@@ -263,7 +262,7 @@ public abstract class BaseAccount implements Account
         }
 
         @Override
-        public UUID getUniqueId()
+        public UUID uniqueId()
         {
             return uuid;
         }

@@ -21,7 +21,6 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 import com.google.inject.Inject;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
@@ -38,13 +37,10 @@ import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.commands.provider.PermissionCompleter;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.FileSubject;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
-import org.spongepowered.plugin.PluginContainer;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
@@ -81,11 +77,11 @@ public class ManagementCommands extends DispatcherCommand
     public void save(CommandCause context)
     {
         module.getConfiguration().save();
-        for (Subject subject : service.getGroupSubjects().getLoadedSubjects())
+        for (Subject subject : service.groupSubjects().loadedSubjects())
         {
             if (subject instanceof FileSubject)
             {
-                ((FileSubject)subject).getSubjectData().save(CompletableFuture.completedFuture(true));
+                ((FileSubject)subject).subjectData().save(CompletableFuture.completedFuture(true));
             }
         }
 
@@ -120,7 +116,7 @@ public class ManagementCommands extends DispatcherCommand
     @Command(desc = "Searches for registered Permissions")
     public void findPermission(CommandCause sender, @Parser(completer = PermissionCompleter.class) String permission)
     {
-        PermissionDescription perm = service.getDescription(permission).orElse(null);
+        PermissionDescription perm = service.description(permission).orElse(null);
         if (perm == null)
         {
             i18n.send(sender, NEGATIVE, "Permission {name} not found!", permission);
@@ -128,18 +124,18 @@ public class ManagementCommands extends DispatcherCommand
         else
         {
             i18n.send(sender, POSITIVE, "Permission {name} found:", permission);
-            if (perm.getDescription().isPresent())
+            if (perm.description().isPresent())
             {
-                sender.sendMessage(Identity.nil(), perm.getDescription().get().color(NamedTextColor.GOLD));
+                sender.sendMessage(Identity.nil(), perm.description().get().color(NamedTextColor.GOLD));
             }
-            Map<Subject, Boolean> roles = perm.getAssignedSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE);
+            Map<Subject, Boolean> roles = perm.assignedSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE);
             if (!roles.isEmpty())
             {
                 i18n.send(sender, POSITIVE, "Permission is assigned to the following templates:");
                 for (Entry<Subject, Boolean> entry : roles.entrySet())
                 {
                     Component.text().append(Component.text("  - "))
-                             .append(Component.text(entry.getKey().getIdentifier() + ": ", NamedTextColor.GOLD))
+                             .append(Component.text(entry.getKey().identifier() + ": ", NamedTextColor.GOLD))
                              .append(Component.text(entry.getValue(), entry.getValue() ? NamedTextColor.DARK_GREEN : NamedTextColor.DARK_RED));
                     // TODO translate entry.getValue true/false
                 }

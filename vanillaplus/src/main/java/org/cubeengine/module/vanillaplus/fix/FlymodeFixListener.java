@@ -26,16 +26,16 @@ public class FlymodeFixListener
     @Listener
     public void join(final ServerSideConnectionEvent.Join event)
     {
-        if (event.getPlayer().get(SafeLoginData.FLYMODE).orElse(false))
+        if (event.player().get(SafeLoginData.FLYMODE).orElse(false))
         {
-            event.getPlayer().offer(Keys.CAN_FLY, true);
-            event.getPlayer().offer(Keys.IS_FLYING, true);
+            event.player().offer(Keys.CAN_FLY, true);
+            event.player().offer(Keys.IS_FLYING, true);
         }
     }
 
     @Listener
     public void quit(final ServerSideConnectionEvent.Disconnect event)
     {
-        event.getPlayer().offer(SafeLoginData.FLYMODE, event.getPlayer().get(Keys.IS_FLYING).orElse(false));
+        event.player().offer(SafeLoginData.FLYMODE, event.player().get(Keys.IS_FLYING).orElse(false));
     }
 }

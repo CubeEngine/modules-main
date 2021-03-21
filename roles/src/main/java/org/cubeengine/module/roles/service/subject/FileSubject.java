@@ -46,7 +46,7 @@ public class FileSubject extends BaseSubject<FileSubjectData>
     }
 
     @Override
-    public FileSubjectData getSubjectData()
+    public FileSubjectData subjectData()
     {
         return this.data;
     }
@@ -61,7 +61,7 @@ public class FileSubject extends BaseSubject<FileSubjectData>
         try
         {
             Subject subject = s.resolve().get();
-            return subject instanceof FileSubject ? ((FileSubject)subject).getUUID().toString() : subject.getIdentifier();
+            return subject instanceof FileSubject ? ((FileSubject)subject).getUUID().toString() : subject.identifier();
         }
         catch (InterruptedException | ExecutionException e)
         {
@@ -73,8 +73,8 @@ public class FileSubject extends BaseSubject<FileSubjectData>
     {
         if (o1 instanceof FileSubject && o2 instanceof FileSubject) // Higher priority first
         {
-            return -Integer.compare(((FileSubject) o1).getSubjectData().getConfig().priority.value,
-                                    ((FileSubject) o2).getSubjectData().getConfig().priority.value);
+            return -Integer.compare(((FileSubject) o1).subjectData().getConfig().priority.value,
+                                    ((FileSubject) o2).subjectData().getConfig().priority.value);
         }
         if (o1 instanceof FileSubject)
         {
@@ -96,30 +96,30 @@ public class FileSubject extends BaseSubject<FileSubjectData>
         {
             return 1;
         }
-        String i1 = o1.getContainingCollection().getIdentifier() + o1.getIdentifier();
-        String i2 = o2.getContainingCollection().getIdentifier() + o2.getIdentifier();
+        String i1 = o1.containingCollection().identifier() + o1.identifier();
+        String i2 = o2.containingCollection().identifier() + o2.identifier();
         return i1.compareTo(i2);
     }
 
     protected UUID getUUID()
     {
-        return getSubjectData().getConfig().identifier;
+        return subjectData().getConfig().identifier;
     }
 
     @Override
-    public String getIdentifier()
+    public String identifier()
     {
-        return getSubjectData().getConfig().roleName;
+        return subjectData().getConfig().roleName;
     }
 
     @Override
-    public Optional<String> getFriendlyIdentifier()
+    public Optional<String> friendlyIdentifier()
     {
-        return Optional.of(getSubjectData().getConfig().roleName);
+        return Optional.of(subjectData().getConfig().roleName);
     }
 
     @Override
-    public Set<Context> getActiveContexts()
+    public Set<Context> activeContexts()
     {
         return GLOBAL_CONTEXT;
     }
@@ -127,23 +127,23 @@ public class FileSubject extends BaseSubject<FileSubjectData>
     public boolean canAssignAndRemove(CommandCause source)
     {
         String perm = service.getPermissionManager().getBasePermission(Roles.class).getId();
-        return source.hasPermission(perm + ".assign." + getIdentifier()); // TODO register permission + assign base
+        return source.hasPermission(perm + ".assign." + identifier()); // TODO register permission + assign base
     }
 
     public void setPriorityValue(int value)
     {
-        getSubjectData().getConfig().priority = Priority.getByValue(value);
-        getSubjectData().getConfig().save(); // TODO async
+        subjectData().getConfig().priority = Priority.getByValue(value);
+        subjectData().getConfig().save(); // TODO async
     }
 
     public Priority prio()
     {
-        return getSubjectData().getConfig().priority;
+        return subjectData().getConfig().priority;
     }
 
     @Override
     public String toString() {
-        return "RoleSubject: " + this.getIdentifier();
+        return "RoleSubject: " + this.identifier();
     }
 
     @Override

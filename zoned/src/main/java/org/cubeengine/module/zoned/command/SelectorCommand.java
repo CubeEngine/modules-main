@@ -47,7 +47,7 @@ public class SelectorCommand
     public void giveSelectionTool(ServerPlayer player)
     {
         ItemStack found = null;
-        Inventory axes = player.getInventory().query(QueryTypes.ITEM_TYPE, ItemTypes.COAL);
+        Inventory axes = player.inventory().query(QueryTypes.ITEM_TYPE, ItemTypes.COAL);
         for (Inventory slot : axes.slots())
         {
             if (SelectionTool.isTool(slot.peek()))
@@ -58,16 +58,16 @@ public class SelectorCommand
             }
         }
 
-        final ItemStack itemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
         if (found == null)
         {
             found = SelectionTool.newTool(player);
             player.setItemInHand(HandTypes.MAIN_HAND, found);
             if (!itemInHand.isEmpty())
             {
-                if (player.getInventory().offer(itemInHand).revertOnFailure())
+                if (player.inventory().offer(itemInHand).revertOnFailure())
                 {
-                    SpawnUtil.spawnItem(itemInHand, player.getServerLocation());
+                    SpawnUtil.spawnItem(itemInHand, player.serverLocation());
                 }
             }
             i18n.send(player, POSITIVE, "Received a new region selector tool");
@@ -75,7 +75,7 @@ public class SelectorCommand
         }
 
         player.setItemInHand(HandTypes.MAIN_HAND, found);
-        player.getInventory().offer(itemInHand);
+        player.inventory().offer(itemInHand);
         i18n.send(player, POSITIVE, "Found a region selector tool in your inventory!");
     }
 

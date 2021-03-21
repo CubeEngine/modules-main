@@ -33,7 +33,6 @@ import org.spongepowered.api.service.permission.SubjectReference;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,7 +62,7 @@ public class FileSubjectData extends CachingSubjectData
                 for (Map.Entry<Context, List<SubjectReference>> entry : parents.entrySet())
                 {
                     List<String> collect = entry.getValue().stream()
-                            .map(r -> r.getCollectionIdentifier() + ":" + r.getSubjectIdentifier() + "#" + FileSubject.getInternalIdentifier(r))
+                            .map(r -> r.collectionIdentifier() + ":" + r.subjectIdentifier() + "#" + FileSubject.getInternalIdentifier(r))
                             .collect(toList());
 
                     getContextSetting(config, entry.getKey()).parents.addAll(collect);
@@ -88,7 +87,7 @@ public class FileSubjectData extends CachingSubjectData
                     throw new IllegalStateException(e);
                 }
                 config.save();// TODO async
-                Sponge.getServer().getOnlinePlayers().forEach(p -> Sponge.getServer().getCommandManager().updateCommandTreeForPlayer(p));
+                Sponge.server().onlinePlayers().forEach(p -> Sponge.server().commandManager().updateCommandTreeForPlayer(p));
             }
             return changed;
         });
@@ -144,7 +143,7 @@ public class FileSubjectData extends CachingSubjectData
         {
             String type = id.substring(0, nameIndex);
             String name = idIndex > 0 ? id.substring(idIndex + 1) : id.substring(nameIndex + 1);
-            SubjectCollection collection = service.getCollection(type).get();
+            SubjectCollection collection = service.collection(type).get();
             if (collection instanceof FileBasedCollection)
             {
                 return ((FileBasedCollection) collection).getByInternalIdentifier(name, getConfig().roleName);
@@ -163,7 +162,7 @@ public class FileSubjectData extends CachingSubjectData
             }
             catch (IllegalArgumentException e)
             {
-                return roleCollection.getSubject(id).get();
+                return roleCollection.subject(id).get();
             }
         }
     }

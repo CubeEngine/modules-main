@@ -70,11 +70,11 @@ public class TimeCommands extends PermissionContainer
         {
             if ("*".equals(world))
             {
-                worldList = Sponge.getServer().getWorldManager().worlds();
+                worldList = Sponge.server().worldManager().worlds();
             }
             else
             {
-                final Optional<ServerWorld> foundWorld = Sponge.getServer().getWorldManager().world(ResourceKey.resolve(world));
+                final Optional<ServerWorld> foundWorld = Sponge.server().worldManager().world(ResourceKey.resolve(world));
                 if (!foundWorld.isPresent())
                 {
                     i18n.send(context, NEGATIVE, "Could not find the world! {input#world}", world);
@@ -85,12 +85,12 @@ public class TimeCommands extends PermissionContainer
         }
         else
         {
-            if (!(context.getSubject() instanceof ServerPlayer))
+            if (!(context.subject() instanceof ServerPlayer))
             {
                 i18n.send(context, NEGATIVE, "You have to specify a world when using this command from the console!");
                 return;
             }
-            worldList = Collections.singletonList(((ServerPlayer)context.getSubject()).getWorld());
+            worldList = Collections.singletonList(((ServerPlayer)context.subject()).world());
         }
         if (time != null)
         {
@@ -101,14 +101,14 @@ public class TimeCommands extends PermissionContainer
         {
             for (ServerWorld w : worldList)
             {
-                toggleTimeLock(context, w, w.getProperties().dayTime().asTicks().getTicks());
+                toggleTimeLock(context, w, w.properties().dayTime().asTicks().ticks());
             }
             return;
         }
         i18n.send(context, POSITIVE, "The current time is:");
         for (ServerWorld w : worldList)
         {
-            long worldTime = w.getProperties().dayTime().asTicks().getTicks();
+            long worldTime = w.properties().dayTime().asTicks().ticks();
             i18n.send(context, NEUTRAL, "{input#time} ({input#neartime}) in {world}.", tm.format(worldTime), tm.matchTimeName(worldTime), w);
         }
     }
@@ -151,15 +151,15 @@ public class TimeCommands extends PermissionContainer
             this.setTime(w, lTime);
             if (lock)
             {
-                toggleTimeLock(context, w, w.getProperties().dayTime().asTicks().getTicks());
+                toggleTimeLock(context, w, w.properties().dayTime().asTicks().ticks());
             }
         }
     }
 
     private void toggleTimeLock(CommandCause context, ServerWorld world, long worldTime)
     {
-        final Boolean oldRule = world.getProperties().getGameRule(GameRules.DO_DAYLIGHT_CYCLE.get());
-        world.getProperties().setGameRule(GameRules.DO_DAYLIGHT_CYCLE.get(), !oldRule);
+        final Boolean oldRule = world.properties().gameRule(GameRules.DO_DAYLIGHT_CYCLE.get());
+        world.properties().setGameRule(GameRules.DO_DAYLIGHT_CYCLE.get(), !oldRule);
         if (oldRule)
         {
             i18n.send(context, POSITIVE, "Time locked for {world}!", world);
@@ -230,6 +230,6 @@ public class TimeCommands extends PermissionContainer
 
     private void setTime(ServerWorld world, long time)
     {
-        world.getProperties().setDayTime(MinecraftDayTime.of(Sponge.getServer(), Ticks.of(time)));
+        world.properties().setDayTime(MinecraftDayTime.of(Sponge.server(), Ticks.of(time)));
     }
 }

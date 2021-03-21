@@ -63,6 +63,7 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.biome.Biome;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
@@ -73,7 +74,6 @@ import org.spongepowered.math.vector.Vector3i;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.entity.EntityTypes.ITEM_FRAME;
-import static org.spongepowered.api.util.Direction.getClosest;
 
 @Singleton
 public class InformationCommands extends PermissionContainer
@@ -94,29 +94,29 @@ public class InformationCommands extends PermissionContainer
                       @Option ServerWorld world,
                       @Label ("<x> <z>") @Option Vector2i blockPos)
     {
-        if (!(context.getSubject() instanceof ServerPlayer) && (world == null || blockPos == null))
+        if (!(context.subject() instanceof ServerPlayer) && (world == null || blockPos == null))
         {
             i18n.send(context, NEGATIVE, "Please provide a world and x and z coordinates!");
             return;
         }
         if (world == null)
         {
-            world = ((ServerPlayer)context.getSubject()).getWorld();
+            world = ((ServerPlayer)context.subject()).world();
         }
         if (blockPos == null)
         {
-            final ServerLocation loc = ((ServerPlayer)context.getSubject()).getServerLocation();
-            if (loc.getWorld() == world)
+            final ServerLocation loc = ((ServerPlayer)context.subject()).serverLocation();
+            if (loc.world() == world)
             {
-                blockPos = new Vector2i(loc.getBlockX(), loc.getBlockZ());
+                blockPos = new Vector2i(loc.blockX(), loc.blockZ());
             }
             else
             {
-                blockPos = new Vector2i(world.getProperties().spawnPosition().getX(), world.getProperties().spawnPosition().getZ());
+                blockPos = new Vector2i(world.properties().spawnPosition().getX(), world.properties().spawnPosition().getZ());
             }
         }
 
-        Biome biome = world.getBiome(blockPos.getX(), 0, blockPos.getY());
+        Biome biome = world.biome(blockPos.getX(), 0, blockPos.getY());
         i18n.send(context, NEUTRAL, "Biome at {vector:x\\=:z\\=} in {world}: {name}", blockPos, world, world.registries().registry(RegistryTypes.BIOME).valueKey(biome).asString());
     }
 
@@ -125,15 +125,15 @@ public class InformationCommands extends PermissionContainer
     {
         if (world == null)
         {
-            if (!(context.getSubject() instanceof ServerPlayer))
+            if (!(context.subject() instanceof ServerPlayer))
             {
                 i18n.send(context, CRITICAL,"Too few arguments!");
                 return;
             }
 
-            world = ((ServerPlayer)context.getSubject()).getWorld();
+            world = ((ServerPlayer)context.subject()).world();
         }
-        final long seed = world.getProperties().worldGenerationConfig().seed();
+        final long seed = world.properties().worldGenerationConfig().seed();
         i18n.send(context, NEUTRAL, "Seed of {world} is {input#seed}", world, Component.text(seed)
                 .clickEvent(ClickEvent.copyToClipboard(String.valueOf(seed)))
                 .hoverEvent(HoverEvent.showText(i18n.translate(context, "click to copy"))));
@@ -143,16 +143,16 @@ public class InformationCommands extends PermissionContainer
     @Restricted(msg = "{text:ProTip}: I assume you are looking right at your screen, right?")
     public void compass(ServerPlayer context)
     {
-        Vector3d rotation = context.getRotation();
+        Vector3d rotation = context.rotation();
         Vector3d direction = Quaterniond.fromAxesAnglesDeg(rotation.getX(), -rotation.getY(), rotation.getZ()).getDirection();
-        i18n.send(context, NEUTRAL, "You are looking to {input#direction}!", getClosest(direction).name()); // TODO translation of direction
+        i18n.send(context, NEUTRAL, "You are looking to {input#direction}!", Direction.closest(direction).name()); // TODO translation of direction
     }
 
     @Command(desc = "Displays your current depth.")
     @Restricted(msg = "You dug too deep!")
     public void depth(ServerPlayer context)
     {
-        final int height = context.getLocation().getBlockY();
+        final int height = context.location().blockY();
         if (height > 62)
         {
             i18n.send(context, POSITIVE, "You are on heightlevel {integer#blocks} ({amount#blocks} above sealevel)", height, height - 62);
@@ -165,8 +165,8 @@ public class InformationCommands extends PermissionContainer
     @Restricted(msg = "Your position: {text:Right in front of your screen!:color=RED}")
     public void getPos(ServerPlayer context)
     {
-        final ServerLocation loc = context.getServerLocation();
-        i18n.send(context, NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+        final ServerLocation loc = context.serverLocation();
+        i18n.send(context, NEUTRAL, "Your position is {vector:x\\=:y\\=:z\\=}", new Vector3i(loc.blockX(), loc.blockY(), loc.blockZ()));
     }
 
     @Command(desc = "Displays near players(entities/mobs) to you.")
@@ -178,12 +178,12 @@ public class InformationCommands extends PermissionContainer
         }
 
         LinkedList<Component> outputlist = new LinkedList<>();
-        ServerLocation userLocation = player.getServerLocation();
+        ServerLocation userLocation = player.serverLocation();
         TreeMap<Double, List<Entity>> sortedMap = new TreeMap<>();
-        player.getNearbyEntities(radius, e -> entity || mob && e instanceof Living || e instanceof ServerPlayer).forEach(e -> {
+        player.nearbyEntities(radius, e -> entity || mob && e instanceof Living || e instanceof ServerPlayer).forEach(e -> {
             if (e != player)
             {
-                double distance = e.getPosition().distance(userLocation.getPosition());
+                double distance = e.position().distance(userLocation.position());
                 sortedMap.computeIfAbsent(distance, k -> new ArrayList<>()).add(e);
             }
         });
@@ -207,16 +207,16 @@ public class InformationCommands extends PermissionContainer
                 }
                 else if (e instanceof Living)
                 {
-                    key = e.getType().asComponent().color(NamedTextColor.DARK_AQUA);
+                    key = e.type().asComponent().color(NamedTextColor.DARK_AQUA);
                 }
                 else if (e instanceof Item)
                 {
                     final ItemStack stack = e.get(Keys.ITEM_STACK_SNAPSHOT).get().createStack();
-                    key = stack.getType().asComponent().color(NamedTextColor.GRAY);
+                    key = stack.type().asComponent().color(NamedTextColor.GRAY);
                 }
                 else
                 {
-                    key = e.getType().asComponent().color(NamedTextColor.GRAY);
+                    key = e.type().asComponent().color(NamedTextColor.GRAY);
                 }
                 Pair<Double, Integer> pair = groupedEntities.get(key);
                 if (pair == null)
@@ -246,7 +246,7 @@ public class InformationCommands extends PermissionContainer
             return;
         }
         Component result = Component.join(Component.text(", ", NamedTextColor.WHITE), outputlist).append(builder.build());
-        if (context.getSubject().equals(player))
+        if (context.subject().equals(player))
         {
             i18n.send(context, NEUTRAL, "Found those nearby you:");
             context.sendMessage(Identity.nil(), result);
@@ -261,11 +261,11 @@ public class InformationCommands extends PermissionContainer
         Component s;
         if (entity instanceof ServerPlayer)
         {
-            s = Component.text(((ServerPlayer)entity).getName(), NamedTextColor.DARK_GREEN);
+            s = Component.text(((ServerPlayer)entity).name(), NamedTextColor.DARK_GREEN);
         }
         else if (entity instanceof Living)
         {
-            s = entity.getType().asComponent().color(NamedTextColor.DARK_AQUA);
+            s = entity.type().asComponent().color(NamedTextColor.DARK_AQUA);
         }
         else if (entity instanceof Item)
         {
@@ -274,14 +274,14 @@ public class InformationCommands extends PermissionContainer
         }
         else
         {
-            s = entity.getType().asComponent().color(NamedTextColor.GRAY);
+            s = entity.type().asComponent().color(NamedTextColor.GRAY);
         }
 
-        if (context.getAudience() instanceof ServerPlayer)
+        if (context.audience() instanceof ServerPlayer)
         {
             s.hoverEvent(HoverEvent.showText(i18n.translate(context, NEUTRAL, "Click here to teleport")));
             s.clickEvent(SpongeComponents.executeCallback(c -> {
-                ((ServerPlayer)c).setLocation(entity.getServerLocation());
+                ((ServerPlayer)c).setLocation(entity.serverLocation());
             }));
         }
         s.append(Component.text(" (", NamedTextColor.WHITE)
@@ -293,11 +293,11 @@ public class InformationCommands extends PermissionContainer
     @Command(alias = "pong", desc = "Pong!")
     public void ping(CommandCause context)
     {
-        boolean ping = context.getContext().get(EventContextKeys.COMMAND).get().toLowerCase().startsWith("/ping");
-        if (context.getSubject() instanceof ServerPlayer)
+        boolean ping = context.context().get(EventContextKeys.COMMAND).get().toLowerCase().startsWith("/ping");
+        if (context.subject() instanceof ServerPlayer)
         {
             i18n.send(context, MessageType.NEUTRAL, (ping ? "pong" : "ping") + "! Your latency: {integer#ping}",
-                      ((ServerPlayer)context.getSubject()).getConnection().getLatency());
+                      ((ServerPlayer)context.subject()).connection().latency());
             return;
         }
         i18n.send(context, NEUTRAL, (ping ? "ping" : "pong") + " in the console?");
@@ -311,12 +311,12 @@ public class InformationCommands extends PermissionContainer
         DateFormat df = SimpleDateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT); // TODO locale
         Date start = new Date(ManagementFactory.getRuntimeMXBean().getStartTime());
 
-        final Locale locale = context.getAudience() instanceof ServerPlayer ? ((ServerPlayer)context.getAudience()).getLocale() : Locale.getDefault();
+        final Locale locale = context.audience() instanceof ServerPlayer ? ((ServerPlayer)context.audience()).locale() : Locale.getDefault();
         String uptime = TimeUtil.format(locale, System.currentTimeMillis() - start.getTime());
         i18n.send(context, POSITIVE, "Server has been running since {input#uptime}", df.format(start));
         i18n.send(context, POSITIVE, "Uptime: {input#uptime}", uptime);
         //TPS:
-        double tps = Sponge.getServer().getTicksPerSecond();
+        double tps = Sponge.server().ticksPerSecond();
         NamedTextColor color = tps == 20 ? NamedTextColor.DARK_GREEN :
                        tps > 17 ?  NamedTextColor.YELLOW :
                        tps > 10 ?  NamedTextColor.RED :
@@ -331,20 +331,20 @@ public class InformationCommands extends PermissionContainer
         color = memUsePercent > 90 ? memUsePercent > 95 ? NamedTextColor.DARK_RED : NamedTextColor.RED : memUsePercent > 60 ? NamedTextColor.YELLOW : NamedTextColor.DARK_GREEN;
         i18n.send(context, POSITIVE, "Memory Usage: {txt#memused}/{integer#memcom}/{integer#memMax} MB", Component.text(memUse, color), memCom, memMax);
         //Worlds with loaded Chunks / Entities
-        for (ServerWorld world : Sponge.getServer().getWorldManager().worlds())
+        for (ServerWorld world : Sponge.server().worldManager().worlds())
         {
-            final long loadedChunks = StreamSupport.stream(world.getLoadedChunks().spliterator(), false).count();
-            int entities = world.getEntities().size();
+            final long loadedChunks = StreamSupport.stream(world.loadedChunks().spliterator(), false).count();
+            int entities = world.entities().size();
             i18n.send(context, POSITIVE, "{world}: {amount} chunks {amount} entities", world, loadedChunks, entities);
 
             final Builder builder = Component.text();
 
             boolean foundAny = false;
-            world.getEntities().stream().filter(e -> e.getType() != ITEM_FRAME.get()).collect(Collectors.groupingBy(e -> e.getLocation().getChunkPosition()))
+            world.entities().stream().filter(e -> e.type() != ITEM_FRAME.get()).collect(Collectors.groupingBy(e -> e.location().chunkPosition()))
                     .entrySet().stream().filter(e -> e.getValue().size() > 50).forEach(e -> {
                 final Component pos = Component.text(e.getKey().getX(), NamedTextColor.GOLD).append(Component.text(":", NamedTextColor.GRAY)).append(Component.text(e.getKey().getZ(), NamedTextColor.GOLD));
                 pos.hoverEvent(HoverEvent.showText(i18n.translate(context, NEUTRAL, "Click here to teleport")));
-                pos.clickEvent(SpongeComponents.executeCallback(c -> ((ServerPlayer)c.getSubject()).setLocation(e.getValue().get(0).getServerLocation())));
+                pos.clickEvent(SpongeComponents.executeCallback(c -> ((ServerPlayer)c.subject()).setLocation(e.getValue().get(0).serverLocation())));
                 builder.append(pos, Component.space());
             });
             final TextComponent builtText = builder.build();
@@ -360,12 +360,12 @@ public class InformationCommands extends PermissionContainer
     public void listWorlds(CommandCause context)
     {
         i18n.send(context, POSITIVE, "Loaded worlds:");
-        for (ServerWorld world : Sponge.getServer().getWorldManager().worlds())
+        for (ServerWorld world : Sponge.server().worldManager().worlds())
         {
             Component text = Component.space().append(Component.text("- ", NamedTextColor.WHITE))
-                     .append(world.getProperties().displayName().orElse(Component.text(world.getKey().getValue())).color(NamedTextColor.GOLD))
+                     .append(world.properties().displayName().orElse(Component.text(world.key().value())).color(NamedTextColor.GOLD))
                      .append(Component.text(": ", NamedTextColor.WHITE))
-                     .append(Component.text(world.getKey().asString(), NamedTextColor.BLUE));
+                     .append(Component.text(world.key().asString(), NamedTextColor.BLUE));
             context.sendMessage(Identity.nil(), text);
         }
     }

@@ -86,19 +86,19 @@ public class ButcherCommand extends PermissionContainer
         lightning = lightning && context.hasPermission(COMMAND_BUTCHER_FLAG_LIGHTNING.getId());
 
         Collection<? extends Entity> remove;
-        if (context.getSubject() instanceof ServerPlayer && ((ServerPlayer)context.getSubject()).getWorld() == world) {
-            remove = ((ServerPlayer)context.getSubject()).getNearbyEntities(radius, types);
+        if (context.subject() instanceof ServerPlayer && ((ServerPlayer)context.subject()).world() == world) {
+            remove = ((ServerPlayer)context.subject()).nearbyEntities(radius, types);
         } else {
-            final Vector3i spawn = world.getProperties().spawnPosition();
-            remove = world.getEntities(AABB.of(spawn.sub(Vector3i.ONE.mul(radius)), spawn.sub(Vector3i.ONE.mul(-radius))), types);
+            final Vector3i spawn = world.properties().spawnPosition();
+            remove = world.entities(AABB.of(spawn.sub(Vector3i.ONE.mul(radius)), spawn.sub(Vector3i.ONE.mul(-radius))), types);
         }
 
-        Sponge.getServer().getCauseStackManager().pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
+        Sponge.server().causeStackManager().pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
         for (Entity entity : remove)
         {
             if (lightning)
             {
-                world.spawnEntity(world.createEntity(EntityTypes.LIGHTNING_BOLT, entity.getLocation().getPosition()));
+                world.spawnEntity(world.createEntity(EntityTypes.LIGHTNING_BOLT, entity.location().position()));
             }
             entity.remove();
         }

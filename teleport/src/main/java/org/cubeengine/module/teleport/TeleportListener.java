@@ -74,27 +74,23 @@ public class TeleportListener
     }
 
     @Listener
-    public void onTeleport(MoveEntityEvent event, @Getter("getEntity") ServerPlayer player)
+    public void onTeleport(MoveEntityEvent event, @Getter("entity") ServerPlayer player)
     {
-        if (event.getContext().get(EventContextKeys.MOVEMENT_TYPE)
+        if (event.context().get(EventContextKeys.MOVEMENT_TYPE)
                           .map(mt -> mt.equals(MovementTypes.COMMAND.get()) || mt.equals(MovementTypes.PLUGIN.get())).orElse(false))
         {
-            final ServerWorld world = event instanceof ChangeEntityWorldEvent ? ((ChangeEntityWorldEvent)event).getOriginalWorld() : player.getWorld();
-            lastLocations.put(player.getUniqueId(), world.getLocation(event.getOriginalPosition()));
+            final ServerWorld world = event instanceof ChangeEntityWorldEvent ? ((ChangeEntityWorldEvent)event).originalWorld() : player.world();
+            lastLocations.put(player.uniqueId(), world.location(event.originalPosition()));
             this.setDeathLocation(player, null);
         }
     }
 
     @Listener
-    public void onDeath(DestructEntityEvent.Death event)
+    public void onDeath(DestructEntityEvent.Death event, @Getter("entity") ServerPlayer player)
     {
-        if (!(event.getEntity() instanceof ServerPlayer))
+        if (player.hasPermission(perms.COMMAND_BACK_ONDEATH.getId()))
         {
-            return;
-        }
-        if (((ServerPlayer)event.getEntity()).hasPermission(perms.COMMAND_BACK_ONDEATH.getId()))
-        {
-            deathLocations.put(event.getEntity().getUniqueId(), event.getEntity().getServerLocation());
+            deathLocations.put(player.uniqueId(), player.serverLocation());
         }
     }
 
@@ -114,16 +110,16 @@ public class TeleportListener
 
     public boolean onPrimary0(@First ServerPlayer player)
     {
-        if (!player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS) || !player.hasPermission(perms.COMPASS_JUMPTO_LEFT.getId()))
+        if (!player.itemInHand(HandTypes.MAIN_HAND).type().isAnyOf(COMPASS) || !player.hasPermission(perms.COMPASS_JUMPTO_LEFT.getId()))
         {
             return false;
         }
         final long now = System.currentTimeMillis();
-        if (this.compassJumpCooldown.getOrDefault(player.getUniqueId(), now) > now)
+        if (this.compassJumpCooldown.getOrDefault(player.uniqueId(), now) > now)
         {
             return true;
         }
-        this.compassJumpCooldown.put(player.getUniqueId(), now + 150); // 150ms cooldown
+        this.compassJumpCooldown.put(player.uniqueId(), now + 150); // 150ms cooldown
         ServerLocation loc = LocationUtil.getBlockInSight(player);
         if (loc == null)
         {
@@ -140,7 +136,7 @@ public class TeleportListener
     @Listener
     public void onSecondary(InteractItemEvent.Secondary event, @First ServerPlayer player)
     {
-        if (!player.getItemInHand(HandTypes.MAIN_HAND).getType().isAnyOf(COMPASS)
+        if (!player.itemInHand(HandTypes.MAIN_HAND).type().isAnyOf(COMPASS)
                 || !player.hasPermission(perms.COMPASS_JUMPTO_RIGHT.getId()))
         {
             return;
@@ -162,68 +158,68 @@ public class TeleportListener
 
     public ServerLocation getDeathLocation(Player player)
     {
-        return deathLocations.get(player.getUniqueId());
+        return deathLocations.get(player.uniqueId());
     }
 
     public void setDeathLocation(ServerPlayer player, ServerLocation loc)
     {
         if (loc == null)
         {
-            deathLocations.remove(player.getUniqueId());
+            deathLocations.remove(player.uniqueId());
         }
         else
         {
-            deathLocations.put(player.getUniqueId(), loc);
+            deathLocations.put(player.uniqueId(), loc);
         }
     }
 
     public ServerLocation getLastLocation(Player player)
     {
-        return lastLocations.get(player.getUniqueId());
+        return lastLocations.get(player.uniqueId());
     }
 
     public void removeRequestTask(Player player)
     {
-        requestCancelTasks.remove(player.getUniqueId());
+        requestCancelTasks.remove(player.uniqueId());
     }
 
     public void setToRequest(Player player, Player target)
     {
-        tpToRequests.put(player.getUniqueId(), target.getUniqueId());
+        tpToRequests.put(player.uniqueId(), target.uniqueId());
     }
 
     public void removeFromRequest(Player player)
     {
-        tpFromRequests.remove(player.getUniqueId());
+        tpFromRequests.remove(player.uniqueId());
     }
 
     public void removeToRequest(Player player)
     {
-        tpToRequests.remove(player.getUniqueId());
+        tpToRequests.remove(player.uniqueId());
     }
 
     public ScheduledTask getRequestTask(Player player)
     {
-        return requestCancelTasks.get(player.getUniqueId());
+        return requestCancelTasks.get(player.uniqueId());
     }
 
     public void setRequestTask(Player player, ScheduledTask task)
     {
-        requestCancelTasks.put(player.getUniqueId(), task);
+        requestCancelTasks.put(player.uniqueId(), task);
     }
 
     public void setFromRequest(Player player, Player target)
     {
-        tpFromRequests.put(player.getUniqueId(), target.getUniqueId());
+        tpFromRequests.put(player.uniqueId(), target.uniqueId());
     }
 
     public UUID getToRequest(Player player)
     {
-        return tpToRequests.get(player.getUniqueId());
+        return tpToRequests.get(player.uniqueId());
     }
 
     public UUID getFromRequest(Player player)
     {
-        return tpFromRequests.get(player.getUniqueId());
+        return tpFromRequests.get(player.uniqueId());
     }
 }

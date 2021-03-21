@@ -45,11 +45,11 @@ public class CircularRoleDependencyExceptionHandler implements CommandExceptionH
             int depth = ((CircularRoleDependencyException) t).getDepth();
             if (depth == 0)
             {
-                builder.append(i18n.translate(context.getCause(), NEGATIVE, "Cannot assign role to itself"));
+                builder.append(i18n.translate(context.cause(), NEGATIVE, "Cannot assign role to itself"));
             }
             else
             {
-                builder.append(i18n.translate(context.getCause(), NEGATIVE, "Circular Dependency detected! Depth: {}", depth));
+                builder.append(i18n.translate(context.cause(), NEGATIVE, "Circular Dependency detected! Depth: {}", depth));
             }
             return true;
         }

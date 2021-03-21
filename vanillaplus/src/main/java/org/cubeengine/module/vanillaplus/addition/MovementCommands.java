@@ -53,7 +53,7 @@ public class MovementCommands extends PermissionContainer
     public void walkspeed(CommandCause context, double speed, @Default ServerPlayer player)
     {
         boolean other = false;
-        if (!context.getSubject().equals(player))
+        if (!context.subject().equals(player))
         {
             if (!COMMAND_WALKSPEED_OTHER.check(context))
             {
@@ -65,7 +65,7 @@ public class MovementCommands extends PermissionContainer
 
         if (!player.isOnline())
         {
-            i18n.send(context, NEGATIVE, "{user} is offline!", player.getName());
+            i18n.send(context, NEGATIVE, "{user} is offline!", player.name());
             return;
         }
         if (speed >= 0 && speed <= 10)
@@ -95,7 +95,7 @@ public class MovementCommands extends PermissionContainer
         //i18n.sendTranslated(context, NEUTRAL, "So... Stopping the Server in {text:3..:color=RED}");
 
         // PermissionChecks
-        final boolean isNotTarget = !player.equals(context.getSubject());
+        final boolean isNotTarget = !player.equals(context.subject());
         if (isNotTarget && !context.hasPermission(COMMAND_FLY_OTHER.getId()))
         {
             i18n.send(context, NEGATIVE, "You are not allowed to change the fly mode of other player!");

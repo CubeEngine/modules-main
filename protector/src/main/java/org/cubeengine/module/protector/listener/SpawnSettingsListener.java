@@ -77,20 +77,20 @@ public class SpawnSettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onSpawn(SpawnEntityEvent event)
     {
-        for (Entity entity : event.getEntities())
+        for (Entity entity : event.entities())
         {
-            ServerLocation loc = entity.getServerLocation();
-            EntityType<?> type = entity.getType();
+            ServerLocation loc = entity.serverLocation();
+            EntityType<?> type = entity.type();
             List<Region> regionsAt = manager.getRegionsAt(loc);
-            Cause cause = event.getCause();
+            Cause cause = event.cause();
             Optional<ServerPlayer> player = cause.first(ServerPlayer.class);
-            if (event.getCause().getContext().get(EventContextKeys.SPAWN_TYPE).map(t -> t.equals(SpawnTypes.PLUGIN.get())).orElse(false))
+            if (event.cause().context().get(EventContextKeys.SPAWN_TYPE).map(t -> t.equals(SpawnTypes.PLUGIN.get())).orElse(false))
             {
                 if (player.isPresent())
                 {
                     final ResourceKey entityTypeKey = type.key(RegistryTypes.ENTITY_TYPE);
                     Permission usePerm = pm.register(
-                            SpawnSettingsListener.class, entityTypeKey.getValue(), "Allows spawning a " + PlainComponentSerializer.plain().serialize(type.asComponent()), spawnEntityPlayerPerm);
+                            SpawnSettingsListener.class, entityTypeKey.value(), "Allows spawning a " + PlainComponentSerializer.plain().serialize(type.asComponent()), spawnEntityPlayerPerm);
                     if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
                     {
                         i18n.send(ChatType.ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");
@@ -106,7 +106,7 @@ public class SpawnSettingsListener extends PermissionContainer
             {
                 final ResourceKey entityTypeKey = type.key(RegistryTypes.ENTITY_TYPE);
                 Permission usePerm = pm.register(
-                        SpawnSettingsListener.class, entityTypeKey.getValue(), "Allows spawning a " +  PlainComponentSerializer.plain().serialize(type.asComponent()), spawnEntityPlayerPerm);
+                        SpawnSettingsListener.class, entityTypeKey.value(), "Allows spawning a " +  PlainComponentSerializer.plain().serialize(type.asComponent()), spawnEntityPlayerPerm);
                 if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
                 {
                     i18n.send(ChatType.ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");

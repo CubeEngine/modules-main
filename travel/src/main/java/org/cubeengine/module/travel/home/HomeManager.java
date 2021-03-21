@@ -69,14 +69,14 @@ public class HomeManager
 
     public Home create(User owner, String name, ServerWorld world, Transform transform)
     {
-        if (this.has(owner.getUniqueId(), name))
+        if (this.has(owner.uniqueId(), name))
         {
             throw new IllegalArgumentException("Tried to create duplicate home!");
         }
 
         Home home = new Home();
         home.name = name;
-        home.owner = owner.getUniqueId();
+        home.owner = owner.uniqueId();
         home.transform = transform;
         home.world = new ConfigWorld(world);
 
@@ -103,13 +103,13 @@ public class HomeManager
 
     public Optional<Home> find(ServerPlayer player, String name, @Nullable User owner)
     {
-        owner = owner == null ? player.getUser() : owner; // No owner specified?
-        Optional<Home> home = get(owner.getUniqueId(), name); // Get home by name and owner
-        if (!home.isPresent() && owner.getUniqueId().equals(player.getUniqueId())) // Not found and not looking for a specific home
+        owner = owner == null ? player.user() : owner; // No owner specified?
+        Optional<Home> home = get(owner.uniqueId(), name); // Get home by name and owner
+        if (!home.isPresent() && owner.uniqueId().equals(player.uniqueId())) // Not found and not looking for a specific home
         {
-            List<UUID> globalInvites = config.globalInvites.getOrDefault(player.getUniqueId(), Collections.emptyList());
+            List<UUID> globalInvites = config.globalInvites.getOrDefault(player.uniqueId(), Collections.emptyList());
             // Go look in invites...
-            home = config.homes.stream().filter(h -> (h.invites.contains(player.getUniqueId()) || globalInvites.contains(h.owner)) && h.name.equals(name)).findFirst();
+            home = config.homes.stream().filter(h -> (h.invites.contains(player.uniqueId()) || globalInvites.contains(h.owner)) && h.name.equals(name)).findFirst();
         }
         return home;
     }
@@ -117,7 +117,7 @@ public class HomeManager
 
     public long getCount(Player player)
     {
-        return config.homes.stream().filter(h -> h.owner.equals(player.getUniqueId())).count();
+        return config.homes.stream().filter(h -> h.owner.equals(player.uniqueId())).count();
     }
 
     public void save()
@@ -127,7 +127,7 @@ public class HomeManager
 
     public boolean rename(Home point, String name)
     {
-        if (has(point.getOwner().getUniqueId(), name))
+        if (has(point.getOwner().uniqueId(), name))
         {
             return false;
         }
@@ -139,10 +139,10 @@ public class HomeManager
 
     public Set<Home> list(User user, boolean owned, boolean invited)
     {
-        List<UUID> globalInvites = config.globalInvites.getOrDefault(user.getUniqueId(), Collections.emptyList());
+        List<UUID> globalInvites = config.globalInvites.getOrDefault(user.uniqueId(), Collections.emptyList());
         return config.homes.stream()
-           .filter(home -> (owned || !invited) && home.owner.equals(user.getUniqueId())
-                         || invited && home.invites.contains(user.getUniqueId())
+           .filter(home -> (owned || !invited) && home.owner.equals(user.uniqueId())
+                         || invited && home.invites.contains(user.uniqueId())
                          || invited && globalInvites.contains(home.owner))
            .collect(Collectors.toSet());
     }
@@ -162,18 +162,18 @@ public class HomeManager
             return;
         }
 
-        if (!event.getBlock().getState().getType().isAnyOf(BlockTypes.BLACK_BED, BlockTypes.BLUE_BED, BlockTypes.BROWN_BED, BlockTypes.CYAN_BED, BlockTypes.GRAY_BED,
+        if (!event.block().state().type().isAnyOf(BlockTypes.BLACK_BED, BlockTypes.BLUE_BED, BlockTypes.BROWN_BED, BlockTypes.CYAN_BED, BlockTypes.GRAY_BED,
                                                            BlockTypes.GREEN_BED, BlockTypes.LIGHT_BLUE_BED, BlockTypes.LIGHT_GRAY_BED, BlockTypes.LIME_BED, BlockTypes.MAGENTA_BED,
                                                            BlockTypes.ORANGE_BED, BlockTypes.PINK_BED, BlockTypes.PURPLE_BED, BlockTypes.RED_BED, BlockTypes.WHITE_BED, BlockTypes.YELLOW_BED)
             || !player.get(Keys.IS_SNEAKING).orElse(false)
-            || !player.getItemInHand(HandTypes.MAIN_HAND).isEmpty())
+            || !player.itemInHand(HandTypes.MAIN_HAND).isEmpty())
         {
             return;
         }
-        Optional<Home> home = this.get(player.getUniqueId(), "home");
+        Optional<Home> home = this.get(player.uniqueId(), "home");
         if (home.isPresent())
         {
-            home.get().setTransform(player.getWorld(), player.getTransform());
+            home.get().setTransform(player.world(), player.transform());
             config.save();
         }
         else if (getCount(player) >= module.getConfig().homes.max)
@@ -184,7 +184,7 @@ public class HomeManager
         }
         else
         {
-            this.create(player.getUser(), "home", player.getWorld(), player.getTransform());
+            this.create(player.user(), "home", player.world(), player.transform());
             i18n.send(player, POSITIVE, "Your home has been created!");
         }
         // event.setCancelled(true);
@@ -192,7 +192,7 @@ public class HomeManager
 
     public void purge(ServerWorld world)
     {
-        this.config.homes.removeIf(home -> home.world.getWorld().getKey().equals(world.getKey()));
+        this.config.homes.removeIf(home -> home.world.getWorld().key().equals(world.key()));
         this.config.save();
     }
 }

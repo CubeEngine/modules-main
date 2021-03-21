@@ -40,16 +40,16 @@ public class MultiverseContextCalculator implements ContextCalculator<Subject> /
     {
         if (subject instanceof Locatable)
         {
-            set.add(new Context(TYPE_UNIVERSE, module.getUniverse(((Locatable)subject).getServerLocation().getWorld())));
+            set.add(new Context(TYPE_UNIVERSE, module.getUniverse(((Locatable)subject).serverLocation().world())));
         }
         else
         {
             // TODO better way to get player
-            if (subject.getContainingCollection() == Sponge.getServer().getServiceProvider().permissionService().getUserSubjects())
+            if (subject.containingCollection() == Sponge.server().serviceProvider().permissionService().userSubjects())
             {
-                final String playerId = subject.getIdentifier();
+                final String playerId = subject.identifier();
                 final UUID uuid = UUID.fromString(playerId);
-                Sponge.getServer().getPlayer(uuid).ifPresent(player -> set.add(new Context(TYPE_UNIVERSE, module.getUniverse(player.getWorld()))));
+                Sponge.server().player(uuid).ifPresent(player -> set.add(new Context(TYPE_UNIVERSE, module.getUniverse(player.world()))));
             }
         }
     }
@@ -59,7 +59,7 @@ public class MultiverseContextCalculator implements ContextCalculator<Subject> /
     {
         if (subject instanceof Locatable && context.getKey().equals(TYPE_UNIVERSE))
         {
-            return module.getUniverse(((Locatable)subject).getServerLocation().getWorld()).equals(context.getValue());
+            return module.getUniverse(((Locatable)subject).serverLocation().world()).equals(context.getValue());
         }
         return false;
     }

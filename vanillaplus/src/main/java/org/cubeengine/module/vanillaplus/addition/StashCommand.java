@@ -56,16 +56,16 @@ public class StashCommand
     public void stash(ServerPlayer context)
     {
         StashedInventory newStash = new StashedInventory();
-        for (Inventory slot : context.getInventory().slots())
+        for (Inventory slot : context.inventory().slots())
         {
-            newStash.items.add(slot.poll().getPolledItem().createStack());
+            newStash.items.add(slot.poll().polledItem().createStack());
         }
 
-        StashedInventory replaced = stashed.put(context.getUniqueId(), newStash);
+        StashedInventory replaced = stashed.put(context.uniqueId(), newStash);
         if (replaced != null)
         {
             Iterator<ItemStack> it = replaced.items.iterator();
-            for (Inventory inventory : context.getInventory().slots())
+            for (Inventory inventory : context.inventory().slots())
             {
                 ItemStack next = it.next();
                 if (next != null)

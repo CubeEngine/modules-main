@@ -32,40 +32,40 @@ public class UserSubject extends BaseSubject<UserSubjectData>
 
     public UserSubject(RolesPermissionService service, UUID uuid)
     {
-        super(service.getUserSubjects(), service);
+        super(service.userSubjects(), service);
         this.data = new UserSubjectData(service, uuid, this);
         this.uuid = uuid;
     }
 
     @Override
-    public UserSubjectData getSubjectData()
+    public UserSubjectData subjectData()
     {
         return data;
     }
 
     @Override
-    public String getIdentifier()
+    public String identifier()
     {
         return uuid.toString();
     }
 
     @Override
-    public Optional<String> getFriendlyIdentifier()
+    public Optional<String> friendlyIdentifier()
     {
-        return Sponge.getServer().getUserManager().get(uuid).map(User::getName);
+        return Sponge.server().userManager().find(uuid).map(User::name);
     }
 
-    public Optional<ServerPlayer> getPlayer()
+    public Optional<ServerPlayer> player()
     {
-        return Sponge.getServer().getPlayer(uuid);
+        return Sponge.server().player(uuid);
     }
 
     public void reload()
     {
-        this.getSubjectData().reload();
-        this.getTransientSubjectData().clearOptions();
-        this.getTransientSubjectData().clearParents();
-        this.getTransientSubjectData().clearPermissions();
+        this.subjectData().reload();
+        this.transientSubjectData().clearOptions();
+        this.transientSubjectData().clearParents();
+        this.transientSubjectData().clearPermissions();
     }
 
     @Override
@@ -77,6 +77,6 @@ public class UserSubject extends BaseSubject<UserSubjectData>
     @Override
     public String toString()
     {
-        return "UserSubject: " + this.getIdentifier() + " " + this.getPlayer().map(ServerPlayer::getName).orElse("?");
+        return "UserSubject: " + this.identifier() + " " + this.player().map(ServerPlayer::name).orElse("?");
     }
 }

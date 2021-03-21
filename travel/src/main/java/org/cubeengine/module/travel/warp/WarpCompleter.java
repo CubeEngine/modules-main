@@ -41,9 +41,9 @@ public class WarpCompleter implements ValueCompleter
     public List<String> complete(CommandContext context, String currentInput)
     {
         final List<String> list = new ArrayList<>();
-        if (context.getCause().getAudience() instanceof ServerPlayer)
+        if (context.cause().audience() instanceof ServerPlayer)
         {
-            for (Warp warp : manager.list(((ServerPlayer) context.getCause().getAudience()).getUser()))
+            for (Warp warp : manager.list(((ServerPlayer) context.cause().audience()).user()))
             {
                 if (warp.name.startsWith(currentInput))
                 {

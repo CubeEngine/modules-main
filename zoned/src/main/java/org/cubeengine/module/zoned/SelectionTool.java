@@ -35,7 +35,7 @@ public class SelectionTool
 
     public static boolean inHand(Player player)
     {
-        final ItemStack itemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
         return isTool(itemInHand);
     }
 
@@ -51,7 +51,7 @@ public class SelectionTool
         newTool.offer(Keys.APPLIED_ENCHANTMENTS, Arrays.asList(Enchantment.of(EnchantmentTypes.BINDING_CURSE, 1)));
         newTool.offer(Keys.HIDE_ENCHANTMENTS, true);
         newTool.offer(Keys.CUSTOM_NAME, Component.text("Selector-Tool", NamedTextColor.BLUE));
-        newTool.offer(Keys.LORE, Arrays.asList(Component.text("created by ").append(Component.text(player.getName()))));
+        newTool.offer(Keys.LORE, Arrays.asList(Component.text("created by ").append(Component.text(player.name()))));
         return newTool;
     }
 }

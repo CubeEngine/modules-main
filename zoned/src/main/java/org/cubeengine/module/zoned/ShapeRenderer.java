@@ -42,26 +42,26 @@ public class ShapeRenderer
 
     public static boolean toggleShowActiveZone(TaskManager tm, ServerPlayer player, Zoned module)
     {
-        final ScheduledTask oldTask = showRegionTasks.remove(player.getUniqueId());
+        final ScheduledTask oldTask = showRegionTasks.remove(player.uniqueId());
         if (oldTask != null)
         {
             oldTask.cancel();
             return false;
         }
-        final ScheduledTask newTask = tm.runTimer(t -> ShapeRenderer.showActiveRegion(tm, player.getUniqueId(), module.getActiveZone(player)),
+        final ScheduledTask newTask = tm.runTimer(t -> ShapeRenderer.showActiveRegion(tm, player.uniqueId(), module.getActiveZone(player)),
                            Ticks.of(10), Ticks.of(10));
-        showRegionTasks.put(player.getUniqueId(), newTask);
+        showRegionTasks.put(player.uniqueId(), newTask);
         return true;
     }
 
     public static boolean isShowingActiveZone(ServerPlayer player)
     {
-        return showRegionTasks.containsKey(player.getUniqueId());
+        return showRegionTasks.containsKey(player.uniqueId());
     }
 
     private static void showActiveRegion(TaskManager tm, UUID playerUuid, ZoneConfig zone)
     {
-        final ServerPlayer player = Sponge.getServer().getPlayer(playerUuid).orElse(null);
+        final ServerPlayer player = Sponge.server().player(playerUuid).orElse(null);
         if (player == null)
         {
             ScheduledTask task = showRegionTasks.remove(playerUuid);

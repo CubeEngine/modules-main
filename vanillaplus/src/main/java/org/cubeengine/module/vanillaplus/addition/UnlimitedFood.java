@@ -40,7 +40,7 @@ public class UnlimitedFood extends PermissionContainer implements Consumer<Sched
 
     @Override
     public void accept(ScheduledTask scheduledTask) {
-        for (ServerPlayer player : Sponge.getServer().getOnlinePlayers())
+        for (ServerPlayer player : Sponge.server().onlinePlayers())
         {
             if (UNLIMITED_FOOD.check(player))
             {

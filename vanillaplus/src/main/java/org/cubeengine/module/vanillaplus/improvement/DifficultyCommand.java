@@ -47,12 +47,12 @@ public class DifficultyCommand
     {
         if (difficulty != null)
         {
-            world.getProperties().setDifficulty(difficulty);
+            world.properties().setDifficulty(difficulty);
             i18n.send(context, POSITIVE, "The difficulty has been set to {input}!", difficulty.asComponent());
             return;
         }
-        i18n.send(context, POSITIVE, "Current difficulty level: {input}", world.getDifficulty().asComponent());
-        if (world.getProperties().hardcore())
+        i18n.send(context, POSITIVE, "Current difficulty level: {input}", world.difficulty().asComponent());
+        if (world.properties().hardcore())
         {
             i18n.send(context, POSITIVE, "The world {world} has the hardcore mode enabled.", world);
         }

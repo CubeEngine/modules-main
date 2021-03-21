@@ -119,7 +119,7 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
     {
         if (PERM_MONSTER.check(commandCause))
         {
-            return new LivingFilter(singletonList(FILTER_MONSTER), commandCause.getSubject(), this);
+            return new LivingFilter(singletonList(FILTER_MONSTER), commandCause.subject(), this);
         }
         return null;
         // TODO errormessage        throw new PermissionDeniedException(PERM_MONSTER);
@@ -129,14 +129,14 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
     public List<String> complete(CommandContext context, String currentInput)
     {
         List<String> types = Arrays.asList(
-            i18n.getTranslation(context.getCause(), "hostile"),
-            i18n.getTranslation(context.getCause(), "monster"),
-            i18n.getTranslation(context.getCause(), "boss"),
-            i18n.getTranslation(context.getCause(), "animal"),
-            i18n.getTranslation(context.getCause(), "npc"),
-            i18n.getTranslation(context.getCause(), "pet"),
-            i18n.getTranslation(context.getCause(), "golem"),
-            i18n.getTranslation(context.getCause(), "ambient"));
+            i18n.getTranslation(context.cause(), "hostile"),
+            i18n.getTranslation(context.cause(), "monster"),
+            i18n.getTranslation(context.cause(), "boss"),
+            i18n.getTranslation(context.cause(), "animal"),
+            i18n.getTranslation(context.cause(), "npc"),
+            i18n.getTranslation(context.cause(), "pet"),
+            i18n.getTranslation(context.cause(), "golem"),
+            i18n.getTranslation(context.cause(), "ambient"));
         final Set<String> closeMatches = new HashSet<>(sm.getBestMatches(currentInput, types, 2));
         for (String type : types)
         {
@@ -149,9 +149,9 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
     }
 
     @Override
-    public Optional<? extends LivingFilter> getValue(Key<? super LivingFilter> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    public Optional<? extends LivingFilter> parseValue(Key<? super LivingFilter> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
-        final CommandCause source = context.getCause();
+        final CommandCause source = context.cause();
         final String token = reader.parseString();
         if ("*".equals(token))
         {
@@ -159,7 +159,7 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
             {
                 throw reader.createException(Component.text("Missing permission"));
             }
-            return Optional.of(new LivingFilter(emptyList(), context.getSubject(), this));
+            return Optional.of(new LivingFilter(emptyList(), context.subject(), this));
         }
 
         List<Predicate<Entity>> list = new ArrayList<>();
@@ -175,11 +175,11 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
         groupMap.put(i18n.getTranslation(source, "ambient"), FILTER_AMBIENT);
 
         Map<String, EntityType<?>> map = new HashMap<>();
-        Sponge.getGame().registries().registry(RegistryTypes.ENTITY_TYPE).streamEntries().forEach(entry -> {
+        Sponge.game().registries().registry(RegistryTypes.ENTITY_TYPE).streamEntries().forEach(entry -> {
             map.put(entry.key().asString(), entry.value());
-            if ("minecraft".equals(entry.key().getNamespace()))
+            if ("minecraft".equals(entry.key().namespace()))
             {
-                map.put(entry.key().getValue(), entry.value());
+                map.put(entry.key().value(), entry.value());
             }
         });
 
@@ -203,7 +203,7 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
                 }
                 EntityType type = map.get(match);
 
-                list.add(entity -> entity.getType().equals(type) && (!entity.get(Keys.TAMER).isPresent() || source.hasPermission(PERM_PET.getId())));
+                list.add(entity -> entity.type().equals(type) && (!entity.get(Keys.TAMER).isPresent() || source.hasPermission(PERM_PET.getId())));
             }
             else
             {
@@ -217,7 +217,7 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
             }
         }
 
-        return Optional.of(new LivingFilter(list, context.getSubject(), this));
+        return Optional.of(new LivingFilter(list, context.subject(), this));
     }
 
 

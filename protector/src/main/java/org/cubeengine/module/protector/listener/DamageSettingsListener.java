@@ -74,7 +74,7 @@ public class DamageSettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onEntityDamage(DamageEntityEvent event)
     {
-        Entity target = event.getEntity();
+        Entity target = event.entity();
         if (target instanceof ServerPlayer)
         {
             onPlayerDamage(event, ((ServerPlayer) target));
@@ -94,7 +94,7 @@ public class DamageSettingsListener extends PermissionContainer
             playerSource = ((ServerPlayer) entitySource);
         }
 
-        List<Region> regionsAt = manager.getRegionsAt(target.getServerLocation());
+        List<Region> regionsAt = manager.getRegionsAt(target.serverLocation());
 
         Tristate defaultTo = checkSetting(event, playerSource, regionsAt, () -> entityDamageAll, s -> s.entityDamage.all, UNDEFINED);
 
@@ -104,7 +104,7 @@ public class DamageSettingsListener extends PermissionContainer
         }
         if (entitySource != null)
         {
-            EntityType type = entitySource.getType();
+            EntityType type = entitySource.type();
             checkSetting(event, null, regionsAt, () -> null, s -> s.entityDamage.byEntity.getOrDefault(type, UNDEFINED), defaultTo);
         }
     }
@@ -113,7 +113,7 @@ public class DamageSettingsListener extends PermissionContainer
     {
         Entity entitySource = getEntitySource(event);
 
-        List<Region> regionsAt = manager.getRegionsAt(target.getServerLocation());
+        List<Region> regionsAt = manager.getRegionsAt(target.serverLocation());
 
         Tristate defaultTo = checkSetting(event, target, regionsAt, () -> playerDamgeAll, s -> s.playerDamage.all, UNDEFINED);
 
@@ -129,14 +129,14 @@ public class DamageSettingsListener extends PermissionContainer
 
     private Entity getEntitySource(DamageEntityEvent event)
     {
-        DamageSource source = event.getCause().first(DamageSource.class).get();
+        DamageSource source = event.cause().first(DamageSource.class).get();
         Entity entitySource = null;
         if (source instanceof EntityDamageSource)
         {
-            entitySource = ((EntityDamageSource) source).getSource();
+            entitySource = ((EntityDamageSource) source).source();
             if (source instanceof IndirectEntityDamageSource)
             {
-                entitySource = ((IndirectEntityDamageSource) source).getIndirectSource();
+                entitySource = ((IndirectEntityDamageSource) source).indirectSource();
             }
         }
         return entitySource;
@@ -144,9 +144,9 @@ public class DamageSettingsListener extends PermissionContainer
 
 
     @Listener(order = Order.EARLY)
-    public void onTargetPlayer(SetAITargetEvent event, @Getter("getTarget") ServerPlayer player)
+    public void onTargetPlayer(SetAITargetEvent event, @Getter("target") ServerPlayer player)
     {
-        List<Region> regions = manager.getRegionsAt(player.getServerLocation());
+        List<Region> regions = manager.getRegionsAt(player.serverLocation());
         checkSetting(event, player, regions, () -> this.playerTargeting, s -> s.playerDamage.aiTargeting, UNDEFINED);
     }
 

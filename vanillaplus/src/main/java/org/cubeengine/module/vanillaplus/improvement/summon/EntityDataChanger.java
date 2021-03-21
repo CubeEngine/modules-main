@@ -222,7 +222,7 @@ public class EntityDataChanger<EntityInterface>
                      {
                          if (input)
                          {
-                             final List<DyeColor> list = Sponge.getGame().registries().registry(RegistryTypes.DYE_COLOR).stream().collect(Collectors.toList());
+                             final List<DyeColor> list = Sponge.game().registries().registry(RegistryTypes.DYE_COLOR).stream().collect(Collectors.toList());
                              entity.offer(Keys.DYE_COLOR, list.get(random.nextInt(list.size())));
                          }
                      }
@@ -277,7 +277,7 @@ public class EntityDataChanger<EntityInterface>
 
     private static <T> Optional<T> findRegistryValue(String input, RegistryType<T> itemType)
     {
-        return Sponge.getGame().registries().registry(itemType).findValue(ResourceKey.resolve(input));
+        return Sponge.game().registries().registry(itemType).findValue(ResourceKey.resolve(input));
     }
 
     public static final EntityDataChanger<Slime> SLIME_SIZE =
@@ -453,7 +453,7 @@ public class EntityDataChanger<EntityInterface>
                                     public void applyEntity(Entity entity, User value) {
                                         if (entity.supports(Keys.TAMER))
                                         {
-                                            entity.offer(Keys.TAMER, value.getUniqueId());
+                                            entity.offer(Keys.TAMER, value.uniqueId());
                                         }
                                     }
 
@@ -463,7 +463,7 @@ public class EntityDataChanger<EntityInterface>
                                         if (input.startsWith("tamer_"))
                                         {
                                             String userName = input.substring(6);
-                                            return Sponge.getServer().getUserManager().get(userName).orElse(null);
+                                            return Sponge.server().userManager().find(userName).orElse(null);
                                         }
                                         return null;
                                     }

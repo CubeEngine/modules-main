@@ -65,7 +65,7 @@ public class PortalModifyCommand extends DispatcherCommand
     @Command(desc = "Changes the owner of a portal")
     public void owner(CommandCause context, User owner, @Default Portal portal)
     {
-        portal.config.owner = owner.getName();
+        portal.config.owner = owner.name();
         portal.config.save();
         i18n.send(context, POSITIVE, "{user} is now the owner of {name#portal}!", owner, portal.getName());
     }
@@ -98,11 +98,11 @@ public class PortalModifyCommand extends DispatcherCommand
         }
         this.module.removePortal(portal);
         final ServerWorld world = activeZone.world.getWorld();
-        final ServerLocation p1 = world.getLocation(((Cuboid)activeZone.shape).getMinimumPoint());
-        final ServerLocation p2 = world.getLocation(((Cuboid)activeZone.shape).getMaximumPoint());
-        portal.config.world = new ConfigWorld(p1.getWorld());
-        portal.config.location.from = new Vector3i(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
-        portal.config.location.to = new Vector3i(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
+        final ServerLocation p1 = world.location(((Cuboid)activeZone.shape).getMinimumPoint());
+        final ServerLocation p2 = world.location(((Cuboid)activeZone.shape).getMaximumPoint());
+        portal.config.world = new ConfigWorld(p1.world());
+        portal.config.location.from = new Vector3i(p1.blockX(), p1.blockY(), p1.blockZ());
+        portal.config.location.to = new Vector3i(p2.blockX(), p2.blockY(), p2.blockZ());
         portal.config.save();
         this.module.addPortal(portal);
         i18n.send(context, POSITIVE, "Portal {name} updated to your current selection!", portal.getName());
@@ -112,14 +112,14 @@ public class PortalModifyCommand extends DispatcherCommand
     @Restricted(msg = "You have to be ingame to do this!")
     public void exit(ServerPlayer context, @Default Portal portal)
     {
-        final ServerLocation location = context.getServerLocation();
-        if (!portal.config.world.getWorld().getKey().equals(location.getWorldKey()))
+        final ServerLocation location = context.serverLocation();
+        if (!portal.config.world.getWorld().key().equals(location.worldKey()))
         {
             // TODO range check? range in config
             i18n.send(context, NEGATIVE, "A portals exit cannot be in an other world than its location!");
             return;
         }
-        portal.config.location.destination = Transform.of(location.getPosition(), context.getRotation());
+        portal.config.location.destination = Transform.of(location.position(), context.rotation());
         portal.config.save();
         i18n.send(context, POSITIVE, "The portal exit of portal {name} was set to your current location!", portal.getName());
     }

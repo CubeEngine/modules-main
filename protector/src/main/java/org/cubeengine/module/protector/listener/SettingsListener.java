@@ -100,18 +100,18 @@ public class SettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onCommand(ExecuteCommandEvent.Pre event, @Root ServerPlayer player)
     {
-        CommandMapping mapping = Sponge.getServer().getCommandManager().getCommandMapping(event.getCommand()).orElse(null);
+        CommandMapping mapping = Sponge.server().commandManager().commandMapping(event.command()).orElse(null);
         if (mapping == null)
         {
             return;
         }
-        List<Region> regionsAt = manager.getRegionsAt(player.getServerLocation());
+        List<Region> regionsAt = manager.getRegionsAt(player.serverLocation());
         if (checkSetting(event, player, regionsAt, () -> command, s -> {
 
             Tristate value = UNDEFINED;
             // TODO subcommands?
             // TODO register commands as aliascommand
-            for (String alias : mapping.getAllAliases())
+            for (String alias : mapping.allAliases())
             {
                 value = value.and(s.blockedCommands.getOrDefault(alias.toLowerCase(), UNDEFINED));
                 if (value != UNDEFINED)

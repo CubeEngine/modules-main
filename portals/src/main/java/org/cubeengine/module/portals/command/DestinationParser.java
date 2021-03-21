@@ -59,18 +59,18 @@ public class DestinationParser implements ValueParser<Destination>, ValueComplet
     }
 
     @Override
-    public Optional<? extends Destination> getValue(Key<? super Destination> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    public Optional<? extends Destination> parseValue(Key<? super Destination> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
         String token = reader.parseString();
         if ("here".equalsIgnoreCase(token))
         {
-            if (context.getCause().getAudience() instanceof ServerPlayer)
+            if (context.cause().audience() instanceof ServerPlayer)
             {
-                final ServerPlayer player = (ServerPlayer)context.getCause().getAudience();
-                return Optional.of(new Destination(player.getServerLocation(), player.getRotation(), i18n));
+                final ServerPlayer player = (ServerPlayer)context.cause().audience();
+                return Optional.of(new Destination(player.serverLocation(), player.rotation(), i18n));
             }
             throw reader.createException(
-                i18n.translate(context.getCause(), "The Portal Agency will bring you your portal for just {text:$ 1337} within {input#amount} weeks",
+                i18n.translate(context.cause(), "The Portal Agency will bring you your portal for just {text:$ 1337} within {input#amount} weeks",
                                String.valueOf(random.nextInt(51) + 1)));
         }
         else if (token.startsWith("p:")) // portal dest
@@ -78,23 +78,23 @@ public class DestinationParser implements ValueParser<Destination>, ValueComplet
             Portal destPortal = module.getPortal(token.substring(2));
             if (destPortal == null)
             {
-                throw reader.createException(i18n.translate(context.getCause(), "Portal {input} not found!", token.substring(2)));
+                throw reader.createException(i18n.translate(context.cause(), "Portal {input} not found!", token.substring(2)));
             }
             return Optional.of(new Destination(destPortal));
         }
         else // world
         {
-            Optional<ServerWorld> world = Sponge.getServer().getWorldManager().world(ResourceKey.resolve(token));
+            Optional<ServerWorld> world = Sponge.server().worldManager().world(ResourceKey.resolve(token));
             if (!world.isPresent())
             {
-                throw reader.createException(i18n.translate(context.getCause(), "World {input} not found!", token));
+                throw reader.createException(i18n.translate(context.cause(), "World {input} not found!", token));
             }
             return world.map(Destination::new);
         }
     }
 
     @Override
-    public List<ClientCompletionType> getClientCompletionType()
+    public List<ClientCompletionType> clientCompletionType()
     {
         return Collections.singletonList(ClientCompletionTypes.RESOURCE_KEY.get());
     }
@@ -121,11 +121,11 @@ public class DestinationParser implements ValueParser<Destination>, ValueComplet
         }
         else
         {
-            for (ServerWorld world : Sponge.getServer().getWorldManager().worlds())
+            for (ServerWorld world : Sponge.server().worldManager().worlds())
             {
-                if (world.getKey().toString().startsWith(currentInput))
+                if (world.key().toString().startsWith(currentInput))
                 {
-                    list.add(world.getKey().toString());
+                    list.add(world.key().toString());
                 }
             }
         }

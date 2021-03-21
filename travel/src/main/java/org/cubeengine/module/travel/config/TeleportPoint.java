@@ -47,17 +47,17 @@ public class TeleportPoint implements Section
 
     public GameProfile getOwner()
     {
-        final GameProfileManager manager = Sponge.getServer().getGameProfileManager();
-        return manager.getBasicProfile(this.owner).join();
+        final GameProfileManager manager = Sponge.server().gameProfileManager();
+        return manager.basicProfile(this.owner).join();
     }
 
     public boolean isOwner(User user)
     {
-        return this.owner.equals(user.getUniqueId());
+        return this.owner.equals(user.uniqueId());
     }
 
     public boolean isOwner(CommandCause cause)
     {
-        return cause.getAudience() instanceof ServerPlayer && this.owner.equals(((ServerPlayer)cause.getAudience()).getUniqueId());
+        return cause.audience() instanceof ServerPlayer && this.owner.equals(((ServerPlayer)cause.audience()).uniqueId());
     }
 }

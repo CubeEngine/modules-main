@@ -42,12 +42,12 @@ public class TamedListener
     @Listener
     public void onInteractWithTamed(InteractEntityEvent event, @First Player player)
     {
-        Optional<UUID> uuid = event.getEntity().get(Keys.TAMER);
+        Optional<UUID> uuid = event.entity().get(Keys.TAMER);
         if (uuid.isPresent())
         {
-            final Optional<User> owner = Sponge.getServer().getUserManager().get(uuid.get());
+            final Optional<User> owner = Sponge.server().userManager().find(uuid.get());
             i18n.send(player, POSITIVE, "This {input#entity} belongs to {user#tamer}!",
-                                event.getEntity().getType().asComponent(), owner.map(User::getName).orElse(uuid.get().toString()));
+                                event.entity().type().asComponent(), owner.map(User::name).orElse(uuid.get().toString()));
         }
     }
 }

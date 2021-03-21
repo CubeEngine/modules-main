@@ -54,7 +54,7 @@ public class WarpManager
 
         Warp warp = new Warp();
         warp.name = name;
-        warp.owner = owner.getUniqueId();
+        warp.owner = owner.uniqueId();
         warp.transform = transform;
         warp.world = new ConfigWorld(world);
 
@@ -104,7 +104,7 @@ public class WarpManager
     public Set<Warp> list(@Nullable User user)
     {
         return config.warps.stream()
-                           .filter(warp -> user == null || warp.owner.equals(user.getUniqueId()))
+                           .filter(warp -> user == null || warp.owner.equals(user.uniqueId()))
                            .collect(Collectors.toSet());
     }
 

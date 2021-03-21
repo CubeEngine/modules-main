@@ -144,7 +144,7 @@ public class MarkdownGenerator implements Generator
         }
 
         TreeMap<String, PermissionDescription> addPerms = new TreeMap<>(
-            permissions.stream().collect(toMap(PermissionDescription::getId, p -> p)));
+            permissions.stream().collect(toMap(PermissionDescription::id, p -> p)));
         if (!commands.isEmpty())
         {
 
@@ -154,11 +154,11 @@ public class MarkdownGenerator implements Generator
                 ".command.<perm>`").append(" |\n");
             sb.append("| --- | --- | --- |\n");
 
-            commands.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey().getPrimaryAlias())).forEach(entry -> {
+            commands.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey().primaryAlias())).forEach(entry -> {
                 generateCommandDocs(sb, addPerms, entry.getKey(), entry.getValue(), new Stack<>(), basePermission, true);
             });
 
-            commands.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey().getPrimaryAlias())).forEach(entry -> {
+            commands.entrySet().stream().sorted(Comparator.comparing(e -> e.getKey().primaryAlias())).forEach(entry -> {
                 generateCommandDocs(sb, addPerms, entry.getKey(), entry.getValue(), new Stack<>(), basePermission, false);
             });
         }
@@ -170,8 +170,8 @@ public class MarkdownGenerator implements Generator
             sb.append("| --- | --- |\n");
             for (PermissionDescription perm : addPerms.values())
             {
-                final String plainDesc = PlainComponentSerializer.plain().serialize(perm.getDescription().orElse(Component.empty()));
-                sb.append("| `").append(perm.getId()).append("` | ").append(plainDesc).append(" |\n");
+                final String plainDesc = PlainComponentSerializer.plain().serialize(perm.description().orElse(Component.empty()));
+                sb.append("| `").append(perm.id()).append("` | ").append(plainDesc).append(" |\n");
             }
         }
 
@@ -195,9 +195,9 @@ public class MarkdownGenerator implements Generator
         String id = basePermission.getId() + ".command.";
 
         final List<Subcommand> subCommands = command.subcommands();
-        subCommands.sort(Comparator.comparing(s -> s.getAliases().iterator().next()));
+        subCommands.sort(Comparator.comparing(s -> s.aliases().iterator().next()));
 
-        String primaryAlias = mapping.getPrimaryAlias();
+        String primaryAlias = mapping.primaryAlias();
         if (primaryAlias.contains(":"))
         {
             primaryAlias = primaryAlias.substring(primaryAlias.indexOf(":") + 1);
@@ -212,10 +212,10 @@ public class MarkdownGenerator implements Generator
                        .replace(" ","-")
                        .replace(WHITESPACE, "").toLowerCase()).append(") | ");
 
-            sb.append(plainSerializer.serialize(command.getShortDescription(CommandCause.create()).orElse(Component.empty())).replace("\n", "<br>")).append(" | ");
+            sb.append(plainSerializer.serialize(command.shortDescription(CommandCause.create()).orElse(Component.empty())).replace("\n", "<br>")).append(" | ");
 //            CubeEngineCommand executor = command.getExecutor().filter(CubeEngineCommand.class::isInstance).map(CubeEngineCommand.class::cast).orElse(null);
-            if (command.getExecutionRequirements() instanceof AnnotationCommandBuilder.Requirements) {
-                final String perm = ((Requirements)command.getExecutionRequirements()).getPermission();
+            if (command.executionRequirements() instanceof AnnotationCommandBuilder.Requirements) {
+                final String perm = ((Requirements)command.executionRequirements()).getPermission();
                 sb.append("`").append(perm.replace(id, "")).append("` |\n");
             }
 
@@ -229,14 +229,14 @@ public class MarkdownGenerator implements Generator
             String fullCmd = String.join(WHITESPACE, commandStack);
             sb.append("\n#### ").append(fullCmd).append("  \n");
 
-            sb.append(plainSerializer.serialize(command.getShortDescription(CommandCause.create()).orElse(Component.empty()))).append("  \n");
+            sb.append(plainSerializer.serialize(command.shortDescription(CommandCause.create()).orElse(Component.empty()))).append("  \n");
             sb.append("**Usage:** `").append(getUsage(commandStack, command, plainSerializer)).append("`  \n");
 
-            final Set<String> allAliases = new HashSet<>(mapping.getAllAliases());
+            final Set<String> allAliases = new HashSet<>(mapping.allAliases());
             allAliases.remove(primaryAlias);
             if (commandStack.size() == 1)
             {
-                allAliases.remove(mapping.getPlugin().getMetadata().getId() + ":" + primaryAlias);
+                allAliases.remove(mapping.plugin().getMetadata().getId() + ":" + primaryAlias);
             }
             if (!allAliases.isEmpty())
             {
@@ -262,8 +262,8 @@ public class MarkdownGenerator implements Generator
                 sb.append("  \n");
             }
 
-            if (command.getExecutionRequirements() instanceof AnnotationCommandBuilder.Requirements) {
-                final String perm = ((Requirements)command.getExecutionRequirements()).getPermission();
+            if (command.executionRequirements() instanceof AnnotationCommandBuilder.Requirements) {
+                final String perm = ((Requirements)command.executionRequirements()).getPermission();
                 sb.append("**Permission:** `").append(perm).append("`  \n");
                 addPerms.remove(perm);
             }
@@ -279,9 +279,9 @@ public class MarkdownGenerator implements Generator
             for (Subcommand sub : subCommands)
             {
                 // TODO is alias?
-                if (!sub.getCommand().getExecutor().map(e -> e instanceof HelpExecutor).orElse(false))
+                if (!sub.command().executor().map(e -> e instanceof HelpExecutor).orElse(false))
                 {
-                    subBuilder.append(" `").append(sub.getAliases().iterator().next()).append("`");
+                    subBuilder.append(" `").append(sub.aliases().iterator().next()).append("`");
                 }
             }
 
@@ -294,10 +294,10 @@ public class MarkdownGenerator implements Generator
 
         for (Subcommand sub : subCommands)
         {
-            if (!sub.getCommand().getExecutor().map(e -> e instanceof HelpExecutor).orElse(false)
-                && !sub.getCommand().subcommands().isEmpty())
+            if (!sub.command().executor().map(e -> e instanceof HelpExecutor).orElse(false)
+                && !sub.command().subcommands().isEmpty())
             {
-                this.generateCommandDocs(sb, addPerms, new TmpCommandMapping(sub.getAliases()), sub.getCommand(), commandStack, basePermission, overview);
+                this.generateCommandDocs(sb, addPerms, new TmpCommandMapping(sub.aliases()), sub.command(), commandStack, basePermission, overview);
             }
         }
 
@@ -311,7 +311,7 @@ public class MarkdownGenerator implements Generator
         {
             if (parameter instanceof Parameter.Value)
             {
-                String paramUsage = ((Value<?>)parameter).getUsage(CommandCause.create());
+                String paramUsage = ((Value<?>)parameter).usage(CommandCause.create());
                 if (!parameter.isOptional())
                 {
                     paramUsage = "<" + paramUsage + ">";
@@ -345,25 +345,25 @@ public class MarkdownGenerator implements Generator
         }
 
         @Override
-        public String getPrimaryAlias()
+        public String primaryAlias()
         {
             return this.aliases.iterator().next();
         }
 
         @Override
-        public Set<String> getAllAliases()
+        public Set<String> allAliases()
         {
             return this.aliases;
         }
 
         @Override
-        public PluginContainer getPlugin()
+        public PluginContainer plugin()
         {
             return null;
         }
 
         @Override
-        public CommandRegistrar<?> getRegistrar()
+        public CommandRegistrar<?> registrar()
         {
             return null;
         }

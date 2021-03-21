@@ -44,7 +44,7 @@ public class ColoredSigns extends PermissionContainer
     public void onSignChange(ChangeSignEvent event, @First ServerPlayer cause)
     {
         final PlainComponentSerializer plain = PlainComponentSerializer.plain();
-        final List<Component> lines = event.getText().get();
+        final List<Component> lines = event.text().get();
         if (!cause.hasPermission(SIGN_STYLED.getId()))
         {
             for (int i = 0; i < lines.size(); i++)

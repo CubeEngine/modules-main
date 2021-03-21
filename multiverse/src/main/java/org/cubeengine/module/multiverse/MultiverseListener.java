@@ -44,9 +44,9 @@ public class MultiverseListener
     @Listener
     public void onWorldChange(ChangeEntityWorldEvent.Reposition event)
     {
-        ServerWorld from = event.getOriginalWorld();
-        ServerWorld to = event.getOriginalDestinationWorld();
-        Entity target = event.getEntity();
+        ServerWorld from = event.originalWorld();
+        ServerWorld to = event.destinationWorld();
+        Entity target = event.entity();
 
         final String toUniverse = module.getUniverse(to);
         final String fromUniverse = module.getUniverse(from);
@@ -67,7 +67,7 @@ public class MultiverseListener
 
             target.offer(MultiverseData.DATA, map);
             target.offer(MultiverseData.UNIVERSE, toUniverse);
-            module.getLogger().info("{} entered the universe {}", ((Player)target).getName(), toUniverse);
+            module.getLogger().info("{} entered the universe {}", ((Player)target).name(), toUniverse);
         }
         else
         {
@@ -78,10 +78,10 @@ public class MultiverseListener
     @Listener
     public void onJoin(ServerSideConnectionEvent.Join event)
     {
-        ServerPlayer player = event.getPlayer();
+        ServerPlayer player = event.player();
         final Map<String, DataContainer> data = player.get(MultiverseData.DATA).orElse(new HashMap<>());
         final Optional<String> currentUniverse = player.get(MultiverseData.UNIVERSE);
-        ServerWorld world = player.getWorld();
+        ServerWorld world = player.world();
         String loginUniverse = module.getUniverse(world);
         if (!currentUniverse.isPresent())
         {
@@ -98,15 +98,15 @@ public class MultiverseListener
     @Listener
     public void onQuit(ServerSideConnectionEvent.Disconnect event)
     {
-        ServerPlayer player = event.getPlayer();
+        ServerPlayer player = event.player();
         final Map<String, DataContainer> data = player.get(MultiverseData.DATA).orElse(null);
         if (data == null)
         {
             return;
             // TODO how?
         }
-        String universe = module.getUniverse(player.getWorld());
-        final PlayerData playerData = PlayerData.of(data.get(universe), player.getWorld()).applyFromPlayer(player);
+        String universe = module.getUniverse(player.world());
+        final PlayerData playerData = PlayerData.of(data.get(universe), player.world()).applyFromPlayer(player);
         data.put(universe, playerData.toContainer());
         player.offer(MultiverseData.DATA, data);
         player.offer(MultiverseData.UNIVERSE, universe);
@@ -115,9 +115,9 @@ public class MultiverseListener
     @Listener
     public void onRespawn(RespawnPlayerEvent event)
     {
-        ServerWorld from = event.getOriginalWorld();
-        ServerWorld to = event.getOriginalDestinationWorld();
-        ServerPlayer target = event.getEntity();
+        ServerWorld from = event.originalWorld();
+        ServerWorld to = event.destinationWorld();
+        ServerPlayer target = event.entity();
 
         final String fromUniverse = module.getUniverse(from);
         final String toUniverse = module.getUniverse(to);

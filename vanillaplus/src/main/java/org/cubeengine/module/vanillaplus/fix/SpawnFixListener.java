@@ -29,21 +29,21 @@ public class SpawnFixListener
     @Listener
     public void join(final ServerSideConnectionEvent.Login event)
     {
-        final ServerLocation toLocation = event.getToLocation();
-        final ServerWorld toWorld = toLocation.getWorld();
-        final WorldBorder border = toWorld.getBorder();
-        Vector3d center = border.getCenter();
-        double radius = border.getDiameter() / 2;
+        final ServerLocation toLocation = event.toLocation();
+        final ServerWorld toWorld = toLocation.world();
+        final WorldBorder border = toWorld.border();
+        Vector3d center = border.center();
+        double radius = border.diameter() / 2;
         double minX = center.getX() - radius;
         double maxX = center.getX() + radius;
         double minZ = center.getZ() - radius;
         double maxZ = center.getZ() + radius;
-        double playerX = toLocation.getPosition().getX();
-        double playerZ = toLocation.getPosition().getZ();
+        double playerX = toLocation.position().getX();
+        double playerZ = toLocation.position().getZ();
 
         if (playerX > maxX || playerX < minX || playerZ > maxZ || playerZ < minZ)
         {
-            event.setToLocation(toWorld.getLocation(toWorld.getProperties().spawnPosition()));
+            event.setToLocation(toWorld.location(toWorld.properties().spawnPosition()));
         }
     }
 }

@@ -51,14 +51,14 @@ public class BankEcoCommand extends DispatcherCommand
     @Command(alias = "grant", desc = "Gives money to a bank or all banks")
     public void give(CommandCause context, BaseAccount.Virtual bank, Double amount)
     {
-        TransactionResult result = bank.deposit(service.getDefaultCurrency(), new BigDecimal(amount));
-        switch (result.getResult())
+        TransactionResult result = bank.deposit(service.defaultCurrency(), new BigDecimal(amount));
+        switch (result.result())
         {
             case SUCCESS:
-                Component formatAmount = result.getCurrency().format(result.getAmount());
+                Component formatAmount = result.currency().format(result.amount());
                 i18n.send(context, POSITIVE, "You gave {txt#amount} to the bank {account}!",
                         formatAmount, bank);
-                Sponge.getServer().getOnlinePlayers().stream()
+                Sponge.server().onlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
                         .forEach(onlineUser -> i18n.send(onlineUser, POSITIVE, "{user} granted {input#amount} to your bank {account}!",
                                 onlineUser, formatAmount, bank));
@@ -72,14 +72,14 @@ public class BankEcoCommand extends DispatcherCommand
     @Command(alias = "remove", desc = "Takes money from given bank or all banks")
     public void take(CommandCause context, BaseAccount.Virtual bank, Double amount)
     {
-        TransactionResult result = bank.withdraw(service.getDefaultCurrency(), new BigDecimal(amount));
-        switch (result.getResult())
+        TransactionResult result = bank.withdraw(service.defaultCurrency(), new BigDecimal(amount));
+        switch (result.result())
         {
             case SUCCESS:
-                Component formatAmount = result.getCurrency().format(result.getAmount());
+                Component formatAmount = result.currency().format(result.amount());
                 i18n.send(context, POSITIVE, "You took {input#amount} from the bank {account}!",
                         formatAmount, bank);
-                Sponge.getServer().getOnlinePlayers().stream()
+                Sponge.server().onlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
                         .forEach(onlineUser -> i18n.send(onlineUser, POSITIVE, "{user} charged your bank {account} for {input#amount}!",
                                 onlineUser, bank, formatAmount));
@@ -94,14 +94,14 @@ public class BankEcoCommand extends DispatcherCommand
     @Command(desc = "Reset the money from given banks")
     public void reset(CommandCause context, BaseAccount.Virtual bank)
     {
-        TransactionResult result = bank.resetBalance(service.getDefaultCurrency());
-        switch (result.getResult())
+        TransactionResult result = bank.resetBalance(service.defaultCurrency());
+        switch (result.result())
         {
             case SUCCESS:
-                Component formatAmount = result.getCurrency().format(result.getAmount());
+                Component formatAmount = result.currency().format(result.amount());
                 i18n.send(context, POSITIVE, "The account of the bank {account} got reset to {txt#balance}!",
                         bank, formatAmount);
-                Sponge.getServer().getOnlinePlayers().stream()
+                Sponge.server().onlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
                         .forEach(onlineUser -> i18n.send(onlineUser, POSITIVE, "{user} reset the money of your bank {account} to {txt#balance}!",
                                 onlineUser, bank, formatAmount));
@@ -116,14 +116,14 @@ public class BankEcoCommand extends DispatcherCommand
     @Command(desc = "Sets the money from given banks")
     public void set(CommandCause context, BaseAccount.Virtual bank, Double amount)
     {
-        TransactionResult result = bank.setBalance(service.getDefaultCurrency(), new BigDecimal(amount));
-        switch (result.getResult())
+        TransactionResult result = bank.setBalance(service.defaultCurrency(), new BigDecimal(amount));
+        switch (result.result())
         {
             case SUCCESS:
-                Component formatAmount = result.getCurrency().format(result.getAmount());
+                Component formatAmount = result.currency().format(result.amount());
                 i18n.send(context, POSITIVE, "The money of bank account {account} got set to {txt#balance}!",
                         bank, formatAmount);
-                Sponge.getServer().getOnlinePlayers().stream()
+                Sponge.server().onlinePlayers().stream()
                         .filter(onlineUser -> service.hasAccess(bank, AccessLevel.WITHDRAW, onlineUser))
                         .forEach(onlineUser -> i18n.send(onlineUser, POSITIVE, "{user} set the money of your bank {account} to {txt#balance}!",
                                 onlineUser, bank, formatAmount));

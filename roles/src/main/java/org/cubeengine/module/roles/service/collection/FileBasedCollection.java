@@ -78,8 +78,8 @@ public class FileBasedCollection extends BaseSubjectCollection
     {
         try
         {
-            createDirectories(modulePath.resolve(this.getIdentifier()));
-            for (Path configFile : newDirectoryStream(modulePath.resolve(this.getIdentifier()), YAML))
+            createDirectories(modulePath.resolve(this.identifier()));
+            for (Path configFile : newDirectoryStream(modulePath.resolve(this.identifier()), YAML))
             {
                 RoleConfig config = reflector.create(RoleConfig.class);
                 config.setFile(configFile.toFile());
@@ -102,15 +102,15 @@ public class FileBasedCollection extends BaseSubjectCollection
     private FileSubject addSubject(RolesPermissionService service, RoleConfig config)
     {
         FileSubject subject = new FileSubject(service, this, config);
-        subjects.put(subject.getIdentifier(), subject);
-        subjectByUUID.put(subject.getSubjectData().getConfig().identifier, subject);
+        subjects.put(subject.identifier(), subject);
+        subjectByUUID.put(subject.subjectData().getConfig().identifier, subject);
         return subject;
     }
 
     @Override
     protected Subject loadSubject0(String identifier)
     {
-        Optional<Subject> result = getSubject(identifier);
+        Optional<Subject> result = subject(identifier);
         if (result.isPresent())
         {
             return result.get();
@@ -120,11 +120,11 @@ public class FileBasedCollection extends BaseSubjectCollection
         while (it.hasNext())
         {
             Subject next = it.next();
-            if (next.getIdentifier().equals(identifier))
+            if (next.identifier().equals(identifier))
             {
                 it.remove();
                 this.subjects.put(identifier, next);
-                this.subjectByUUID.put(((FileSubject) next).getSubjectData().getConfig().identifier, ((FileSubject) next));
+                this.subjectByUUID.put(((FileSubject) next).subjectData().getConfig().identifier, ((FileSubject) next));
                 return next;
             }
         }
@@ -146,7 +146,7 @@ public class FileBasedCollection extends BaseSubjectCollection
     }
 
     @Override
-    public CompletableFuture<Set<String>> getAllIdentifiers()
+    public CompletableFuture<Set<String>> allIdentifiers()
     {
         return CompletableFuture.supplyAsync(this::getAllIds);
     }
@@ -156,7 +156,7 @@ public class FileBasedCollection extends BaseSubjectCollection
         Set<String> set = new HashSet<>();
         try
         {
-            for (Path configFile : newDirectoryStream(modulePath.resolve(this.getIdentifier()), YAML))
+            for (Path configFile : newDirectoryStream(modulePath.resolve(this.identifier()), YAML))
             {
                 set.add(StringUtils.stripFileExtension(configFile.getFileName().toString()));
             }
@@ -169,7 +169,7 @@ public class FileBasedCollection extends BaseSubjectCollection
 
     private Path getFile(String identifier)
     {
-        return this.modulePath.resolve(this.getIdentifier()).resolve(identifier + YAML.getExtention());
+        return this.modulePath.resolve(this.identifier()).resolve(identifier + YAML.getExtention());
     }
 
     @Override
@@ -190,7 +190,7 @@ public class FileBasedCollection extends BaseSubjectCollection
             return false;
         }
 
-        if (!role.getSubjectData().getConfig().getFile().delete())
+        if (!role.subjectData().getConfig().getFile().delete())
         {
             throw new IllegalStateException();
         }
@@ -199,8 +199,8 @@ public class FileBasedCollection extends BaseSubjectCollection
         subjects.values().stream()
                 .filter(subject -> subject instanceof FileSubject)
                 .map(FileSubject.class::cast)
-                .filter(subject -> subject.getParents().contains(newSubjectReference(role.getIdentifier())))
-                .forEach(subject -> subject.getSubjectData()
+                .filter(subject -> subject.parents().contains(newSubjectReference(role.identifier())))
+                .forEach(subject -> subject.subjectData()
                 .save(CompletableFuture.completedFuture(true)));
 
         return true;
@@ -210,7 +210,7 @@ public class FileBasedCollection extends BaseSubjectCollection
     {
         // TODO maybe async this whole thing
 
-        SubjectReference ref = newSubjectReference(r.getIdentifier());
+        SubjectReference ref = newSubjectReference(r.identifier());
         // remove role from
         for (Subject subject : subjects.values())
         {
@@ -223,9 +223,9 @@ public class FileBasedCollection extends BaseSubjectCollection
             }
         }
 
-        for (Subject userSubject : service.getUserSubjects().subjects.values())
+        for (Subject userSubject : service.userSubjects().subjects.values())
         {
-            if (userSubject.isChildOf(r.getActiveContexts(), ref))
+            if (userSubject.isChildOf(r.activeContexts(), ref))
             {
                 if (!force)
                 {
@@ -234,12 +234,12 @@ public class FileBasedCollection extends BaseSubjectCollection
             }
         }
 
-        subjects.remove(r.getIdentifier());
-        subjectByUUID.remove(r.getSubjectData().getConfig().identifier);
+        subjects.remove(r.identifier());
+        subjectByUUID.remove(r.subjectData().getConfig().identifier);
 
-        r.getSubjectData().delete(); // delete file
+        r.subjectData().delete(); // delete file
 
-        for (SubjectCollection collection : service.getLoadedCollections().values())
+        for (SubjectCollection collection : service.loadedCollections().values())
         {
             if (collection instanceof FileBasedCollection)
             {
@@ -261,12 +261,12 @@ public class FileBasedCollection extends BaseSubjectCollection
 
     public void setRoleName(FileSubject subject, String name)
     {
-        RoleConfig config = subject.getSubjectData().getConfig();
-        subjects.remove(subject.getIdentifier());
+        RoleConfig config = subject.subjectData().getConfig();
+        subjects.remove(subject.identifier());
         subjects.put(name, subject);
         config.roleName = name;
         config.setFile(getFile(name).toFile());
-        subject.getSubjectData().save(CompletableFuture.completedFuture(true));
+        subject.subjectData().save(CompletableFuture.completedFuture(true));
     }
 
     public Optional<FileSubject> getByUUID(UUID uuid)
@@ -289,7 +289,7 @@ public class FileBasedCollection extends BaseSubjectCollection
         }
         catch (IllegalArgumentException ignored)
         {
-            Optional<Subject> subject = this.service.getGroupSubjects().getSubject(internalId);
+            Optional<Subject> subject = this.service.groupSubjects().subject(internalId);
             if (subject.isPresent())
             {
                 return ((FileSubject) subject.get());

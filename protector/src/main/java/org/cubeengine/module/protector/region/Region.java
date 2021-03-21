@@ -52,9 +52,9 @@ public class Region
         }
         if (this.config.name == null) // world
         {
-            return loc.getWorld().equals(this.config.world.getWorld());
+            return loc.world().equals(this.config.world.getWorld());
         }
-        return this.contains(loc.getPosition()); // zone
+        return this.contains(loc.position()); // zone
     }
 
     public boolean contains(Vector3d pos)

@@ -46,15 +46,15 @@ public abstract class AbstractSettingsCommand extends DispatcherCommand
 
     protected void setPermission(CommandCause context, Tristate set, Region region, String role, String perm)
     {
-        PermissionService ps = Sponge.getServer().getServiceProvider().permissionService();
-        ps.getGroupSubjects().hasSubject(role).thenAccept(b -> {
+        PermissionService ps = Sponge.server().serviceProvider().permissionService();
+        ps.groupSubjects().hasSubject(role).thenAccept(b -> {
             if (!b)
             {
                 i18n.send(context, NEGATIVE, "This role does not exist");
                 return;
             }
-            Subject subject = ps.getGroupSubjects().loadSubject(role).join();
-            subject.getSubjectData().setPermission(ImmutableSet.of(region.getContext()), perm, set);
+            Subject subject = ps.groupSubjects().loadSubject(role).join();
+            subject.subjectData().setPermission(ImmutableSet.of(region.getContext()), perm, set);
             i18n.send(context, POSITIVE, "Bypass permissions set for the role {name}!", role);
         });
     }

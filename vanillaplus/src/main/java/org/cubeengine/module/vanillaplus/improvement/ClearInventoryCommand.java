@@ -67,7 +67,7 @@ public class ClearInventoryCommand extends PermissionContainer
                                @Flag boolean force)
     {
         //sender.sendTranslated(NEGATIVE, "That awkward moment when you realize you do not have an inventory!");
-        boolean self = context.getIdentifier().equals(player.getIdentifier());
+        boolean self = context.identifier().equals(player.identifier());
         if (!self)
         {
             if (!context.hasPermission(COMMAND_CLEARINVENTORY_OTHER.getId()))
@@ -83,12 +83,12 @@ public class ClearInventoryCommand extends PermissionContainer
             }
         }
 
-        StandardInventory playerInventory = player.isOnline() ? player.getPlayer().get().getInventory() : player.getInventory();
-        playerInventory.getPrimary().clear();
+        StandardInventory playerInventory = player.isOnline() ? player.player().get().inventory() : player.inventory();
+        playerInventory.primary().clear();
         if (removeArmor)
         {
-            playerInventory.getArmor().clear();
-            playerInventory.getOffhand().clear();
+            playerInventory.armor().clear();
+            playerInventory.offhand().clear();
         }
         if (self)
         {
@@ -97,7 +97,7 @@ public class ClearInventoryCommand extends PermissionContainer
         }
         if (player.isOnline() && player.hasPermission(COMMAND_CLEARINVENTORY_NOTIFY.getId()) && !quiet)
         {
-            i18n.send(player.getPlayer().get(), NEUTRAL, "Your inventory has been cleared by {sender}!", context);
+            i18n.send(player.player().get(), NEUTRAL, "Your inventory has been cleared by {sender}!", context);
         }
         i18n.send(context, POSITIVE, "The inventory of {user} has been cleared!", player);
     }

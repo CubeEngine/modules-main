@@ -61,14 +61,14 @@ public class WhitelistCommand extends DispatcherCommand
 
     private WhitelistService getWhitelistService()
     {
-        return Sponge.getServer().getServiceProvider().whitelistService();
+        return Sponge.server().serviceProvider().whitelistService();
     }
 
     @Command(desc = "Adds a player to the whitelist.")
     public void add(CommandCause context, User player) // TODO allow players that never played on the server
     {
         WhitelistService service = getWhitelistService();
-        if (service.addProfile(player.getProfile()).join())
+        if (service.addProfile(player.profile()).join())
         {
             i18n.send(context, NEUTRAL, "{user} is already whitelisted.", player);
             return;
@@ -80,9 +80,9 @@ public class WhitelistCommand extends DispatcherCommand
     public void remove(CommandCause context, User player)
     {
         WhitelistService service = getWhitelistService();
-        if (service.removeProfile(player.getProfile()).join())
+        if (service.removeProfile(player.profile()).join())
         {
-            i18n.send(context, POSITIVE, "{user} is not whitelisted anymore.", player.getName());
+            i18n.send(context, POSITIVE, "{user} is not whitelisted anymore.", player.name());
             return;
         }
         i18n.send(context, NEUTRAL, "{user} is not whitelisted.", player);
@@ -92,7 +92,7 @@ public class WhitelistCommand extends DispatcherCommand
     public void list(CommandCause context)
     {
         WhitelistService service = getWhitelistService();
-        if (!Sponge.getServer().isWhitelistEnabled())
+        if (!Sponge.server().isWhitelistEnabled())
         {
             i18n.send(context, NEUTRAL, "The whitelist is currently disabled.");
         }
@@ -101,18 +101,18 @@ public class WhitelistCommand extends DispatcherCommand
             i18n.send(context, POSITIVE, "The whitelist is enabled!.");
         }
         context.sendMessage(Identity.nil(), Component.empty());
-        Collection<GameProfile> list = service.getWhitelistedProfiles().join();
+        Collection<GameProfile> list = service.whitelistedProfiles().join();
         if (list.isEmpty())
         {
             i18n.send(context, NEUTRAL, "There are currently no whitelisted players!");
         }
         else
         {
-            Sponge.getGame().getServiceProvider().paginationService().builder()
+            Sponge.serviceProvider().paginationService().builder()
                   .title(i18n.translate(context, NEUTRAL, "The following players are whitelisted"))
-                  .contents(list.stream().map(p -> Component.text(" - ").append(Component.text(p.getName().orElse("??"), NamedTextColor.DARK_GREEN)))
+                  .contents(list.stream().map(p -> Component.text(" - ").append(Component.text(p.name().orElse("??"), NamedTextColor.DARK_GREEN)))
                                 .collect(Collectors.toList()))
-                .sendTo(context.getAudience());
+                .sendTo(context.audience());
         }
 
         /* TODO list ops too
@@ -131,24 +131,24 @@ public class WhitelistCommand extends DispatcherCommand
     @Command(desc = "Enables the whitelisting")
     public void on(CommandCause context)
     {
-        if (Sponge.getServer().isWhitelistEnabled())
+        if (Sponge.server().isWhitelistEnabled())
         {
             i18n.send(context, NEGATIVE, "The whitelist is already enabled!");
             return;
         }
-        Sponge.getServer().setHasWhitelist(true);
+        Sponge.server().setHasWhitelist(true);
         i18n.send(context, POSITIVE, "The whitelist is now enabled.");
     }
 
     @Command(desc = "Disables the whitelisting")
     public void off(CommandCause context)
     {
-        if (!Sponge.getServer().isWhitelistEnabled())
+        if (!Sponge.server().isWhitelistEnabled())
         {
             i18n.send(context, NEGATIVE, "The whitelist is already disabled!");
             return;
         }
-        Sponge.getServer().setHasWhitelist(false);
+        Sponge.server().setHasWhitelist(false);
         i18n.send(context, POSITIVE, "The whitelist is now disabled.");
     }
 
@@ -158,7 +158,7 @@ public class WhitelistCommand extends DispatcherCommand
     public void wipe(CommandCause context)
     {
         WhitelistService service = getWhitelistService();
-        service.getWhitelistedProfiles().join().forEach(service::removeProfile);
+        service.whitelistedProfiles().join().forEach(service::removeProfile);
         i18n.send(context, POSITIVE, "The whitelist was successfully wiped!");
     }
 }

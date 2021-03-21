@@ -45,25 +45,25 @@ public class RolesPermissionDescription implements PermissionDescription
     }
 
     @Override
-    public String getId()
+    public String id()
     {
         return this.id;
     }
 
     @Override
-    public Optional<Component> getDescription()
+    public Optional<Component> description()
     {
         return Optional.ofNullable(this.description);
     }
 
     @Override
-    public Map<Subject, Boolean> getAssignedSubjects(String type)
+    public Map<Subject, Boolean> assignedSubjects(String type)
     {
-        return this.permissionService.getCollection(type).get().getLoadedWithPermission(this.id);
+        return this.permissionService.collection(type).get().loadedWithPermission(this.id);
     }
 
     @Override
-    public Optional<PluginContainer> getOwner()
+    public Optional<PluginContainer> owner()
     {
         return Optional.ofNullable(this.owner);
     }
@@ -71,7 +71,7 @@ public class RolesPermissionDescription implements PermissionDescription
     @Override
     public CompletableFuture<Map<SubjectReference, Boolean>> findAssignedSubjects(String type)
     {
-        return this.permissionService.getCollection(type).get().getAllWithPermission(this.id);
+        return this.permissionService.collection(type).get().allWithPermission(this.id);
     }
 
     @Override

@@ -50,8 +50,8 @@ public class BankManageCommand extends DispatcherCommand
     @Command(desc = "Sets the access level for a player in a bank")
     public void access(CommandCause context, User player, AccessLevel level, @Default BaseAccount.Virtual bank)
     {
-        player.getSubjectData().setOption(bank.getActiveContexts(),
-                "conomy.bank.access-level." + bank.getIdentifier(), String.valueOf(level.value));
+        player.subjectData().setOption(bank.activeContexts(),
+                                          "conomy.bank.access-level." + bank.identifier(), String.valueOf(level.value));
         switch (level)
         {
             case NONE:
@@ -117,7 +117,7 @@ public class BankManageCommand extends DispatcherCommand
             i18n.send(context, NEGATIVE, "There is already a bank names {input#bank}!", name);
             return;
         }
-        BaseAccount.Virtual bank = service.getOrCreateAccount(name).map(BaseAccount.Virtual.class::cast).get();
+        BaseAccount.Virtual bank = service.orCreateAccount(name).map(BaseAccount.Virtual.class::cast).get();
         bank.setHidden(hidden);
         bank.setInvite(invite);
         i18n.send(context, POSITIVE, "Created new Bank {account}!", bank);

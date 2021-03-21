@@ -53,7 +53,7 @@ public class GodCommand extends PermissionContainer
     public void god(CommandCause context, @Default ServerPlayer player)
     {
         boolean other = false;
-        if (!context.getSubject().equals(player))
+        if (!context.subject().equals(player))
         {
             if (!context.hasPermission(COMMAND_GOD_OTHER.getId()))
             {

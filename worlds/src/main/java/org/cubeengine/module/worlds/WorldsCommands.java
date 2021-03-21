@@ -173,7 +173,7 @@ public class WorldsCommands extends DispatcherCommand
     @Command(desc = "Loads a world")
     public void load(CommandCause context, ResourceKey world)
     {
-        final CompletableFuture<ServerWorld> futureWorld = Sponge.getServer().getWorldManager().loadWorld(world);
+        final CompletableFuture<ServerWorld> futureWorld = Sponge.server().worldManager().loadWorld(world);
         if (futureWorld.isDone())
         {
             i18n.send(context, POSITIVE, "The world {world} is already loaded!", futureWorld.join());
@@ -200,7 +200,7 @@ public class WorldsCommands extends DispatcherCommand
     {
         if (!force)
         {
-            Collection<ServerPlayer> entities = world.getPlayers();
+            Collection<ServerPlayer> entities = world.players();
             if (!entities.isEmpty())
             {
                 int amount = entities.size();
@@ -212,20 +212,20 @@ public class WorldsCommands extends DispatcherCommand
             return;
         }
 
-        final WorldManager wm = Sponge.getServer().getWorldManager();
+        final WorldManager wm = Sponge.server().worldManager();
 
         final ServerWorld defWorld = wm.defaultWorld();
 
-        ServerWorld evacuation = wm.world(defWorld.getKey()).get();
+        ServerWorld evacuation = wm.world(defWorld.key()).get();
         if (evacuation == world)
         {
-            world.getPlayers().forEach(p -> p.kick(i18n.translate(p, NEGATIVE, "Main world unloading. Flee!")));
+            world.players().forEach(p -> p.kick(i18n.translate(p, NEGATIVE, "Main world unloading. Flee!")));
         }
         else
         {
-            final Vector3i pos = evacuation.getProperties().spawnPosition();
-            final ServerLocation loc = evacuation.getLocation(pos);
-            world.getPlayers().forEach(p -> p.setLocation(Sponge.getServer().getTeleportHelper().getSafeLocation(loc).orElse(loc)));
+            final Vector3i pos = evacuation.properties().spawnPosition();
+            final ServerLocation loc = evacuation.location(pos);
+            world.players().forEach(p -> p.setLocation(Sponge.server().teleportHelper().findSafeLocation(loc).orElse(loc)));
         }
 
         i18n.send(context, POSITIVE, "Teleported all players out of {world}", world);
@@ -248,7 +248,8 @@ public class WorldsCommands extends DispatcherCommand
                        @Flag @ParameterPermission // TODO (value = "remove-worldfolder", desc = "Allows deleting the world folder")
                            boolean folder, @Flag boolean unload)
     {
-        final Optional<ServerWorld> loadedWorld = Sponge.getServer().getWorldManager().world(world);
+        final WorldManager wm = Sponge.server().worldManager();
+        final Optional<ServerWorld> loadedWorld = wm.world(world);
         if (loadedWorld.isPresent())
         {
             if (!unload)
@@ -256,7 +257,7 @@ public class WorldsCommands extends DispatcherCommand
                 i18n.send(context, NEGATIVE, "You have to unload the world first!");
                 return;
             }
-            final CompletableFuture<Boolean> unloadFuture = Sponge.getServer().getWorldManager().unloadWorld(loadedWorld.get());
+            final CompletableFuture<Boolean> unloadFuture = wm.unloadWorld(loadedWorld.get());
 
             unloadFuture.thenCompose(ub -> {
                 if (!ub)
@@ -266,8 +267,8 @@ public class WorldsCommands extends DispatcherCommand
                 }
                 if (!folder)
                 {
-                    final WorldTemplate build = WorldTemplate.builder().from(Sponge.getServer().getWorldManager().loadTemplate(world).join().get()).loadOnStartup(false).build();
-                    Sponge.getServer().getWorldManager().saveTemplate(build);
+                    final WorldTemplate build = WorldTemplate.builder().from(wm.loadTemplate(world).join().get()).loadOnStartup(false).build();
+                    wm.saveTemplate(build);
                     i18n.send(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
                     return CompletableFuture.completedFuture(false);
                 }
@@ -286,7 +287,7 @@ public class WorldsCommands extends DispatcherCommand
     private CompletableFuture<Boolean> deleteUnloadedWorld(CommandCause context, ResourceKey world)
     {
         i18n.send(context, POSITIVE, "Deleting the world {world} from disk...", world);
-        return Sponge.getServer().getWorldManager().deleteWorld(world);
+        return Sponge.server().worldManager().deleteWorld(world);
     }
 
     @Alias("listworlds")
@@ -297,7 +298,8 @@ public class WorldsCommands extends DispatcherCommand
         Component tNotLoaded = i18n.translate(context, "not loaded");
         Component tNotEnabled = i18n.translate(context, "not enabled");
 
-        Sponge.getServer().getWorldManager().worldKeys().stream().sorted(Comparator.comparing(o -> o.asString())).forEach(worldKey -> {
+        final WorldManager wm = Sponge.server().worldManager();
+        wm.worldKeys().stream().sorted(Comparator.comparing(ResourceKey::asString)).forEach(worldKey -> {
             Component builder =
                 Component.text(" - ").append(Component.text(worldKey.asString(), NamedTextColor.GOLD)) // TODO worldname
                 .append(Component.space())
@@ -307,7 +309,7 @@ public class WorldsCommands extends DispatcherCommand
                                                     .clickEvent(ClickEvent.runCommand("/worlds info" + worldKey.asString()))
                                                     .hoverEvent(HoverEvent.showText(i18n.translate(context, "Click to show world info")));
 
-            if (!Sponge.getServer().getWorldManager().world(worldKey).isPresent())
+            if (!wm.world(worldKey).isPresent())
             {
                 builder.append(Component.space());
 
@@ -331,9 +333,9 @@ public class WorldsCommands extends DispatcherCommand
         context.sendMessage(Identity.nil(), Component.empty());
         i18n.send(context, POSITIVE, "World information for {world}:", world);
 
-        if (!Sponge.getServer().getWorldManager().world(world.getKey()).isPresent())
+        if (!Sponge.server().worldManager().world(world.key()).isPresent())
         {
-            Component load = loadWorldText(context, world.getKey());
+            Component load = loadWorldText(context, world.key());
             i18n.send(context, NEGATIVE, "This world is not loaded. {txt#load}", load);
         }
         if (!world.initialized())
@@ -360,7 +362,7 @@ public class WorldsCommands extends DispatcherCommand
         {
             i18n.send(context, NEUTRAL, "PVP disabled");
         }
-        if (!world.commands() && Sponge.getPlatform().getType() == Type.CLIENT)
+        if (!world.commands() && Sponge.platform().type() == Type.CLIENT)
         {
             i18n.send(context, NEUTRAL, "Commands are not allowed");
         }
@@ -379,13 +381,13 @@ public class WorldsCommands extends DispatcherCommand
         }
         Vector3i spawn = world.spawnPosition();
         i18n.send(context, NEUTRAL, "This worlds spawn is at {vector}", new Vector3i(spawn.getX(), spawn.getY(), spawn.getZ()));
-        if (showGameRules && !world.getGameRules().isEmpty()) // Show gamerules
+        if (showGameRules && !world.gameRules().isEmpty()) // Show gamerules
         {
             i18n.send(context, NEUTRAL, "The following game-rules are set:");
-            for (Entry<GameRule<?>, ?> entry : world.getGameRules().entrySet())
+            for (Entry<GameRule<?>, ?> entry : world.gameRules().entrySet())
             {
 
-                context.sendMessage(Identity.nil(), Component.text(entry.getKey().getName(), NamedTextColor.YELLOW).append(Component.text(": "))
+                context.sendMessage(Identity.nil(), Component.text(entry.getKey().name(), NamedTextColor.YELLOW).append(Component.text(": "))
                                                              .append(Component.text(entry.getValue().toString(), NamedTextColor.GOLD)));
             }
         }
@@ -394,7 +396,7 @@ public class WorldsCommands extends DispatcherCommand
     @Command(desc = "Lists the players in a world")
     public void listplayers(CommandCause context, @Default ServerWorld world)
     {
-        Collection<ServerPlayer> players = world.getPlayers();
+        Collection<ServerPlayer> players = world.players();
         if (players.isEmpty())
         {
             i18n.send(context, NEUTRAL, "There are no players in {world}", world);
@@ -403,7 +405,7 @@ public class WorldsCommands extends DispatcherCommand
         i18n.send(context, POSITIVE, "The following players are in {world}", world);
         for (ServerPlayer player : players)
         {
-            context.sendMessage(Identity.nil(), Component.text(" - ", NamedTextColor.YELLOW).append(Component.text(player.getName(), NamedTextColor.DARK_GREEN)));
+            context.sendMessage(Identity.nil(), Component.text(" - ", NamedTextColor.YELLOW).append(Component.text(player.name(), NamedTextColor.DARK_GREEN)));
         }
     }
 }

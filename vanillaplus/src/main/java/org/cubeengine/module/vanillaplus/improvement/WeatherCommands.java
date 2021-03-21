@@ -54,7 +54,7 @@ public class WeatherCommands
         duration = (duration == null ? 10000000 : duration) * 20;
 
         final Weather currentWeather = world.weather();
-        final String weatherKey = Sponge.getGame().registries().registry(RegistryTypes.WEATHER_TYPE).valueKey(weather).getValue();
+        final String weatherKey = Sponge.game().registries().registry(RegistryTypes.WEATHER_TYPE).valueKey(weather).value();
         if (currentWeather.type() == weather) // weather is not changing
         {
             i18n.send(context, POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weatherKey);

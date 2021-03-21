@@ -29,6 +29,6 @@ public class Home extends TeleportPoint implements Section
 
     public boolean isInvited(User user)
     {
-        return invites.contains(user.getUniqueId());
+        return invites.contains(user.uniqueId());
     }
 }

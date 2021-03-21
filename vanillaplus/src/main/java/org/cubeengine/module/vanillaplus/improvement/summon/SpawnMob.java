@@ -44,7 +44,7 @@ public class SpawnMob
 {
     static Entity createMob(Audience context, EntityType type, List<String> data, ServerLocation loc, I18n i18n)
     {
-        Entity entity = loc.getWorld().createEntity(type, loc.getPosition());
+        Entity entity = loc.world().createEntity(type, loc.position());
         if (!(entity instanceof Living))
         {
             i18n.send(context, NEGATIVE, "Invalid mob-type: {input#entityname} is not living!", type.asComponent());
@@ -99,7 +99,7 @@ public class SpawnMob
             i18n.send(context, NEGATIVE, "The serverlimit is set to {amount}, you cannot spawn more mobs at once!", module.getConfig().improve.spawnmobLimit);
             return;
         }
-        try (StackFrame frame = Sponge.getServer().getCauseStackManager().pushCauseFrame())
+        try (StackFrame frame = Sponge.server().causeStackManager().pushCauseFrame())
         {
             frame.pushCause(context).addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
             for (int i = 0; i < amount; i++)
@@ -121,7 +121,7 @@ public class SpawnMob
     {
         if (at != null)
         {
-            return at.getServerLocation();
+            return at.serverLocation();
         }
 
         final ServerLocation result = LocationUtil.getBlockInSight(sourcePlayer);
@@ -130,6 +130,6 @@ public class SpawnMob
             i18n.send(sourcePlayer, NEGATIVE, "Cannot find Targetblock");
             return null;
         }
-        return Sponge.getServer().getTeleportHelper().getSafeLocation(result).orElse(result);
+        return Sponge.server().teleportHelper().findSafeLocation(result).orElse(result);
     }
 }

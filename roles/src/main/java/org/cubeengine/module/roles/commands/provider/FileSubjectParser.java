@@ -53,9 +53,9 @@ public class FileSubjectParser implements ValueParser<FileSubject>, ValueComplet
     public List<String> complete(CommandContext context, String currentInput)
     {
         ArrayList<String> result = new ArrayList<>();
-        for (Subject subject : service.getGroupSubjects().getLoadedSubjects())
+        for (Subject subject : service.groupSubjects().loadedSubjects())
         {
-            String name = subject.getIdentifier();
+            String name = subject.identifier();
             if (name.startsWith(currentInput))
             {
                 result.add(name);
@@ -65,13 +65,13 @@ public class FileSubjectParser implements ValueParser<FileSubject>, ValueComplet
     }
 
     @Override
-    public Optional<? extends FileSubject> getValue(Key<? super FileSubject> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    public Optional<? extends FileSubject> parseValue(Key<? super FileSubject> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
         String token = reader.parseString();
-        if (service.getGroupSubjects().hasSubject(token).join())
+        if (service.groupSubjects().hasSubject(token).join())
         {
-            return Optional.of((FileSubject) service.getGroupSubjects().loadSubject(token).join());
+            return Optional.of((FileSubject) service.groupSubjects().loadSubject(token).join());
         }
-        throw reader.createException(i18n.translate(context.getCause(), "Could not find the role: {input#role}", token));
+        throw reader.createException(i18n.translate(context.cause(), "Could not find the role: {input#role}", token));
     }
 }

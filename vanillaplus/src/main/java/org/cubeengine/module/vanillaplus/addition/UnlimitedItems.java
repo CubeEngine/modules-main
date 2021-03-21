@@ -58,7 +58,7 @@ public class UnlimitedItems
     {
         if (unlimited == null)
         {
-            unlimited = !unlimitedPlayers.contains(context.getUniqueId());
+            unlimited = !unlimitedPlayers.contains(context.uniqueId());
         }
         if (unlimited)
         {
@@ -70,11 +70,11 @@ public class UnlimitedItems
         }
         if (unlimited)
         {
-            this.unlimitedPlayers.add(context.getUniqueId());
+            this.unlimitedPlayers.add(context.uniqueId());
         }
         else
         {
-            this.unlimitedPlayers.remove(context.getUniqueId());
+            this.unlimitedPlayers.remove(context.uniqueId());
         }
     }
 
@@ -82,9 +82,9 @@ public class UnlimitedItems
     public void blockplace(final ChangeBlockEvent.All event, @First Player player)
     {
 
-        if (this.unlimitedPlayers.contains(player.getUniqueId()))
+        if (this.unlimitedPlayers.contains(player.uniqueId()))
         {
-            if (!event.getTransactions(Operations.PLACE.get()).findAny().isPresent())
+            if (!event.transactions(Operations.PLACE.get()).findAny().isPresent())
             {
                 return;
             }
@@ -92,8 +92,8 @@ public class UnlimitedItems
             {
                 return;
             }
-            ItemStack item = player.getItemInHand(HandTypes.MAIN_HAND);
-            item.setQuantity(item.getQuantity() + 1);
+            ItemStack item = player.itemInHand(HandTypes.MAIN_HAND);
+            item.setQuantity(item.quantity() + 1);
             player.setItemInHand(HandTypes.MAIN_HAND, item);
         }
     }

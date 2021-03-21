@@ -121,9 +121,9 @@ public class BorderCommands extends DispatcherCommand
     {
         if (pos == null)
         {
-            if (context.getSubject() instanceof ServerPlayer)
+            if (context.subject() instanceof ServerPlayer)
             {
-                Vector3d position = ((ServerPlayer)context.getSubject()).getLocation().getPosition();
+                Vector3d position = ((ServerPlayer)context.subject()).location().position();
                 pos = new Vector2i(position.getX(), position.getZ());
             }
             else
@@ -132,7 +132,7 @@ public class BorderCommands extends DispatcherCommand
                 return;
             }
         }
-        world.getBorder().setCenter(pos.getX() + 0.5, pos.getY() + 0.5);
+        world.border().setCenter(pos.getX() + 0.5, pos.getY() + 0.5);
         i18n.send(context, POSITIVE, "Set world border of {world} center to {vector}", world, pos);
     }
 
@@ -141,12 +141,12 @@ public class BorderCommands extends DispatcherCommand
     {
         if (seconds == null)
         {
-            world.getBorder().setDiameter(size);
+            world.border().setDiameter(size);
             i18n.send(context, POSITIVE, "Set world border of {world} to {} blocks wide", world, size);
             return;
         }
-        int prevDiameter = (int) world.getBorder().getDiameter();
-        world.getBorder().setDiameter(size, seconds, ChronoUnit.SECONDS);
+        int prevDiameter = (int) world.border().diameter();
+        world.border().setDiameter(size, seconds, ChronoUnit.SECONDS);
         if (size < prevDiameter)
         {
             i18n.send(context, POSITIVE, "Shrinking world border of {world} to {} blocks wide from {} over {} seconds",
@@ -162,34 +162,34 @@ public class BorderCommands extends DispatcherCommand
     @Command(desc = "Sets the diameter of the worldborder")
     public void add(CommandCause context, Integer size, @Option Integer time, @Default @Named("in") ServerWorld world)
     {
-        this.setDiameter(context, size + (int)world.getBorder().getDiameter(), time, world);
+        this.setDiameter(context, size + (int)world.border().diameter(), time, world);
     }
 
     @Command(desc = "Sets the warning time")
     public void warningTime(CommandCause context, int seconds, @Default ServerWorld world)
     {
-        world.getBorder().setWarningTime(seconds, ChronoUnit.SECONDS);
+        world.border().setWarningTime(seconds, ChronoUnit.SECONDS);
         i18n.send(context, POSITIVE, "Set world border of {world} warning to {} seconds away", world, seconds);
     }
 
     @Command(desc = "Sets the warning time")
     public void warningDistance(CommandCause context, int blocks, @Default ServerWorld world)
     {
-        world.getBorder().setWarningDistance(blocks);
+        world.border().setWarningDistance(blocks);
         i18n.send(context, POSITIVE, "Set world border of {world} warning to {} blocks away", world, blocks);
     }
 
     @Command(desc = "Shows information about the world border", alias = "get")
     public void info(CommandCause context, @Default ServerWorld world)
     {
-        WorldBorder border = world.getBorder();
-        double diameter = border.getDiameter();
+        WorldBorder border = world.border();
+        double diameter = border.diameter();
         i18n.send(context, POSITIVE, "The world border in {world} is currently {} blocks wide", world,
                             diameter);
-        long secondsRemaining = border.getTimeRemaining().get(ChronoUnit.SECONDS);
+        long secondsRemaining = border.timeRemaining().get(ChronoUnit.SECONDS);
         if (secondsRemaining != 0)
         {
-            double newDiameter = border.getNewDiameter();
+            double newDiameter = border.newDiameter();
             if (newDiameter < diameter)
             {
                 i18n.send(context, POSITIVE, "Currently shrinking to {} blocks wide over {} seconds", newDiameter, secondsRemaining);
@@ -199,21 +199,21 @@ public class BorderCommands extends DispatcherCommand
                 i18n.send(context, POSITIVE, "Currently growing to {} blocks wide over {} seconds", newDiameter, secondsRemaining);
             }
         }
-        i18n.send(context, POSITIVE, "Warnings will show within {} seconds or {} blocks from the border", border.getWarningTime().get(ChronoUnit.SECONDS), border.getWarningDistance());
-        i18n.send(context, POSITIVE, "When more than {} blocks outside the border players will take {} damage per block per second", border.getDamageThreshold(), border.getDamageAmount());
+        i18n.send(context, POSITIVE, "Warnings will show within {} seconds or {} blocks from the border", border.warningTime().get(ChronoUnit.SECONDS), border.warningDistance());
+        i18n.send(context, POSITIVE, "When more than {} blocks outside the border players will take {} damage per block per second", border.damageThreshold(), border.damageAmount());
     }
 
     @Command(desc = "Sets the world border damage per second per block")
     public void damage(CommandCause context, Double damage, @Default ServerWorld world)
     {
-        world.getBorder().setDamageAmount(damage);
+        world.border().setDamageAmount(damage);
         i18n.send(context, POSITIVE, "Set world border of {world} damage to {} per block per second", world, damage);
     }
 
     @Command(desc = "Sets the world border damage buffer")
     public void damageBuffer(CommandCause context, Integer blocks, @Default ServerWorld world)
     {
-        world.getBorder().setDamageThreshold(blocks);
+        world.border().setDamageThreshold(blocks);
         i18n.send(context, POSITIVE, "Set world border of {world} damage buffer to {} block", world, blocks);
     }
 }

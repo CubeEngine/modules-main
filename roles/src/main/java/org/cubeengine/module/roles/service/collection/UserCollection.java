@@ -72,7 +72,7 @@ public class UserCollection extends BaseSubjectCollection
     }
 
     @Override
-    public Predicate<String> getIdentifierValidityPredicate()
+    public Predicate<String> identifierValidityPredicate()
     {
         return identifier -> {
             try
@@ -91,17 +91,17 @@ public class UserCollection extends BaseSubjectCollection
     public CompletableFuture<Boolean> hasSubject(String identifier)
     {
         return CompletableFuture.supplyAsync(() -> {
-            final UserManager userManager = Sponge.getServer().getUserManager();
-            return userManager.get(UUID.fromString(identifier)).isPresent();
+            final UserManager userManager = Sponge.server().userManager();
+            return userManager.find(UUID.fromString(identifier)).isPresent();
         });
     }
 
     @Override
-    public CompletableFuture<Set<String>> getAllIdentifiers()
+    public CompletableFuture<Set<String>> allIdentifiers()
     {
         return CompletableFuture.supplyAsync(() -> {
-            final UserManager userManager = Sponge.getServer().getUserManager();
-            return userManager.getAll().stream().map(gp -> gp.getUniqueId().toString()).collect(Collectors.toSet());
+            final UserManager userManager = Sponge.server().userManager();
+            return userManager.all().stream().map(gp -> gp.uniqueId().toString()).collect(Collectors.toSet());
         });
     }
 

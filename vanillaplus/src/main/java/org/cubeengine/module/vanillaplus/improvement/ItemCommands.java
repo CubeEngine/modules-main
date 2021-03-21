@@ -66,22 +66,22 @@ public class ItemCommands extends PermissionContainer
     public void give(CommandCause context, User player, ItemStackSnapshot itemstack, @Option Integer amount)
     {
         final ItemStack item = itemstack.createStack();
-        amount = amount == null ? item.getMaxStackQuantity() : amount;
+        amount = amount == null ? item.maxStackQuantity() : amount;
         if (amount <= 0)
         {
             i18n.send(context, NEGATIVE, "The amount has to be a number greater than 0!");
             return;
         }
         item.setQuantity(amount);
-        final Inventory inventory = getHotbarFirst(player.isOnline() ? player.getPlayer().get().getInventory() : player.getInventory());
-        if (inventory.offer(item.copy()).getType() == Type.SUCCESS)
+        final Inventory inventory = getHotbarFirst(player.isOnline() ? player.player().get().inventory() : player.inventory());
+        if (inventory.offer(item.copy()).type() == Type.SUCCESS)
         {
             Component matname = item.get(Keys.DISPLAY_NAME).get().color(NamedTextColor.GOLD);
             i18n.send(context, POSITIVE, "You gave {user} {amount} {name#item}!", player, amount, matname);
             if (player.isOnline())
             {
-                i18n.send(player.getPlayer().get(), POSITIVE, "{user} just gave you {amount} {name#item}!",
-                          context.getSubject().getFriendlyIdentifier().orElse(context.getSubject().getIdentifier()), amount, matname);
+                i18n.send(player.player().get(), POSITIVE, "{user} just gave you {amount} {name#item}!",
+                          context.subject().friendlyIdentifier().orElse(context.subject().identifier()), amount, matname);
             }
             return;
         }
@@ -93,15 +93,15 @@ public class ItemCommands extends PermissionContainer
     public void item(ServerPlayer context, ItemStackSnapshot itemstack, @Option Integer amount)
     {
         final ItemStack item = itemstack.createStack();
-        amount = amount == null ? item.getMaxStackQuantity() : amount;
+        amount = amount == null ? item.maxStackQuantity() : amount;
         if (amount <= 0)
         {
             i18n.send(context, NEGATIVE, "The amount has to be a number greater than 0!");
             return;
         }
         item.setQuantity(amount);
-        Inventory hotbarFirstInventory = getHotbarFirst(context.getInventory());
-        if (!hotbarFirstInventory.offer(item.copy()).getRejectedItems().isEmpty())
+        Inventory hotbarFirstInventory = getHotbarFirst(context.inventory());
+        if (!hotbarFirstInventory.offer(item.copy()).rejectedItems().isEmpty())
         {
             i18n.send(context, NEGATIVE, "Not enough space for the item!");
             return;
@@ -120,7 +120,7 @@ public class ItemCommands extends PermissionContainer
     {
         if (all)
         {
-            for (Slot slot : context.getInventory().slots())
+            for (Slot slot : context.inventory().slots())
             {
                 if (!slot.peek().isEmpty())
                 {
@@ -139,13 +139,13 @@ public class ItemCommands extends PermissionContainer
             return;
         }
 
-        final ItemStack item = context.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack item = context.itemInHand(HandTypes.MAIN_HAND);
         if (item.isEmpty())
         {
             i18n.send(context, NEUTRAL, "More nothing is still nothing!");
             return;
         }
-        item.setQuantity(item.getMaxStackQuantity());
+        item.setQuantity(item.maxStackQuantity());
         context.setItemInHand(HandTypes.MAIN_HAND, item);
         if (amount == 1)
         {
@@ -154,7 +154,7 @@ public class ItemCommands extends PermissionContainer
         }
         for (int i = 1; i < amount; ++i)
         {
-            context.getInventory().offer(item.copy());
+            context.inventory().offer(item.copy());
         }
         i18n.send(context, POSITIVE, "Refilled {amount} stacks in hand!", amount);
     }

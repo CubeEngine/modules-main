@@ -56,14 +56,14 @@ public class PortalListener
     @Listener
     public void onMove(MoveEntityEvent event)
     {
-        final Optional<MovementType> movementType = event.getContext().get(EventContextKeys.MOVEMENT_TYPE);
-        final Entity entity = event.getEntity();
-        ServerWorld destWorld = entity.getServerLocation().getWorld();
-        ServerWorld origWorld = entity.getServerLocation().getWorld();
+        final Optional<MovementType> movementType = event.context().get(EventContextKeys.MOVEMENT_TYPE);
+        final Entity entity = event.entity();
+        ServerWorld destWorld = entity.serverLocation().world();
+        ServerWorld origWorld = entity.serverLocation().world();
         if (event instanceof ChangeEntityWorldEvent)
         {
-            destWorld = ((ChangeEntityWorldEvent)event).getDestinationWorld();
-            origWorld = ((ChangeEntityWorldEvent)event).getOriginalWorld();
+            destWorld = ((ChangeEntityWorldEvent)event).destinationWorld();
+            origWorld = ((ChangeEntityWorldEvent)event).originalWorld();
             if ((this.module.getConfig().disableVanillaPortals
                 || this.module.getConfig().disabledVanillaPortalsInWorlds.getOrDefault(new ConfigWorld(origWorld), false))
                 && movementType.map(t -> t == MovementTypes.PORTAL.get()).orElse(false))
@@ -73,26 +73,26 @@ public class PortalListener
             }
             if (entity instanceof ServerPlayer)
             {
-                final ServerLocation dest = ((ChangeEntityWorldEvent)event).getDestinationWorld().getLocation(event.getDestinationPosition());
+                final ServerLocation dest = ((ChangeEntityWorldEvent)event).destinationWorld().location(event.destinationPosition());
                 onTeleport(dest, ((ServerPlayer)entity));
             }
         }
         if (entity instanceof ServerPlayer)
         {
             final ServerPlayer player = (ServerPlayer)entity;
-            if (!origWorld.getKey().equals(destWorld.getKey())
-                || (event.getOriginalPosition().getFloorX() == event.getDestinationPosition().getFloorX()
-                && event.getOriginalPosition().getFloorY() == event.getDestinationPosition().getFloorY()
-                && event.getOriginalPosition().getFloorZ() == event.getDestinationPosition().getFloorZ())
+            if (!origWorld.key().equals(destWorld.key())
+                || (event.originalPosition().getFloorX() == event.destinationPosition().getFloorX()
+                && event.originalPosition().getFloorY() == event.destinationPosition().getFloorY()
+                && event.originalPosition().getFloorZ() == event.destinationPosition().getFloorZ())
             )
             {
                 return;
             }
 
-            final PortalsAttachment attachment = module.getPortalsAttachment(player.getUniqueId());
+            final PortalsAttachment attachment = module.getPortalsAttachment(player.uniqueId());
             for (Portal portal : module.getPortals())
             {
-                if (portal.has(destWorld.getLocation(event.getDestinationPosition())))
+                if (portal.has(destWorld.location(event.destinationPosition())))
                 {
                     if (attachment.isDebug())
                     {
@@ -110,7 +110,7 @@ public class PortalListener
                     else if (!attachment.isInPortal())
                     {
                         portal.teleport(player);
-                        onTeleport(player.getServerLocation(), player);
+                        onTeleport(player.serverLocation(), player);
                     }
                     return;
                 }
@@ -125,12 +125,12 @@ public class PortalListener
         {
             // Get list of entities known to be in the portal
             List<UUID> entities = module.getEntitiesInPortal(portal);
-            if (portal.has(destWorld.getLocation(event.getDestinationPosition())))
+            if (portal.has(destWorld.location(event.destinationPosition())))
             {
-                entities.add(entity.getUniqueId());
+                entities.add(entity.uniqueId());
                 return;
             }
-            entities.remove(entity.getUniqueId());
+            entities.remove(entity.uniqueId());
         }
     }
 
@@ -140,7 +140,7 @@ public class PortalListener
         {
             if (portal.has(target))
             {
-                PortalsAttachment attachment = module.getPortalsAttachment(player.getUniqueId());
+                PortalsAttachment attachment = module.getPortalsAttachment(player.uniqueId());
                 attachment.setInPortal(true);
                 if (attachment.isDebug())
                 {

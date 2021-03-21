@@ -79,7 +79,7 @@ public class RoleManagementCommands extends DispatcherCommand
                               @Default Tristate type,
                               @Named("in") @Default Context context)
     {
-        role.getSubjectData().setPermission(toSet(context), permission, type).thenAccept(b -> {
+        role.subjectData().setPermission(toSet(context), permission, type).thenAccept(b -> {
             switch (type)
             {
                 case UNDEFINED:
@@ -105,7 +105,7 @@ public class RoleManagementCommands extends DispatcherCommand
     @Command(alias = "setData", desc = "Sets an option for given role [in context]")
     public void setOption(CommandCause ctx, FileSubject role, String key, @Option String value, @Named("in") @Default Context context)
     {
-        role.getSubjectData().setOption(toSet(context), key, value);
+        role.subjectData().setOption(toSet(context), key, value);
         if (value == null)
         {
             i18n.send(ctx, NEUTRAL, "Options {input#key} reset for the role {role} in {context}!", key, role, context);
@@ -125,7 +125,7 @@ public class RoleManagementCommands extends DispatcherCommand
     @Command(alias = "clearData", desc = "Clears the options for given role [in context]")
     public void clearOption(CommandCause ctx, FileSubject role, @Named("in") @Default Context context)
     {
-        role.getSubjectData().clearOptions(toSet(context));
+        role.subjectData().clearOptions(toSet(context));
         i18n.send(ctx, NEUTRAL, "Options cleared for the role {role} in {context}!", role, context);
     }
 
@@ -134,7 +134,7 @@ public class RoleManagementCommands extends DispatcherCommand
     @ExceptionHandler(CircularRoleDependencyExceptionHandler.class)
     public void addParent(CommandCause ctx, FileSubject role, FileSubject parentRole, @Named("in") @Default Context context)
     {
-        role.getSubjectData().addParent(toSet(context), parentRole.asSubjectReference()).thenAccept(b -> {
+        role.subjectData().addParent(toSet(context), parentRole.asSubjectReference()).thenAccept(b -> {
             if (b)
             {
                 i18n.send(ctx, POSITIVE, "Added {role} as parent role for the role {role} in {context}", parentRole, role, context);
@@ -151,7 +151,7 @@ public class RoleManagementCommands extends DispatcherCommand
     @Command(desc = "Removes a parent role from given role [in context]")
     public void removeParent(CommandCause ctx, FileSubject role, FileSubject parentRole, @Named("in") @Default Context context)
     {
-        role.getSubjectData().removeParent(toSet(context), parentRole.asSubjectReference()).thenAccept(b -> {
+        role.subjectData().removeParent(toSet(context), parentRole.asSubjectReference()).thenAccept(b -> {
             if (b)
             {
                 i18n.send(ctx, POSITIVE, "Removed the parent role {role} from the role {role} in {context}!", parentRole, role, context);
@@ -165,7 +165,7 @@ public class RoleManagementCommands extends DispatcherCommand
     @Command(desc = "Removes all parent roles from given role [in context]")
     public void clearParent(CommandCause ctx, FileSubject role, @Named("in") @Default Context context)
     {
-        role.getSubjectData().clearParents(toSet(context)).thenAccept(b -> {
+        role.subjectData().clearParents(toSet(context)).thenAccept(b -> {
             if (b)
             {
                 i18n.send(ctx, NEUTRAL, "All parent roles of the role {role} in {context} cleared!", role, context);
@@ -196,13 +196,13 @@ public class RoleManagementCommands extends DispatcherCommand
     @Command(desc = "Renames given role")
     public void rename(CommandCause ctx, FileSubject role, @Label("new name") String newName)
     {
-        String oldName = role.getIdentifier();
+        String oldName = role.identifier();
         if (oldName.equalsIgnoreCase(newName))
         {
             i18n.send(ctx, NEGATIVE, "These are the same names!");
             return;
         }
-        if (service.getGroupSubjects().rename(role, newName))
+        if (service.groupSubjects().rename(role, newName))
         {
             i18n.send(ctx, POSITIVE, "The role {name#old} was renamed to {role}", oldName, role);
             return;
@@ -214,14 +214,14 @@ public class RoleManagementCommands extends DispatcherCommand
     @Command(desc = "Creates a new role")
     public void create(CommandCause ctx, String name)
     {
-        service.getGroupSubjects().hasSubject(name).thenAccept(b -> {
+        service.groupSubjects().hasSubject(name).thenAccept(b -> {
             if (b)
             {
                 i18n.send(ctx, NEUTRAL, "There is already a role named {name}.", name);
                 return;
             }
-            service.getGroupSubjects().loadSubject(name).thenAccept(s -> {
-                ((FileSubjectData) s.getSubjectData()).save(CompletableFuture.completedFuture(true));
+            service.groupSubjects().loadSubject(name).thenAccept(s -> {
+                ((FileSubjectData) s.subjectData()).save(CompletableFuture.completedFuture(true));
                 i18n.send(ctx, POSITIVE, "Role {name} created!", name);
             });
         });
@@ -231,7 +231,7 @@ public class RoleManagementCommands extends DispatcherCommand
     @Command(desc = "Deletes a role")
     public void delete(CommandCause ctx, FileSubject role, @Flag boolean force)
     {
-        if (service.getGroupSubjects().delete(role, force))
+        if (service.groupSubjects().delete(role, force))
         {
             i18n.send(ctx, POSITIVE, "Deleted the role {role}!", role);
             return;
@@ -243,8 +243,8 @@ public class RoleManagementCommands extends DispatcherCommand
     @ExceptionHandler(CircularRoleDependencyExceptionHandler.class)
     public void toggleDefaultRole(CommandCause ctx, FileSubject role)
     {
-        SubjectData defaultData = service.getUserSubjects().getDefaults().getSubjectData();
-        if (defaultData.getParents(GLOBAL_CONTEXT).contains(role.asSubjectReference()))
+        SubjectData defaultData = service.userSubjects().defaults().subjectData();
+        if (defaultData.parents(GLOBAL_CONTEXT).contains(role.asSubjectReference()))
         {
             defaultData.removeParent(GLOBAL_CONTEXT, role.asSubjectReference());
             i18n.send(ctx, POSITIVE, "{role} is no longer a default role!", role);

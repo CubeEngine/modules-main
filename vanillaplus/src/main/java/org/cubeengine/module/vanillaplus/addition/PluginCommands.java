@@ -69,7 +69,7 @@ public class PluginCommands extends PermissionContainer
     @Command(desc = "Lists all loaded plugins")
     public void plugins(CommandCause context)
     {
-        List<PluginContainer> plugins = new ArrayList<>(Sponge.getPluginManager().getPlugins());
+        List<PluginContainer> plugins = new ArrayList<>(Sponge.pluginManager().plugins());
         List<PluginContainer> modules = new ArrayList<>(mm.getModulePlugins().values());
         plugins.removeAll(modules);
         PluginContainer core = mm.getPlugin(LibCube.class).get();
@@ -83,9 +83,9 @@ public class PluginCommands extends PermissionContainer
         // TODO no pagination for console and hover id for player
         List<Component> list = new ArrayList<>();
 
-        final PluginContainer game = Sponge.getGame().getPlatform().getContainer(GAME);
-        final PluginContainer api = Sponge.getGame().getPlatform().getContainer(API);
-        final PluginContainer impl = Sponge.getGame().getPlatform().getContainer(IMPLEMENTATION);
+        final PluginContainer game = Sponge.game().platform().container(GAME);
+        final PluginContainer api = Sponge.game().platform().container(API);
+        final PluginContainer impl = Sponge.game().platform().container(IMPLEMENTATION);
         plugins.remove(game);
         plugins.remove(api);
         plugins.remove(impl);
@@ -120,7 +120,7 @@ public class PluginCommands extends PermissionContainer
                          .append(Component.text("(" + getVersionOf(module) + ")")));
         }
 
-        builder.contents(list).sendTo(context.getAudience());
+        builder.contents(list).sendTo(context.audience());
     }
 
     private String simplifyCEName(String name)
@@ -151,26 +151,26 @@ public class PluginCommands extends PermissionContainer
     {
         if (plugin == null)
         {
-            Platform platform = Sponge.getGame().getPlatform();
-            PluginContainer impl = platform.getContainer(IMPLEMENTATION);
+            Platform platform = Sponge.game().platform();
+            PluginContainer impl = platform.container(IMPLEMENTATION);
             final PluginMetadata meta = impl.getMetadata();
-            switch (platform.getType())
+            switch (platform.type())
             {
                 case CLIENT:
                     i18n.send(context, NEUTRAL, "This client is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
-                                        meta.getName().orElse(meta.getId()), platform.getMinecraftVersion().getName(), meta.getVersion());
+                                        meta.getName().orElse(meta.getId()), platform.minecraftVersion().name(), meta.getVersion());
                     break;
                 case SERVER:
                     i18n.send(context, NEUTRAL, "This server is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
-                                        meta.getName().orElse(meta.getId()), platform.getMinecraftVersion().getName(), meta.getVersion());
+                                        meta.getName().orElse(meta.getId()), platform.minecraftVersion().name(), meta.getVersion());
                     break;
                 case UNKNOWN:
                     i18n.send(context, NEUTRAL, "Unknown platform running {name#server} {name#version:color=INDIGO} {name#version:color"
                                     + "=INDIGO}",
-                                        meta.getName().orElse(meta.getId()), platform.getMinecraftVersion().getName(), meta.getVersion());
+                                        meta.getName().orElse(meta.getId()), platform.minecraftVersion().name(), meta.getVersion());
             }
 
-            i18n.send(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.getContainer(API).getMetadata().getVersion());
+            i18n.send(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.container(API).getMetadata().getVersion());
             context.sendMessage(Identity.nil(), Component.empty());
 
             i18n.send(context, NEUTRAL, "with {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.mm.getPlugin(LibCube.class).get().getMetadata().getVersion());
@@ -181,10 +181,10 @@ public class PluginCommands extends PermissionContainer
             i18n.send(context, NEGATIVE, "You don't have permissions to show plugin versions");
             return;
         }
-        java.util.Optional<PluginContainer> instance = Sponge.getPluginManager().getPlugin(plugin);
+        java.util.Optional<PluginContainer> instance = Sponge.pluginManager().plugin(plugin);
         if (!instance.isPresent())
         {
-            List<PluginContainer> plugins = Sponge.getPluginManager().getPlugins().stream()
+            List<PluginContainer> plugins = Sponge.pluginManager().plugins().stream()
                   .filter(container -> container.getMetadata().getName().orElse(container.getMetadata().getId()).toLowerCase().startsWith(plugin.toLowerCase()))
                   .collect(Collectors.toList());
             i18n.send(context, NEGATIVE, "The given plugin doesn't seem to be loaded, have you typed it correctly (casing does matter)?");

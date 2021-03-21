@@ -62,8 +62,8 @@ public class BaseSubjectData implements SubjectData
     public BaseSubjectData(RolesPermissionService service, Subject holder, boolean isTransient)
     {
         this.service = service;
-        userCollection = service.getUserSubjects();
-        roleCollection = service.getGroupSubjects();
+        userCollection = service.userSubjects();
+        roleCollection = service.groupSubjects();
         this.isTransient = isTransient;
         this.subject = holder;
     }
@@ -92,7 +92,7 @@ public class BaseSubjectData implements SubjectData
     }
 
     @Override
-    public Map<Set<Context>, Map<String, String>> getAllOptions()
+    public Map<Set<Context>, Map<String, String>> allOptions()
     {
         Map<Set<Context>, Map<String, String>> options = this.options.entrySet().stream()
                 .collect(Collectors.toMap(e -> toSet(e.getKey()), Map.Entry::getValue));
@@ -100,19 +100,19 @@ public class BaseSubjectData implements SubjectData
     }
 
     @Override
-    public Map<String, String> getOptions(Set<Context> contexts)
+    public Map<String, String> options(Set<Context> contexts)
     {
         return unmodifiableMap(accumulate(contexts, options, new HashMap<>(), Map::putAll));
     }
 
     @Override
-    public Map<String, Boolean> getPermissions(Set<Context> contexts)
+    public Map<String, Boolean> permissions(Set<Context> contexts)
     {
         return unmodifiableMap(accumulate(contexts, permissions, new HashMap<>(), Map::putAll));
     }
 
     @Override
-    public List<SubjectReference> getParents(Set<Context> contexts)
+    public List<SubjectReference> parents(Set<Context> contexts)
     {
         List<SubjectReference> list = accumulate(contexts, parents, new ArrayList<>(), List::addAll);
         return unmodifiableList(list);
@@ -159,7 +159,7 @@ public class BaseSubjectData implements SubjectData
     }
 
     @Override
-    public Map<Set<Context>, Map<String, Boolean>> getAllPermissions()
+    public Map<Set<Context>, Map<String, Boolean>> allPermissions()
     {
         Map<Set<Context>, Map<String, Boolean>> permissions = this.permissions.entrySet().stream()
                 .collect(Collectors.toMap(e -> toSet(e.getKey()), Map.Entry::getValue));
@@ -211,7 +211,7 @@ public class BaseSubjectData implements SubjectData
     }
 
     @Override
-    public Map<Set<Context>, List<SubjectReference>> getAllParents()
+    public Map<Set<Context>, List<SubjectReference>> allParents()
     {
         Map<Set<Context>, List<SubjectReference>> parents = this.parents.entrySet().stream()
                 .collect(Collectors.toMap(e -> toSet(e.getKey()), Map.Entry::getValue));
@@ -223,7 +223,7 @@ public class BaseSubjectData implements SubjectData
     public CompletableFuture<Boolean> addParent(Set<Context> contexts, SubjectReference parent)
     {
         CompletableFuture<Boolean> ret = parent.resolve().thenApply(p -> {
-            if (PermissionService.SUBJECTS_DEFAULT.equals(parent.getCollectionIdentifier())) {
+            if (PermissionService.SUBJECTS_DEFAULT.equals(parent.collectionIdentifier())) {
                 return false; // You can never add defaults as parents
             }
 
@@ -247,13 +247,13 @@ public class BaseSubjectData implements SubjectData
 
     protected void checkForCircularDependency(Set<Context> contexts, Subject parent, int depth)
     {
-        if (this == parent.getSubjectData())
+        if (this == parent.subjectData())
         {
             throw new CircularRoleDependencyException("at", depth); // TODO translatable / show parameter
         }
         depth++;
 
-        for (SubjectReference parentParents : parent.getParents(contexts))
+        for (SubjectReference parentParents : parent.parents(contexts))
         {
             checkForCircularDependency(contexts, parentParents.resolve().join(), depth);
         }
@@ -366,7 +366,7 @@ public class BaseSubjectData implements SubjectData
     }
 
     @Override
-    public Subject getSubject()
+    public Subject subject()
     {
         return this.subject;
     }

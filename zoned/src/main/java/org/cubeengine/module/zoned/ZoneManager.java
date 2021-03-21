@@ -119,7 +119,7 @@ public class ZoneManager
         cfg.save();
         zones.put(name, cfg);
         i18n.send(cmdSource, POSITIVE, "Saved zone as {name}", name);
-        Sponge.getEventManager().post(new ZoneEvent(cfg));
+        Sponge.eventManager().post(new ZoneEvent(cfg));
     }
 
     public ZoneConfig getZone(String token)

@@ -76,19 +76,19 @@ public class ConfigCurrency implements Currency
     }
 
     @Override
-    public Component getDisplayName()
+    public Component displayName()
     {
         return Component.text(config.name);
     }
 
     @Override
-    public Component getPluralDisplayName()
+    public Component pluralDisplayName()
     {
         return Component.text(config.namePlural);
     }
 
     @Override
-    public Component getSymbol()
+    public Component symbol()
     {
         return Component.text(config.symbol);
     }
@@ -109,7 +109,7 @@ public class ConfigCurrency implements Currency
     }
 
     @Override
-    public int getDefaultFractionDigits()
+    public int defaultFractionDigits()
     {
         return config.fractionalDigits;
     }

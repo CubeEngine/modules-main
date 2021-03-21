@@ -97,7 +97,7 @@ public class InteractSettingsListener extends PermissionContainer
     @Listener
     public void onEntityUse(InteractEntityEvent.Secondary event, @Root ServerPlayer player)
     {
-        List<Region> regionsAt = manager.getRegionsAt(player.getServerLocation());
+        List<Region> regionsAt = manager.getRegionsAt(player.serverLocation());
         if (checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ENTITY), (s) -> s.use.all.entity, UNDEFINED) == FALSE)
         {
             i18n.send(ChatType.ACTION_BAR, player, CRITICAL, "You are not allowed to interact with this entity here.");
@@ -116,10 +116,10 @@ public class InteractSettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onUseItem(InteractItemEvent.Secondary event, @Root ServerPlayer player)
     {
-        ItemType item = event.getItemStack().getType();
-        List<Region> regionsAt = manager.getRegionsAt(player.getServerLocation());
-        final ResourceKey itemKey = Sponge.getGame().registries().registry(RegistryTypes.ITEM_TYPE).valueKey(item);
-        Permission usePerm = pm.register(SettingsListener.class, itemKey.getValue(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(item.asComponent()) + " Item in hand", useItemPerm);
+        ItemType item = event.itemStack().type();
+        List<Region> regionsAt = manager.getRegionsAt(player.serverLocation());
+        final ResourceKey itemKey = Sponge.game().registries().registry(RegistryTypes.ITEM_TYPE).valueKey(item);
+        Permission usePerm = pm.register(SettingsListener.class, itemKey.value(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(item.asComponent()) + " Item in hand", useItemPerm);
         Tristate set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ITEM), s -> s.use.all.item, UNDEFINED);
         if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item, UNDEFINED), set) == FALSE)
         {
@@ -131,32 +131,32 @@ public class InteractSettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onUse(InteractBlockEvent.Secondary event, @Root ServerPlayer player)
     {
-        final ServerLocation loc = player.getWorld().getLocation(event.getInteractionPoint());
+        final ServerLocation loc = player.world().location(event.interactionPoint());
         // cause when the player tries to place a block and it cannot the client will not send the clicked location
         List<Region> regionsAt = manager.getRegionsAt(loc);
-        BlockType type = event.getBlock().getState().getType();
-        ItemStack item = player.getItemInHand(HandTypes.MAIN_HAND);
+        BlockType type = event.block().state().type();
+        ItemStack item = player.itemInHand(HandTypes.MAIN_HAND);
 
-        final ResourceKey typeKey = Sponge.getGame().registries().registry(RegistryTypes.BLOCK_TYPE).valueKey(type);
-        Permission blockPerm = pm.register(SettingsListener.class, typeKey.getValue(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(type.asComponent()) + " Block", useBlockPerm);
+        final ResourceKey typeKey = Sponge.game().registries().registry(RegistryTypes.BLOCK_TYPE).valueKey(type);
+        Permission blockPerm = pm.register(SettingsListener.class, typeKey.value(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(type.asComponent()) + " Block", useBlockPerm);
 
         Tristate set = UNDEFINED;
         if (type != BlockTypes.AIR.get())
         {
             set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.BLOCK), s -> s.use.all.block, set);
         }
-        if (type.getDefaultState().supports(Keys.IS_OPEN))
+        if (type.defaultState().supports(Keys.IS_OPEN))
         {
             set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.OPEN), s -> s.use.all.open, set);
         }
-        if (type.getDefaultState().supports(Keys.IS_POWERED))
+        if (type.defaultState().supports(Keys.IS_POWERED))
         {
             set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.REDSTONE), s -> s.use.all.redstone, set);
         }
 
-        if (loc.getBlockEntity().isPresent())
+        if (loc.blockEntity().isPresent())
         {
-            final BlockEntity blockEntity = loc.getBlockEntity().get();
+            final BlockEntity blockEntity = loc.blockEntity().get();
             if (blockEntity instanceof Carrier)
             {
                 // TODO check if this is right
@@ -175,10 +175,10 @@ public class InteractSettingsListener extends PermissionContainer
         {
             // Check all items
             set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ITEM), s -> s.use.all.item, UNDEFINED);
-            final ResourceKey itemKey = Sponge.getGame().registries().registry(RegistryTypes.ITEM_TYPE).valueKey(item.getType());
-            Permission usePerm = pm.register(SettingsListener.class, itemKey.getValue(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(item.getType().asComponent()) + " Item in hand", useItemPerm);
+            final ResourceKey itemKey = Sponge.game().registries().registry(RegistryTypes.ITEM_TYPE).valueKey(item.type());
+            Permission usePerm = pm.register(SettingsListener.class, itemKey.value(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(item.type().asComponent()) + " Item in hand", useItemPerm);
             // Then check individual item
-            if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item.getType(), UNDEFINED), set) == FALSE)
+            if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item.type(), UNDEFINED), set) == FALSE)
             {
                 i18n.send(ChatType.ACTION_BAR, player, CRITICAL, "You are not allowed to use this here.");
             }
@@ -189,9 +189,9 @@ public class InteractSettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onRedstoneChangeNotify(NotifyNeighborBlockEvent event, @Root LocatableBlock block)
     {
-        for (Map.Entry<Direction, BlockState> entry : event.getOriginalNeighbors().entrySet())
+        for (Map.Entry<Direction, BlockState> entry : event.originalNeighbors().entrySet())
         {
-            ServerLocation loc = block.getServerLocation().relativeTo(entry.getKey());
+            ServerLocation loc = block.serverLocation().relativeTo(entry.getKey());
             List<Region> regionsAt = manager.getRegionsAt(loc);
             if (isRedstoneChange(entry.getValue()))
             {
@@ -206,7 +206,7 @@ public class InteractSettingsListener extends PermissionContainer
                     return;
                 }
                 // Redstone is disabled for player?
-                Optional<ServerPlayer> player = event.getCause().getContext().get(EventContextKeys.NOTIFIER).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast);
+                Optional<ServerPlayer> player = event.cause().context().get(EventContextKeys.NOTIFIER).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast);
                 if (player.isPresent())
                 {
                     if (checkSetting(event, player.get(), regionsAt, () -> usePermission.get(InteractSettingsListener.UseType.REDSTONE), s -> s.use.all.redstone, UNDEFINED) == FALSE)
@@ -224,14 +224,11 @@ public class InteractSettingsListener extends PermissionContainer
         // TODO check if this can be simplified after the great flattening
         return block.get(Keys.IS_POWERED).isPresent() // Levers etc.
             || block.get(Keys.POWER).isPresent() // Redstone
-            || block.getType() == BlockTypes.REDSTONE_LAMP.get() // Lamp
-            || block.getType() == BlockTypes.REPEATER.get() // Repeater
-            || block.getType() == BlockTypes.COMPARATOR.get() // Comparator
-            || block.get(Keys.IS_OPEN).isPresent() // Doors etc.
+            || block.type().isAnyOf(BlockTypes.REDSTONE_LAMP, BlockTypes.REPEATER, BlockTypes.COMPARATOR)
             || block.get(Keys.IS_OPEN).isPresent() // Doors etc.
             || block.get(Keys.IS_EXTENDED).isPresent() // Pistons
 //            || block.get(Keys.IS_TRIGGERED).isPresent() // Dropper / Dispenser TODO check if this is now IS_POWERED?
-            || block.getType() == BlockTypes.TNT.get() // Tnt
+            || block.type().isAnyOf(BlockTypes.TNT)
             // TODO other activateable blocks
             ;
     }

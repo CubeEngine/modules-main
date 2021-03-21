@@ -41,9 +41,9 @@ public class HomeCompleter implements ValueCompleter
     public List<String> complete(CommandContext context, String currentInput)
     {
         List<String> list = new ArrayList<>();
-        if (context.getCause().getAudience() instanceof ServerPlayer)
+        if (context.cause().audience() instanceof ServerPlayer)
         {
-            for (Home home : manager.list(((ServerPlayer) context.getCause().getAudience()).getUser(), true, true))
+            for (Home home : manager.list(((ServerPlayer) context.cause().audience()).user(), true, true))
             {
                 if (home.name.startsWith(currentInput))
                 {

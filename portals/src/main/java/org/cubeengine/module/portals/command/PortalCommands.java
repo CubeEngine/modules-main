@@ -86,14 +86,14 @@ public class PortalCommands extends DispatcherCommand
             return;
         }
         final ServerWorld world = activeZone.world.getWorld();
-        final ServerLocation p1 = world.getLocation(((Cuboid)activeZone.shape).getMinimumPoint());
-        final ServerLocation p2 = world.getLocation(((Cuboid)activeZone.shape).getMaximumPoint());
+        final ServerLocation p1 = world.location(((Cuboid)activeZone.shape).getMinimumPoint());
+        final ServerLocation p2 = world.location(((Cuboid)activeZone.shape).getMaximumPoint());
         final PortalConfig config = reflector.create(PortalConfig.class);
-        config.location.from = new Vector3i(p1.getBlockX(), p1.getBlockY(), p1.getBlockZ());
-        config.location.to = new Vector3i(p2.getBlockX(), p2.getBlockY(), p2.getBlockZ());
-        config.location.destination = Transform.of(context.getLocation().getPosition(), context.getRotation());
-        config.owner = context.getName();
-        config.world = new ConfigWorld(p1.getWorld());
+        config.location.from = new Vector3i(p1.blockX(), p1.blockY(), p1.blockZ());
+        config.location.to = new Vector3i(p2.blockX(), p2.blockY(), p2.blockZ());
+        config.location.destination = Transform.of(context.location().position(), context.rotation());
+        config.owner = context.name();
+        config.world = new ConfigWorld(p1.world());
 
         config.destination = destination;
 
@@ -102,7 +102,7 @@ public class PortalCommands extends DispatcherCommand
         final Portal portal = new Portal(module, name, config, i18n);
         module.addPortal(portal);
 
-        module.getPortalsAttachment(context.getUniqueId()).setPortal(portal);
+        module.getPortalsAttachment(context.uniqueId()).setPortal(portal);
         i18n.send(context, POSITIVE, "Portal {name} created!", portal.getName());
         if (destination == null)
         {
@@ -115,7 +115,7 @@ public class PortalCommands extends DispatcherCommand
     @Restricted(msg = "You must be ingame to do this!")
     public void select(ServerPlayer context, Portal portal)
     {
-        module.getPortalsAttachment(context.getUniqueId()).setPortal(portal);
+        module.getPortalsAttachment(context.uniqueId()).setPortal(portal);
         i18n.send(context, POSITIVE, "Portal selected: {name}", portal.getName());
     }
 
@@ -123,7 +123,7 @@ public class PortalCommands extends DispatcherCommand
     @Command(desc = "Show info about a portal")
     public void info(CommandCause context, @Default Portal portal)
     {
-        portal.showInfo(context.getAudience());
+        portal.showInfo(context.audience());
     }
 
     @Alias(value = "mvpr")
@@ -138,7 +138,7 @@ public class PortalCommands extends DispatcherCommand
     @Restricted(msg = "You must be ingame to do this!")
     public void debug(ServerPlayer context, @Option Boolean isDebug)
     {
-        final PortalsAttachment attachment = module.getPortalsAttachment(context.getUniqueId());
+        final PortalsAttachment attachment = module.getPortalsAttachment(context.uniqueId());
         if (isDebug == null)
         {
             attachment.toggleDebug();
@@ -174,6 +174,6 @@ public class PortalCommands extends DispatcherCommand
         }
         PaginationList.Builder builder = PaginationList.builder().title(i18n.translate(context, POSITIVE, "The following portals are located in {world}", world))
             .contents(portals.stream().sorted(Comparator.comparing(Portal::getName)).map(p -> Component.text(" - " + p.getName())).collect(Collectors.toList()));
-        builder.sendTo(context.getAudience());
+        builder.sendTo(context.audience());
     }
 }

@@ -31,13 +31,11 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Stream;
 import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.command.ParameterRegistry;
 import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.conomy.command.EcoCommand;
 import org.cubeengine.module.conomy.command.MoneyCommand;
-import org.cubeengine.module.conomy.command.UniqueAccountParser;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.module.sql.database.Database;
@@ -116,7 +114,7 @@ public class ConomyService implements EconomyService
     }
 
     @Override
-    public Collection<UniqueAccount> getUniqueAccounts()
+    public Collection<UniqueAccount> uniqueAccounts()
     {
         return null;
     }
@@ -128,7 +126,7 @@ public class ConomyService implements EconomyService
     }
 
     @Override
-    public Collection<VirtualAccount> getVirtualAccounts()
+    public Collection<VirtualAccount> virtualAccounts()
     {
         return null;
     }
@@ -146,7 +144,7 @@ public class ConomyService implements EconomyService
     }
 
     @Override
-    public Currency getDefaultCurrency()
+    public Currency defaultCurrency()
     {
         return defaultCurrency;
     }
@@ -176,7 +174,7 @@ public class ConomyService implements EconomyService
     }
 
     @Override
-    public Optional<UniqueAccount> getOrCreateAccount(UUID uuid)
+    public Optional<UniqueAccount> orCreateAccount(UUID uuid)
     {
         Account account = accounts.get(uuid.toString());
         if (account instanceof UniqueAccount)
@@ -192,11 +190,11 @@ public class ConomyService implements EconomyService
     }
 
     @Override
-    public Optional<Account> getOrCreateAccount(String identifier)
+    public Optional<Account> orCreateAccount(String identifier)
     {
         try
         {
-            return getOrCreateAccount(UUID.fromString(identifier)).map(Account.class::cast);
+            return orCreateAccount(UUID.fromString(identifier)).map(Account.class::cast);
         }
         catch (IllegalArgumentException e)
         {
@@ -226,8 +224,8 @@ public class ConomyService implements EconomyService
 
     private AccountModel createModel(UUID uuid)
     {
-        Optional<User> user = Sponge.getServer().getUserManager().get(uuid);
-        AccountModel model = db.getDSL().newRecord(TABLE_ACCOUNT).newAccount(uuid, user.map(User::getName).orElse(uuid.toString()), false, false);
+        Optional<User> user = Sponge.server().userManager().find(uuid);
+        AccountModel model = db.getDSL().newRecord(TABLE_ACCOUNT).newAccount(uuid, user.map(User::name).orElse(uuid.toString()), false, false);
         model.store();
         return model;
     }

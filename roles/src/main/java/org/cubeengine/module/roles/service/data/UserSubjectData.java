@@ -60,13 +60,13 @@ public class UserSubjectData extends CachingSubjectData
 
     private <E> Optional<E> getData(Key<? extends Value<E>> key)
     {
-        final Optional<ServerPlayer> player = Sponge.getServer().getPlayer(uuid);
+        final Optional<ServerPlayer> player = Sponge.server().player(uuid);
         if (player.isPresent())
         {
             return player.get().get(key);
         }
-        final UserManager userManager = Sponge.getServer().getUserManager();
-        User user = userManager.get(uuid).get();
+        final UserManager userManager = Sponge.server().userManager();
+        User user = userManager.find(uuid).get();
         return user.get(key);
     }
 
@@ -85,14 +85,14 @@ public class UserSubjectData extends CachingSubjectData
                 Map<String, String> options = serializeToMap(this.options);
 
                 // Get User for Storage
-                final UserManager userManager = Sponge.getServer().getUserManager();
-                User user = userManager.get(uuid).get();
+                final UserManager userManager = Sponge.server().userManager();
+                User user = userManager.find(uuid).get();
                 // Save Data in User
                 user.offer(PermissionData.PARENTS, parents);
                 user.offer(PermissionData.PERMISSIONS, permissions);
                 user.offer(PermissionData.OPTIONS, options);
 
-                Sponge.getServer().getPlayer(uuid).ifPresent(p -> Sponge.getServer().getCommandManager().updateCommandTreeForPlayer(p));
+                Sponge.server().player(uuid).ifPresent(p -> Sponge.server().commandManager().updateCommandTreeForPlayer(p));
             }
             return changed;
         });

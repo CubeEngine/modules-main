@@ -121,8 +121,8 @@ public class LockerManager
     {
         if (dataHolder instanceof BlockEntity)
         {
-            final Set<Direction> directions = ((BlockEntity)dataHolder).getBlock().get(Keys.CONNECTED_DIRECTIONS).orElse(Collections.emptySet());
-            return directions.stream().map(dir -> ((BlockEntity)dataHolder).getServerLocation().relativeTo(dir)).map(Location::getBlockEntity)
+            final Set<Direction> directions = ((BlockEntity)dataHolder).block().get(Keys.CONNECTED_DIRECTIONS).orElse(Collections.emptySet());
+            return directions.stream().map(dir -> ((BlockEntity)dataHolder).serverLocation().relativeTo(dir)).map(Location::blockEntity)
                              .filter(Optional::isPresent).map(Optional::get).map(Mutable.class::cast).collect(Collectors.toList());
         }
         return Collections.emptyList();
@@ -166,7 +166,7 @@ public class LockerManager
         for (Mutable multiBlock : multiBlocks)
         {
             final Optional<UUID> otherOowner = multiBlock.get(LockerData.OWNER);
-            final boolean isOwner = otherOowner.map(o -> o.equals(owner.getUniqueId())).orElse(false);
+            final boolean isOwner = otherOowner.map(o -> o.equals(owner.uniqueId())).orElse(false);
 
             if (otherOowner.isPresent())
             {
@@ -228,7 +228,7 @@ public class LockerManager
 
     public void createLockAt(DataHolder.Mutable dataHolder, ServerPlayer owner, int flags, Map<UUID, Integer> accessMap)
     {
-        dataHolder.offer(LockerData.OWNER, owner.getUniqueId());
+        dataHolder.offer(LockerData.OWNER, owner.uniqueId());
         dataHolder.offer(LockerData.FLAGS, flags);
         if (!accessMap.isEmpty())
         {
@@ -239,11 +239,11 @@ public class LockerManager
 
     public void transferLockOwner(DataHolder.Mutable dataHolder, ServerPlayer player, User newOwner)
     {
-        final boolean isOwner = dataHolder.get(LockerData.OWNER).map(owner -> owner.equals(player.getUniqueId())).orElse(false);
+        final boolean isOwner = dataHolder.get(LockerData.OWNER).map(owner -> owner.equals(player.uniqueId())).orElse(false);
         final boolean hasPerm = perms.CMD_GIVE_OTHER.check(player);
         if (isOwner || hasPerm)
         {
-            dataHolder.offer(LockerData.OWNER, newOwner.getUniqueId());
+            dataHolder.offer(LockerData.OWNER, newOwner.uniqueId());
             i18n.send(player, NEUTRAL, "{user} is now the owner of this protection.", newOwner);
             return;
         }
@@ -264,8 +264,8 @@ public class LockerManager
             i18n.send(ChatType.ACTION_BAR, player, MessageType.NEUTRAL, "There is no protection here");
             return;
         }
-        final boolean isOwner = dataHolder.get(LockerData.OWNER).map(owner -> owner.equals(player.getUniqueId())).orElse(false);
-        final boolean hasAdmin = ProtectionFlag.ADMIN.isSet(dataHolder.get(LockerData.ACCESS).map(a -> a.get(player.getUniqueId())).orElse(0));
+        final boolean isOwner = dataHolder.get(LockerData.OWNER).map(owner -> owner.equals(player.uniqueId())).orElse(false);
+        final boolean hasAdmin = ProtectionFlag.ADMIN.isSet(dataHolder.get(LockerData.ACCESS).map(a -> a.get(player.uniqueId())).orElse(0));
         final boolean hasPerm = perms.CMD_MODIFY_OTHER_FLAGS.check(player);
         if (!isOwner && !hasAdmin && !hasPerm)
         {
@@ -290,8 +290,8 @@ public class LockerManager
             i18n.send(ChatType.ACTION_BAR, player, MessageType.NEUTRAL, "There is no protection here");
             return;
         }
-        final boolean isOwner = dataHolder.get(LockerData.OWNER).map(owner -> owner.equals(player.getUniqueId())).orElse(false);
-        final boolean hasAdmin = ProtectionFlag.ADMIN.isSet(dataHolder.get(LockerData.ACCESS).map(a -> a.get(player.getUniqueId())).orElse(0));
+        final boolean isOwner = dataHolder.get(LockerData.OWNER).map(owner -> owner.equals(player.uniqueId())).orElse(false);
+        final boolean hasAdmin = ProtectionFlag.ADMIN.isSet(dataHolder.get(LockerData.ACCESS).map(a -> a.get(player.uniqueId())).orElse(0));
         final boolean hasPerm = perms.CMD_MODIFY_OTHER_ACCESS.check(player);
 
         if (!isOwner && !hasAdmin && !hasPerm)
@@ -329,8 +329,8 @@ public class LockerManager
 
     public void showLock(Mutable dataHolder, ServerPlayer player)
     {
-        final boolean isOwner = dataHolder.get(LockerData.OWNER).map(o -> o.equals(player.getUniqueId())).orElse(false);
-        final boolean hasAdmin = ProtectionFlag.ADMIN.isSet(dataHolder.get(LockerData.ACCESS).map(a -> a.get(player.getUniqueId())).orElse(0));
+        final boolean isOwner = dataHolder.get(LockerData.OWNER).map(o -> o.equals(player.uniqueId())).orElse(false);
+        final boolean hasAdmin = ProtectionFlag.ADMIN.isSet(dataHolder.get(LockerData.ACCESS).map(a -> a.get(player.uniqueId())).orElse(0));
         final boolean hasPerm = perms.CMD_INFO_OTHER.check(player);
         if (isOwner || hasAdmin || hasPerm)
         {
@@ -360,7 +360,7 @@ public class LockerManager
         }
 
         final List<UUID> unlocks = dataHolder.get(LockerData.UNLOCKS).orElse(Collections.emptyList());
-        if (unlocks.contains(player.getUniqueId()))
+        if (unlocks.contains(player.uniqueId()))
         {
             // TODO password protection?
             i18n.send(player, POSITIVE, "Has a password and is currently {text:unlocked:color=YELLOW}");
@@ -460,8 +460,8 @@ public class LockerManager
 
     public void removeLock(Mutable dataHolder, ServerPlayer player)
     {
-        final boolean isOwner = dataHolder.get(LockerData.OWNER).map(o -> o.equals(player.getUniqueId())).orElse(false);
-        final boolean hasAdmin = ProtectionFlag.ADMIN.isSet(dataHolder.get(LockerData.ACCESS).map(a -> a.get(player.getUniqueId())).orElse(0));
+        final boolean isOwner = dataHolder.get(LockerData.OWNER).map(o -> o.equals(player.uniqueId())).orElse(false);
+        final boolean hasAdmin = ProtectionFlag.ADMIN.isSet(dataHolder.get(LockerData.ACCESS).map(a -> a.get(player.uniqueId())).orElse(0));
         final boolean hasPerm = perms.CMD_REMOVE_OTHER.check(player);
         if (isOwner || hasAdmin || hasPerm)
         {
@@ -504,7 +504,7 @@ public class LockerManager
         {
             for (BlockLockConfig cfg : module.getConfig().block.blocks)
             {
-                if (cfg.isType(((ServerLocation)dataHolder).getBlockType()))
+                if (cfg.isType(((ServerLocation)dataHolder).blockType()))
                 {
                     return true;
                 }
@@ -514,7 +514,7 @@ public class LockerManager
         {
             for (EntityLockConfig cfg : module.getConfig().entity.entities)
             {
-                if (cfg.isType(((Entity)dataHolder).getType()))
+                if (cfg.isType(((Entity)dataHolder).type()))
                 {
                     return true;
                 }
@@ -586,14 +586,14 @@ public class LockerManager
 
     public String uuidToName(UUID owner, String s)
     {
-        return Sponge.getServer().getGameProfileManager().getBasicProfile(owner).join().getName().orElse(s);
+        return Sponge.server().gameProfileManager().basicProfile(owner).join().name().orElse(s);
     }
 
     private void notify(UUID owner, ServerPlayer player, Mutable dataHolder, int flags)
     {
         if (ProtectionFlag.NOTIFY_ACCESS.isSet(flags) && !perms.PREVENT_NOTIFY.check(player))
         {
-            Sponge.getServer().getPlayer(owner).ifPresent(ownerPlayer -> {
+            Sponge.server().player(owner).ifPresent(ownerPlayer -> {
                 // TODO notify
                 // TODO prevent spamming. ~60s
 //                i18n.send(ownerPlayer, NEUTRAL, "{player} accessed your protected {type} at {vector} in {world}" , player, type, pos, world);
@@ -603,35 +603,35 @@ public class LockerManager
 
     public int canAccess(DataHolder dataHolder, @Nullable ServerPlayer player, UUID owner, @Nullable Permission byPassPerm)
     {
-        final boolean isOwner = player != null && player.getUniqueId().equals(owner);
+        final boolean isOwner = player != null && player.uniqueId().equals(owner);
         if (isOwner)
         {
             return ProtectionFlag.ALL; // allowed by owner
         }
         final Map<UUID, Integer> trust = this.getTrust(owner);
-        if (trust.containsKey(player.getUniqueId()))
+        if (trust.containsKey(player.uniqueId()))
         {
-            return trust.get(player.getUniqueId());
+            return trust.get(player.uniqueId());
         }
         final boolean hasValidKeyBook = player != null && isValidKeyBook(dataHolder, player);
         if (hasValidKeyBook)
         {
-            ItemStack heldItem = player.getItemInHand(HandTypes.MAIN_HAND);
-            return heldItem.get(LockerData.ACCESS).get().getOrDefault(player.getUniqueId(), 0);
+            ItemStack heldItem = player.itemInHand(HandTypes.MAIN_HAND);
+            return heldItem.get(LockerData.ACCESS).get().getOrDefault(player.uniqueId(), 0);
         }
         final boolean canAccessOther = player != null && byPassPerm != null && byPassPerm.check(player);
         if (canAccessOther)
         {
             return ProtectionFlag.ALL; // allowed by permission
         }
-        final boolean isUnlocked = player != null && dataHolder.get(LockerData.UNLOCKS).orElse(Collections.emptyList()).contains(player.getUniqueId());
+        final boolean isUnlocked = player != null && dataHolder.get(LockerData.UNLOCKS).orElse(Collections.emptyList()).contains(player.uniqueId());
         if (isUnlocked)
         {
             return ProtectionFlag.FULL;
         }
         if (player != null)
         {
-            return dataHolder.get(LockerData.ACCESS).orElse(Collections.emptyMap()).getOrDefault(player.getUniqueId(), ProtectionFlag.NONE);
+            return dataHolder.get(LockerData.ACCESS).orElse(Collections.emptyMap()).getOrDefault(player.uniqueId(), ProtectionFlag.NONE);
         }
         return ProtectionFlag.NONE;
     }
@@ -641,14 +641,14 @@ public class LockerManager
         final Map<UUID, Integer> trust = this.trustCache.get(owner);
         if (trust == null)
         {
-            final Optional<Map<UUID, Integer>> onlineTrust = Sponge.getServer().getPlayer(owner).flatMap(p -> p.get(LockerData.TRUST));
+            final Optional<Map<UUID, Integer>> onlineTrust = Sponge.server().player(owner).flatMap(p -> p.get(LockerData.TRUST));
             if (onlineTrust.isPresent())
             {
                 this.trustCache.put(owner, onlineTrust.get());
             }
             else
             {
-                final Map<UUID, Integer> offlineTrust = Sponge.getServer().getUserManager().get(owner).flatMap(p -> p.get(LockerData.TRUST)).orElse(Collections.emptyMap());
+                final Map<UUID, Integer> offlineTrust = Sponge.server().userManager().find(owner).flatMap(p -> p.get(LockerData.TRUST)).orElse(Collections.emptyMap());
                 this.trustCache.put(owner, offlineTrust);
             }
         }
@@ -657,7 +657,7 @@ public class LockerManager
 
     public boolean isValidKeyBook(DataHolder dataHolder, ServerPlayer player)
     {
-        final ItemStack itemInHand = player.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
         if (true) {
             return false;
         }
@@ -736,9 +736,9 @@ public class LockerManager
 
     public int getCarrierFlags(Inventory source)
     {
-        if (source instanceof CarriedInventory && ((CarriedInventory<?>)source).getCarrier().orElse(null) instanceof Mutable)
+        if (source instanceof CarriedInventory && ((CarriedInventory<?>)source).carrier().orElse(null) instanceof Mutable)
         {
-            return ((Mutable)((CarriedInventory<?>)source).getCarrier().get()).get(LockerData.FLAGS).orElse(ProtectionFlag.NONE);
+            return ((Mutable)((CarriedInventory<?>)source).carrier().get()).get(LockerData.FLAGS).orElse(ProtectionFlag.NONE);
         }
         return ProtectionFlag.NONE;
     }
@@ -810,18 +810,18 @@ public class LockerManager
         {
             return null;
         }
-        return serverLoc.getBlockEntity().map(Mutable.class::cast).orElse(serverLoc);
+        return serverLoc.blockEntity().map(Mutable.class::cast).orElse(serverLoc);
     }
 
     public boolean handleBlockBreak(@Nullable BlockSnapshot snap, @Nullable ServerPlayer player, boolean withDetachable, Set<Vector3i> checkedPositions)
     {
         // TODO loc does not have the TileEntityData anymore
-        if (snap == null || checkedPositions.contains(snap.getPosition()))
+        if (snap == null || checkedPositions.contains(snap.position()))
         {
             return false;
         }
-        final ServerLocation loc = snap.getLocation().get();
-        checkedPositions.add(loc.getBlockPosition());
+        final ServerLocation loc = snap.location().get();
+        checkedPositions.add(loc.blockPosition());
         final Integer flags = snap.get(LockerData.FLAGS).orElse(null);
 
         if (flags == null)
@@ -857,9 +857,9 @@ public class LockerManager
             }
 
             // Detachable Entities
-            for (Hanging entity : loc.getWorld().getEntities(Hanging.class, AABB.of(loc.getBlockPosition().sub(Vector3i.ONE), loc.getBlockPosition().add(Vector3i.ONE))))
+            for (Hanging entity : loc.world().entities(Hanging.class, AABB.of(loc.blockPosition().sub(Vector3i.ONE), loc.blockPosition().add(Vector3i.ONE))))
             {
-                if (entity.getServerLocation().relativeTo(entity.get(Keys.DIRECTION).orElse(Direction.NONE)).getBlockPosition().equals(loc.getBlockPosition()))
+                if (entity.serverLocation().relativeTo(entity.get(Keys.DIRECTION).orElse(Direction.NONE)).blockPosition().equals(loc.blockPosition()))
                 {
                     if (handleEntityDamage(entity, player))
                     {
@@ -875,7 +875,7 @@ public class LockerManager
 
     public void openBook(ServerPlayer player)
     {
-        final ItemStack lockerBook = player.getItemInHand(HandTypes.MAIN_HAND);
+        final ItemStack lockerBook = player.itemInHand(HandTypes.MAIN_HAND);
         player.openBook(Book.book(Component.empty(), Component.empty(), buildPages(player, lockerBook)));
     }
 
@@ -974,7 +974,7 @@ public class LockerManager
                     builder.append(Component.text("Access "));
                     builder.append(i18n.translate(player, "(Add new)").color(NamedTextColor.GOLD).clickEvent(SpongeComponents.executeCallback(c -> {
                         i18n.send(player, POSITIVE, "Punch your friend");
-                        accessBookPunchers.add(c.getCause().first(ServerPlayer.class).get().getUniqueId());
+                        accessBookPunchers.add(c.cause().first(ServerPlayer.class).get().uniqueId());
                     })));
 
                     builder.append(Component.newline()).append(Component.newline());
@@ -1027,7 +1027,7 @@ public class LockerManager
                     builder.append(Component.text("Trust "));
                     builder.append(i18n.translate(player, "(Add new)").color(NamedTextColor.GOLD).clickEvent(SpongeComponents.executeCallback(c -> {
                         i18n.send(player, POSITIVE, "Punch your trusted friend");
-                        trustBookPunchers.add(c.getCause().first(ServerPlayer.class).get().getUniqueId());
+                        trustBookPunchers.add(c.cause().first(ServerPlayer.class).get().uniqueId());
                     })));
                     builder.append(Component.newline()).append(Component.newline());
                     final Map<UUID, Integer> trustMap = player.get(LockerData.TRUST).orElse(new HashMap<>());
@@ -1040,7 +1040,7 @@ public class LockerManager
                                                 .clickEvent(SpongeComponents.executeCallback(c -> {
                                                     trustMap.remove(entry.getKey());
                                                     player.offer(LockerData.TRUST, trustMap);
-                                                    this.invalidateTrustCache(player.getUniqueId());
+                                                    this.invalidateTrustCache(player.uniqueId());
                                                     openBook(player);
                                                     i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Removed trust from {user}", userName);
                                                 })));
@@ -1051,7 +1051,7 @@ public class LockerManager
                                       .clickEvent(SpongeComponents.executeCallback(c -> {
                                           trustMap.put(entry.getKey(), entry.getValue() & ~ProtectionFlag.ADMIN.flagValue);
                                           player.offer(LockerData.TRUST, trustMap);
-                                          this.invalidateTrustCache(player.getUniqueId());
+                                          this.invalidateTrustCache(player.uniqueId());
                                           openBook(player);
                                           i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Revoked admin trust from {user}", userName);
                                       }))));
@@ -1063,7 +1063,7 @@ public class LockerManager
                                      .clickEvent(SpongeComponents.executeCallback(c -> {
                                          trustMap.put(entry.getKey(), entry.getValue() | ProtectionFlag.ADMIN.flagValue);
                                          player.offer(LockerData.TRUST, trustMap);
-                                         this.invalidateTrustCache(player.getUniqueId());
+                                         this.invalidateTrustCache(player.uniqueId());
                                          openBook(player);
                                          i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Granted admin trust to {user}", userName);
                                      }))));
@@ -1169,8 +1169,8 @@ public class LockerManager
                 }
                 return false;
             }
-            final int oldQuantity = stack1.getQuantity();
-            final int newQuantity = stack2.getQuantity();
+            final int oldQuantity = stack1.quantity();
+            final int newQuantity = stack2.quantity();
             if (oldQuantity > newQuantity && !this.blockTake)
             {
                 return true; // Allow taking stack out

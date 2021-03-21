@@ -71,7 +71,7 @@ public class MultiverseCommands extends DispatcherCommand
         module.setUniverse(new ConfigWorld(world), universe);
         i18n.send(context, POSITIVE, "{world} is now in the universe {input}!", world, universe);
 
-        Sponge.getServer().getOnlinePlayers().stream().filter(player -> player.getWorld().equals(world)).forEach(
+        Sponge.server().onlinePlayers().stream().filter(player -> player.world().equals(world)).forEach(
             p -> {
                 final Map<String, DataContainer> data = p.get(MultiverseData.DATA).orElse(Collections.emptyMap());
                 // Serialize current data on previous universe
@@ -80,7 +80,7 @@ public class MultiverseCommands extends DispatcherCommand
                 PlayerData.of(data.get(universe), world).applyToPlayer(p);
 
                 i18n.send(p, NEUTRAL, "The sky opens up and sucks in the whole world.");
-                p.playSound(Sound.sound(SoundTypes.BLOCK_PORTAL_TRIGGER, Source.NEUTRAL, 1, 1), p.getLocation().getPosition());
+                p.playSound(Sound.sound(SoundTypes.BLOCK_PORTAL_TRIGGER, Source.NEUTRAL, 1, 1), p.location().position());
                 p.offer(Keys.POTION_EFFECTS, Arrays.asList(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, 2 * 20)));
                 i18n.send(p, NEUTRAL, "When you open your eyes you now are in {input#univserse}.", universe);
                 p.offer(MultiverseData.DATA, data);

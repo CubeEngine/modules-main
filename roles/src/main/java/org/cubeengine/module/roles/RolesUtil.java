@@ -57,14 +57,14 @@ public class RolesUtil
         FoundPermission found = findPermission(service, subject, permission, contexts, new HashSet<>());
         if (debug)
         {
-            final String name =  subject.getContainingCollection().getIdentifier() + ":" + subject.getFriendlyIdentifier().orElse(subject.getIdentifier());
+            final String name =  subject.containingCollection().identifier() + ":" + subject.friendlyIdentifier().orElse(subject.identifier());
             if (found == null)
             {
                 System.out.print("[PermCheck] " + name + " has not " + permission + "\n");
             }
             else
             {
-                System.out.print("[PermCheck] " + name + " has " + permission + " set to " + found.value + " as " + found.permission + " in " + found.subject.getIdentifier() + "\n");
+                System.out.print("[PermCheck] " + name + " has " + permission + " set to " + found.value + " as " + found.permission + " in " + found.subject.identifier() + "\n");
             }
         }
         return found;
@@ -83,7 +83,7 @@ public class RolesUtil
         // If not found check in default
         if (found == null)
         {
-            Subject defaults = subject.getContainingCollection().getDefaults();
+            Subject defaults = subject.containingCollection().defaults();
             if (defaults == subject)
             {
                 return null; // Stop recursion at global default
@@ -96,17 +96,17 @@ public class RolesUtil
 
     public static FoundPermission findPermission0(PermissionService service, Subject subject, String permission, Set<Context> contexts, boolean resolve, Set<Subject> checked)
     {
-        SubjectData transientData = subject.getTransientSubjectData();
-        SubjectData data = subject.getSubjectData();
+        SubjectData transientData = subject.transientSubjectData();
+        SubjectData data = subject.subjectData();
 
         // Directly assigned transient?
-        Boolean set = transientData.getPermissions(contexts).get(permission);
+        Boolean set = transientData.permissions(contexts).get(permission);
         if (set != null)
         {
             return new FoundPermission(subject, permission, set); // Great this is done already
         }
         // Directly assigned persistent?
-        set = data.getPermissions(contexts).get(permission);
+        set = data.permissions(contexts).get(permission);
         if (set != null)
         {
             return new FoundPermission(subject, permission, set); // Great this is done already
@@ -149,12 +149,12 @@ public class RolesUtil
 
     private static List<Subject> getParents(Set<Context> contexts, Subject subject)
     {
-        Map<String, Map<Set<Context>, List<Subject>>> collectionMap = cache.computeIfAbsent(subject.getContainingCollection().getIdentifier(), k -> new HashMap<>());
-        Map<Set<Context>, List<Subject>> subjectMap = collectionMap.computeIfAbsent(subject.getIdentifier(), k -> new HashMap<>());
+        Map<String, Map<Set<Context>, List<Subject>>> collectionMap = cache.computeIfAbsent(subject.containingCollection().identifier(), k -> new HashMap<>());
+        Map<Set<Context>, List<Subject>> subjectMap = collectionMap.computeIfAbsent(subject.identifier(), k -> new HashMap<>());
         return subjectMap.computeIfAbsent(contexts, c -> {
             List<Subject> list = new ArrayList<>();
-            list.addAll(subject.getSubjectData().getParents(contexts).stream().map(sr -> sr.resolve().join()).collect(Collectors.toList()));
-            list.addAll(subject.getTransientSubjectData().getParents(contexts).stream().map(sr -> sr.resolve().join()).collect(Collectors.toList()));
+            list.addAll(subject.subjectData().parents(contexts).stream().map(sr -> sr.resolve().join()).collect(Collectors.toList()));
+            list.addAll(subject.transientSubjectData().parents(contexts).stream().map(sr -> sr.resolve().join()).collect(Collectors.toList()));
             return list;
         });
     }
@@ -177,7 +177,7 @@ public class RolesUtil
 
     public static Optional<FoundOption> getOption(PermissionService service, Subject subject, SubjectData data, String key, Set<Context> contexts)
     {
-        String result = data.getOptions(contexts).get(key);
+        String result = data.options(contexts).get(key);
         if (result != null)
         {
             return Optional.of(new FoundOption(subject, result));
@@ -188,10 +188,10 @@ public class RolesUtil
 
     public static Optional<FoundOption> getOption(PermissionService service, Subject subject, String key, Set<Context> contexts, boolean recurseDefault)
     {
-        Optional<FoundOption> option = getOption(service, subject, subject.getTransientSubjectData(), key, contexts);
+        Optional<FoundOption> option = getOption(service, subject, subject.transientSubjectData(), key, contexts);
         if (!option.isPresent())
         {
-            option = getOption(service, subject, subject.getSubjectData(), key, contexts);
+            option = getOption(service, subject, subject.subjectData(), key, contexts);
         }
 
         if (!option.isPresent()) {
@@ -210,7 +210,7 @@ public class RolesUtil
 
         if (recurseDefault && !option.isPresent())
         {
-            Subject defaults = subject.getContainingCollection().getDefaults();
+            Subject defaults = subject.containingCollection().defaults();
             if (defaults == subject)
             {
                 return option; // Stop recursion at global default
@@ -224,12 +224,12 @@ public class RolesUtil
     public static Component permText(CommandCause cmdSource, String permission, PermissionService service, I18n i18n)
     {
         Component permText = Component.text(permission);
-        Optional<PermissionDescription> permDesc = service.getDescription(permission);
+        Optional<PermissionDescription> permDesc = service.description(permission);
         if (permDesc.isPresent())
         {
-            if (permDesc.get().getDescription().isPresent())
+            if (permDesc.get().description().isPresent())
             {
-                permText = permText.hoverEvent(HoverEvent.showText(permDesc.get().getDescription().get().color(NamedTextColor.YELLOW)));
+                permText = permText.hoverEvent(HoverEvent.showText(permDesc.get().description().get().color(NamedTextColor.YELLOW)));
             }
             // TODO else
         }
@@ -281,7 +281,7 @@ public class RolesUtil
 
     public static Map<String, Boolean> fillPermissions(Subject subject, Set<Context> contexts, Map<String, Boolean> data, PermissionService service)
     {
-        for (Entry<String, Boolean> entry : subject.getSubjectData().getPermissions(contexts).entrySet())
+        for (Entry<String, Boolean> entry : subject.subjectData().permissions(contexts).entrySet())
         {
             data.putIfAbsent(entry.getKey(), entry.getValue());
         }
@@ -296,7 +296,7 @@ public class RolesUtil
 
     public static Map<String, FoundOption> fillOptions(Subject subject, Set<Context> contexts, Map<String, FoundOption> data, PermissionService service)
     {
-        for (Entry<String, String> entry : subject.getSubjectData().getOptions(contexts).entrySet())
+        for (Entry<String, String> entry : subject.subjectData().options(contexts).entrySet())
         {
             data.putIfAbsent(entry.getKey(), new FoundOption(subject, entry.getValue()));
         }

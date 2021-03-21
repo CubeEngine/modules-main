@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.cubeengine.libcube.ModuleManager;
-import org.cubeengine.libcube.service.command.ParameterRegistry;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.conomy.AccessLevel;
@@ -35,7 +34,6 @@ import org.cubeengine.module.conomy.Conomy;
 import org.cubeengine.module.conomy.ConomyConfiguration;
 import org.cubeengine.module.conomy.ConomyService;
 import org.cubeengine.module.conomy.bank.command.BankCommand;
-import org.cubeengine.module.conomy.bank.command.VirtualAccountParser;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.reflect.Reflector;
@@ -60,11 +58,11 @@ public class BankConomyService extends ConomyService
     }
 
     @Override
-    public Optional<Account> getOrCreateAccount(String identifier)
+    public Optional<Account> orCreateAccount(String identifier)
     {
         try
         {
-            return getOrCreateAccount(UUID.fromString(identifier)).map(Account.class::cast);
+            return orCreateAccount(UUID.fromString(identifier)).map(Account.class::cast);
         }
         catch (IllegalArgumentException e)
         {
@@ -103,7 +101,7 @@ public class BankConomyService extends ConomyService
         {
             account = new BaseAccount.Virtual(this, model, db);
         }
-        this.accounts.put(account.getIdentifier(), account);
+        this.accounts.put(account.identifier(), account);
         return Optional.of(account);
     }
 
@@ -116,8 +114,8 @@ public class BankConomyService extends ConomyService
 
     public List<BaseAccount.Virtual> getBanks(Subject user, AccessLevel level)
     {
-        SubjectData data = user.getSubjectData();
-        Map<String, String> options = data.getOptions(user.getActiveContexts());
+        SubjectData data = user.subjectData();
+        Map<String, String> options = data.options(user.activeContexts());
 
         List<String> manage = new ArrayList<>();
         List<String> withdraw = new ArrayList<>();
@@ -161,7 +159,7 @@ public class BankConomyService extends ConomyService
             manage.addAll(see);
         }
 
-        List<BaseAccount.Virtual> collect = manage.stream().map(this::getOrCreateAccount)
+        List<BaseAccount.Virtual> collect = manage.stream().map(this::orCreateAccount)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .filter(a -> a instanceof BaseAccount.Virtual)
@@ -222,7 +220,7 @@ public class BankConomyService extends ConomyService
                 }
                 break;
         }
-        Map<String, String> options = context.getSubjectData().getOptions(context.getActiveContexts());
-        return Integer.valueOf(options.get("conomy.bank.access-level." + bank.getIdentifier())) >= level.value;
+        Map<String, String> options = context.subjectData().options(context.activeContexts());
+        return Integer.valueOf(options.get("conomy.bank.access-level." + bank.identifier())) >= level.value;
     }
 }

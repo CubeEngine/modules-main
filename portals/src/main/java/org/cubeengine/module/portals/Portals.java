@@ -110,21 +110,21 @@ public class Portals
             if (portal.config.particles)
             {
                 final AABB aabb = portal.config.getAABB();
-                final Vector3d size = aabb.getSize();
+                final Vector3d size = aabb.size();
                 final ParticleEffect effect = ParticleEffect.builder()
                                                             .type(ParticleTypes.PORTAL)
                                                             .quantity((int)(10 * size.getX() * size.getY() * size.getZ()))
                                                             .offset(size.div(4))
                                                             .build();
-                portal.getWorld().spawnParticles(effect, aabb.getCenter());
+                portal.getWorld().spawnParticles(effect, aabb.center());
             }
         }
     }
 
     public Pair<Integer, Vector3i> getRandomDestinationSetting(ServerWorld world)
     {
-        Vector3i pos = world.getProperties().spawnPosition();
-        Integer radius = Math.min((int)world.getProperties().worldBorder().getDiameter() / 2, 60 * 16);
+        Vector3i pos = world.properties().spawnPosition();
+        Integer radius = Math.min((int)world.properties().worldBorder().diameter() / 2, 60 * 16);
         return new Pair<>(radius, pos);
     }
 
@@ -178,10 +178,10 @@ public class Portals
                     .filter(portal -> portal.config.teleportNonPlayers)
                     .forEach(portal -> {
                         final AABB aabb = portal.getAABB();
-                        final Collection<? extends Entity> nowInPortal = portal.getWorld().getEntities(aabb, entity -> !(entity instanceof ServerPlayer));
+                        final Collection<? extends Entity> nowInPortal = portal.getWorld().entities(aabb, entity -> !(entity instanceof ServerPlayer));
                         final List<UUID> wasInPortal = entitesInPortals.computeIfAbsent(portal, k -> new ArrayList<>());
                         nowInPortal.forEach(entity -> {
-                            if (!wasInPortal.remove(entity.getUniqueId()))
+                            if (!wasInPortal.remove(entity.uniqueId()))
                             {
                                 portal.teleport(entity);
                             }

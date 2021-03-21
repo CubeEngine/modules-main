@@ -74,11 +74,11 @@ public class BlockSettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onPreChangeBlock(ChangeBlockEvent.Pre event, @Root LocatableBlock block)
     {
-        for (ServerLocation loc : event.getLocations()) {
+        for (ServerLocation loc : event.locations()) {
 
-            if (loc.getBlockType() != BlockTypes.AIR.get() && loc.getBlockType() != block.getBlockState().getType()) {
+            if (loc.blockType() != BlockTypes.AIR.get() && loc.blockType() != block.blockState().type()) {
                 List<Region> regionsAt = manager.getRegionsAt(loc);
-                if (checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(block.getBlockState().getType() , UNDEFINED), UNDEFINED) == FALSE)
+                if (checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(block.blockState().type() , UNDEFINED), UNDEFINED) == FALSE)
                 {
                     return;
                 }
@@ -89,17 +89,17 @@ public class BlockSettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onChangeBlock(ExplosionEvent.Detonate event)
     {
-        Object rootCause = event.getCause().root();
+        Object rootCause = event.cause().root();
         // Check Explosions first...
 
-        for (ServerLocation loc : event.getAffectedLocations())
+        for (ServerLocation loc : event.affectedLocations())
         {
             List<Region> regionsAt = manager.getRegionsAt(loc);
             checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.allExplosion, UNDEFINED);
-            ServerPlayer player = event.getCause().getContext().get(EventContextKeys.CREATOR).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast).orElse(null);
+            ServerPlayer player = event.cause().context().get(EventContextKeys.CREATOR).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast).orElse(null);
             if (player == null)
             {
-                player = event.getCause().getContext().get(EventContextKeys.IGNITER).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast).orElse(null);
+                player = event.cause().context().get(EventContextKeys.IGNITER).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast).orElse(null);
             }
             if (rootCause instanceof ServerPlayer)
             {
@@ -123,13 +123,13 @@ public class BlockSettingsListener extends PermissionContainer
     @Listener(order = Order.EARLY)
     public void onChangeBlock(ChangeBlockEvent.All event)
     {
-        Object rootCause = event.getCause().root();
+        Object rootCause = event.cause().root();
         // Hostile Mob causes BlockChange?
         if (rootCause instanceof Hostile)
         {
-            for (Transaction<BlockSnapshot> trans : event.getTransactions())
+            for (Transaction<BlockSnapshot> trans : event.transactions())
             {
-                List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
+                List<Region> regionsAt = manager.getRegionsAt(trans.original().location().get());
                 if (checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.monster, UNDEFINED) == FALSE)
                 {
                     return;
@@ -140,10 +140,10 @@ public class BlockSettingsListener extends PermissionContainer
         // Block causes BlockChange?
         if (rootCause instanceof LocatableBlock)
         {
-            for (Transaction<BlockSnapshot> trans : event.getTransactions())
+            for (Transaction<BlockSnapshot> trans : event.transactions())
             {
-                List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
-                if (checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(((LocatableBlock) rootCause).getBlockState().getType() , UNDEFINED), UNDEFINED) == FALSE)
+                List<Region> regionsAt = manager.getRegionsAt(trans.original().location().get());
+                if (checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.block.getOrDefault(((LocatableBlock) rootCause).blockState().type() , UNDEFINED), UNDEFINED) == FALSE)
                 {
                     return;
                 }
@@ -152,9 +152,9 @@ public class BlockSettingsListener extends PermissionContainer
 
         if (rootCause instanceof LightningBolt)
         {
-            for (Transaction<BlockSnapshot> trans : event.getTransactions())
+            for (Transaction<BlockSnapshot> trans : event.transactions())
             {
-                List<Region> regionsAt = manager.getRegionsAt(trans.getOriginal().getLocation().get());
+                List<Region> regionsAt = manager.getRegionsAt(trans.original().location().get());
                 if (checkSetting(event, null, regionsAt, () -> null, s -> s.blockDamage.lightning, UNDEFINED) == FALSE)
                 {
                     return;
@@ -171,7 +171,7 @@ public class BlockSettingsListener extends PermissionContainer
             return;
         }
 
-        for (ServerLocation loc : event.getLocations())
+        for (ServerLocation loc : event.locations())
         {
             List<Region> regionsAt = manager.getRegionsAt(loc);
             if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.build, UNDEFINED) == FALSE)
@@ -190,13 +190,13 @@ public class BlockSettingsListener extends PermissionContainer
             return;
         }
 
-        for (Transaction<BlockSnapshot> transaction : event.getTransactions())
+        for (Transaction<BlockSnapshot> transaction : event.transactions())
         {
-            if (transaction.getOriginal().getState().getType() == transaction.getFinal().getState().getType())
+            if (transaction.original().state().type() == transaction.finalReplacement().state().type())
             {
                 continue;
             }
-            transaction.getOriginal().getLocation().ifPresent(loc -> {
+            transaction.original().location().ifPresent(loc -> {
                 List<Region> regionsAt = manager.getRegionsAt(loc);
                 if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.build, UNDEFINED) == FALSE)
                 {

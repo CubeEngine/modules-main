@@ -67,7 +67,7 @@ public class BankCommand extends DispatcherCommand
     @Command(desc = "Shows the balance of the specified bank")
     public void balance(CommandCause context, @Default BaseAccount.Virtual bank)
     {
-        Map<Currency, BigDecimal> balances = bank.getBalances(context.getActiveContexts());
+        Map<Currency, BigDecimal> balances = bank.balances(context.activeContexts());
 
         if (balances.isEmpty())
         {
@@ -85,7 +85,7 @@ public class BankCommand extends DispatcherCommand
     @Restricted(msg =  "You cannot deposit into a bank as console!")
     public void deposit(ServerPlayer context, BaseAccount.Virtual bank, Double amount)
     {
-        Optional<UniqueAccount> account = service.getOrCreateAccount(context.getUniqueId());
+        Optional<UniqueAccount> account = service.orCreateAccount(context.uniqueId());
         if (!account.isPresent())
         {
             i18n.send(context, NEGATIVE, "You do not have an account!");
@@ -98,13 +98,13 @@ public class BankCommand extends DispatcherCommand
             return;
         }
 
-        TransferResult result = account.get().transfer(bank, service.getDefaultCurrency(), new BigDecimal(amount));
-        switch (result.getResult())
+        TransferResult result = account.get().transfer(bank, service.defaultCurrency(), new BigDecimal(amount));
+        switch (result.result())
         {
             case SUCCESS:
-                Currency cur = result.getCurrency();
+                Currency cur = result.currency();
                 i18n.send(context, POSITIVE, "Deposited {txt#amount} into {account}! New Balance: {txt#balance}",
-                        cur.format(result.getAmount()), bank, cur.format(bank.getBalance(cur)));
+                        cur.format(result.amount()), bank, cur.format(bank.balance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
                 i18n.send(context, NEGATIVE, "You cannot afford to spend that much!");
@@ -119,7 +119,7 @@ public class BankCommand extends DispatcherCommand
     @Restricted(msg = "You cannot withdraw from a bank as console!")
     public void withdraw(ServerPlayer context, BaseAccount.Virtual bank, Double amount) //takes money from the bank
     {
-        Optional<UniqueAccount> account = service.getOrCreateAccount(context.getUniqueId());
+        Optional<UniqueAccount> account = service.orCreateAccount(context.uniqueId());
         if (!account.isPresent())
         {
             i18n.send(context, NEGATIVE, "You do not have an account!");
@@ -131,13 +131,13 @@ public class BankCommand extends DispatcherCommand
             i18n.send(context, NEGATIVE, "You are not allowed to withdraw money from that bank!");
         }
 
-        TransferResult result = account.get().transfer(bank, service.getDefaultCurrency(), new BigDecimal(amount));
-        switch (result.getResult())
+        TransferResult result = account.get().transfer(bank, service.defaultCurrency(), new BigDecimal(amount));
+        switch (result.result())
         {
             case SUCCESS:
-                Currency cur = result.getCurrency();
+                Currency cur = result.currency();
                 i18n.send(context, POSITIVE, "Withdrawn {txt#amount} from {account}! New Balance: {txt#balance}",
-                        cur.format(result.getAmount()), bank, cur.format(bank.getBalance(cur)));
+                        cur.format(result.amount()), bank, cur.format(bank.balance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
                 i18n.send(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
@@ -164,13 +164,13 @@ public class BankCommand extends DispatcherCommand
             return;
         }
 
-        TransferResult result = bank.transfer(otherBank, service.getDefaultCurrency(), new BigDecimal(amount));
-        switch (result.getResult())
+        TransferResult result = bank.transfer(otherBank, service.defaultCurrency(), new BigDecimal(amount));
+        switch (result.result())
         {
             case SUCCESS:
-                Currency cur = result.getCurrency();
+                Currency cur = result.currency();
                 i18n.send(context, POSITIVE, "Transferred {txt#amount} from {account} to {account} New Balance: {txt#balance}",
-                        cur.format(result.getAmount()), bank, otherBank, cur.format(bank.getBalance(cur)));
+                        cur.format(result.amount()), bank, otherBank, cur.format(bank.balance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
                 i18n.send(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
@@ -190,13 +190,13 @@ public class BankCommand extends DispatcherCommand
             return;
         }
 
-        TransferResult result = bank.transfer(user, service.getDefaultCurrency(), new BigDecimal(amount));
-        switch (result.getResult())
+        TransferResult result = bank.transfer(user, service.defaultCurrency(), new BigDecimal(amount));
+        switch (result.result())
         {
             case SUCCESS:
-                Currency cur = result.getCurrency();
+                Currency cur = result.currency();
                 i18n.send(context, POSITIVE, "Transferred {txt#amount} from {account} to {account#user}! New Balance: {txt#balance}",
-                        cur.format(result.getAmount()), bank, user, cur.format(bank.getBalance(cur)));
+                        cur.format(result.amount()), bank, user, cur.format(bank.balance(cur)));
                 break;
             case ACCOUNT_NO_FUNDS:
                 i18n.send(context, NEGATIVE, "The bank does not hold enough money to spend that much!");
@@ -225,7 +225,7 @@ public class BankCommand extends DispatcherCommand
 
             for (BaseAccount.Virtual bank : namedAccounts)
             {
-                context.sendMessage(Identity.nil(), Component.text(" - ").append(bank.getDisplayName().color(NamedTextColor.YELLOW)));
+                context.sendMessage(Identity.nil(), Component.text(" - ").append(bank.displayName().color(NamedTextColor.YELLOW)));
             }
             return;
         }
@@ -239,7 +239,7 @@ public class BankCommand extends DispatcherCommand
         i18n.send(context, POSITIVE, "The following banks are available:");
         for (BaseAccount.Virtual bank : namedAccounts)
         {
-            context.sendMessage(Identity.nil(), Component.text(" - ").append(bank.getDisplayName().color(NamedTextColor.YELLOW)));
+            context.sendMessage(Identity.nil(), Component.text(" - ").append(bank.displayName().color(NamedTextColor.YELLOW)));
         }
     }
 
@@ -247,7 +247,7 @@ public class BankCommand extends DispatcherCommand
     public void info(CommandCause context, BaseAccount.Virtual bank)
     {
         i18n.send(context, POSITIVE, "Bank Information for {account}:", bank);
-        i18n.send(context, POSITIVE, "Current Balance: {txt}", service.getDefaultCurrency().format(bank.getBalance(service.getDefaultCurrency())));
+        i18n.send(context, POSITIVE, "Current Balance: {txt}", service.defaultCurrency().format(bank.balance(service.defaultCurrency())));
 
         this.listaccess(context, bank);
 
@@ -266,9 +266,9 @@ public class BankCommand extends DispatcherCommand
         // Everyone can SEE(hidden) DEPOSIT(needInvite)
         // Noone can ...
 
-        for (Subject subject : Sponge.getServer().getServiceProvider().permissionService().getUserSubjects().getLoadedSubjects())
+        for (Subject subject : Sponge.server().serviceProvider().permissionService().userSubjects().loadedSubjects())
         {
-            Optional<String> option = subject.getOption(bank.getActiveContexts(), "conomy.bank.access-level." + bank.getIdentifier());
+            Optional<String> option = subject.option(bank.activeContexts(), "conomy.bank.access-level." + bank.identifier());
             if (option.isPresent())
             {
                 // TODO list players highlight granted access

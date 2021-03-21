@@ -76,7 +76,7 @@ public class RegionCommands extends DispatcherCommand
         ServerWorld w = world;
         if (world == null && context instanceof Locatable)
         {
-            w = ((Locatable) context).getServerLocation().getWorld();
+            w = ((Locatable) context).serverLocation().world();
         }
         Map<ResourceKey, Map<String, Region>> regions = manager.getRegions();
         List<Region> list = new ArrayList<>();
@@ -89,7 +89,7 @@ public class RegionCommands extends DispatcherCommand
         }
         else
         {
-            list.addAll(regions.getOrDefault(w.getUniqueId(), Collections.emptyMap()).values());
+            list.addAll(regions.getOrDefault(w.key(), Collections.emptyMap()).values());
         }
 
         if (match != null)
@@ -104,7 +104,7 @@ public class RegionCommands extends DispatcherCommand
         }
         else
         {
-            list.add(manager.getWorldRegion(world.getKey()));
+            list.add(manager.getWorldRegion(world.key()));
         }
 
         if (list.isEmpty())

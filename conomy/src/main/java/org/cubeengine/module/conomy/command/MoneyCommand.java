@@ -46,8 +46,6 @@ import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.User;
-import org.spongepowered.api.event.Cause;
-import org.spongepowered.api.event.EventContext;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
 import org.spongepowered.api.service.economy.transaction.TransferResult;
@@ -75,7 +73,7 @@ public class MoneyCommand extends DispatcherCommand
 
     private BaseAccount.Unique getUserAccount(UUID user)
     {
-        return service.getOrCreateAccount(user)
+        return service.orCreateAccount(user)
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast).orElse(null);
     }
@@ -84,7 +82,7 @@ public class MoneyCommand extends DispatcherCommand
     @Command(desc = "Shows your balance")
     public void balance(CommandCause context, @Default BaseAccount.Unique account)
     {
-        Map<Currency, BigDecimal> balances = account.getBalances();
+        Map<Currency, BigDecimal> balances = account.balances();
         if (balances.isEmpty())
         {
             i18n.send(context, NEGATIVE, "No Balance for {account} found!", account);
@@ -124,7 +122,7 @@ public class MoneyCommand extends DispatcherCommand
         int i = fromRank;
 
 
-        PaginationList.Builder pagination = Sponge.getGame().getServiceProvider().paginationService().builder();
+        PaginationList.Builder pagination = Sponge.game().serviceProvider().paginationService().builder();
         pagination.padding(Component.text("-"));
         if (fromRank == 1)
         {
@@ -137,7 +135,7 @@ public class MoneyCommand extends DispatcherCommand
         List<Component> texts = new ArrayList<>();
         for (BalanceModel balance : models)
         {
-            Account account = service.getOrCreateAccount(balance.getAccountID()).get();
+            Account account = service.orCreateAccount(balance.getAccountID()).get();
             ConfigCurrency currency = service.getCurrency(balance.getCurrency());
             if (currency == null)
             {
@@ -146,13 +144,13 @@ public class MoneyCommand extends DispatcherCommand
             else
             {
                 texts.add(Component.text(i++).append(Component.text(" - ", NamedTextColor.WHITE))
-                         .append(account.getDisplayName().color(NamedTextColor.DARK_GREEN))
+                         .append(account.displayName().color(NamedTextColor.DARK_GREEN))
                          .append(Component.text(":", NamedTextColor.WHITE))
                          .append(Component.text(currency.fromLong(balance.getBalance()).longValue(), NamedTextColor.GOLD)));
             }
         }
         pagination.contents(texts);
-        pagination.sendTo(context.getAudience());
+        pagination.sendTo(context.audience());
     }
 
     @Alias(value = "pay")
@@ -166,7 +164,7 @@ public class MoneyCommand extends DispatcherCommand
         }
 
         boolean asSomeOneElse = false;
-        if (!source.getIdentifier().equals(context.getIdentifier()))
+        if (!source.identifier().equals(context.identifier()))
         {
             if (!service.getPerms().ACCESS_WITHDRAW.check(context))
             {
@@ -178,21 +176,21 @@ public class MoneyCommand extends DispatcherCommand
 
         for (User player : users)
         {
-            if (player.getUniqueId().equals(source.getUniqueId()))
+            if (player.uniqueId().equals(source.uniqueId()))
             {
                 i18n.send(context, NEGATIVE, "Source and target are the same!", player);
                 continue;
             }
-            Account target = getUserAccount(player.getUniqueId());
+            Account target = getUserAccount(player.uniqueId());
             if (target == null)
             {
                 i18n.send(context, NEGATIVE, "{user} does not have an account!", player);
                 continue;
             }
-            Currency cur = service.getDefaultCurrency();
+            Currency cur = service.defaultCurrency();
             TransferResult result = source.transfer(target, cur, new BigDecimal(amount), Collections.emptySet());
-            Component formatAmount = cur.format(result.getAmount());
-            switch (result.getResult())
+            Component formatAmount = cur.format(result.amount());
+            switch (result.result())
             {
                 case SUCCESS:
                     if (asSomeOneElse)
@@ -205,7 +203,7 @@ public class MoneyCommand extends DispatcherCommand
                     }
                     if (player.isOnline())
                     {
-                        i18n.send(player.getPlayer().get(), POSITIVE, "{account} just paid you {txt#amount}!", source, formatAmount);
+                        i18n.send(player.player().get(), POSITIVE, "{account} just paid you {txt#amount}!", source, formatAmount);
                     }
                     break;
                 case ACCOUNT_NO_FUNDS:

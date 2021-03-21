@@ -87,7 +87,7 @@ public class HomeCommand extends DispatcherCommand
     @Command(name = "tp", desc = "Teleport to a home", dispatcher = true)
     public void dispatcher(ServerPlayer sender, @Parser(completer = HomeCompleter.class) @Option String home)
     {
-        this.tp(sender, home, sender.getUser());
+        this.tp(sender, home, sender.user());
     }
 
     @Restricted
@@ -103,7 +103,7 @@ public class HomeCommand extends DispatcherCommand
             i18n.send(sender, NEUTRAL, "Use {text:/sethome} to set your home"); // TODO create on click
             return;
         }
-        if (!h.isInvited(sender.getUser()) && !owner.getUniqueId().equals(sender.getUniqueId()))
+        if (!h.isInvited(sender.user()) && !owner.uniqueId().equals(sender.uniqueId()))
         {
             if (!perms.HOME_TP_OTHER.check(sender, i18n))
             {
@@ -112,13 +112,13 @@ public class HomeCommand extends DispatcherCommand
         }
         Transform transform = h.transform;
         sender.remove(Keys.VEHICLE);
-        sender.setLocationAndRotation(h.world.getWorld().getLocation(transform.getPosition()), transform.getRotation());
+        sender.setLocationAndRotation(h.world.getWorld().location(transform.position()), transform.rotation());
         if (h.welcomeMsg != null)
         {
             sender.sendMessage(Identity.nil(), Component.text(h.welcomeMsg));
             return;
         }
-        if (h.owner.equals(sender.getUniqueId()))
+        if (h.owner.equals(sender.uniqueId()))
         {
             i18n.send(ChatType.ACTION_BAR, sender, POSITIVE, "You have been teleported to your home {name}!", h.name);
             return;
@@ -144,12 +144,12 @@ public class HomeCommand extends DispatcherCommand
             i18n.send(context, NEGATIVE, "Homes may not have names that are longer then 32 characters nor contain colon(:)'s!");
             return;
         }
-        if (this.manager.has(context.getUniqueId(), name))
+        if (this.manager.has(context.uniqueId(), name))
         {
             i18n.send(context, NEGATIVE, "The home already exists! You can move it with {text:/home move}");
             return;
         }
-        Home home = this.manager.create(context.getUser(), name, context.getWorld(), context.getTransform());
+        Home home = this.manager.create(context.user(), name, context.world(), context.transform());
         i18n.send(context, POSITIVE, "Your home {name} has been created!", home.name);
     }
 
@@ -160,10 +160,10 @@ public class HomeCommand extends DispatcherCommand
                          @Default @Named("owner") User owner,
                          @Flag boolean append)
     {
-        Home h = this.manager.get(owner.getUniqueId(), home).orElse(null);
+        Home h = this.manager.get(owner.uniqueId(), home).orElse(null);
         if (h == null)
         {
-            homeNotFoundMessage(sender.getAudience(), owner, home);
+            homeNotFoundMessage(sender.audience(), owner, home);
             return;
         }
         if (append)
@@ -191,7 +191,7 @@ public class HomeCommand extends DispatcherCommand
     public void move(ServerPlayer sender, @Parser(completer = HomeCompleter.class) @Option String name, @Default User owner)
     {
         name = name == null ? "home" : name;
-        Home home = this.manager.get(owner.getUniqueId(), name).orElse(null);
+        Home home = this.manager.get(owner.uniqueId(), name).orElse(null);
         if (home == null)
         {
             homeNotFoundMessage(sender, owner, name);
@@ -199,13 +199,13 @@ public class HomeCommand extends DispatcherCommand
             return;
         }
 
-        if (!home.isOwner(sender.getUser()) && !perms.HOME_MOVE_OTHER.check(sender, i18n))
+        if (!home.isOwner(sender.user()) && !perms.HOME_MOVE_OTHER.check(sender, i18n))
         {
             return;
         }
-        home.setTransform(sender.getWorld(), sender.getTransform());
+        home.setTransform(sender.world(), sender.transform());
         manager.save();
-        if (home.owner.equals(sender.getUniqueId()))
+        if (home.owner.equals(sender.uniqueId()))
         {
             i18n.send(sender, POSITIVE, "Your home {name} has been moved to your current location!", home.name);
             return;
@@ -218,19 +218,19 @@ public class HomeCommand extends DispatcherCommand
     public void remove(CommandCause sender, @Parser(completer = HomeCompleter.class) @Option String name, @Default User owner)
     {
         name = name == null ? "home" : name;
-        Home home = this.manager.get(owner.getUniqueId(), name).orElse(null);
+        Home home = this.manager.get(owner.uniqueId(), name).orElse(null);
         if (home == null)
         {
-            homeNotFoundMessage(sender.getAudience(), owner, name);
+            homeNotFoundMessage(sender.audience(), owner, name);
             return;
         }
 
-        if (!home.isOwner(sender) && !perms.HOME_REMOVE_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
+        if (!home.isOwner(sender) && !perms.HOME_REMOVE_OTHER.check(sender.subject(), sender.audience(), i18n))
         {
             return;
         }
         this.manager.delete(home);
-        if (sender.getAudience() instanceof ServerPlayer && owner.getUniqueId().equals(((ServerPlayer)sender.getAudience()).getUniqueId()))
+        if (sender.audience() instanceof ServerPlayer && owner.uniqueId().equals(((ServerPlayer)sender.audience()).uniqueId()))
         {
             i18n.send(sender, POSITIVE, "Your home {name} has been removed!", name);
             return;
@@ -241,14 +241,14 @@ public class HomeCommand extends DispatcherCommand
     @Command(desc = "Rename a home")
     public void rename(CommandCause sender, @Parser(completer = HomeCompleter.class) String home, @Label("new name") String newName, @Default @Option User owner)
     {
-        Home h = manager.get(owner.getUniqueId(), home).orElse(null);
+        Home h = manager.get(owner.uniqueId(), home).orElse(null);
         if (h == null)
         {
-            homeNotFoundMessage(sender.getAudience(), owner, home);
+            homeNotFoundMessage(sender.audience(), owner, home);
             return;
         }
 
-        if (!h.isOwner(sender) && !perms.HOME_RENAME_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
+        if (!h.isOwner(sender) && !perms.HOME_RENAME_OTHER.check(sender.subject(), sender.audience(), i18n))
         {
             return;
         }
@@ -279,10 +279,10 @@ public class HomeCommand extends DispatcherCommand
                      @Flag boolean invited) throws Exception
     {
 
-        final boolean isOwner = sender.getAudience() instanceof ServerPlayer && owner.getUniqueId().equals(((ServerPlayer)sender.getAudience()).getUniqueId());
+        final boolean isOwner = sender.audience() instanceof ServerPlayer && owner.uniqueId().equals(((ServerPlayer)sender.audience()).uniqueId());
         if (!isOwner)
         {
-            if (!perms.HOME_LIST_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
+            if (!perms.HOME_LIST_OTHER.check(sender.subject(), sender.audience(), i18n))
             {
                 return;
             }
@@ -315,7 +315,7 @@ public class HomeCommand extends DispatcherCommand
         for (Home home : homes)
         {
             Component teleport = i18n.translate(sender, "(tp)").color(NamedTextColor.BLUE)
-                                     .clickEvent(ClickEvent.runCommand("/home tp " + home.name + " " + home.getOwner().getName().get()))
+                                     .clickEvent(ClickEvent.runCommand("/home tp " + home.name + " " + home.getOwner().name().get()))
                                      .hoverEvent(HoverEvent.showText(i18n.translate(sender, POSITIVE, "Click to teleport to {name}", home.name)));
             if (home.isOwner(sender))
             {
@@ -326,7 +326,7 @@ public class HomeCommand extends DispatcherCommand
             else
             {
                 sender.sendMessage(Identity.nil(), Component.text().append(Component.text("   - "))
-                                                            .append(Component.text(home.getOwner().getName() +":" + home.name + " ", NamedTextColor.GOLD))
+                                                            .append(Component.text(home.getOwner().name() +":" + home.name + " ", NamedTextColor.GOLD))
                                                             .append(teleport).build());
             }
         }
@@ -335,9 +335,9 @@ public class HomeCommand extends DispatcherCommand
     @Command(name = "ilist", alias = "invited", desc = "List all players invited to your homes")
     public void invitedList(CommandCause sender, @Default User owner)
     {
-        final boolean isOwner = sender.getAudience() instanceof ServerPlayer && owner.getUniqueId().equals(((ServerPlayer)sender.getAudience()).getUniqueId());
+        final boolean isOwner = sender.audience() instanceof ServerPlayer && owner.uniqueId().equals(((ServerPlayer)sender.audience()).uniqueId());
 
-        if (!isOwner && !perms.HOME_LIST_OTHER.check(sender.getSubject(), sender.getAudience(), i18n))
+        if (!isOwner && !perms.HOME_LIST_OTHER.check(sender.subject(), sender.audience(), i18n))
         {
             return;
         }
@@ -367,7 +367,7 @@ public class HomeCommand extends DispatcherCommand
             sender.sendMessage(Identity.nil(), Component.text("  " + home.name + ":", NamedTextColor.GOLD));
             for (UUID invite : home.invites)
             {
-                final String name = Sponge.getServer().getUserManager().get(invite).get().getName();
+                final String name = Sponge.server().userManager().find(invite).get().name();
                 final Component unInvite = Component.text("(-)", NamedTextColor.RED).hoverEvent(
                     HoverEvent.showText(i18n.translate(sender, NEUTRAL, "Click to uninvite {user} from {name}", name, home.name)))
                                                     .clickEvent(ClickEvent.runCommand("/home uninvite " + name + " " + home.name));
@@ -381,13 +381,13 @@ public class HomeCommand extends DispatcherCommand
     public void invite(ServerPlayer sender, User player, @Parser(completer = HomeCompleter.class) @Option String home)
     {
         home = home == null ? "home" : home;
-        Home h = this.manager.get(sender.getUniqueId(), home).orElse(null);
-        if (h == null || !h.owner.equals(sender.getUniqueId()))
+        Home h = this.manager.get(sender.uniqueId(), home).orElse(null);
+        if (h == null || !h.owner.equals(sender.uniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You do not own a home named {name#home}!", home);
             return;
         }
-        if (player.getUniqueId().equals(sender.getUniqueId()))
+        if (player.uniqueId().equals(sender.uniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You cannot invite yourself to your own home!");
             return;
@@ -397,13 +397,13 @@ public class HomeCommand extends DispatcherCommand
             i18n.send(sender, NEGATIVE, "{user} is already invited to your home!", player);
             return;
         }
-        h.invites.add(player.getUniqueId());
+        h.invites.add(player.uniqueId());
         this.manager.save();
         if (player.isOnline())
         {
-            i18n.send(player.getPlayer().get(), NEUTRAL,
+            i18n.send(player.player().get(), NEUTRAL,
                       "{user} invited you to their home. To teleport to it use: /home {name#home} {name}", sender,
-                      h.name, sender.getName());
+                      h.name, sender.name());
         }
         i18n.send(sender, POSITIVE, "{user} is now invited to your home {name}", player, h.name);
     }
@@ -413,13 +413,13 @@ public class HomeCommand extends DispatcherCommand
     public void unInvite(ServerPlayer sender, User player, @Parser(completer = HomeCompleter.class) @Option String home)
     {
         home = home == null ? "home" : home;
-        Home h = this.manager.get(sender.getUniqueId(), home).orElse(null);
-        if (h == null || !h.owner.equals(sender.getUniqueId()))
+        Home h = this.manager.get(sender.uniqueId(), home).orElse(null);
+        if (h == null || !h.owner.equals(sender.uniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You do not own a home named {name#home}!", home);
             return;
         }
-        if (player.getUniqueId().equals(sender.getUniqueId()))
+        if (player.uniqueId().equals(sender.uniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You cannot uninvite yourself from your own home!");
             return;
@@ -429,10 +429,10 @@ public class HomeCommand extends DispatcherCommand
             i18n.send(sender, NEGATIVE, "{user} is not invited to your home!", player);
             return;
         }
-        h.invites.remove(player.getUniqueId());
+        h.invites.remove(player.uniqueId());
         if (player.isOnline())
         {
-            i18n.send(player.getPlayer().get(), NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.name);
+            i18n.send(player.player().get(), NEUTRAL, "You are no longer invited to {user}'s home {name#home}", sender, h.name);
         }
         i18n.send(sender, POSITIVE, "{user} is no longer invited to your home {name}", player, h.name);
     }
@@ -450,7 +450,7 @@ public class HomeCommand extends DispatcherCommand
     public void clear(final CommandCause context, @Option final User owner,
                       @Flag(value = "sel", longName = "selection") final boolean selection)
     {
-        if (this.module.getConfig().clearOnlyFromConsole && !(context.getAudience() instanceof SystemSubject))
+        if (this.module.getConfig().clearOnlyFromConsole && !(context.audience() instanceof SystemSubject))
         {
             i18n.send(context, NEGATIVE, "This command has been disabled for ingame use via the configuration");
             return;
@@ -500,18 +500,18 @@ public class HomeCommand extends DispatcherCommand
             }
         }
         Component confirmText = i18n.translate(context, NEUTRAL, "Confirm before 30 seconds have passed to delete the homes");
-        ConfirmManager.requestConfirmation(i18n, confirmText, context.getAudience(), () -> {
+        ConfirmManager.requestConfirmation(i18n, confirmText, context.audience(), () -> {
             Predicate<Home> predicate = home -> true;
             if (owner != null)
             {
-                predicate = predicate.and(h -> h.owner.equals(owner.getUniqueId()));
+                predicate = predicate.and(h -> h.owner.equals(owner.uniqueId()));
             }
             if (selection)
             {
-                Cuboid cuboid = new Cuboid(firstPoint.getPosition(), secondPoint.getPosition());
+                Cuboid cuboid = new Cuboid(firstPoint.position(), secondPoint.position());
                 predicate = predicate.and(h -> {
-                    Vector3d chp = h.transform.getPosition();
-                    return h.world.getWorld().equals(firstPoint.getWorld())
+                    Vector3d chp = h.transform.position();
+                    return h.world.getWorld().equals(firstPoint.world())
                         && cuboid.contains(new Vector3d(chp.getX(), chp.getY(), chp.getZ()));
                 });
                 manager.massDelete(predicate);
@@ -536,7 +536,7 @@ public class HomeCommand extends DispatcherCommand
 
     private void homeNotFoundMessage(Audience sender, User user, String name)
     {
-        if (sender instanceof ServerPlayer && ((ServerPlayer)sender).getUniqueId().equals(user.getUniqueId()))
+        if (sender instanceof ServerPlayer && ((ServerPlayer)sender).uniqueId().equals(user.uniqueId()))
         {
             i18n.send(sender, NEGATIVE, "You have no home named {name#home}!", name);
         }

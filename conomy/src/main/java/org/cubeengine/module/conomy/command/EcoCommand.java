@@ -55,17 +55,17 @@ public class EcoCommand extends DispatcherCommand
             UniqueAccount target = getAccount(context, user);
             if (target != null)
             {
-                Currency cur = service.getDefaultCurrency();
+                Currency cur = service.defaultCurrency();
                 TransactionResult result = target.deposit(cur, new BigDecimal(amount));
-                Component formatAmount = cur.format(result.getAmount());
-                switch (result.getResult())
+                Component formatAmount = cur.format(result.amount());
+                switch (result.result())
                 {
                     case SUCCESS:
 
-                        i18n.send(context, POSITIVE, "You gave {txt} to {user}!", formatAmount, user.getName());
-                        if (!user.isOnline() && context.getSubject().equals(user.getPlayer().get()))
+                        i18n.send(context, POSITIVE, "You gave {txt} to {user}!", formatAmount, user.name());
+                        if (!user.isOnline() && context.subject().equals(user.player().get()))
                         {
-                            i18n.send(user.getPlayer().get(), POSITIVE, "You were granted {txt}.", formatAmount);
+                            i18n.send(user.player().get(), POSITIVE, "You were granted {txt}.", formatAmount);
                         }
                         break;
                     default:
@@ -78,7 +78,7 @@ public class EcoCommand extends DispatcherCommand
 
     private BaseAccount.Unique getAccount(CommandCause context, User user)
     {
-        BaseAccount.Unique target = service.getOrCreateAccount(user.getUniqueId())
+        BaseAccount.Unique target = service.orCreateAccount(user.uniqueId())
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast).orElse(null);
         if (target == null)
@@ -96,16 +96,16 @@ public class EcoCommand extends DispatcherCommand
             UniqueAccount target = getAccount(context, user);
             if (target != null)
             {
-                Currency cur = service.getDefaultCurrency();
+                Currency cur = service.defaultCurrency();
                 TransactionResult result = target.withdraw(cur, new BigDecimal(amount));
-                Component formatAmount = cur.format(result.getAmount());
-                switch (result.getResult())
+                Component formatAmount = cur.format(result.amount());
+                switch (result.result())
                 {
                     case SUCCESS:
                         i18n.send(context, POSITIVE, "You took {txt} from {user}!", formatAmount, user);
-                        if (!user.isOnline() && context.getSubject().equals(user.getPlayer().get()))
+                        if (!user.isOnline() && context.subject().equals(user.player().get()))
                         {
-                            i18n.send(user.getPlayer().get(), NEUTRAL, "Withdrew {txt} from your account.", formatAmount);
+                            i18n.send(user.player().get(), NEUTRAL, "Withdrew {txt} from your account.", formatAmount);
                         }
                         break;
                     default:
@@ -124,16 +124,16 @@ public class EcoCommand extends DispatcherCommand
             UniqueAccount target = getAccount(context, user);
             if (target != null)
             {
-                Currency cur = service.getDefaultCurrency();
+                Currency cur = service.defaultCurrency();
                 TransactionResult result = target.resetBalance(cur);
-                Component formatAmount = cur.format(result.getAmount());
-                switch (result.getResult())
+                Component formatAmount = cur.format(result.amount());
+                switch (result.result())
                 {
                     case SUCCESS:
                         i18n.send(context, POSITIVE, "{user} account reset to {txt}!", user, formatAmount);
-                        if (!user.isOnline() && context.getSubject().equals(user.getPlayer().get()))
+                        if (!user.isOnline() && context.subject().equals(user.player().get()))
                         {
-                            i18n.send(user.getPlayer().get(), NEUTRAL, "Your balance got reset to {txt}.", formatAmount);
+                            i18n.send(user.player().get(), NEUTRAL, "Your balance got reset to {txt}.", formatAmount);
                         }
                         break;
                     default:
@@ -152,16 +152,16 @@ public class EcoCommand extends DispatcherCommand
             UniqueAccount target = getAccount(context, user);
             if (target != null)
             {
-                Currency cur = service.getDefaultCurrency();
+                Currency cur = service.defaultCurrency();
                 TransactionResult result = target.setBalance(cur, new BigDecimal(amount));
-                Component formatAmount = cur.format(result.getAmount());
-                switch (result.getResult())
+                Component formatAmount = cur.format(result.amount());
+                switch (result.result())
                 {
                     case SUCCESS:
                         i18n.send(context, POSITIVE, "{user} account set to {txt}!", user, formatAmount);
-                        if (!user.isOnline() && context.getSubject().equals(user.getPlayer().get()))
+                        if (!user.isOnline() && context.subject().equals(user.player().get()))
                         {
-                            i18n.send(user.getPlayer().get(), NEUTRAL, "Your balance got set to {txt}.", formatAmount);
+                            i18n.send(user.player().get(), NEUTRAL, "Your balance got set to {txt}.", formatAmount);
                         }
                         break;
                     default:

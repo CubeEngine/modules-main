@@ -90,9 +90,9 @@ public class PlayerInfoCommands
 
     private Locale getLocale(CommandCause context)
     {
-        if (context.getSubject() instanceof ServerPlayer)
+        if (context.subject() instanceof ServerPlayer)
         {
-            return ((ServerPlayer)context.getSubject()).getLocale();
+            return ((ServerPlayer)context.subject()).locale();
         }
         return Locale.getDefault();
     }
@@ -117,12 +117,12 @@ public class PlayerInfoCommands
 
             if (player.isOnline())
             {
-                ServerLocation loc = player.getPlayer().get().getServerLocation();
-                i18n.send(context, NEUTRAL, "Position: {vector} in {world}", new Vector3i(loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()), loc.getWorld());
+                ServerLocation loc = player.player().get().serverLocation();
+                i18n.send(context, NEUTRAL, "Position: {vector} in {world}", new Vector3i(loc.blockX(), loc.blockY(), loc.blockZ()), loc.world());
             }
             if (player.isOnline())
             {
-                i18n.send(context, NEUTRAL, "IP: {input#ip}", player.getPlayer().get().getConnection().getAddress().getAddress().getHostAddress());
+                i18n.send(context, NEUTRAL, "IP: {input#ip}", player.player().get().connection().address().getAddress().getHostAddress());
             }
             Optional<GameMode> gameMode = player.get(Keys.GAME_MODE);
             if (gameMode.isPresent())
@@ -163,24 +163,24 @@ public class PlayerInfoCommands
                                              .format(player.get(Keys.FIRST_DATE_JOINED).get());
             i18n.send(context, NEUTRAL, "First played: {input#date}", format);
         }
-        final BanService banService = Sponge.getServer().getServiceProvider().banService();
-        if (banService.isBanned(player.getProfile()).join())
+        final BanService banService = Sponge.server().serviceProvider().banService();
+        if (banService.isBanned(player.profile()).join())
         {
-            final Ban.Profile ban = banService.getBanFor(player.getProfile()).join().get();
+            final Ban.Profile ban = banService.banFor(player.profile()).join().get();
             Component expires;
             DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, locale);
 
-            if (!ban.getExpirationDate().isPresent())
+            if (!ban.expirationDate().isPresent())
             {
                 expires = i18n.translate(context, "for ever");
             }
             else
             {
-                expires = Component.text(format.format(ban.getExpirationDate().get()));
+                expires = Component.text(format.format(ban.expirationDate().get()));
             }
             i18n.send(context, NEUTRAL, "Banned by {text#source} on {input#date}: {input#reason} ({input#expire})",
-                                ban.getBanSource().orElse(Component.text("?")), format.format(ban.getCreationDate()),
-                                ban.getReason(), expires);
+                                ban.banSource().orElse(Component.text("?")), format.format(ban.creationDate()),
+                                ban.reason(), expires);
         }
     }
 }

@@ -23,7 +23,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.cubeengine.module.roles.service.RolesPermissionService;
-import org.cubeengine.module.roles.service.subject.UserSubject;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
@@ -42,17 +41,17 @@ public abstract class CachingSubjectData extends BaseSubjectData
     public abstract CompletableFuture<Boolean> save(CompletableFuture<Boolean> changed);
 
     @Override
-    public Map<Set<Context>, List<SubjectReference>> getAllParents()
+    public Map<Set<Context>, List<SubjectReference>> allParents()
     {
         cacheParents();
-        return super.getAllParents();
+        return super.allParents();
     }
 
     @Override
-    public List<SubjectReference> getParents(Set<Context> contexts)
+    public List<SubjectReference> parents(Set<Context> contexts)
     {
         cacheParents();
-        return super.getParents(contexts);
+        return super.parents(contexts);
     }
 
     @Override
@@ -84,17 +83,17 @@ public abstract class CachingSubjectData extends BaseSubjectData
     }
 
     @Override
-    public Map<Set<Context>, Map<String, Boolean>> getAllPermissions()
+    public Map<Set<Context>, Map<String, Boolean>> allPermissions()
     {
         cachePermissions();
-        return super.getAllPermissions();
+        return super.allPermissions();
     }
 
     @Override
-    public Map<String, Boolean> getPermissions(Set<Context> contexts)
+    public Map<String, Boolean> permissions(Set<Context> contexts)
     {
         cachePermissions();
-        return super.getPermissions(contexts);
+        return super.permissions(contexts);
     }
 
     @Override
@@ -119,17 +118,17 @@ public abstract class CachingSubjectData extends BaseSubjectData
     }
 
     @Override
-    public Map<Set<Context>, Map<String, String>> getAllOptions()
+    public Map<Set<Context>, Map<String, String>> allOptions()
     {
         cacheOptions();
-        return super.getAllOptions();
+        return super.allOptions();
     }
 
     @Override
-    public Map<String, String> getOptions(Set<Context> contexts)
+    public Map<String, String> options(Set<Context> contexts)
     {
         cacheOptions();
-        return super.getOptions(contexts);
+        return super.options(contexts);
     }
 
     @Override

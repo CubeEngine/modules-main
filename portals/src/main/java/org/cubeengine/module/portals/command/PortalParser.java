@@ -55,9 +55,9 @@ public class PortalParser implements ValueParser<Portal>, ValueCompleter, Defaul
     public Portal apply(CommandCause commandCause)
     {
         Portal portal = null;
-        if (commandCause.getAudience() instanceof ServerPlayer)
+        if (commandCause.audience() instanceof ServerPlayer)
         {
-            portal = module.getPortalsAttachment(((ServerPlayer)commandCause.getAudience()).getUniqueId()).getPortal();
+            portal = module.getPortalsAttachment(((ServerPlayer)commandCause.audience()).uniqueId()).getPortal();
         }
         if (portal == null)
         {
@@ -83,13 +83,13 @@ public class PortalParser implements ValueParser<Portal>, ValueCompleter, Defaul
     }
 
     @Override
-    public Optional<? extends Portal> getValue(Key<? super Portal> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    public Optional<? extends Portal> parseValue(Key<? super Portal> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
         String portalName = reader.parseString();
         Portal portal = this.module.getPortal(portalName);
         if (portal == null)
         {
-            throw reader.createException(i18n.translate(context.getCause(), "Portal {input} not found", portalName));
+            throw reader.createException(i18n.translate(context.cause(), "Portal {input} not found", portalName));
         }
         return Optional.of(portal);
     }

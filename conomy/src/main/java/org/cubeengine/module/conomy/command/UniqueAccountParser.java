@@ -60,13 +60,13 @@ public class UniqueAccountParser implements ValueParser<Unique>, DefaultParamete
     @Override
     public Unique apply(CommandCause commandCause)
     {
-        if (!(commandCause.getAudience() instanceof ServerPlayer))
+        if (!(commandCause.audience() instanceof ServerPlayer))
         {
             i18n.send(commandCause, NEGATIVE,  "You have to specify a user!");
             return null;
         }
-        ServerPlayer user = (ServerPlayer) commandCause.getAudience();
-        Optional<BaseAccount.Unique> account = getAccount(user.getUniqueId());
+        ServerPlayer user = (ServerPlayer) commandCause.audience();
+        Optional<BaseAccount.Unique> account = getAccount(user.uniqueId());
         if (!account.isPresent())
         {
             i18n.send(commandCause, NEGATIVE, "You have no account!");
@@ -82,24 +82,24 @@ public class UniqueAccountParser implements ValueParser<Unique>, DefaultParamete
     }
 
     @Override
-    public Optional<? extends Unique> getValue(Key<? super Unique> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
+    public Optional<? extends Unique> parseValue(Key<? super Unique> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
         final String arg = reader.parseString();
-        final Optional<Unique> account = ResourceKeyedValueParameters.USER.get().getValue(Parameter.key(parameterKey.key(), User.class), reader, context).flatMap(
-            user -> getAccount(user.getUniqueId()).filter(a -> {
-                CommandCause cmdSource = context.getCause();
+        final Optional<Unique> account = ResourceKeyedValueParameters.USER.get().parseValue(Parameter.key(parameterKey.key(), User.class), reader, context).flatMap(
+            user -> getAccount(user.uniqueId()).filter(a -> {
+                CommandCause cmdSource = context.cause();
                 return !a.isHidden() && !service.getPerms().ACCESS_SEE.check(cmdSource);
             }));
         if (!account.isPresent())
         {
-            throw reader.createException(i18n.translate(context.getCause(), NEGATIVE, "No account found for {user}!", arg));
+            throw reader.createException(i18n.translate(context.cause(), NEGATIVE, "No account found for {user}!", arg));
         }
         return account;
     }
 
     private Optional<BaseAccount.Unique> getAccount(UUID user)
     {
-        return service.getOrCreateAccount(user)
+        return service.orCreateAccount(user)
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast);
     }
