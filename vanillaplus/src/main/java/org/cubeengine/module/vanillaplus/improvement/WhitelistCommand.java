@@ -68,7 +68,7 @@ public class WhitelistCommand extends DispatcherCommand
     public void add(CommandCause context, User player) // TODO allow players that never played on the server
     {
         WhitelistService service = getWhitelistService();
-        if (service.addProfile(player.getProfile()))
+        if (service.addProfile(player.getProfile()).join())
         {
             i18n.send(context, NEUTRAL, "{user} is already whitelisted.", player);
             return;
@@ -80,7 +80,7 @@ public class WhitelistCommand extends DispatcherCommand
     public void remove(CommandCause context, User player)
     {
         WhitelistService service = getWhitelistService();
-        if (service.removeProfile(player.getProfile()))
+        if (service.removeProfile(player.getProfile()).join())
         {
             i18n.send(context, POSITIVE, "{user} is not whitelisted anymore.", player.getName());
             return;
@@ -101,7 +101,7 @@ public class WhitelistCommand extends DispatcherCommand
             i18n.send(context, POSITIVE, "The whitelist is enabled!.");
         }
         context.sendMessage(Identity.nil(), Component.empty());
-        Collection<GameProfile> list = service.getWhitelistedProfiles();
+        Collection<GameProfile> list = service.getWhitelistedProfiles().join();
         if (list.isEmpty())
         {
             i18n.send(context, NEUTRAL, "There are currently no whitelisted players!");
@@ -158,7 +158,7 @@ public class WhitelistCommand extends DispatcherCommand
     public void wipe(CommandCause context)
     {
         WhitelistService service = getWhitelistService();
-        service.getWhitelistedProfiles().forEach(service::removeProfile);
+        service.getWhitelistedProfiles().join().forEach(service::removeProfile);
         i18n.send(context, POSITIVE, "The whitelist was successfully wiped!");
     }
 }

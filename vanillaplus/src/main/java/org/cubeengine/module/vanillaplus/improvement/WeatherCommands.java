@@ -30,6 +30,7 @@ import org.spongepowered.api.registry.RegistryTypes;
 import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.weather.Weather;
+import org.spongepowered.api.world.weather.WeatherType;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
@@ -48,15 +49,14 @@ public class WeatherCommands
     }
 
     @Command(desc = "Changes the weather")
-    public void weather(CommandCause context, Weather weather, @Option Integer duration, @Default @Named("in") ServerWorld world)
+    public void weather(CommandCause context, WeatherType weather, @Option Integer duration, @Default @Named("in") ServerWorld world)
     {
         duration = (duration == null ? 10000000 : duration) * 20;
 
         final Weather currentWeather = world.weather();
-        final String weatherKey = Sponge.getGame().registries().registry(RegistryTypes.WEATHER_TYPE).valueKey(weather.type()).getValue();
-        if (currentWeather == weather) // weather is not changing
+        final String weatherKey = Sponge.getGame().registries().registry(RegistryTypes.WEATHER_TYPE).valueKey(weather).getValue();
+        if (currentWeather.type() == weather) // weather is not changing
         {
-
             i18n.send(context, POSITIVE, "Weather in {world} is already set to {input#weather}!", world, weatherKey);
         }
         else
@@ -64,7 +64,7 @@ public class WeatherCommands
             i18n.send(context, POSITIVE, "Changed weather in {world} to {input#weather}!", world, weatherKey);
         }
 
-        world.setWeather(weather.type(), Ticks.of(duration));
+        world.setWeather(weather, Ticks.of(duration));
     }
 
     /* TODO wait for https://github.com/SpongePowered/SpongeAPI/issues/393

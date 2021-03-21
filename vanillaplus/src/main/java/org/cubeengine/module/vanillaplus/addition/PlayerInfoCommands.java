@@ -164,9 +164,9 @@ public class PlayerInfoCommands
             i18n.send(context, NEUTRAL, "First played: {input#date}", format);
         }
         final BanService banService = Sponge.getServer().getServiceProvider().banService();
-        if (banService.isBanned(player.getProfile()))
+        if (banService.isBanned(player.getProfile()).join())
         {
-            final Ban.Profile ban = banService.getBanFor(player.getProfile()).get();
+            final Ban.Profile ban = banService.getBanFor(player.getProfile()).join().get();
             Component expires;
             DateFormat format = DateFormat.getDateTimeInstance(SHORT, SHORT, locale);
 
