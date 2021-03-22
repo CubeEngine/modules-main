@@ -18,12 +18,12 @@
 package org.cubeengine.module.protector;
 
 import com.google.inject.Inject;
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.InjectService;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.module.protector.command.PlayerDamageSettingsCommands;
 import org.cubeengine.module.protector.command.RegionCommands;
 import org.cubeengine.module.protector.listener.BlockSettingsListener;
 import org.cubeengine.module.protector.listener.DamageSettingsListener;
@@ -46,6 +46,7 @@ import org.spongepowered.api.service.permission.PermissionService;
 @Module
 public class Protector
 {
+    @Inject private Logger logger;
     @Inject private I18n i18n;
     @InjectService private PermissionService ps;
     @Inject private ModuleManager mm;
@@ -67,7 +68,7 @@ public class Protector
         i18n.getCompositor().registerFormatter(new RegionFormatter());
 
         manager.reload();
-        mm.getLoggerFor(Protector.class).info("{} Regions loaded", manager.getRegionCount());
+        logger.info("{} Regions loaded", manager.getRegionCount());
     }
 
     @Listener

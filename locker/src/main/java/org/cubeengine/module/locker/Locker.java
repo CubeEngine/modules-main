@@ -19,11 +19,11 @@ package org.cubeengine.module.locker;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.converter.ConverterManager;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.locker.config.BlockLockConfig;
 import org.cubeengine.module.locker.config.BlockLockConfig.BlockLockerConfigConverter;
 import org.cubeengine.module.locker.config.EntityLockConfig;
@@ -37,7 +37,6 @@ import org.cubeengine.module.locker.listener.LockerBookListener;
 import org.cubeengine.module.locker.listener.LockerLockedListener;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
-import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.RegisterDataPackValueEvent;
@@ -55,10 +54,9 @@ public class Locker
     @ModuleListener private LockerLockedListener lockedListener;
 
     @Inject
-    public Locker(Reflector reflector, ModuleManager mm)
+    public Locker(Reflector reflector, ModuleManager mm, Logger logger)
     {
         ConverterManager cManager = reflector.getDefaultConverterManager();
-        final Log logger = mm.getLoggerFor(Locker.class);
         cManager.registerConverter(new BlockLockerConfigConverter(logger), BlockLockConfig.class);
         cManager.registerConverter(new EntityLockerConfigConverter(logger), EntityLockConfig.class);
     }

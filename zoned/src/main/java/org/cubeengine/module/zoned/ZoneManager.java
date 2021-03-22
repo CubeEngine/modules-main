@@ -29,9 +29,9 @@ import java.util.stream.Stream;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.kyori.adventure.audience.Audience;
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.cubeengine.module.zoned.event.ZoneEvent;
 import org.cubeengine.reflect.Reflector;
@@ -48,14 +48,14 @@ public class ZoneManager
     private Map<String, ZoneConfig> zones = new HashMap<>();
     private I18n i18n;
     private Reflector reflector;
-    private Log logger;
+    private Logger logger;
 
     @Inject
-    public ZoneManager(I18n i18n, Reflector reflector, ModuleManager mm)
+    public ZoneManager(I18n i18n, Reflector reflector, ModuleManager mm, Logger logger)
     {
         this.i18n = i18n;
         this.reflector = reflector;
-        this.logger = mm.getLoggerFor(Zoned.class);
+        this.logger = logger;
         this.path = mm.getPathFor(Zoned.class);
     }
 

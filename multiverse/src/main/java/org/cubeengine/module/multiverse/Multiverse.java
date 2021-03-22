@@ -23,12 +23,12 @@ import java.util.Map.Entry;
 import java.util.Set;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.InjectService;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.event.ModuleListener;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.processor.Module;
 import org.spongepowered.api.Server;
@@ -58,7 +58,7 @@ import org.spongepowered.api.world.server.ServerWorld;
 public class Multiverse
 {
     public static final String UNKNOWN_UNIVERSE_NAME = "unknown";
-    @Inject private Log log;
+    @Inject private Logger log;
     @InjectService private PermissionService ps;
 
     @ModuleConfig private MultiverseConfig config;
@@ -124,10 +124,5 @@ public class Multiverse
         Set<ConfigWorld> set = config.universes.computeIfAbsent(universe, k -> new HashSet<>());
         set.add(cWorld);
         config.save();
-    }
-
-    public Log getLogger()
-    {
-        return this.log;
     }
 }

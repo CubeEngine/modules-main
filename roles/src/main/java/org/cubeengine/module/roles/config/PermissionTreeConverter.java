@@ -19,6 +19,8 @@ package org.cubeengine.module.roles.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.converter.converter.SimpleConverter;
 import org.cubeengine.converter.node.ListNode;
@@ -32,10 +34,12 @@ public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
 {
 
     private RolesPermissionService service;
+    private final Logger logger;
 
-    public PermissionTreeConverter(RolesPermissionService service)
+    public PermissionTreeConverter(RolesPermissionService service, Logger logger)
     {
         this.service = service;
+        this.logger = logger;
     }
 
     @Override
@@ -145,7 +149,7 @@ public class PermissionTreeConverter extends SimpleConverter<PermissionTree>
         }
         else
         {
-            this.service.getLog().warn("Deleted Invalid PermissionTree!");
+            this.logger.warn("Deleted Invalid PermissionTree!");
         }
         return permTree;
     }

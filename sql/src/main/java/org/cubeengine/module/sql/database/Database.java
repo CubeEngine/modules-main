@@ -18,7 +18,6 @@
 package org.cubeengine.module.sql.database;
 
 import com.google.inject.ImplementedBy;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.sql.database.impl.SQLDatabase;
 import org.jooq.DSLContext;
 import org.jooq.Query;
@@ -111,8 +110,6 @@ public interface Database
     DSLContext getDSL();
 
     String getTablePrefix();
-
-    Log getLog();
 
     void init();
 }

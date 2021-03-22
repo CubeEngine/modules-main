@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.sql.database.impl;
 
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.module.sql.database.Database;
 import org.jooq.ExecuteContext;
 import org.jooq.impl.DefaultExecuteListener;
@@ -24,10 +25,12 @@ import org.jooq.impl.DefaultExecuteListener;
 public class JooqLogger extends DefaultExecuteListener
 {
     private Database database;
+    private final Logger logger;
 
-    public JooqLogger(Database database)
+    public JooqLogger(Database database, Logger logger)
     {
         this.database = database;
+        this.logger = logger;
     }
 
     @Override
@@ -35,7 +38,7 @@ public class JooqLogger extends DefaultExecuteListener
     {
         if (database.getDatabaseConfig().logDatabaseQueries)
         {
-            database.getLog().debug(ctx.query().getSQL());
+            logger.debug(ctx.query().getSQL());
         }
     }
 }

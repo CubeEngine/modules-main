@@ -26,11 +26,11 @@ import java.util.Map;
 import java.util.TreeMap;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.InjectService;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Server;
@@ -47,6 +47,7 @@ import static org.cubeengine.module.docs.DocType.MARKDOWN;
 @Module
 public class Docs
 {
+    @Inject private Logger logger;
     @Inject private Reflector reflector;
     @InjectService private PermissionService ps;
     @Inject private PermissionManager pm;
@@ -67,14 +68,13 @@ public class Docs
 
     public void generateDocumentation()
     {
-        Log log = mm.getLoggerFor(Docs.class);
         Map<String, ModuleDocs> docs = new TreeMap<>();
         for (Map.Entry<Class<?>, PluginContainer> entry : mm.getModulePlugins().entrySet())
         {
             docs.put(entry.getValue().getMetadata().getId(), new ModuleDocs(entry.getValue(), entry.getKey(), reflector, pm, ps, mm));
         }
 
-        log.info("Generating Module Docs...");
+        logger.info("Generating Module Docs...");
 
         try
         {
@@ -101,8 +101,8 @@ public class Docs
 
             for (Map.Entry<String, ModuleDocs> entry : docs.entrySet())
             {
-                log.info("Generating docs for " + entry.getKey());
-                entry.getValue().generate(moduleDocsPath, MARKDOWN, mm.getLoggerFor(getClass()));
+                logger.info("Generating docs for " + entry.getKey());
+                entry.getValue().generate(moduleDocsPath, MARKDOWN, logger);
             }
         }
         catch (IOException e)
@@ -111,8 +111,8 @@ public class Docs
         }
 
 
-        log.info("Done Generating Module Docs!");
-        log.info(modulePath.toAbsolutePath().toString());
+        logger.info("Done Generating Module Docs!");
+        logger.info(modulePath.toAbsolutePath().toString());
     }
 
     private static void deleteFile(Path path)

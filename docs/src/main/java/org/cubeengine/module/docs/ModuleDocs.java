@@ -28,10 +28,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.reflect.ReflectedFile;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
@@ -104,7 +105,7 @@ public class ModuleDocs
         this.commands.putAll(mm.getBaseCommands(module));
     }
 
-    public void generate(Path modulesPath, DocType docType, Log log)
+    public void generate(Path modulesPath, DocType docType, Logger log)
     {
         String generated = docType.getGenerator()
                 .generate(log, this.id, this.name, this.pc, this.config, this.permissions, this.commands, this.basePermission);

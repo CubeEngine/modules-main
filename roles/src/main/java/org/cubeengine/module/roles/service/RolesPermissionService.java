@@ -33,11 +33,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Predicate;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.converter.ConverterManager;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.roles.Roles;
 import org.cubeengine.module.roles.RolesConfig;
 import org.cubeengine.module.roles.config.PermissionTree;
@@ -69,23 +69,23 @@ public class RolesPermissionService implements PermissionService
     private final Path modulePath;
 
     private RolesConfig config;
-    private Log logger;
+    private Logger logger;
 
     private final Map<String, PermissionDescription> descriptionMap = new LinkedHashMap<String, PermissionDescription>();
     private Collection<PermissionDescription> descriptions;
     @Inject private PermissionManager pm;
 
     @Inject
-    public RolesPermissionService(Roles module, FileManager fm, Reflector reflector, ModuleManager mm)
+    public RolesPermissionService(Roles module, FileManager fm, Reflector reflector, ModuleManager mm, Logger logger, PluginContainer plugin)
     {
         ConverterManager cManager = reflector.getDefaultConverterManager();
-        cManager.registerConverter(new PermissionTreeConverter(this), PermissionTree.class);
+        cManager.registerConverter(new PermissionTreeConverter(this, logger), PermissionTree.class);
         cManager.registerConverter(new PriorityConverter(), Priority.class);
 
         this.reflector = reflector;
         this.modulePath = mm.getPathFor(Roles.class);
-        this.logger = mm.getLoggerFor(Roles.class);
-        this.config = fm.loadConfig(module, RolesConfig.class);
+        this.logger = logger;
+        this.config = fm.loadConfig(plugin, module, RolesConfig.class);
         collections.put(SUBJECTS_DEFAULT, new FileBasedCollection(modulePath, this, reflector, SUBJECTS_DEFAULT, true));
         collections.put(SUBJECTS_USER, new UserCollection(this));
         collections.put(SUBJECTS_GROUP, new FileBasedCollection(modulePath, this, reflector, SUBJECTS_GROUP, true));
@@ -225,11 +225,6 @@ public class RolesPermissionService implements PermissionService
     public PermissionManager getPermissionManager()
     {
         return pm;
-    }
-
-    public Log getLog()
-    {
-        return logger;
     }
 
     public void fullReload()

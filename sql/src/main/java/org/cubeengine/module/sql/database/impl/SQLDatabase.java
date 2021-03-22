@@ -23,14 +23,11 @@ import java.sql.SQLException;
 import javax.sql.DataSource;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.ModuleInjector;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.util.Version;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.sql.database.AbstractDatabase;
 import org.cubeengine.module.sql.database.Database;
 import org.cubeengine.module.sql.database.DatabaseConfiguration;
@@ -67,36 +64,27 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
     private final DatabaseConfiguration config;
     private DataSource dataSource;
     private ModuleManager mm;
-    private final Log logger;
+    private final Logger logger;
 
     private Settings settings;
     private MappedSchema mappedSchema;
-    private final JooqLogger jooqLogger = new JooqLogger(this);
+    private final JooqLogger jooqLogger;
     private Configuration jooqConfig;
 
     @Inject
-    public SQLDatabase(Reflector reflector, ModuleManager mm, FileManager fm, Log log)
+    public SQLDatabase(Reflector reflector, ModuleManager mm, FileManager fm, Logger log)
     {
         this.mm = mm;
         this.logger = log;
+        this.jooqLogger = new JooqLogger(this, log);
         this.mm.registerBinding(Database.class, this);
         File pluginFolder = mm.getBasePath();
-
-        // Disable HikariPool Debug ConsoleSpam
-        silenceLogger("com.zaxxer.hikari.pool.HikariPool");
-        silenceLogger("com.zaxxer.hikari.pool.PoolBase"); // really? now pkg-private
-        silenceLogger("com.zaxxer.hikari.HikariConfig");
 
         reflector.getDefaultConverterManager().registerConverter(new SQLDialectConverter(), SQLDialect.class);
 
         this.config = reflector.load(DatabaseConfiguration.class, new File(pluginFolder, "database.yml"));
 
 
-    }
-
-    private static void silenceLogger(String name)
-    {
-        ((Logger)LogManager.getLogger(name)).setLevel(Level.INFO);
     }
 
     @Override
@@ -164,7 +152,7 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
             }
             catch (SQLException e)
             {
-                logger.warn(e, "Could not execute structure update for the table {}", updater.getName());
+                logger.warn("Could not execute structure update for the table {}", updater.getName(), e);
             }
         }
         return false;
@@ -280,11 +268,5 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
     public String getTablePrefix()
     {
         return this.config.tablePrefix;
-    }
-
-    @Override
-    public Log getLog()
-    {
-        return logger;
     }
 }

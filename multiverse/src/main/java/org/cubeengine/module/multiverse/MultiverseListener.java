@@ -20,6 +20,8 @@ package org.cubeengine.module.multiverse;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.module.multiverse.player.PlayerData;
 import org.spongepowered.api.data.persistence.DataContainer;
@@ -35,10 +37,12 @@ import org.spongepowered.api.world.server.ServerWorld;
 public class MultiverseListener
 {
     private Multiverse module;
+    private final Logger logger;
 
-    public MultiverseListener(Multiverse module)
+    public MultiverseListener(Multiverse module, Logger logger)
     {
         this.module = module;
+        this.logger = logger;
     }
 
     @Listener
@@ -67,7 +71,7 @@ public class MultiverseListener
 
             target.offer(MultiverseData.DATA, map);
             target.offer(MultiverseData.UNIVERSE, toUniverse);
-            module.getLogger().info("{} entered the universe {}", ((Player)target).name(), toUniverse);
+            logger.info("{} entered the universe {}", ((Player)target).name(), toUniverse);
         }
         else
         {

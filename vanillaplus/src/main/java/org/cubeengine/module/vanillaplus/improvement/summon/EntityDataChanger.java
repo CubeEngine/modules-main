@@ -27,6 +27,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import org.apache.logging.log4j.LogManager;
 import org.cubeengine.libcube.service.matcher.StringMatcher;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
@@ -289,7 +290,7 @@ public class EntityDataChanger<EntityInterface>
                      entity.offer(Keys.SIZE, input);
                  }
 
-                 private StringMatcher sm = new StringMatcher(null); // TODO this is suboptimal
+                 private StringMatcher sm = new StringMatcher(); // TODO this is suboptimal (I agree - pschichtel)
 
                  @Override
                  public Integer getTypeValue(String input)

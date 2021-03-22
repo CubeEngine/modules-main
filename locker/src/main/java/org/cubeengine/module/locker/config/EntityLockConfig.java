@@ -17,8 +17,8 @@
  */
 package org.cubeengine.module.locker.config;
 
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.converter.ConversionException;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.locker.data.ProtectedType;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
@@ -40,7 +40,7 @@ public class EntityLockConfig extends LockConfig<EntityLockConfig, EntityType>
 
     public static class EntityLockerConfigConverter extends LockConfigConverter<EntityLockConfig>
     {
-        public EntityLockerConfigConverter(Log logger)
+        public EntityLockerConfigConverter(Logger logger)
         {
             super(logger);
         }

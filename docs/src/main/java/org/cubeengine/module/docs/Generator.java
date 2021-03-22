@@ -20,9 +20,10 @@ package org.cubeengine.module.docs;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.permission.Permission;
-import org.cubeengine.logscribe.Log;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.manager.CommandMapping;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -30,7 +31,7 @@ import org.spongepowered.plugin.PluginContainer;
 
 public interface Generator
 {
-    String generate(Log log, String id, String name, PluginContainer pc, Info info, Set<PermissionDescription> permissions, Map<CommandMapping, Command.Parameterized> commands,
+    String generate(Logger log, String id, String name, PluginContainer pc, Info info, Set<PermissionDescription> permissions, Map<CommandMapping, Command.Parameterized> commands,
                     Permission basePermission);
 
     String generateList(Map<String, ModuleDocs> docs, Path modulePath, ModuleManager mm);

@@ -28,12 +28,12 @@ import java.util.Stack;
 import java.util.TreeMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.AnnotationCommandBuilder;
 import org.cubeengine.libcube.service.command.AnnotationCommandBuilder.Requirements;
 import org.cubeengine.libcube.service.command.HelpExecutor;
 import org.cubeengine.libcube.service.permission.Permission;
-import org.cubeengine.logscribe.Log;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.Command.Parameterized;
 import org.spongepowered.api.command.CommandCause;
@@ -84,7 +84,7 @@ public class MarkdownGenerator implements Generator
     }
 
     @Override
-    public String generate(Log log, String id, String name, PluginContainer pc, Info info, Set<PermissionDescription> permissions,
+    public String generate(Logger log, String id, String name, PluginContainer pc, Info info, Set<PermissionDescription> permissions,
                            Map<CommandMapping, Command.Parameterized> commands, Permission basePermission)
     {
         StringBuilder sb = new StringBuilder();

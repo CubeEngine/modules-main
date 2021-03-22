@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.UUID;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.event.ModuleListener;
@@ -37,7 +38,6 @@ import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.util.Pair;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.portals.command.PortalCommands;
 import org.cubeengine.module.portals.config.Destination;
 import org.cubeengine.module.portals.config.DestinationConverter;
@@ -48,7 +48,6 @@ import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.effect.particle.ParticleEffect;
-import org.spongepowered.api.effect.particle.ParticleOptions;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -56,7 +55,6 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.util.AABB;
-import org.spongepowered.api.util.Color;
 import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.server.ServerWorld;
@@ -72,7 +70,7 @@ public class Portals
 {
     @Inject private Reflector reflector;
     @Inject private TaskManager tm;
-    private Log logger;
+    @Inject private Logger logger;
     private Path path;
     @Inject private I18n i18n;
     @Inject private ModuleManager mm;
@@ -92,7 +90,6 @@ public class Portals
     @Listener
     public void onEnable(StartedEngineEvent<Server> event) throws IOException
     {
-        this.logger = mm.getLoggerFor(Portals.class);
         this.path = mm.getPathFor(Portals.class);
         this.reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(), Destination.class);
 

@@ -31,11 +31,11 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
 import org.cubeengine.module.zoned.Zoned;
@@ -57,7 +57,7 @@ public class RegionManager
     private final Path modulePath;
     private ModuleManager mm;
     private final Reflector reflector;
-    private Log logger;
+    private Logger logger;
     private Zoned zoned;
     private Map<ResourceKey, Map<String, Region>> byName = new HashMap<>();
     private Map<ResourceKey, Map<Vector2i, List<Region>>> byChunk = new HashMap<>();
@@ -68,9 +68,9 @@ public class RegionManager
     private Map<UUID, Region> activeRegion = new HashMap<>(); // playerUUID -> Region
 
     @Inject
-    public RegionManager(ModuleManager mm, Reflector reflector)
+    public RegionManager(ModuleManager mm, Reflector reflector, Logger logger)
     {
-        this.logger = mm.getLoggerFor(Protector.class);
+        this.logger = logger;
         this.modulePath = mm.getPathFor(Protector.class);
         this.mm = mm;
         this.reflector = reflector;

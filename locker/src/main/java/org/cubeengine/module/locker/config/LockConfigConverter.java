@@ -19,6 +19,8 @@ package org.cubeengine.module.locker.config;
 
 import java.util.ArrayList;
 import java.util.Map.Entry;
+
+import org.apache.logging.log4j.Logger;
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.converter.converter.SimpleConverter;
 import org.cubeengine.converter.node.BooleanNode;
@@ -27,14 +29,13 @@ import org.cubeengine.converter.node.MapNode;
 import org.cubeengine.converter.node.Node;
 import org.cubeengine.converter.node.NullNode;
 import org.cubeengine.converter.node.StringNode;
-import org.cubeengine.logscribe.Log;
 import org.cubeengine.module.locker.data.ProtectionFlag;
 
 public abstract class LockConfigConverter<C extends LockConfig<C, ?>> extends SimpleConverter<C>
 {
-    private Log logger;
+    private Logger logger;
 
-    public LockConfigConverter(Log logger)
+    public LockConfigConverter(Logger logger)
     {
         this.logger = logger;
     }
