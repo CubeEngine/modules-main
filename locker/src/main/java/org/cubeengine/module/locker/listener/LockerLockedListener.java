@@ -113,8 +113,7 @@ public class LockerLockedListener
             return;
         }
         final ServerLocation loc = snap.location().get();
-        // TODO maybe the blockstate could have the data copied over?
-        event.filterDirections(direction -> !lockerManager.handleRedstoneInteract(loc.relativeTo(direction)));
+        event.filterTargetPositions(pos -> !lockerManager.handleRedstoneInteract(loc.world().location(pos)));
     }
 
     @Listener

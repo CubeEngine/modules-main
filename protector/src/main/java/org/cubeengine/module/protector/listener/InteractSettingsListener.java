@@ -186,37 +186,37 @@ public class InteractSettingsListener extends PermissionContainer
     }
 
 
-    @Listener(order = Order.EARLY)
-    public void onRedstoneChangeNotify(NotifyNeighborBlockEvent event, @Root LocatableBlock block)
-    {
-        for (Map.Entry<Direction, BlockState> entry : event.originalNeighbors().entrySet())
-        {
-            ServerLocation loc = block.serverLocation().relativeTo(entry.getKey());
-            List<Region> regionsAt = manager.getRegionsAt(loc);
-            if (isRedstoneChange(entry.getValue()))
-            {
-                // Redstone is disabled entirely?
-                if (checkSetting(event, null, regionsAt, () -> null, s -> s.deadCircuit, UNDEFINED) == FALSE)
-                {
-                    return;
-                }
-                if (true)
-                {
-                    // TODO this check is spammed way too often (also with wrong notifier mabye?)
-                    return;
-                }
-                // Redstone is disabled for player?
-                Optional<ServerPlayer> player = event.cause().context().get(EventContextKeys.NOTIFIER).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast);
-                if (player.isPresent())
-                {
-                    if (checkSetting(event, player.get(), regionsAt, () -> usePermission.get(InteractSettingsListener.UseType.REDSTONE), s -> s.use.all.redstone, UNDEFINED) == FALSE)
-                    {
-                        return;
-                    }
-                }
-            }
-        }
-    }
+//    @Listener(order = Order.EARLY)
+//    public void onRedstoneChangeNotify(NotifyNeighborBlockEvent event, @Root LocatableBlock block)
+//    {
+//        for (Map.Entry<Direction, BlockState> entry : event.originalNeighbors().entrySet())
+//        {
+//            ServerLocation loc = block.serverLocation().relativeTo(entry.getKey());
+//            List<Region> regionsAt = manager.getRegionsAt(loc);
+//            if (isRedstoneChange(entry.getValue()))
+//            {
+//                // Redstone is disabled entirely?
+//                if (checkSetting(event, null, regionsAt, () -> null, s -> s.deadCircuit, UNDEFINED) == FALSE)
+//                {
+//                    return;
+//                }
+//                if (true)
+//                {
+//                    // TODO this check is spammed way too often (also with wrong notifier mabye?)
+//                    return;
+//                }
+//                // Redstone is disabled for player?
+//                Optional<ServerPlayer> player = event.cause().context().get(EventContextKeys.NOTIFIER).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast);
+//                if (player.isPresent())
+//                {
+//                    if (checkSetting(event, player.get(), regionsAt, () -> usePermission.get(InteractSettingsListener.UseType.REDSTONE), s -> s.use.all.redstone, UNDEFINED) == FALSE)
+//                    {
+//                        return;
+//                    }
+//                }
+//            }
+//        }
+//    }
 
 
     private boolean isRedstoneChange(BlockState block)
