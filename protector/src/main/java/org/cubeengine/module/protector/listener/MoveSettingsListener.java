@@ -75,7 +75,7 @@ public class MoveSettingsListener extends PermissionContainer
     }
 
     @Listener(order = Order.EARLY)
-    public void onMove(MoveEntityEvent event, @Getter("getEntity") ServerPlayer player)
+    public void onMove(MoveEntityEvent event, @Getter("entity") ServerPlayer player)
     {
         // Ignore subblock movements
         if (event.destinationPosition().toInt().equals(event.originalPosition().toInt()))
