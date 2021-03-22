@@ -85,7 +85,7 @@ public class BankCommand extends DispatcherCommand
     @Restricted(msg =  "You cannot deposit into a bank as console!")
     public void deposit(ServerPlayer context, BaseAccount.Virtual bank, Double amount)
     {
-        Optional<UniqueAccount> account = service.orCreateAccount(context.uniqueId());
+        Optional<UniqueAccount> account = service.accountOrCreate(context.uniqueId());
         if (!account.isPresent())
         {
             i18n.send(context, NEGATIVE, "You do not have an account!");
@@ -119,7 +119,7 @@ public class BankCommand extends DispatcherCommand
     @Restricted(msg = "You cannot withdraw from a bank as console!")
     public void withdraw(ServerPlayer context, BaseAccount.Virtual bank, Double amount) //takes money from the bank
     {
-        Optional<UniqueAccount> account = service.orCreateAccount(context.uniqueId());
+        Optional<UniqueAccount> account = service.accountOrCreate(context.uniqueId());
         if (!account.isPresent())
         {
             i18n.send(context, NEGATIVE, "You do not have an account!");

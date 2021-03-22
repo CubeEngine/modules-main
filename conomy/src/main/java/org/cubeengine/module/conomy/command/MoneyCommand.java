@@ -73,7 +73,7 @@ public class MoneyCommand extends DispatcherCommand
 
     private BaseAccount.Unique getUserAccount(UUID user)
     {
-        return service.orCreateAccount(user)
+        return service.accountOrCreate(user)
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast).orElse(null);
     }
@@ -135,7 +135,7 @@ public class MoneyCommand extends DispatcherCommand
         List<Component> texts = new ArrayList<>();
         for (BalanceModel balance : models)
         {
-            Account account = service.orCreateAccount(balance.getAccountID()).get();
+            Account account = service.accountOrCreate(balance.getAccountID()).get();
             ConfigCurrency currency = service.getCurrency(balance.getCurrency());
             if (currency == null)
             {

@@ -117,7 +117,7 @@ public class BankManageCommand extends DispatcherCommand
             i18n.send(context, NEGATIVE, "There is already a bank names {input#bank}!", name);
             return;
         }
-        BaseAccount.Virtual bank = service.orCreateAccount(name).map(BaseAccount.Virtual.class::cast).get();
+        BaseAccount.Virtual bank = service.accountOrCreate(name).map(BaseAccount.Virtual.class::cast).get();
         bank.setHidden(hidden);
         bank.setInvite(invite);
         i18n.send(context, POSITIVE, "Created new Bank {account}!", bank);
