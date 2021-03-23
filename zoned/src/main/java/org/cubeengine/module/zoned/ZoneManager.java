@@ -31,6 +31,7 @@ import com.google.inject.Singleton;
 import net.kyori.adventure.audience.Audience;
 import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.cubeengine.module.zoned.event.ZoneEvent;
@@ -51,12 +52,12 @@ public class ZoneManager
     private Logger logger;
 
     @Inject
-    public ZoneManager(I18n i18n, Reflector reflector, ModuleManager mm, Logger logger)
+    public ZoneManager(I18n i18n, Reflector reflector, FileManager fm, Logger logger)
     {
         this.i18n = i18n;
         this.reflector = reflector;
         this.logger = logger;
-        this.path = mm.getPathFor(Zoned.class);
+        this.path = fm.getModulePath(Zoned.class);
     }
 
     public void loadZones() throws IOException

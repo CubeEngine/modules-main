@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.PermissionManager;
@@ -58,6 +59,7 @@ public class Conomy
     @Inject private I18n i18n;
     @Inject private Reflector reflector;
     @Inject private ModuleManager mm;
+    @Inject private FileManager fm;
     @Inject private PluginContainer plugin;
     private Path modulePath;
 
@@ -67,7 +69,7 @@ public class Conomy
     public void onEnable(StartedEngineEvent<Server> event)
     {
         i18n.getCompositor().registerFormatter(new BaseAccountFormatter());
-        this.modulePath = mm.getPathFor(Conomy.class);
+        this.modulePath = fm.getModulePath(Conomy.class);
         // TODO logging transactions / can be done via events
         // TODO logging new accounts not! workaround set start value using transaction
 

@@ -35,7 +35,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.logging.log4j.Logger;
 import org.cubeengine.converter.ConverterManager;
-import org.cubeengine.libcube.ModuleManager;
+import org.cubeengine.libcube.service.filesystem.ConfigLoader;
 import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.roles.Roles;
@@ -76,16 +76,16 @@ public class RolesPermissionService implements PermissionService
     @Inject private PermissionManager pm;
 
     @Inject
-    public RolesPermissionService(Roles module, FileManager fm, Reflector reflector, ModuleManager mm, Logger logger, PluginContainer plugin)
+    public RolesPermissionService(FileManager fm, Reflector reflector, Logger logger, ConfigLoader cl)
     {
         ConverterManager cManager = reflector.getDefaultConverterManager();
         cManager.registerConverter(new PermissionTreeConverter(this, logger), PermissionTree.class);
         cManager.registerConverter(new PriorityConverter(), Priority.class);
 
         this.reflector = reflector;
-        this.modulePath = mm.getPathFor(Roles.class);
+        this.modulePath = fm.getModulePath(Roles.class);
         this.logger = logger;
-        this.config = fm.loadConfig(plugin, module, RolesConfig.class);
+        this.config = cl.loadConfig(RolesConfig.class);
         collections.put(SUBJECTS_DEFAULT, new FileBasedCollection(modulePath, this, reflector, SUBJECTS_DEFAULT, true));
         collections.put(SUBJECTS_USER, new UserCollection(this));
         collections.put(SUBJECTS_GROUP, new FileBasedCollection(modulePath, this, reflector, SUBJECTS_GROUP, true));

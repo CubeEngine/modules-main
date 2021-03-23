@@ -19,11 +19,13 @@ package org.cubeengine.module.roles;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
+import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
 import org.cubeengine.libcube.util.ContextUtil;
@@ -56,15 +58,21 @@ public class Roles
 {
     @Inject private I18n i18n;
     @Inject private ModuleManager mm;
+    @Inject private FileManager fm;
     @Inject private RolesPermissionService service;
     @ModuleCommand private RoleCommands roleCommands;
 
     private boolean firstRun;
 
+    private Path defaultPermissionsGrantedMarker()
+    {
+        return fm.getModulePath(Roles.class).resolve("delete_me_if_you_need_permissions");
+    }
+
     @Listener
     public void onSetup(StartingEngineEvent<Server> event)
     {
-        this.firstRun = !Files.exists(mm.getPathFor(Roles.class).resolve("delete_me_if_you_need_permissions"));
+        this.firstRun = !Files.exists(defaultPermissionsGrantedMarker());
     }
 
     @Listener
@@ -92,7 +100,7 @@ public class Roles
         {
             try
             {
-                Files.createFile(mm.getPathFor(Roles.class).resolve("delete_me_if_you_need_permissions"));
+                Files.createFile(defaultPermissionsGrantedMarker());
                 this.firstRun = false;
             }
             catch (IOException e)

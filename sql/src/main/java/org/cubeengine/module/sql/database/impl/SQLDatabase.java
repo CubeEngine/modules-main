@@ -17,7 +17,6 @@
  */
 package org.cubeengine.module.sql.database.impl;
 
-import java.io.File;
 import java.sql.Connection;
 import java.sql.SQLException;
 import javax.sql.DataSource;
@@ -72,17 +71,16 @@ public class SQLDatabase extends AbstractDatabase implements Database, ModuleInj
     private Configuration jooqConfig;
 
     @Inject
-    public SQLDatabase(Reflector reflector, ModuleManager mm, FileManager fm, Logger log)
+    public SQLDatabase(Reflector reflector, ModuleManager mm, Logger log, FileManager fm)
     {
         this.mm = mm;
         this.logger = log;
         this.jooqLogger = new JooqLogger(this, log);
         this.mm.registerBinding(Database.class, this);
-        File pluginFolder = mm.getBasePath();
 
         reflector.getDefaultConverterManager().registerConverter(new SQLDialectConverter(), SQLDialect.class);
 
-        this.config = reflector.load(DatabaseConfiguration.class, new File(pluginFolder, "database.yml"));
+        this.config = reflector.load(DatabaseConfiguration.class, fm.getDataPath().resolve("database.yml").toFile());
 
 
     }

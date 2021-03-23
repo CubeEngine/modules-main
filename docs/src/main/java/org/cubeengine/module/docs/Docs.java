@@ -30,6 +30,7 @@ import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.InjectService;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
+import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
@@ -53,12 +54,13 @@ public class Docs
     @Inject private PermissionManager pm;
     private Path modulePath;
     @Inject private ModuleManager mm;
+    @Inject private FileManager fm;
     @ModuleCommand private DocsCommands docsCommands;
 
     @Listener(order = Order.LAST)
     public void onStartedServer(StartedEngineEvent<Server> event)
     {
-        this.modulePath = mm.getPathFor(Docs.class);
+        this.modulePath = fm.getModulePath(Docs.class);
         this.generateDocumentation();
         if ("true".equals(System.getenv("CUBEENGINE_DOCS_SHUTDOWN")))
         {

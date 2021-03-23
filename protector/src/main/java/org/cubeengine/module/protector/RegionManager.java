@@ -35,6 +35,7 @@ import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.filesystem.FileExtensionFilter;
+import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.protector.region.Region;
 import org.cubeengine.module.protector.region.RegionConfig;
@@ -68,10 +69,10 @@ public class RegionManager
     private Map<UUID, Region> activeRegion = new HashMap<>(); // playerUUID -> Region
 
     @Inject
-    public RegionManager(ModuleManager mm, Reflector reflector, Logger logger)
+    public RegionManager(ModuleManager mm, Reflector reflector, Logger logger, FileManager fm)
     {
         this.logger = logger;
-        this.modulePath = mm.getPathFor(Protector.class);
+        this.modulePath = fm.getModulePath(Protector.class);
         this.mm = mm;
         this.reflector = reflector;
         Path path = modulePath.resolve("region");

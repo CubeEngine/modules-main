@@ -76,14 +76,14 @@ public class ModuleDocs
     }
 
 
-    public ModuleDocs(PluginContainer plugin, Class module, Reflector reflector, PermissionManager pm, PermissionService ps, ModuleManager mm)
+    public ModuleDocs(PluginContainer plugin, Class<?> module, Reflector reflector, PermissionManager pm, PermissionService ps, ModuleManager mm)
     {
         this.reflector = reflector;
         this.pc = plugin;
         this.name = plugin.getMetadata().getName().get();
         this.moduleName = mm.getModuleName(module).get();
         this.id = plugin.getMetadata().getId();
-        this.moduleId = mm.getModuleID(module).get();
+        this.moduleId = mm.getModuleId(plugin);
         InputStream is = plugin.getClass().getResourceAsStream("/assets/"+ id + "/info.yml");
         if (is == null)
         {

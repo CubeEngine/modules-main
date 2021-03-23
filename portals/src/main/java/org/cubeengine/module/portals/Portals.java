@@ -34,6 +34,7 @@ import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.event.ModuleListener;
+import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
@@ -74,6 +75,7 @@ public class Portals
     private Path path;
     @Inject private I18n i18n;
     @Inject private ModuleManager mm;
+    @Inject private FileManager fm;
 
     private Path portalsDir;
     private final Map<String, Portal> portals = new HashMap<>();
@@ -90,7 +92,7 @@ public class Portals
     @Listener
     public void onEnable(StartedEngineEvent<Server> event) throws IOException
     {
-        this.path = mm.getPathFor(Portals.class);
+        this.path = fm.getModulePath(Portals.class);
         this.reflector.getDefaultConverterManager().registerConverter(new DestinationConverter(), Destination.class);
 
         this.portalsDir = Files.createDirectories(path.resolve("portals"));

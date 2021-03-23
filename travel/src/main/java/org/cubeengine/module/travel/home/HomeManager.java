@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.travel.home;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -27,8 +28,8 @@ import java.util.stream.Collectors;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.config.Home;
@@ -59,9 +60,12 @@ public class HomeManager
     private HomeConfig config;
 
     @Inject
-    public HomeManager(EventManager em, PluginContainer plugin, Travel module, I18n i18n, Reflector reflector, ModuleManager mm)
+    public HomeManager(EventManager em, PluginContainer plugin, Travel module, I18n i18n, Reflector reflector, FileManager fm)
     {
-        this.config = reflector.load(HomeConfig.class, mm.getPathFor(Travel.class).resolve("homes.yml").toFile());
+        final File confFile = fm.getModulePath(Travel.class)
+                .resolve("homes.yml")
+                .toFile();
+        this.config = reflector.load(HomeConfig.class, confFile);
         this.module = module;
         this.i18n = i18n;
         em.registerListeners(plugin, this);

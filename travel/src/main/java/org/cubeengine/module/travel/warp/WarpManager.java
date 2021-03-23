@@ -17,6 +17,7 @@
  */
 package org.cubeengine.module.travel.warp;
 
+import java.io.File;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -24,8 +25,8 @@ import java.util.stream.Collectors;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.config.ConfigWorld;
+import org.cubeengine.libcube.service.filesystem.FileManager;
 import org.cubeengine.module.travel.Travel;
 import org.cubeengine.module.travel.config.Warp;
 import org.cubeengine.module.travel.config.WarpConfig;
@@ -40,9 +41,12 @@ public class WarpManager
     private WarpConfig config;
 
     @Inject
-    public WarpManager(Reflector reflector, ModuleManager mm)
+    public WarpManager(Reflector reflector, FileManager fm)
     {
-        this.config = reflector.load(WarpConfig.class, mm.getPathFor(Travel.class).resolve("warps.yml").toFile());
+        final File confFile = fm.getModulePath(Travel.class)
+                .resolve("warps.yml")
+                .toFile();
+        this.config = reflector.load(WarpConfig.class, confFile);
     }
 
     public Warp create(User owner, String name, ServerWorld world, Transform transform)
