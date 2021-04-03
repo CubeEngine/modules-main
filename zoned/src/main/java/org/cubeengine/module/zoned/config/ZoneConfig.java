@@ -109,6 +109,7 @@ public class ZoneConfig extends ReflectedYaml
     public void clear()
     {
         this.vectors.clear();
+        this.world = null;
         this.shape = null;
     }
 
