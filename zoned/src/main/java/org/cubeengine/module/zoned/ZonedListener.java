@@ -28,6 +28,7 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.module.zoned.config.ZoneConfig;
@@ -43,6 +44,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent.Primary;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.item.inventory.ChangeInventoryEvent;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.Direction.Division;
 import org.spongepowered.api.world.server.ServerLocation;
@@ -62,13 +64,43 @@ public class ZonedListener
     private I18n i18n;
     private Permission selectPerm;
     private Reflector reflector;
+    private TaskManager tm;
 
     @Inject
-    public ZonedListener(I18n i18n, PermissionManager pm, Reflector reflector)
+    public ZonedListener(I18n i18n, PermissionManager pm, Reflector reflector, TaskManager tm)
     {
         this.i18n = i18n;
         selectPerm = pm.register(Zoned.class, "use-tool", "Allows using the selector tool", null);
         this.reflector = reflector;
+        this.tm = tm;
+    }
+
+    @Listener
+    public void onInteract(InteractItemEvent.Secondary event, @First ServerPlayer player)
+    {
+        final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
+        if (!ZonedData.isSavedSelection(itemInHand))
+        {
+            return;
+        }
+        event.setCancelled(true);
+
+
+        if (!event.context().get(EventContextKeys.USED_HAND).map(
+            hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        {
+            return;
+        }
+
+        i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "Recalled selection");
+        final ZoneConfig zone = new ZoneConfig();
+        zone.world = new ConfigWorld(itemInHand.get(ZonedData.ZONE_WORLD).get().asString());
+        final Vector3d min = itemInHand.get(ZonedData.ZONE_MIN).get();
+        final Vector3d max = itemInHand.get(ZonedData.ZONE_MAX).get();
+        Vector3d size = max.sub(min);
+        zone.shape = new Cuboid(min, size);
+        this.setZone(player, zone);
+        ShapeRenderer.showActiveZone(tm, player, this::getZone);
     }
 
     @Listener
@@ -80,7 +112,8 @@ public class ZonedListener
             return;
         }
 
-        if (!SelectionTool.inHand(player) || !player.hasPermission(selectPerm.getId()))
+        final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
+        if (!ZonedData.isTool(itemInHand) || !player.hasPermission(selectPerm.getId()))
         {
             return;
         }
@@ -116,7 +149,8 @@ public class ZonedListener
             return;
         }
 
-        if (!SelectionTool.inHand(player) || !player.hasPermission(selectPerm.getId()))
+        final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
+        if (!ZonedData.isTool(itemInHand) || !player.hasPermission(selectPerm.getId()))
         {
             return;
         }
@@ -150,6 +184,7 @@ public class ZonedListener
             Component added = config.addPoint(i18n, player, event instanceof InteractBlockEvent.Primary, block.position());
             Component selected = config.getSelected(i18n, player);
 
+            ShapeRenderer.showActiveZone(tm, player, this::getZone);
             i18n.send(ChatType.ACTION_BAR, player, POSITIVE, "{txt} ({integer}, {integer}, {integer}). {txt}", added, block.blockX(),
                       block.blockY(), block.blockZ(), selected);
         }
@@ -163,27 +198,35 @@ public class ZonedListener
     @Listener
     public void onScrollBar(ChangeInventoryEvent.Held event, @First ServerPlayer player)
     {
-        if (!player.get(Keys.IS_SNEAKING).orElse(false))
+        if (player.get(Keys.IS_SNEAKING).orElse(false))
         {
-           return;
+            if (ZonedData.isTool(event.originalSlot().peek()) && player.hasPermission(selectPerm.getId()))
+            {
+                ZoneConfig config = getZone(player);
+                if (config.world == null)
+                {
+                    config.world = new ConfigWorld(player.world());
+                }
+                int scrollDirection = this.compareSlots(event.originalSlot().get(Keys.SLOT_INDEX).get(), event.finalSlot().get(Keys.SLOT_INDEX).get());
+                if (scrollDirection == 0)
+                {
+                    return;
+                }
+                this.expandShape(scrollDirection > 0, player, config);
+                event.setCancelled(true);
+                return;
+            }
         }
-
-        if (!SelectionTool.isTool(event.originalSlot().peek()) || !player.hasPermission(selectPerm.getId()))
+        final ItemStack originalStack = event.originalSlot().peek();
+        if (ZonedData.isSavedSelection(originalStack) || ZonedData.isTool(originalStack))
         {
-            return;
+            ShapeRenderer.hideActiveZone(player);
         }
-        ZoneConfig config = getZone(player);
-        if (config.world == null)
+        final ItemStack finalStack = event.finalSlot().peek();
+        if (ZonedData.isTool(finalStack))
         {
-            config.world = new ConfigWorld(player.world());
+            ShapeRenderer.showActiveZone(tm, player, this::getZone);
         }
-        int scrollDirection = this.compareSlots(event.originalSlot().get(Keys.SLOT_INDEX).get(), event.finalSlot().get(Keys.SLOT_INDEX).get());
-        if (scrollDirection == 0)
-        {
-            return;
-        }
-        this.expandShape(scrollDirection > 0, player, config);
-        event.setCancelled(true);
     }
 
     private int compareSlots(int previousSlot, int newSlot)
@@ -206,6 +249,7 @@ public class ZonedListener
             i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Cannot extend incomplete selection");
             return true;
         }
+        ShapeRenderer.showActiveZone(tm, player, this::getZone);
 
         final Direction direction = Direction.closest(player.headDirection(), Division.CARDINAL);
         final Shape shape = config.shape;
@@ -278,6 +322,7 @@ public class ZonedListener
             i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Cannot move incomplete selection");
             return true;
         }
+        ShapeRenderer.showActiveZone(tm, player, this::getZone);
 
         final Direction direction = Direction.closest(player.headDirection(), Division.CARDINAL);
         final Shape shape = config.shape;

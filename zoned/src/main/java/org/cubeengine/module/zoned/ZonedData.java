@@ -25,19 +25,46 @@ import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.util.TypeTokens;
+import org.spongepowered.math.vector.Vector3d;
 
 public interface ZonedData
 {
     Key<Value<String>> ZONE_TYPE = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-type")).type(TypeTokens.STRING_VALUE_TOKEN).build();
 
+    Key<Value<ResourceKey>> ZONE_WORLD = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-world")).type(TypeTokens.RESOURCE_KEY_VALUE_TOKEN).build();
+    Key<Value<Vector3d>> ZONE_MIN = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-min")).type(TypeTokens.VECTOR_3D_VALUE_TOKEN).build();
+    Key<Value<Vector3d>> ZONE_MAX = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-max")).type(TypeTokens.VECTOR_3D_VALUE_TOKEN).build();
+
+
     static void register(RegisterDataEvent event)
     {
-        final ResourceKey regKey = ResourceKey.of(PluginZoned.ZONED_ID, "zone-type");
-        final DataStore dataStore = DataStore.builder().pluginData(regKey).holder(ItemStack.class).key(ZonedData.ZONE_TYPE, "zone-type").build();
-        final DataRegistration registration = DataRegistration.builder()
-                                                              .dataKey(ZonedData.ZONE_TYPE)
-                                                              .store(dataStore)
-                                                              .build();
-        event.register(registration);
+        {
+            final ResourceKey regKey = ResourceKey.of(PluginZoned.ZONED_ID, "zone-type");
+            final DataStore dataStore = DataStore.builder().pluginData(regKey).holder(ItemStack.class).keys(ZonedData.ZONE_TYPE).build();
+            final DataRegistration registration = DataRegistration.builder()
+                                                                  .dataKey(ZonedData.ZONE_TYPE)
+                                                                  .store(dataStore)
+                                                                  .build();
+            event.register(registration);
+        }
+        {
+            final DataStore dataStore = DataStore.builder().pluginData(ResourceKey.of(PluginZoned.ZONED_ID, "saved-zone-type")).holder(ItemStack.class).keys(ZONE_WORLD, ZONE_MAX, ZONE_MIN).build();
+            final DataRegistration registration = DataRegistration.builder()
+                                                                   .dataKey(ZONE_WORLD, ZONE_MAX, ZONE_MIN)
+                                                                   .store(dataStore)
+                                                                   .build();
+            event.register(registration);
+        }
+
+    }
+
+    static boolean isTool(ItemStack stack)
+    {
+        return stack.get(ZONE_TYPE).isPresent();
+    }
+
+    static boolean isSavedSelection(ItemStack stack)
+    {
+        return stack.get(ZONE_WORLD).isPresent();
     }
 }

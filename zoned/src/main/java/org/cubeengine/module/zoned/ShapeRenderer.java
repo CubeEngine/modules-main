@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import org.cubeengine.libcube.service.task.TaskManager;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.zoned.config.ZoneConfig;
@@ -40,16 +41,38 @@ public class ShapeRenderer
 {
     private static final Map<UUID, ScheduledTask> showRegionTasks = new HashMap<>();
 
-    public static boolean toggleShowActiveZone(TaskManager tm, ServerPlayer player, Zoned module)
+    public static boolean toggleShowActiveZone(TaskManager tm, ServerPlayer player, Function<ServerPlayer, ZoneConfig> zoneProvider)
+    {
+
+        final ScheduledTask oldTask = showRegionTasks.remove(player.uniqueId());
+        if (oldTask != null)
+        {
+            hideActiveZone(player);
+            return false;
+        }
+        showActiveZone(tm, player, zoneProvider);
+        return true;
+    }
+
+    public static boolean hideActiveZone(ServerPlayer player)
     {
         final ScheduledTask oldTask = showRegionTasks.remove(player.uniqueId());
         if (oldTask != null)
         {
             oldTask.cancel();
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean showActiveZone(TaskManager tm, ServerPlayer player, Function<ServerPlayer, ZoneConfig> zoneProvider)
+    {
+        if (showRegionTasks.containsKey(player.uniqueId()))
+        {
             return false;
         }
-        final ScheduledTask newTask = tm.runTimer(t -> ShapeRenderer.showActiveRegion(tm, player.uniqueId(), module.getActiveZone(player)),
-                           Ticks.of(10), Ticks.of(10));
+        final ScheduledTask newTask = tm.runTimer(t -> ShapeRenderer.showActiveRegion0(player.uniqueId(), zoneProvider.apply(player)),
+                                                  Ticks.of(10), Ticks.of(10));
         showRegionTasks.put(player.uniqueId(), newTask);
         return true;
     }
@@ -59,7 +82,7 @@ public class ShapeRenderer
         return showRegionTasks.containsKey(player.uniqueId());
     }
 
-    private static void showActiveRegion(TaskManager tm, UUID playerUuid, ZoneConfig zone)
+    private static void showActiveRegion0(UUID playerUuid, ZoneConfig zone)
     {
         final ServerPlayer player = Sponge.server().player(playerUuid).orElse(null);
         if (player == null)

@@ -164,7 +164,7 @@ public class ZonedCommands extends DispatcherCommand
         {
             i18n.send(ACTION_BAR, context, NEGATIVE, "You don't have an active zone");
         }
-        if (!ShapeRenderer.toggleShowActiveZone(tm, context, module))
+        if (!ShapeRenderer.toggleShowActiveZone(tm, context, module::getActiveZone))
         {
             i18n.send(ACTION_BAR, context, POSITIVE, "Stopped showing active zone.");
             return;

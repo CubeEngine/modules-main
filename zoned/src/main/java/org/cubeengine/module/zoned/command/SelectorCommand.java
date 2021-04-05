@@ -22,7 +22,8 @@ import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.util.SpawnUtil;
-import org.cubeengine.module.zoned.SelectionTool;
+import org.cubeengine.module.zoned.ZonedData;
+import org.cubeengine.module.zoned.ZonedItems;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.item.ItemTypes;
@@ -50,7 +51,7 @@ public class SelectorCommand
         Inventory axes = player.inventory().query(QueryTypes.ITEM_TYPE, ItemTypes.COAL);
         for (Inventory slot : axes.slots())
         {
-            if (SelectionTool.isTool(slot.peek()))
+            if (ZonedData.isTool(slot.peek()))
             {
                 found = slot.peek();
                 slot.clear();
@@ -61,7 +62,7 @@ public class SelectorCommand
         final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
         if (found == null)
         {
-            found = SelectionTool.newTool(player);
+            found = ZonedItems.newTool();
             player.setItemInHand(HandTypes.MAIN_HAND, found);
             if (!itemInHand.isEmpty())
             {

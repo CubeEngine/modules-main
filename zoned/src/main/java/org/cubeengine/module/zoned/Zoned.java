@@ -34,7 +34,9 @@ import org.spongepowered.api.Server;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
+import org.spongepowered.api.event.lifecycle.RegisterDataPackValueEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
+import org.spongepowered.api.item.recipe.RecipeRegistration;
 import org.spongepowered.math.vector.Vector3d;
 
 @Singleton
@@ -67,6 +69,12 @@ public class Zoned
     public void onRegisterData(RegisterDataEvent event)
     {
         ZonedData.register(event);
+    }
+
+    @Listener
+    public void onRegisterRecipe(RegisterDataPackValueEvent<RecipeRegistration> event)
+    {
+        ZonedItems.registerRecipes(event, listener);
     }
 
     public ZoneConfig getActiveZone(ServerPlayer player)
