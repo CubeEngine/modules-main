@@ -29,6 +29,7 @@ import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.libcube.service.task.TaskManager;
+import org.cubeengine.libcube.util.EventUtil;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.libcube.util.math.shape.Shape;
 import org.cubeengine.module.zoned.config.ZoneConfig;
@@ -37,7 +38,6 @@ import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Cancellable;
-import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent.Primary;
@@ -85,9 +85,7 @@ public class ZonedListener
         }
         event.setCancelled(true);
 
-
-        if (!event.context().get(EventContextKeys.USED_HAND).map(
-            hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        if (!EventUtil.isMainHand(event.context()))
         {
             return;
         }
@@ -97,7 +95,7 @@ public class ZonedListener
         zone.world = new ConfigWorld(itemInHand.get(ZonedData.ZONE_WORLD).get().asString());
         final Vector3d min = itemInHand.get(ZonedData.ZONE_MIN).get();
         final Vector3d max = itemInHand.get(ZonedData.ZONE_MAX).get();
-        Vector3d size = max.sub(min);
+        final Vector3d size = max.sub(min);
         zone.shape = new Cuboid(min, size);
         this.setZone(player, zone);
         ShapeRenderer.showActiveZone(tm, player, this::getZone);
@@ -106,8 +104,7 @@ public class ZonedListener
     @Listener
     public void onInteract(InteractItemEvent event, @First ServerPlayer player)
     {
-        if (!event.context().get(EventContextKeys.USED_HAND).map(
-            hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        if (!EventUtil.isMainHand(event.context()))
         {
             return;
         }
@@ -143,8 +140,7 @@ public class ZonedListener
     @Listener
     public void onInteract(InteractBlockEvent event, @First ServerPlayer player)
     {
-        if (!event.context().get(EventContextKeys.USED_HAND).map(
-            hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        if (!EventUtil.isMainHand(event.context()))
         {
             return;
         }

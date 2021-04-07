@@ -27,6 +27,7 @@ import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
 import org.cubeengine.libcube.service.i18n.formatter.MessageType;
+import org.cubeengine.libcube.util.EventUtil;
 import org.cubeengine.module.locker.data.LockerData;
 import org.cubeengine.module.locker.data.LockerManager;
 import org.cubeengine.module.locker.data.LockerMode;
@@ -62,7 +63,7 @@ public class LockerBookListener
     @Listener
     public void onInteractBlock(InteractBlockEvent.Secondary event, @Root ServerPlayer player)
     {
-        if (!event.context().get(EventContextKeys.USED_HAND).map(hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        if (!EventUtil.isMainHand(event.context()))
         {
             return;
         }
@@ -143,7 +144,7 @@ public class LockerBookListener
     {
         final ItemStack itemInHand = player.itemInHand(HandTypes.MAIN_HAND);
         final Optional<String> mode = itemInHand.get(LockerData.MODE);
-        if (mode.isPresent() && event.context().get(EventContextKeys.USED_HAND).map(hand -> hand.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        if (mode.isPresent() && EventUtil.isMainHand(event.context()))
         {
             if (this.handleLockerBookInteraction(player, LockerMode.valueOf(mode.get()), event.entity(), itemInHand))
             {

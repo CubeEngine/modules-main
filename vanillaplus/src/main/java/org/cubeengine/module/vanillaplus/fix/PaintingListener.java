@@ -29,6 +29,7 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
+import org.cubeengine.libcube.util.EventUtil;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
@@ -73,7 +74,7 @@ public class PaintingListener extends PermissionContainer
     {
         if (event.entity() instanceof Painting)
         {
-            if (event.context().get(EventContextKeys.USED_HAND).get() != HandTypes.MAIN_HAND.get())
+            if (!EventUtil.isMainHand(event.context()))
             {
                 return;
             }

@@ -68,14 +68,7 @@ public interface ZonedItems
                                                                                         ItemStack.empty(), ItemStack.empty(), ItemStack.empty(),
                                                                                         ItemStack.empty(), ItemStack.empty(), ItemStack.empty())
                                                                       )
-                                                                      .result(g -> {
-                                                                          final ServerPlayer craftingPlayer = Sponge.server().causeStackManager().currentCause().first(ServerPlayer.class).orElse(null);
-                                                                          if (craftingPlayer == null)
-                                                                          {
-                                                                              return ItemStack.empty();
-                                                                          }
-                                                                          return savedSelection(craftingPlayer, listener);
-                                                                      }, savedSelection())
+                                                                      .result(g -> savedSelection(listener), savedSelection())
                                                                       .key(ResourceKey.of(PluginZoned.ZONED_ID, "saved_selection"))
                                                                       .build();
         event.register(savedSelectionRecipe);
@@ -92,24 +85,25 @@ public interface ZonedItems
         return newTool;
     }
 
-    static ItemStack savedSelection(ServerPlayer player, ZonedListener listener)
+    static ItemStack savedSelection(ZonedListener listener)
     {
-        final ItemStack newTool = savedSelection();
-        if (player != null)
+        ServerPlayer player = Sponge.server().causeStackManager().currentCause().first(ServerPlayer.class).orElse(null);
+        if (player == null)
         {
-            final ZoneConfig zone = listener.getZone(player);
-            if (zone == null)
-            {
-                return ItemStack.empty();
-            }
-            final Cuboid cuboid = zone.shape.getBoundingCuboid();
-            final Vector3d min = cuboid.getMinimumPoint();
-            final Vector3d max = cuboid.getMaximumPoint();
-            final ResourceKey worldKey = ResourceKey.resolve(zone.world.getName());
-            newTool.offer(ZonedData.ZONE_WORLD, worldKey);
-            newTool.offer(ZonedData.ZONE_MAX, max);
-            newTool.offer(ZonedData.ZONE_MIN, min);
+            return ItemStack.empty();
         }
+        final ZoneConfig zone = listener.getZone(player);
+        if (zone == null)
+        {
+            return ItemStack.empty();
+        }
+        final Cuboid cuboid = zone.shape.getBoundingCuboid();
+        final ResourceKey worldKey = ResourceKey.resolve(zone.world.getName());
+
+        final ItemStack newTool = savedSelection();
+        newTool.offer(ZonedData.ZONE_WORLD, worldKey);
+        newTool.offer(ZonedData.ZONE_MAX, cuboid.getMaximumPoint());
+        newTool.offer(ZonedData.ZONE_MIN, cuboid.getMinimumPoint());
         return newTool;
     }
 

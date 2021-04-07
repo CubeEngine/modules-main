@@ -21,6 +21,7 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Queue;
 import java.util.Set;
 import com.google.inject.Inject;
@@ -39,9 +40,11 @@ import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.event.EventManager;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.task.TaskManager;
+import org.cubeengine.libcube.util.EventUtil;
 import org.cubeengine.libcube.util.math.shape.CompositeShape;
 import org.cubeengine.libcube.util.math.shape.Cuboid;
 import org.cubeengine.module.zoned.ShapeRenderer;
+import org.cubeengine.module.zoned.ZoneManager;
 import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.cubeengine.module.zoned.Zoned;
 import org.spongepowered.api.Sponge;
@@ -57,6 +60,7 @@ import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 import org.spongepowered.api.world.teleport.TeleportHelperFilters;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
@@ -74,24 +78,26 @@ public class ZonedCommands extends DispatcherCommand
 
     private Zoned module;
     private I18n i18n;
+    private ZoneManager manager;
     private TaskManager tm;
     private EventManager em;
 
     @Inject
-    public ZonedCommands(Zoned module, I18n i18n, TaskManager tm, EventManager em)
+    public ZonedCommands(Zoned module, I18n i18n, TaskManager tm, EventManager em, ZoneManager manager)
     {
         super(Zoned.class);
         this.module = module;
         this.tm = tm;
         this.em = em;
         this.i18n = i18n;
+        this.manager = manager;
     }
 
     @Command(desc = "Defines a new zone")
     public void define(ServerPlayer context, String name)
     {
         ZoneConfig cfg = this.module.getActiveZone(context);
-        module.getManager().define(context, name, cfg, false);
+        this.manager.define(context, name, cfg, false);
     }
 
     @Command(desc = "Redefines an existing zone")
@@ -100,7 +106,7 @@ public class ZonedCommands extends DispatcherCommand
         ZoneConfig cfg = this.module.getActiveZone(context);
         zone.shape = cfg.shape;
         zone.world = cfg.world;
-        module.getManager().define(context, zone.name, zone, true);
+        this.manager.define(context, zone.name, zone, true);
     }
 
     @Command(desc = "Selects a zone")
@@ -113,7 +119,7 @@ public class ZonedCommands extends DispatcherCommand
     @Command(desc = "Lists zones")
     public void list(Audience context, @Option String match, @Named("in") ServerWorld world)
     {
-        Collection<ZoneConfig> zones = this.module.getManager().getZones(match, world);
+        Collection<ZoneConfig> zones = this.manager.getZones(match, world);
         if (zones.isEmpty())
         {
             i18n.send(context, NEGATIVE, "No Zones found");
@@ -131,6 +137,11 @@ public class ZonedCommands extends DispatcherCommand
     @Command(desc = "Displays zone info")
     public void info(Audience context, @Default ZoneConfig zone)
     {
+        if (zone == null)
+        {
+            i18n.send(context, NEGATIVE, "No zone selected");
+            return;
+        }
         if (zone.name == null)
         {
             i18n.send(context, POSITIVE, "Undefined Zone in {name#world}", zone.world.getName());
@@ -143,7 +154,7 @@ public class ZonedCommands extends DispatcherCommand
     @Command(desc = "Deletes a zone", alias = "remove")
     public void delete(Audience context, ZoneConfig zone)
     {
-        this.module.getManager().delete(context, zone);
+        this.manager.delete(context, zone);
     }
 
     @Command(desc = "Toggles particles for the currently selected zone")
@@ -175,22 +186,19 @@ public class ZonedCommands extends DispatcherCommand
     @Command(desc = "Teleports to a zone", alias = "tp")
     public void teleport(ServerPlayer context, ZoneConfig zone, @Flag boolean force)
     {
-        Cuboid boundingCuboid = zone.shape.getBoundingCuboid();
-        Vector3d middle = boundingCuboid.getMinimumPoint().add(boundingCuboid.getMaximumPoint()).div(2);
+        final Cuboid boundingCuboid = zone.shape.getBoundingCuboid();
+        final Vector3d middle = boundingCuboid.getMinimumPoint().add(boundingCuboid.getMaximumPoint()).div(2);
+        final GameMode mode = context.get(Keys.GAME_MODE).orElse(null);
         ServerLocation loc = zone.world.getWorld().location(middle);
-        GameMode mode = context.get(Keys.GAME_MODE).orElse(null);
-        if (mode != GameModes.SPECTATOR)
+        if (mode != GameModes.SPECTATOR.get())
         {
             int h = (int)boundingCuboid.getHeight() / 2 + 1;
             int w = (int)Math.max(boundingCuboid.getWidth() / 2 + 1, boundingCuboid.getDepth() / 2 + 1);
-            java.util.Optional<ServerLocation> adjusted = Sponge.server().teleportHelper()
-                .findSafeLocation(loc, Math.max(h, 5), Math.max(w, 5),
-                                 ((int)boundingCuboid.getHeight()),
-                                 mode == GameModes.CREATIVE.get() ? TeleportHelperFilters.FLYING.get() : TeleportHelperFilters.DEFAULT.get());
+            final TeleportHelperFilter filter = mode == GameModes.CREATIVE.get() ? TeleportHelperFilters.FLYING.get() : TeleportHelperFilters.DEFAULT.get();
+            Optional<ServerLocation> adjusted = Sponge.server().teleportHelper().findSafeLocation(loc, Math.max(h, 5), Math.max(w, 5), ((int)boundingCuboid.getHeight()), filter);
             if (!adjusted.isPresent() && !force)
             {
-                i18n.send(ACTION_BAR, context, POSITIVE,
-                          "Could not find a safe spot in zone. Use -force to teleport anyways");
+                i18n.send(ACTION_BAR, context, POSITIVE, "Could not find a safe spot in zone. Use -force to teleport anyways");
                 return;
             }
             loc = adjusted.orElse(loc);
@@ -226,7 +234,7 @@ public class ZonedCommands extends DispatcherCommand
 
     private boolean circuitSelect(InteractBlockEvent.Secondary e, ServerPlayer player, Set<Direction> directions)
     {
-        if (!e.context().get(EventContextKeys.USED_HAND).map(h -> h.equals(HandTypes.MAIN_HAND.get())).orElse(false))
+        if (!EventUtil.isMainHand(e.context()))
         {
             return false;
         }
