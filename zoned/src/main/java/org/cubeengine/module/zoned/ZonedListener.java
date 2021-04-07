@@ -85,7 +85,7 @@ public class ZonedListener
         }
         event.setCancelled(true);
 
-        if (!EventUtil.isMainHand(event.context()))
+        if (!EventUtil.isMainHand(event.context()) || !player.hasPermission(selectPerm.getId()))
         {
             return;
         }
@@ -119,18 +119,15 @@ public class ZonedListener
             return;
         }
 
-        ZoneConfig config = getZone(player);
+        final ZoneConfig config = getZone(player);
         if (config.world == null)
         {
             config.world = new ConfigWorld(player.world());
         }
-        else
+        else if (config.world.getWorld() != player.world())
         {
-            if (config.world.getWorld() != player.world())
-            {
-                i18n.send(player, NEUTRAL, "No Zone selected in this world yet.");
-                return;
-            }
+            i18n.send(player, NEUTRAL, "No Zone selected in this world yet.");
+            return;
         }
 
         final boolean extend = event instanceof InteractItemEvent.Primary;
@@ -194,6 +191,10 @@ public class ZonedListener
     @Listener
     public void onScrollBar(ChangeInventoryEvent.Held event, @First ServerPlayer player)
     {
+        if (!player.hasPermission(selectPerm.getId()))
+        {
+            return;
+        }
         if (player.get(Keys.IS_SNEAKING).orElse(false))
         {
             if (ZonedData.isTool(event.originalSlot().peek()) && player.hasPermission(selectPerm.getId()))

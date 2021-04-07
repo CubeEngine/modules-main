@@ -26,8 +26,6 @@ import org.jetbrains.annotations.NotNull;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.lifecycle.RegisterDataPackValueEvent;
 import org.spongepowered.api.item.ItemTypes;
@@ -37,7 +35,6 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.recipe.RecipeRegistration;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.Ingredient;
-import org.spongepowered.math.vector.Vector3d;
 
 import static org.spongepowered.api.item.ItemTypes.COAL;
 
@@ -46,32 +43,34 @@ public interface ZonedItems
 
     static void registerRecipes(RegisterDataPackValueEvent<RecipeRegistration> event, ZonedListener listener)
     {
-        final RecipeRegistration selectionToolRecipe = CraftingRecipe.shapedBuilder()
-                                                                  .aisle("trt", "rcr", "trt")
-                                                                  .where('t', Ingredient.of(ItemTypes.REDSTONE_TORCH))
-                                                                  .where('r', Ingredient.of(ItemTypes.REDSTONE))
-                                                                  .where('c', Ingredient.of(ItemTypes.COAL))
-                                                                  .result(newTool())
-                                                                  .key(ResourceKey.of(PluginZoned.ZONED_ID, "selection_tool"))
-                                                                  .build();
-        event.register(selectionToolRecipe);
-
-        final Ingredient toolIngredient = Ingredient.of(ResourceKey.of(PluginZoned.ZONED_ID, "tool_ingredient"), stack -> stack.get(ZonedData.ZONE_TYPE).isPresent(), newTool());
-        final RecipeRegistration savedSelectionRecipe = CraftingRecipe.shapedBuilder()
-                                                                      .aisle(" t ", "ses", " i ")
-                                                                      .where('s', Ingredient.of(ItemTypes.STRING))
-                                                                      .where('i', Ingredient.of(ItemTypes.SLIME_BALL))
-                                                                      .where('e', Ingredient.of(ItemTypes.ENDER_EYE))
-                                                                      .where('t', toolIngredient)
-                                                                      .remainingItems(g ->
-                                                                          Arrays.asList(ItemStack.empty(), g.asGrid().peek(0, 1).get(), ItemStack.empty(),
-                                                                                        ItemStack.empty(), ItemStack.empty(), ItemStack.empty(),
-                                                                                        ItemStack.empty(), ItemStack.empty(), ItemStack.empty())
-                                                                      )
-                                                                      .result(g -> savedSelection(listener), savedSelection())
-                                                                      .key(ResourceKey.of(PluginZoned.ZONED_ID, "saved_selection"))
-                                                                      .build();
-        event.register(savedSelectionRecipe);
+        final ItemStack selectionTool = newTool();
+        {
+            final RecipeRegistration recipe = CraftingRecipe.shapedBuilder()
+                  .aisle("trt", "rcr", "trt")
+                  .where('t', Ingredient.of(ItemTypes.REDSTONE_TORCH))
+                  .where('r', Ingredient.of(ItemTypes.REDSTONE))
+                  .where('c', Ingredient.of(ItemTypes.COAL))
+                  .result(selectionTool)
+                  .key(ResourceKey.of(PluginZoned.ZONED_ID, "selection_tool"))
+                  .build();
+            event.register(recipe);
+        }
+        final Ingredient toolIngredient = Ingredient.of(ResourceKey.of(PluginZoned.ZONED_ID, "tool_ingredient"), stack -> stack.get(ZonedData.ZONE_TYPE).isPresent(), selectionTool);
+        {
+            final RecipeRegistration recipe = CraftingRecipe.shapedBuilder()
+                  .aisle(" t ", "ses", " i ")
+                  .where('s', Ingredient.of(ItemTypes.STRING))
+                  .where('i', Ingredient.of(ItemTypes.SLIME_BALL))
+                  .where('e', Ingredient.of(ItemTypes.ENDER_EYE))
+                  .where('t', toolIngredient)
+                  .remainingItems(g -> Arrays.asList(ItemStack.empty(), g.asGrid().peek(0, 1).get(), ItemStack.empty(),
+                                                     ItemStack.empty(), ItemStack.empty(), ItemStack.empty(),
+                                                     ItemStack.empty(), ItemStack.empty(), ItemStack.empty()))
+                  .result(g -> savedSelection(listener), savedSelection())
+                  .key(ResourceKey.of(PluginZoned.ZONED_ID, "saved_selection"))
+                  .build();
+            event.register(recipe);
+        }
     }
 
     static ItemStack newTool()
