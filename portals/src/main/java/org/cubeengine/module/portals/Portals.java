@@ -44,6 +44,7 @@ import org.cubeengine.module.portals.config.Destination;
 import org.cubeengine.module.portals.config.DestinationConverter;
 import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.module.zoned.Zoned;
+import org.cubeengine.module.zoned.ZonedItems;
 import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;
@@ -53,7 +54,10 @@ import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
+import org.spongepowered.api.event.lifecycle.RegisterDataPackValueEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.item.recipe.RecipeRegistration;
 import org.spongepowered.api.scheduler.ScheduledTask;
 import org.spongepowered.api.util.AABB;
 import org.spongepowered.api.util.Ticks;
@@ -100,6 +104,18 @@ public class Portals
         tm.runTimer(this::checkForEntitiesInPortals, Ticks.of(5), Ticks.of(5));
         tm.runTimer(this::spawnPortalParticles, Ticks.of(20), Ticks.of(20));
         this.zoned = (Zoned) mm.getModule(Zoned.class);
+    }
+
+    @Listener
+    public void onRegisterRecipe(RegisterDataPackValueEvent<RecipeRegistration> event)
+    {
+        PortalsItems.registerRecipes(event);
+    }
+
+    @Listener
+    public void onRegisterData(RegisterDataEvent event)
+    {
+        PortalsData.register(event);
     }
 
     private void spawnPortalParticles(ScheduledTask task)

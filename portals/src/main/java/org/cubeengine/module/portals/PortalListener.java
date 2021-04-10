@@ -17,16 +17,19 @@
  */
 package org.cubeengine.module.portals;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.kyori.adventure.identity.Identity;
-import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.cubeengine.libcube.util.ItemUtil;
+import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.ArmorStand;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.EventContextKeys;
@@ -35,6 +38,12 @@ import org.spongepowered.api.event.cause.entity.MovementType;
 import org.spongepowered.api.event.cause.entity.MovementTypes;
 import org.spongepowered.api.event.entity.ChangeEntityWorldEvent;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
+import org.spongepowered.api.event.entity.SpawnEntityEvent;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
+import org.spongepowered.api.item.ItemTypes;
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.equipment.EquipmentType;
+import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
 
@@ -132,6 +141,41 @@ public class PortalListener
             }
             entities.remove(entity.uniqueId());
         }
+    }
+
+    @Listener
+    public void onPlacePortalExit(SpawnEntityEvent.Pre event)
+    {
+        final HashMap<EquipmentType, Boolean> noInteraction = new HashMap<>();
+        noInteraction.put(EquipmentTypes.CHEST.get(), true);
+        noInteraction.put(EquipmentTypes.FEET.get(), true);
+        noInteraction.put(EquipmentTypes.HEAD.get(), true);
+        noInteraction.put(EquipmentTypes.LEGS.get(), true);
+        noInteraction.put(EquipmentTypes.MAIN_HAND.get(), true);
+        noInteraction.put(EquipmentTypes.OFF_HAND.get(), true);
+        if (event.entities().size() == 1 && event.entities().get(0).type() == EntityTypes.ARMOR_STAND.get())
+        {
+            event.context().get(EventContextKeys.USED_ITEM).flatMap(item -> item.get(PortalsData.PORTAL)).ifPresent(p -> {
+                final ArmorStand entity = (ArmorStand) event.entities().get(0);
+                entity.offer(PortalsData.PORTAL, p);
+                entity.setHead(ItemStack.of(ItemTypes.PLAYER_HEAD));
+                entity.offer(Keys.HAS_ARMS, true);
+                entity.offer(Keys.IS_PLACING_DISABLED, noInteraction);
+                entity.offer(Keys.IS_TAKING_DISABLED, noInteraction);
+            });
+        }
+    }
+
+    @Listener
+    public void onBreakPortalExit(DropItemEvent.Destruct event)
+    {
+        event.cause().first(ArmorStand.class).ifPresent(armorStand -> {
+            if (armorStand.get(PortalsData.PORTAL).isPresent())
+            {
+                event.setCancelled(true);
+                ItemUtil.spawnItem(armorStand.serverLocation(), PortalsItems.portalExit());
+            }
+        });
     }
 
     private void onTeleport(ServerLocation target, Player player)
