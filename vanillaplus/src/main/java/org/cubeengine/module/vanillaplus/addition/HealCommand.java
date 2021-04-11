@@ -20,6 +20,7 @@ package org.cubeengine.module.vanillaplus.addition;
 import java.util.Collection;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.cubeengine.libcube.service.Broadcaster;
 import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.command.annotation.Option;
@@ -27,7 +28,6 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
@@ -83,7 +83,7 @@ public class HealCommand extends PermissionContainer
                 return;
             }
             i18n.send(context, POSITIVE, "You healed everyone!");
-            bc.broadcastStatus(ChatFormat.BRIGHT_GREEN + "healed every player.", context);
+            bc.broadcastStatus(i18n.translate(context, "healed every player.").color(NamedTextColor.GREEN), context);
         }
         else
         {

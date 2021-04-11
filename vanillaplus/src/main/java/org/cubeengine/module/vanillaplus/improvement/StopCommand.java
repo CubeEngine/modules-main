@@ -22,10 +22,11 @@ import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.command.annotation.Greedy;
 import org.cubeengine.libcube.service.command.annotation.Option;
-import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
+
+import static org.cubeengine.libcube.util.ComponentUtil.fromLegacy;
 
 @Singleton
 public class StopCommand
@@ -45,8 +46,7 @@ public class StopCommand
         {
             message = module.getConfig().improve.commandStopDefaultMessage;
         }
-        message = ChatFormat.parseFormats(message);
 
-        Sponge.server().shutdown(ChatFormat.fromLegacy(message, '&'));
+        Sponge.server().shutdown(fromLegacy(message));
     }
 }

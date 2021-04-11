@@ -31,7 +31,6 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
-import org.cubeengine.libcube.util.ChatFormat;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
@@ -141,7 +140,7 @@ public class FoodCommands extends PermissionContainer
                 return;
             }
             i18n.send(context, NEUTRAL, "You let everyone starve to death!");
-            bc.broadcastStatus(ChatFormat.YELLOW + "took away all food.", context);
+            bc.broadcastStatus(i18n.translate(context, "took away all food.").color(NamedTextColor.YELLOW), context);
         }
         else
         {

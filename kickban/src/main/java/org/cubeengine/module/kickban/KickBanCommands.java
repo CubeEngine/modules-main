@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import com.google.inject.Inject;
 import net.kyori.adventure.audience.Audience;
-import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.Style;
@@ -38,26 +37,23 @@ import org.cubeengine.libcube.service.command.annotation.Label;
 import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
-import org.cubeengine.libcube.util.ChatFormat;
+import org.cubeengine.libcube.util.ComponentUtil;
 import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.libcube.util.TimeConversionException;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.command.exception.CommandPermissionException;
-import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.ban.Ban;
 import org.spongepowered.api.service.ban.Ban.IP;
 import org.spongepowered.api.service.ban.BanService;
 import org.spongepowered.api.service.ban.BanTypes;
-import org.spongepowered.api.service.pagination.PaginationService;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.cubeengine.libcube.util.ChatFormat.*;
+import static org.cubeengine.libcube.util.ComponentUtil.fromLegacy;
 
 /**
  * Contains commands to manage kicks/bans.
@@ -92,24 +88,24 @@ public class KickBanCommands
     @Command(desc = "Kicks a player from the server")
     public void kick(CommandCause context, Collection<ServerPlayer> players, @Option @Greedy String reason) throws CommandPermissionException
     {
-        reason = parseReason(reason, perms.COMMAND_KICK_NOREASON, context);
+        Component formattedReason = parseReason(reason, perms.COMMAND_KICK_NOREASON, context);
         for (ServerPlayer player : players)
         {
-            player.kick(this.getKickMessage(reason, player));
+            player.kick(this.getKickMessage(formattedReason, player));
             bc.broadcastTranslatedWithPerm(NEGATIVE, "{user} was kicked from the server by {user}!",
                                                 perms.KICK_RECEIVEMESSAGE.getId(), player, context.subject());
         }
         bc.broadcastMessageWithPerm(Style.empty(), reason, perms.KICK_RECEIVEMESSAGE.getId());
     }
 
-    private Component getKickMessage(String reason, Audience player)
+    private Component getKickMessage(Component reason, Audience player)
     {
-        return i18n.translate(player, NEGATIVE, "You have been kicked from the server!").append(Component.newline()).append(Component.newline()).append(Component.text(reason));
+        return i18n.translate(player, NEGATIVE, "You have been kicked from the server!").append(Component.newline()).append(Component.newline()).append(reason);
     }
 
-    private Component getBanMessage(String reason, Audience player)
+    private Component getBanMessage(Component reason, Audience player)
     {
-        return i18n.translate(player, NEGATIVE,"You have been banned from this server!").append(Component.newline()).append(Component.newline()).append(Component.text(reason));
+        return i18n.translate(player, NEGATIVE,"You have been banned from this server!").append(Component.newline()).append(Component.newline()).append(reason);
     }
 
     @Command(alias = "kickban", desc = "Bans a player permanently on your server.")
@@ -127,7 +123,7 @@ public class KickBanCommands
             i18n.send(context, NEGATIVE,"{user} has never played on this server before! Use the -force flag to ban him anyway.", user);
             return;
         }
-        reason = parseReason(reason, perms.COMMAND_BAN_NOREASON, context);
+        Component formattedReason = parseReason(reason, perms.COMMAND_BAN_NOREASON, context);
         Component banSource = Component.text(context.subject().friendlyIdentifier().orElse(context.subject().identifier()));
         if (ipban)
         {
@@ -151,7 +147,7 @@ public class KickBanCommands
                 {
                     if (ipPlayer.connection().address().getAddress() != null && ipPlayer.connection().address().getAddress().equals(ipAdress))
                     {
-                        ipPlayer.kick(this.getBanMessage(reason, ipPlayer));
+                        ipPlayer.kick(this.getBanMessage(formattedReason, ipPlayer));
                         bannedUsers.add(ipPlayer.name());
                     }
                 }
@@ -179,7 +175,7 @@ public class KickBanCommands
             this.banService.addBan(Ban.builder().type(BanTypes.PROFILE).profile(user.profile()).reason(Component.text(reason)).source(banSource).build());
             if (player != null && player.isOnline())
             {
-                player.kick(this.getBanMessage(reason, player));
+                player.kick(this.getBanMessage(formattedReason, player));
             }
         }
         i18n.send(context, NEGATIVE, "You banned {user}!", user);
@@ -187,7 +183,7 @@ public class KickBanCommands
         bc.broadcastMessageWithPerm(Style.empty(), reason, perms.BAN_RECEIVEMESSAGE.getId());
     }
 
-    private String parseReason(String reason, Permission permission, CommandCause cmdCause) throws CommandPermissionException
+    private Component parseReason(String reason, Permission permission, CommandCause cmdCause) throws CommandPermissionException
     {
         if (reason == null)
         {
@@ -195,9 +191,9 @@ public class KickBanCommands
             {
                 throw new CommandPermissionException(i18n.translate(cmdCause, NEGATIVE, "You need to specify a reason!"));
             }
-            return "";
+            return Component.empty();
         }
-        return ChatFormat.parseFormats(reason);
+        return fromLegacy(reason);
     }
 
 
@@ -231,7 +227,7 @@ public class KickBanCommands
                 i18n.send(context, NEUTRAL, "The IP {input#ip} is already banned!", address.getHostAddress());
                 return;
             }
-            reason = parseReason(reason, perms.COMMAND_IPBAN_NOREASON, context);
+            Component formattedReasons = parseReason(reason, perms.COMMAND_IPBAN_NOREASON, context);
             Component banSource = Component.text(context.subject().friendlyIdentifier().orElse(context.subject().identifier()));
             this.banService.addBan(Ban.builder().type(BanTypes.IP).address(address).reason(Component.text(reason)).source(banSource).build());
             i18n.send(context, NEGATIVE, "You banned the IP {input#ip} from your server!", address.getHostAddress());
@@ -240,7 +236,7 @@ public class KickBanCommands
             {
                 if (player.connection().address().getAddress() != null && player.connection().address().getAddress().getHostAddress().equals(ipaddress))
                 {
-                    player.kick(this.getBanMessage(reason, player));
+                    player.kick(this.getBanMessage(formattedReasons, player));
                     bannedUsers.add(player.name());
                 }
             }
@@ -295,7 +291,7 @@ public class KickBanCommands
             i18n.send(context, NEUTRAL, "{user} has never played on this server before! Use the -force flag to ban him anyways.", user);
             return;
         }
-        reason = parseReason(reason, perms.COMMAND_TEMPBAN_NOREASON, context);
+        Component formattedReason = parseReason(reason, perms.COMMAND_TEMPBAN_NOREASON, context);
         if (this.banService.isBanned(user.profile()).join())
         {
             i18n.send(context, NEGATIVE, "{user} is already banned!", user);
@@ -310,7 +306,7 @@ public class KickBanCommands
             if (user.isOnline())
             {
                 if (player == null) throw new IllegalStateException();
-                player.kick(getBanMessage(reason, player));
+                player.kick(getBanMessage(formattedReason, player));
             }
             i18n.send(context, POSITIVE, "You banned {user} temporarily!", user);
             bc.broadcastTranslatedWithPerm(NEGATIVE, "{user} was banned temporarily from the server by {sender}!",

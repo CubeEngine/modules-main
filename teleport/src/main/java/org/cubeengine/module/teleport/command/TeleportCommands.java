@@ -36,7 +36,7 @@ import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.command.annotation.ParameterPermission;
 import org.cubeengine.libcube.service.command.annotation.Restricted;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.util.StringUtils;
+import org.cubeengine.libcube.service.i18n.formatter.CommandSourceFormatter;
 import org.cubeengine.module.teleport.permission.TeleportPerm;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
@@ -45,14 +45,11 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
-import org.spongepowered.math.vector.Vector2d;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.math.vector.Vector3i;
 
 import static org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType.ACTION_BAR;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
-import static org.cubeengine.libcube.util.ChatFormat.DARK_GREEN;
-import static org.cubeengine.libcube.util.ChatFormat.WHITE;
 
 /**
  * Contains commands to teleport to players/worlds/position.
@@ -207,7 +204,17 @@ public class TeleportCommands
             i18n.send(ACTION_BAR, context, NEGATIVE, "You are not allowed to teleport to {user}!", player);
             return;
         }
-        ArrayList<String> noTp = new ArrayList<>();
+
+        List<String> noTp = noTpList(player, force);
+        bc.broadcastTranslated(POSITIVE, "Teleporting everyone to {user}", player);
+        if (!noTp.isEmpty())
+        {
+            i18n.send(context, NEUTRAL, "The following players were not teleported: \n{user#list}", new CommandSourceFormatter.ListOfNames(noTp));
+        }
+    }
+
+    private List<String> noTpList(ServerPlayer player, @Flag boolean force) {
+        List<String> noTp = new ArrayList<>();
         ServerLocation target = player.serverLocation();
         for (ServerPlayer p : Sponge.server().onlinePlayers())
         {
@@ -218,11 +225,7 @@ public class TeleportCommands
             }
             p.setLocation(target);
         }
-        bc.broadcastTranslated(POSITIVE, "Teleporting everyone to {user}", player);
-        if (!noTp.isEmpty())
-        {
-            i18n.send(context, NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(WHITE + "," + DARK_GREEN, noTp));
-        }
+        return noTp;
     }
 
     @Command(desc = "Teleport a player directly to you.")
@@ -251,23 +254,12 @@ public class TeleportCommands
     public void tphereall(ServerPlayer context, @Flag boolean force)
     {
         force = force && context.hasPermission(perms.COMMAND_TPHEREALL_FORCE.getId());
-        ArrayList<String> noTp = new ArrayList<>();
-        ServerLocation target = context.serverLocation();
-        for (ServerPlayer p : Sponge.server().onlinePlayers())
-        {
-            if (!force && p.hasPermission(perms.TELEPORT_PREVENT_TP.getId()))
-            {
-                noTp.add(p.name());
-                continue;
-            }
-            p.setLocation(target);
-        }
+        List<String> noTp = noTpList(context, force);
         i18n.send(ACTION_BAR, context, POSITIVE, "You teleported everyone to you!");
         bc.broadcastTranslated(POSITIVE, "Teleporting everyone to {sender}", context);
         if (!noTp.isEmpty())
         {
-            i18n.send(context, NEUTRAL, "The following players were not teleported: \n{user#list}", StringUtils.implode(
-                WHITE + "," + DARK_GREEN, noTp));
+            i18n.send(context, NEUTRAL, "The following players were not teleported: \n{user#list}", new CommandSourceFormatter.ListOfNames(noTp));
         }
     }
 
