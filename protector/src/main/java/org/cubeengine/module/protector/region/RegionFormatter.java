@@ -39,9 +39,9 @@ public class RegionFormatter extends AbstractFormatter<Region>
             {
                 return new Text("global");
             }
-            return new Text(region.getWorld().key().asString() + ".world");
+            return new Text(region.getWorld().key().asString());
         }
 
-        return new Text(region.getWorld().key().asString() + "." + region.getName());
+        return new Text(region.getName());
     }
 }

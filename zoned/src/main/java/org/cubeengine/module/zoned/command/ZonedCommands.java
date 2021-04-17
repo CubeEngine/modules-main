@@ -128,9 +128,7 @@ public class ZonedCommands extends DispatcherCommand
         i18n.send(context, NEUTRAL, "The following zones were found:");
         for (ZoneConfig zone : zones)
         {
-            context.sendMessage(Identity.nil(), Component.empty().append(Component.text(" - ")).append(
-                Component.text(zone.world.getName(), GOLD)).append(Component.text(".", WHITE)).append(
-                Component.text(zone.name, GOLD)));
+            i18n.send(context, NEUTRAL, " - {name} in {name#world}", zone.name, zone.world.getName());
         }
     }
 
@@ -148,7 +146,17 @@ public class ZonedCommands extends DispatcherCommand
             return;
         }
         i18n.send(context, POSITIVE, "Zone {name} in {name#world}", zone.name, zone.world.getName());
-        // TODO print shape information
+        if (zone.shape instanceof Cuboid)
+        {
+            final Vector3d min = ((Cuboid)zone.shape).getMinimumPoint();
+            final Vector3d max = ((Cuboid)zone.shape).getMaximumPoint();
+            i18n.send(context, POSITIVE, "Cuboid ranging from {vector} to {vector}", min, max);
+            i18n.send(context, POSITIVE, "Size: {vector}", max.sub(min));
+        }
+        else
+        {
+            i18n.send(context, NEGATIVE, "Shape not supported: {name}", zone.shape.getClass());
+        }
     }
 
     @Command(desc = "Deletes a zone", alias = "remove")

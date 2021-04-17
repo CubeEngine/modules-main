@@ -18,6 +18,7 @@
 package org.cubeengine.module.protector.region;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,6 +42,8 @@ import org.spongepowered.api.command.parameter.CommandContext.Builder;
 import org.spongepowered.api.command.parameter.Parameter.Key;
 import org.spongepowered.api.command.parameter.managed.ValueCompleter;
 import org.spongepowered.api.command.parameter.managed.ValueParser;
+import org.spongepowered.api.command.parameter.managed.clientcompletion.ClientCompletionType;
+import org.spongepowered.api.command.parameter.managed.clientcompletion.ClientCompletionTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.Locatable;
 import org.spongepowered.api.world.server.ServerWorld;
@@ -62,6 +65,12 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
         this.zoneMan = ((Zoned)mm.getModule(Zoned.class)).getManager();
         this.manager = manager;
         this.i18n = i18n;
+    }
+
+    @Override
+    public List<ClientCompletionType> clientCompletionType()
+    {
+        return Collections.singletonList(ClientCompletionTypes.RESOURCE_KEY.get());
     }
 
     @Override
@@ -108,17 +117,14 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
         for (Map.Entry<ResourceKey, Map<String, Region>> perWorld : manager.getRegions().entrySet())
         {
             if (world != null && perWorld.getKey().equals(world.key())
-                && !world.key().asString().startsWith(token.replace(".", ""))) // TODO correct?
+                && !world.key().asString().startsWith(token.replace("/", ""))) // TODO correct?
             {
                 continue; // Skip if already without world ; except when token starts with world
             }
-            if (token.contains(".") || !isLocatable) // Skip if without dot and locatable
+
+            if (!isLocatable) // Skip if without dot and locatable
             {
                 String worldName = perWorld.getKey().asString();
-                if ((worldName + ".world").startsWith(token))
-                {
-                    list.add(worldName + ".world");
-                }
                 for (Map.Entry<String, Region> entry : perWorld.getValue().entrySet())
                 {
                     String value = entry.getValue().getContext().getValue();
@@ -144,10 +150,6 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
             {
                 list.add(worldName);
             }
-            if (token.contains(".") && (worldName + ".").startsWith(token))
-            {
-                list.add(worldName + ".world");
-            }
         }
         // Add Zones
         if (isLocatable)
@@ -161,24 +163,41 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
     @Override
     public Optional<? extends Region> parseValue(Key<? super Region> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
-        String token = reader.parseString();
-        if (context.subject() instanceof Locatable)
+        final ResourceKey tokenAsKey = reader.parseResourceKey("protector");
+        String token = tokenAsKey.asString();
+        if (tokenAsKey.namespace().equals("protector"))
         {
-            final ServerWorld world = ((Locatable)context.subject()).serverLocation().world();
-            Region region = manager.getRegions(world.key()).get(token);
-            if (region != null)
+            if (context.subject() instanceof Locatable)
             {
-                return Optional.of(region);
-            }
-            if ("world".equals(token))
-            {
-                region = manager.getWorldRegion(world.key());
+                final ServerWorld world = ((Locatable)context.subject()).serverLocation().world();
+                Region region = manager.getRegions(world.key()).get(token);
                 if (region != null)
                 {
                     return Optional.of(region);
                 }
+                if ("protector:world".equals(token))
+                {
+                    region = manager.getWorldRegion(world.key());
+                    if (region != null)
+                    {
+                        return Optional.of(region);
+                    }
+                }
             }
+
+            if ("protector:global".equals(token))
+            {
+                return Optional.of(manager.getGlobalRegion());
+            }
+
+            ZoneConfig zone = zoneMan.getZone(tokenAsKey.value());
+            if (zone != null)
+            {
+                return Optional.of(manager.newRegion(zone));
+            }
+            throw reader.createException(i18n.translate(context.cause(), NEGATIVE, "There is no such region as {name}", token));
         }
+
         for (Map.Entry<ResourceKey, Map<String, Region>> perWorld : manager.getRegions().entrySet())
         {
             for (Map.Entry<String, Region> entry : perWorld.getValue().entrySet())
@@ -189,30 +208,16 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
                 }
             }
         }
-        if (token.endsWith(".world"))
-        {
-            String worldName = token.replaceAll(".world$", "");
-            final ResourceKey worldKey = ResourceKey.resolve(worldName);
-            if (Sponge.server().worldManager().world(worldKey).isPresent())
-            {
-                return Optional.of(manager.getWorldRegion(worldKey));
-            }
-            else
-            {
-                throw reader.createException(i18n.translate(context.cause(), NEGATIVE, "Unknown World {name} for world-region", token, worldName));
-            }
-        }
-        if ("global".equals(token))
-        {
-            return Optional.of(manager.getGlobalRegion());
-        }
 
-        ZoneConfig zone = zoneMan.getZone(token); // TODO world
-        if (zone != null)
+        if (Sponge.server().worldManager().world(tokenAsKey).isPresent())
         {
-            return Optional.of(manager.newRegion(zone));
+            return Optional.of(manager.getWorldRegion(tokenAsKey));
         }
-        throw reader.createException(i18n.translate(context.cause(), NEGATIVE, "There is no such Region as {name}", token));
+        else
+        {
+            // TODO region in world
+            throw reader.createException(i18n.translate(context.cause(), NEGATIVE, "Unknown World {name} for world-region", token, token));
+        }
     }
 
 }
