@@ -196,7 +196,9 @@ public class RolesUtil
 
         if (!option.isPresent()) {
 
-            for (Subject parent : getParents(contexts, subject))
+            final List<Subject> parents = getParents(contexts, subject);
+            parents.sort(FileSubject::compare);
+            for (Subject parent : parents)
             {
                 // TODO do not check a parent multiple times
                 option = getOption(service, parent, key, contexts, false);
