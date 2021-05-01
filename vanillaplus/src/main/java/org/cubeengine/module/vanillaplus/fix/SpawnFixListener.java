@@ -34,12 +34,12 @@ public class SpawnFixListener
         final WorldBorder border = toWorld.border();
         Vector3d center = border.center();
         double radius = border.diameter() / 2;
-        double minX = center.getX() - radius;
-        double maxX = center.getX() + radius;
-        double minZ = center.getZ() - radius;
-        double maxZ = center.getZ() + radius;
-        double playerX = toLocation.position().getX();
-        double playerZ = toLocation.position().getZ();
+        double minX = center.x() - radius;
+        double maxX = center.x() + radius;
+        double minZ = center.z() - radius;
+        double maxZ = center.z() + radius;
+        double playerX = toLocation.position().x();
+        double playerZ = toLocation.position().z();
 
         if (playerX > maxX || playerX < minX || playerZ > maxZ || playerZ < minZ)
         {

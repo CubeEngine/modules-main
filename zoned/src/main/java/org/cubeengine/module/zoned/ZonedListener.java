@@ -260,31 +260,31 @@ public class ZonedListener
             Vector3d newMax = max;
 
             final Vector3i directionOffset = direction.asBlockOffset();
-            if (directionOffset.getX() > 0)
+            if (directionOffset.x() > 0)
             {
                 newMax = newMax.add(expand ? 1 : -1, 0, 0);
             }
-            else if (directionOffset.getX() < 0)
+            else if (directionOffset.x() < 0)
             {
                 newMin = newMin.add(expand ? -1 : 1, 0, 0);
             }
-            if (directionOffset.getY() > 0)
+            if (directionOffset.y() > 0)
             {
                 newMax = newMax.add(0, expand ? 1 : -1, 0);
             }
-            else if (directionOffset.getY() < 0)
+            else if (directionOffset.y() < 0)
             {
                 newMin = newMin.add(0, expand ? -1 : 1, 0);
             }
-            if (directionOffset.getZ() > 0)
+            if (directionOffset.z() > 0)
             {
                 newMax = newMax.add(0, 0, expand ? 1 : -1);
             }
-            else if (directionOffset.getZ() < 0)
+            else if (directionOffset.z() < 0)
             {
                 newMin = newMin.add(0, 0, expand ? -1 : 1);
             }
-            if (newMax.getX() < newMin.getX() || newMax.getY() < newMin.getY() || newMax.getZ() < newMin.getZ())
+            if (newMax.x() < newMin.x() || newMax.y() < newMin.y() || newMax.z() < newMin.z())
             {
                 i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "Cannot contract anymore in this direction");
                 return false;

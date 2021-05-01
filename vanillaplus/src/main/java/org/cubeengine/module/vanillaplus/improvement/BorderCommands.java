@@ -124,7 +124,7 @@ public class BorderCommands extends DispatcherCommand
             if (context.subject() instanceof ServerPlayer)
             {
                 Vector3d position = ((ServerPlayer)context.subject()).location().position();
-                pos = new Vector2i(position.getX(), position.getZ());
+                pos = new Vector2i(position.x(), position.z());
             }
             else
             {
@@ -132,7 +132,7 @@ public class BorderCommands extends DispatcherCommand
                 return;
             }
         }
-        world.border().setCenter(pos.getX() + 0.5, pos.getY() + 0.5);
+        world.border().setCenter(pos.x() + 0.5, pos.y() + 0.5);
         i18n.send(context, POSITIVE, "Set world border of {world} center to {vector}", world, pos);
     }
 

@@ -174,7 +174,7 @@ public class ConomyService implements EconomyService
     }
 
     @Override
-    public Optional<UniqueAccount> accountOrCreate(UUID uuid)
+    public Optional<UniqueAccount> findOrCreateAccount(UUID uuid)
     {
         Account account = accounts.get(uuid.toString());
         if (account instanceof UniqueAccount)
@@ -190,11 +190,11 @@ public class ConomyService implements EconomyService
     }
 
     @Override
-    public Optional<Account> accountOrCreate(String identifier)
+    public Optional<Account> findOrCreateAccount(String identifier)
     {
         try
         {
-            return accountOrCreate(UUID.fromString(identifier)).map(Account.class::cast);
+            return findOrCreateAccount(UUID.fromString(identifier)).map(Account.class::cast);
         }
         catch (IllegalArgumentException e)
         {

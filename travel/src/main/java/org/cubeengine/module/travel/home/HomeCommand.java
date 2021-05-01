@@ -512,7 +512,7 @@ public class HomeCommand extends DispatcherCommand
                 predicate = predicate.and(h -> {
                     Vector3d chp = h.transform.position();
                     return h.world.getWorld().equals(firstPoint.world())
-                        && cuboid.contains(new Vector3d(chp.getX(), chp.getY(), chp.getZ()));
+                        && cuboid.contains(new Vector3d(chp.x(), chp.y(), chp.z()));
                 });
                 manager.massDelete(predicate);
                 if (owner != null)

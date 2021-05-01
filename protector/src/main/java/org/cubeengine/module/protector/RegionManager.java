@@ -110,10 +110,10 @@ public class RegionManager
     public List<Vector2i> getChunks(Vector3i from, Vector3i to)
     {
         List<Vector2i> result = new ArrayList<>();
-        int chunkXFrom = from.getX() >> 4;
-        int chunkZFrom = from.getZ() >> 4;
-        int chunkXTo =  to.getX() >> 4;
-        int chunkZTo = to.getZ() >> 4;
+        int chunkXFrom = from.x() >> 4;
+        int chunkZFrom = from.z() >> 4;
+        int chunkXTo =  to.x() >> 4;
+        int chunkZTo = to.z() >> 4;
         if (chunkXFrom > chunkXTo) // if from is greater swap
         {
             chunkXFrom = chunkXFrom + chunkXTo;
@@ -151,8 +151,8 @@ public class RegionManager
 
     private List<Region> getRegions(ServerWorld world, Vector3i pos)
     {
-        int chunkX = pos.getX() >> 4;
-        int chunkZ = pos.getZ() >> 4;
+        int chunkX = pos.x() >> 4;
+        int chunkZ = pos.z() >> 4;
         List<Region> regions = new ArrayList<>();
         regions.add(globalRegion);
         regions.add(getWorldRegion(world.key()));

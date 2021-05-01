@@ -380,7 +380,7 @@ public class WorldsCommands extends DispatcherCommand
             i18n.send(context, NEUTRAL, "This world will not load automatically on startup!");
         }
         Vector3i spawn = world.spawnPosition();
-        i18n.send(context, NEUTRAL, "This worlds spawn is at {vector}", new Vector3i(spawn.getX(), spawn.getY(), spawn.getZ()));
+        i18n.send(context, NEUTRAL, "This worlds spawn is at {vector}", new Vector3i(spawn.x(), spawn.y(), spawn.z()));
         if (showGameRules && !world.gameRules().isEmpty()) // Show gamerules
         {
             i18n.send(context, NEUTRAL, "The following game-rules are set:");

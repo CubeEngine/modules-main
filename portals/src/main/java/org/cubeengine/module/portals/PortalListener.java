@@ -90,9 +90,9 @@ public class PortalListener
         {
             final ServerPlayer player = (ServerPlayer)entity;
             if (!origWorld.key().equals(destWorld.key())
-                || (event.originalPosition().getFloorX() == event.destinationPosition().getFloorX()
-                && event.originalPosition().getFloorY() == event.destinationPosition().getFloorY()
-                && event.originalPosition().getFloorZ() == event.destinationPosition().getFloorZ())
+                || (event.originalPosition().floorX() == event.destinationPosition().floorX()
+                && event.originalPosition().floorY() == event.destinationPosition().floorY()
+                && event.originalPosition().floorZ() == event.destinationPosition().floorZ())
             )
             {
                 return;

@@ -78,7 +78,7 @@ public class EcoCommand extends DispatcherCommand
 
     private BaseAccount.Unique getAccount(CommandCause context, User user)
     {
-        BaseAccount.Unique target = service.accountOrCreate(user.uniqueId())
+        BaseAccount.Unique target = service.findOrCreateAccount(user.uniqueId())
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast).orElse(null);
         if (target == null)

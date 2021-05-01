@@ -112,11 +112,11 @@ public class InformationCommands extends PermissionContainer
             }
             else
             {
-                blockPos = new Vector2i(world.properties().spawnPosition().getX(), world.properties().spawnPosition().getZ());
+                blockPos = new Vector2i(world.properties().spawnPosition().x(), world.properties().spawnPosition().z());
             }
         }
 
-        Biome biome = world.biome(blockPos.getX(), 0, blockPos.getY());
+        Biome biome = world.biome(blockPos.x(), 0, blockPos.y());
         i18n.send(context, NEUTRAL, "Biome at {vector:x\\=:z\\=} in {world}: {name}", blockPos, world, world.registries().registry(RegistryTypes.BIOME).valueKey(biome).asString());
     }
 
@@ -144,7 +144,7 @@ public class InformationCommands extends PermissionContainer
     public void compass(ServerPlayer context)
     {
         Vector3d rotation = context.rotation();
-        Vector3d direction = Quaterniond.fromAxesAnglesDeg(rotation.getX(), -rotation.getY(), rotation.getZ()).getDirection();
+        Vector3d direction = Quaterniond.fromAxesAnglesDeg(rotation.x(), -rotation.y(), rotation.z()).direction();
         i18n.send(context, NEUTRAL, "You are looking to {input#direction}!", Direction.closest(direction).name()); // TODO translation of direction
     }
 
@@ -342,7 +342,7 @@ public class InformationCommands extends PermissionContainer
             boolean foundAny = false;
             world.entities().stream().filter(e -> e.type() != ITEM_FRAME.get()).collect(Collectors.groupingBy(e -> e.location().chunkPosition()))
                     .entrySet().stream().filter(e -> e.getValue().size() > 50).forEach(e -> {
-                final Component pos = Component.text(e.getKey().getX(), NamedTextColor.GOLD).append(Component.text(":", NamedTextColor.GRAY)).append(Component.text(e.getKey().getZ(), NamedTextColor.GOLD));
+                final Component pos = Component.text(e.getKey().x(), NamedTextColor.GOLD).append(Component.text(":", NamedTextColor.GRAY)).append(Component.text(e.getKey().z(), NamedTextColor.GOLD));
                 pos.hoverEvent(HoverEvent.showText(i18n.translate(context, NEUTRAL, "Click here to teleport")));
                 pos.clickEvent(SpongeComponents.executeCallback(c -> ((ServerPlayer)c.subject()).setLocation(e.getValue().get(0).serverLocation())));
                 builder.append(pos, Component.space());

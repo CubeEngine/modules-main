@@ -63,7 +63,7 @@ public class PlayerDamageSettingsCommands extends AbstractSettingsCommand
     }
 
     @Command(desc = "Controls player damage by living entities")
-    public void living(CommandCause context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
+    public void byliving(CommandCause context, Tristate set, @Default @Named("in") Region region, @Named("bypass") String role)
     {
         if (role != null)
         {

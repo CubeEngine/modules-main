@@ -56,7 +56,7 @@ public class RandomDestination extends Destination
         final int x = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
         final int z = random.nextInt(2 * config.getLeft() + 1) - config.getLeft();
         final Vector3i pos = config.getRight().add(x, 0, z);
-        world.loadChunk(Sponge.server().chunkLayout().forceToChunk(pos.getX(), pos.getY(), pos.getZ()), true);
+        world.loadChunk(Sponge.server().chunkLayout().forceToChunk(pos.x(), pos.y(), pos.z()), true);
         ServerLocation block = world.location(pos);
         block = Sponge.server().teleportHelper().findSafeLocation(block, 256, 16).orElse(block);
         entity.setLocation(block);

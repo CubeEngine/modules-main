@@ -79,7 +79,7 @@ public class ZoneConfig extends ReflectedYaml
                 Vector3d pos1 = vectors.get(1);
                 Vector3d pos2 = vectors.get(2);
                 Vector3d size = pos1.sub(pos2);
-                int count = (int)((Math.abs(size.getX()) + 1) * (Math.abs(size.getY()) + 1) * (Math.abs(size.getZ()) + 1));
+                int count = (int)((Math.abs(size.x()) + 1) * (Math.abs(size.y()) + 1) * (Math.abs(size.z()) + 1));
 
                 return i18n.translate(player, Style.empty().color(NamedTextColor.GRAY), "{amount} blocks selected", count);
             }

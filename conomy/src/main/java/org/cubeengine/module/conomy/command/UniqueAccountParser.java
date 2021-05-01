@@ -99,7 +99,7 @@ public class UniqueAccountParser implements ValueParser<Unique>, DefaultParamete
 
     private Optional<BaseAccount.Unique> getAccount(UUID user)
     {
-        return service.accountOrCreate(user)
+        return service.findOrCreateAccount(user)
                 .filter(a -> a instanceof BaseAccount.Unique)
                 .map(BaseAccount.Unique.class::cast);
     }

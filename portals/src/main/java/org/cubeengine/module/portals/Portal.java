@@ -17,11 +17,8 @@
  */
 package org.cubeengine.module.portals;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.kyori.adventure.audience.Audience;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.util.Pair;
 import org.cubeengine.libcube.util.math.MathHelper;
 import org.cubeengine.module.portals.config.PortalConfig;
 import org.spongepowered.api.entity.Entity;
@@ -57,10 +54,14 @@ public class Portal
 
     public boolean has(ServerLocation location)
     {
+        if (config.location.from == null)
+        {
+            return false;
+        }
         return location.world().key().equals(config.world.getWorld().key()) &&
-            isBetween(config.location.from.getX(), config.location.to.getX(), location.blockX()) &&
-            isBetween(config.location.from.getY(), config.location.to.getY(), location.blockY()) &&
-            isBetween(config.location.from.getZ(), config.location.to.getZ(), location.blockZ());
+            isBetween(config.location.from.x(), config.location.to.x(), location.blockX()) &&
+            isBetween(config.location.from.y(), config.location.to.y(), location.blockY()) &&
+            isBetween(config.location.from.z(), config.location.to.z(), location.blockZ());
     }
 
     private static boolean isBetween(int a, int b, int x)
@@ -89,7 +90,7 @@ public class Portal
         if (this.config.location.destination == null)
         {
             Vector3i midpoint = MathHelper.midpoint(this.config.location.to, this.config.location.from);
-            return ServerLocation.of(this.config.world.getWorld(), midpoint.getX() + 0.5, midpoint.getY(), midpoint.getZ() + 0.5);
+            return ServerLocation.of(this.config.world.getWorld(), midpoint.x() + 0.5, midpoint.y(), midpoint.z() + 0.5);
         }
         return this.config.world.getWorld().location(this.config.location.destination.position());
     }
@@ -118,8 +119,8 @@ public class Portal
         }
         i18n.send(user, POSITIVE, "{user} is the owner of this portal", this.config.owner);
         i18n.send(user, POSITIVE, "Location: {vector} to {vector} in {name#world}",
-                            new Vector3i(this.config.location.from.getX(), this.config.location.from.getY(), this.config.location.from.getZ()),
-                            new Vector3i(this.config.location.to.getX(), this.config.location.to.getY(), this.config.location.to.getZ()), this.config.world.getName());
+                            new Vector3i(this.config.location.from.x(), this.config.location.from.y(), this.config.location.from.z()),
+                            new Vector3i(this.config.location.to.x(), this.config.location.to.y(), this.config.location.to.z()), this.config.world.getName());
         if (this.config.destination == null)
         {
             i18n.send(user, POSITIVE, "This portal has no destination yet");

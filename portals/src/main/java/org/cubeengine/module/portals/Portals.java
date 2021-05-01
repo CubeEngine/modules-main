@@ -128,7 +128,7 @@ public class Portals
                 final Vector3d size = aabb.size();
                 final ParticleEffect effect = ParticleEffect.builder()
                                                             .type(ParticleTypes.PORTAL)
-                                                            .quantity((int)(10 * size.getX() * size.getY() * size.getZ()))
+                                                            .quantity((int)(10 * size.x() * size.y() * size.z()))
                                                             .offset(size.div(4))
                                                             .build();
                 portal.getWorld().spawnParticles(effect, aabb.center());

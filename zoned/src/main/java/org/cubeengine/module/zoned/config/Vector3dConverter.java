@@ -32,9 +32,9 @@ public class Vector3dConverter extends SimpleConverter<Vector3d>
     public Node toNode(Vector3d vector) throws ConversionException
     {
         ListNode node = ListNode.emptyList();
-        node.addNode(new DoubleNode(vector.getX()));
-        node.addNode(new DoubleNode(vector.getY()));
-        node.addNode(new DoubleNode(vector.getZ()));
+        node.addNode(new DoubleNode(vector.x()));
+        node.addNode(new DoubleNode(vector.y()));
+        node.addNode(new DoubleNode(vector.z()));
         return node;
     }
 

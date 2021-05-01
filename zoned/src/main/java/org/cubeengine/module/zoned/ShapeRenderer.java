@@ -104,13 +104,13 @@ public class ShapeRenderer
         Vector3d mmm = cuboid.getMinimumPoint().add(-0.5, -0.5, -0.5);
         Vector3d xxx = cuboid.getMaximumPoint().add(0.5, 0.5, 0.5);
 
-        Vector3d mmx = new Vector3d(mmm.getX(), mmm.getY(), xxx.getZ());
-        Vector3d mxx = new Vector3d(mmm.getX(), xxx.getY(), xxx.getZ());
-        Vector3d xmm = new Vector3d(xxx.getX(), mmm.getY(), mmm.getZ());
-        Vector3d xxm = new Vector3d(xxx.getX(), xxx.getY(), mmm.getZ());
+        Vector3d mmx = new Vector3d(mmm.x(), mmm.y(), xxx.z());
+        Vector3d mxx = new Vector3d(mmm.x(), xxx.y(), xxx.z());
+        Vector3d xmm = new Vector3d(xxx.x(), mmm.y(), mmm.z());
+        Vector3d xxm = new Vector3d(xxx.x(), xxx.y(), mmm.z());
 
-        Vector3d mxm = new Vector3d(mmm.getX(), xxx.getY(), mmm.getZ());
-        Vector3d xmx = new Vector3d(xxx.getX(), mmm.getY(), xxx.getZ());
+        Vector3d mxm = new Vector3d(mmm.x(), xxx.y(), mmm.z());
+        Vector3d xmx = new Vector3d(xxx.x(), mmm.y(), xxx.z());
 
         Map<Color, List<Vector3d>> particles = new HashMap<>();
         List<Vector3d> red = new ArrayList<>();

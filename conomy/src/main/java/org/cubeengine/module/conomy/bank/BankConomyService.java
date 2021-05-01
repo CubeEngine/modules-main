@@ -58,11 +58,11 @@ public class BankConomyService extends ConomyService
     }
 
     @Override
-    public Optional<Account> accountOrCreate(String identifier)
+    public Optional<Account> findOrCreateAccount(String identifier)
     {
         try
         {
-            return accountOrCreate(UUID.fromString(identifier)).map(Account.class::cast);
+            return findOrCreateAccount(UUID.fromString(identifier)).map(Account.class::cast);
         }
         catch (IllegalArgumentException e)
         {
@@ -159,7 +159,7 @@ public class BankConomyService extends ConomyService
             manage.addAll(see);
         }
 
-        List<BaseAccount.Virtual> collect = manage.stream().map(this::accountOrCreate)
+        List<BaseAccount.Virtual> collect = manage.stream().map(this::findOrCreateAccount)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .filter(a -> a instanceof BaseAccount.Virtual)

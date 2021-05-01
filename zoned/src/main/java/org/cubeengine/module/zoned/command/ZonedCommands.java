@@ -300,8 +300,8 @@ public class ZonedCommands extends DispatcherCommand
         cfg.world = new ConfigWorld(world);
         cfg.shape = new Cuboid(min.toDouble(), max.sub(min).toDouble());
 
-        i18n.send(player, POSITIVE, "Minimum: x={number} y={number} z={number}", min.getX(), min.getY(), min.getZ());
-        i18n.send(player, POSITIVE, "Maximum: x={number} y={number} z={number}", max.getX(), max.getY(), max.getZ());
+        i18n.send(player, POSITIVE, "Minimum: x={number} y={number} z={number}", min.x(), min.y(), min.z());
+        i18n.send(player, POSITIVE, "Maximum: x={number} y={number} z={number}", max.x(), max.y(), max.z());
         i18n.send(player, POSITIVE, "Redstone blocks contained in zone: {number}", poweringLocations.size());
 
         return true;

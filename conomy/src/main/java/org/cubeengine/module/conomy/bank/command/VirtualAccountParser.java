@@ -78,7 +78,7 @@ public class VirtualAccountParser implements ValueParser<Virtual>, DefaultParame
         Optional<BaseAccount.Virtual> target = Optional.empty();
         if (service.hasAccount(arg))
         {
-            target = service.accountOrCreate(arg).filter(a -> a instanceof BaseAccount.Virtual).map(BaseAccount.Virtual.class::cast);
+            target = service.findOrCreateAccount(arg).filter(a -> a instanceof BaseAccount.Virtual).map(BaseAccount.Virtual.class::cast);
         }
         if (!target.isPresent())
         {
