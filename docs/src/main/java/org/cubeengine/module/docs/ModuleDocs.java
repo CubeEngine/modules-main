@@ -80,9 +80,9 @@ public class ModuleDocs
     {
         this.reflector = reflector;
         this.pc = plugin;
-        this.name = plugin.getMetadata().getName().get();
+        this.name = plugin.metadata().name().get();
         this.moduleName = mm.getModuleName(module).get();
-        this.id = plugin.getMetadata().getId();
+        this.id = plugin.metadata().id();
         this.moduleId = mm.getModuleId(plugin);
         InputStream is = plugin.getClass().getResourceAsStream("/assets/"+ id + "/info.yml");
         if (is == null)

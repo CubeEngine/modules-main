@@ -89,15 +89,15 @@ public class PluginCommands extends PermissionContainer
         plugins.remove(game);
         plugins.remove(api);
         plugins.remove(impl);
-        Collections.sort(plugins, Comparator.comparing(p -> p.getMetadata().getName().orElse(p.getMetadata().getId())));
-        Collections.sort(modules, Comparator.comparing(p -> p.getMetadata().getName().orElse(p.getMetadata().getId())));
+        Collections.sort(plugins, Comparator.comparing(p -> p.metadata().name().orElse(p.metadata().id())));
+        Collections.sort(modules, Comparator.comparing(p -> p.metadata().name().orElse(p.metadata().id())));
 
         for (PluginContainer plugin : plugins)
         {
-            final PluginMetadata meta = plugin.getMetadata();
-            list.add(Component.text(" - ").append(Component.text(meta.getName().orElse(meta.getId()), NamedTextColor.GREEN))
+            final PluginMetadata meta = plugin.metadata();
+            list.add(Component.text(" - ").append(Component.text(meta.name().orElse(meta.id()), NamedTextColor.GREEN))
                          .append(Component.space())
-                         .append(Component.text(meta.getId(), NamedTextColor.GRAY))
+                         .append(Component.text(meta.id(), NamedTextColor.GRAY))
                          .append(Component.text(" (" + getVersionOf(plugin) + ")")));
         }
 
@@ -105,17 +105,17 @@ public class PluginCommands extends PermissionContainer
 
         list.add(Component.text(" - ").append(Component.text("CubeEngine", NamedTextColor.GREEN))
                      .append(Component.space())
-                     .append(Component.text(core.getMetadata().getId(), NamedTextColor.GRAY))
+                     .append(Component.text(core.metadata().id(), NamedTextColor.GRAY))
                      .append(Component.space())
                      .append(Component.text("(" + getVersionOf(core) + ")"))
                      .append(i18n.translate(context, NEUTRAL, " with {amount} Modules:", modules.size())));
 
         for (PluginContainer module : modules)
         {
-            final PluginMetadata meta = module.getMetadata();
-            list.add(Component.text("  - ").append(Component.text(simplifyCEName(meta.getName().orElse(meta.getId())), NamedTextColor.YELLOW))
+            final PluginMetadata meta = module.metadata();
+            list.add(Component.text("  - ").append(Component.text(simplifyCEName(meta.name().orElse(meta.id())), NamedTextColor.YELLOW))
                          .append(Component.space())
-                         .append(Component.text(meta.getId(), NamedTextColor.GRAY))
+                         .append(Component.text(meta.id(), NamedTextColor.GRAY))
                          .append(Component.space())
                          .append(Component.text("(" + getVersionOf(module) + ")")));
         }
@@ -134,7 +134,7 @@ public class PluginCommands extends PermissionContainer
 
     private String getVersionOf(PluginContainer core)
     {
-        return core.getMetadata().getVersion();
+        return core.metadata().version();
     }
 
     private String simplifyVersion(String version)
@@ -153,27 +153,27 @@ public class PluginCommands extends PermissionContainer
         {
             Platform platform = Sponge.game().platform();
             PluginContainer impl = platform.container(IMPLEMENTATION);
-            final PluginMetadata meta = impl.getMetadata();
+            final PluginMetadata meta = impl.metadata();
             switch (platform.type())
             {
                 case CLIENT:
                     i18n.send(context, NEUTRAL, "This client is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
-                                        meta.getName().orElse(meta.getId()), platform.minecraftVersion().name(), meta.getVersion());
+                                        meta.name().orElse(meta.id()), platform.minecraftVersion().name(), meta.version());
                     break;
                 case SERVER:
                     i18n.send(context, NEUTRAL, "This server is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
-                                        meta.getName().orElse(meta.getId()), platform.minecraftVersion().name(), meta.getVersion());
+                                        meta.name().orElse(meta.id()), platform.minecraftVersion().name(), meta.version());
                     break;
                 case UNKNOWN:
                     i18n.send(context, NEUTRAL, "Unknown platform running {name#server} {name#version:color=INDIGO} {name#version:color"
                                     + "=INDIGO}",
-                                        meta.getName().orElse(meta.getId()), platform.minecraftVersion().name(), meta.getVersion());
+                                        meta.name().orElse(meta.id()), platform.minecraftVersion().name(), meta.version());
             }
 
-            i18n.send(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.container(API).getMetadata().getVersion());
+            i18n.send(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.container(API).metadata().version());
             context.sendMessage(Identity.nil(), Component.empty());
 
-            i18n.send(context, NEUTRAL, "with {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.mm.getPlugin(LibCube.class).get().getMetadata().getVersion());
+            i18n.send(context, NEUTRAL, "with {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.mm.getPlugin(LibCube.class).get().metadata().version());
             return;
         }
         if (!COMMAND_VERSION_PLUGINS.check(context))
@@ -185,7 +185,7 @@ public class PluginCommands extends PermissionContainer
         if (!instance.isPresent())
         {
             List<PluginContainer> plugins = Sponge.pluginManager().plugins().stream()
-                  .filter(container -> container.getMetadata().getName().orElse(container.getMetadata().getId()).toLowerCase().startsWith(plugin.toLowerCase()))
+                  .filter(container -> container.metadata().name().orElse(container.metadata().id()).toLowerCase().startsWith(plugin.toLowerCase()))
                   .collect(Collectors.toList());
             i18n.send(context, NEGATIVE, "The given plugin doesn't seem to be loaded, have you typed it correctly (casing does matter)?");
             if (!plugins.isEmpty())
@@ -193,14 +193,14 @@ public class PluginCommands extends PermissionContainer
                 i18n.send(context, NEGATIVE, "You might want to try one of these:");
                 for (PluginContainer p : plugins)
                 {
-                    context.sendMessage(Identity.nil(), Component.text(" - " + p.getMetadata().getName()));
+                    context.sendMessage(Identity.nil(), Component.text(" - " + p.metadata().name()));
                 }
             }
             return;
         }
-        final PluginMetadata meta = instance.get().getMetadata();
+        final PluginMetadata meta = instance.get().metadata();
         i18n.send(context, NEUTRAL, "{name#plugin} is currently running in version {input#version:color=INDIGO}.",
-                  meta.getName().orElse(meta.getId()), meta.getVersion());
+                  meta.name().orElse(meta.id()), meta.version());
         context.sendMessage(Identity.nil(), Component.empty());
 // TODO
         //        i18n.send(context, NEUTRAL, "Plugin information:");

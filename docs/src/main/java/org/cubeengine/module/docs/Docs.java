@@ -73,7 +73,7 @@ public class Docs
         Map<String, ModuleDocs> docs = new TreeMap<>();
         for (Map.Entry<Class<?>, PluginContainer> entry : mm.getModulePlugins().entrySet())
         {
-            docs.put(entry.getValue().getMetadata().getId(), new ModuleDocs(entry.getValue(), entry.getKey(), reflector, pm, ps, mm));
+            docs.put(entry.getValue().metadata().id(), new ModuleDocs(entry.getValue(), entry.getKey(), reflector, pm, ps, mm));
         }
 
         logger.info("Generating Module Docs...");

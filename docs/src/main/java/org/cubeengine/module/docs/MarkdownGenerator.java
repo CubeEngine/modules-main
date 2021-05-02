@@ -95,11 +95,11 @@ public class MarkdownGenerator implements Generator
         }
 
         sb.append("\n");
-        sb.append(pc.getMetadata().getDescription().orElse(""));
+        sb.append(pc.metadata().description().orElse(""));
         sb.append("\n");
         if (info.features.isEmpty())
         {
-            log.warn("Missing Features for " + name + "(" + pc.getMetadata().getId() + ")!");
+            log.warn("Missing Features for " + name + "(" + pc.metadata().id() + ")!");
         }
         else
         {
@@ -110,18 +110,18 @@ public class MarkdownGenerator implements Generator
             }
         }
 
-        List<PluginDependency> plugDep = pc.getMetadata().getDependencies();
+        List<PluginDependency> plugDep = pc.metadata().dependencies();
         if (plugDep.size() > 2) // ignore cubeengine-core and spongeapi
         {
             sb.append("\n## Dependencies:\n");
             for (PluginDependency dep : plugDep)
             {
-                if (dep.getId().equals("cubeengine-core") || dep.getId().equals("spongeapi"))
+                if (dep.id().equals("cubeengine-core") || dep.id().equals("spongeapi"))
                 {
                     continue;
                 }
                 // TODO link to module or plugin on ore if possible?
-                sb.append(" `").append(dep.getId()).append("`");
+                sb.append(" `").append(dep.id()).append("`");
             }
             sb.append("\n");
         }
@@ -236,7 +236,7 @@ public class MarkdownGenerator implements Generator
             allAliases.remove(primaryAlias);
             if (commandStack.size() == 1)
             {
-                allAliases.remove(mapping.plugin().getMetadata().getId() + ":" + primaryAlias);
+                allAliases.remove(mapping.plugin().metadata().id() + ":" + primaryAlias);
             }
             if (!allAliases.isEmpty())
             {
