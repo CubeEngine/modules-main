@@ -28,6 +28,7 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.portals.Portal;
 import org.cubeengine.module.portals.Portals;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -69,14 +70,14 @@ public class PortalParser implements ValueParser<Portal>, ValueCompleter, Defaul
     }
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
-        List<String> list = new ArrayList<>();
+        List<CommandCompletion> list = new ArrayList<>();
         for (Portal portal : module.getPortals())
         {
             if (portal.getName().startsWith(currentInput))
             {
-                list.add(portal.getName());
+                list.add(CommandCompletion.of(portal.getName()));
             }
         }
         return list;

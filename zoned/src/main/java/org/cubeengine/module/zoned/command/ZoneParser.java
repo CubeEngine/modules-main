@@ -30,6 +30,7 @@ import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.cubeengine.module.zoned.ZoneManager;
 import org.cubeengine.module.zoned.Zoned;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -78,10 +79,10 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
     }
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
         String token = currentInput.toLowerCase();
-        List<String> list = new ArrayList<>();
+        List<CommandCompletion> list = new ArrayList<>();
         ServerWorld world = null;
         boolean isLocatable = context.cause().audience() instanceof Locatable;
         if (isLocatable)
@@ -95,7 +96,7 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
                 }
                 if (zone.name.startsWith(token))
                 {
-                    list.add(zone.name);
+                    list.add(CommandCompletion.of(zone.name));
                 }
             }
         }
@@ -118,7 +119,7 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
                 String fullName = zone.world.getName() + "." + zone.name;
                 if (fullName.startsWith(token))
                 {
-                    list.add(fullName);
+                    list.add(CommandCompletion.of(fullName));
                 }
                 /* TODO world region?
                 if ((worldName + ".world").startsWith(token))

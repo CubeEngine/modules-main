@@ -26,6 +26,7 @@ import org.cubeengine.libcube.service.command.annotation.ParserFor;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.FileSubject;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -50,15 +51,15 @@ public class FileSubjectParser implements ValueParser<FileSubject>, ValueComplet
     }
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
-        ArrayList<String> result = new ArrayList<>();
+        List<CommandCompletion> result = new ArrayList<>();
         for (Subject subject : service.groupSubjects().loadedSubjects())
         {
             String name = subject.identifier();
             if (name.startsWith(currentInput))
             {
-                result.add(name);
+                result.add(CommandCompletion.of(name));
             }
         }
         return result;

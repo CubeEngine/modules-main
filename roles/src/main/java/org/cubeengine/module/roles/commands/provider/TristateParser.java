@@ -24,6 +24,7 @@ import org.cubeengine.libcube.service.command.annotation.ParserFor;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.roles.service.subject.FileSubject;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
@@ -57,14 +58,14 @@ public class TristateParser implements DefaultParameterProvider<Tristate>, Value
     }
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
-        final ArrayList<String> list = new ArrayList<>();
+        final List<CommandCompletion> list = new ArrayList<>();
         for (Tristate value : Tristate.values())
         {
             if (value.name().toLowerCase().startsWith(currentInput.toLowerCase()))
             {
-                list.add(value.name());
+                list.add(CommandCompletion.of(value.name()));
             }
         }
         return list;

@@ -41,6 +41,7 @@ import org.cubeengine.libcube.util.StringUtils;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -126,7 +127,7 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
     }
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
         List<String> types = Arrays.asList(
             i18n.getTranslation(context.cause(), "hostile"),
@@ -145,7 +146,7 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
                 closeMatches.add(type);
             }
         }
-        return new ArrayList<>(closeMatches);
+        return closeMatches.stream().map(CommandCompletion::of).collect(Collectors.toList());
     }
 
     @Override

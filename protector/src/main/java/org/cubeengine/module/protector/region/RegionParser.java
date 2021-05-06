@@ -35,6 +35,7 @@ import org.cubeengine.module.zoned.config.ZoneConfig;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -94,10 +95,10 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
     }
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
         String token = currentInput.toLowerCase();
-        List<String> list = new ArrayList<>();
+        List<CommandCompletion> list = new ArrayList<>();
         ServerWorld world = null;
         boolean isLocatable = context.subject() instanceof Locatable;
         if (isLocatable)
@@ -109,7 +110,7 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
             {
                 if (entry.getKey().startsWith(token))
                 {
-                    list.add(entry.getKey());
+                    list.add(CommandCompletion.of(entry.getKey()));
                 }
             }
 
@@ -130,31 +131,31 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
                     String value = entry.getValue().getContext().getValue();
                     if (value.startsWith(token))
                     {
-                        list.add(value);
+                        list.add(CommandCompletion.of(value));
                     }
                 }
             }
         }
         if ("global".startsWith(token))
         {
-            list.add("global");
+            list.add(CommandCompletion.of("global"));
         }
         if (isLocatable && "world".startsWith(token))
         {
-            list.add("world");
+            list.add(CommandCompletion.of("world"));
         }
         for (Region region : manager.getWorldRegions())
         {
             String worldName = region.getWorld().key().asString();
             if (worldName.startsWith(token))
             {
-                list.add(worldName);
+                list.add(CommandCompletion.of(worldName));
             }
         }
         // Add Zones
         if (isLocatable)
         {
-            zoneMan.getZones(token, world).stream().map(cfg -> cfg.name).forEach(list::add);
+            zoneMan.getZones(token, world).stream().map(cfg -> cfg.name).map(CommandCompletion::of).forEach(list::add);
         }
 
         return list;

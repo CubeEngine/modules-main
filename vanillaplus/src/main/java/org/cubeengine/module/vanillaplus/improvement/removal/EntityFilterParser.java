@@ -33,6 +33,7 @@ import org.cubeengine.libcube.service.matcher.MaterialMatcher;
 import org.cubeengine.libcube.util.StringUtils;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -66,12 +67,14 @@ public class EntityFilterParser implements ValueParser<EntityFilter>, ValueCompl
     }
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
         return Stream.of(ITEM, ARROW, MINECART, PAINTING, ITEM_FRAME, EXPERIENCE_ORB)
               .map(DefaultedRegistryReference::location)
               .filter(key -> currentInput.startsWith(key.asString()) || "minecraft".equals(key.namespace()) && currentInput.startsWith(key.value()))
-              .map(ResourceKey::asString).collect(Collectors.toList());
+              .map(ResourceKey::asString)
+              .map(CommandCompletion::of)
+              .collect(Collectors.toList());
     }
 
     @Override

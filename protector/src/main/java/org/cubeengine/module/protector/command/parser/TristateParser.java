@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import net.kyori.adventure.text.Component;
 import org.cubeengine.libcube.service.command.annotation.ParserFor;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -36,21 +37,21 @@ public class TristateParser implements ValueParser<Tristate>, ValueCompleter
 {
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
         String token = currentInput.toLowerCase();
-        List<String> list = new ArrayList<>();
+        List<CommandCompletion> list = new ArrayList<>();
         if ("allow".startsWith(token))
         {
-            list.add("allow");
+            list.add(CommandCompletion.of("allow"));
         }
         if ("deny".startsWith(token))
         {
-            list.add("deny");
+            list.add(CommandCompletion.of("deny"));
         }
         if ("reset".startsWith(token))
         {
-            list.add("reset");
+            list.add(CommandCompletion.of("reset"));
         }
         return list;
     }

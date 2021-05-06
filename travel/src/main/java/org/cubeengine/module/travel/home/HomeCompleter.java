@@ -22,6 +22,7 @@ import java.util.List;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.module.travel.config.Home;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.managed.ValueCompleter;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -38,16 +39,16 @@ public class HomeCompleter implements ValueCompleter
     }
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
-        List<String> list = new ArrayList<>();
+        List<CommandCompletion> list = new ArrayList<>();
         if (context.cause().audience() instanceof ServerPlayer)
         {
             for (Home home : manager.list(((ServerPlayer) context.cause().audience()).user(), true, true))
             {
                 if (home.name.startsWith(currentInput))
                 {
-                    list.add(home.name);
+                    list.add(CommandCompletion.of(home.name));
                 }
             }
         }

@@ -25,6 +25,7 @@ import java.util.Set;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.command.annotation.ParserFor;
 import org.cubeengine.module.roles.RolesUtil;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.parameter.CommandContext;
 import org.spongepowered.api.command.parameter.managed.ValueCompleter;
 
@@ -34,24 +35,24 @@ import static java.util.stream.Collectors.toList;
 public class PermissionCompleter implements ValueCompleter
 {
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
-        Set<String> result = new HashSet<>();
+        Set<CommandCompletion> result = new HashSet<>();
         for (String permission : RolesUtil.allPermissions.stream().filter(p -> p.startsWith(currentInput)).collect(toList()))
         {
             String substring = permission.substring(currentInput.length());
             int i = substring.indexOf(".");
             if (i == -1)
             {
-                result.add(permission);
+                result.add(CommandCompletion.of(permission));
             }
             else
             {
-                result.add(permission.substring(0, currentInput.length() + i));
+                result.add(CommandCompletion.of(permission.substring(0, currentInput.length() + i)));
             }
         }
-        ArrayList<String> list = new ArrayList<>(result);
-        Collections.sort(list);
+        List<CommandCompletion> list = new ArrayList<>(result);
+//        Collections.sort(list);
         return list;
     }
 

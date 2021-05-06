@@ -29,6 +29,7 @@ import org.cubeengine.module.conomy.BaseAccount;
 import org.cubeengine.module.conomy.BaseAccount.Unique;
 import org.cubeengine.module.conomy.ConomyService;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -76,7 +77,7 @@ public class UniqueAccountParser implements ValueParser<Unique>, DefaultParamete
     }
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
         return ResourceKeyedValueParameters.USER.get().complete(context, currentInput);
     }

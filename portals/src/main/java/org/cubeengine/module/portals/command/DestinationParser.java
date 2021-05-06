@@ -31,6 +31,7 @@ import org.cubeengine.module.portals.Portals;
 import org.cubeengine.module.portals.config.Destination;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCompletion;
 import org.spongepowered.api.command.exception.ArgumentParseException;
 import org.spongepowered.api.command.parameter.ArgumentReader.Mutable;
 import org.spongepowered.api.command.parameter.CommandContext;
@@ -100,12 +101,12 @@ public class DestinationParser implements ValueParser<Destination>, ValueComplet
     }
 
     @Override
-    public List<String> complete(CommandContext context, String currentInput)
+    public List<CommandCompletion> complete(CommandContext context, String currentInput)
     {
-        final List<String> list = new ArrayList<>();
+        final List<CommandCompletion> list = new ArrayList<>();
         if (currentInput.toLowerCase().startsWith("here"))
         {
-            list.add("here");
+            list.add(CommandCompletion.of("here"));
         }
 
         if (currentInput.toLowerCase().startsWith("p:"))
@@ -115,7 +116,7 @@ public class DestinationParser implements ValueParser<Destination>, ValueComplet
             {
                 if (portal.getName().startsWith(portalInput))
                 {
-                    list.add("p:" + portal.getName());
+                    list.add(CommandCompletion.of("p:" + portal.getName()));
                 }
             }
         }
@@ -125,7 +126,7 @@ public class DestinationParser implements ValueParser<Destination>, ValueComplet
             {
                 if (world.key().toString().startsWith(currentInput))
                 {
-                    list.add(world.key().toString());
+                    list.add(CommandCompletion.of(world.key().toString()));
                 }
             }
         }
