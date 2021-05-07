@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.logging.log4j.Logger;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.module.multiverse.player.PlayerData;
@@ -34,11 +36,13 @@ import org.spongepowered.api.event.entity.living.player.RespawnPlayerEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
 import org.spongepowered.api.world.server.ServerWorld;
 
+@Singleton
 public class MultiverseListener
 {
     private Multiverse module;
     private final Logger logger;
 
+    @Inject
     public MultiverseListener(Multiverse module, Logger logger)
     {
         this.module = module;

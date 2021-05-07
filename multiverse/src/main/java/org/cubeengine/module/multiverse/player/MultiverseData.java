@@ -18,26 +18,27 @@
 package org.cubeengine.module.multiverse.player;
 
 import io.leangen.geantyref.TypeToken;
+import org.cubeengine.module.multiverse.PluginMultiverse;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataStore;
 import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.data.value.Value;
+import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
-import org.cubeengine.module.multiverse.PluginMultiverse;
+import org.spongepowered.api.util.TypeTokens;
 
 
 public interface MultiverseData
 {
-    TypeToken<Value<String>> TTV_String = new TypeToken<Value<String>>() {};
     TypeToken<MapValue<String, DataContainer>> TTMV_Data = new TypeToken<MapValue<String, DataContainer>>() { };
 
     Key<Value<String>> UNIVERSE = Key.builder()
                                      .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "current-universe"))
-                                     .type(TTV_String).build();
+                                     .type(TypeTokens.STRING_VALUE_TOKEN).build();
 
     Key<MapValue<String, DataContainer>> DATA = Key.builder()
                                   .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "player-data"))
@@ -53,7 +54,7 @@ public interface MultiverseData
     {
         final ResourceKey rkey = ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "current-universe");
         final DataStore dataStore = DataStore.builder().pluginData(rkey)
-                                             .holder(BlockEntity.class)
+                                             .holder(ServerPlayer.class, User.class)
                                              .key(MultiverseData.UNIVERSE, "current-universe")
                                              .build();
 
@@ -68,7 +69,7 @@ public interface MultiverseData
     {
         final ResourceKey rkey = ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "player-data");
         final DataStore dataStore = DataStore.builder().pluginData(rkey)
-                                             .holder(BlockEntity.class)
+                                             .holder(ServerPlayer.class, User.class)
                                              .key(MultiverseData.DATA, "player-data")
                                              .build();
 

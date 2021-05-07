@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
@@ -43,12 +45,14 @@ import org.spongepowered.api.world.server.ServerWorld;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
+@Singleton
 @Command(name = "multiverse", desc = "Multiverse commands", alias = "mv")
 public class MultiverseCommands extends DispatcherCommand
 {
     private Multiverse module;
     private I18n i18n;
 
+    @Inject
     public MultiverseCommands(Multiverse module, I18n i18n)
     {
         this.module = module;
