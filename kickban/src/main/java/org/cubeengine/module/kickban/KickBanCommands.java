@@ -135,7 +135,7 @@ public class KickBanCommands
             if (player.connection().address().getAddress() != null)
             {
                 InetAddress ipAdress = player.connection().address().getAddress();
-                if (this.banService.isBanned(ipAdress).join())
+                if (this.banService.banFor(ipAdress).join().isPresent())
                 {
                     i18n.send(context, NEGATIVE, "{user} is already IP banned!", user);
                     return;
@@ -167,7 +167,7 @@ public class KickBanCommands
         }
         else
         {
-            if (this.banService.isBanned(user.profile()).join())
+            if (this.banService.banFor(user.profile()).join().isPresent())
             {
                 i18n.send(context, NEGATIVE, "{user} is already banned!", user);
                 return;
@@ -200,7 +200,7 @@ public class KickBanCommands
     @Command(alias = "pardon", desc = "Unbans a previously banned player.")
     public void unban(CommandCause context, User player)
     {
-        if (banService.isBanned(player.profile()).join())
+        if (banService.banFor(player.profile()).join().isPresent())
         {
             this.banService.pardon(player.profile()).join();
             if (context instanceof Player)
@@ -222,7 +222,7 @@ public class KickBanCommands
         try
         {
             InetAddress address = InetAddress.getByName(ipaddress);
-            if (this.banService.isBanned(address).join())
+            if (this.banService.banFor(address).join().isPresent())
             {
                 i18n.send(context, NEUTRAL, "The IP {input#ip} is already banned!", address.getHostAddress());
                 return;
@@ -262,7 +262,7 @@ public class KickBanCommands
         try
         {
             InetAddress address = InetAddress.getByName(ipaddress);
-            if (this.banService.isBanned(address).join())
+            if (this.banService.banFor(address).join().isPresent())
             {
                 this.banService.pardon(address);
                 i18n.send(context, POSITIVE, "You unbanned the IP {input#ip}!", address.getHostAddress());
@@ -292,7 +292,7 @@ public class KickBanCommands
             return;
         }
         Component formattedReason = parseReason(reason, perms.COMMAND_TEMPBAN_NOREASON, context);
-        if (this.banService.isBanned(user.profile()).join())
+        if (this.banService.banFor(user.profile()).join().isPresent())
         {
             i18n.send(context, NEGATIVE, "{user} is already banned!", user);
             return;
