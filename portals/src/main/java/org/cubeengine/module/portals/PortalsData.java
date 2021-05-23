@@ -24,11 +24,10 @@ import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.TypeTokens;
 
 public interface PortalsData
 {
-    Key<Value<String>> PORTAL = Key.builder().key(ResourceKey.of(PluginPortals.PORTALS_ID, "portal")).type(TypeTokens.STRING_VALUE_TOKEN).build();
+    Key<Value<String>> PORTAL = Key.builder().key(ResourceKey.of(PluginPortals.PORTALS_ID, "portal")).elementType(String.class).build();
 
     static void register(RegisterDataEvent event)
     {

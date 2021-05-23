@@ -24,16 +24,15 @@ import org.spongepowered.api.data.persistence.DataStore;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.TypeTokens;
 import org.spongepowered.math.vector.Vector3d;
 
 public interface ZonedData
 {
-    Key<Value<String>> ZONE_TYPE = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-type")).type(TypeTokens.STRING_VALUE_TOKEN).build();
+    Key<Value<String>> ZONE_TYPE = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-type")).elementType(String.class).build();
 
-    Key<Value<ResourceKey>> ZONE_WORLD = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-world")).type(TypeTokens.RESOURCE_KEY_VALUE_TOKEN).build();
-    Key<Value<Vector3d>> ZONE_MIN = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-min")).type(TypeTokens.VECTOR_3D_VALUE_TOKEN).build();
-    Key<Value<Vector3d>> ZONE_MAX = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-max")).type(TypeTokens.VECTOR_3D_VALUE_TOKEN).build();
+    Key<Value<ResourceKey>> ZONE_WORLD = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-world")).elementType(ResourceKey.class).build();
+    Key<Value<Vector3d>> ZONE_MIN = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-min")).elementType(Vector3d.class).build();
+    Key<Value<Vector3d>> ZONE_MAX = Key.builder().key(ResourceKey.of(PluginZoned.ZONED_ID, "zone-max")).elementType(Vector3d.class).build();
 
 
     static void register(RegisterDataEvent event)

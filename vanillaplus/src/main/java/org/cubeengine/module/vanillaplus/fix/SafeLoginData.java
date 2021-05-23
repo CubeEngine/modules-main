@@ -25,14 +25,13 @@ import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
-import org.spongepowered.api.util.TypeTokens;
 
 public interface SafeLoginData
 {
 
     Key<Value<Boolean>> FLYMODE = Key.builder()
          .key(ResourceKey.of(PluginVanillaPlus.VANILLAPLUS_ID, "flymore"))
-         .type(TypeTokens.BOOLEAN_VALUE_TOKEN).build();
+         .elementType(Boolean.class).build();
 
     static void register(RegisterDataEvent event)
     {

@@ -18,7 +18,6 @@
 package org.cubeengine.module.locker.data;
 
 import java.util.UUID;
-import io.leangen.geantyref.TypeToken;
 import org.cubeengine.module.locker.PluginLocker;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -35,31 +34,27 @@ import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.util.TypeTokens;
 
 public interface LockerData
 {
-    TypeToken<MapValue<UUID, Integer>> TTMV_UUIDInteger = new TypeToken<MapValue<UUID, Integer>>() {};
-    TypeToken<ListValue<UUID>> TTLV_UUID = new TypeToken<ListValue<UUID>>() {};
+    Key<Value<String>> MODE = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "mode")).elementType(String.class).build();
 
-    Key<Value<String>> MODE = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "mode")).type(TypeTokens.STRING_VALUE_TOKEN).build();
+    Key<Value<String>> PASS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "pass")).elementType(String.class).build();
 
-    Key<Value<String>> PASS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "pass")).type(TypeTokens.STRING_VALUE_TOKEN).build();
-
-    Key<Value<UUID>> OWNER = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "owner")).type(TypeTokens.UUID_VALUE_TOKEN).build();
+    Key<Value<UUID>> OWNER = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "owner")).elementType(UUID.class).build();
 
     /**
      * Bitmasks see {@link ProtectionFlag}
      */
-    Key<Value<Integer>> FLAGS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "flags")).type(TypeTokens.INTEGER_VALUE_TOKEN).build();
-    Key<MapValue<UUID, Integer>> ACCESS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "access")).type(TTMV_UUIDInteger).build();
+    Key<Value<Integer>> FLAGS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "flags")).elementType(Integer.class).build();
+    Key<MapValue<UUID, Integer>> ACCESS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "access")).mapElementType(UUID.class, Integer.class).build();
 
-    Key<MapValue<UUID, Integer>> TRUST = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "trust")).type(TTMV_UUIDInteger).build();
+    Key<MapValue<UUID, Integer>> TRUST = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "trust")).mapElementType(UUID.class, Integer.class).build();
 
-    Key<ListValue<UUID>> UNLOCKS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "unlocks")).type(TTLV_UUID).build();
+    Key<ListValue<UUID>> UNLOCKS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "unlocks")).listElementType(UUID.class).build();
 
-    Key<Value<Long>> LAST_ACCESS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "last_access")).type(TypeTokens.LONG_VALUE_TOKEN).build();
-    Key<Value<Long>> CREATED = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "created")).type(TypeTokens.LONG_VALUE_TOKEN).build();
+    Key<Value<Long>> LAST_ACCESS = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "last_access")).elementType(Long.class).build();
+    Key<Value<Long>> CREATED = Key.builder().key(ResourceKey.of(PluginLocker.LOCKER_ID, "created")).elementType(Long.class).build();
 
     static void register(RegisterDataEvent event)
     {

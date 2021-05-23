@@ -29,20 +29,17 @@ import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
-import org.spongepowered.api.util.TypeTokens;
 
 
 public interface MultiverseData
 {
-    TypeToken<MapValue<String, DataContainer>> TTMV_Data = new TypeToken<MapValue<String, DataContainer>>() { };
-
     Key<Value<String>> UNIVERSE = Key.builder()
                                      .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "current-universe"))
-                                     .type(TypeTokens.STRING_VALUE_TOKEN).build();
+                                     .elementType(String.class).build();
 
     Key<MapValue<String, DataContainer>> DATA = Key.builder()
                                   .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "player-data"))
-                                  .type(TTMV_Data).build();
+                                  .mapElementType(String.class, DataContainer.class).build();
 
     static void register(RegisterDataEvent event)
     {
