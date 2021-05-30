@@ -38,6 +38,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -77,7 +78,7 @@ public class MultiverseCommands extends DispatcherCommand
 
         Sponge.server().onlinePlayers().stream().filter(player -> player.world().equals(world)).forEach(
             p -> {
-                final Map<String, DataContainer> data = p.get(MultiverseData.DATA).orElse(new HashMap<>());
+                final Map<String, DataView> data = p.get(MultiverseData.DATA).orElse(new HashMap<>());
                 // Serialize current data on previous universe
                 data.put(previous, PlayerData.of(data.get(previous), world).applyFromPlayer(p).toContainer());
                 // Deserialize new universe data on player

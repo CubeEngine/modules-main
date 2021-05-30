@@ -27,6 +27,7 @@ import org.apache.logging.log4j.Logger;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.module.multiverse.player.PlayerData;
 import org.spongepowered.api.data.persistence.DataContainer;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -65,12 +66,12 @@ public class MultiverseListener
 
         if (target instanceof ServerPlayer)
         {
-            final Map<String, DataContainer> map = target.get(MultiverseData.DATA).orElse(new HashMap<>());
-            final DataContainer dataContainerFrom = map.get(fromUniverse);
+            final Map<String, DataView> map = target.get(MultiverseData.DATA).orElse(new HashMap<>());
+            final DataView dataContainerFrom = map.get(fromUniverse);
             final PlayerData fromPlayerData = PlayerData.of(dataContainerFrom, from).applyFromPlayer(((ServerPlayer)target));// save playerdata
             map.put(fromUniverse, fromPlayerData.toContainer());
 
-            final DataContainer dataContainerTo = map.get(toUniverse);
+            final DataView dataContainerTo = map.get(toUniverse);
             PlayerData.of(dataContainerTo, to).applyToPlayer(((ServerPlayer)target));  // load playerdata
 
             target.offer(MultiverseData.DATA, map);
@@ -87,7 +88,7 @@ public class MultiverseListener
     public void onJoin(ServerSideConnectionEvent.Join event)
     {
         ServerPlayer player = event.player();
-        final Map<String, DataContainer> data = player.get(MultiverseData.DATA).orElse(new HashMap<>());
+        final Map<String, DataView> data = player.get(MultiverseData.DATA).orElse(new HashMap<>());
         final Optional<String> currentUniverse = player.get(MultiverseData.UNIVERSE);
         ServerWorld world = player.world();
         String loginUniverse = module.getUniverse(world);
@@ -107,7 +108,7 @@ public class MultiverseListener
     public void onQuit(ServerSideConnectionEvent.Disconnect event)
     {
         ServerPlayer player = event.player();
-        final Map<String, DataContainer> data = player.get(MultiverseData.DATA).orElse(null);
+        final Map<String, DataView> data = player.get(MultiverseData.DATA).orElse(null);
         if (data == null)
         {
             return;
@@ -134,7 +135,7 @@ public class MultiverseListener
             return;
         }
 
-        final Map<String, DataContainer> data = target.get(MultiverseData.DATA).orElse(new HashMap<>());
+        final Map<String, DataView> data = target.get(MultiverseData.DATA).orElse(new HashMap<>());
         data.put(fromUniverse, PlayerData.of(data.get(fromUniverse), from).applyFromPlayer(target).toContainer()); // save playerdata
         PlayerData.of(data.get(toUniverse), to).applyToPlayer(target);
         target.offer(MultiverseData.UNIVERSE, toUniverse);

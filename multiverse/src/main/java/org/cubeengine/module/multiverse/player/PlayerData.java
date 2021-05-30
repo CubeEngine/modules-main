@@ -79,7 +79,7 @@ public class PlayerData implements DataSerializable
         // TODO defaultdata from world
     }
 
-    public PlayerData(DataContainer value)
+    public PlayerData(DataView value)
     {
         if (!value.getInt(Queries.CONTENT_VERSION).get().equals(contentVersion()))
         {
@@ -124,7 +124,7 @@ public class PlayerData implements DataSerializable
         this.gameMode = Sponge.game().registries().registry(RegistryTypes.GAME_MODE).value(ResourceKey.resolve(value.getString(GAMEMODE).get()));
     }
 
-    public static PlayerData of(DataContainer dataContainer, ServerWorld world)
+    public static PlayerData of(DataView dataContainer, ServerWorld world)
     {
         if (dataContainer == null)
         {

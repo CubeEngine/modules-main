@@ -17,19 +17,18 @@
  */
 package org.cubeengine.module.multiverse.player;
 
-import io.leangen.geantyref.TypeToken;
 import org.cubeengine.module.multiverse.PluginMultiverse;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.data.DataRegistration;
 import org.spongepowered.api.data.Key;
 import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataStore;
+import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.data.value.MapValue;
 import org.spongepowered.api.data.value.Value;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
-
 
 public interface MultiverseData
 {
@@ -37,9 +36,9 @@ public interface MultiverseData
                                      .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "current-universe"))
                                      .elementType(String.class).build();
 
-    Key<MapValue<String, DataContainer>> DATA = Key.builder()
-                                  .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "player-data"))
-                                  .mapElementType(String.class, DataContainer.class).build();
+    Key<MapValue<String, DataView>> DATA = Key.builder()
+                                              .key(ResourceKey.of(PluginMultiverse.MULTIVERSE_ID, "player-data"))
+                                              .mapElementType(String.class, DataView.class).build();
 
     static void register(RegisterDataEvent event)
     {
