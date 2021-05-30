@@ -18,7 +18,7 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -77,7 +77,7 @@ public class MultiverseCommands extends DispatcherCommand
 
         Sponge.server().onlinePlayers().stream().filter(player -> player.world().equals(world)).forEach(
             p -> {
-                final Map<String, DataContainer> data = p.get(MultiverseData.DATA).orElse(Collections.emptyMap());
+                final Map<String, DataContainer> data = p.get(MultiverseData.DATA).orElse(new HashMap<>());
                 // Serialize current data on previous universe
                 data.put(previous, PlayerData.of(data.get(previous), world).applyFromPlayer(p).toContainer());
                 // Deserialize new universe data on player
