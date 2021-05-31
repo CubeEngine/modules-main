@@ -114,38 +114,32 @@ public class BankConomyService extends ConomyService
 
     public List<BaseAccount.Virtual> getBanks(Subject user, AccessLevel level)
     {
-        SubjectData data = user.subjectData();
-        Map<String, String> options = data.options(user.activeContexts());
-
         List<String> manage = new ArrayList<>();
         List<String> withdraw = new ArrayList<>();
         List<String> deposit = new ArrayList<>();
         List<String> see = new ArrayList<>();
-        options.entrySet().stream()
-                .filter(e -> e.getKey().startsWith("conomy.bank.access-level"))
-                .forEach(e ->
-                {
-                    String key = e.getKey().substring("conomy.bank.access-level".length());
-                    switch (e.getValue())
-                    {
-                        case "0":
-                            break;
-                        case "1":
-                            see.add(key);
-                            break;
-                        case "2":
-                            deposit.add(key);
-                            break;
-                        case "3":
-                            withdraw.add(key);
-                            break;
-                        case "4":
-                            manage.add(key);
-                            break;
-                        default:
-                            break;
-                    }
-                });
+        this.getBankAccounts().stream().map(BaseAccount::identifier).forEach(bank -> {
+            switch (user.option("conomy.bank.access-level" + bank).orElse("-1"))
+            {
+                case "0":
+                    break;
+                case "1":
+                    see.add(bank);
+                    break;
+                case "2":
+                    deposit.add(bank);
+                    break;
+                case "3":
+                    withdraw.add(bank);
+                    break;
+                case "4":
+                    manage.add(bank);
+                    break;
+                default:
+                    break;
+            }
+        });
+
         if (level.value <= AccessLevel.WITHDRAW.value)
         {
             manage.addAll(withdraw);
@@ -220,7 +214,6 @@ public class BankConomyService extends ConomyService
                 }
                 break;
         }
-        Map<String, String> options = context.subjectData().options(context.activeContexts());
-        return Integer.valueOf(options.get("conomy.bank.access-level." + bank.identifier())) >= level.value;
+        return context.option("conomy.bank.access-level." + bank.identifier()).map(Integer::valueOf).orElse(-1) >= level.value;
     }
 }

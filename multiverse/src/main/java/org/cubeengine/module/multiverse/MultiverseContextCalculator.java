@@ -17,15 +17,13 @@
  */
 package org.cubeengine.module.multiverse;
 
-import java.util.Set;
-import java.util.UUID;
-import org.spongepowered.api.Sponge;
+import java.util.function.Consumer;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.world.Locatable;
 
-public class MultiverseContextCalculator implements ContextCalculator<Subject> // TODO for User is should be possible to get the world too
+public class MultiverseContextCalculator implements ContextCalculator // TODO for User is should be possible to get the world too
 {
     private static final String TYPE_UNIVERSE = "universe";
     private Multiverse module;
@@ -36,31 +34,20 @@ public class MultiverseContextCalculator implements ContextCalculator<Subject> /
     }
 
     @Override
-    public void accumulateContexts(Subject subject, Set<Context> set)
+    public void accumulateContexts(Cause source, Consumer<Context> consumer)
     {
-        if (subject instanceof Locatable)
-        {
-            set.add(new Context(TYPE_UNIVERSE, module.getUniverse(((Locatable)subject).serverLocation().world())));
-        }
-        else
-        {
-            // TODO better way to get player
-            if (subject.containingCollection() == Sponge.server().serviceProvider().permissionService().userSubjects())
-            {
-                final String playerId = subject.identifier();
-                final UUID uuid = UUID.fromString(playerId);
-                Sponge.server().player(uuid).ifPresent(player -> set.add(new Context(TYPE_UNIVERSE, module.getUniverse(player.world()))));
-            }
-        }
+        source.first(Locatable.class).ifPresent(locatable -> {
+            consumer.accept(new Context(TYPE_UNIVERSE, module.getUniverse(locatable.serverLocation().world())));
+        });
     }
 
-    @Override
-    public boolean matches(Context context, Subject subject)
-    {
-        if (subject instanceof Locatable && context.getKey().equals(TYPE_UNIVERSE))
-        {
-            return module.getUniverse(((Locatable)subject).serverLocation().world()).equals(context.getValue());
-        }
-        return false;
-    }
+//    @Override
+//    public boolean matches(Context context, Subject subject)
+//    {
+//        if (subject instanceof Locatable && context.getKey().equals(TYPE_UNIVERSE))
+//        {
+//            return module.getUniverse(((Locatable)subject).serverLocation().world()).equals(context.getValue());
+//        }
+//        return false;
+//    }
 }

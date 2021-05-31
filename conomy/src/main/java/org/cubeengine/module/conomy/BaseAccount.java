@@ -18,6 +18,7 @@
 package org.cubeengine.module.conomy;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -28,6 +29,7 @@ import org.cubeengine.module.conomy.bank.BankConomyService;
 import org.cubeengine.module.conomy.storage.AccountModel;
 import org.cubeengine.module.conomy.storage.BalanceModel;
 import org.cubeengine.module.sql.database.Database;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.economy.Currency;
 import org.spongepowered.api.service.economy.account.Account;
@@ -61,6 +63,60 @@ public abstract class BaseAccount implements Account
         this.db = db;
         this.display = Component.text(account.getName());
         this.id = account.getID();
+    }
+
+    @Override
+    public boolean hasBalance(Currency currency, Cause cause)
+    {
+        return this.hasBalance(currency, Collections.emptySet());
+    }
+
+    @Override
+    public BigDecimal balance(Currency currency, Cause cause)
+    {
+        return this.balance(currency, Collections.emptySet());
+    }
+
+    @Override
+    public Map<Currency, BigDecimal> balances(Cause cause)
+    {
+        return this.balances(Collections.emptySet());
+    }
+
+    @Override
+    public TransactionResult setBalance(Currency currency, BigDecimal amount, Cause cause)
+    {
+        return this.setBalance(currency, amount, Collections.emptySet());
+    }
+
+    @Override
+    public Map<Currency, TransactionResult> resetBalances(Cause cause)
+    {
+        return this.resetBalances(Collections.emptySet());
+    }
+
+    @Override
+    public TransactionResult resetBalance(Currency currency, Cause cause)
+    {
+        return this.resetBalance(currency, Collections.emptySet());
+    }
+
+    @Override
+    public TransactionResult deposit(Currency currency, BigDecimal amount, Cause cause)
+    {
+        return this.deposit(currency, amount, Collections.emptySet());
+    }
+
+    @Override
+    public TransactionResult withdraw(Currency currency, BigDecimal amount, Cause cause)
+    {
+        return this.withdraw(currency, amount, Collections.emptySet());
+    }
+
+    @Override
+    public TransferResult transfer(Account to, Currency currency, BigDecimal amount, Cause cause)
+    {
+        return this.transfer(to, currency, amount, Collections.emptySet());
     }
 
     private Optional<BalanceModel> getModel(ConfigCurrency currency, Set<Context> ctxs)
@@ -221,12 +277,6 @@ public abstract class BaseAccount implements Account
         {
             return new Result.Transfer(this, to, currency, amount, contexts, result.result(), TRANSFER);
         }
-    }
-
-    @Override
-    public Set<Context> activeContexts()
-    {
-        return service.getActiveContexts(this);
     }
 
     public boolean isHidden()

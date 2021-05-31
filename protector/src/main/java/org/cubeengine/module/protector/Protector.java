@@ -37,6 +37,7 @@ import org.cubeengine.processor.Module;
 import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.service.context.ContextService;
 import org.spongepowered.api.service.permission.PermissionService;
 
 // TODO fill/empty bucket (in hand)
@@ -48,7 +49,7 @@ public class Protector
 {
     @Inject private Logger logger;
     @Inject private I18n i18n;
-    @InjectService private PermissionService ps;
+    @InjectService private ContextService ps;
     @Inject private ModuleManager mm;
     @ModuleCommand private RegionCommands regionCommands;
 

@@ -34,6 +34,8 @@ import org.spongepowered.api.entity.living.player.User;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 
+import java.util.Collections;
+
 @Singleton
 @Command(name = "manage", desc = "Management commands for Conomy Banks.")
 public class BankManageCommand extends DispatcherCommand
@@ -50,8 +52,8 @@ public class BankManageCommand extends DispatcherCommand
     @Command(desc = "Sets the access level for a player in a bank")
     public void access(CommandCause context, User player, AccessLevel level, @Default BaseAccount.Virtual bank)
     {
-        player.subjectData().setOption(bank.activeContexts(),
-                                          "conomy.bank.access-level." + bank.identifier(), String.valueOf(level.value));
+        player.subjectData().setOption(Collections.emptySet(),
+                                       "conomy.bank.access-level." + bank.identifier(), String.valueOf(level.value));
         switch (level)
         {
             case NONE:

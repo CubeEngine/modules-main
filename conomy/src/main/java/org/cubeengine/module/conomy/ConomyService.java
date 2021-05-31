@@ -65,7 +65,6 @@ import static org.cubeengine.module.conomy.storage.TableBalance.TABLE_BALANCE;
 public class ConomyService implements EconomyService
 {
     private ConfigCurrency defaultCurrency;
-    private List<ContextCalculator<Account>> contextCalculators = new ArrayList<>();
 
     protected Map<String, Account> accounts = new HashMap<>();
     private Map<String, ConfigCurrency> currencies = new HashMap<>();
@@ -233,22 +232,6 @@ public class ConomyService implements EconomyService
     protected AccountModel loadModel(String id)
     {
         return db.getDSL().selectFrom(TABLE_ACCOUNT).where(TABLE_ACCOUNT.ID.eq(id)).fetchOne();
-    }
-
-    @Override
-    public void registerContextCalculator(ContextCalculator<Account> contextCalculator)
-    {
-        this.contextCalculators.add(contextCalculator);
-    }
-
-    public Set<Context> getActiveContexts(BaseAccount baseAccount)
-    {
-        Set<Context> contexts = new HashSet<>();
-        for (ContextCalculator<Account> calculator : contextCalculators)
-        {
-            calculator.accumulateContexts(baseAccount, contexts);
-        }
-        return contexts;
     }
 
     public Collection<BalanceModel> getTopBalance(boolean user, boolean bank, int fromRank, int toRank, boolean showHidden)

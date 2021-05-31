@@ -17,21 +17,18 @@
  */
 package org.cubeengine.module.protector;
 
+import java.util.List;
+import java.util.function.Consumer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.module.protector.region.Region;
-import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
-import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.world.Locatable;
 
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
-
 @Singleton
-public class RegionContextCalculator implements ContextCalculator<Subject>
+public class RegionContextCalculator implements ContextCalculator
 {
     private RegionManager manager;
 
@@ -42,39 +39,24 @@ public class RegionContextCalculator implements ContextCalculator<Subject>
     }
 
     @Override
-    public void accumulateContexts(Subject subject, Set<Context> set)
+    public void accumulateContexts(Cause source, Consumer<Context> accumulator)
     {
-        if (subject instanceof Locatable)
-        {
-            List<Region> regions = manager.getRegionsAt(((Locatable) subject).serverLocation());
-            regions.stream().map(Region::getContext).forEach(set::add);
-        }
-        else
-        {
-            // TODO better way to get player
-            if (subject.containingCollection() == Sponge.server().serviceProvider().permissionService().userSubjects())
-            {
-                final String playerId = subject.identifier();
-                final UUID uuid = UUID.fromString(playerId);
-                Sponge.server().player(uuid).ifPresent(player -> {
-                    List<Region> regions = manager.getRegionsAt(player.serverLocation());
-                    regions.stream().map(Region::getContext).forEach(set::add);
-                });
-
-            }
-        }
+        source.first(Locatable.class).ifPresent(locatable -> {
+            List<Region> regions = manager.getRegionsAt(locatable.serverLocation());
+            regions.stream().map(Region::getContext).forEach(accumulator::accept);
+        });
     }
 
-    @Override
-    public boolean matches(Context context, Subject subject)
-    {
-        if ("region".equals(context.getKey()) && subject instanceof Locatable)
-        {
-            List<Region> regions = manager.getRegionsAt(((Locatable) subject).serverLocation());
-            return regions.stream().map(Region::getContext)
-                                   .map(Context::getValue)
-                                   .anyMatch(m -> m.equals(context.getValue()));
-        }
-        return false;
-    }
+//    @Override
+//    public boolean matches(Context context, Subject subject)
+//    {
+//        if ("region".equals(context.getKey()) && subject instanceof Locatable)
+//        {
+//            List<Region> regions = manager.getRegionsAt(((Locatable) subject).serverLocation());
+//            return regions.stream().map(Region::getContext)
+//                                   .map(Context::getValue)
+//                                   .anyMatch(m -> m.equals(context.getValue()));
+//        }
+//        return false;
+//    }
 }

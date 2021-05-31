@@ -17,30 +17,27 @@
  */
 package org.cubeengine.module.vanillaplus.improvement;
 
+import java.time.Duration;
 import java.time.temporal.ChronoUnit;
-import java.time.temporal.TemporalUnit;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.cubeengine.libcube.service.command.DispatcherCommand;
-import org.cubeengine.libcube.service.command.annotation.Alias;
 import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.command.annotation.Default;
-import org.cubeengine.libcube.service.command.annotation.Flag;
 import org.cubeengine.libcube.service.command.annotation.Named;
 import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
-import org.cubeengine.libcube.util.TimeUtil;
 import org.cubeengine.module.vanillaplus.VanillaPlus;
 import org.spongepowered.api.command.CommandCause;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.api.world.border.WorldBorder;
 import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.math.vector.Vector2i;
 import org.spongepowered.math.vector.Vector3d;
 import org.spongepowered.plugin.PluginContainer;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 // TODO border cmds
 // TODO prevent tp out of border
@@ -132,7 +129,7 @@ public class BorderCommands extends DispatcherCommand
                 return;
             }
         }
-        world.border().setCenter(pos.x() + 0.5, pos.y() + 0.5);
+        world.setBorder(world.border().toBuilder().center(pos.x() + 0.5, pos.y() + 0.5).build());
         i18n.send(context, POSITIVE, "Set world border of {world} center to {vector}", world, pos);
     }
 
@@ -141,12 +138,12 @@ public class BorderCommands extends DispatcherCommand
     {
         if (seconds == null)
         {
-            world.border().setDiameter(size);
+            world.setBorder(world.border().toBuilder().targetDiameter(size).build());
             i18n.send(context, POSITIVE, "Set world border of {world} to {} blocks wide", world, size);
             return;
         }
         int prevDiameter = (int) world.border().diameter();
-        world.border().setDiameter(size, seconds, ChronoUnit.SECONDS);
+        world.setBorder(world.border().toBuilder().targetDiameter(size).timeToTargetDiameter(Duration.of(seconds, ChronoUnit.SECONDS)).build());
         if (size < prevDiameter)
         {
             i18n.send(context, POSITIVE, "Shrinking world border of {world} to {} blocks wide from {} over {} seconds",
@@ -168,14 +165,14 @@ public class BorderCommands extends DispatcherCommand
     @Command(desc = "Sets the warning time")
     public void warningTime(CommandCause context, int seconds, @Default ServerWorld world)
     {
-        world.border().setWarningTime(seconds, ChronoUnit.SECONDS);
+        world.setBorder(world.border().toBuilder().warningTime(Duration.of(seconds, ChronoUnit.SECONDS)).build());
         i18n.send(context, POSITIVE, "Set world border of {world} warning to {} seconds away", world, seconds);
     }
 
     @Command(desc = "Sets the warning time")
     public void warningDistance(CommandCause context, int blocks, @Default ServerWorld world)
     {
-        world.border().setWarningDistance(blocks);
+        world.setBorder(world.border().toBuilder().warningDistance(blocks).build());
         i18n.send(context, POSITIVE, "Set world border of {world} warning to {} blocks away", world, blocks);
     }
 
@@ -186,10 +183,10 @@ public class BorderCommands extends DispatcherCommand
         double diameter = border.diameter();
         i18n.send(context, POSITIVE, "The world border in {world} is currently {} blocks wide", world,
                             diameter);
-        long secondsRemaining = border.timeRemaining().get(ChronoUnit.SECONDS);
+        long secondsRemaining = border.timeUntilTargetDiameter().get(ChronoUnit.SECONDS);
         if (secondsRemaining != 0)
         {
-            double newDiameter = border.newDiameter();
+            double newDiameter = border.targetDiameter();
             if (newDiameter < diameter)
             {
                 i18n.send(context, POSITIVE, "Currently shrinking to {} blocks wide over {} seconds", newDiameter, secondsRemaining);
@@ -200,20 +197,20 @@ public class BorderCommands extends DispatcherCommand
             }
         }
         i18n.send(context, POSITIVE, "Warnings will show within {} seconds or {} blocks from the border", border.warningTime().get(ChronoUnit.SECONDS), border.warningDistance());
-        i18n.send(context, POSITIVE, "When more than {} blocks outside the border players will take {} damage per block per second", border.damageThreshold(), border.damageAmount());
+        i18n.send(context, POSITIVE, "When more than {} blocks outside the border players will take {} damage per block per second", border.safeZone(), border.damagePerBlock());
     }
 
     @Command(desc = "Sets the world border damage per second per block")
     public void damage(CommandCause context, Double damage, @Default ServerWorld world)
     {
-        world.border().setDamageAmount(damage);
+        world.setBorder(world.border().toBuilder().damagePerBlock(damage).build());
         i18n.send(context, POSITIVE, "Set world border of {world} damage to {} per block per second", world, damage);
     }
 
     @Command(desc = "Sets the world border damage buffer")
     public void damageBuffer(CommandCause context, Integer blocks, @Default ServerWorld world)
     {
-        world.border().setDamageThreshold(blocks);
+        world.setBorder(world.border().toBuilder().safeZone(blocks).build());
         i18n.send(context, POSITIVE, "Set world border of {world} damage buffer to {} block", world, blocks);
     }
 }

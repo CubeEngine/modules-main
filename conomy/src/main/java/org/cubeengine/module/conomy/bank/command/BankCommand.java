@@ -67,7 +67,7 @@ public class BankCommand extends DispatcherCommand
     @Command(desc = "Shows the balance of the specified bank")
     public void balance(CommandCause context, @Default BaseAccount.Virtual bank)
     {
-        Map<Currency, BigDecimal> balances = bank.balances(context.activeContexts());
+        Map<Currency, BigDecimal> balances = bank.balances(context.contextCause());
 
         if (balances.isEmpty())
         {
@@ -268,7 +268,7 @@ public class BankCommand extends DispatcherCommand
 
         for (Subject subject : Sponge.server().serviceProvider().permissionService().userSubjects().loadedSubjects())
         {
-            Optional<String> option = subject.option(bank.activeContexts(), "conomy.bank.access-level." + bank.identifier());
+            Optional<String> option = subject.option("conomy.bank.access-level." + bank.identifier(), bank.contextCause());
             if (option.isPresent())
             {
                 // TODO list players highlight granted access

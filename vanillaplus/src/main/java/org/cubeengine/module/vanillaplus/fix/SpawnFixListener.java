@@ -19,9 +19,10 @@ package org.cubeengine.module.vanillaplus.fix;
 
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
-import org.spongepowered.api.world.WorldBorder;
+import org.spongepowered.api.world.border.WorldBorder;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.math.vector.Vector2d;
 import org.spongepowered.math.vector.Vector3d;
 
 public class SpawnFixListener
@@ -32,12 +33,12 @@ public class SpawnFixListener
         final ServerLocation toLocation = event.toLocation();
         final ServerWorld toWorld = toLocation.world();
         final WorldBorder border = toWorld.border();
-        Vector3d center = border.center();
+        Vector2d center = border.center();
         double radius = border.diameter() / 2;
         double minX = center.x() - radius;
         double maxX = center.x() + radius;
-        double minZ = center.z() - radius;
-        double maxZ = center.z() + radius;
+        double minZ = center.y() - radius;
+        double maxZ = center.y() + radius;
         double playerX = toLocation.position().x();
         double playerZ = toLocation.position().z();
 

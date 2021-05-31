@@ -35,6 +35,7 @@ import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
+import org.spongepowered.api.service.context.ContextService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.world.server.ServerWorld;
 
@@ -59,7 +60,7 @@ public class Multiverse
 {
     public static final String UNKNOWN_UNIVERSE_NAME = "unknown";
     @Inject private Logger log;
-    @InjectService private PermissionService ps;
+    @InjectService private ContextService ps;
 
     @ModuleConfig private MultiverseConfig config;
     @ModuleCommand private MultiverseCommands multiverseCommands;
