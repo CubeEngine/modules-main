@@ -18,29 +18,39 @@
 package org.cubeengine.module.roles.service;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.regex.Pattern;
 import net.kyori.adventure.text.Component;
 import org.cubeengine.module.roles.RolesUtil;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectReference;
+import org.spongepowered.api.util.Tristate;
 import org.spongepowered.plugin.PluginContainer;
 
 public class RolesPermissionDescription implements PermissionDescription
 {
+    private static final Pattern PLACEHOLDER = Pattern.compile("\\.<[a-zA-Z0-9_-]+>");
+
     private final PermissionService permissionService;
     private final String id;
     private final Component description;
     private final PluginContainer owner;
+    private final String strippedId;
+    private Tristate defaultValue;
 
-    public RolesPermissionDescription(PermissionService permissionService, String id, Component description, PluginContainer owner)
+    public RolesPermissionDescription(PermissionService permissionService, String id, Component description, PluginContainer owner, Tristate defaultValue)
     {
         this.permissionService = permissionService;
         this.id = id;
         this.description = description;
         this.owner = owner;
+        this.defaultValue = defaultValue;
+        this.strippedId = PLACEHOLDER.matcher(this.id).replaceAll("");
         RolesUtil.allPermissions.add(id);
     }
 
@@ -57,7 +67,7 @@ public class RolesPermissionDescription implements PermissionDescription
     }
 
     @Override
-    public Map<Subject, Boolean> assignedSubjects(String type)
+    public Map<? extends Subject, Boolean> assignedSubjects(String type)
     {
         return this.permissionService.collection(type).get().loadedWithPermission(this.id);
     }
@@ -69,9 +79,49 @@ public class RolesPermissionDescription implements PermissionDescription
     }
 
     @Override
-    public CompletableFuture<Map<SubjectReference, Boolean>> findAssignedSubjects(String type)
+    public CompletableFuture<? extends Map<? extends SubjectReference, Boolean>> findAssignedSubjects(String type)
     {
         return this.permissionService.collection(type).get().allWithPermission(this.id);
+    }
+
+    @Override
+    public boolean query(Subject subj)
+    {
+        return subj.hasPermission(this.strippedId);
+    }
+
+    @Override
+    public boolean query(Subject subj, ResourceKey key)
+    {
+        return subj.hasPermission(this.strippedId + '.' + key.namespace() + '.' + key.value());
+    }
+
+    @Override
+    public boolean query(Subject subj, String... parameters)
+    {
+        if (parameters.length == 0) {
+            return this.query(subj);
+        } else if (parameters.length == 1) {
+            return this.query(subj, parameters[0]);
+        }
+        final StringBuilder build = new StringBuilder(this.strippedId);
+        for (final String parameter : parameters) {
+            build.append('.').append(parameter);
+        }
+        return subj.hasPermission(build.toString());
+    }
+
+    @Override
+    public boolean query(Subject subj, String parameter)
+    {
+        final String extendedPermission = this.strippedId + '.' + Objects.requireNonNull(parameter, "parameter");
+        return subj.hasPermission(extendedPermission);
+    }
+
+    @Override
+    public Tristate defaultValue()
+    {
+        return this.defaultValue;
     }
 
     @Override

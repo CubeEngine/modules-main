@@ -51,6 +51,12 @@ public class FileSubject extends BaseSubject<FileSubjectData>
         return this.data;
     }
 
+    @Override
+    public Optional<?> associatedObject()
+    {
+        return Optional.empty();
+    }
+
     /**
      * Returns the internal UUID as String or the Subjects Identifier if it is not a RoleSubject
      * @param s the subject
@@ -116,12 +122,6 @@ public class FileSubject extends BaseSubject<FileSubjectData>
     public Optional<String> friendlyIdentifier()
     {
         return Optional.of(subjectData().getConfig().roleName);
-    }
-
-    @Override
-    public Set<Context> activeContexts()
-    {
-        return GLOBAL_CONTEXT;
     }
 
     public boolean canAssignAndRemove(CommandCause source)

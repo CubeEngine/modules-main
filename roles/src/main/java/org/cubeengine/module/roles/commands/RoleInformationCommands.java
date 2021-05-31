@@ -116,7 +116,7 @@ public class RoleInformationCommands extends DispatcherCommand
         String defaultRole = i18n.getTranslation(cContext, "default");
         String noDefaultRole = i18n.getTranslation(cContext, "not default");
         roles.sort(Comparator.comparing(Contextual::identifier));
-        List<SubjectReference> defaults = service.defaults().subjectData().parents(Collections.emptySet());
+        List<? extends SubjectReference> defaults = service.defaults().subjectData().parents(Collections.emptySet());
         for (Subject r : roles)
         {
 
@@ -357,7 +357,7 @@ public class RoleInformationCommands extends DispatcherCommand
     @Command(alias = {"default","defaultRoles","listDefRoles"}, desc = "Lists all default roles")
     public void listDefaultRoles(CommandCause cContext)
     {
-        List<SubjectReference> parents = service.userSubjects().defaults().subjectData().parents(Collections.emptySet());
+        List<? extends SubjectReference> parents = service.userSubjects().defaults().subjectData().parents(Collections.emptySet());
         if (parents.isEmpty())
         {
             i18n.send(cContext, NEGATIVE, "There are no default roles set!");

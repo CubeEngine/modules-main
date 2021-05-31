@@ -128,11 +128,11 @@ public class ManagementCommands extends DispatcherCommand
             {
                 sender.sendMessage(Identity.nil(), perm.description().get().color(NamedTextColor.GOLD));
             }
-            Map<Subject, Boolean> roles = perm.assignedSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE);
+            Map<? extends Subject, Boolean> roles = perm.assignedSubjects(PermissionService.SUBJECTS_ROLE_TEMPLATE);
             if (!roles.isEmpty())
             {
                 i18n.send(sender, POSITIVE, "Permission is assigned to the following templates:");
-                for (Entry<Subject, Boolean> entry : roles.entrySet())
+                for (Entry<? extends Subject, Boolean> entry : roles.entrySet())
                 {
                     Component.text().append(Component.text("  - "))
                              .append(Component.text(entry.getKey().identifier() + ": ", NamedTextColor.GOLD))

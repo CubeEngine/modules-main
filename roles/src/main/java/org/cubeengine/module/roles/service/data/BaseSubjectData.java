@@ -18,12 +18,15 @@
 package org.cubeengine.module.roles.service.data;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.cubeengine.module.roles.RolesUtil;
@@ -32,10 +35,12 @@ import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.collection.FileBasedCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
 import org.spongepowered.api.service.context.Context;
+import org.spongepowered.api.service.permission.NodeTree;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectData;
 import org.spongepowered.api.service.permission.SubjectReference;
+import org.spongepowered.api.service.permission.TransferMethod;
 import org.spongepowered.api.util.Tristate;
 
 import static java.util.Collections.unmodifiableList;
@@ -375,5 +380,99 @@ public class BaseSubjectData implements SubjectData
     public boolean isTransient()
     {
         return this.isTransient;
+    }
+
+    @Override
+    public Tristate fallbackPermissionValue(Set<Context> contexts)
+    {
+        return Tristate.UNDEFINED;
+    }
+
+    @Override
+    public Map<Set<Context>, Tristate> allFallbackPermissionValues()
+    {
+        return Collections.emptyMap();
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setFallbackPermissionValue(Set<Context> contexts, Tristate fallback)
+    {
+        return CompletableFuture.completedFuture(false);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> clearFallbackPermissionValues()
+    {
+        return CompletableFuture.completedFuture(false);
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setPermissions(Set<Context> contexts, Map<String, Boolean> permissions, TransferMethod method)
+    {
+        CompletableFuture<Boolean> future = CompletableFuture.completedFuture(true);
+        if (method == TransferMethod.OVERWRITE)
+        {
+            future = this.clearOptions(contexts);
+        }
+        return future.thenCompose(b -> CompletableFuture.allOf(permissions.entrySet().stream().map(e ->
+           this.setPermission(contexts, e.getKey(), Tristate.fromBoolean(e.getValue()))).toArray(CompletableFuture[]::new)).thenApply(v -> true));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setParents(Set<Context> contexts, List<? extends SubjectReference> parents, TransferMethod method)
+    {
+        CompletableFuture<Boolean> future = CompletableFuture.completedFuture(true);
+        if (method == TransferMethod.OVERWRITE)
+        {
+            future = this.clearOptions(contexts);
+        }
+        future = future.thenCompose(b -> CompletableFuture.allOf(parents.stream().map(p ->
+                       this.addParent(contexts, p)).toArray(CompletableFuture[]::new)).thenApply(v -> true));
+        RolesUtil.invalidateCache();
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> setOptions(Set<Context> contexts, Map<String, String> options, TransferMethod method)
+    {
+        CompletableFuture<Boolean> future = CompletableFuture.completedFuture(true);
+        if (method == TransferMethod.OVERWRITE)
+        {
+            future = this.clearOptions(contexts);
+        }
+        return future.thenCompose(b -> CompletableFuture.allOf(options.entrySet().stream().map(e ->
+           this.setOption(contexts, e.getKey(), e.getValue())).toArray(CompletableFuture[]::new)).thenApply(v -> true));
+    }
+
+    @Override
+    public CompletableFuture<Boolean> copyFrom(SubjectData other, TransferMethod method)
+    {
+        final CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() -> {
+            switch (method)
+            {
+                case OVERWRITE:
+                    this.permissions.clear();
+                    this.options.clear();
+                    this.parents.clear();
+                case MERGE:
+                    this.permissions.putAll(((BaseSubjectData)other).permissions);
+                    this.options.putAll(((BaseSubjectData)other).options);
+                    this.parents.putAll(((BaseSubjectData)other).parents);
+            }
+            return true;
+        });
+        RolesUtil.invalidateCache();
+        return future;
+    }
+
+    @Override
+    public CompletableFuture<Boolean> moveFrom(SubjectData other, TransferMethod method)
+    {
+        return this.copyFrom(other, method).thenApply(b -> {
+            other.clearPermissions();
+            other.clearOptions();
+            other.clearParents();
+            return b;
+        });
     }
 }

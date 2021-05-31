@@ -32,6 +32,7 @@ import java.util.function.Predicate;
 
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.subject.RolesSubjectReference;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.Subject;
@@ -86,12 +87,12 @@ public abstract class BaseSubjectCollection implements SubjectCollection
     }
 
     @Override
-    public CompletableFuture<Map<String, Subject>> loadSubjects(Set<String> identifiers)
+    public CompletableFuture<Map<String, Subject>> loadSubjects(Iterable<String> identifiers)
     {
         return CompletableFuture.supplyAsync(() -> this.loadSubjects0(identifiers));
     }
 
-    private Map<String, Subject> loadSubjects0(Set<String> ids)
+    private Map<String, Subject> loadSubjects0(Iterable<String> ids)
     {
         Map<String, Subject> map = new HashMap<>();
         for (String id : ids)
@@ -132,17 +133,17 @@ public abstract class BaseSubjectCollection implements SubjectCollection
     {
         return allIdentifiers().thenApply(this::loadSubjects0).thenApply(s -> {
             final Map<SubjectReference, Boolean> result = new HashMap<>();
-            s.values().forEach(elem -> collectPermRef(elem, permission, elem.activeContexts(), result));
+            s.values().forEach(elem -> collectPermRef(elem, permission, elem.contextCause(), result));
             return Collections.unmodifiableMap(result);
         });
     }
 
     @Override
-    public CompletableFuture<Map<SubjectReference, Boolean>> allWithPermission(Set<Context> contexts, String permission)
+    public CompletableFuture<Map<SubjectReference, Boolean>> allWithPermission(String permission, Cause cause)
     {
         return allIdentifiers().thenApply(this::loadSubjects0).thenApply(s -> {
             final Map<SubjectReference, Boolean> result = new HashMap<>();
-            s.values().forEach(elem -> collectPermRef(elem, permission, contexts, result));
+            s.values().forEach(elem -> collectPermRef(elem, permission, cause, result));
             return Collections.unmodifiableMap(result);
         });
     }
@@ -151,15 +152,15 @@ public abstract class BaseSubjectCollection implements SubjectCollection
     public Map<Subject, Boolean> loadedWithPermission(String permission)
     {
         final Map<Subject, Boolean> result = new HashMap<>();
-        subjects.values().forEach(elem -> collectPerm(elem, permission, elem.activeContexts(), result));
+        subjects.values().forEach(elem -> collectPerm(elem, permission, elem.contextCause(), result));
         return Collections.unmodifiableMap(result);
     }
 
     @Override
-    public Map<Subject, Boolean> loadedWithPermission(Set<Context> contexts, String permission)
+    public Map<Subject, Boolean> loadedWithPermission(String permission, Cause cause)
     {
         final Map<Subject, Boolean> result = new HashMap<>();
-        subjects.values().forEach(elem -> collectPerm(elem, permission, contexts, result));
+        subjects.values().forEach(elem -> collectPerm(elem, permission, cause, result));
         return Collections.unmodifiableMap(result);
     }
 
@@ -176,18 +177,18 @@ public abstract class BaseSubjectCollection implements SubjectCollection
         }
     }
 
-    private void collectPerm(Subject subject, String permission, Set<Context> contexts, Map<Subject, Boolean> result)
+    private void collectPerm(Subject subject, String permission, Cause cause, Map<Subject, Boolean> result)
     {
-        Tristate state = subject.permissionValue(contexts, permission);
+        Tristate state = subject.permissionValue(permission, service.contextsFor(cause));
         if (state != UNDEFINED)
         {
             result.put(subject, state.asBoolean());
         }
     }
 
-    private void collectPermRef(Subject subject, String permission, Set<Context> contexts, Map<SubjectReference, Boolean> result)
+    private void collectPermRef(Subject subject, String permission, Cause cause, Map<SubjectReference, Boolean> result)
     {
-        Tristate state = subject.permissionValue(contexts, permission);
+        Tristate state = subject.permissionValue(permission, service.contextsFor(cause));
         if (state != UNDEFINED)
         {
             result.put(subject.containingCollection().newSubjectReference(subject.identifier()), state.asBoolean());

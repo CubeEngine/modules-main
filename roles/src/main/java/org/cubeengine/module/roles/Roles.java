@@ -42,6 +42,7 @@ import org.spongepowered.api.event.lifecycle.RegisterDataEvent;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.event.lifecycle.StartingEngineEvent;
 import org.spongepowered.api.event.network.ServerSideConnectionEvent;
+import org.spongepowered.api.service.context.ContextService;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.util.Tristate;
 
@@ -82,10 +83,17 @@ public class Roles
     }
 
     @Listener
-    public void onProvideService(ProvideServiceEvent<PermissionService> event)
+    public void onProvidePermissionService(ProvideServiceEvent<PermissionService> event)
     {
         event.suggest(this::getService);
     }
+
+    @Listener
+    public void onProvideContextCalculatorService(ProvideServiceEvent<ContextService> event)
+    {
+        event.suggest(this::getService);
+    }
+
 
     @Listener
     public void onEnable(StartedEngineEvent<Server> event)

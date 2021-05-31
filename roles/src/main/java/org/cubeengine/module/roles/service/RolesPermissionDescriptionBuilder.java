@@ -32,6 +32,7 @@ public class RolesPermissionDescriptionBuilder implements Builder
     private String id;
     private Component description;
     private final Map<String, Tristate> roleAssignments = new LinkedHashMap<String, Tristate>();
+    private Tristate defaultValue;
 
     public RolesPermissionDescriptionBuilder(PluginContainer owner, RolesPermissionService permissionService)
     {
@@ -65,6 +66,13 @@ public class RolesPermissionDescriptionBuilder implements Builder
     @Override
     public PermissionDescription register() throws IllegalStateException
     {
-        return permissionService.addDescription(new RolesPermissionDescription(permissionService, id, description, owner), roleAssignments);
+        return permissionService.addDescription(new RolesPermissionDescription(permissionService, id, description, owner, defaultValue), roleAssignments);
+    }
+
+    @Override
+    public Builder defaultValue(Tristate defaultValue)
+    {
+        this.defaultValue = defaultValue;
+        return this;
     }
 }

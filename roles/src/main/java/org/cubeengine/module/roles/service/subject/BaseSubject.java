@@ -18,7 +18,6 @@
 package org.cubeengine.module.roles.service.subject;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +25,7 @@ import org.cubeengine.module.roles.RolesUtil;
 import org.cubeengine.module.roles.RolesUtil.FoundPermission;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.BaseSubjectData;
+import org.spongepowered.api.event.Cause;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.permission.Subject;
 import org.spongepowered.api.service.permission.SubjectCollection;
@@ -57,13 +57,13 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     }
 
     @Override
-    public Optional<String> option(Set<Context> contexts, String key)
+    public Tristate permissionValue(String permission, Cause cause)
     {
-        return RolesUtil.getOption(service, this, key, contexts, true).map(found -> found.value);
+        return this.permissionValue(permission, service.contextsFor(cause));
     }
 
     @Override
-    public Tristate permissionValue(Set<Context> contexts, String permission)
+    public Tristate permissionValue(String permission, Set<Context> contexts)
     {
         if (permission == null)
         {
@@ -78,9 +78,33 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
     }
 
     @Override
-    public boolean isChildOf(Set<Context> contexts, SubjectReference parent)
+    public boolean isChildOf(SubjectReference parent, Cause cause)
+    {
+        return this.isChildOf(parent, service.contextsFor(cause));
+    }
+
+    @Override
+    public boolean isChildOf(SubjectReference parent, Set<Context> contexts)
     {
         return transientSubjectData().parents(contexts).contains(parent) || subjectData().parents(contexts).contains(parent);
+    }
+
+    @Override
+    public Optional<String> option(String key, Cause cause)
+    {
+        return this.option(key, service.contextsFor(cause));
+    }
+
+    @Override
+    public Optional<String> option(String key, Set<Context> contexts)
+    {
+        return RolesUtil.getOption(service, this, key, contexts, true).map(found -> found.value);
+    }
+
+    @Override
+    public List<? extends SubjectReference> parents(Cause cause)
+    {
+        return this.parents(service.contextsFor(cause));
     }
 
     @Override
@@ -107,11 +131,4 @@ public abstract class BaseSubject<T extends SubjectData> implements Subject
         return collection;
     }
 
-    @Override
-    public Set<Context> activeContexts()
-    {
-        Set<Context> contexts = new HashSet<>();
-        service.getContextCalculators().forEach(c -> c.accumulateContexts(this, contexts));
-        return contexts;
-    }
 }

@@ -20,6 +20,7 @@ package org.cubeengine.module.roles.service;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,11 @@ import org.cubeengine.module.roles.service.collection.FileBasedCollection;
 import org.cubeengine.module.roles.service.collection.UserCollection;
 import org.cubeengine.module.roles.service.subject.RolesSubjectReference;
 import org.cubeengine.reflect.Reflector;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.event.Cause;
+import org.spongepowered.api.service.context.Context;
 import org.spongepowered.api.service.context.ContextCalculator;
+import org.spongepowered.api.service.context.ContextService;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionDescription.Builder;
 import org.spongepowered.api.service.permission.PermissionService;
@@ -61,10 +66,10 @@ import org.spongepowered.plugin.PluginContainer;
 import static org.spongepowered.api.service.permission.SubjectData.GLOBAL_CONTEXT;
 
 @Singleton
-public class RolesPermissionService implements PermissionService
+public class RolesPermissionService implements PermissionService, ContextService
 {
     private final ConcurrentMap<String, SubjectCollection> collections = new ConcurrentHashMap<>();
-    private final List<ContextCalculator<Subject>> calculators = new CopyOnWriteArrayList<>();
+    private final List<ContextCalculator> calculators = new CopyOnWriteArrayList<>();
     private Reflector reflector;
     private final Path modulePath;
 
@@ -138,14 +143,23 @@ public class RolesPermissionService implements PermissionService
     }
 
     @Override
-    public void registerContextCalculator(ContextCalculator<Subject> calculator)
+    public void registerContextCalculator(ContextCalculator calculator)
     {
         calculators.add(calculator);
     }
 
-    public List<ContextCalculator<Subject>> getContextCalculators()
+    @Override
+    public Set<Context> contexts()
     {
-        return this.calculators;
+        return this.contextsFor(Sponge.server().causeStackManager().currentCause());
+    }
+
+    @Override
+    public Set<Context> contextsFor(Cause cause)
+    {
+        Set<Context> contexts = new HashSet<>();
+        calculators.forEach(c -> c.accumulateContexts(cause, contexts::add));
+        return contexts;
     }
 
     public RolesConfig getConfig()

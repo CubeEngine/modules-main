@@ -60,6 +60,12 @@ public class UserSubject extends BaseSubject<UserSubjectData>
         return Sponge.server().player(uuid);
     }
 
+    @Override
+    public Optional<?> associatedObject()
+    {
+        return this.player();
+    }
+
     public void reload()
     {
         this.subjectData().reload();

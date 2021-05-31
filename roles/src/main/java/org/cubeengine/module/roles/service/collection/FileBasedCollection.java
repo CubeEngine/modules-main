@@ -225,7 +225,7 @@ public class FileBasedCollection extends BaseSubjectCollection
 
         for (Subject userSubject : service.userSubjects().subjects.values())
         {
-            if (userSubject.isChildOf(r.activeContexts(), ref))
+            if (userSubject.isChildOf(ref, r.contextCause()))
             {
                 if (!force)
                 {

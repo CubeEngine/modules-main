@@ -50,7 +50,7 @@ public class RolesSubjectReference implements SubjectReference
     }
 
     @Override
-    public CompletableFuture<Subject> resolve()
+    public CompletableFuture<? extends Subject> resolve()
     {
         return this.collection.loadSubject(identifier);
     }

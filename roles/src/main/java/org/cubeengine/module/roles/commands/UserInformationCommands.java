@@ -80,8 +80,8 @@ public class UserInformationCommands extends DispatcherCommand
     @Command(desc = "Lists roles of a user")
     public void list(CommandCause ctx, @Default User player)
     {
-        List<SubjectReference> parents = player.subjectData().parents(GLOBAL_CONTEXT);
-        List<SubjectReference> transientParents = player.transientSubjectData().parents(GLOBAL_CONTEXT);
+        List<? extends SubjectReference> parents = player.subjectData().parents(GLOBAL_CONTEXT);
+        List<? extends SubjectReference> transientParents = player.transientSubjectData().parents(GLOBAL_CONTEXT);
 
         Component translation = i18n.translate(ctx, NEUTRAL, "Roles of {user}:", player);
         if (ctx.hasPermission("cubeengine.roles.command.roles.user.assign"))
@@ -144,7 +144,7 @@ public class UserInformationCommands extends DispatcherCommand
 
         Component permText = RolesUtil.permText(ctx, permission, service, i18n);
         FoundPermission found = RolesUtil.findPermission(service, player, permission, contexts);
-        FoundPermission foundNow = RolesUtil.findPermission(service, player, permission, player.activeContexts());
+        FoundPermission foundNow = RolesUtil.findPermission(service, player, permission, service.contextsFor(player.contextCause()));
 
         i18n.send(ctx, NEUTRAL, "Player {user} permission check {txt#permission}", player, permText);
         if (found != null)

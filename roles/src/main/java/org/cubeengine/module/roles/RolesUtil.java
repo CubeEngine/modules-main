@@ -226,7 +226,7 @@ public class RolesUtil
     public static Component permText(CommandCause cmdSource, String permission, PermissionService service, I18n i18n)
     {
         Component permText = Component.text(permission);
-        Optional<PermissionDescription> permDesc = service.description(permission);
+        Optional<? extends PermissionDescription> permDesc = service.description(permission);
         if (permDesc.isPresent())
         {
             if (permDesc.get().description().isPresent())

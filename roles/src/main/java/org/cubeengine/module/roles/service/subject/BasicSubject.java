@@ -17,13 +17,10 @@
  */
 package org.cubeengine.module.roles.service.subject;
 
-import java.util.Collections;
-import java.util.Set;
 import org.cubeengine.module.roles.service.RolesPermissionService;
 import org.cubeengine.module.roles.service.data.BaseSubjectData;
-import org.spongepowered.api.service.context.Context;
-import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.api.service.permission.SubjectCollection;
+import java.util.Optional;
 
 public class BasicSubject extends BaseSubject<BaseSubjectData>
 {
@@ -35,6 +32,12 @@ public class BasicSubject extends BaseSubject<BaseSubjectData>
         super(collection, service);
         this.identifier = identifier;
         this.data = new BaseSubjectData(service, this,false);
+    }
+
+    @Override
+    public Optional<?> associatedObject()
+    {
+        return Optional.empty();
     }
 
     @Override
@@ -63,15 +66,15 @@ public class BasicSubject extends BaseSubject<BaseSubjectData>
 //        return Optional.empty();
 //    }
 
-    @Override
-    public Set<Context> activeContexts()
-    {
-        if (containingCollection().identifier().equals(PermissionService.SUBJECTS_ROLE_TEMPLATE))
-        {
-            return Collections.emptySet();
-        }
-        return super.activeContexts();
-    }
+//    @Override
+//    public Set<Context> activeContexts()
+//    {
+//        if (containingCollection().identifier().equals(PermissionService.SUBJECTS_ROLE_TEMPLATE))
+//        {
+//            return Collections.emptySet();
+//        }
+//        return super.activeContexts();
+//    }
 
     @Override
     public boolean isSubjectDataPersisted()
