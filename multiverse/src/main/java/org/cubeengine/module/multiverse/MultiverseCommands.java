@@ -103,7 +103,7 @@ public class MultiverseCommands extends DispatcherCommand
             i18n.send(context, NEUTRAL, "There is no universe yet.");
             return;
         }
-        i18n.send(context, POSITIVE, "The following universes exits:");
+        i18n.send(context, POSITIVE, "The following universes exists:");
         for (Entry<String, Set<ConfigWorld>> entry : universes)
         {
             context.sendMessage(Identity.nil(), Component.text(entry.getKey() + ":"));
