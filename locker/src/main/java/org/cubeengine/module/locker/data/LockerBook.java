@@ -17,14 +17,6 @@
  */
 package org.cubeengine.module.locker.data;
 
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.TextComponent.Builder;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.spongepowered.api.adventure.SpongeComponents;
-import org.spongepowered.api.data.type.HandTypes;
-import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.item.inventory.ItemStack;
-
 public interface LockerBook
 {
 
