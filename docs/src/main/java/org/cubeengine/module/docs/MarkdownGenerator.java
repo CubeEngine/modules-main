@@ -28,6 +28,7 @@ import java.util.Stack;
 import java.util.TreeMap;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.command.AnnotationCommandBuilder;
@@ -186,7 +187,7 @@ public class MarkdownGenerator implements Generator
     private void generateCommandDocs(StringBuilder sb, Map<String, PermissionDescription> addPerms, CommandMapping mapping,
                                      Command.Parameterized command, Stack<String> commandStack, Permission basePermission, boolean overview)
     {
-        final PlainComponentSerializer plainSerializer = PlainComponentSerializer.plain();
+        final PlainTextComponentSerializer plainSerializer = PlainTextComponentSerializer.plainText();
         // TODO alias commands?
 //        if (command.getExecutor().map(e -> e instanceof HelpExecutor).orElse(false))
 //        {
@@ -216,9 +217,9 @@ public class MarkdownGenerator implements Generator
 //            CubeEngineCommand executor = command.getExecutor().filter(CubeEngineCommand.class::isInstance).map(CubeEngineCommand.class::cast).orElse(null);
             if (command.executionRequirements() instanceof AnnotationCommandBuilder.Requirements) {
                 final String perm = ((Requirements)command.executionRequirements()).getPermission();
-                sb.append("`").append(perm.replace(id, "")).append("` |\n");
+                sb.append("`").append(perm.replace(id, "")).append("`");
             }
-
+            sb.append(" |\n");
 
             commandStack.pop();
             commandStack.push("**" + primaryAlias + "**");
@@ -304,7 +305,7 @@ public class MarkdownGenerator implements Generator
         commandStack.pop();
     }
 
-    private String getUsage(Stack<String> commandStack, Parameterized command, PlainComponentSerializer plainSerializer)
+    private String getUsage(Stack<String> commandStack, Parameterized command, PlainTextComponentSerializer plainSerializer)
     {
         StringBuilder usage = new StringBuilder(String.join(" ", commandStack));
         for (Parameter parameter : command.parameters())
