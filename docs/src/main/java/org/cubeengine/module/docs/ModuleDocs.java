@@ -17,8 +17,8 @@
  */
 package org.cubeengine.module.docs;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -27,8 +27,8 @@ import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
-
 import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
 import org.cubeengine.libcube.service.permission.Permission;
@@ -36,6 +36,8 @@ import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.reflect.ReflectedFile;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.manager.CommandMapping;
 import org.spongepowered.api.service.permission.PermissionDescription;
@@ -84,14 +86,22 @@ public class ModuleDocs
         this.moduleName = mm.getModuleName(module).get();
         this.id = plugin.metadata().id();
         this.moduleId = mm.getModuleId(plugin);
-        InputStream is = plugin.getClass().getResourceAsStream("/assets/"+ id + "/info.yml");
-        if (is == null)
+        final Optional<Asset> spongeAsset = Sponge.assetManager().asset(plugin, "info.yml");
+        if (!spongeAsset.isPresent())
         {
             this.config = reflector.create(Info.class);
         }
         else
         {
-            this.config = reflector.load(Info.class, new InputStreamReader(is));
+            try
+            {
+                final byte[] bytes = spongeAsset.get().readBytes();
+                this.config = reflector.load(Info.class, new InputStreamReader(new ByteArrayInputStream(bytes)));
+            }
+            catch (IOException e)
+            {
+                throw new IllegalStateException(e);
+            }
         }
         this.basePermission = pm.getBasePermission(module);
         for (PermissionDescription perm : ps.descriptions())
@@ -123,10 +133,18 @@ public class ModuleDocs
             // Copy Markdown pages
             for (String pageName : this.config.pages.values())
             {
-                InputStream is = this.pc.getClass().getResourceAsStream("/assets/" + this.id + "/pages/" + pageName + ".md");
-                Files.createDirectories(modulePages);
-                Path pageFileTarget = modulePages.resolve(pageName + ".md");
-                Files.copy(is, pageFileTarget);
+                final Optional<Asset> asset = Sponge.assetManager().asset(this.pc, "pages/" + pageName + ".md");
+                if (asset.isPresent())
+                {
+                    Files.createDirectories(modulePages);
+                    Path pageFileTarget = modulePages.resolve(pageName + ".md");
+                    asset.get().copyToFile(pageFileTarget);
+                }
+                else
+                {
+                    log.warn("Page is missing! " + pageName);
+                }
+
             }
 
             for (Class configClass : this.config.config) {
