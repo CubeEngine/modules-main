@@ -55,6 +55,7 @@ public class PlayerData implements DataSerializable
     public static final DataQuery INVENTORY = DataQuery.of("inventory");
     public static final DataQuery ENDER_INVENTORY = DataQuery.of("enderInventory");
     public static final DataQuery GAMEMODE = DataQuery.of("gamemode");
+    public static final DataQuery FLYING = DataQuery.of("flying");
 
     public int heldItemSlot = 0;
     public double health = 20;
@@ -64,6 +65,7 @@ public class PlayerData implements DataSerializable
     public double exhaustion = 0;
     public int exp = 0;
     public long fireTicks = 0;
+    public boolean flying = false;
 
     public List<PotionEffect> activePotionEffects = new ArrayList<>();
     public Map<Integer, ItemStack> inventory  = new HashMap<>();
@@ -122,6 +124,7 @@ public class PlayerData implements DataSerializable
         }
 
         this.gameMode = Sponge.game().registries().registry(RegistryTypes.GAME_MODE).value(ResourceKey.resolve(value.getString(GAMEMODE).get()));
+        this.flying = value.getBoolean(FLYING).orElse(false);
     }
 
     public static PlayerData of(DataView dataContainer, ServerWorld world)
@@ -150,7 +153,8 @@ public class PlayerData implements DataSerializable
             .set(ACTIVE_EFFECTS, activePotionEffects)
             .set(INVENTORY, inventory)
             .set(ENDER_INVENTORY, enderChest)
-            .set(GAMEMODE, Sponge.game().registries().registry(RegistryTypes.GAME_MODE).valueKey(gameMode).asString());
+            .set(GAMEMODE, Sponge.game().registries().registry(RegistryTypes.GAME_MODE).valueKey(gameMode).asString())
+            .set(FLYING, flying);
         return result;
     }
 
@@ -203,6 +207,7 @@ public class PlayerData implements DataSerializable
         }
 
         player.offer(Keys.GAME_MODE, gameMode);
+        player.offer(Keys.IS_FLYING, flying);
         return this;
     }
 
@@ -243,6 +248,7 @@ public class PlayerData implements DataSerializable
             i++;
         }
         this.gameMode = player.get(Keys.GAME_MODE).get();
+        this.flying = player.get(Keys.IS_FLYING).get();
         return this;
     }
 
