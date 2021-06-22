@@ -4,3 +4,5 @@ features:
   - Replaces a set of vanilla commands with more user-friendly versions
   - Adds a small set of commonly wanted commands
   - Everything can be disabled
+config:
+  - org.cubeengine.module.vanillaplus.VanillaPlusConfig
