@@ -17,9 +17,19 @@
  */
 package org.cubeengine.module.sql.database;
 
+import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
+import static org.jooq.impl.DSL.constraint;
+
 import org.cubeengine.libcube.util.Version;
 import org.cubeengine.module.sql.database.impl.Keys;
-import org.jooq.*;
+import org.jooq.CreateTableColumnStep;
+import org.jooq.DSLContext;
+import org.jooq.DataType;
+import org.jooq.ForeignKey;
+import org.jooq.Identity;
+import org.jooq.Record;
+import org.jooq.TableField;
+import org.jooq.UniqueKey;
 import org.jooq.exception.DataAccessException;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
@@ -28,9 +38,6 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.cubeengine.module.sql.database.TableVersion.TABLE_VERSION;
-import static org.jooq.impl.DSL.constraint;
 
 public abstract class Table<R extends Record> extends TableImpl<R> implements TableCreator<R>
 {
@@ -159,16 +166,11 @@ public abstract class Table<R extends Record> extends TableImpl<R> implements Ta
             UniqueKey pKey = foreignKey.getKey();
             if (fields.length == 1)
             {
-                tableCreator.constraint(
-                        constraint().foreignKey(fields[0])
-                                    .references(pKey.getTable(), pKey.getFieldsArray()[0])
-                                    .onDeleteCascade());
+                tableCreator.constraint(constraint().foreignKey(fields[0]).references(pKey.getTable(), pKey.getFieldsArray()[0]).onDeleteCascade());
             }
             else
             {
-                tableCreator.constraint(
-                        constraint().foreignKey(fields)
-                                    .references(pKey.getTable(), pKey.getFieldsArray()));
+                tableCreator.constraint(constraint().foreignKey(fields).references(pKey.getTable(), pKey.getFieldsArray()));
             }
         }
 
@@ -182,7 +184,9 @@ public abstract class Table<R extends Record> extends TableImpl<R> implements Ta
             {
                 dsl.createIndex("I" + i + "_" + this.getName()).on(this, index).execute();
             }
-            catch (DataAccessException ignored) {}
+            catch (DataAccessException ignored)
+            {
+            }
         }
 
         if (this.version != null)
