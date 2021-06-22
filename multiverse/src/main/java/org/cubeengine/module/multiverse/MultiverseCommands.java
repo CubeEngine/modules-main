@@ -17,27 +17,38 @@
  */
 package org.cubeengine.module.multiverse;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.kyori.adventure.identity.Identity;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.Sound.Source;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.Style;
 import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Flag;
+import org.cubeengine.libcube.service.command.annotation.Parser;
 import org.cubeengine.libcube.service.config.ConfigWorld;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.module.multiverse.player.MultiverseData;
 import org.cubeengine.module.multiverse.player.PlayerData;
+import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.data.Keys;
-import org.spongepowered.api.data.persistence.DataContainer;
 import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
@@ -50,6 +61,7 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 @Command(name = "multiverse", desc = "Multiverse commands", alias = "mv")
 public class MultiverseCommands extends DispatcherCommand
 {
+    public static final String UNKNOWN_UNIVERSE = "unknown";
     private Multiverse module;
     private I18n i18n;
 
@@ -64,7 +76,7 @@ public class MultiverseCommands extends DispatcherCommand
     // TODO command to load inventory from another universe
 
     @Command(desc = "Moves a world into another universe")
-    public void move(CommandCause context, ServerWorld world, String universe)
+    public void move(CommandCause context, ServerWorld world, @Parser(completer = UniverseCompleter.class) String universe)
     {
         // TODO old universe is not removed
         String previous = module.getUniverse(world);
@@ -106,41 +118,128 @@ public class MultiverseCommands extends DispatcherCommand
         i18n.send(context, POSITIVE, "The following universes exists:");
         for (Entry<String, Set<ConfigWorld>> entry : universes)
         {
-            context.sendMessage(Identity.nil(), Component.text(entry.getKey() + ":"));
+            final List<Component> autoconfig = module.getConfig().universeRegex.getOrDefault(entry.getKey(), new ArrayList<>()).stream()
+                .map(Component::text).collect(Collectors.toList());
+            if (autoconfig.isEmpty())
+            {
+                autoconfig.add(i18n.translate(context, Style.style(NamedTextColor.GRAY), "nothing configured"));
+            }
+            else
+            {
+                autoconfig.add(0, i18n.translate(context, Style.style(NamedTextColor.GRAY), "Regex configured:"));
+            }
+
+            final TextComponent autoconfigComponent = Component.text("(autoconfig)", NamedTextColor.GRAY)
+                                                   .hoverEvent(HoverEvent.showText(Component.join(Component.newline(), autoconfig)));
+            context.sendMessage(Identity.nil(), Component.text(entry.getKey(), NamedTextColor.GOLD)
+                                                         .append(Component.text(": ", NamedTextColor.GRAY))
+                                                         .append(autoconfigComponent));
             for (ConfigWorld world : entry.getValue())
             {
-                context.sendMessage(Identity.nil(), Component.text(" - " + world.getName()));
+                context.sendMessage(Identity.nil(), Component.text(" - ", NamedTextColor.GRAY).append(Component.text(world.getName(), NamedTextColor.YELLOW)));
+            }
+            if (entry.getValue().isEmpty())
+            {
+                context.sendMessage(Identity.nil(), Component.text(" - ", NamedTextColor.GRAY).append(i18n.translate(context, Style.style(NamedTextColor.GRAY), "empty")));
             }
         }
     }
 
     @Command(desc = "Removes a universe")
-    public void remove(CommandCause context, String universe)
+    public void remove(CommandCause context, @Parser(completer = UniverseCompleter.class) String universe)
     {
         Set<ConfigWorld> removed = module.getConfig().universes.remove(universe);
         if (removed == null)
         {
-            i18n.send(context, NEGATIVE, "There is no universe named {}", universe);
+            i18n.send(context, NEGATIVE, "There is no universe named {input}", universe);
             return;
         }
         removed.stream().filter(cWorld -> cWorld.getWorld() != null)
-                        .forEach(cWorld -> module.setUniverse(cWorld, "unknown"));
+                        .forEach(cWorld -> module.setUniverse(cWorld, UNKNOWN_UNIVERSE));
         module.getConfig().save();
-        i18n.send(context, POSITIVE, "{name} was removed and {amount} universes moved to {name}", universe, removed.size(), "unknown");
+        i18n.send(context, POSITIVE, "{name} was removed and {amount} universes moved to {name}", universe, removed.size(), UNKNOWN_UNIVERSE);
     }
 
     @Command(desc = "Renames a universe")
-    public void rename(CommandCause context, String universe, String newName)
+    public void rename(CommandCause context, @Parser(completer = UniverseCompleter.class) String universe, String newName)
     {
+        if (module.getConfig().universes.containsKey(newName) || module.getConfig().universeRegex.containsKey(newName))
+        {
+            i18n.send(context, NEGATIVE, "A universe named {input} already exists", universe);
+            return;
+        }
         Set<ConfigWorld> worlds = module.getConfig().universes.remove(universe);
+        List<String> regexes = module.getConfig().universeRegex.remove(universe);
+
         if (worlds == null)
         {
-            i18n.send(context, NEGATIVE, "There is no universe named {}", universe);
+            i18n.send(context, NEGATIVE, "There is no universe named {input}", universe);
             return;
         }
         i18n.send(context, POSITIVE, "Renamed universe {input} to {input}", universe, newName);
         module.getConfig().universes.put(newName, worlds);
+        if (regexes != null)
+        {
+            module.getConfig().universeRegex.put(newName, regexes);
+        }
         module.getConfig().save();
+    }
+
+    @Command(desc = "Removes all regex for a universe")
+    public void clearautoconfig(CommandCause context, @Parser(completer = UniverseCompleter.class) String universe)
+    {
+        List<String> regexList = module.getConfig().universeRegex.remove(universe);
+        if (regexList == null)
+        {
+            i18n.send(context, NEGATIVE, "There was no autoconfig for {input}.", universe);
+            return;
+        }
+        i18n.send(context, POSITIVE, "Autoconfig for {input} cleared!", universe);
+        module.getConfig().save();
+    }
+
+    @Command(desc = "Displays all known worlds matching given regex")
+    public void testautoconfig(CommandCause context, String regex)
+    {
+        try
+        {
+            Pattern.compile(regex);
+            i18n.send(context, POSITIVE, "The following worlds match {input}", regex);
+            for (ResourceKey worldKey : Sponge.server().worldManager().worldKeys())
+            {
+                if (worldKey.asString().matches(regex))
+                {
+                    context.sendMessage(Identity.nil(), Component.text(" - ", NamedTextColor.GRAY).append(Component.text(worldKey.asString(), NamedTextColor.YELLOW)));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            i18n.send(context, CRITICAL, "{input} is not a valid regex", regex);
+        }
+    }
+
+    @Command(desc = "Add a regex to automatically assign worlds to universes")
+    public void autoconfig(CommandCause context, @Parser(completer = UniverseCompleter.class) String universe, String regex)
+    {
+        List<String> regexList = module.getConfig().universeRegex.computeIfAbsent(universe, k -> new ArrayList<>());
+        try
+        {
+            Pattern.compile(regex);
+        }
+        catch (Exception e)
+        {
+            i18n.send(context, CRITICAL, "{input} is not a valid regex", regex);
+            return;
+        }
+        regexList.add(regex);
+        module.getConfig().save();
+        i18n.send(context, POSITIVE, "Regex {input} was added to {input}", regex, universe);
+
+        if (!module.getConfig().universes.getOrDefault(UNKNOWN_UNIVERSE, Collections.emptySet()).isEmpty())
+        {
+            i18n.send(context, NEUTRAL, "There are worlds matching the regex in the {input} universe", universe);
+        }
     }
 
 }

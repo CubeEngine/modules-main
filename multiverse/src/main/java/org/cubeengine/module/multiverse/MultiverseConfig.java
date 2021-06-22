@@ -18,6 +18,7 @@
 package org.cubeengine.module.multiverse;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,5 +29,5 @@ import org.cubeengine.libcube.service.config.ConfigWorld;
 public class MultiverseConfig extends ReflectedYaml
 {
     public Map<String, Set<ConfigWorld>> universes = new HashMap<>();
-    public boolean autoDetectUnivserse = true;
+    public Map<String, List<String>> universeRegex = new HashMap<>();
 }

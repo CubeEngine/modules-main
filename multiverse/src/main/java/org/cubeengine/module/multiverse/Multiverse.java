@@ -19,8 +19,10 @@ package org.cubeengine.module.multiverse;
 
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Pattern;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import org.apache.logging.log4j.Logger;
@@ -97,17 +99,18 @@ public class Multiverse
             }
         }
 
-        if (config.autoDetectUnivserse)
+        for (Entry<String, List<String>> regexes : config.universeRegex.entrySet())
         {
-            final String worldKeyValue = world.key().value();
-            if (worldKeyValue.contains("_"))
+            for (String regex : regexes.getValue())
             {
-                String name = worldKeyValue.substring(0, worldKeyValue.indexOf("_"));
-                return saveInUniverse(new ConfigWorld(world), name);
+                if (world.key().asString().matches(regex))
+                {
+                    return this.saveInUniverse(new ConfigWorld(world), regexes.getKey());
+                }
             }
         }
 
-        return saveInUniverse(new ConfigWorld(world), UNKNOWN_UNIVERSE_NAME);
+        return this.saveInUniverse(new ConfigWorld(world), UNKNOWN_UNIVERSE_NAME);
     }
 
     public String saveInUniverse(ConfigWorld cWorld, String name)
