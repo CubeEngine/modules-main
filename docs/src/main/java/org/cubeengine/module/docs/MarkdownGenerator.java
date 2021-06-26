@@ -123,6 +123,10 @@ public class MarkdownGenerator implements Generator
                 }
                 // TODO link to module or plugin on ore if possible?
                 sb.append(" `").append(dep.id()).append("`");
+                if (dep.optional())
+                {
+                    sb.append(" (optional)");
+                }
             }
             sb.append("\n");
         }
@@ -171,7 +175,7 @@ public class MarkdownGenerator implements Generator
             sb.append("| --- | --- |\n");
             for (PermissionDescription perm : addPerms.values())
             {
-                final String plainDesc = PlainComponentSerializer.plain().serialize(perm.description().orElse(Component.empty()));
+                final String plainDesc = PlainTextComponentSerializer.plainText().serialize(perm.description().orElse(Component.empty()));
                 sb.append("| `").append(perm.id()).append("` | ").append(plainDesc).append(" |\n");
             }
         }
