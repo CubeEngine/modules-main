@@ -52,7 +52,7 @@ public class UserSubject extends BaseSubject<UserSubjectData>
     @Override
     public Optional<String> friendlyIdentifier()
     {
-        return Sponge.server().userManager().find(uuid).map(User::name);
+        return Sponge.server().gameProfileManager().uncached().profile(uuid).join().name();
     }
 
     public Optional<ServerPlayer> player()

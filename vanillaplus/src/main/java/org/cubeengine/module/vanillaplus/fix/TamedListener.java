@@ -45,9 +45,9 @@ public class TamedListener
         Optional<UUID> uuid = event.entity().get(Keys.TAMER);
         if (uuid.isPresent())
         {
-            final Optional<User> owner = Sponge.server().userManager().find(uuid.get());
+            final Optional<String> owner = Sponge.server().gameProfileManager().uncached().profile(uuid.get()).join().name();
             i18n.send(player, POSITIVE, "This {input#entity} belongs to {user#tamer}!",
-                                event.entity().type().asComponent(), owner.map(User::name).orElse(uuid.get().toString()));
+                                event.entity().type().asComponent(), owner.orElse(uuid.get().toString()));
         }
     }
 }

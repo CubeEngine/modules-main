@@ -176,7 +176,7 @@ public class LivingFilterParser extends PermissionContainer implements ValuePars
         groupMap.put(i18n.getTranslation(source, "ambient"), FILTER_AMBIENT);
 
         Map<String, EntityType<?>> map = new HashMap<>();
-        Sponge.game().registries().registry(RegistryTypes.ENTITY_TYPE).streamEntries().forEach(entry -> {
+        RegistryTypes.ENTITY_TYPE.get().streamEntries().forEach(entry -> {
             map.put(entry.key().asString(), entry.value());
             if ("minecraft".equals(entry.key().namespace()))
             {

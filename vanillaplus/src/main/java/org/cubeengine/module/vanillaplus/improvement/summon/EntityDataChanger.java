@@ -223,7 +223,7 @@ public class EntityDataChanger<EntityInterface>
                      {
                          if (input)
                          {
-                             final List<DyeColor> list = Sponge.game().registries().registry(RegistryTypes.DYE_COLOR).stream().collect(Collectors.toList());
+                             final List<DyeColor> list = RegistryTypes.DYE_COLOR.get().stream().collect(Collectors.toList());
                              entity.offer(Keys.DYE_COLOR, list.get(random.nextInt(list.size())));
                          }
                      }
@@ -276,9 +276,9 @@ public class EntityDataChanger<EntityInterface>
                         }
                     });
 
-    private static <T> Optional<T> findRegistryValue(String input, RegistryType<T> itemType)
+    private static <T> Optional<T> findRegistryValue(String input, RegistryType<T> type)
     {
-        return Sponge.game().registries().registry(itemType).findValue(ResourceKey.resolve(input));
+        return Sponge.game().registry(type).findValue(ResourceKey.resolve(input));
     }
 
     public static final EntityDataChanger<Slime> SLIME_SIZE =
@@ -464,7 +464,7 @@ public class EntityDataChanger<EntityInterface>
                                         if (input.startsWith("tamer_"))
                                         {
                                             String userName = input.substring(6);
-                                            return Sponge.server().userManager().find(userName).orElse(null);
+                                            return Sponge.server().userManager().load(userName).join().orElse(null);
                                         }
                                         return null;
                                     }

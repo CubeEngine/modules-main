@@ -118,7 +118,7 @@ public class InteractSettingsListener extends PermissionContainer
     {
         ItemType item = event.itemStack().type();
         List<Region> regionsAt = manager.getRegionsAt(player.serverLocation());
-        final ResourceKey itemKey = Sponge.game().registries().registry(RegistryTypes.ITEM_TYPE).valueKey(item);
+        final ResourceKey itemKey = item.key(RegistryTypes.ITEM_TYPE);
         Permission usePerm = pm.register(SettingsListener.class, itemKey.value(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(item.asComponent()) + " Item in hand", useItemPerm);
         Tristate set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ITEM), s -> s.use.all.item, UNDEFINED);
         if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item, UNDEFINED), set) == FALSE)
@@ -137,7 +137,7 @@ public class InteractSettingsListener extends PermissionContainer
         BlockType type = event.block().state().type();
         ItemStack item = player.itemInHand(HandTypes.MAIN_HAND);
 
-        final ResourceKey typeKey = Sponge.game().registries().registry(RegistryTypes.BLOCK_TYPE).valueKey(type);
+        final ResourceKey typeKey = type.key(RegistryTypes.BLOCK_TYPE);
         Permission blockPerm = pm.register(SettingsListener.class, typeKey.value(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(type.asComponent()) + " Block", useBlockPerm);
 
         Tristate set = UNDEFINED;
@@ -175,7 +175,7 @@ public class InteractSettingsListener extends PermissionContainer
         {
             // Check all items
             set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ITEM), s -> s.use.all.item, UNDEFINED);
-            final ResourceKey itemKey = Sponge.game().registries().registry(RegistryTypes.ITEM_TYPE).valueKey(item.type());
+            final ResourceKey itemKey = item.type().key(RegistryTypes.ITEM_TYPE);
             Permission usePerm = pm.register(SettingsListener.class, itemKey.value(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(item.type().asComponent()) + " Item in hand", useItemPerm);
             // Then check individual item
             if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item.type(), UNDEFINED), set) == FALSE)

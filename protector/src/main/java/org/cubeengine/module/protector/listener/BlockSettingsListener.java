@@ -28,6 +28,7 @@ import org.cubeengine.libcube.service.permission.PermissionManager;
 import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.region.Region;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.Transaction;
@@ -96,7 +97,7 @@ public class BlockSettingsListener extends PermissionContainer
         {
             List<Region> regionsAt = manager.getRegionsAt(loc);
             checkSetting(event, null, regionsAt, () -> null, (s) -> s.blockDamage.allExplosion, UNDEFINED);
-            ServerPlayer player = event.cause().context().get(EventContextKeys.CREATOR).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast).orElse(null);
+            ServerPlayer player = event.cause().context().get(EventContextKeys.CREATOR).flatMap(s -> Sponge.server().player(s)).orElse(null);
             if (player == null)
             {
                 player = event.cause().context().get(EventContextKeys.IGNITER).filter(p -> p instanceof ServerPlayer).map(ServerPlayer.class::cast).orElse(null);

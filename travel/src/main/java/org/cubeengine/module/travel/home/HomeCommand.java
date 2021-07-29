@@ -367,7 +367,7 @@ public class HomeCommand extends DispatcherCommand
             sender.sendMessage(Identity.nil(), Component.text("  " + home.name + ":", NamedTextColor.GOLD));
             for (UUID invite : home.invites)
             {
-                final String name = Sponge.server().userManager().find(invite).get().name();
+                final String name = Sponge.server().gameProfileManager().uncached().profile(invite).join().name().get();
                 final Component unInvite = Component.text("(-)", NamedTextColor.RED).hoverEvent(
                     HoverEvent.showText(i18n.translate(sender, NEUTRAL, "Click to uninvite {user} from {name}", name, home.name)))
                                                     .clickEvent(ClickEvent.runCommand("/home uninvite " + name + " " + home.name));

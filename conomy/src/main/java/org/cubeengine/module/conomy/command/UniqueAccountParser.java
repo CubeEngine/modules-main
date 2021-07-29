@@ -86,8 +86,8 @@ public class UniqueAccountParser implements ValueParser<Unique>, DefaultParamete
     public Optional<? extends Unique> parseValue(Key<? super Unique> parameterKey, Mutable reader, Builder context) throws ArgumentParseException
     {
         final String arg = reader.parseString();
-        final Optional<Unique> account = ResourceKeyedValueParameters.USER.get().parseValue(Parameter.key(parameterKey.key(), User.class), reader, context).flatMap(
-            user -> getAccount(user.uniqueId()).filter(a -> {
+        final Optional<Unique> account = ResourceKeyedValueParameters.USER.get().parseValue(Parameter.key(parameterKey.key(), UUID.class), reader, context).flatMap(
+            user -> getAccount(user).filter(a -> {
                 CommandCause cmdSource = context.cause();
                 return !a.isHidden() && !service.getPerms().ACCESS_SEE.check(cmdSource);
             }));

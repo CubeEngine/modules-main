@@ -66,7 +66,7 @@ public class UserSubjectData extends CachingSubjectData
             return player.get().get(key);
         }
         final UserManager userManager = Sponge.server().userManager();
-        User user = userManager.find(uuid).get();
+        User user = userManager.load(uuid).join().get();
         return user.get(key);
     }
 
@@ -86,7 +86,7 @@ public class UserSubjectData extends CachingSubjectData
 
                 // Get User for Storage
                 final UserManager userManager = Sponge.server().userManager();
-                User user = userManager.find(uuid).get();
+                User user = userManager.load(uuid).join().get();
                 // Save Data in User
                 user.offer(PermissionData.PARENTS, parents);
                 user.offer(PermissionData.PERMISSIONS, permissions);

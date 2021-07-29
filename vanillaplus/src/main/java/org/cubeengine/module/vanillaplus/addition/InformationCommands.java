@@ -117,7 +117,7 @@ public class InformationCommands extends PermissionContainer
         }
 
         Biome biome = world.biome(blockPos.x(), 0, blockPos.y());
-        i18n.send(context, NEUTRAL, "Biome at {vector:x\\=:z\\=} in {world}: {name}", blockPos, world, world.registries().registry(RegistryTypes.BIOME).valueKey(biome).asString());
+        i18n.send(context, NEUTRAL, "Biome at {vector:x\\=:z\\=} in {world}: {name}", blockPos, world, RegistryTypes.BIOME.keyFor(world, biome).asString());
     }
 
     @Command(desc = "Displays the seed of a world.")

@@ -135,7 +135,7 @@ public class PaintingListener extends PermissionContainer
                     return;
                 }
 
-                List<ArtType> arts = Sponge.game().registries().registry(RegistryTypes.ART_TYPE).stream().collect(Collectors.toList());
+                List<ArtType> arts = RegistryTypes.ART_TYPE.get().stream().collect(Collectors.toList());
                 int artNumber = arts.indexOf(painting.art().get());
                 int change = this.compareSlots(event.originalSlot().get(Keys.SLOT_INDEX).get(), event.finalSlot().get(Keys.SLOT_INDEX).get());
                 artNumber += change;

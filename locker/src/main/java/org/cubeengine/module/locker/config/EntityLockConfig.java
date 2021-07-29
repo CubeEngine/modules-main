@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.module.locker.data.ProtectedType;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.registry.RegistryTypes;
 
@@ -35,7 +34,7 @@ public class EntityLockConfig extends LockConfig<EntityLockConfig, EntityType>
 
     public String getTitle()
     {
-        return Sponge.game().registries().registry(RegistryTypes.ENTITY_TYPE).valueKey(type).toString();
+        return type.key(RegistryTypes.ENTITY_TYPE).asString();
     }
 
     public static class EntityLockerConfigConverter extends LockConfigConverter<EntityLockConfig>
@@ -47,7 +46,7 @@ public class EntityLockConfig extends LockConfig<EntityLockConfig, EntityType>
 
         protected EntityLockConfig fromString(String s) throws ConversionException
         {
-            return Sponge.game().registries().registry(RegistryTypes.ENTITY_TYPE).findValue(ResourceKey.resolve(s))
+            return RegistryTypes.ENTITY_TYPE.get().findValue(ResourceKey.resolve(s))
                          .map(EntityLockConfig::new).orElseThrow(() -> ConversionException.of(this, s, "Invalid EntityType!"));
         }
     }

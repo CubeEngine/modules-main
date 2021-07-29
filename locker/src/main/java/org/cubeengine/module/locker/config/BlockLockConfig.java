@@ -21,7 +21,6 @@ import org.apache.logging.log4j.Logger;
 import org.cubeengine.converter.ConversionException;
 import org.cubeengine.module.locker.data.ProtectedType;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.registry.RegistryTypes;
 
@@ -35,7 +34,7 @@ public class BlockLockConfig extends LockConfig<BlockLockConfig, BlockType>
 
     public String getTitle()
     {
-        return Sponge.game().registries().registry(RegistryTypes.BLOCK_TYPE).valueKey(type).toString();
+        return type.key(RegistryTypes.BLOCK_TYPE).asString();
     }
 
     public static class BlockLockerConfigConverter extends LockConfigConverter<BlockLockConfig>
@@ -47,7 +46,7 @@ public class BlockLockConfig extends LockConfig<BlockLockConfig, BlockType>
 
         protected BlockLockConfig fromString(String s) throws ConversionException
         {
-            return Sponge.game().registries().registry(RegistryTypes.BLOCK_TYPE).findValue(ResourceKey.resolve(s))
+            return RegistryTypes.BLOCK_TYPE.get().findValue(ResourceKey.resolve(s))
                   .map(BlockLockConfig::new).orElseThrow(() -> ConversionException.of(this, s, "Invalid BlockType!"));
         }
     }

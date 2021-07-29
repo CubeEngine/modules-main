@@ -648,7 +648,7 @@ public class LockerManager
             }
             else
             {
-                final Map<UUID, Integer> offlineTrust = Sponge.server().userManager().find(owner).flatMap(p -> p.get(LockerData.TRUST)).orElse(Collections.emptyMap());
+                final Map<UUID, Integer> offlineTrust = Sponge.server().userManager().load(owner).join().flatMap(p -> p.get(LockerData.TRUST)).orElse(Collections.emptyMap());
                 this.trustCache.put(owner, offlineTrust);
             }
         }

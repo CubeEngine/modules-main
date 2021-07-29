@@ -92,7 +92,7 @@ public class UserCollection extends BaseSubjectCollection
     {
         return CompletableFuture.supplyAsync(() -> {
             final UserManager userManager = Sponge.server().userManager();
-            return userManager.find(UUID.fromString(identifier)).isPresent();
+            return userManager.exists(UUID.fromString(identifier));
         });
     }
 
@@ -101,7 +101,7 @@ public class UserCollection extends BaseSubjectCollection
     {
         return CompletableFuture.supplyAsync(() -> {
             final UserManager userManager = Sponge.server().userManager();
-            return userManager.all().stream().map(gp -> gp.uniqueId().toString()).collect(Collectors.toSet());
+            return userManager.streamAll().map(gp -> gp.uniqueId().toString()).collect(Collectors.toSet());
         });
     }
 

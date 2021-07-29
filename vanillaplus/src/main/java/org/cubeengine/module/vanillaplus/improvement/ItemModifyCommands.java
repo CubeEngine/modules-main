@@ -195,7 +195,8 @@ public class ItemModifyCommands extends PermissionContainer
             i18n.send(context, NEGATIVE, "This enchantment level is not allowed!");
             return;
         }
-        final List<Component> possibleEnchantments = Sponge.game().registries().registry(RegistryTypes.ENCHANTMENT_TYPE).streamEntries()
+
+        final List<Component> possibleEnchantments = RegistryTypes.ENCHANTMENT_TYPE.get().streamEntries()
                                                            .filter(e -> e.value().canBeAppliedToStack(item))
                                                            .map(enchantmentType -> enchantmentType.value().asComponent().color(NamedTextColor.YELLOW)
                                                                                       .hoverEvent(HoverEvent.showText(Component.text(enchantmentType.key().asString(), NamedTextColor.YELLOW))))

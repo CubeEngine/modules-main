@@ -105,7 +105,7 @@ public class InvseeCommand extends PermissionContainer
         {
             final ItemStack barrier = ItemStack.of(ItemTypes.BARRIER);
             barrier.offer(Keys.CUSTOM_NAME, Component.text("Unused Slot", NamedTextColor.BLACK));
-            final StandardInventory playerInventory = player.isOnline() ? player.player().get().inventory() : player.inventory();
+            final StandardInventory playerInventory = player.isOnline() ? player.player().get().inventory() : (StandardInventory) player.inventory();
             viewable = ViewableInventory.builder().type(ContainerTypes.GENERIC_9X5)
                                         .slots(playerInventory.armor().slots(), 0)
                                         .dummySlots(4, 4).item(barrier.createSnapshot())

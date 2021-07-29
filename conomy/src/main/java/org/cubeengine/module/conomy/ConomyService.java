@@ -223,7 +223,7 @@ public class ConomyService implements EconomyService
 
     private AccountModel createModel(UUID uuid)
     {
-        Optional<User> user = Sponge.server().userManager().find(uuid);
+        Optional<User> user = Sponge.server().userManager().load(uuid).join();
         AccountModel model = db.getDSL().newRecord(TABLE_ACCOUNT).newAccount(uuid, user.map(User::name).orElse(uuid.toString()), false, false);
         model.store();
         return model;

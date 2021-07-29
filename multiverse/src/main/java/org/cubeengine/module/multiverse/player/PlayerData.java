@@ -123,7 +123,7 @@ public class PlayerData implements DataSerializable
             enderChest.put(Integer.valueOf(key.asString("")), ItemStack.builder().fromContainer(inventoryView.getView(key).get()).build());
         }
 
-        this.gameMode = Sponge.game().registries().registry(RegistryTypes.GAME_MODE).value(ResourceKey.resolve(value.getString(GAMEMODE).get()));
+        this.gameMode = RegistryTypes.GAME_MODE.get().value(ResourceKey.resolve(value.getString(GAMEMODE).get()));
         this.flying = value.getBoolean(FLYING).orElse(false);
     }
 
@@ -153,7 +153,7 @@ public class PlayerData implements DataSerializable
             .set(ACTIVE_EFFECTS, activePotionEffects)
             .set(INVENTORY, inventory)
             .set(ENDER_INVENTORY, enderChest)
-            .set(GAMEMODE, Sponge.game().registries().registry(RegistryTypes.GAME_MODE).valueKey(gameMode).asString())
+            .set(GAMEMODE, gameMode.key(RegistryTypes.GAME_MODE).asString())
             .set(FLYING, flying);
         return result;
     }

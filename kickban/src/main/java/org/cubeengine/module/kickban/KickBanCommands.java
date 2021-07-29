@@ -135,13 +135,13 @@ public class KickBanCommands
             if (player.connection().address().getAddress() != null)
             {
                 InetAddress ipAdress = player.connection().address().getAddress();
-                if (this.banService.banFor(ipAdress).join().isPresent())
+                if (this.banService.find(ipAdress).join().isPresent())
                 {
                     i18n.send(context, NEGATIVE, "{user} is already IP banned!", user);
                     return;
                 }
 
-                this.banService.addBan(Ban.builder().type(BanTypes.IP).address(ipAdress).reason(Component.text(reason)).source(banSource).build());
+                this.banService.add(Ban.builder().type(BanTypes.IP).address(ipAdress).reason(Component.text(reason)).source(banSource).build());
                 Set<String> bannedUsers = new HashSet<>();
                 for (ServerPlayer ipPlayer : Sponge.server().onlinePlayers())
                 {
@@ -167,12 +167,12 @@ public class KickBanCommands
         }
         else
         {
-            if (this.banService.banFor(user.profile()).join().isPresent())
+            if (this.banService.find(user.profile()).join().isPresent())
             {
                 i18n.send(context, NEGATIVE, "{user} is already banned!", user);
                 return;
             }
-            this.banService.addBan(Ban.builder().type(BanTypes.PROFILE).profile(user.profile()).reason(Component.text(reason)).source(banSource).build());
+            this.banService.add(Ban.builder().type(BanTypes.PROFILE).profile(user.profile()).reason(Component.text(reason)).source(banSource).build());
             if (player != null && player.isOnline())
             {
                 player.kick(this.getBanMessage(formattedReason, player));
@@ -200,7 +200,7 @@ public class KickBanCommands
     @Command(alias = "pardon", desc = "Unbans a previously banned player.")
     public void unban(CommandCause context, User player)
     {
-        if (banService.banFor(player.profile()).join().isPresent())
+        if (banService.find(player.profile()).join().isPresent())
         {
             this.banService.pardon(player.profile()).join();
             if (context instanceof Player)
@@ -222,14 +222,14 @@ public class KickBanCommands
         try
         {
             InetAddress address = InetAddress.getByName(ipaddress);
-            if (this.banService.banFor(address).join().isPresent())
+            if (this.banService.find(address).join().isPresent())
             {
                 i18n.send(context, NEUTRAL, "The IP {input#ip} is already banned!", address.getHostAddress());
                 return;
             }
             Component formattedReasons = parseReason(reason, perms.COMMAND_IPBAN_NOREASON, context);
             Component banSource = Component.text(context.subject().friendlyIdentifier().orElse(context.subject().identifier()));
-            this.banService.addBan(Ban.builder().type(BanTypes.IP).address(address).reason(Component.text(reason)).source(banSource).build());
+            this.banService.add(Ban.builder().type(BanTypes.IP).address(address).reason(Component.text(reason)).source(banSource).build());
             i18n.send(context, NEGATIVE, "You banned the IP {input#ip} from your server!", address.getHostAddress());
             Set<String> bannedUsers = new HashSet<>();
             for (ServerPlayer player : Sponge.server().onlinePlayers())
@@ -262,7 +262,7 @@ public class KickBanCommands
         try
         {
             InetAddress address = InetAddress.getByName(ipaddress);
-            if (this.banService.banFor(address).join().isPresent())
+            if (this.banService.find(address).join().isPresent())
             {
                 this.banService.pardon(address);
                 i18n.send(context, POSITIVE, "You unbanned the IP {input#ip}!", address.getHostAddress());
@@ -292,7 +292,7 @@ public class KickBanCommands
             return;
         }
         Component formattedReason = parseReason(reason, perms.COMMAND_TEMPBAN_NOREASON, context);
-        if (this.banService.banFor(user.profile()).join().isPresent())
+        if (this.banService.find(user.profile()).join().isPresent())
         {
             i18n.send(context, NEGATIVE, "{user} is already banned!", user);
             return;
@@ -302,7 +302,7 @@ public class KickBanCommands
             long millis = StringUtils.convertTimeToMillis(time);
             Instant until = Instant.now().plusMillis(millis);
             Component banSource = Component.text(context.subject().friendlyIdentifier().orElse(context.subject().identifier()));
-            this.banService.addBan(Ban.builder().type(BanTypes.PROFILE).profile(user.profile()).reason(Component.text(reason)).expirationDate(until).source(banSource).build());
+            this.banService.add(Ban.builder().type(BanTypes.PROFILE).profile(user.profile()).reason(Component.text(reason)).expirationDate(until).source(banSource).build());
             if (user.isOnline())
             {
                 if (player == null) throw new IllegalStateException();
