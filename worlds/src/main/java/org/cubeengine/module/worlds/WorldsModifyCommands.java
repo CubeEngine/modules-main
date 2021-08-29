@@ -23,9 +23,16 @@ import org.cubeengine.libcube.service.command.DispatcherCommand;
 import org.cubeengine.libcube.service.command.annotation.Command;
 import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.i18n.I18n;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.registry.RegistryTypes;
+import org.spongepowered.api.world.WorldType;
+import org.spongepowered.api.world.WorldTypes;
+import org.spongepowered.api.world.generation.ChunkGenerator;
+import org.spongepowered.api.world.server.WorldTemplate;
 import org.spongepowered.api.world.server.storage.ServerWorldProperties;
 
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.POSITIVE;
 
 @Singleton
@@ -71,4 +78,5 @@ public class WorldsModifyCommands extends DispatcherCommand
         }
         i18n.send(context, POSITIVE, "{world} will no longer generate structures", world);
     }
+
 }

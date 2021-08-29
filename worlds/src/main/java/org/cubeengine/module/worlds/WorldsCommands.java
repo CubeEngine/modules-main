@@ -42,12 +42,12 @@ import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.gamerule.GameRule;
+import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
+import org.spongepowered.api.world.server.WorldManager;
 import org.spongepowered.api.world.server.WorldTemplate;
 import org.spongepowered.api.world.server.storage.ServerWorldProperties;
-import org.spongepowered.api.world.server.WorldManager;
 import org.spongepowered.math.vector.Vector3i;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -63,8 +63,8 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
  * - info
  * - listplayers
  *
- * TODO autosave?
- * TODO alias for worlds
+ * TODO alias for worlds?
+ * TODO recreate cmd
  */
 @Singleton
 @Command(name = "worlds", desc = "Worlds commands")
@@ -73,126 +73,67 @@ public class WorldsCommands extends DispatcherCommand
     private I18n i18n;
 
     @Inject
-    public WorldsCommands(I18n i18n, WorldsModifyCommands modify)
+    public WorldsCommands(I18n i18n, WorldsModifyCommands modify, WorldsTemplateCommands template)
     {
-        super(modify);
+        super(modify, template);
         this.i18n = i18n;
     }
 
-//    @Command(desc = "Creates a new world")
-//    public void create(CommandCause context,
-//                       String name,
-//                       @Default @Named({"dimension", "dim"}) DimensionType dimension,
-//                       @Named("seed") String seed,
-//                       @Default @Named({"type"}) GeneratorType type,
-//                       @Default @Label("generate") @Named({"structure", "struct"}) boolean generateStructures,
-//                       @Default @Named({"gamemode", "mode"}) GameMode gamemode,
-//                       @Default @Named({"difficulty", "diff"}) Difficulty difficulty,
-//                       @Option @Label("name") @Named({"generator", "gen"}) WorldGeneratorModifier generator,
-//                       @Flag boolean recreate,
-//                       @Flag boolean noload,
-//                       @Flag boolean spawnInMemory)
-//    {
-//        Optional<World> world = Sponge.getServer().getWorld(name);
-//        if (world.isPresent())
-//        {
-//            if (recreate)
-//            {
-//                i18n.send(context, NEGATIVE, "You have to unload a world before recreating it!");
-//                return;
-//            }
-//            i18n.send(context, NEGATIVE, "A world named {world} already exists and is loaded!", world.get());
-//            return;
-//        }
-//        Optional<WorldProperties> worldProperties = Sponge.getServer().getWorldProperties(name);
-//        if (worldProperties.isPresent())
-//        {
-//            if (!recreate)
-//            {
-//                i18n.send(context, NEGATIVE, "A world named {name#world} already exists but is not loaded!", name);
-//                return;
-//            }
-//            worldProperties.get().setEnabled(false);
-//            String newName = name + "_" + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-//            Sponge.getServer().renameWorld(worldProperties.get(), newName);
-//            i18n.send(context, POSITIVE, "Old world moved to {name#folder}", newName);
-//        }
-//
-//        WorldArchetype.Builder builder = WorldArchetype.builder().from(WorldArchetypes.OVERWORLD);
-//        builder.keepsSpawnLoaded(spawnInMemory);
-//        builder.loadsOnStartup(!noload);
-//        if (seed != null)
-//        {
-//            try
-//            {
-//                builder.seed(Long.parseLong(seed));
-//            }
-//            catch (NumberFormatException ignore)
-//            {
-//                builder.seed(seed.hashCode());
-//            }
-//        }
-//
-//        builder.generator(type);
-//        builder.dimension(dimension);
-//        builder.usesMapFeatures(generateStructures);
-//        builder.gameMode(gamemode);
-//        if (generator != null)
-//        {
-//            builder.generatorModifiers(generator);
-//        }
-//        builder.difficulty(difficulty);
-//        try
-//        {
-//            WorldProperties properties = Sponge.getServer().createWorldProperties(name, builder.build("org.cubeengine.customworld:" + UUID.randomUUID().toString(), name));
-//            i18n.send(context, POSITIVE, "World {name} successfully created!", name);
-//            i18n.send(context, NEUTRAL, "This world is not yet loaded! Click {txt#here} to load.",
-//                    i18n.translate(context, TextFormat.NONE, "here").toBuilder().onClick(TextActions.runCommand("/worlds load " + name)).build());
-//        }
-//        catch (IOException e)
-//        {
-//            i18n.send(context, NEGATIVE, "Could not create world!");
-//            throw new IllegalStateException(e); // TODO handle exception better
-//        }
-//    }
-
-//    @Command(desc = "Renames a world")
-//    public void rename(CommandCause context, WorldProperties world, String newName)
-//    {
-//        Optional<World> theWorld = Sponge.getServer().getWorld(world.getUniqueId());
-//        if (theWorld.isPresent())
-//        {
-//            i18n.send(context, POSITIVE, "The world must be unloaded to rename.");
-//            return;
-//        }
-//        String oldName = world.getWorldName();
-//        Sponge.getServer().renameWorld(world, newName);
-//        i18n.send(context, POSITIVE, "The world {name} was renamed to {name}", oldName, newName);
-//    }
-
-    @Command(desc = "Loads a world")
-    public void load(CommandCause context, ResourceKey world)
+    @Command(desc = "Renames a world")
+    public void rename(CommandCause context, ServerWorldProperties world, ResourceKey newName)
     {
-        final CompletableFuture<ServerWorld> futureWorld = Sponge.server().worldManager().loadWorld(world);
+        if (Sponge.server().worldManager().world(world.key()).isPresent())
+        {
+            i18n.send(context, POSITIVE, "The world must be unloaded to rename.");
+            return;
+        }
+        Sponge.server().worldManager().moveWorld(world.key(), newName).whenComplete((b, t) -> {
+            i18n.send(context, POSITIVE, "The world {name} was renamed to {name}", world.key().asString(), newName.asString());
+        });
+    }
+
+    @Command(desc = "Creates a world based on a template")
+    public void create(CommandCause context, WorldTemplate template)
+    {
+        final CompletableFuture<ServerWorld> futureWorld = Sponge.server().worldManager().loadWorld(template);
         if (futureWorld.isDone())
         {
             i18n.send(context, POSITIVE, "The world {world} is already loaded!", futureWorld.join());
             return;
         }
-        else
+        i18n.send(context, NEUTRAL, "Loading {name}...", template.key().asString());
+        futureWorld.whenComplete((w, t) -> {
+            if (w != null)
+            {
+                i18n.send(context, POSITIVE, "World {world} loaded!", w);
+            }
+            else
+            {
+                i18n.send(context, NEGATIVE, "Could not load {name#world}", template.key().asString());
+            }
+        });
+    }
+
+    @Command(desc = "Loads a world")
+    public void load(CommandCause context, ServerWorldProperties world)
+    {
+        final CompletableFuture<ServerWorld> futureWorld = Sponge.server().worldManager().loadWorld(world.key());
+        if (futureWorld.isDone())
         {
-            i18n.send(context, NEGATIVE, "Loading...", world);
-            futureWorld.whenComplete((w, e) -> {
-                if (w != null)
-                {
-                    i18n.send(context, POSITIVE, "World {world} loaded!", w);
-                }
-                else
-                {
-                    i18n.send(context, NEGATIVE, "Could not load {name#world}", world);
-                }
-            });
+            i18n.send(context, NEGATIVE, "The world {world} is already loaded!", futureWorld.join());
+            return;
         }
+        i18n.send(context, NEUTRAL, "Loading {name}...", world.key().asString());
+        futureWorld.whenComplete((w, t) -> {
+            if (w != null)
+            {
+                i18n.send(context, POSITIVE, "World {world} loaded!", w);
+            }
+            else
+            {
+                i18n.send(context, NEGATIVE, "Could not load {name#world}", world.key().asString());
+            }
+        });
     }
 
     @Command(desc = "Unload a loaded world")
@@ -200,16 +141,14 @@ public class WorldsCommands extends DispatcherCommand
     {
         if (!force)
         {
-            Collection<ServerPlayer> entities = world.players();
-            if (!entities.isEmpty())
+            Collection<ServerPlayer> players = world.players();
+            if (!players.isEmpty())
             {
-                int amount = entities.size();
-                i18n.sendN(context, NEUTRAL, amount, "There is still one player on that map!",
+                int amount = players.size();
+                i18n.sendN(context, NEGATIVE, amount, "There is still one player on that map!",
                         "There are still {amount} players on that map!", amount);
                 return;
             }
-            i18n.send(context, NEGATIVE, "Could not unload {world}", world);
-            return;
         }
 
         final WorldManager wm = Sponge.server().worldManager();
@@ -225,11 +164,14 @@ public class WorldsCommands extends DispatcherCommand
         {
             final Vector3i pos = evacuation.properties().spawnPosition();
             final ServerLocation loc = evacuation.location(pos);
-            world.players().forEach(p -> p.setLocation(Sponge.server().teleportHelper().findSafeLocation(loc).orElse(loc)));
+            if (!world.players().isEmpty())
+            {
+                world.players().forEach(p -> p.setLocation(Sponge.server().teleportHelper().findSafeLocation(loc).orElse(loc)));
+                i18n.send(context, POSITIVE, "Teleported all players out of {world}", world);
+            }
         }
 
-        i18n.send(context, POSITIVE, "Teleported all players out of {world}", world);
-
+        i18n.send(context, NEUTRAL, "Unloading {name}...", world.key().asString());
         final CompletableFuture<Boolean> futureNoWorld = wm.unloadWorld(world);
         futureNoWorld.thenAccept(b -> {
             if (b)
