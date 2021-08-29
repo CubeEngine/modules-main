@@ -66,8 +66,7 @@ public class UserSubjectData extends CachingSubjectData
             return player.get().get(key);
         }
         final UserManager userManager = Sponge.server().userManager();
-        User user = userManager.load(uuid).join().get();
-        return user.get(key);
+        return userManager.load(uuid).join().flatMap(u -> u.get(key));
     }
 
     @Override
