@@ -150,6 +150,7 @@ public class UserSubjectData extends CachingSubjectData
         if (permissions.isEmpty())
         {
             permissions.putAll(deserialzeMap(PermissionData.PERMISSIONS));
+            permissions.putIfAbsent(ContextUtil.GLOBAL, Collections.emptyMap());
         }
     }
 
@@ -159,6 +160,7 @@ public class UserSubjectData extends CachingSubjectData
         if (options.isEmpty())
         {
             options.putAll(deserialzeMap(PermissionData.OPTIONS));
+            options.putIfAbsent(ContextUtil.GLOBAL, Collections.emptyMap());
         }
     }
 
