@@ -134,7 +134,7 @@ public class PluginCommands extends PermissionContainer
 
     private String getVersionOf(PluginContainer core)
     {
-        return core.metadata().version();
+        return core.metadata().version().toString();
     }
 
     private String simplifyVersion(String version)

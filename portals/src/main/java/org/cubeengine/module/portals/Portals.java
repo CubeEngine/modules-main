@@ -70,7 +70,7 @@ import static java.util.stream.Collectors.toSet;
 import static org.cubeengine.libcube.service.filesystem.FileExtensionFilter.YAML;
 
 @Singleton
-@Module(dependencies = @Dependency("cubeengine-zoned"))
+@Module(dependencies = @Dependency(value = "cubeengine-zoned", version = "[1.1.0-SNAPSHOT,)"))
 public class Portals
 {
     @Inject private Reflector reflector;

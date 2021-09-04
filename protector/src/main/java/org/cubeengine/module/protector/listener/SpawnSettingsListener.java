@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
 import org.cubeengine.libcube.service.permission.Permission;
@@ -90,7 +90,7 @@ public class SpawnSettingsListener extends PermissionContainer
                 {
                     final ResourceKey entityTypeKey = type.key(RegistryTypes.ENTITY_TYPE);
                     Permission usePerm = pm.register(
-                            SpawnSettingsListener.class, entityTypeKey.value(), "Allows spawning a " + PlainComponentSerializer.plain().serialize(type.asComponent()), spawnEntityPlayerPerm);
+                        SpawnSettingsListener.class, entityTypeKey.value(), "Allows spawning a " + PlainTextComponentSerializer.plainText().serialize(type.asComponent()), spawnEntityPlayerPerm);
                     if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
                     {
                         i18n.send(ChatType.ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");
@@ -106,7 +106,7 @@ public class SpawnSettingsListener extends PermissionContainer
             {
                 final ResourceKey entityTypeKey = type.key(RegistryTypes.ENTITY_TYPE);
                 Permission usePerm = pm.register(
-                        SpawnSettingsListener.class, entityTypeKey.value(), "Allows spawning a " +  PlainComponentSerializer.plain().serialize(type.asComponent()), spawnEntityPlayerPerm);
+                        SpawnSettingsListener.class, entityTypeKey.value(), "Allows spawning a " + PlainTextComponentSerializer.plainText().serialize(type.asComponent()), spawnEntityPlayerPerm);
                 if (checkSetting(event, player.get(), regionsAt, () -> usePerm, (s) -> s.spawn.player.getOrDefault(type, UNDEFINED), UNDEFINED) == FALSE)
                 {
                     i18n.send(ChatType.ACTION_BAR, player.get(), CRITICAL, "You are not allowed spawn this here.");

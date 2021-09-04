@@ -20,7 +20,7 @@ package org.cubeengine.module.vanillaplus.fix;
 import java.util.List;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
@@ -43,7 +43,7 @@ public class ColoredSigns extends PermissionContainer
     @Listener
     public void onSignChange(ChangeSignEvent event, @First ServerPlayer cause)
     {
-        final PlainComponentSerializer plain = PlainComponentSerializer.plain();
+        final PlainTextComponentSerializer plain = PlainTextComponentSerializer.plainText();
         final List<Component> lines = event.text().get();
         if (!cause.hasPermission(SIGN_STYLED.getId()))
         {

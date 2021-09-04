@@ -19,7 +19,6 @@ package org.cubeengine.module.travel;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.cubeengine.libcube.service.Selector;
 import org.cubeengine.libcube.service.command.annotation.ModuleCommand;
 import org.cubeengine.libcube.service.filesystem.ModuleConfig;
 import org.cubeengine.libcube.service.i18n.I18n;
@@ -33,7 +32,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 
 @Singleton
-@Module(dependencies = @Dependency(value = "cubeengine-zoned", optional = true))
+@Module(dependencies = @Dependency(value = "cubeengine-zoned", version = "[1.1.0-SNAPSHOT,)", optional = true))
 public class Travel
 {
     @ModuleConfig private TravelConfig config;

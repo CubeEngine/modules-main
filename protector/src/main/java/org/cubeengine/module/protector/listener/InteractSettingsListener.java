@@ -17,14 +17,13 @@
  */
 package org.cubeengine.module.protector.listener;
 
-import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
-import static org.cubeengine.module.protector.listener.SettingsListener.checkSetting;
-import static org.spongepowered.api.util.Tristate.FALSE;
-import static org.spongepowered.api.util.Tristate.UNDEFINED;
-
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.i18n.I18nTranslate.ChatType;
 import org.cubeengine.libcube.service.permission.Permission;
@@ -34,7 +33,6 @@ import org.cubeengine.module.protector.Protector;
 import org.cubeengine.module.protector.RegionManager;
 import org.cubeengine.module.protector.region.Region;
 import org.spongepowered.api.ResourceKey;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -42,11 +40,9 @@ import org.spongepowered.api.block.entity.BlockEntity;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.data.type.HandTypes;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
-import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.InteractBlockEvent;
-import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.item.inventory.InteractItemEvent;
@@ -54,15 +50,13 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.registry.RegistryTypes;
-import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.util.Tristate;
-import org.spongepowered.api.world.LocatableBlock;
 import org.spongepowered.api.world.server.ServerLocation;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import static org.cubeengine.libcube.service.i18n.formatter.MessageType.CRITICAL;
+import static org.cubeengine.module.protector.listener.SettingsListener.checkSetting;
+import static org.spongepowered.api.util.Tristate.FALSE;
+import static org.spongepowered.api.util.Tristate.UNDEFINED;
 
 @Singleton
 public class InteractSettingsListener extends PermissionContainer
@@ -119,7 +113,7 @@ public class InteractSettingsListener extends PermissionContainer
         ItemType item = event.itemStack().type();
         List<Region> regionsAt = manager.getRegionsAt(player.serverLocation());
         final ResourceKey itemKey = item.key(RegistryTypes.ITEM_TYPE);
-        Permission usePerm = pm.register(SettingsListener.class, itemKey.value(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(item.asComponent()) + " Item in hand", useItemPerm);
+        Permission usePerm = pm.register(SettingsListener.class, itemKey.value(), "Allows interacting with a " + PlainTextComponentSerializer.plainText().serialize(item.asComponent()) + " Item in hand", useItemPerm);
         Tristate set = checkSetting(event, player, regionsAt, () -> usePermission.get(UseType.ITEM), s -> s.use.all.item, UNDEFINED);
         if (checkSetting(event, player, regionsAt, () -> usePerm, (s) -> s.use.item.getOrDefault(item, UNDEFINED), set) == FALSE)
         {
@@ -138,7 +132,7 @@ public class InteractSettingsListener extends PermissionContainer
         ItemStack item = player.itemInHand(HandTypes.MAIN_HAND);
 
         final ResourceKey typeKey = type.key(RegistryTypes.BLOCK_TYPE);
-        Permission blockPerm = pm.register(SettingsListener.class, typeKey.value(), "Allows interacting with a " + PlainComponentSerializer.plain().serialize(type.asComponent()) + " Block", useBlockPerm);
+        Permission blockPerm = pm.register(SettingsListener.class, typeKey.value(), "Allows interacting with a " + PlainTextComponentSerializer.plainText().serialize(type.asComponent()) + " Block", useBlockPerm);
 
         Tristate set = UNDEFINED;
         if (type != BlockTypes.AIR.get())

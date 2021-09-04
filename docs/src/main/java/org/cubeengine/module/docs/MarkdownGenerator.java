@@ -27,7 +27,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.serializer.plain.PlainComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.apache.logging.log4j.Logger;
 import org.cubeengine.libcube.ModuleManager;
@@ -45,7 +44,7 @@ import org.spongepowered.api.command.parameter.Parameter.Value;
 import org.spongepowered.api.command.registrar.CommandRegistrar;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.plugin.PluginContainer;
-import org.spongepowered.plugin.metadata.PluginDependency;
+import org.spongepowered.plugin.metadata.model.PluginDependency;
 
 import static java.util.stream.Collectors.toMap;
 
@@ -111,7 +110,7 @@ public class MarkdownGenerator implements Generator
             }
         }
 
-        List<PluginDependency> plugDep = pc.metadata().dependencies();
+        Set<PluginDependency> plugDep = pc.metadata().dependencies();
         if (plugDep.size() > 2) // ignore cubeengine-core and spongeapi
         {
             sb.append("\n## Dependencies:\n");
