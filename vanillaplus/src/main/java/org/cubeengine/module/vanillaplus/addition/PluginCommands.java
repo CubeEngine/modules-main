@@ -158,22 +158,22 @@ public class PluginCommands extends PermissionContainer
             {
                 case CLIENT:
                     i18n.send(context, NEUTRAL, "This client is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
-                                        meta.name().orElse(meta.id()), platform.minecraftVersion().name(), meta.version());
+                                        meta.name().orElse(meta.id()), platform.minecraftVersion().name(), meta.version().toString());
                     break;
                 case SERVER:
                     i18n.send(context, NEUTRAL, "This server is running {name#server} {name#version:color=INDIGO} {name#version:color=INDIGO}",
-                                        meta.name().orElse(meta.id()), platform.minecraftVersion().name(), meta.version());
+                                        meta.name().orElse(meta.id()), platform.minecraftVersion().name(), meta.version().toString());
                     break;
                 case UNKNOWN:
                     i18n.send(context, NEUTRAL, "Unknown platform running {name#server} {name#version:color=INDIGO} {name#version:color"
                                     + "=INDIGO}",
-                                        meta.name().orElse(meta.id()), platform.minecraftVersion().name(), meta.version());
+                                        meta.name().orElse(meta.id()), platform.minecraftVersion().name(), meta.version().toString());
             }
 
-            i18n.send(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.container(API).metadata().version());
+            i18n.send(context, NEUTRAL, "Sponge API: {input#version:color=INDIGO}", platform.container(API).metadata().version().toString());
             context.sendMessage(Identity.nil(), Component.empty());
 
-            i18n.send(context, NEUTRAL, "with {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.mm.getPlugin(LibCube.class).get().metadata().version());
+            i18n.send(context, NEUTRAL, "with {text:CubeEngine:color=BRIGHT_GREEN} version {input#version:color=INDIGO}", this.mm.getPlugin(LibCube.class).get().metadata().version().toString());
             return;
         }
         if (!COMMAND_VERSION_PLUGINS.check(context))
@@ -200,7 +200,7 @@ public class PluginCommands extends PermissionContainer
         }
         final PluginMetadata meta = instance.get().metadata();
         i18n.send(context, NEUTRAL, "{name#plugin} is currently running in version {input#version:color=INDIGO}.",
-                  meta.name().orElse(meta.id()), meta.version());
+                  meta.name().orElse(meta.id()), meta.version().toString());
         context.sendMessage(Identity.nil(), Component.empty());
 // TODO
         //        i18n.send(context, NEUTRAL, "Plugin information:");
