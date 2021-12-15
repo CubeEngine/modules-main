@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeMap;
@@ -240,7 +241,7 @@ public class MarkdownGenerator implements Generator
             allAliases.remove(primaryAlias);
             if (commandStack.size() == 1)
             {
-                allAliases.remove(mapping.plugin().metadata().id() + ":" + primaryAlias);
+                allAliases.remove(mapping.plugin().map(p -> p.metadata().id()).orElse("???") + ":" + primaryAlias);
             }
             if (!allAliases.isEmpty())
             {
@@ -361,9 +362,9 @@ public class MarkdownGenerator implements Generator
         }
 
         @Override
-        public PluginContainer plugin()
+        public Optional<PluginContainer> plugin()
         {
-            return null;
+            return Optional.empty();
         }
 
         @Override
