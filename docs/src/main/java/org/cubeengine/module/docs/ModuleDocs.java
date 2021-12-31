@@ -17,12 +17,14 @@
  */
 package org.cubeengine.module.docs;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -37,9 +39,9 @@ import org.cubeengine.reflect.ReflectedFile;
 import org.cubeengine.reflect.Reflector;
 import org.cubeengine.reflect.codec.yaml.ReflectedYaml;
 import org.spongepowered.api.Sponge;
-import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.command.Command;
 import org.spongepowered.api.command.manager.CommandMapping;
+import org.spongepowered.api.resource.ResourcePath;
 import org.spongepowered.api.service.permission.PermissionDescription;
 import org.spongepowered.api.service.permission.PermissionService;
 import org.spongepowered.plugin.PluginContainer;
@@ -86,8 +88,9 @@ public class ModuleDocs
         this.moduleName = mm.getModuleName(module).get();
         this.id = plugin.metadata().id();
         this.moduleId = mm.getModuleId(plugin);
-        final Optional<Asset> spongeAsset = Sponge.assetManager().asset(plugin, "info.yml");
-        if (!spongeAsset.isPresent())
+        final Path infoPath = Paths.get("assets", plugin.metadata().id(), "info.yml");
+        final Optional<URI> infoFile = plugin.locateResource(URI.create(infoPath.toString()));
+        if (!infoFile.isPresent())
         {
             this.config = reflector.create(Info.class);
         }
@@ -95,8 +98,7 @@ public class ModuleDocs
         {
             try
             {
-                final byte[] bytes = spongeAsset.get().readBytes();
-                this.config = reflector.load(Info.class, new InputStreamReader(new ByteArrayInputStream(bytes)));
+                this.config = reflector.load(Info.class, new InputStreamReader(infoFile.get().toURL().openStream()));
             }
             catch (IOException e)
             {
@@ -130,15 +132,16 @@ public class ModuleDocs
 
             Files.write(file, generated.getBytes(), StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
 
+            final Path pagesDir = Paths.get("assets", this.pc.metadata().id(), "pages");
             // Copy Markdown pages
             for (String pageName : this.config.pages.values())
             {
-                final Optional<Asset> asset = Sponge.assetManager().asset(this.pc, "pages/" + pageName + ".md");
+                final Optional<URI> asset = this.pc.locateResource(URI.create(pagesDir.resolve(pageName + ".md").toString()));
                 if (asset.isPresent())
                 {
                     Files.createDirectories(modulePages);
                     Path pageFileTarget = modulePages.resolve(pageName + ".md");
-                    asset.get().copyToFile(pageFileTarget);
+                    Files.copy(asset.get().toURL().openStream(), pageFileTarget);
                 }
                 else
                 {

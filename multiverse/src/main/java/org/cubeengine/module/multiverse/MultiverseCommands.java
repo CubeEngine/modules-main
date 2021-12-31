@@ -53,6 +53,7 @@ import org.spongepowered.api.data.persistence.DataView;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.server.ServerWorld;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
@@ -98,7 +99,7 @@ public class MultiverseCommands extends DispatcherCommand
 
                 i18n.send(p, NEUTRAL, "The sky opens up and sucks in the whole world.");
                 p.playSound(Sound.sound(SoundTypes.BLOCK_PORTAL_TRIGGER, Source.NEUTRAL, 1, 1), p.location().position());
-                p.offer(Keys.POTION_EFFECTS, Arrays.asList(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, 2 * 20)));
+                p.offer(Keys.POTION_EFFECTS, Collections.singletonList(PotionEffect.of(PotionEffectTypes.BLINDNESS, 1, Ticks.of(2 * 20))));
                 i18n.send(p, NEUTRAL, "When you open your eyes you now are in {input#univserse}.", universe);
                 p.offer(MultiverseData.DATA, data);
                 p.offer(MultiverseData.UNIVERSE, universe);
