@@ -38,6 +38,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.entity.StandardInventory;
 import org.spongepowered.api.item.inventory.menu.InventoryMenu;
 import org.spongepowered.api.item.inventory.type.ViewableInventory;
+import org.spongepowered.plugin.PluginContainer;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEGATIVE;
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
@@ -49,13 +50,15 @@ import static org.cubeengine.libcube.service.i18n.formatter.MessageType.NEUTRAL;
 @Singleton
 public class InvseeCommand extends PermissionContainer
 {
-    private I18n i18n;
+    private final I18n i18n;
+    private final PluginContainer plugin;
 
     @Inject
-    public InvseeCommand(PermissionManager pm, I18n i18n)
+    public InvseeCommand(PermissionManager pm, I18n i18n, PluginContainer plugin)
     {
         super(pm, VanillaPlus.class);
         this.i18n = i18n;
+        this.plugin = plugin;
     }
 
     public final Permission COMMAND_INVSEE_ENDERCHEST = register("command.invsee.ender", "Allows to look at someones enderchest", null);
@@ -99,6 +102,7 @@ public class InvseeCommand extends PermissionContainer
             viewable = ViewableInventory.builder().type(ContainerTypes.GENERIC_9X3)
                                         .slots(player.enderChestInventory().slots(), 0)
                                         .completeStructure()
+                                        .plugin(plugin)
                                         .build();
         }
         else
@@ -113,6 +117,7 @@ public class InvseeCommand extends PermissionContainer
                                         .slots(playerInventory.storage().slots(), 9)
                                         .slots(playerInventory.hotbar().slots(), 4*9)
                                         .completeStructure()
+                                        .plugin(plugin)
                                         .build();
         }
 
