@@ -171,7 +171,7 @@ public class RegionParser implements ValueParser<Region>, ValueCompleter, Defaul
             if (context.subject() instanceof Locatable)
             {
                 final ServerWorld world = ((Locatable)context.subject()).serverLocation().world();
-                Region region = manager.getRegions(world.key()).get(token);
+                Region region = manager.getRegions(world.key()).get(tokenAsKey.value());
                 if (region != null)
                 {
                     return Optional.of(region);
