@@ -99,7 +99,7 @@ public class ZoneManager
 
     public void define(Audience cmdSource, String name, ZoneConfig cfg, boolean overwrite)
     {
-        if (cfg.isComplete())
+        if (!cfg.isComplete())
         {
             i18n.send(cmdSource, NEGATIVE, "Current selection is incomplete and cannot be saved as a zone");
             return;
