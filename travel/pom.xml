@@ -10,7 +10,7 @@
 
     <artifactId>travel</artifactId>
     <name>Travel</name>
-    <version>1.1.0</version>
+    <version>1.1.1-SNAPSHOT</version>
     <description>Travel anywhere!</description>
 
     <scm>
