@@ -23,7 +23,6 @@ import org.cubeengine.libcube.service.i18n.I18n;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
@@ -40,14 +39,14 @@ public class TamedListener
     }
 
     @Listener
-    public void onInteractWithTamed(InteractEntityEvent event, @First Player player)
+    public void onInteractWithTamed(InteractEntityEvent.Secondary.On event, @First Player player)
     {
         Optional<UUID> uuid = event.entity().get(Keys.TAMER);
         if (uuid.isPresent())
         {
             final Optional<String> owner = Sponge.server().gameProfileManager().uncached().profile(uuid.get()).join().name();
             i18n.send(player, POSITIVE, "This {input#entity} belongs to {user#tamer}!",
-                                event.entity().type().asComponent(), owner.orElse(uuid.get().toString()));
+                      event.entity().type().asComponent(), owner.orElse(uuid.get().toString()));
         }
     }
 }
