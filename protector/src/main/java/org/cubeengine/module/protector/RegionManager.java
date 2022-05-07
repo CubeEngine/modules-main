@@ -90,6 +90,7 @@ public class RegionManager
 
     private Region loadRegion(Region region)
     {
+        // TODO handle unloaded worlds
         ServerWorld world = region.getWorld();
         if (world == null) {
             logger.warn("Region {} was not loaded: Could not find world {}.", region.getName(), region.getWorldName());

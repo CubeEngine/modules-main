@@ -38,7 +38,6 @@ import org.spongepowered.api.Server;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.lifecycle.StartedEngineEvent;
 import org.spongepowered.api.service.context.ContextService;
-import org.spongepowered.api.service.permission.PermissionService;
 
 // TODO fill/empty bucket (in hand)
 // TNT can be ignited ( but no world change )
