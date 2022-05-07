@@ -206,6 +206,7 @@ public class VanillaPlus
         if (config.add.commandUnlimited)
         {
             final UnlimitedItems cmd = momu.registerCommands(event, plugin, this, UnlimitedItems.class);
+            evm.removeListener(cmd);
             evm.registerListener(cmd);
         }
 
