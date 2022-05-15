@@ -31,6 +31,7 @@ import org.cubeengine.module.protector.region.Region;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.block.transaction.NotificationTicket;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.living.Hostile;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
@@ -39,6 +40,8 @@ import org.spongepowered.api.event.EventContextKeys;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.block.InteractBlockEvent;
+import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.filter.cause.Root;
 import org.spongepowered.api.event.world.ExplosionEvent;
@@ -205,6 +208,35 @@ public class BlockSettingsListener extends PermissionContainer
                     return;
                 }
             });
+        }
+    }
+
+    // TODO this is not preventing tnt spawn
+    @Listener
+    public void onNotifyExplosive(NotifyNeighborBlockEvent event, @First ServerPlayer player)
+    {
+        for (final NotificationTicket ticket : event.tickets().stream().filter(t -> t.target().state().type().isAnyOf(BlockTypes.TNT)).toList())
+        {
+            final List<Region> regionsAt = manager.getRegionsAt(ticket.notifier().serverLocation().world(), ticket.targetPosition());
+            if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.build, UNDEFINED) == FALSE)
+            {
+                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "You are not allowed to build here.");
+                return;
+            }
+        }
+    }
+
+    @Listener
+    public void onIgniteTnt(InteractBlockEvent.Secondary event, @First ServerPlayer player)
+    {
+        if (event.block().state().type().isAnyOf(BlockTypes.TNT))
+        {
+            final List<Region> regionsAt = manager.getRegionsAt(event.block().location().get());
+            if (checkSetting(event, player, regionsAt, () -> null, (s) -> s.build, UNDEFINED) == FALSE)
+            {
+                i18n.send(ChatType.ACTION_BAR, player, NEGATIVE, "You are not allowed to build here.");
+                return;
+            }
         }
     }
 }
