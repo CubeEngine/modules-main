@@ -7,8 +7,8 @@ val hikariCPVersion: String by project
 val jooqVersion: String by project
 
 dependencies {
-    implementation("org.jooq:jooq:$jooqVersion") // TODO shade
+    api("org.jooq:jooq:$jooqVersion")
 
-    implementation("org.apache.logging.log4j:log4j-core:$log4jVersion") // TODO provided dependency
-    implementation("com.zaxxer:HikariCP:$hikariCPVersion") // TODO provided dependency
+    compileOnly("org.apache.logging.log4j:log4j-core:$log4jVersion")
+    compileOnly("com.zaxxer:HikariCP:$hikariCPVersion")
 }

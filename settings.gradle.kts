@@ -30,5 +30,5 @@ include("conomy",
         "travel",
         "vanillaplus",
         "worldcontrol",
-        "world",
+        "worlds",
         "zoned")
