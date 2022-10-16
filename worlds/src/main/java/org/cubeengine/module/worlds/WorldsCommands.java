@@ -42,6 +42,7 @@ import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.world.DefaultWorldKeys;
 import org.spongepowered.api.world.gamerule.GameRule;
 import org.spongepowered.api.world.server.ServerLocation;
 import org.spongepowered.api.world.server.ServerWorld;
@@ -153,7 +154,7 @@ public class WorldsCommands extends DispatcherCommand
 
         final WorldManager wm = Sponge.server().worldManager();
 
-        final ServerWorld defWorld = wm.defaultWorld();
+        final ServerWorld defWorld = wm.world(DefaultWorldKeys.DEFAULT).get();
 
         ServerWorld evacuation = wm.world(defWorld.key()).get();
         if (evacuation == world)
