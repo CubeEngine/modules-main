@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    compileOnly("org.cubeengine.module:sql:1.1.0-SNAPSHOT")
+    compileOnly("org.cubeengine.module:sql:9.1.2-SNAPSHOT")
 }
