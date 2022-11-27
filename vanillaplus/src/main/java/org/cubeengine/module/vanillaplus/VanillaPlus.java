@@ -127,6 +127,7 @@ public class VanillaPlus
     @ModuleConfig(early = true) private VanillaPlusConfig config;
     @Inject private EventManager evm;
     @Inject private PluginContainer plugin;
+    private UnlimitedItems unlimitedItemsCommand;
 
     @Listener
     public void onEnable(StartedEngineEvent<Server> event)
@@ -205,8 +206,12 @@ public class VanillaPlus
         }
         if (config.add.commandUnlimited)
         {
-            final UnlimitedItems cmd = momu.registerCommands(event, plugin, this, UnlimitedItems.class);
-            evm.registerListener(cmd);
+            if (unlimitedItemsCommand != null)
+            {
+                evm.removeListener(unlimitedItemsCommand);
+            }
+            unlimitedItemsCommand = momu.registerCommands(event, plugin, this, UnlimitedItems.class);
+            evm.registerListener(unlimitedItemsCommand);
         }
 
         // improvements
