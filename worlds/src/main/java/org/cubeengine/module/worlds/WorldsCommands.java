@@ -41,6 +41,8 @@ import org.spongepowered.api.Platform.Type;
 import org.spongepowered.api.ResourceKey;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
+import org.spongepowered.api.data.Keys;
+import org.spongepowered.api.datapack.DataPacks;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.DefaultWorldKeys;
 import org.spongepowered.api.world.gamerule.GameRule;
@@ -210,8 +212,9 @@ public class WorldsCommands extends DispatcherCommand
                 }
                 if (!folder)
                 {
-                    final WorldTemplate build = WorldTemplate.builder().from(wm.loadTemplate(world).join().get()).loadOnStartup(false).build();
-                    wm.saveTemplate(build);
+                    final WorldTemplate loadedTemplate = Sponge.server().dataPackManager().load(DataPacks.WORLD, world).join().get();
+                    final WorldTemplate noLoadOnStartup = WorldTemplate.builder().from(loadedTemplate).add(Keys.IS_LOAD_ON_STARTUP, false).build();
+                    Sponge.server().dataPackManager().save(noLoadOnStartup);
                     i18n.send(context, POSITIVE, "The world {world} is now disabled and will not load by itself.", world);
                     return CompletableFuture.completedFuture(false);
                 }
@@ -287,14 +290,14 @@ public class WorldsCommands extends DispatcherCommand
         }
         i18n.send(context, NEUTRAL, "Gamemode: {text}", world.gameMode().asComponent());
         i18n.send(context, NEUTRAL, "DimensionType: {input}", world.worldType());
-        if (world.worldGenerationConfig().generateFeatures())
-        {
+//        if (world.worldGenerationConfig().generateFeatures())
+//        {
 //            i18n.send(context, NEUTRAL, "WorldType: {input} with features", world.getGeneratorType().getName());
-        }
-        else
-        {
+//        }
+//        else
+//        {
 //            i18n.send(context, NEUTRAL, "WorldType: {input} no features", world.getGeneratorType().getName());
-        }
+//        }
 
         i18n.send(context, NEUTRAL, "Difficulty {text}", world.difficulty().asComponent());
         if (world.hardcore())
