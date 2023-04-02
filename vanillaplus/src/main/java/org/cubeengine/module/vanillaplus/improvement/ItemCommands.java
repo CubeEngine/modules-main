@@ -22,6 +22,7 @@ import com.google.inject.Singleton;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.cubeengine.libcube.service.command.annotation.Command;
+import org.cubeengine.libcube.service.command.annotation.Default;
 import org.cubeengine.libcube.service.command.annotation.Flag;
 import org.cubeengine.libcube.service.command.annotation.Option;
 import org.cubeengine.libcube.service.command.annotation.Restricted;
@@ -63,7 +64,7 @@ public class ItemCommands extends PermissionContainer
     }
 
     @Command(desc = "Gives the specified Item to a player")
-    public void give(CommandCause context, User player, ItemStackSnapshot itemstack, @Option Integer amount)
+    public void give(CommandCause context, @Default User player, ItemStackSnapshot itemstack, @Option Integer amount)
     {
         final ItemStack item = itemstack.createStack();
         amount = amount == null ? item.maxStackQuantity() : amount;
@@ -76,9 +77,9 @@ public class ItemCommands extends PermissionContainer
         final Inventory inventory = getHotbarFirst(player.isOnline() ? player.player().get().inventory() : player.inventory());
         if (inventory.offer(item.copy()).type() == Type.SUCCESS)
         {
-            Component matname = item.get(Keys.DISPLAY_NAME).get().color(NamedTextColor.GOLD);
+            Component matname = item.require(Keys.DISPLAY_NAME).color(NamedTextColor.GOLD);
             i18n.send(context, POSITIVE, "You gave {user} {amount} {name#item}!", player, amount, matname);
-            if (player.isOnline())
+            if (player.isOnline() && !(context.subject() instanceof ServerPlayer p && p.uniqueId().equals(player.uniqueId())))
             {
                 i18n.send(player.player().get(), POSITIVE, "{user} just gave you {amount} {name#item}!",
                           context.subject().friendlyIdentifier().orElse(context.subject().identifier()), amount, matname);
@@ -106,7 +107,7 @@ public class ItemCommands extends PermissionContainer
             i18n.send(context, NEGATIVE, "Not enough space for the item!");
             return;
         }
-        i18n.send(context, NEUTRAL, "Received: {amount} {text#item}", amount, item.get(Keys.CUSTOM_NAME).get());
+        i18n.send(context, NEUTRAL, "Received: {amount} {name#item}", amount, item.require(Keys.DISPLAY_NAME).color(NamedTextColor.GOLD));
     }
 
     public Inventory getHotbarFirst(Inventory inventory)
