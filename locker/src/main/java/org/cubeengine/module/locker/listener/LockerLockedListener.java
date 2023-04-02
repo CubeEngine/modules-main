@@ -43,7 +43,7 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.block.ChangeBlockEvent;
 import org.spongepowered.api.event.block.InteractBlockEvent;
 import org.spongepowered.api.event.block.NotifyNeighborBlockEvent;
-import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.entity.AttackEntityEvent;
 import org.spongepowered.api.event.entity.InteractEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
@@ -95,7 +95,7 @@ public class LockerLockedListener
     }
 
     @Listener
-    public void onAttackEntity(AttackEntityEvent event, @First EntityDamageSource source)
+    public void onAttackEntity(AttackEntityEvent event, @First DamageSource source)
     {
         ServerPlayer player = findDamageSource(source);
         if (this.handleLockedInteraction(player, event.entity(), false))
@@ -187,16 +187,16 @@ public class LockerLockedListener
         event.filterEntities(entity -> !lockerManager.handleEntityDamage(entity, null));
     }
 
-    public ServerPlayer findDamageSource(EntityDamageSource source)
+    public ServerPlayer findDamageSource(DamageSource source)
     {
         ServerPlayer player = null;
-        if (source.source() instanceof ServerPlayer)
+        if (source.source().orElse(null) instanceof ServerPlayer sp)
         {
-            player = (ServerPlayer) source.source();
+            player = sp;
         }
-        else if (source.source() instanceof Projectile)
+        else if (source.source().orElse(null) instanceof Projectile proj)
         {
-            final ProjectileSource projectileSource = ((Projectile)source.source()).shooter().map(Value::get).orElse(null);
+            final ProjectileSource projectileSource = proj.shooter().map(Value::get).orElse(null);
             if (projectileSource instanceof ServerPlayer)
             {
                 player = ((ServerPlayer)projectileSource);

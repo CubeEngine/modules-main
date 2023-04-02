@@ -44,7 +44,6 @@ import org.cubeengine.module.portals.config.Destination;
 import org.cubeengine.module.portals.config.DestinationConverter;
 import org.cubeengine.module.portals.config.PortalConfig;
 import org.cubeengine.module.zoned.Zoned;
-import org.cubeengine.module.zoned.ZonedItems;
 import org.cubeengine.processor.Dependency;
 import org.cubeengine.processor.Module;
 import org.cubeengine.reflect.Reflector;

@@ -20,7 +20,6 @@ package org.cubeengine.module.protector.listener;
 import java.util.List;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import org.cubeengine.libcube.service.i18n.I18n;
 import org.cubeengine.libcube.service.permission.Permission;
 import org.cubeengine.libcube.service.permission.PermissionContainer;
 import org.cubeengine.libcube.service.permission.PermissionManager;
@@ -35,8 +34,6 @@ import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.Order;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
-import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.entity.ai.SetAITargetEvent;
 import org.spongepowered.api.event.filter.Getter;
@@ -131,12 +128,12 @@ public class DamageSettingsListener extends PermissionContainer
     {
         DamageSource source = event.cause().first(DamageSource.class).get();
         Entity entitySource = null;
-        if (source instanceof EntityDamageSource)
+        if (source.source().isPresent())
         {
-            entitySource = ((EntityDamageSource) source).source();
-            if (source instanceof IndirectEntityDamageSource)
+            entitySource = source.source().get();
+            if (source.indirectSource().isPresent())
             {
-                entitySource = ((IndirectEntityDamageSource) source).indirectSource();
+                entitySource = source.indirectSource().get();
             }
         }
         return entitySource;

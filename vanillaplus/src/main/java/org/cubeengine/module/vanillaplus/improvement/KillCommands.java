@@ -35,11 +35,11 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandCause;
 import org.spongepowered.api.data.Keys;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
+import org.spongepowered.api.event.cause.entity.damage.DamageTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 
 import static org.cubeengine.libcube.service.i18n.formatter.MessageType.*;
 import static org.spongepowered.api.entity.EntityTypes.LIGHTNING_BOLT;
-import static org.spongepowered.api.event.cause.entity.damage.DamageTypes.CUSTOM;
 
 /**
  * {@link #kill0}
@@ -119,7 +119,7 @@ public class KillCommands extends PermissionContainer
         }
 
 
-        player.damage(player.get(Keys.MAX_HEALTH).get(), DamageSource.builder().absolute().type(CUSTOM).build());
+        player.damage(player.get(Keys.MAX_HEALTH).get(), DamageSource.builder().type(DamageTypes.OUT_OF_WORLD).build());
 
         if (force)
         {
