@@ -104,7 +104,7 @@ public class ZoneManager
             i18n.send(cmdSource, NEGATIVE, "Current selection is incomplete and cannot be saved as a zone");
             return;
         }
-        Path dir = this.path.resolve("zones").resolve(cfg.world.getName());
+        Path dir = this.path.resolve("zones");
         Path file = dir.resolve(name + ".yml");
         if (!overwrite && Files.exists(file))
         {
