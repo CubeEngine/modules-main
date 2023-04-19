@@ -161,7 +161,7 @@ public class ZoneParser implements ValueParser<ZoneConfig>, ValueCompleter, Defa
     {
         final Audience audience = context.cause().audience();
 
-        final String token = reader.parseUnquotedString().toLowerCase();
+        final String token = reader.parseUnquotedString();
         if (audience instanceof Locatable)
         {
             ServerWorld world = ((Locatable)audience).serverLocation().world();
